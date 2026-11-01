@@ -77,7 +77,6 @@ export default function MultiPayModal({ open, onClose, kind }: Props) {
 
   const fail = (msg: string) => {
     setErr(msg);
-    toastMsg.error(msg);
   };
 
   const handleConfirm = () => {

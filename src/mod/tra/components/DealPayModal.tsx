@@ -73,11 +73,7 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
 
   const handleSave = () => {
     if (!effectiveDeal) return;
-    if (Object.keys(formErrors).length > 0) {
-      const firstErr = Object.values(formErrors)[0];
-      toastMsg.error(firstErr || 'لطفاً خطاها را برطرف کنید');
-      return;
-    }
+    if (Object.keys(formErrors).length > 0) return;
     const newPayment: DealPayment = {
       id: crypto.randomUUID(),
       date,
