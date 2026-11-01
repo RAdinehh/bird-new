@@ -35,6 +35,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty);
   const [err, setErr] = useState('');
+  const [maintErr, setMaintErr] = useState('');
   const [undoDevice, setUndoDevice] = useState<{ device: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [maintDeviceId, setMaintDeviceId] = useState<string | null>(null);
@@ -191,7 +192,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
   const addMaintenance = (deviceId: string) => {
     const dev = devices.find(d => d.id === deviceId);
     if (!dev) return;
-    if (!maintForm.date || !maintForm.type) { toastMsg.error('تاریخ و نوع تعمیر را وارد کنید'); return; }
+    if (!maintForm.date || !maintForm.type) { setMaintErr('تاریخ و نوع تعمیر را وارد کنید'); return; }
     const log = {
       id: Date.now().toString(),
       date: maintForm.date,
@@ -202,6 +203,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
     const logs = [...((dev as any).maintenanceLogs || []), log];
     updateDevice(deviceId, { maintenanceLogs: logs } as any);
     setMaintForm({ date: '', type: '', cost: '', description: '' });
+    setMaintErr('');
     setMaintDeviceId(null);
     toastMsg.success('تعمیر ثبت شد');
   };
@@ -373,6 +375,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
       <MaintenanceModal
         open={!!maintDeviceId}
         form={maintForm}
+        err={maintErr}
         setForm={setMaintForm}
         onSave={() => { if (maintDeviceId) addMaintenance(maintDeviceId); }}
         onClose={() => setMaintDeviceId(null)}

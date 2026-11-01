@@ -1,7 +1,7 @@
 /**
  * MaintenanceModal.tsx — ثبت رکورد تعمیر برای دستگاه
  */
-import { Btn, BtnRow, Field, Input, Modal, MoneyField, Textarea } from '../../../shr/components/ui';
+import { Btn, BtnRow, Field, Input, Modal, MoneyField, Textarea, ErrorBox } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 
 export interface MaintForm {
@@ -17,10 +17,11 @@ export interface MaintenanceModalProps {
   setForm: (f: MaintForm) => void;
   onSave: () => void;
   onClose: () => void;
+  err?: string;
 }
 
 export default function MaintenanceModal(props: MaintenanceModalProps) {
-  const { open, form, setForm, onSave, onClose } = props;
+  const { open, form, setForm, onSave, onClose, err } = props;
   return (
     <Modal
       open={open}
@@ -33,6 +34,7 @@ export default function MaintenanceModal(props: MaintenanceModalProps) {
         </BtnRow>
       }
     >
+      {err && <ErrorBox>{err}</ErrorBox>}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
         <Field label="تاریخ" required>
           <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })} autoToday />
