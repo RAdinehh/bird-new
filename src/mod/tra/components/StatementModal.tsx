@@ -157,7 +157,8 @@ export default function StatementModal({ open, onClose }: Props) {
     const farmPhone = settings?.farm?.phone || '';
 
     const rows = lines.map(l => {
-      const info = KIND_INFO[l.kind];
+      const isOutP = l.debit > 0 && (l.kind === 'payment_cash' || l.kind === 'payment_card' || l.kind === 'payment_check');
+      const info = isOutP ? { icon: '💸', label: 'پرداخت', color: '#dc2626' } : KIND_INFO[l.kind];
       const metaParts = [info.label];
       if (l.docNumber) metaParts.push(l.docNumber);
       if (l.kind === 'payment_check' && l.checkNo) metaParts.push('#' + l.checkNo);
@@ -260,7 +261,7 @@ td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {lines.map((l, i) => {
-              const info = KIND_INFO[l.kind];
+              const info = (l.debit > 0 && (l.kind === 'payment_cash' || l.kind === 'payment_card' || l.kind === 'payment_check')) ? { icon: '💸', label: 'پرداخت', color: 'var(--danger)' } : KIND_INFO[l.kind];
               const checkInfo = l.checkStatus ? CHECK_INFO[l.checkStatus] : null;
               const amountColor = l.debit > 0 ? 'var(--danger)' : l.credit > 0 ? 'var(--accent)' : 'var(--text)';
               const amountSign = l.debit > 0 ? '+' : l.credit > 0 ? '-' : '';
@@ -277,7 +278,7 @@ td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: info.color, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {info.icon} {info.label}
-                      {l.docNumber && <span style={{ color: 'var(--muted)', fontWeight: 400, marginRight: 4 }}>({l.docNumber})</span>}
+                      {l.docNumber && (l.kind === 'invoice_sale' || l.kind === 'invoice_purchase' || l.kind === 'deal') && <span style={{ color: 'var(--muted)', fontWeight: 400, marginRight: 4 }}>({l.docNumber})</span>}
                     </span>
                     <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', flexShrink: 0 }}>
                       {toFa(l.date)}
