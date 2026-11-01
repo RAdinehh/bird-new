@@ -361,25 +361,6 @@ td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
           </div>
         </>
       )}
-      <div style={{
-        position: 'sticky',
-        bottom: 0,
-        zIndex: 10,
-        backgroundColor: 'var(--card)',
-        paddingTop: '12px',
-        paddingBottom: '12px',
-        marginTop: 'var(--sp-4)',
-        borderTop: '1px solid var(--border)',
-        marginLeft: '-16px',
-        marginRight: '-16px',
-        paddingLeft: '16px',
-        paddingRight: '16px'
-      }}>
-        <ModalFooter actions={[
-          { label: '📄 چاپ / PDF', role: 'primary', onClick: handlePrint, disabled: !partyId || lines.length === 0 },
-          { label: 'بستن', role: 'secondary', onClick: onClose },
-        ]} />
-      </div>
-    </Modal>
+      </Modal>
   );
 }
