@@ -236,7 +236,7 @@ export function useInvoiceForm(params: {
   // باز کردن فرم جدید — همیشه خالی (فقط تاریخ امروز)
   // ⚠️ هرگز داده‌ی فاکتور قبلی کپی نمی‌شود (جلوگیری از ساخت تصادفی رکورد تکراری)
   const openNew = () => {
-    if (parties.length === 0) { toastMsg.error(isPurchase ? 'اول یک فروشنده بسازید' : 'اول یک مشتری بسازید'); return; }
+    if (parties.length === 0) { toastMsg.error(isPurchase ? 'اول یک فروشنده تعریف کنید' : 'اول یک مشتری تعریف کنید'); return; }
     const today = formatJ(new Date(), 'yyyy/MM/dd');
     setForm({
       ...empty(isPurchase),
