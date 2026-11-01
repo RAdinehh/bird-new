@@ -226,10 +226,13 @@ export default function StatementModal({ open, onClose }: Props) {
     .header .doc-info .meta { font-size: 10px; color: #64748b; margin-bottom: 2px; }
     
     /* بخش طرف حساب‌ها */
-    .parties { display: flex; gap: 12px; margin-bottom: 16px; }
-    .party-box { flex: 1; border: 1px solid #cbd5e1; border-radius: 4px; padding: 8px 12px; background: #f8fafc; }
-    .party-box .title { font-size: 10px; color: #64748b; font-weight: 700; margin-bottom: 6px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; }
-    .party-box .info { font-size: 11px; line-height: 1.8; color: #0f172a; }
+    .parties { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .party-box { border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 12px; background: #f8fafc; }
+    .party-box .title { font-size: 11px; color: #334155; font-weight: 700; margin-bottom: 8px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; }
+    .info-row { display: flex; gap: 6px; font-size: 11px; line-height: 1.6; color: #0f172a; margin-bottom: 4px; }
+    .info-row:last-child { margin-bottom: 0; }
+    .info-row .lbl { color: #64748b; width: 50px; flex-shrink: 0; font-weight: 600; }
+    .info-row .val { font-weight: 500; word-break: break-word; }
     
     /* جدول */
     table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
@@ -262,31 +265,25 @@ export default function StatementModal({ open, onClose }: Props) {
       <div class="desc">او روزی‌دهنده است</div>
     </div>
 
-    <div class="doc-info">
-      <h2>صورت‌حساب</h2>
-      <div class="meta">تاریخ چاپ: ${toFa(getTodayJalali())}</div>
-      <div class="meta">بازه: ${toFa(fromDate || '—')} تا ${toFa(toDate || '—')}</div>
+    <div class="doc-info" style="text-align: left;">
+      <div class="meta" style="font-size: 11px; color: #64748b;">تاریخ چاپ: ${toFa(getTodayJalali())}</div>
     </div>
   </div>
 
   <div class="parties">
     <div class="party-box">
       <div class="title">مشخصات فروشنده</div>
-      <div class="info">
-        <strong>${farmName}</strong><br>
-        نشانی: ${farmAddr || '—'} ${farmCity ? `(${farmCity})` : ''}<br>
-        ${farmPostal ? `کد پستی: ${toFa(farmPostal)}<br>` : ''}
-        تلفن: ${farmPhone ? toFa(farmPhone) : '—'}
-      </div>
+      <div class="info-row"><span class="lbl">نام:</span> <span class="val">${farmName}</span></div>
+      <div class="info-row"><span class="lbl">نشانی:</span> <span class="val">${farmAddr || '—'} ${farmCity ? `(${farmCity})` : ''}</span></div>
+      <div class="info-row"><span class="lbl">کد پستی:</span> <span class="val">${farmPostal ? toFa(farmPostal) : '—'}</span></div>
+      <div class="info-row"><span class="lbl">تلفن:</span> <span class="val">${farmPhone ? toFa(farmPhone) : '—'}</span></div>
     </div>
     <div class="party-box">
-      <div class="title">مشخصات خریدار (طرف حساب)</div>
-      <div class="info">
-        <strong>${party?.name || '—'}</strong><br>
-        نشانی: ${party?.address || '—'} ${party?.city ? `(${party.city})` : ''}<br>
-        ${party?.nationalId ? `کد ملی: ${toFa(party.nationalId)}<br>` : ''}
-        تلفن: ${party?.phone ? toFa(party.phone) : '—'}
-      </div>
+      <div class="title">مشخصات خریدار</div>
+      <div class="info-row"><span class="lbl">نام:</span> <span class="val">${party?.name || '—'}</span></div>
+      <div class="info-row"><span class="lbl">نشانی:</span> <span class="val">${party?.address || '—'} ${party?.city ? `(${party.city})` : ''}</span></div>
+      <div class="info-row"><span class="lbl">کد ملی:</span> <span class="val">${party?.nationalId ? toFa(party.nationalId) : '—'}</span></div>
+      <div class="info-row"><span class="lbl">تلفن:</span> <span class="val">${party?.phone ? toFa(party.phone) : '—'}</span></div>
     </div>
   </div>
 
