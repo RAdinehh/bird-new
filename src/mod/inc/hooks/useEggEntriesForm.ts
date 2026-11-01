@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
+import { MSG } from '../../../shr/validation/errorMessages';
 import { recordHistory } from '../../../shr/intelligence';
 import { addDaysJalali, incubationDays } from '../store';
 import type { EggEntry } from '../store';
@@ -42,6 +43,7 @@ export function useEggEntriesForm(params: UseEggEntriesFormParams) {
   } = params;
 
   const [open, setOpen] = useState(false);
+  const [rowErr, setRowErr] = useState('');
   const [multiDeviceId, setMultiDeviceId] = useState('');
   const [hideHatchTip, setHideHatchTip] = useState(() => {
     try { return localStorage.getItem('pm-inc-hide-hatch-tip') === '1'; } catch { return false; }
@@ -94,12 +96,12 @@ export function useEggEntriesForm(params: UseEggEntriesFormParams) {
 
   const addRowToList = async () => {
     const cnt = parseInt(toEn(currentRow.count)) || 0;
-    if (!currentRow.count.trim()) { toastMsg.error('تعداد تخم را وارد کنید'); return; }
-    if (cnt <= 0) { toastMsg.error('تعداد باید بزرگتر از صفر باشد'); return; }
-    if (!currentRow.entryDate.trim()) { toastMsg.error('تاریخ ورود را وارد کنید'); return; }
-    if (currentRow.dealType === 'purchase' && !currentRow.dealData.sellerId) { toastMsg.error('فروشنده را انتخاب کنید'); return; }
-    if (currentRow.dealType === 'partnership' && !currentRow.dealData.partnerId) { toastMsg.error('شریک اجباری است'); return; }
-    if (currentRow.dealType === 'own' && !currentRow.flockId) { toastMsg.error('گله اجباری است'); return; }
+    if (!currentRow.count.trim()) { setRowErr(MSG.required('تعداد تخم')); return; }
+    if (cnt <= 0) { setRowErr(MSG.positiveNumber('تعداد')); return; }
+    if (!currentRow.entryDate.trim()) { setRowErr(MSG.required('تاریخ ورود')); return; }
+    if (currentRow.dealType === 'purchase' && !currentRow.dealData.sellerId) { setRowErr(MSG.select('فروشنده')); return; }
+    if (currentRow.dealType === 'partnership' && !currentRow.dealData.partnerId) { setRowErr(MSG.select('شریک')); return; }
+    if (currentRow.dealType === 'own' && !currentRow.flockId) { setRowErr(MSG.select('گله')); return; }
 
     // چک آماده بودن گله
     if (currentRow.dealType === 'own' && currentRow.flockId) {
@@ -107,7 +109,7 @@ export function useEggEntriesForm(params: UseEggEntriesFormParams) {
       const brd = birds.find(b => b.id === currentRow.birdId);
       const ready = flockReadyForEggs(flk, brd);
       if (!ready.ready) {
-        toastMsg.error('گله به سن تخم‌گذاری نرسیده — سن فعلی ' + toFa(ready.ageDays) + ' روز، حداقل ' + toFa(ready.minAge) + ' روز، ' + toFa(ready.daysLeft) + ' روز مانده');
+        setRowErr('گله به سن تخم‌گذاری نرسیده — سن فعلی ' + toFa(ready.ageDays) + ' روز، حداقل ' + toFa(ready.minAge) + ' روز، ' + toFa(ready.daysLeft) + ' روز مانده');
         return;
       }
     }
@@ -355,6 +357,7 @@ export function useEggEntriesForm(params: UseEggEntriesFormParams) {
 
   return {
     // state
+    rowErr, setRowErr,
     open, setOpen,
     multiDeviceId, setMultiDeviceId,
     hideHatchTip, setHideHatchTip,
