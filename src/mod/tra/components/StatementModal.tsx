@@ -179,21 +179,21 @@ export default function StatementModal({ open, onClose }: Props) {
       const info = isOutP ? { label: 'پرداخت' } : KIND_INFO[l.kind];
       
       const metaParts = [info.label];
-      if (l.docNumber && !isOutP && l.kind !== 'payment_cash' && l.kind !== 'payment_card' && l.kind !== 'payment_check') metaParts.push(l.docNumber);
+      if (l.docNumber && !isOutP) metaParts.push(l.docNumber);
       if (l.kind === 'payment_check' && l.checkNo) metaParts.push('#' + l.checkNo);
       if (l.kind === 'payment_check' && l.bank) metaParts.push(l.bank);
       if (l.kind === 'payment_check' && l.dueDate) metaParts.push('سرسید ' + toFa(l.dueDate));
       
       return `
         <tr>
-          <td class="center">${toFa(l.date)}</td>
+          <td class="center text-muted" style="width: 80px;">${toFa(l.date)}</td>
           <td>
-            <div class="fw-bold">${metaParts.join(' • ')}</div>
+            <div class="fw-bold text-main">${metaParts.join(' • ')}</div>
             ${l.description ? `<div class="text-muted text-sm">${l.description}</div>` : ''}
           </td>
-          <td class="amount text-danger">${l.debit > 0 ? toFa(l.debit.toLocaleString('fa-IR')) : '—'}</td>
-          <td class="amount text-success">${l.credit > 0 ? toFa(l.credit.toLocaleString('fa-IR')) : '—'}</td>
-          <td class="amount fw-bold">${toFa(Math.abs(l.balance).toLocaleString('fa-IR'))} ${l.balance < 0 ? '(بستانکار)' : ''}</td>
+          <td class="amount ${l.debit > 0 ? 'text-danger' : 'text-muted'}">${l.debit > 0 ? toFa(l.debit.toLocaleString('fa-IR')) : '—'}</td>
+          <td class="amount ${l.credit > 0 ? 'text-success' : 'text-muted'}">${l.credit > 0 ? toFa(l.credit.toLocaleString('fa-IR')) : '—'}</td>
+          <td class="amount fw-bold text-main">${toFa(Math.abs(l.balance).toLocaleString('fa-IR'))}</td>
         </tr>
       `;
     }).join('');
@@ -207,66 +207,93 @@ export default function StatementModal({ open, onClose }: Props) {
     @import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
     @page { size: A4; margin: 15mm; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body { 
-      font-family: Vazirmatn, sans-serif; direction: rtl; color: #1e293b; font-size: 11px; background: #fff; line-height: 1.4; 
+      font-family: Vazirmatn, sans-serif; direction: rtl; color: #0f172a; font-size: 12px; background: #fff; line-height: 1.6; 
     }
     
-    .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #16a34a; padding-bottom: 12px; margin-bottom: 16px; }
-    .header h1 { font-size: 22px; color: #16a34a; margin-bottom: 8px; }
-    .header h2 { font-size: 16px; color: #0f172a; margin-bottom: 8px; }
+    /* Typography Helpers */
+    .text-main { color: #0f172a; }
     .text-muted { color: #64748b; }
     .text-sm { font-size: 11px; }
-    .fw-bold { font-weight: 700; }
-    
-    .meta-info { display: flex; justify-content: space-between; background: #f8fafc; padding: 10px 12px; border-radius: 8px; margin-bottom: 16px; border: 1px solid #e2e8f0; }
-    
-    table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 24px; }
-    th { background: #f8fafc; color: #0f172a; padding: 10px 12px; text-align: right; font-weight: 700; border-bottom: 1px solid #e2e8f0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
-    td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; color: #334155; }
-    tr:last-child td { border-bottom: none; }
-    tr:nth-child(even) td { background: #fcfdfe; }
-    .center { text-align: center; }
-    .amount { text-align: left; font-variant-numeric: tabular-nums; direction: ltr; }
     .text-danger { color: #dc2626; }
     .text-success { color: #16a34a; }
+    .fw-bold { font-weight: 700; }
+    .center { text-align: center; }
+    .amount { text-align: left; font-variant-numeric: tabular-nums; direction: ltr; }
+
+    /* Header Layout */
+    .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid #16a34a; padding-bottom: 16px; margin-bottom: 24px; }
+    .header .brand h1 { font-size: 22px; color: #16a34a; margin-bottom: 4px; font-weight: 800; }
+    .header .doc-title { text-align: left; }
+    .header .doc-title h2 { font-size: 20px; color: #0f172a; margin-bottom: 4px; font-weight: 700; letter-spacing: -0.5px; }
     
-    .summary { display: flex; justify-content: flex-end; margin-bottom: 32px; }
-    .summary-box { width: 100%; max-width: 340px; background: #f8fafc; border-radius: 12px; padding: 16px 20px; }
-    .summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 12px; color: #64748b; }
-    .summary-row span:last-child { color: #0f172a; font-weight: 600; }
-    .summary-total { font-size: 14px; font-weight: 700; color: #0f172a; border-top: 1px solid #cbd5e1; padding-top: 12px; margin-top: 8px; }
+    /* Meta Info (Customer & Range) */
+    .meta-grid { display: flex; justify-content: space-between; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 20px; margin-bottom: 24px; }
+    .meta-block { display: flex; flex-direction: column; gap: 4px; }
+    .meta-label { font-size: 10px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .meta-value { font-size: 14px; font-weight: 700; color: #0f172a; }
+    .meta-sub { font-size: 11px; color: #64748b; }
     
-    .footer { display: flex; justify-content: space-between; padding-top: 24px; margin-top: 16px; padding-bottom: 10px; }
-    .signature { text-align: center; color: #94a3b8; font-size: 11px; width: 150px; }
+    /* Table */
+    table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 24px; }
+    th { background: #f1f5f9; color: #334155; padding: 12px 10px; text-align: right; font-weight: 700; border-bottom: 2px solid #cbd5e1; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { padding: 12px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: #f8fafc; }
+    
+    /* Summary Box */
+    .summary-wrapper { display: flex; justify-content: flex-end; margin-bottom: 40px; }
+    .summary-box { 
+      width: 340px; 
+      background: #ffffff; 
+      border: 1px solid #e2e8f0; 
+      border-radius: 10px; 
+      padding: 16px 20px; 
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+    .summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; color: #475569; }
+    .summary-total { font-size: 16px; font-weight: 800; color: #0f172a; border-top: 2px solid #cbd5e1; padding-top: 12px; margin-top: 8px; }
+    
+    /* Footer / Signatures */
+    .footer { display: flex; justify-content: space-between; padding-top: 24px; margin-top: 20px; border-top: 1px solid #e2e8f0; }
+    .signature { text-align: center; color: #94a3b8; font-size: 11px; width: 160px; }
     .signature-box { height: 60px; margin-bottom: 8px; border-bottom: 1px dashed #cbd5e1; }
   </style>
 </head>
 <body>
   <div class="header">
-    <div>
+    <div class="brand">
       <h1>${farmName}</h1>
       <div class="text-muted text-sm">${farmAddr}</div>
       <div class="text-muted text-sm">${farmPhone}</div>
     </div>
-    <div style="text-align: left;">
-      <h2>صورت‌حساب طرف حساب</h2>
+    <div class="doc-title">
+      <h2>صورت‌حساب</h2>
       <div class="text-muted text-sm">تاریخ چاپ: ${toFa(getTodayJalali())}</div>
     </div>
   </div>
   
-  <div class="meta-info">
-    <div><span style="color: #94a3b8; font-size: 11px;">طرف حساب</span><br><strong style="font-size: 13px;">${party?.name || '—'}</strong> ${party?.phone ? `<span style="color: #64748b; font-size: 11px;">(${party.phone})</span>` : ''}</div>
-    <div style="text-align: left;"><span style="color: #94a3b8; font-size: 11px;">بازه زمانی</span><br><strong style="font-size: 13px;">${toFa(fromDate || '—')} تا ${toFa(toDate || '—')}</strong></div>
+  <div class="meta-grid">
+    <div class="meta-block">
+      <div class="meta-label">طرف حساب</div>
+      <div class="meta-value">${party?.name || '—'}</div>
+      <div class="meta-sub">${party?.phone ? `تلفن: ${party.phone}` : ''}</div>
+    </div>
+    <div class="meta-block" style="text-align: left;">
+      <div class="meta-label">بازه زمانی</div>
+      <div class="meta-value" style="direction: rtl;">${toFa(fromDate || '—')} تا ${toFa(toDate || '—')}</div>
+    </div>
   </div>
   
   <table>
     <thead>
       <tr>
         <th style="width: 80px; text-align: center;">تاریخ</th>
-        <th>شرح</th>
-        <th style="width: 120px; text-align: left;">بدهی (تومان)</th>
-        <th style="width: 120px; text-align: left;">پرداخت (تومان)</th>
-        <th style="width: 120px; text-align: left;">مانده (تومان)</th>
+        <th>شرح عملیات</th>
+        <th style="width: 110px; text-align: left;">بدهی (تومان)</th>
+        <th style="width: 110px; text-align: left;">پرداخت (تومان)</th>
+        <th style="width: 110px; text-align: left;">مانده (تومان)</th>
       </tr>
     </thead>
     <tbody>
@@ -274,13 +301,13 @@ export default function StatementModal({ open, onClose }: Props) {
     </tbody>
   </table>
   
-  <div class="summary">
+  <div class="summary-wrapper">
     <div class="summary-box">
-      <div class="summary-row"><span>مجموع بدهی:</span><span class="fw-bold">${toFa(totalDebit.toLocaleString('fa-IR'))}</span></div>
-      <div class="summary-row"><span>مجموع پرداخت:</span><span class="fw-bold">${toFa(totalCredit.toLocaleString('fa-IR'))}</span></div>
+      <div class="summary-row"><span>مجموع بدهی:</span><span class="fw-bold text-main">${toFa(totalDebit.toLocaleString('fa-IR'))}</span></div>
+      <div class="summary-row"><span>مجموع پرداخت:</span><span class="fw-bold text-main">${toFa(totalCredit.toLocaleString('fa-IR'))}</span></div>
       <div class="summary-row summary-total">
         <span>مانده نهایی:</span>
-        <span style="direction: ltr;">${toFa(Math.abs(netBalance).toLocaleString('fa-IR'))} ${netBalance < 0 ? '(بستانکار)' : ''}</span>
+        <span class="${netBalance > 0 ? 'text-danger' : 'text-success'}" style="direction: ltr;">${toFa(Math.abs(netBalance).toLocaleString('fa-IR'))} ${netBalance < 0 ? '(بستانکار)' : ''}</span>
       </div>
     </div>
   </div>
