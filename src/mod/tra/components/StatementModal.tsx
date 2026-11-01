@@ -229,7 +229,18 @@ td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
   };
 
   return (
-    <Modal open={open} onClose={onClose} title="📄 صورت‌حساب طرف حساب" size="lg">
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="📄 صورت‌حساب طرف حساب"
+      size="lg"
+      footer={
+        <ModalFooter actions={[
+          { label: '📄 چاپ / PDF', role: 'primary', onClick: handlePrint, disabled: !partyId || lines.length === 0 },
+          { label: 'بستن', role: 'secondary', onClick: onClose },
+        ]} />
+      }
+    >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 8, paddingTop: 12 }}>
         <Field label="طرف حساب" required>
           <Select value={partyId} onChange={e => setPartyId(e.target.value)}>
