@@ -39,8 +39,8 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
   const vPrevInvoice = (ctx as any).prevInvoice as any | undefined;
   return z.object({
     type: oneOf('نوع فاکتور', ['purchase', 'sale'] as const),
-    date: persianDateOpt('تاریخ'),
-    partyId: optionalId(),
+    date: persianDate('تاریخ'),
+    partyId: requiredId('طرف حساب'),
     category: optionalStr(40),
     items: z.array(z.object({
       id: z.string(),

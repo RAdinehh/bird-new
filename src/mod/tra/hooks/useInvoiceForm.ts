@@ -177,6 +177,14 @@ export function useInvoiceForm(params: {
       })();
       nx.total = calcItemTotal(nx.quantity, nx.unitPrice, nx.discountType, nx.discountValue, factor) + (nx.shipping || 0);
 
+      // auto-calc unknownCount for chick/adult
+      if ((cat === 'chick' || cat === 'adult') && (patch.quantity !== undefined || patch.maleCount !== undefined || patch.femaleCount !== undefined)) {
+        const m = Number(nx.maleCount) || 0;
+        const fe = Number(nx.femaleCount) || 0;
+        const q = Number(nx.quantity) || 0;
+        nx.unknownCount = Math.max(0, q - m - fe);
+      }
+
       const identityFields = ['flockId', 'hatchId', 'stockItemId', 'unit', 'unitPrice', 'birdId', 'breedId', 'description'];
       const isIdentityChange = Object.keys(patch).some(k => identityFields.includes(k));
 
@@ -325,14 +333,15 @@ export function useInvoiceForm(params: {
       const firstErr = zodResult.error.issues[0];
       const path = firstErr.path.join('.');
       const itemMatch = path.match(/^items\.(\d+)\./);
-      const itemLabel = itemMatch ? `قلم ${toFa(parseInt(itemMatch[1]) + 1)}: ` : '';
-      setErr(`${itemLabel}${firstErr.message}`);
+      // inline errors shown by useFormErrors (showError)
+      void itemMatch; void firstErr;
       return;
     }
     // ═══ پایان اعتبارسنجی Zod ═══
     
-    if (!form.partyId) { setErr(isPurchase ? 'فروشنده اجباری است' : 'مشتری اجباری است'); return; }
-    if (!form.date.trim()) { setErr('تاریخ اجباری است'); return; }
+    // inline errors shown by useFormErrors (showError)
+    if (!form.partyId) return;
+    if (!form.date.trim()) return;
 
 
     // ─── اعتبارسنجی نرم (Soft Validation) ───
