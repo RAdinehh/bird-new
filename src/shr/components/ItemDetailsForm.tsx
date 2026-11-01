@@ -78,6 +78,7 @@ interface Props {
   invoiceDate?: string;
   sellerSlot?: React.ReactNode;
 itemIndex?: number;
+  quantityField?: React.ReactNode;
 }
 
 const SecTitle = ({ icon, title }: { icon: string; title: string }) => (
@@ -86,7 +87,7 @@ const SecTitle = ({ icon, title }: { icon: string; title: string }) => (
   </div>
 );
 
-export default function ItemDetailsForm({ category, item, updateItem, isPurchase = false, invoiceDate, sellerSlot, showError, markTouched, itemIndex = 0 }: Props) {
+export default function ItemDetailsForm({ category, item, updateItem, isPurchase = false, invoiceDate, sellerSlot, showError, markTouched, itemIndex = 0, quantityField }: Props) {
   const [hatchOverride, setHatchOverride] = useState(false);
   const err = (field: string) => {
     const kind = isPurchase ? 'purchase' : 'sale';
@@ -209,15 +210,42 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         <SecTitle icon="🧬" title="اطلاعات گله" />
 
         {!isPurchase && (
-          <Field label="منبع جوجه" hint="جوجه از گله موجود می‌آید یا از هچری">
-            <Select value={item.source || 'flock'} onChange={e => {
-              const ns = e.target.value as 'flock' | 'hatch';
-              updateItem({ source: ns, flockId: '', hatchId: '' });
-            }}>
-              <option value="flock">🐔 از گله موجود</option>
-              <option value="hatch">🥚 از هچری</option>
-            </Select>
-          </Field>
+          <Grid2>
+            <Field label="منبع جوجه" hint="جوجه از گله موجود می‌آید یا از هچری">
+              <Select value={item.source || 'flock'} onChange={e => {
+                const ns = e.target.value as 'flock' | 'hatch';
+                updateItem({ source: ns, flockId: '', hatchId: '' });
+              }}>
+                <option value="flock">🐔 از گله موجود</option>
+                <option value="hatch">🥚 از هچری</option>
+              </Select>
+            </Field>
+          {(item.source || 'flock') === 'hatch' ? (
+            <Field label="هچ مبدأ" required error={err('hatchId')} onTouch={touch('hatchId')} hint="هچی که جوجه‌ها از آن آمده">
+              <SmartSelect value={String(item.hatchId || '')} onChange={v => {
+                const h = availableHatches.find(x => x.id === v);
+                if (!h) return;
+                const f = flocks.find(x => x.id === h.generatedFlockId);
+                const age = computeAgeFromHatch(h.date);
+                updateItem({ hatchId: v, source: 'hatch', flockId: h.generatedFlockId || '', birdId: f?.birdId || item.birdId, breedId: f?.breedId || item.breedId, ageDays: age, hatchDate: h.date, maleCount: h.maleCount, femaleCount: h.femaleCount, unknownCount: h.unknownCount, description: item.description || `جوجه از هچ ${h.date}` });
+                setHatchOverride(false);
+              }} options={availableHatches.map(h => ({ value: h.id, label: `${h.date} — ${h.hatched} جوجه` }))} placeholder="— انتخاب هچ —" modalTitle="انتخاب هچ" autoThreshold={6} />
+            </Field>
+          ) : (
+            <Field label="گله مبدأ" required error={err('flockId')} onTouch={touch('flockId')} hint={
+              (item.birdId || item.breedId) && flocksForItem(item).length === 0
+                ? '⚠️ گله‌ای با این پرنده/نژاد یافت نشد — ابتدا از بخش «گله» گله بسازید'
+                : 'گله‌ای که جوجه از آن فروخته می‌شود'
+            }>
+              <SmartSelect value={String(item.flockId || '')} onChange={v => {
+                const f = flocks.find(x => x.id === v);
+                const age = computeAgeFromHatch(f?.hatchDate);
+                updateItem({ flockId: v, source: 'flock', hatchId: '', birdId: f?.birdId || item.birdId, breedId: f?.breedId || item.breedId, ageDays: age != null ? age : (f ? getAgeDays(f) : item.ageDays), hatchDate: f?.hatchDate || item.hatchDate });
+                setHatchOverride(false);
+              }} options={flocksForItem(item)} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" autoThreshold={6} />
+            </Field>
+          )}
+          </Grid2>
         )}
 
         {/* --- بخش ۱: هویت پرنده --- */}
@@ -230,7 +258,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
               const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
               return { value: b.id, label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name };
-            })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={!!item.existingFlockId || (isPurchase && !!item.existingFlockId)} />
+            })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" autoThreshold={6} disabled={!!item.existingFlockId || (!isPurchase && !!item.flockId)} />
             {item.birdId && breedsForBird.length === 0 && (
               <div style={{ color: 'var(--warn)', fontSize: 11, marginTop: 4, fontWeight: 600 }}>
                 ⚠️ این پرنده هنوز نژادی ندارد. ابتدا از بخش «پرنده و نژاد» نژاد تعریف کنید.
@@ -279,33 +307,9 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         </Grid2>
 
         {/* ردیف ۳: منبع (هچ/گله) */}
-        {isPurchase ? (
+        {isPurchase && (
           <Field label="اتصال به گله موجود" hint="اتصال به گله دستی">
             <SmartSelect value={String(item.existingFlockId || '')} onChange={v => updateItem({ existingFlockId: v, flockId: v })} options={flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }))} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله" />
-          </Field>
-        ) : (item.source || 'flock') === 'hatch' ? (
-          <Field label="هچ مبدأ" required error={err('hatchId')} onTouch={touch('hatchId')} hint="هچی که جوجه‌ها از آن آمده">
-            <SmartSelect value={String(item.hatchId || '')} onChange={v => {
-              const h = availableHatches.find(x => x.id === v);
-              if (!h) return;
-              const f = flocks.find(x => x.id === h.generatedFlockId);
-              const age = computeAgeFromHatch(h.date);
-              updateItem({ hatchId: v, source: 'hatch', flockId: h.generatedFlockId || '', birdId: f?.birdId || item.birdId, breedId: f?.breedId || item.breedId, ageDays: age, hatchDate: h.date, maleCount: h.maleCount, femaleCount: h.femaleCount, unknownCount: h.unknownCount, description: item.description || `جوجه از هچ ${h.date}` });
-              setHatchOverride(false);
-            }} options={availableHatches.map(h => ({ value: h.id, label: `${h.date} — ${h.hatched} جوجه` }))} placeholder="— انتخاب هچ —" modalTitle="انتخاب هچ" autoThreshold={6} />
-          </Field>
-        ) : (
-          <Field label="گله مبدأ" required error={err('flockId')} onTouch={touch('flockId')} hint={
-            (item.birdId || item.breedId) && flocksForItem(item).length === 0
-              ? '⚠️ گله‌ای با این پرنده/نژاد یافت نشد — ابتدا از بخش «گله» گله بسازید'
-              : 'گله‌ای که جوجه از آن فروخته می‌شود'
-          }>
-            <SmartSelect value={String(item.flockId || '')} onChange={v => {
-              const f = flocks.find(x => x.id === v);
-              const age = computeAgeFromHatch(f?.hatchDate);
-              updateItem({ flockId: v, source: 'flock', hatchId: '', birdId: f?.birdId || item.birdId, breedId: f?.breedId || item.breedId, ageDays: age != null ? age : (f ? getAgeDays(f) : item.ageDays), hatchDate: f?.hatchDate || item.hatchDate });
-              setHatchOverride(false);
-            }} options={flocksForItem(item)} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" autoThreshold={6} />
           </Field>
         )}
 
@@ -330,6 +334,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               updateItem({ chickWeight: v });
             }} unit="g" min={20} max={100} />
           </Field>
+          {quantityField}
         </Grid2>
 
       </div>
@@ -345,7 +350,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* --- بخش ۱: هویت --- */}
         <Grid2>
           <Field label="نوع پرنده" required error={err('birdId')} onTouch={touch('birdId')} hint={(!isPurchase && item.flockId) ? 'از گله انتخاب‌شده' : undefined}>
-            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} disabled={!!item.existingFlockId || (!isPurchase && !item.flockId)} />
+            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" autoThreshold={6} disabled={!!item.existingFlockId || (!isPurchase && !!item.flockId)} />
           </Field>
           <Field label="نژاد" required error={err('breedId')} onTouch={touch('breedId')} hint={(!isPurchase && item.flockId) ? 'از گله انتخاب‌شده' : undefined}>
             <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {

@@ -342,6 +342,19 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                     showError={showError}
                     markTouched={markTouched}
                     itemIndex={idx}
+                    quantityField={
+                      cat === 'chick' && (UOM_CATEGORIES[cat] || UOM_CATEGORIES.other).units.length === 1 ? (
+                        <Field label="تعداد" required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
+                          <NumField placeholder="تعداد" value={it.quantity > 0 ? toFa(String(it.quantity)) : ''} onChange={e => {
+                            let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
+                            const max = getQuantityMax(cat);
+                            if (max && val > max) val = max;
+                            if (val < 0) val = 0;
+                            updateItem(it.id, { quantity: val });
+                          }} min={0} max={getQuantityMax(cat)} />
+                        </Field>
+                      ) : undefined
+                    }
                   />
                   
 
@@ -360,6 +373,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                       <>
                         {isSingleUnit ? (
                           <Grid2>
+                                                        {cat !== 'chick' && (
                                                         <Field label="تعداد" required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
                               <NumField placeholder="تعداد" value={it.quantity > 0 ? toFa(String(it.quantity)) : ''} onChange={e => {
                                   let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
@@ -369,6 +383,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                                   updateItem(it.id, { quantity: val });
                                 }} min={0} max={getQuantityMax(cat)} />
                             </Field>
+                            )}
                                                         {(cat === 'chick' || cat === 'adult') && isPurchase && (
                                                           <Field label="تعداد سالم" error={showError(`items.${idx}.healthyCount`)} onTouch={() => markTouched(`items.${idx}.healthyCount`)}>
                                                             <NumField placeholder="تعداد" unit="پرنده" value={it.healthyCount != null && it.healthyCount > 0 ? toFa(String(it.healthyCount)) : ''} onChange={e => { const v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || 0; const clamped = v > 0 ? Math.min(v, it.quantity || 0) : null; updateItem(it.id, { healthyCount: clamped }); }} min={0} />
@@ -378,6 +393,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                         ) : (
                           <>
                                                         <Grid2>
+                              {cat !== 'chick' && (
                               <Field label="تعداد" required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
                                 <NumField placeholder="تعداد" value={it.quantity > 0 ? toFa(String(it.quantity)) : ''} onChange={e => {
                                   let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
@@ -387,6 +403,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                                   updateItem(it.id, { quantity: val });
                                 }} min={0} max={getQuantityMax(cat)} />
                               </Field>
+                              )}
                               <Field label="واحد" error={showError(`items.${idx}.unit`)} onTouch={() => markTouched(`items.${idx}.unit`)}>
                                 <Select value={currentUnit} onChange={e => updateItem(it.id, { unit: e.target.value, unitWeight: null })}>
                                   {uom.units.map((u: UOMUnit) => <option key={u.value} value={u.value}>{u.label}</option>)}
