@@ -18,3 +18,4 @@ export * from './Form';
 export * from './Temp';
 
 export * from './CardActions';
+export * from './ModalFooter';
