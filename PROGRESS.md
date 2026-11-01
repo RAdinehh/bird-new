@@ -735,3 +735,21 @@ Deals (معاملات خاص) — چرخه کامل: Deal → Settlement → Inv
 - `addPartyPayment: (p: any)` — نقض L12
 - hatch چندگله + Deal restore با existingFlockId حذف‌شده (باگ‌های مشکوک)
 
+---
+
+## 📅 جلسه ۱۴۰۵/۱۱/۰۱ (شماره ۷ — هماهنگ‌سازی پرداخت + DealPayModal v2)
+
+### ✅ DONE
+- **`PaymentSchema` (Invoice) + `DealPaymentSchema`:** `checkNo` اجباری، `bank`/`dueDate` اختیاری (هماهنگ با SAP F-28)
+- **`DealPayModal` v2:** quick amounts [25٪/50٪/75٪/کل] + partial hint زنده + حروف فارسی (showWords) + Zod validation + FieldHint (Intelligence) + recordHistory
+- **هماهنگی ۳ بخش پرداخت:** Invoice / MultiPayModal / DealPayModal → قانون یکسان
+- **Intelligence:** `recordHistory('tra.deal.payment', amount, {})` بعد از save
+
+### ⏸ PENDING
+1. 🟠 **`MultiPayModal` → Zod:** مهاجرت از `setErr` دستی به `useFormErrors` + `FieldHint`
+2. 🟠 **`PaymentsSection` → `FieldHint`:** برای `payment.amount`
+3. 🟡 **L11 tests:** برای `getDealPaymentFormSchema` (۵-۶ تست)
+4. 🟡 **Refactor `DealPayModal` → `useValidation` + `useFormErrors`** (استاندارد پروژه، به جای `formErrors` دستی)
+5. 🚨 **باگ snapshot:** `dealPayTarget` snapshot قدیمی — کارت ۲۵۸B ولی modal ۴.۲M
+6. 🟠 **مطالبات فاز ۳:** Statement PDF + Aging CSV
+
