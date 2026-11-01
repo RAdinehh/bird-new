@@ -8,7 +8,7 @@ import DatePicker from '../../../shr/components/DatePicker';
 import { useTra, computeDealBalance, DEAL_LABEL } from '../store';
 import { useCtc } from '../../ctc/store';
 import { useSet } from '../../set/store';
-import { toFa } from '../../../shr/utils/fa';
+import { toFa, numberToWords } from '../../../shr/utils/fa';
 import { printHTML } from '../../../shr/utils/export';
 import { getTodayJalali } from '../calc';
 
@@ -246,6 +246,7 @@ export default function StatementModal({ open, onClose }: Props) {
     .summary-table .col-val { text-align: left; direction: ltr; font-variant-numeric: tabular-nums; }
     .summary-table .total-row { background: #f1f5f9; font-weight: 700; color: #0f172a; }
     
+    .amount-words { font-size: 11px; font-weight: 600; margin-bottom: 24px; padding: 10px 12px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 4px; text-align: right; color: #0f172a; line-height: 1.6; }
     .footer { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; padding-top: 16px; border-top: 1px dashed #cbd5e1; }
     .sign-box { text-align: center; font-size: 10px; color: #64748b; }
     .sign-space { height: 60px; }
@@ -312,6 +313,10 @@ export default function StatementModal({ open, onClose }: Props) {
       <tr><td class="col-lbl">مجموع پرداخت:</td><td class="col-val">${toFa(totalCredit.toLocaleString('fa-IR'))}</td></tr>
       <tr class="total-row"><td class="col-lbl">مانده نهایی:</td><td class="col-val" style="color: ${netBalance > 0 ? '#dc2626' : '#16a34a'}">${toFa(Math.abs(netBalance).toLocaleString('fa-IR'))} ${netBalance < 0 ? '(بستانکار)' : ''}</td></tr>
     </table>
+  </div>
+
+  <div class="amount-words">
+    <strong>مانده نهایی به حروف:</strong> ${numberToWords(Math.abs(netBalance))} تومان ${netBalance < 0 ? '(بستانکار)' : ''}
   </div>
 
   <div class="footer">
