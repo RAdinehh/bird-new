@@ -2,7 +2,7 @@
  * GroupsPage.tsx — مدیریت گروه‌های گله
  */
 import { useState, useMemo, useRef } from 'react';
-import { Modal, Btn, BtnRow, Field, Input, Select, Textarea, Grid2 } from '../../../shr/components/ui';
+import { Modal, Btn, BtnRow, Field, Input, Select, Textarea, Grid2, ErrorBox } from '../../../shr/components/ui';
 import { IconX, IconSearch } from '../../../shr/icons';
 import { useFlk, type FlockGroup, type FlockGroupType, type FlockGroupRule } from '../store';
 import { useBrd } from '../../brd/store';
@@ -52,6 +52,7 @@ export default function GroupsPage({ open, onClose }: Props) {
   const { halls } = useHal();
 
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [err, setErr] = useState('');
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [showForm, setShowForm] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -174,6 +175,7 @@ export default function GroupsPage({ open, onClose }: Props) {
     setEditingId(null);
     setForm(EMPTY_FORM);
     setShowForm(true);
+    setErr('');
   };
 
   const handleEdit = (g: FlockGroup) => {
@@ -191,7 +193,7 @@ export default function GroupsPage({ open, onClose }: Props) {
 
   const handleSave = () => {
     if (!form.name.trim()) {
-      toastMsg.error('نام گروه را وارد کنید');
+      setErr('نام گروه را وارد کنید');
       return;
     }
     const data = {
@@ -216,6 +218,7 @@ export default function GroupsPage({ open, onClose }: Props) {
     setShowForm(false);
     setForm(EMPTY_FORM);
     setEditingId(null);
+    setErr('');
   };
 
   const handleArchive = async (g: FlockGroup) => {
@@ -439,6 +442,7 @@ export default function GroupsPage({ open, onClose }: Props) {
             <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="مثلاً: گروه گله‌های ممتاز نژاد مرندی" rows={2} />
           </Field>
 
+          {err && <ErrorBox>{err}</ErrorBox>}
           <BtnRow>
             <Btn variant="primary" onClick={handleSave}>{editingId ? 'ذخیره' : 'ایجاد'}</Btn>
             <Btn onClick={() => { setShowForm(false); setForm(EMPTY_FORM); setEditingId(null); }}>لغو</Btn>
