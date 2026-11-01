@@ -813,6 +813,126 @@ ${label} نیاز به بررسی دارد
 
 ---
 
+### Gap ۸ — Unit normalization نیست 🆕
+
+**وضعیت فعلی:** `recordHistory('tra.price_feed', it.unitPrice)` در `useInvoiceForm.ts:535` — خام، بدون تبدیل به baseUnit.
+
+**مشکل:**
+- کاربر ۱ لیتر @ ۱۰۰,۰۰۰ ثبت می‌کند → recorded: ۱۰۰,۰۰۰
+- کاربر ۵۰۰ml @ ۵۰,۰۰۰ ثبت می‌کند → recorded: ۵۰,۰۰۰ (کاهش ۵۰٪ کاذب!)
+- سیستم فکر می‌کند «تورم کاهش یافت» — در حالی که قیمت هر لیتر یکسان است
+
+**UOM helper هست (`uom.ts`)** — `factor` و `baseUnit` برای هر دسته — ولی در `recordHistory` استفاده نمی‌شود.
+
+**فایل‌های درگیر:**
+- `src/shr/units/uom.ts` (helper آماده)
+- `src/mod/tra/hooks/useInvoiceForm.ts:535` (نیاز به fix)
+- `src/mod/whs/ItemsPage.tsx` (نیاز به fix)
+- `src/mod/whs/MovesPage.tsx:191` (نیاز به fix)
+
+**Fix پیشنهادی:**
+~~~typescript
+const uom = UOM_CATEGORIES[cat];
+const unitDef = uom.units.find(u => u.value === it.unit);
+if (unitDef?.factor) {
+  const basePrice = it.unitPrice / unitDef.factor;
+  recordHistory(`tra.price_${cat}`, basePrice, {});
+}
+~~~
+
+---
+
+### Gap ۹ — Rule mode برای n≥2 (تجهیزات/اجاره) 🆕
+
+**وضعیت فعلی:** `if (n >= 6)` در `historyStore.ts:79` → تجهیزات ۵M→۱۰M با n=2 کور است.
+
+**مشکل:**
+- خرید دماسنج ۱۴۰۳ @ ۵M، ۱۴۰۴ @ ۱۰M → n=2 → هیچ هشداری
+- اجاره سالن ۱۴۰۳ @ ۱۰۰M، ۱۴۰۴ @ ۱۵۰M → n=2 → هیچ هشداری
+- استاندارد SAP: برای material با خرید نادر، threshold بالاتر ولی **n=2 کافی**
+
+**Fix پیشنهادی:**
+- اضافه به `FieldProfile`: پرچم `mode: 'statistical' | 'rule'`
+- برای `equipment.*` و `*.rentAmount`: `mode: 'rule'`
+- در `anomalyDetector`:
+~~~typescript
+if (profile.mode === 'rule') {
+  if (values.length < 2) return null;
+  const ratio = last / prev;
+  if (ratio >= 1.5) return { level: 'orange', reason: 'قیمت X٪ افزایش' };
+  if (ratio <= 0.66) return { level: 'yellow', reason: 'قیمت X٪ کاهش' };
+}
+~~~
+
+---
+
+### Gap ۱۰ — Dedup + Time-span نیست 🆕
+
+**وضعیت فعلی:**
+- `recordHistory` (`historyStore.ts:137`) — بدون dedup
+- `if (n >= 6)` (`historyStore.ts:79`) — بدون شرط زمانی
+
+**مشکل ۱ — بدون dedup:**
+- کاربر ۱۰ بار در یک روز عدد را تغییر می‌دهد و ذخیره می‌کند
+- ۱۰ رکورد با `date: same day` ثبت می‌شود
+- `structuralBreak` وقتی n=6 می‌شود trigger می‌شود
+
+**مشکل ۲ — بدون time-span:**
+- ۶ رکورد در ۷ دقیقه = ۶ رکورد در ۷ ماه
+- هیچ تمایزی وجود ندارد
+
+**Fix پیشنهادی:**
+~~~typescript
+// در recordHistory:
+const last = freshValues[freshValues.length - 1];
+if (last && last.date === today && last.v === value) return;  // no-op
+if (last && last.date === today) { last.v = value; return; }  // update
+
+// در computeStats structuralBreak:
+const timeSpan = daysBetween(first.date, last.date);
+if (timeSpan < 7) return null;  // skip structural break
+~~~
+
+---
+
+### Gap ۱۱ — الگوی فرم tra (نیمه‌کاره) 🆕
+
+**وضعیت فعلی:** `InvoicePage.tsx:461` هنوز `setErr('')` دارد (برخلاف HallsPage).
+
+**الگوی درست** (از `HallsPage.tsx:234` و `BirdsPage.tsx:119`):
+~~~typescript
+const save = () => {
+  attemptSave();
+  if (Object.keys(vErrors).length > 0) return;  // ← فقط return، بدون setErr
+  // ... business logic (تکرار، موجودی) → setError
+};
+~~~
+
+**Anti-pattern فعلی در tra:**
+- `InvoicePage.tsx:461`: `{ setErr(''); return; }` — خطاهای قبلی پاک می‌شود
+- `useInvoiceForm.ts:329, 334, 335`: `setErr(...)` برای validation (باید فقط `return;`)
+
+**فایل‌های درگیر:**
+- `src/mod/tra/InvoicePage.tsx:461`
+- `src/mod/tra/hooks/useInvoiceForm.ts` (خطوط 329, 334, 335)
+
+---
+
+### Gap ۱۲ — AI-BOOT بدون لینک به این سند 🆕 ⚠️ بحرانی
+
+**وضعیت فعلی:** `docs/AI-BOOT.md` لینکی به `validation-intelligence-map.md` ندارد.
+
+**مشکل:**
+- AI جدید فقط ۵ فایل مقدس را می‌خواند (CONSTITUTION, UI-PATTERNS, DECISIONS, PARADIGM, COMPLEX-SCENARIOS)
+- این سند ۸۴۲+ خطی را پیدا نمی‌کند
+- خودش باید ۱ ساعت کد بخواند تا Intelligence را بفهمد
+
+**Fix پیشنهادی:**
+- اضافه به `AI-BOOT.md` بخش «پنج فایل مقدس» → **شش فایل مقدس**
+- `۶. docs/modules/validation-intelligence-map.md — نقشه Intelligence (۸۴۲+ خط)`
+
+---
+
 ## اولویت‌بندی Gap ها (اصلاح‌شده)
 
 | # | Gap | اهمیت | پیچیدگی | اثر |
@@ -824,6 +944,11 @@ ${label} نیاز به بررسی دارد
 | ۵ | Intelligence در whs/inc/hal/egg | 🟡 پایین | بالا | feature آماده ولی غیرفعال |
 | ۶ | inc.temperature bio range | 🟡 پایین | کم | محدوده زیستی ناقص |
 | ۷ | chickWeight پیشوند | 🟢 خیلی پایین | صفر | exception |
+| ۸ | Unit normalization نبود | 🔴 بالا | متوسط | هشدار کاذب از تغییر واحد |
+| ۹ | Rule mode n≥2 | 🟠 متوسط | متوسط | تجهیزات/اجاره کور |
+| ۱۰ | Dedup + Time-span | 🔴 بالا | کم | false positive از تست |
+| ۱۱ | الگوی فرم tra | 🟠 متوسط | کم | نیمه‌کاره (خلاف brd/hal) |
+| ۱۲ | AI-BOOT بدون لینک | 🔴 بحرانی | صفر | AI بعدی سند را پیدا نمی‌کند |
 
 ## قوانین برای AI بعدی
 
