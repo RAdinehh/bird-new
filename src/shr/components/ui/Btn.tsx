@@ -37,7 +37,22 @@ export const Btn = forwardRef<HTMLButtonElement, BtnProps>(({  variant = 'ghost'
 });
 Btn.displayName = 'Btn';
 export function BtnRow({ children }: { children: React.ReactNode }) {
-  const items = React.Children.toArray(children).filter(Boolean);
+  const rawItems = React.Children.toArray(children).filter(Boolean);
+  // RTL standard: primary on right (first in DOM), secondary/outline on left
+  const isPrimary = (el: React.ReactNode): boolean => {
+    if (!React.isValidElement(el)) return false;
+    const props = el.props as { variant?: string };
+    return props?.variant === 'primary';
+  };
+  const allElements = rawItems.every(el => React.isValidElement(el));
+  const items = allElements
+    ? [...rawItems].sort((a, b) => {
+        const aP = isPrimary(a);
+        const bP = isPrimary(b);
+        if (aP === bP) return 0;
+        return aP ? -1 : 1;
+      })
+    : rawItems;
   return (
     <div style={{ display: 'flex', gap: 'var(--sp-2)', width: '100%' }}>
       {items.map((child, i) => (
