@@ -16,7 +16,6 @@
 ۴. `docs/PARADIGM.md` — پارادایم‌های درمانی (مدرن/سنتی)
 ۵. `docs/COMPLEX-SCENARIOS.md` — سناریوهای پیچیده
 ۶. `docs/modules/validation-intelligence-map.md` — نقشه Intelligence (۹۵۰+ خط، ۵ لایه، ۱۳۵ profile)
-۶. `docs/modules/validation-intelligence-map.md` — نقشه Intelligence (۹۵۰+ خط، ۵ لایه، ۱۳۵ profile)
 
 **قبل از هر commit:**
 ~~~bash
