@@ -214,7 +214,7 @@ export default function StatementModal({ open, onClose }: Props) {
     
     /* هدر */
     .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0284c7; padding-bottom: 12px; margin-bottom: 16px; }
-    .header .brand h1 { font-size: 16px; color: #0f172a; margin-bottom: 4px; font-weight: 800; }
+    .header .brand h1 { font-size: 14px; color: #0f172a; margin-bottom: 4px; font-weight: 800; }
     .header .brand p { font-size: 10px; color: #64748b; line-height: 1.6; }
     
     .header .center-title { text-align: center; }
@@ -227,11 +227,11 @@ export default function StatementModal({ open, onClose }: Props) {
     
     /* بخش طرف حساب‌ها */
     .parties { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-    .party-box { border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 12px; background: #f8fafc; }
+    .party-box { border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 10px; background: #f8fafc; }
     .party-box .title { font-size: 11px; color: #334155; font-weight: 700; margin-bottom: 8px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; }
     .info-row { display: flex; gap: 6px; font-size: 11px; line-height: 1.6; color: #0f172a; margin-bottom: 4px; }
     .info-row:last-child { margin-bottom: 0; }
-    .info-row .lbl { color: #64748b; width: 50px; flex-shrink: 0; font-weight: 600; }
+    .info-row .lbl { color: #64748b; white-space: nowrap; flex-shrink: 0; font-weight: 600; margin-left: 4px; }
     .info-row .val { font-weight: 500; word-break: break-word; }
     
     /* جدول */
