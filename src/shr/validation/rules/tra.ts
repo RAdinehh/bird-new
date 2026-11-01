@@ -676,12 +676,7 @@ export function getDealPaymentFormSchema(maxAmount: number) {
       if (!d.checkNo || d.checkNo.trim().length === 0) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('شماره چک'), path: ['checkNo'] });
       }
-      if (!d.bank || d.bank.trim().length === 0) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('نام بانک'), path: ['bank'] });
-      }
-      if (!d.dueDate) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('سرسید چک'), path: ['dueDate'] });
-      }
+
     }
   });
 }
