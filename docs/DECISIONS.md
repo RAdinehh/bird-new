@@ -332,3 +332,38 @@
 - **SHORT = 3000ms** (success)، **STANDARD = 3500ms** (info/warn/error)
 - **دلیل:** W3C WCAG 2.2 (≥۳s) + نظر کاربر (۳-۳.۵s، نه بیشتر)
 - **قانون:** هر toast جدید از `TOAST_DURATION` استفاده کنه، نه عدد مستقیم
+
+## جلسه ۱۴۰۵/۱۱/۰۲ — مستندسازی Intelligence (بدون کد)
+
+### تصمیم
+- `validation-intelligence-map.md` بازسازی ساختاری (نه بازنویسی): ۵ تناقض تصحیح + ۵ بخش جدید (~۳۰۰ خط)
+- `AI-BOOT.md`: پنج فایل مقدس → شش فایل (اضافه شدن Intelligence Map)
+
+### چرا
+- AI قبلی ۱ ساعت برای فهم Intelligence کد خواند — این سند جلوی تکرار را می‌گیرد
+- ۵ تناقض داخلی (structuralBreak ۱۸ vs ۱۶، biologicalRange ۱۲ vs ۸، Coverage Matrix غلط، ...) AI را گمراه می‌کرد
+
+### محتوای جدید
+1. **الگوریتم structuralBreak** (کد + ۵ محدودیت + مثال ایران ۳۶٪)
+2. **۱۴ سناریو** (تنوع تأمین‌کننده، تخفیف حجمی، فصلی، typo، ...) — فاز ۱/۲/۳
+3. **Gap ۸**: Unit normalization (۱L vs 500ml → هشدار کاذب)
+4. **Gap ۹**: Rule mode برای n≥2 (تجهیزات ۵M→۱۰M)
+5. **Gap ۱۰**: Dedup + Time-span (۶ رکورد در ۲ دقیقه = trigger)
+6. **Gap ۱۱**: الگوی فرم tra (wrapper setErr، خلاف HallsPage)
+7. **Gap ۱۲** (بحرانی): AI-BOOT بدون لینک به این سند
+8. **چک‌لیست v2** (۵ بخش: Profile, Unit+History, UI, پیام, AI Discovery, تست)
+9. **Known Naming Issues** (chickWeight، tra.price_chick با ۳ اسم مختلف)
+
+### تصمیم درباره پیاده‌سازی
+- **Deferred:** فاز ۱ کد (unit + dedup + time-span + rule mode + form pattern) — جلسه جدا
+- **Deferred:** فاز ۲ و ۳ سناریوها (فصلی، الگوی کاربر، وارداتی، ...)
+
+### محدودیت‌های پذیرفته‌شده
+- structuralBreak فعلی: ۶ رکورد بدون زمان، فقط صعودی، mean نه median
+- ۱۱ از ۱۴ سناریو در فاز ۱/۲/۳ پیاده نشده
+
+### مرجع
+- commits: 796abdaf, ee3d24a7, 3392aa3c
+- سند: `docs/modules/validation-intelligence-map.md`
+
+*آخرین تصمیم: 1405/11/02*
