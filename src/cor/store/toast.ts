@@ -3,7 +3,7 @@ import { toFa } from '../../shr/utils/fa';
  * toast.ts — سیستم Toast (پیام کوتاه بالای صفحه)
  *
  * زمان‌ها طبق استاندارد Material Design 3:
- *   success: 2s  |  info: 2.5s  |  warn: 3s  |  error: 4s
+ *   success: 3s  |  info: 3.5s  |  warn: 3.5s  |  error: 3.5s
  */
 import { create } from 'zustand';
 
@@ -16,11 +16,24 @@ export interface Toast {
   duration: number;
 }
 
+/**
+ * 🎯 قانون استاندارد پروژه — مدت‌زمان toast
+ * 
+ * منبع: W3C WCAG 2.2 (حداقل ۳s) + نظر کاربر (۳ تا ۳.۵ ثانیه)
+ * 
+ * SHORT = تأییدهای سریع (ذخیره، کپی)
+ * STANDARD = بقیه (اطلاع، هشدار، خطا، عملیات مهم)
+ */
+export const TOAST_DURATION = {
+  SHORT: 3000,     // ۳ ثانیه
+  STANDARD: 3500,  // ۳.۵ ثانیه
+} as const;
+
 const DEFAULT_DURATION: Record<ToastType, number> = {
-  success: 2000,
-  info: 2500,
-  warn: 3000,
-  error: 4000,
+  success: TOAST_DURATION.SHORT,
+  info: TOAST_DURATION.STANDARD,
+  warn: TOAST_DURATION.STANDARD,
+  error: TOAST_DURATION.STANDARD,
 };
 
 interface ToastState {

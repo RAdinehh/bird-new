@@ -304,3 +304,31 @@
 **مرجع:** docs/ERROR-HANDLING.md
 
 *آخرین تصمیم: [1405/11/01] — جلسه ۱۵*
+
+## جلسه ۱۴۰۵/۱۱/۰۱ — ATP + Auto-merge + Toast + UI chick
+
+### ۱. UI chick: weight + quantity دوستونه
+- **فایل:** `InvoiceFormModal.tsx`, `ItemDetailsForm.tsx`
+- **قانون:** `quantityField` prop از والد → `ItemDetailsForm` در Grid2 بعد از وزن اولیه
+- **دلیل:** مطابق الگوی DealsPage و UI-PATTERNS (Grid2 = ۲ ستون)
+
+### ۲. ATP Check فروش (Zod + Defense in depth)
+- **فایل:** `tra.ts`, `invoiceHelpers.ts`, `store.ts`, `useInvoiceForm.ts`
+- **قانون:** فروش از گله/انبار > موجودی → Zod error (نه clamp)
+- **Edit:** `available = currentCount + prevQty`
+- **Multi-item:** تجمیع per flockId/stockItemId (نه چک تک‌تک)
+- **Defense in depth:** `applyInvoiceFlocks` throw + `store.ts` re-throw
+- **متن خطا:** `تعداد فروش (X) بیش از موجودی گله (Y) است`
+- **دلیل:** قبلاً `Math.max(0, ...)` = جوجه فانتوم
+
+### ۳. Auto-merge قلم تکراری
+- **فایل:** `useInvoiceForm.ts`
+- **Identity:** category+unit+unitPrice+flockId+hatchId+stockItemId+birdId+breedId+description
+- **Merge:** quantity/healthy/male/female/unknown/liveWeight جمع می‌شن
+- **دلیل:** هماهنگ با DealsPage.handleSourceChange
+
+### ۴. TOAST_DURATION استاندارد
+- **فایل:** `toast.ts`
+- **SHORT = 3000ms** (success)، **STANDARD = 3500ms** (info/warn/error)
+- **دلیل:** W3C WCAG 2.2 (≥۳s) + نظر کاربر (۳-۳.۵s، نه بیشتر)
+- **قانون:** هر toast جدید از `TOAST_DURATION` استفاده کنه، نه عدد مستقیم

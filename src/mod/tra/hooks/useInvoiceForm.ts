@@ -12,6 +12,23 @@ import { createInvoiceSchema } from '../../../shr/validation/rules/tra';
 import { recordHistory } from '../../../shr/intelligence';
 import { emptyForm as empty, type F } from '../types-invoice';
 import { toastMsg } from '../../../cor/store/toast';
+
+function isSameInvoiceIdentity(a: Partial<InvoiceItem>, b: Partial<InvoiceItem>, defaultCat: string): boolean {
+  const catA = a.category || defaultCat;
+  const catB = b.category || defaultCat;
+  return (
+    catA === catB &&
+    (a.unit || '') === (b.unit || '') &&
+    (a.unitPrice || 0) === (b.unitPrice || 0) &&
+    (a.priceUnit || '') === (b.priceUnit || '') &&
+    (a.flockId || '') === (b.flockId || '') &&
+    (a.hatchId || '') === (b.hatchId || '') &&
+    (a.stockItemId || '') === (b.stockItemId || '') &&
+    (a.birdId || '') === (b.birdId || '') &&
+    (a.breedId || '') === (b.breedId || '') &&
+    (a.description || '').trim() === (b.description || '').trim()
+  );
+}
 import { showConfirmAsync } from '../../../cor/store/dialog';
 
 import { checkHallCapacity } from '../../flk/api/hallCapacity';
@@ -142,24 +159,67 @@ export function useInvoiceForm(params: {
     }] };
   });
   const updateItem = (id: string, patch: Partial<InvoiceItem>) => {
-    setForm(f => ({ ...f, items: f.items.map(x => {
-      if (x.id !== id) return x;
-      const nx = { ...x, ...patch };
+    setForm(f => {
+      const target = f.items.find(x => x.id === id);
+      if (!target) return f;
+
+      const nx = { ...target, ...patch };
       const cat = nx.category || f.category;
       const unit = nx.unit || 'pcs';
       const unitDef = UOM_CATEGORIES[cat]?.units.find((u: any) => u.value === unit);
       const factor = (() => {
         if (unitDef && unitDef.factor !== null) return unitDef.factor;
         if (nx.unitWeight) return nx.unitWeight;
-        // 🆕 adult sale perKg: factor = liveWeight / quantity
         if ((nx.priceUnit === 'perKg' || nx.priceUnit === 'per_kg') && nx.liveWeight && nx.liveWeight > 0 && nx.quantity && nx.quantity > 0) {
           return nx.liveWeight / nx.quantity;
         }
         return 1;
       })();
       nx.total = calcItemTotal(nx.quantity, nx.unitPrice, nx.discountType, nx.discountValue, factor) + (nx.shipping || 0);
-      return nx;
-    }) }));
+
+      const identityFields = ['flockId', 'hatchId', 'stockItemId', 'unit', 'unitPrice', 'birdId', 'breedId', 'description'];
+      const isIdentityChange = Object.keys(patch).some(k => identityFields.includes(k));
+
+      if (isIdentityChange) {
+        const duplicate = f.items.find(y => y.id !== id && isSameInvoiceIdentity(y, nx, f.category || ''));
+        if (duplicate) {
+          const dupUnitDef = UOM_CATEGORIES[cat]?.units.find((u: any) => u.value === (duplicate.unit || 'pcs'));
+          const dupFactor = (() => {
+            if (dupUnitDef && dupUnitDef.factor !== null) return dupUnitDef.factor;
+            if (duplicate.unitWeight) return duplicate.unitWeight;
+            if ((duplicate.priceUnit === 'perKg' || duplicate.priceUnit === 'per_kg') && duplicate.liveWeight && duplicate.liveWeight > 0 && duplicate.quantity && duplicate.quantity > 0) {
+              return duplicate.liveWeight / duplicate.quantity;
+            }
+            return 1;
+          })();
+
+          const mergedQty = (duplicate.quantity || 0) + (nx.quantity || 0);
+          const mergedLiveWeight = (duplicate.liveWeight || 0) + (nx.liveWeight || 0);
+          const mergedFactor = (() => {
+            if ((duplicate.priceUnit === 'perKg' || duplicate.priceUnit === 'per_kg') && mergedLiveWeight > 0 && mergedQty > 0) {
+              return mergedLiveWeight / mergedQty;
+            }
+            return dupFactor;
+          })();
+
+          const mergedObj = {
+            ...duplicate,
+            quantity: mergedQty,
+            healthyCount: (duplicate.healthyCount != null || nx.healthyCount != null) ? ((duplicate.healthyCount || 0) + (nx.healthyCount || 0)) : null,
+            maleCount: (duplicate.maleCount != null || nx.maleCount != null) ? ((duplicate.maleCount || 0) + (nx.maleCount || 0)) : null,
+            femaleCount: (duplicate.femaleCount != null || nx.femaleCount != null) ? ((duplicate.femaleCount || 0) + (nx.femaleCount || 0)) : null,
+            unknownCount: (duplicate.unknownCount != null || nx.unknownCount != null) ? ((duplicate.unknownCount || 0) + (nx.unknownCount || 0)) : null,
+            liveWeight: (duplicate.liveWeight != null || nx.liveWeight != null) ? mergedLiveWeight : null,
+            total: calcItemTotal(mergedQty, duplicate.unitPrice, duplicate.discountType, duplicate.discountValue, mergedFactor) + (duplicate.shipping || 0)
+          };
+
+          setTimeout(() => toastMsg.info('قلم تکراری ادغام شد — مقدار جمع شد'), 0);
+          return { ...f, items: f.items.filter(y => y.id !== id).map(y => y.id === duplicate.id ? mergedObj : y) };
+        }
+      }
+
+      return { ...f, items: f.items.map(x => x.id === id ? nx : x) };
+    });
   };
   const removeItem = (id: string) => setForm(f => ({ ...f, items: f.items.filter(x => x.id !== id) }));
 
@@ -260,7 +320,7 @@ export function useInvoiceForm(params: {
       isPreorder: form.isPreorder,
       deliveryDate: form.deliveryDate || '',
     };
-    const zodResult = createInvoiceSchema({ flocks, whsItems, contacts, invoices, allocations, isEdit: !!form.id } as any).safeParse(validationData);
+    const zodResult = createInvoiceSchema({ flocks, whsItems, contacts, invoices, allocations, isEdit: !!form.id, prevInvoice: form.id ? invoices.find((i: any) => i.id === form.id) : undefined } as any).safeParse(validationData);
     if (!zodResult.success) {
       const firstErr = zodResult.error.issues[0];
       const path = firstErr.path.join('.');
