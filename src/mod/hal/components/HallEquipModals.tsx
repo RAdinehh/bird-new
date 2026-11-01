@@ -33,6 +33,8 @@ export interface HallEquipModalsProps {
   pickerType: string;
   setPickerType: (v: string) => void;
   pickerName: string;
+  err?: string;
+  setErr?: (e: string) => void;
   setPickerName: (v: string) => void;
   pickerCount: string;
   setPickerCount: (v: string) => void;
@@ -58,6 +60,7 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
     openPicker, openEdit, removeEquip,
     picker, setPicker, pickerCat, pickerType, setPickerType,
     pickerName, setPickerName, pickerCount, setPickerCount, pickerCap, setPickerCap,
+    err, setErr,
     saveNewEquip, typesForCategory, equipment,
     editId, setEditId, currentEdit, editCount, setEditCount, editCap, setEditCap, saveEdit,
   } = props;
@@ -193,7 +196,7 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
           />
         </Field>
 
-        <Field label="نام تجهیز" required>
+        <Field label="نام تجهیز" required error={err}>
           <Input
             placeholder="مثلاً — فن تونلی سالن ۱"
             value={pickerName}

@@ -71,6 +71,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
   const [pickerCount, setPickerCount] = useState<string>('');
   const [pickerCap, setPickerCap] = useState<string>('');
   const [pickerName, setPickerName] = useState<string>('');
+  const [err, setErr] = useState('');
 
   // Edit state
   const [editId, setEditId] = useState<string | null>(null);
@@ -156,14 +157,15 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
     setPickerCount('');
     setPickerCap('');
     setPickerName('');
+    setErr('');
     setPicker(true);
   };
 
   const saveNewEquip = () => {
-    if (!pickerName.trim()) { toastMsg.error('نام تجهیز را وارد کنید'); return; }
+    if (!pickerName.trim()) { setErr('نام تجهیز را وارد کنید'); return; }
     const name = pickerName.trim();
     const dup = hallEquips.find((x) => x.type === pickerType && x.name.trim() === name);
-    if (dup) { toastMsg.error('این تجهیز قبلاً در همین سالن ثبت شده'); return; }
+    if (dup) { setErr('این تجهیز قبلاً در همین سالن ثبت شده'); return; }
     const def = getEquipUnit(pickerType);
     const capValue = pickerCap
       ? parseFloat(toEn(pickerCap).replace('٫', '.')) || null
@@ -371,6 +373,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
         picker={picker} setPicker={setPicker} pickerCat={pickerCat}
         pickerType={pickerType} setPickerType={setPickerType}
         pickerName={pickerName} setPickerName={setPickerName}
+        err={err} setErr={setErr}
         pickerCount={pickerCount} setPickerCount={setPickerCount}
         pickerCap={pickerCap} setPickerCap={setPickerCap}
         saveNewEquip={saveNewEquip} typesForCategory={typesForCategory}
