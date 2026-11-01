@@ -212,15 +212,15 @@ export default function StatementModal({ open, onClose }: Props) {
     
     /* هدر */
     .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0284c7; padding-bottom: 12px; margin-bottom: 16px; }
-    .header .brand h1 { font-size: 18px; color: #0284c7; margin-bottom: 4px; font-weight: 800; }
+    .header .brand h1 { font-size: 16px; color: #0f172a; margin-bottom: 4px; font-weight: 800; }
     .header .brand p { font-size: 10px; color: #64748b; line-height: 1.6; }
     
     .header .center-title { text-align: center; }
-    .header .center-title .arq { font-size: 20px; font-weight: 900; color: #16a34a; letter-spacing: 1px; }
+    .header .center-title .arq { font-size: 16px; font-weight: 900; color: #0f172a; letter-spacing: 1px; }
     .header .center-title .desc { font-size: 10px; color: #64748b; font-weight: 600; margin-top: 2px; }
     
     .header .doc-info { text-align: left; }
-    .header .doc-info h2 { font-size: 18px; margin-bottom: 4px; color: #0f172a; font-weight: 700; }
+    .header .doc-info h2 { font-size: 16px; margin-bottom: 4px; color: #0f172a; font-weight: 700; }
     .header .doc-info .meta { font-size: 10px; color: #64748b; margin-bottom: 2px; }
     
     /* بخش طرف حساب‌ها */
