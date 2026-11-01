@@ -186,15 +186,15 @@ export default function StatementModal({ open, onClose }: Props) {
       
       return `
         <tr>
-          <td class="col-center">${toFa(index + 1)}</td>
-          <td class="col-center">${toFa(l.date)}</td>
-          <td class="col-right">
+          <td class="td-center">${toFa(index + 1)}</td>
+          <td class="td-center">${toFa(l.date)}</td>
+          <td class="td-right">
             <div style="font-weight: 600;">${metaParts.join(' - ')}</div>
             ${l.description ? `<div style="font-size: 10px; color: #64748b; margin-top: 2px; font-weight: 400;">${l.description}</div>` : ''}
           </td>
-          <td class="col-left" style="color: #dc2626;">${l.debit > 0 ? toFa(l.debit.toLocaleString('fa-IR')) : '—'}</td>
-          <td class="col-left" style="color: #16a34a;">${l.credit > 0 ? toFa(l.credit.toLocaleString('fa-IR')) : '—'}</td>
-          <td class="col-left" style="font-weight: 700;">${toFa(Math.abs(l.balance).toLocaleString('fa-IR'))}</td>
+          <td class="td-left" style="color: #dc2626;">${l.debit > 0 ? toFa(l.debit.toLocaleString('fa-IR')) : '—'}</td>
+          <td class="td-left" style="color: #16a34a;">${l.credit > 0 ? toFa(l.credit.toLocaleString('fa-IR')) : '—'}</td>
+          <td class="td-left" style="font-weight: 700;">${toFa(Math.abs(l.balance).toLocaleString('fa-IR'))}</td>
         </tr>
       `;
     }).join('');
@@ -212,43 +212,42 @@ export default function StatementModal({ open, onClose }: Props) {
     
     .invoice-box { max-width: 800px; margin: auto; border: 1px solid #cbd5e1; padding: 16px; border-radius: 4px; }
     
-    /* هدر */
-    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0284c7; padding-bottom: 12px; margin-bottom: 16px; }
-    .header .brand h1 { font-size: 14px; color: #0f172a; margin-bottom: 4px; font-weight: 800; }
-    .header .brand p { font-size: 10px; color: #64748b; line-height: 1.6; }
-    
-    .header .center-title { text-align: center; }
-    .header .center-title .arq { font-size: 16px; font-weight: 900; color: #0f172a; letter-spacing: 1px; }
-    .header .center-title .desc { font-size: 10px; color: #64748b; font-weight: 600; margin-top: 2px; }
-    
+    .header { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; border-bottom: 2px solid #0284c7; padding-bottom: 12px; margin-bottom: 16px; }
+    .header .brand { text-align: right; }
+    .header .brand h1 { font-size: 14px; color: #0f172a; font-weight: 800; margin-bottom: 2px; }
+    .header .center-title { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .header .center-title .arq { font-size: 14px; font-weight: 900; color: #0f172a; }
+    .header .center-title .desc { font-size: 9px; color: #64748b; font-weight: 600; }
     .header .doc-info { text-align: left; }
-    .header .doc-info h2 { font-size: 16px; margin-bottom: 4px; color: #0f172a; font-weight: 700; }
-    .header .doc-info .meta { font-size: 10px; color: #64748b; margin-bottom: 2px; }
+    .header .doc-info .meta { font-size: 10px; color: #64748b; font-weight: 600; }
     
-    /* بخش طرف حساب‌ها */
     .parties { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-    .party-box { border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 10px; background: #f8fafc; }
-    .party-box .title { font-size: 11px; color: #334155; font-weight: 700; margin-bottom: 8px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; }
-    .info-row { display: flex; gap: 6px; font-size: 11px; line-height: 1.6; color: #0f172a; margin-bottom: 4px; }
-    .info-row:last-child { margin-bottom: 0; }
-    .info-row .lbl { color: #64748b; white-space: nowrap; flex-shrink: 0; font-weight: 600; margin-left: 4px; }
-    .info-row .val { font-weight: 500; word-break: break-word; }
+    .party-box { border: 1px solid #cbd5e1; border-radius: 4px; padding: 8px 10px; background: #f8fafc; }
+    .party-box .title { font-size: 10px; color: #334155; font-weight: 700; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 6px; text-align: right; }
+    .info-grid { display: grid; grid-template-columns: 50px 1fr; gap: 4px 8px; }
+    .info-lbl { color: #64748b; font-size: 10px; font-weight: 600; text-align: right; }
+    .info-val { color: #0f172a; font-size: 11px; font-weight: 500; text-align: right; word-break: break-word; }
     
-    /* جدول */
-    table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
-    th { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px; text-align: center; font-weight: 700; font-size: 10px; color: #334155; }
-    td { border: 1px solid #cbd5e1; padding: 8px; text-align: center; vertical-align: middle; }
-    .amount { text-align: left; font-variant-numeric: tabular-nums; direction: ltr; }
+    /* تنظیمات قفل شده جدول */
+    table { width: 100%; border-collapse: collapse; margin-bottom: 16px; table-layout: fixed; }
+    th, td { border: 1px solid #cbd5e1; padding: 8px 6px; font-size: 11px; }
+    th { background: #f1f5f9; font-weight: 700; color: #334155; font-size: 11px; text-align: center; white-space: nowrap; }
+    td { vertical-align: middle; }
     
-    /* خلاصه */
-    .summary { display: flex; justify-content: flex-end; margin-bottom: 16px; }
-    .summary-table { width: 320px; border-collapse: collapse; }
-    .summary-table td { border: 1px solid #cbd5e1; padding: 6px 10px; font-size: 11px; }
-    .summary-table .total { background: #f8fafc; font-weight: 700; font-size: 13px; color: #0f172a; }
+    /* کلاس‌های ترازبندی */
+    .td-center { text-align: center; }
+    .td-right { text-align: right; }
+    .td-left { text-align: left; direction: ltr; font-variant-numeric: tabular-nums; }
     
-    /* فوتر (امضا) */
-    .footer { display: flex; justify-content: space-between; margin-top: 24px; padding-top: 12px; border-top: 1px dashed #cbd5e1; }
-    .sign-box { width: 180px; text-align: center; font-size: 10px; color: #64748b; }
+    .summary-wrapper { display: flex; justify-content: flex-start; margin-bottom: 24px; }
+    .summary-table { width: 320px; border-collapse: collapse; table-layout: fixed; }
+    .summary-table td { border: 1px solid #cbd5e1; padding: 8px 10px; font-size: 11px; }
+    .summary-table .col-lbl { text-align: right; color: #334155; font-weight: 600; }
+    .summary-table .col-val { text-align: left; direction: ltr; font-variant-numeric: tabular-nums; }
+    .summary-table .total-row { background: #f1f5f9; font-weight: 700; color: #0f172a; }
+    
+    .footer { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; padding-top: 16px; border-top: 1px dashed #cbd5e1; }
+    .sign-box { text-align: center; font-size: 10px; color: #64748b; }
     .sign-space { height: 60px; }
   </style>
 </head>
@@ -265,37 +264,41 @@ export default function StatementModal({ open, onClose }: Props) {
       <div class="desc">او روزی‌دهنده است</div>
     </div>
 
-    <div class="doc-info" style="text-align: left;">
-      <div class="meta" style="font-size: 11px; color: #64748b;">تاریخ چاپ: ${toFa(getTodayJalali())}</div>
+    <div class="doc-info">
+      <div class="meta">تاریخ چاپ: ${toFa(getTodayJalali())}</div>
     </div>
   </div>
 
   <div class="parties">
     <div class="party-box">
       <div class="title">مشخصات فروشنده</div>
-      <div class="info-row"><span class="lbl">نام:</span> <span class="val">${farmName}</span></div>
-      <div class="info-row"><span class="lbl">نشانی:</span> <span class="val">${farmAddr || '—'} ${farmCity ? `(${farmCity})` : ''}</span></div>
-      <div class="info-row"><span class="lbl">کد پستی:</span> <span class="val">${farmPostal ? toFa(farmPostal) : '—'}</span></div>
-      <div class="info-row"><span class="lbl">تلفن:</span> <span class="val">${farmPhone ? toFa(farmPhone) : '—'}</span></div>
+      <div class="info-grid">
+        <div class="info-lbl">نام:</div><div class="info-val">${farmName}</div>
+        <div class="info-lbl">نشانی:</div><div class="info-val">${farmAddr || '—'} ${farmCity ? `(${farmCity})` : ''}</div>
+        <div class="info-lbl">کد پستی:</div><div class="info-val">${farmPostal ? toFa(farmPostal) : '—'}</div>
+        <div class="info-lbl">تلفن:</div><div class="info-val">${farmPhone ? toFa(farmPhone) : '—'}</div>
+      </div>
     </div>
     <div class="party-box">
       <div class="title">مشخصات خریدار</div>
-      <div class="info-row"><span class="lbl">نام:</span> <span class="val">${party?.name || '—'}</span></div>
-      <div class="info-row"><span class="lbl">نشانی:</span> <span class="val">${party?.address || '—'} ${party?.city ? `(${party.city})` : ''}</span></div>
-      <div class="info-row"><span class="lbl">کد ملی:</span> <span class="val">${party?.nationalId ? toFa(party.nationalId) : '—'}</span></div>
-      <div class="info-row"><span class="lbl">تلفن:</span> <span class="val">${party?.phone ? toFa(party.phone) : '—'}</span></div>
+      <div class="info-grid">
+        <div class="info-lbl">نام:</div><div class="info-val">${party?.name || '—'}</div>
+        <div class="info-lbl">نشانی:</div><div class="info-val">${party?.address || '—'} ${party?.city ? `(${party.city})` : ''}</div>
+        <div class="info-lbl">کد ملی:</div><div class="info-val">${party?.nationalId ? toFa(party.nationalId) : '—'}</div>
+        <div class="info-lbl">تلفن:</div><div class="info-val">${party?.phone ? toFa(party.phone) : '—'}</div>
+      </div>
     </div>
   </div>
 
   <table>
     <thead>
       <tr>
-        <th style="width: 30px;">ردیف</th>
+        <th style="width: 40px;">ردیف</th>
         <th style="width: 80px;">تاریخ</th>
-        <th style="text-align: right;">شرح عملیات</th>
-        <th style="width: 100px; text-align: left;">بدهی (تومان)</th>
-        <th style="width: 100px; text-align: left;">پرداخت (تومان)</th>
-        <th style="width: 100px; text-align: left;">مانده (تومان)</th>
+        <th>شرح عملیات</th>
+        <th style="width: 110px;">بدهی (تومان)</th>
+        <th style="width: 110px;">پرداخت (تومان)</th>
+        <th style="width: 110px;">مانده (تومان)</th>
       </tr>
     </thead>
     <tbody>
@@ -303,11 +306,11 @@ export default function StatementModal({ open, onClose }: Props) {
     </tbody>
   </table>
 
-  <div class="summary">
+  <div class="summary-wrapper">
     <table class="summary-table">
-      <tr><td>جمع کل بدهی:</td><td class="amount">${toFa(totalDebit.toLocaleString('fa-IR'))}</td></tr>
-      <tr><td>مجموع پرداخت:</td><td class="amount">${toFa(totalCredit.toLocaleString('fa-IR'))}</td></tr>
-      <tr class="total"><td>مانده نهایی:</td><td class="amount" style="color: ${netBalance > 0 ? '#dc2626' : '#16a34a'}">${toFa(Math.abs(netBalance).toLocaleString('fa-IR'))} ${netBalance < 0 ? '(بستانکار)' : ''}</td></tr>
+      <tr><td class="col-lbl">جمع کل بدهی:</td><td class="col-val">${toFa(totalDebit.toLocaleString('fa-IR'))}</td></tr>
+      <tr><td class="col-lbl">مجموع پرداخت:</td><td class="col-val">${toFa(totalCredit.toLocaleString('fa-IR'))}</td></tr>
+      <tr class="total-row"><td class="col-lbl">مانده نهایی:</td><td class="col-val" style="color: ${netBalance > 0 ? '#dc2626' : '#16a34a'}">${toFa(Math.abs(netBalance).toLocaleString('fa-IR'))} ${netBalance < 0 ? '(بستانکار)' : ''}</td></tr>
     </table>
   </div>
 
