@@ -142,6 +142,8 @@ ${farmName} 🐔`;
     fontFamily: 'inherit',
   });
 
+  const isCustomChannel = !CHANNEL_PRESETS.includes(channel);
+
   return (
     <Modal
       open={open}
@@ -159,7 +161,7 @@ ${farmName} 🐔`;
         padding: 'var(--pad-normal)',
         background: 'var(--input-bg)',
         borderRadius: 'var(--r-sm)',
-        marginBottom: 'var(--sp-3)',
+        marginBottom: 'var(--sp-2)',
         fontSize: 'var(--fs-sm)',
         lineHeight: 1.8,
       }}>
@@ -168,15 +170,25 @@ ${farmName} 🐔`;
         <div style={{ color: 'var(--muted)' }}>📅 {daysPhrase}</div>
       </div>
 
-      <Field label="کانال" hint="می‌تونید دستی هم بنویسید">
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
+      <Field label="کانال">
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: isCustomChannel ? 6 : 0 }}>
           {CHANNEL_PRESETS.map(c => (
             <button key={c} type="button" onClick={() => setChannel(c)} style={chipStyle(channel === c)}>
               {c}
             </button>
           ))}
+          <button type="button" onClick={() => setChannel('')} style={chipStyle(isCustomChannel)}>
+            سایر
+          </button>
         </div>
-        <Input value={channel} onChange={e => setChannel(e.target.value)} placeholder="واتس‌اپ" />
+        {isCustomChannel && (
+          <Input
+            value={channel}
+            onChange={e => setChannel(e.target.value)}
+            placeholder="نام کانال..."
+            autoFocus={false}
+          />
+        )}
       </Field>
 
       <Field label="پیام" hint="قابل ویرایش">
@@ -195,22 +207,22 @@ ${farmName} 🐔`;
 
 
       <Field label="یادآوری بعدی">
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
           {[3, 7, 14, 30].map(d => (
             <button key={d} type="button" onClick={() => setIntervalDaysStr(String(d))} style={chipStyle(intervalDaysStr === String(d))}>
               {toFa(d)} روز
             </button>
           ))}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginRight: 'auto' }}>
-            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>دلخواه:</span>
-            <Input
-              inputMode="tel"
-              value={intervalDaysStr}
-              onChange={e => setIntervalDaysStr(e.target.value.replace(/[^0-9۰-۹]/g, ''))}
-              style={{ width: 70, textAlign: 'center' }}
-            />
-            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>روز</span>
-          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>دلخواه:</span>
+          <Input
+            inputMode="tel"
+            value={intervalDaysStr}
+            onChange={e => setIntervalDaysStr(e.target.value.replace(/[^0-9۰-۹]/g, ''))}
+            style={{ width: 70, textAlign: 'center' }}
+          />
+          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>روز</span>
         </div>
       </Field>
 
