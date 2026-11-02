@@ -796,14 +796,20 @@ ${label} نیاز به بررسی دارد
 
 ---
 
-### Gap ۵ — Intelligence در whs/inc/hal/egg
+### Gap ۵ — Intelligence در whs/inc/hal/egg (🟢 ۷۵٪ رفع‌شده — 2026/11/02)
 
-- whs: فقط `recordHistory` در ItemsPage و MovesPage — بدون FieldHint
-- inc: فقط `recordHistory` در useEggEntriesForm — بدون FieldHint
-- hal: هیچ connection
-- egg: هیچ connection
+| ماژول | قبل | بعد |
+|---|---|---|
+| egg | ۰ FieldHint | ✅ ۶ FieldHint (ProductionFormModal: eating/fertile/broken/soft/dirty/avgWeight) |
+| inc | ۰ FieldHint | ✅ ۱ FieldHint (DeviceFormModal: temperature) |
+| hal | ۰ OverrideHint | ✅ ۳ OverrideHint (HallsFormModal: capacity, targetTemp, targetHumidity) — الگوی بهتر از FieldHint (autoFrom + reset + diff با استاندارد نژاد) |
+| whs | ۰ FieldHint | ⏸ PENDING (ItemsFormModal, MoveFormModal) |
 
-**نکته:** این ماژول‌ها `recordHistory` دارن (یاد می‌گیرن) ولی FieldHint ندارن (نشون نمی‌دن).
+**Gap ۵ باقی‌مونده:**
+- whs: ۵-۶ FieldHint potential (unitPrice, currentStock, dosePerBird, withdrawalDays, ...)
+- hal: density و equipCount فیلد ورودی نیستن (density از استاندارد نژاد محاسبه می‌شه، equipCount شمارش تجهیزاته)
+
+**قانون برای AI بعدی:** برای فیلدهایی که از استاندارد نژاد میان (targetTemp, targetHumidity, capacity, density) → از `OverrideHint` استفاده کن، نه `FieldHint`. برای فیلدهای داده‌ای → `FieldHint`.
 
 ---
 
