@@ -22,7 +22,7 @@ interface Props {
 }
 
 export default function DealPayModal({ open, onClose, deal }: Props) {
-  const { deals, updateDeal } = useTra();
+  const { deals, updateDeal, addPartyPayment } = useTra();
   const liveDeal = deal ? deals.find(d => d.id === deal.id) : null;
   const effectiveDeal = liveDeal || deal;
   const [date, setDate] = useState(getTodayJalali());
@@ -74,21 +74,46 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
     if (!effectiveDeal) return;
     attemptSave();
     if (Object.keys(vErrors).length > 0) return;
-    const newPayment: DealPayment = {
-      id: crypto.randomUUID(),
-      date,
-      amount: entered,
-      direction,
-      method,
-      notes: notes.trim() || undefined,
-      checkNo: method === 'check' ? checkNo.trim() : undefined,
-      bank: method === 'check' ? bank.trim() : undefined,
-      dueDate: method === 'check' ? checkDue : undefined,
-    };
-    updateDeal(effectiveDeal.id, { payments: [...(effectiveDeal.payments || []), newPayment] });
-    if (entered > 0) recordHistory('tra.deal.payment', entered, {});
-    toastMsg.saved();
-    onClose();
+    try {
+      // ۱. ساخت PartyPayment (برای computePartyCredit + Statement + audit)
+      let ppId: string | undefined;
+      if (entered > 0) {
+        ppId = addPartyPayment({
+          partyId: effectiveDeal.partyId,
+          date,
+          amount: entered,
+          method,
+          type: 'regular',
+          checkNo: method === 'check' ? checkNo.trim() : '',
+          bank: method === 'check' ? bank.trim() : '',
+          dueDate: method === 'check' ? checkDue : '',
+          notes: notes.trim() || `پرداخت معامله ${effectiveDeal.dealNumber || ''}`,
+          status: method === 'check' ? 'pending' : undefined,
+        } as any);
+      }
+
+      // ۲. ساخت DealPayment (متصل به PartyPayment)
+      const newPayment: DealPayment = {
+        id: crypto.randomUUID(),
+        date,
+        amount: entered,
+        direction,
+        method,
+        notes: notes.trim() || undefined,
+        checkNo: method === 'check' ? checkNo.trim() : undefined,
+        bank: method === 'check' ? bank.trim() : undefined,
+        dueDate: method === 'check' ? checkDue : undefined,
+        status: method === 'check' ? 'pending' : undefined,
+        partyPaymentId: ppId,
+      };
+      updateDeal(effectiveDeal.id, { payments: [...(effectiveDeal.payments || []), newPayment] });
+      if (entered > 0) recordHistory('tra.deal.payment', entered, {});
+      toastMsg.saved();
+      onClose();
+    } catch (e) {
+      console.error('[DealPay]', e);
+      toastMsg.error('خطا در ثبت پرداخت');
+    }
   };
 
   if (!effectiveDeal) return null;

@@ -315,6 +315,8 @@ export interface DealPayment {
   clearedDate?: string;
   /** 🆕 تاریخ برگشت چک */
   bouncedDate?: string;
+  /** 🆕 شناسه PartyPayment مرتبط (برای sync با computePartyCredit) */
+  partyPaymentId?: string;
 }
 
 export interface DealSale {
