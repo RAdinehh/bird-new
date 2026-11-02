@@ -1,9 +1,45 @@
 # PROGRESS.md — وضعیت ۲۰۵ مفهوم
 
 ## 🎯 CURRENT
-- بخش: hal (سالن)
-- وضعیت: HallsPage ✅ — ZonesPage در حال انجام
-- فاز: verify
+- بخش: tra (dunning) — تکمیل‌شده
+- وضعیت: Dunning C4+C5 ✅ | L11 ctc/validation tests ✅ (۹۲ تست جدید)
+- آخرین commit: 4a8dc7ac
+- PENDING بعدی: DealPrint | Phase F (Lot Tracking) | Phase G-2
+- فاز: done
+
+## 🎯 جلسه ۱۴۰۵/۱۱/۰۲ — Dunning C4+C5 + L11 tests (۶ commit)
+
+### کارهای انجام‌شده
+- **Dunning C4** (`360cd382`): `computeUpcoming` در `helpers.tsx` — filter by `nextReminderAt` (snooze logic)
+- **ReminderModal** (`59a09691`): textarea فقط برای «سایر» — phone/in_person → read-only
+- **Dunning C5** (`73ad5160`): auto-cancel `nextReminderAt` در `updateInvoice` وقتی پرداخت کامل شد
+- **L11 test** (`5c244ff3`): `getDealPaymentFormSchema` (12 tests)
+- **L11 test** (`812b8862`): ctc validators + format — Luhn, MOD-97, account (36 tests)
+- **L11 test** (`4a8dc7ac`): `createContactSchema` (30 tests)
+
+### 🔍 کشف جلسه (brief اشتباه بود)
+- **Installments UI gap** — بررسی شد، gap نیست. `addInvoice`/`updateInvoice`/`deleteInvoice` همه `applyPaymentsToInstallments` رو صدا می‌زنن. `deleteAllocation` فقط داخلی.
+- **undo/reopen Settlement** — بررسی شد، قبلاً وصل شده در `DealsPage.tsx:818,829`
+- **DealPrint** — هیچ فایلی نیست، feature از صفر
+- **Dunning C5 gap:** مسیرهای `addAllocation`/`addPartyPayment` (ctc→tra) از `updateInvoice` نمی‌گذرن. auto-cancel فقط مسیر ویرایش رو پوشش می‌ده.
+
+### 🧪 تست‌های جدید (جمع: ۹۲)
+- `tra-helpers.test.ts` — ۱۴
+- `validation-deal-payment.test.ts` — ۱۲
+- `ctc-validators-format.test.ts` — ۳۶
+- `ctc-contact-schema.test.ts` — ۳۰
+
+### ⏸ PENDING (جلسه بعد)
+- DealPrint (از صفر)
+- Phase F (Lot Tracking)
+- Phase G-2 (40 file migration)
+- C5 gap: auto-cancel در مسیرهای پرداخت مستقیم
+
+### 🧪 توصیه جلسه بعد
+اول: **DealPrint** (بزرگ، از صفر)
+یا: **C5 gap** (تکمیل auto-cancel در مسیرهای addPartyPayment)
+
+---
 
 ## 🎯 جلسه ۱۴۰۵/۰۸/۰۹ (ادامه) — ۳۴ commit + ۱۷ test
 
