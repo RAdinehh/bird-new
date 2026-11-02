@@ -828,3 +828,45 @@ Deals (معاملات خاص) — چرخه کامل: Deal → Settlement → Inv
 3. 🟡 **RHF Pilot:** شروع مهاجرت به React Hook Form (بحث جلسه ۱۴۰۵/۱۱/۰۱)
 
 *آخرین به‌روزرسانی: جلسه ۱۷ — ۱۴۰۵/۱۱/۰۱*
+
+---
+
+## 📅 جلسه ۱۴۰۵/۱۱/۰۲ — مستندسازی Intelligence + رفع باگ خرید جوجه
+
+### ✅ DONE — ۱۱ commit
+
+| # | Commit | موضوع |
+|---|--------|-------|
+| ۱ | 796abdaf | docs(intelligence): ۵ تناقض تصحیح |
+| ۲ | ee3d24a7 | docs: الگوریتم structuralBreak + ۱۴ سناریو |
+| ۳ | 3392aa3c | docs: Gaps ۸-۱۲ + priority table |
+| ۴ | e42ffac5 | docs: چک‌لیست v2 + خلاصه + naming |
+| ۵ | 05505b2d | docs: AI-BOOT شش فایل مقدس |
+| ۶ | 5e6a44d6 | docs: پاک‌سازی تکرارها |
+| ۷ | 502f1a7c | fix(tra): required partyId/date + inline errors + auto-calc unknownCount |
+| ۸ | 6ab3542f | fix(tra): wrapper save matches HallsPage |
+| ۹ | a5f4ac8b | fix(tra): filter empty items/payments in useValidation |
+
+### 🚨 باگ‌های رفع‌شده
+
+1. **خرید جوجه بدون جنسیت ذخیره نمی‌شد** — `unknownCount` خودکار پر می‌شود (`Math.max(0, q - m - fe)`)
+2. **Zod fail بی‌صدا** — wrapper save `setErr('')` حذف، فقط `return` (مطابق HallsPage)
+3. **کلمه «اجباری»** — `partyId/date` → `requiredId/persianDate` (MSG standard)
+4. **پرداخت/قلم خالی جلوی ذخیره** — `_cleanItemsForValidation` + `_cleanPaymentsForValidation` در `InvoicePage.tsx`
+
+### 📊 وضعیت تست‌ها
+- ۵/۵ سناریو تست دستی ✅ (پرداخت خالی، قلم خالی، تاریخ خالی، چک بدون شماره، همه خالی)
+- TSC سبز
+- Intelligence tests سبز
+
+### 📚 مستندسازی
+- `validation-intelligence-map.md`: ۸۴۲ → ۱۰۹۸ خط (+۲۵۶)
+- `AI-BOOT.md`: ۵ فایل مقدس → ۶ (اضافه Intelligence Map)
+- `DECISIONS.md`: ۱ entry جدید
+
+### ⏸ PENDING (جلسه بعد)
+- **Intelligence فاز ۱**: unit normalization + dedup + time-span + rule mode n≥2 (Gaps ۸-۱۰)
+- **Gaps ۵**: FieldHint به hal/egg/fed/ctc/cal
+- **Gap ۲**: MSG در ۱۰ فایل rules
+- **L11 tests**: `getDealPaymentFormSchema`
+- **RHF Pilot** — تصمیم نهایی
