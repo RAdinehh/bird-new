@@ -2,7 +2,8 @@
  * ContactFormModal — فرم افزودن/ویرایش مخاطب
  */
 import { Btn, BtnRow, DigitField, Field, Grid2, Input, Modal, PhoneField, Select, Textarea, ErrorBox } from '../../../shr/components/ui';
-import { ROLE_LABEL, CUSTOMER_TYPES, BANKS_BY_GROUP, isBankCode, findBankByShabaCode, type Role, type Gender, type BankAccount } from '../store';
+import { ROLE_LABEL, CUSTOMER_TYPES, BANKS_BY_GROUP, BANKS, isBankCode, findBankByShabaCode, findBankByCardBin, type Role, type Gender, type BankAccount } from '../store';
+import { cardValidation, shabaValidation, accountValidation } from '../validators';
 
 const GENDER_OPTIONS: { value: Gender; label: string; icon: string }[] = [
   { value: 'unspecified', label: 'بی‌طرف', icon: '—' },
@@ -130,7 +131,20 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
           <div style={{ paddingTop: 8, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>🏦 اطلاعات بانکی (اختیاری)</div>
 
           <Grid2>
-            <Field label="بانک">
+            <Field label="بانک" hint={(() => {
+              const card = form.bankAccount?.cardNumber || '';
+              if (card.length < 4) return undefined;
+              const det = findBankByCardBin(card);
+              if (det.bank) {
+                const bank = BANKS.find(b => b.key === det.bank);
+                return `✓ تشخیص: ${bank?.label || det.bank}`;
+              }
+              if (det.possibleBanks && det.possibleBanks.length > 0) {
+                const names = det.possibleBanks.map(b => BANKS.find(x => x.key === b)?.shortLabel || b).join(' / ');
+                return `ممکن: ${names}`;
+              }
+              return undefined;
+            })()}>
               <Select
                 value={form.bankAccount?.bank || ''}
                 onChange={e => {
@@ -170,7 +184,12 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
           </Grid2>
 
           <Grid2>
-            <Field label="شماره حساب">
+            <Field label="شماره حساب" hint={(() => {
+              const v = accountValidation(form.bankAccount?.accountNumber || '');
+              if (v.state === 'invalid') return v.message;
+              if (v.state === 'partial') return v.message;
+              return undefined;
+            })()}>
               <Input
                 dir="ltr"
                 inputMode="numeric"
@@ -183,7 +202,14 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
                 }}
               />
             </Field>
-            <Field label="شماره کارت" hint="۱۶ رقم">
+            <Field label="شماره کارت" hint={(() => {
+              const card = form.bankAccount?.cardNumber || '';
+              const v = cardValidation(card);
+              if (v.state === 'invalid') return v.message;
+              if (v.state === 'partial') return v.message;
+              if (v.state === 'valid') return '✓ شماره کارت معتبر است';
+              return '۱۶ رقم';
+            })()}>
               <Input
                 dir="ltr"
                 inputMode="numeric"
@@ -192,7 +218,15 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
                 value={form.bankAccount?.cardNumber || ''}
                 onChange={e => {
                   const v = e.target.value.replace(/\D/g, '').slice(0, 16);
-                  setForm(f => ({ ...f, bankAccount: { ...f.bankAccount, cardNumber: v } }));
+                  const det = findBankByCardBin(v);
+                  setForm(f => ({
+                    ...f,
+                    bankAccount: {
+                      ...f.bankAccount,
+                      cardNumber: v,
+                      bank: det.bank || f.bankAccount?.bank,
+                    },
+                  }));
                 }}
               />
             </Field>
@@ -200,11 +234,16 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
 
           <Field
             label="شماره شبا"
-            hint={
-              form.bankAccount?.bank
-                ? `بانک تشخیص‌داده‌شده: ${BANKS_BY_GROUP.gov.concat(BANKS_BY_GROUP.private, BANKS_BY_GROUP.other).find(b => b.key === form.bankAccount?.bank)?.label || '—'}`
-                : 'IR + ۲۴ رقم — با ورود، بانک خودکار تشخیص داده می‌شود'
-            }
+            hint={(() => {
+              const v = shabaValidation(form.bankAccount?.shaba || '');
+              if (v.state === 'invalid') return v.message;
+              if (v.state === 'partial') return v.message;
+              if (v.state === 'valid') return '✓ شماره شبا معتبر است (MOD-97)';
+              if (form.bankAccount?.bank) {
+                return `بانک تشخیص‌داده‌شده: ${BANKS.find(b => b.key === form.bankAccount?.bank)?.label || '—'}`;
+              }
+              return 'IR + ۲۴ رقم — با ورود، بانک خودکار تشخیص داده می‌شود';
+            })()}
           >
             <Input
               dir="ltr"
