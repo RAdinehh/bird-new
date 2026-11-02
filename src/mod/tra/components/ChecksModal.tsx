@@ -46,7 +46,6 @@ export default function ChecksModal({ open, onClose }: Props) {
   const { partyPayments, invoices, deals, depositPartyPayment, clearPartyPayment, bouncePartyPayment } = useTra();
   const { contacts } = useCtc();
   const [filter, setFilter] = useState<FilterKey>('all');
-  const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
 
   const rows = useMemo<CheckRow[]>(() => {
     const partyMap = new Map(contacts.map(c => [c.id, c]));
@@ -213,43 +212,14 @@ export default function ChecksModal({ open, onClose }: Props) {
           </span>
           {row.docNumber && <span style={{ fontSize: 10, color: 'var(--dim)', fontWeight: 400 }}>فاکتور {row.docNumber}</span>}
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: 6, position: 'relative' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: 6 }}>
           <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 'var(--r-sm)', background: info.bg, color: info.color }}>{info.label}</span>
           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
             {row.status === 'pending' && <Btn size="sm" variant="outline" onClick={() => void handleAction(row, 'deposit')}>↑ واریز به بانک</Btn>}
             {row.status === 'in_transit' && <Btn size="sm" variant="primary" onClick={() => void handleAction(row, 'clear')}>✓ وصول شد</Btn>}
-            
-            <div style={{ position: 'relative' }}>
-              <button type="button" onClick={() => setMenuOpenId(menuOpenId === row.pp.id ? null : row.pp.id)} style={{
-                width: 30, height: 30, borderRadius: 'var(--r-sm)',
-                background: menuOpenId === row.pp.id ? 'var(--accent-soft)' : 'var(--btn-bg)', 
-                border: `1px solid ${menuOpenId === row.pp.id ? 'var(--accent-border)' : 'var(--border)'}`,
-                color: menuOpenId === row.pp.id ? 'var(--accent)' : 'var(--muted)', 
-                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, fontSize: 14
-              }}>⋯</button>
-              
-              {menuOpenId === row.pp.id && (
-                <div style={{
-                  position: 'absolute', bottom: '100%', left: 0, marginBottom: 6,
-                  background: 'var(--card)', border: '1px solid var(--border)',
-                  borderRadius: 'var(--r-md)', boxShadow: 'var(--shadow)',
-                  padding: 4, zIndex: 10, minWidth: 120, direction: 'rtl'
-                }}>
-                  {(row.status === 'pending' || row.status === 'in_transit') && (
-                    <button type="button" onClick={() => { setMenuOpenId(null); void handleAction(row, 'bounce'); }} style={{
-                      width: '100%', padding: '8px 12px', background: 'transparent', border: 'none',
-                      textAlign: 'right', fontSize: 'var(--fs-sm)', color: 'var(--danger)',
-                      fontFamily: 'inherit', cursor: 'pointer', borderRadius: 'var(--r-sm)'
-                    }}>برگشت چک</button>
-                  )}
-                  <button type="button" onClick={() => setMenuOpenId(null)} style={{
-                    width: '100%', padding: '8px 12px', background: 'transparent', border: 'none',
-                    textAlign: 'right', fontSize: 'var(--fs-sm)', color: 'var(--muted)',
-                    fontFamily: 'inherit', cursor: 'pointer', borderRadius: 'var(--r-sm)'
-                  }}>بستن منو</button>
-                </div>
-              )}
-            </div>
+            {(row.status === 'pending' || row.status === 'in_transit') && (
+              <Btn size="sm" variant="ghost" onClick={() => void handleAction(row, 'bounce')} style={{ color: 'var(--danger)', border: '1px solid var(--danger-border)' }}>✗ برگشت</Btn>
+            )}
           </div>
         </div>
       </div>
