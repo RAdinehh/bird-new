@@ -14,7 +14,7 @@ import { useTra } from '../store';
 import { remaining } from '../calc';
 import { copyText, shareText } from '../../../shr/utils/clipboard';
 import { toastMsg } from '../../../cor/store/toast';
-import type { Invoice, ReminderMethod } from '../types';
+import type { Invoice } from '../types';
 
 const CAT_LABEL: Record<string, string> = {
   chick: 'جوجه یک‌روزه',
@@ -41,12 +41,6 @@ function getFarmName(state: unknown): string {
   return typeof name === 'string' && name.trim() ? name : 'مرغداری';
 }
 
-const METHOD_OPTIONS: { key: ReminderMethod; label: string; icon: string }[] = [
-  { key: 'phone', label: 'تلفنی', icon: '📞' },
-  { key: 'in_person', label: 'حضوری', icon: '🚶' },
-  { key: 'other', label: 'سایر', icon: '📝' },
-];
-
 const CHANNEL_PRESETS = ['واتس‌اپ', 'پیامک', 'تلگرام', 'اینستاگرام', 'ایمیل'];
 
 interface Props {
@@ -61,7 +55,6 @@ export default function ReminderModal({ open, onClose, invoice }: Props) {
   const contacts = useCtc(s => s.contacts);
   const settingsState = useSet();
 
-  const [method, setMethod] = useState<ReminderMethod>('phone');
   const [channel, setChannel] = useState('واتس‌اپ');
   const [note, setNote] = useState('');
   const [intervalDaysStr, setIntervalDaysStr] = useState('7');
@@ -103,18 +96,18 @@ ${farmName} 🐔`;
   };
 
   useEffect(() => {
-    if (open && invoice && party && method === 'other') {
+    if (open && invoice && party) {
       setMessage(generateMessage());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, invoice?.id, method]);
+  }, [open, invoice?.id]);
 
   const handleSave = () => {
     if (!invoice) return;
     const intervalDays = Math.max(1, Math.min(365, parseInt(toEn(intervalDaysStr)) || 7));
     addReminder(invoice.id, {
-      method,
-      methodLabel: method === 'other' ? channel.trim() || undefined : undefined,
+      method: 'other',
+      methodLabel: channel.trim() || undefined,
       note: note.trim(),
       intervalDays,
     });
@@ -175,46 +168,31 @@ ${farmName} 🐔`;
         <div style={{ color: 'var(--muted)' }}>📅 {daysPhrase}</div>
       </div>
 
-      <Field label="روش یادآوری">
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          {METHOD_OPTIONS.map(m => (
-            <button key={m.key} type="button" onClick={() => setMethod(m.key)} style={chipStyle(method === m.key)}>
-              {m.icon} {m.label}
+      <Field label="کانال" hint="می‌تونید دستی هم بنویسید">
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
+          {CHANNEL_PRESETS.map(c => (
+            <button key={c} type="button" onClick={() => setChannel(c)} style={chipStyle(channel === c)}>
+              {c}
             </button>
           ))}
         </div>
+        <Input value={channel} onChange={e => setChannel(e.target.value)} placeholder="واتس‌اپ" />
       </Field>
 
-      {method === 'other' && (
-        <Field label="کانال" hint="می‌تونید دستی هم بنویسید">
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
-            {CHANNEL_PRESETS.map(c => (
-              <button key={c} type="button" onClick={() => setChannel(c)} style={chipStyle(channel === c)}>
-                {c}
-              </button>
-            ))}
-          </div>
-          <Input value={channel} onChange={e => setChannel(e.target.value)} placeholder="مثلاً واتس‌اپ" />
-        </Field>
-      )}
+      <Field label="پیام" hint="قابل ویرایش">
+        <Textarea
+          value={message}
+          onChange={e => setMessage(e.target.value)}
+          rows={8}
+          maxHeight={240}
+        />
+      </Field>
 
-      {method === 'other' && (
-        <Field label="پیام" hint="قابل ویرایش">
-          <Textarea
-            value={message}
-            onChange={e => setMessage(e.target.value)}
-            rows={8}
-            maxHeight={240}
-          />
-        </Field>
-      )}
+      <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+        <Btn size="sm" variant="outline" onClick={handleShare} style={{ flex: 1 }}>📤 ارسال پیام</Btn>
+        <Btn size="sm" variant="outline" onClick={handleCopy} style={{ flex: 1 }}>📋 کپی</Btn>
+      </div>
 
-      {method === 'other' && (
-        <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-          <Btn size="sm" variant="outline" onClick={handleShare} style={{ flex: 1 }}>📤 ارسال پیام</Btn>
-          <Btn size="sm" variant="outline" onClick={handleCopy} style={{ flex: 1 }}>📋 کپی</Btn>
-        </div>
-      )}
 
       <Field label="یادآوری بعدی">
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -240,7 +218,7 @@ ${farmName} 🐔`;
         <Input
           value={note}
           onChange={e => setNote(e.target.value)}
-          placeholder="مثلاً: گفت تا آخر هفته می‌آره"
+          placeholder="گفت تا آخر هفته می‌آره"
         />
       </Field>
     </Modal>

@@ -185,7 +185,7 @@ export interface DeletedInvoiceSnapshot {
   linkedSettlement?: { id: string; periodStart: string; periodEnd: string };
 }
 
-export type ReminderMethod = 'phone' | 'in_person' | 'other';
+export type ReminderMethod = 'other';
 
 export interface ReminderLogEntry {
   date: string;
@@ -426,7 +426,7 @@ export interface State {
   addAllocation: (a: Omit<PaymentAllocation, 'id'>) => string;
   /** 🆕 ثبت یادآوری برای فاکتور (Phase C1) */
   addReminder: (invoiceId: string, params: {
-    method: 'phone' | 'in_person' | 'other';
+    method: ReminderMethod;
     methodLabel?: string;
     note: string;
     intervalDays: number;
