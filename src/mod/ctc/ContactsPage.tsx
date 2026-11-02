@@ -2,7 +2,7 @@
  * ContactsPage — مخاطبین (carousel tabs مثل hal)
  */
 import { useState } from 'react';
-import { useCtc, type Person, type Role, CUSTOMER_TYPES } from './store';
+import { useCtc, type Person, type Role, type Salutation, CUSTOMER_TYPES } from './store';
 import { useCarousel } from '../../shr/hooks/useCarousel';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showConfirmAsync } from '../../cor/store/dialog';
@@ -15,12 +15,16 @@ interface F {
   customerType: string;
   customerTypes: string[]; trustScore: string; defaultDiscount: string;
   supplierTypes: string[]; position: string; startDate: string; salaryType: string; salaryAmount: string; insurance: boolean;
+  salutation?: Salutation;
+  reminderIntervalDays?: string;
 }
 
 const empty: F = {
   name: '', phone: '', phone2: '', email: '', address: '', city: '', nationalId: '', roles: ['customer'], notes: '',
   customerType: 'wholesale', customerTypes: [], trustScore: '', defaultDiscount: '', supplierTypes: [],
   position: '', startDate: '', salaryType: 'monthly', salaryAmount: '', insurance: false,
+  salutation: 'unspecified',
+  reminderIntervalDays: '7',
 };
 
 type TabId = 'all' | 'customer' | 'supplier' | 'worker';
@@ -47,6 +51,8 @@ export default function ContactsPage() {
       salaryType: p.salaryType || 'monthly',
       salaryAmount: p.salaryAmount ? toFa(p.salaryAmount) : '',
       insurance: p.insurance,
+      salutation: p.salutation || 'unspecified',
+      reminderIntervalDays: p.reminderIntervalDays ? toFa(String(p.reminderIntervalDays)) : '7',
     });
     setErr(''); setOpen(true);
   };
