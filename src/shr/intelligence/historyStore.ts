@@ -134,6 +134,26 @@ function isExpired(dateStr: string, todayStr: string): boolean {
   return days > TTL_DAYS;
 }
 
+function daysBetween(dateA: string, dateB: string): number {
+  const parse = (s: string): [number, number, number] | null => {
+    const m = s.trim().match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+    return m ? [+m[1], +m[2], +m[3]] : null;
+  };
+  const a = parse(dateA);
+  const b = parse(dateB);
+  if (!a || !b) return 0;
+  const aG = a[0] >= 1900;
+  const bG = b[0] >= 1900;
+  if (aG !== bG) return 0;
+  if (aG) {
+    return Math.round(Math.abs(Date.UTC(b[0], b[1] - 1, b[2]) - Date.UTC(a[0], a[1] - 1, a[2])) / 86400000);
+  }
+  // Jalali approximation (365.25 days/year, 30.4 days/month)
+  const daysA = a[0] * 365.25 + a[1] * 30.4 + a[2];
+  const daysB = b[0] * 365.25 + b[1] * 30.4 + b[2];
+  return Math.round(Math.abs(daysB - daysA));
+}
+
 export function recordHistory(
   fieldPath: string,
   value: number,
@@ -148,6 +168,12 @@ export function recordHistory(
   const freshValues: FieldHistoryEntry[] = (existing?.values ?? [])
     .filter(e => !isExpired(e.date, today));
 
+  // Dedup: same day + same value → no-op (avoid pollution from repeated saves)
+  const lastEntry = freshValues[freshValues.length - 1];
+  if (lastEntry && lastEntry.date === today && lastEntry.v === value) {
+    return;
+  }
+
   freshValues.push({
     v: value,
     ctx: { ...ctx },
@@ -161,6 +187,16 @@ export function recordHistory(
 
   // محاسبه stats جدید
   const stats = computeStats(trimmed.map(e => e.v));
+
+  // Time-span guard: structural break requires >= 7 days between first/last
+  if (stats && stats.structuralBreak && trimmed.length >= 2) {
+    const firstDate = trimmed[0].date;
+    const lastDate = trimmed[trimmed.length - 1].date;
+    if (daysBetween(firstDate, lastDate) < 7) {
+      stats.structuralBreak = false;
+      stats.recentMean = undefined;
+    }
+  }
 
   store.set(fieldPath, {
     values: trimmed,

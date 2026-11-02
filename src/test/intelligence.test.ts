@@ -123,13 +123,19 @@ describe('AnomalyDetector — History', () => {
     expect(w).toBeNull();
   });
   it('قیمت ۲x با تاریخچه ثابت → warn', () => {
-    for (let i = 0; i < 5; i++) recordHistory('tra.price_chick', 100_000, {}, STORE);
+    for (let i = 0; i < 5; i++) {
+      const d = new Date(Date.now() - (5 - i) * 86400000).toISOString().slice(0, 10);
+      recordHistory('tra.price_chick', 100_000, {}, { ...STORE, today: d });
+    }
     const w = analyzeAnomaly('tra.price_chick', 200_000, {}, STORE);
     expect(w).not.toBeNull();
     expect(['yellow', 'orange', 'red']).toContain(w!.level);
   });
   it('قیمت ۱۰x با تاریخچه → orange/red', () => {
-    for (let i = 0; i < 5; i++) recordHistory('tra.price_chick', 100_000, {}, STORE);
+    for (let i = 0; i < 5; i++) {
+      const d = new Date(Date.now() - (5 - i) * 86400000).toISOString().slice(0, 10);
+      recordHistory('tra.price_chick', 100_000, {}, { ...STORE, today: d });
+    }
     const w = analyzeAnomaly('tra.price_chick', 1_000_000, {}, STORE);
     expect(['orange', 'red']).toContain(w!.level);
   });
@@ -193,7 +199,10 @@ describe('Cross-field', () => {
 // ══════════════════════════════════════════════════════════════════
 describe('User Pattern — درصد', () => {
   it('کاربر همیشه ۵۰-۵۰ → ۸۰ غیرعادی', () => {
-    for (let i = 0; i < 5; i++) recordHistory('flk.partnerPercent', 50, {}, STORE);
+    for (let i = 0; i < 5; i++) {
+      const d = new Date(Date.now() - (5 - i) * 86400000).toISOString().slice(0, 10);
+      recordHistory('flk.partnerPercent', 50, {}, { ...STORE, today: d });
+    }
     const w = analyzeAnomaly('flk.partnerPercent', 80, {}, STORE);
     expect(w).not.toBeNull();
     // ۳ سیگنال (ratio + z-score + pattern) → red هم ممکنه
