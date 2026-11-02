@@ -210,14 +210,19 @@ export default function ChecksModal({ open, onClose }: Props) {
           <span style={{ fontSize: 10, color: 'var(--dim)', fontWeight: 400 }}>
             چک شماره {row.pp.checkNo || '—'}{row.pp.bank ? ` • ${row.pp.bank}` : ''}
           </span>
-          {row.docNumber && <span style={{ fontSize: 10, color: 'var(--dim)', fontWeight: 400 }}>{row.docNumber}</span>}
+          {row.docNumber && <span style={{ fontSize: 10, color: 'var(--dim)', fontWeight: 400 }}>فاکتور {row.docNumber}</span>}
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: 6 }}>
           <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 'var(--r-sm)', background: info.bg, color: info.color }}>{info.icon} {info.label}</span>
           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-            {row.status === 'pending' && <Btn size="sm" variant="outline" onClick={() => void handleAction(row, 'deposit')}>↑ واریز</Btn>}
+            {row.status === 'pending' && <Btn size="sm" variant="outline" onClick={() => void handleAction(row, 'deposit')}>↑ واریز به بانک</Btn>}
             {row.status === 'in_transit' && <Btn size="sm" variant="primary" onClick={() => void handleAction(row, 'clear')}>✓ وصول شد</Btn>}
             {(row.status === 'pending' || row.status === 'in_transit') && <Btn size="sm" variant="ghost" onClick={() => void handleAction(row, 'bounce')}>✗</Btn>}
+            <button type="button" style={{
+              width: 30, height: 30, borderRadius: 'var(--r-sm)',
+              background: 'var(--btn-bg)', border: '1px solid var(--border)',
+              color: 'var(--muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, fontSize: 14
+            }}>⋯</button>
           </div>
         </div>
       </div>
@@ -229,30 +234,30 @@ export default function ChecksModal({ open, onClose }: Props) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 8 }}>
 
         {rows.length > 0 && (
-          <div style={{ background: 'var(--input-bg)', borderRadius: 'var(--r-md)', padding: 12 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, paddingBottom: 8, borderBottom: '1px solid var(--border)' }}>
+          <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '10px 12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
               <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: 'var(--muted)' }}>کل چک‌های باز</span>
               <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
                 {toFa(summary.total.toLocaleString('fa-IR'))}
                 <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 500, color: 'var(--muted)', marginRight: 4 }}>تومان</span>
               </span>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 8, borderLeft: '1px solid var(--border)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', borderTop: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '8px 4px', borderLeft: '1px solid var(--border)' }}>
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 500 }}>در دست</span>
-                <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: 'var(--warn)', whiteSpace: 'nowrap' }}>{toFa(summary.hand.toLocaleString('fa-IR'))}</span>
+                <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: summary.hand > 0 ? 'var(--warn)' : 'var(--muted)', whiteSpace: 'nowrap' }}>{toFa(summary.hand.toLocaleString('fa-IR'))}</span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 8 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '8px 4px' }}>
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 500 }}>در جریان</span>
-                <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: 'var(--info, #0284c7)', whiteSpace: 'nowrap' }}>{toFa(summary.transit.toLocaleString('fa-IR'))}</span>
+                <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: summary.transit > 0 ? 'var(--info, #0284c7)' : 'var(--muted)', whiteSpace: 'nowrap' }}>{toFa(summary.transit.toLocaleString('fa-IR'))}</span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 8, borderLeft: '1px solid var(--border)', borderTop: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '8px 4px', borderLeft: '1px solid var(--border)', borderTop: '1px solid var(--border)' }}>
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 500 }}>وصول شده</span>
-                <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: 'var(--accent)', whiteSpace: 'nowrap' }}>{toFa(summary.cleared.toLocaleString('fa-IR'))}</span>
+                <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: summary.cleared > 0 ? 'var(--accent)' : 'var(--muted)', whiteSpace: 'nowrap' }}>{toFa(summary.cleared.toLocaleString('fa-IR'))}</span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 8, borderTop: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '8px 4px', borderTop: '1px solid var(--border)' }}>
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 500 }}>برگشتی</span>
-                <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: 'var(--danger)', whiteSpace: 'nowrap' }}>{toFa(summary.bounced.toLocaleString('fa-IR'))}</span>
+                <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: summary.bounced > 0 ? 'var(--danger)' : 'var(--muted)', whiteSpace: 'nowrap' }}>{toFa(summary.bounced.toLocaleString('fa-IR'))}</span>
               </div>
             </div>
           </div>
