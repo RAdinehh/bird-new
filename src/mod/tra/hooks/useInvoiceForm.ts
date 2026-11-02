@@ -146,6 +146,9 @@ export function useInvoiceForm(params: {
     [form.items, form.category]
   );
   const paid = useMemo(() => paidSum(form.payments), [form.payments]);
+
+  // 🆕 Hoisted: must be top-level (was inside async save → Invalid hook call)
+  const breedStd = useBreedStandard();
   const rem = Math.max(0, total - paid);
 
   // اقلام
@@ -420,7 +423,7 @@ export function useInvoiceForm(params: {
     if (kind === 'purchase') {
       const flkState = useFlk.getState();
       const halState = useHal.getState();
-      const breedStd = useBreedStandard();
+      // breedStd now at top-level (was: useBreedStandard() — hook-in-async bug)
 
       for (const it of cleanedItems) {
         const cat = it.category || form.category;

@@ -455,17 +455,21 @@ return (
         flocks={flocks}
         whsItems={whsItems}
         deals={deals || []}
-        vErrors={vErrors}
-        showError={showError}
-        markTouched={markTouched}
+        vErrors={{ ...(saveAttempted ? vErrors : {}) }}
         err={err}
         total={total}
         paid={paid}
         rem={rem}
-        save={() => {
+        save={async () => {
           setSaveAttempted(true);
           if (Object.keys(vErrors).length > 0) return;
-          save();
+          try {
+            await save();
+          } catch (e) {
+            const msg = e instanceof Error ? e.message : String(e);
+            toastMsg.error('❌ ' + msg);
+            setErr(msg);
+          }
         }}
         addItem={addItem}
         updateItem={updateItem}

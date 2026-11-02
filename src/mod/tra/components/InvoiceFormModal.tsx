@@ -34,8 +34,6 @@ export interface InvoiceFormModalProps {
   deals?: any[];
   vErrors: Record<string, string>;
   err: string;
-  showError: (field: string) => string | undefined;
-  markTouched: (field: string) => void;
   total: number;
   paid: number;
   rem: number;
@@ -101,11 +99,15 @@ const getQuantityMax = (cat: string): number | undefined => {
 export default function InvoiceFormModal(props: InvoiceFormModalProps) {
   const {
     open, setOpen, form, setForm, isPurchase,
-    parties, flocks, whsItems, vErrors, err, onNewFlock, showError, markTouched,
+    parties, flocks, whsItems, vErrors, err, onNewFlock,
     total, paid, rem,
     save, addItem, updateItem, removeItem,
     addPayment, updatePayment, removePayment,
   } = props;
+
+  // 🆕 Local showError identity (vErrors prop is already filtered by saveAttempted in parent)
+  const showError = (f: string) => vErrors[f];
+  const markTouched = (_f: string) => {};
 
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
   const [expandedPaymentId, setExpandedPaymentId] = useState<string | null>(null);
