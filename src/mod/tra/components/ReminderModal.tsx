@@ -220,10 +220,8 @@ ${farmName} 🐔`;
               inputMode="tel"
               value={toFa(intervalDaysStr)}
               onChange={e => {
-                const v = e.target.value.replace(/[^0-9۰-۹]/g, '');
-                setIntervalDaysStr(v);
-                const presets = ['3', '7', '30'];
-                setIsCustomInterval(v !== '' && !presets.includes(v));
+                setIntervalDaysStr(e.target.value.replace(/[^0-9۰-۹]/g, ''));
+                setIsCustomInterval(true);
               }}
               placeholder="دلخواه"
               style={{
