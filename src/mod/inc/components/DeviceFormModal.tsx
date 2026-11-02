@@ -11,6 +11,7 @@ import type { DeviceMode, DeviceStatus } from '../store';
 import type { F } from '../types-devices';
 import { warrantyInfo } from '../api/warranty';
 import CapacityEditor from './CapacityEditor';
+import { FieldHint } from '../../../shr/intelligence';
 
 export interface DeviceFormModalProps {
   open: boolean;
@@ -110,9 +111,12 @@ export default function DeviceFormModal(props: DeviceFormModalProps) {
           <Field label="O₂ فعلی">
             <NumField placeholder="۲۰.۹" value={form.o2Current} onChange={e => setForm({...form, o2Current: e.target.value})} unit="٪" min={15} max={25} />
           </Field>
-          <Field label="دما محیط">
-            <NumField placeholder="۳۷.۵" value={form.temp} onChange={e => setForm({...form, temp: e.target.value})} unit="°C" min={30} max={45} />
-          </Field>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+            <Field label="دما محیط">
+              <NumField placeholder="۳۷.۵" value={form.temp} onChange={e => setForm({...form, temp: e.target.value})} unit="°C" min={30} max={45} />
+            </Field>
+            <FieldHint fieldPath="inc.temperature" value={form.temp} />
+          </div>
         </Grid2>
         <Grid2>
           <Field label="وضعیت چرخش">

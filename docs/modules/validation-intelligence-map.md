@@ -813,11 +813,11 @@ ${label} نیاز به بررسی دارد
 - **الان:** resolver پیاده شد (`anomalyDetector.ts` + `biological.ts`)
   - `INCUBATION_TEMP`: chicken 37.8, turkey/duck/quail 37.5
   - `getTempIdeal(species, fieldPath)`: ideal temp for inc.* (incubation) and dlg/hal.* (hall)
-- **⚠️ UI wiring ناقص (Gap 5 overlap):**
-  - `dlg.temperature*`: FieldHint هست، از `context.expected` استفاده می‌کند
-  - `hal.targetTemp`: FieldHint ندارد (Gap 5)
-  - `inc.temperature`: FieldHint ندارد (Gap 5)
-- **نتیجه:** resolver آماده، ۲ از ۵ فیلد تا رفع Gap 5 از آن بهره نمی‌برند
+- **وضعیت UI wiring:**
+  - `dlg.temperature*`: FieldHint هست (EnvironmentSection), از `context.expected` استفاده می‌کند
+  - `hal.targetTemp`: OverrideHint دارد (بهتر از FieldHint — مقایسه با استاندارد نژاد + autoFrom)
+  - `inc.temperature`: FieldHint اضافه شد (2026/11/02) — DeviceFormModal.tsx
+- **نتیجه:** هر ۵ فیلد متصل — resolver کامل
 
 ---
 
