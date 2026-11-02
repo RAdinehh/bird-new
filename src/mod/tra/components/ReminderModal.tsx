@@ -171,7 +171,7 @@ ${farmName} 🐔`;
       </div>
 
       <Field label="کانال">
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: isCustomChannel ? 6 : 0 }}>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'nowrap', overflowX: 'auto', marginBottom: isCustomChannel ? 6 : 0 }}>
           {CHANNEL_PRESETS.map(c => (
             <button key={c} type="button" onClick={() => setChannel(c)} style={chipStyle(channel === c)}>
               {c}
@@ -191,7 +191,7 @@ ${farmName} 🐔`;
         )}
       </Field>
 
-      <Field label="پیام" hint="قابل ویرایش">
+      <Field label="پیام">
         <Textarea
           value={message}
           onChange={e => setMessage(e.target.value)}
@@ -207,22 +207,20 @@ ${farmName} 🐔`;
 
 
       <Field label="یادآوری بعدی">
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'nowrap', overflowX: 'auto' }}>
           {[3, 7, 14, 30].map(d => (
-            <button key={d} type="button" onClick={() => setIntervalDaysStr(String(d))} style={chipStyle(intervalDaysStr === String(d))}>
+            <button key={d} type="button" onClick={() => setIntervalDaysStr(String(d))} style={{ ...chipStyle(intervalDaysStr === String(d)), flexShrink: 0 }}>
               {toFa(d)} روز
             </button>
           ))}
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>دلخواه:</span>
+          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', flexShrink: 0, marginRight: 4 }}>دلخواه:</span>
           <Input
             inputMode="tel"
             value={intervalDaysStr}
             onChange={e => setIntervalDaysStr(e.target.value.replace(/[^0-9۰-۹]/g, ''))}
-            style={{ width: 70, textAlign: 'center' }}
+            style={{ width: 60, textAlign: 'center', flexShrink: 0 }}
           />
-          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>روز</span>
+          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', flexShrink: 0 }}>روز</span>
         </div>
       </Field>
 
