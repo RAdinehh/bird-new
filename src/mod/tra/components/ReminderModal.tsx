@@ -143,6 +143,7 @@ ${farmName} 🐔`;
   });
 
   const isCustomChannel = !CHANNEL_PRESETS.includes(channel);
+  const isCustomInterval = ![3, 7, 30].map(String).includes(intervalDaysStr);
 
   return (
     <Modal
@@ -226,15 +227,16 @@ ${farmName} 🐔`;
                 padding: '0 0 0 16px',
                 fontSize: 'var(--fs-sm)',
                 textAlign: 'center',
-                background: 'var(--input-bg)',
-                border: '1px solid var(--border)',
+                background: isCustomInterval ? 'var(--accent-soft)' : 'var(--input-bg)',
+                border: `1px solid ${isCustomInterval ? 'var(--accent-border)' : 'var(--border)'}`,
                 borderRadius: 'var(--r-sm)',
-                color: 'var(--text)',
+                color: isCustomInterval ? 'var(--accent)' : 'var(--text)',
+                fontWeight: isCustomInterval ? 700 : 500,
                 fontFamily: 'inherit',
                 outline: 'none',
               }}
             />
-            <span style={{ position: 'absolute', left: 6, top: '50%', transform: 'translateY(-50%)', fontSize: '10px', color: 'var(--muted)', pointerEvents: 'none' }}>روز</span>
+            <span style={{ position: 'absolute', left: 6, top: '50%', transform: 'translateY(-50%)', fontSize: '10px', color: isCustomInterval ? 'var(--accent)' : 'var(--muted)', pointerEvents: 'none' }}>روز</span>
           </div>
         </div>
       </Field>
