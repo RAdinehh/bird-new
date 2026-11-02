@@ -174,34 +174,31 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
         </button>
       </div>
 
-                {/* Actions: دریافت گروهی + صورت‌حساب + چک‌ها */}
+                {/* Actions — به سبک tab */}
                 <div style={{ display: 'grid', gridTemplateColumns: kind === 'deal' ? '1fr 1fr' : 'repeat(3, 1fr)', gap: 6, marginBottom: 8 }}>
                   {kind !== 'deal' && (
-                    <Btn
-                      size="sm"
-                      variant="outline"
-                      style={{ fontSize: 'var(--fs-xs)', padding: '0 4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                    <button
+                      type="button"
                       onClick={() => { setMultiPayPrefill(null); setMultiPayOpen(true); }}
+                      style={tab(multiPayOpen)}
                     >
                       {kind === 'sale' ? 'دریافت گروهی' : 'پرداخت گروهی'}
-                    </Btn>
+                    </button>
                   )}
-                  <Btn
-                    size="sm"
-                    variant="outline"
-                    style={{ fontSize: 'var(--fs-xs)', padding: '0 4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                  <button
+                    type="button"
                     onClick={() => setStatementOpen(true)}
+                    style={tab(statementOpen)}
                   >
                     صورت‌حساب
-                  </Btn>
-                  <Btn
-                    size="sm"
-                    variant="outline"
-                    style={{ fontSize: 'var(--fs-xs)', padding: '0 4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => setChecksOpen(true)}
+                    style={tab(checksOpen)}
                   >
                     چک‌ها
-                  </Btn>
+                  </button>
                 </div>
 
       {/* خلاصه — یه خط */}
