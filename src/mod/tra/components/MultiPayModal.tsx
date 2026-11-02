@@ -2,7 +2,7 @@
  * MultiPayModal.tsx — پرداخت گروهی به چند فاکتور
  * یک PartyPayment می‌سازد و بین چند فاکتور توزیع می‌کند.
  */
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Btn, BtnRow, Field, Grid2, MoneyField, Modal, NumField, SectionTitle, Select, ErrorBox } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
@@ -15,9 +15,11 @@ interface Props {
   open: boolean;
   onClose: () => void;
   kind: 'sale' | 'purchase';
+  prefillPartyId?: string;
+  prefillInvoiceId?: string;
 }
 
-export default function MultiPayModal({ open, onClose, kind }: Props) {
+export default function MultiPayModal({ open, onClose, kind, prefillPartyId, prefillInvoiceId }: Props) {
   const { invoices, addPartyPayment, updateInvoice } = useTra();
   const contacts = useCtc(s => s.contacts);
   const [partyId, setPartyId] = useState('');
@@ -30,6 +32,17 @@ export default function MultiPayModal({ open, onClose, kind }: Props) {
   const [notes, setNotes] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [err, setErr] = useState('');
+
+  // 🆕 Prefill از props (دکمه 💳 روی ردیف فاکتور)
+  useEffect(() => {
+    if (!open) return;
+    if (prefillPartyId) {
+      setPartyId(prefillPartyId);
+      if (prefillInvoiceId) {
+        setSelectedIds(new Set([prefillInvoiceId]));
+      }
+    }
+  }, [open, prefillPartyId, prefillInvoiceId]);
 
   // فاکتورهای معوق این طرف حساب
   const unpaid = useMemo(() => {

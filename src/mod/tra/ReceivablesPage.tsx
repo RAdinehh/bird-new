@@ -25,6 +25,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   const { invoices, deals, updateInvoice, allocations } = useTra();
   const { contacts } = useCtc();
   const [multiPayOpen, setMultiPayOpen] = useState(false);
+  const [multiPayPrefill, setMultiPayPrefill] = useState<{ partyId: string; invoiceId: string } | null>(null);
   const [kind, setKind] = useState<'sale' | 'purchase' | 'deal'>('sale');
   const [expandedBucket, setExpandedBucket] = useState<BucketKey | null>(null);
   const [expandedInvoice, setExpandedInvoice] = useState<string | null>(null);
@@ -174,7 +175,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
           <Btn
             size="sm"
             variant="outline"
-            onClick={() => setMultiPayOpen(true)}
+            onClick={() => { setMultiPayPrefill(null); setMultiPayOpen(true); }}
           >
             💳 {kind === 'sale' ? 'دریافت گروهی' : 'پرداخت گروهی'}
           </Btn>
@@ -360,6 +361,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                               }}>
                                 {toFa(rem.toLocaleString('fa-IR'))} تومان
                               </div>
+                              <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setMultiPayPrefill({ partyId: inv.partyId, invoiceId: inv.id }); setMultiPayOpen(true); }} style={{ fontSize: 11, padding: '2px 8px', minHeight: 24, height: 24 }}>💳</Btn>
                             </div>
 
                             <div style={{
@@ -421,8 +423,10 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
           {kind !== 'deal' && (
             <MultiPayModal
               open={multiPayOpen}
-              onClose={() => setMultiPayOpen(false)}
+              onClose={() => { setMultiPayOpen(false); setMultiPayPrefill(null); }}
               kind={kind}
+              prefillPartyId={multiPayPrefill?.partyId}
+              prefillInvoiceId={multiPayPrefill?.invoiceId}
             />
           )}
       <StatementModal
