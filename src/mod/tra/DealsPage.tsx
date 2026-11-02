@@ -418,7 +418,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
 
   const save = () => {
     attemptSave();
-    if (Object.keys(vErrors).length > 0) { setErr(''); return; }
+    if (Object.keys(vErrors).length > 0) return;
 
     // 🆕 Duplicate dealNumber check
     if (form.dealNumber.trim()) {

@@ -158,7 +158,7 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
 
   const save = async () => {
     attemptSave();
-    if (Object.keys(vErrors).length > 0) { setErr(''); return; }
+    if (Object.keys(vErrors).length > 0) return;
 
     const qty = num(form.quantity);
     if (form.type === 'out' && qty > currentStock) {

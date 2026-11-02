@@ -263,7 +263,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
 
   const save = () => {
     attemptSave();
-    if (Object.keys(vErrors).length > 0) { setErr(''); return; }
+    if (Object.keys(vErrors).length > 0) return;
 
     // 🔒 جلوگیری قاطع از نام تکراری کالا
     if (!form.id) {
