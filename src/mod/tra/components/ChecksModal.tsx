@@ -243,21 +243,21 @@ export default function ChecksModal({ open, onClose }: Props) {
               </span>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', borderTop: '1px solid var(--border)' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '8px 4px', borderLeft: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '6px 2px', borderLeft: '1px solid var(--border)' }}>
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 500 }}>در دست</span>
-                <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: summary.hand > 0 ? 'var(--warn)' : 'var(--muted)', whiteSpace: 'nowrap' }}>{toFa(summary.hand.toLocaleString('fa-IR'))}</span>
+                <span style={{ fontSize: 'var(--fs-md)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: summary.hand > 0 ? 'var(--warn)' : 'var(--muted)', whiteSpace: 'nowrap' }}>{toFa(summary.hand.toLocaleString('fa-IR'))}</span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '8px 4px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '6px 2px' }}>
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 500 }}>در جریان</span>
-                <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: summary.transit > 0 ? 'var(--info, #0284c7)' : 'var(--muted)', whiteSpace: 'nowrap' }}>{toFa(summary.transit.toLocaleString('fa-IR'))}</span>
+                <span style={{ fontSize: 'var(--fs-md)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: summary.transit > 0 ? 'var(--info, #0284c7)' : 'var(--muted)', whiteSpace: 'nowrap' }}>{toFa(summary.transit.toLocaleString('fa-IR'))}</span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '8px 4px', borderLeft: '1px solid var(--border)', borderTop: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '6px 2px', borderLeft: '1px solid var(--border)', borderTop: '1px solid var(--border)' }}>
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 500 }}>وصول شده</span>
-                <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: summary.cleared > 0 ? 'var(--accent)' : 'var(--muted)', whiteSpace: 'nowrap' }}>{toFa(summary.cleared.toLocaleString('fa-IR'))}</span>
+                <span style={{ fontSize: 'var(--fs-md)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: summary.cleared > 0 ? 'var(--accent)' : 'var(--muted)', whiteSpace: 'nowrap' }}>{toFa(summary.cleared.toLocaleString('fa-IR'))}</span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '8px 4px', borderTop: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '6px 2px', borderTop: '1px solid var(--border)' }}>
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 500 }}>برگشتی</span>
-                <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: summary.bounced > 0 ? 'var(--danger)' : 'var(--muted)', whiteSpace: 'nowrap' }}>{toFa(summary.bounced.toLocaleString('fa-IR'))}</span>
+                <span style={{ fontSize: 'var(--fs-md)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: summary.bounced > 0 ? 'var(--danger)' : 'var(--muted)', whiteSpace: 'nowrap' }}>{toFa(summary.bounced.toLocaleString('fa-IR'))}</span>
               </div>
             </div>
           </div>
