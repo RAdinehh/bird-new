@@ -368,20 +368,8 @@ export default function FlocksModal(props: FlocksModalProps) {
             }));
           }} unit="پرنده" min={1} max={100000} />
         </Field>
-        <Field label="تعداد فعلی" hint={(() => {
-          const orig = form.id ? allFlocks.find(f => f.id === form.id) : null;
-          const lock = (orig?.events?.length || 0) > 0 || (orig ? orig.currentCount !== orig.initialCount : false) || !!isSourceLinked;
-          return lock
-            ? 'از تاریخچه گله تغییر می‌کند — برای اصلاح از دکمه «✏️ تاریخچه» در کارت گله استفاده کنید'
-            : 'اگه خالی بمونه = تعداد اولیه';
-        })()} error={showError('currentCount')} onTouch={() => markTouched('currentCount')}>
-          <NumField placeholder="۸۳۲" disabled={(() => {
-            const orig = form.id ? allFlocks.find(f => f.id === form.id) : null;
-            return ((orig?.events?.length || 0) > 0) || (orig ? orig.currentCount !== orig.initialCount : false) || !!isSourceLinked;
-          })()} value={form.currentCount} onChange={e => {
-            const orig = form.id ? allFlocks.find(f => f.id === form.id) : null;
-            const lock = ((orig?.events?.length || 0) > 0) || (orig ? orig.currentCount !== orig.initialCount : false) || !!isSourceLinked;
-            if (lock) return;
+        <Field label="تعداد فعلی" hint="اگه خالی بمونه = تعداد اولیه" error={showError('currentCount')} onTouch={() => markTouched('currentCount')}>
+          <NumField placeholder="۸۳۲" value={form.currentCount} onChange={e => {
             const ccStr = e.target.value;
             const cc = parseInt(toEn(ccStr)) || 0;
             const m = parseInt(toEn(form.maleCount || '0')) || 0;
