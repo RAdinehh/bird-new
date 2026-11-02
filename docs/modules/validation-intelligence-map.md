@@ -807,11 +807,17 @@ ${label} نیاز به بررسی دارد
 
 ---
 
-### Gap ۶ — inc.temperature بدون biologicalRange
+### Gap ۶ — inc.temperature بدون biologicalRange (✅ رفع‌شده 2026/11/02)
 
-- dlg.temperature: bio range 15-35 ✅
-- inc.temperature: bio range ❌ (فقط hard limits)
-- منطق: دمای دستگاه جوجه‌کشی هم محدوده زیستی داره (37.5-38 درجه)
+- **قبل:** `expectedFrom: 'species_temp'` تعریف شده بود ولی resolver وجود نداشت
+- **الان:** resolver پیاده شد (`anomalyDetector.ts` + `biological.ts`)
+  - `INCUBATION_TEMP`: chicken 37.8, turkey/duck/quail 37.5
+  - `getTempIdeal(species, fieldPath)`: ideal temp for inc.* (incubation) and dlg/hal.* (hall)
+- **⚠️ UI wiring ناقص (Gap 5 overlap):**
+  - `dlg.temperature*`: FieldHint هست، از `context.expected` استفاده می‌کند
+  - `hal.targetTemp`: FieldHint ندارد (Gap 5)
+  - `inc.temperature`: FieldHint ندارد (Gap 5)
+- **نتیجه:** resolver آماده، ۲ از ۵ فیلد تا رفع Gap 5 از آن بهره نمی‌برند
 
 ---
 

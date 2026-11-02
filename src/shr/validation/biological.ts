@@ -18,6 +18,37 @@ export const TEMP = {
 } as const;
 
 // ═══════════════════════════════════════════════
+// دمای جوجه‌کشی (per species)
+// ═══════════════════════════════════════════════
+export const INCUBATION_TEMP = {
+  chicken: 37.8,
+  turkey: 37.5,
+  duck: 37.5,
+  quail: 37.5,
+} as const;
+
+/**
+ * دمای ایده‌آل بر اساس species + fieldPath
+ * - inc.* → دمای جوجه‌کشی
+ * - dlg/hal.* → دمای سالن (بسته به مرحله پرورش — chick/layer/broiler)
+ */
+export function getTempIdeal(
+  species: string | undefined,
+  fieldPath: string,
+): number | null {
+  if (fieldPath.startsWith('inc.')) {
+    if (!species) return null;
+    const key = species as keyof typeof INCUBATION_TEMP;
+    return INCUBATION_TEMP[key] ?? null;
+  }
+  // سالن — اولین مرحله (chick) یا ۳۳ درجه به عنوان default
+  if (fieldPath.startsWith('dlg.') || fieldPath.startsWith('hal.')) {
+    return TEMP.chick.ideal;  // 33°C — user در روز اول
+  }
+  return null;
+}
+
+// ═══════════════════════════════════════════════
 // رطوبت
 // ═══════════════════════════════════════════════
 export const HUMIDITY = {

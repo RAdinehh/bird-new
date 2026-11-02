@@ -8,6 +8,7 @@ import type {
   FieldProfile, AnalysisContext, Warning, Signal, AlertLevel,
 } from './types';
 import { getProfile } from './fieldProfiles';
+import { getTempIdeal } from '../validation/biological';
 import { getHistory, HistoryOptions, getUserPattern } from './historyStore';
 
 // ══════════════════════════════════════════════════════════════════
@@ -144,6 +145,12 @@ export function analyzeAnomaly(
 
   if (typeof context.expected === 'number' && Number.isFinite(context.expected)) {
     expected = context.expected;
+  }
+  if (expected === null && profile.expectedFrom === 'species_temp') {
+    expected = getTempIdeal(context.species, profile.fieldPath);
+  }
+  if (expected === null && profile.expectedFrom === 'species_temp') {
+    expected = getTempIdeal(context.species, profile.fieldPath);
   }
   if (expected === null && profile.expectedFrom === 'cross_field' && profile.crossFieldRule) {
     expected = getCrossFieldExpected(profile.crossFieldRule, context);
