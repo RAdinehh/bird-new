@@ -13,7 +13,7 @@ import { bus } from '../../cor/events';
 
 import type { Invoice, InvoiceItem, State, DeletedInvoiceSnapshot, DeletedDealSnapshot, Deal, Settlement } from './types';
 import { saveToRecycleBin, removeFromRecycleBin, listRecycleBin } from '../../shr/utils/recycleBin';
-import { applyPaymentsToInstallments, paidSumAllocated, computeCashDiscount } from './calc';
+import { applyPaymentsToInstallments, paidSumAllocated, computeCashDiscount, getTodayJalali, addJalaliDays } from './calc';
 import { applyInvoiceFlocks, applyInvoiceEquipment, applyInvoiceEgg, BIRD_CATS } from './invoiceHelpers';
 import { applyInvoiceStock } from './applyStock';
 import { generateInvoiceNumber, paidSum } from './calc';
@@ -784,6 +784,28 @@ export const useTra = create<State>()(
         const id = uuid();
         set({ allocations: [...get().allocations, { ...a, id }] });
         return id;
+      },
+      addReminder: (invoiceId, params) => {
+        const inv = get().invoices.find(i => i.id === invoiceId);
+        if (!inv) return;
+        const today = getTodayJalali();
+        const nextDate = addJalaliDays(today, params.intervalDays);
+        const logEntry = {
+          date: today,
+          method: params.method,
+          methodLabel: params.methodLabel,
+          note: params.note,
+          intervalDays: params.intervalDays,
+        };
+        set({
+          invoices: get().invoices.map(i => i.id === invoiceId ? {
+            ...i,
+            lastRemindedAt: today,
+            nextReminderAt: nextDate,
+            reminderLog: [...(i.reminderLog || []), logEntry],
+            updatedAt: new Date().toISOString(),
+          } : i),
+        });
       },
       updateAllocation: (id, patch) => {
         set({ allocations: get().allocations.map(x => x.id === id ? { ...x, ...patch } : x) });

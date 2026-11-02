@@ -185,6 +185,16 @@ export interface DeletedInvoiceSnapshot {
   linkedSettlement?: { id: string; periodStart: string; periodEnd: string };
 }
 
+export type ReminderMethod = 'phone' | 'in_person' | 'other';
+
+export interface ReminderLogEntry {
+  date: string;
+  method: ReminderMethod;
+  methodLabel?: string;
+  note: string;
+  intervalDays: number;
+}
+
 export interface Invoice {
   id: string;
   type: InvoiceType;
@@ -237,6 +247,12 @@ export interface Invoice {
   // ===== اقساط =====
   installments?: Installment[];
   remindersMuted?: boolean;
+  /** 🆕 تاریخ آخرین یادآوری (jalali) */
+  lastRemindedAt?: string;
+  /** 🆕 تاریخ یادآوری بعدی (auto = lastRemindedAt + intervalDays) */
+  nextReminderAt?: string;
+  /** 🆕 تاریخچه یادآوری‌ها */
+  reminderLog?: ReminderLogEntry[];
 }
 
 export type DealUnit = 'kg' | 'g' | 'L' | 'l' | 'ml' | 'pcs' | 'vial' | 'pack' | 'ton' | 'bag' | 'dose';
@@ -408,6 +424,13 @@ export interface State {
   deleteSettlement: (id: string) => void;
   allocations: PaymentAllocation[];
   addAllocation: (a: Omit<PaymentAllocation, 'id'>) => string;
+  /** 🆕 ثبت یادآوری برای فاکتور (Phase C1) */
+  addReminder: (invoiceId: string, params: {
+    method: 'phone' | 'in_person' | 'other';
+    methodLabel?: string;
+    note: string;
+    intervalDays: number;
+  }) => void;
   updateAllocation: (id: string, patch: Partial<PaymentAllocation>) => void;
   deleteAllocation: (id: string) => void;
   addInvoice: (i: Omit<Invoice, 'id'|'createdAt'|'updatedAt'>) => string;
