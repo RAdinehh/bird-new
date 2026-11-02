@@ -209,18 +209,32 @@ ${farmName} 🐔`;
       <Field label="یادآوری بعدی">
         <div style={{ display: 'flex', gap: 4, alignItems: 'center', width: '100%' }}>
           {[3, 7, 30].map(d => (
-            <button key={d} type="button" onClick={() => setIntervalDaysStr(String(d))} style={{ ...chipStyle(intervalDaysStr === String(d)), flex: 1, padding: '6px 2px', fontSize: 'var(--fs-xs)', minWidth: 0 }}>
+            <button key={d} type="button" onClick={() => setIntervalDaysStr(String(d))} style={{ ...chipStyle(intervalDaysStr === String(d)), flex: 1, height: 32, padding: 0, fontSize: 'var(--fs-sm)', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {toFa(d)}
             </button>
           ))}
           <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
-            <Input
+            <input
+              type="text"
               inputMode="tel"
               value={intervalDaysStr}
               onChange={e => setIntervalDaysStr(e.target.value.replace(/[^0-9۰-۹]/g, ''))}
-              style={{ width: '100%', textAlign: 'center', paddingLeft: 22, paddingRight: 4, fontSize: 'var(--fs-xs)', minHeight: 30 }}
+              style={{
+                width: '100%',
+                height: 32,
+                boxSizing: 'border-box',
+                padding: '0 0 0 16px',
+                fontSize: 'var(--fs-sm)',
+                textAlign: 'center',
+                background: 'var(--input-bg)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--r-sm)',
+                color: 'var(--text)',
+                fontFamily: 'inherit',
+                outline: 'none',
+              }}
             />
-            <span style={{ position: 'absolute', left: 4, top: '50%', transform: 'translateY(-50%)', fontSize: '9px', color: 'var(--muted)', pointerEvents: 'none' }}>روز</span>
+            <span style={{ position: 'absolute', left: 6, top: '50%', transform: 'translateY(-50%)', fontSize: '10px', color: 'var(--muted)', pointerEvents: 'none' }}>روز</span>
           </div>
         </div>
       </Field>
