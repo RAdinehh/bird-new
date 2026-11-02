@@ -171,13 +171,13 @@ ${farmName} 🐔`;
       </div>
 
       <Field label="کانال">
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'nowrap', overflowX: 'auto', marginBottom: isCustomChannel ? 6 : 0 }}>
+        <div style={{ display: 'flex', gap: 4, width: '100%', marginBottom: isCustomChannel ? 6 : 0 }}>
           {CHANNEL_PRESETS.map(c => (
-            <button key={c} type="button" onClick={() => setChannel(c)} style={chipStyle(channel === c)}>
+            <button key={c} type="button" onClick={() => setChannel(c)} style={{ ...chipStyle(channel === c), flex: 1, padding: '6px 2px', fontSize: 'var(--fs-xs)', minWidth: 0 }}>
               {c}
             </button>
           ))}
-          <button type="button" onClick={() => setChannel('')} style={chipStyle(isCustomChannel)}>
+          <button type="button" onClick={() => setChannel('')} style={{ ...chipStyle(isCustomChannel), flex: 1, padding: '6px 2px', fontSize: 'var(--fs-xs)', minWidth: 0 }}>
             سایر
           </button>
         </div>
@@ -207,20 +207,21 @@ ${farmName} 🐔`;
 
 
       <Field label="یادآوری بعدی">
-        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'nowrap', overflowX: 'auto' }}>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'nowrap' }}>
           {[3, 7, 14, 30].map(d => (
             <button key={d} type="button" onClick={() => setIntervalDaysStr(String(d))} style={{ ...chipStyle(intervalDaysStr === String(d)), flexShrink: 0 }}>
               {toFa(d)} روز
             </button>
           ))}
-          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', flexShrink: 0, marginRight: 4 }}>دلخواه:</span>
-          <Input
-            inputMode="tel"
-            value={intervalDaysStr}
-            onChange={e => setIntervalDaysStr(e.target.value.replace(/[^0-9۰-۹]/g, ''))}
-            style={{ width: 60, textAlign: 'center', flexShrink: 0 }}
-          />
-          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', flexShrink: 0 }}>روز</span>
+          <div style={{ position: 'relative', flexShrink: 0 }}>
+            <Input
+              inputMode="tel"
+              value={intervalDaysStr}
+              onChange={e => setIntervalDaysStr(e.target.value.replace(/[^0-9۰-۹]/g, ''))}
+              style={{ width: 70, textAlign: 'center', paddingLeft: 28 }}
+            />
+            <span style={{ position: 'absolute', left: 6, top: '50%', transform: 'translateY(-50%)', fontSize: 'var(--fs-xs)', color: 'var(--muted)', pointerEvents: 'none' }}>روز</span>
+          </div>
         </div>
       </Field>
 
