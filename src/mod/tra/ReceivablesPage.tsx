@@ -18,6 +18,7 @@ import SummaryBox from './components/SummaryBox';
 import UpcomingDueSection from './components/UpcomingDueSection';
 import StatementModal from './components/StatementModal';
 import { agingBucketFromDue } from './formulas';
+import { agingBucketFromDeal } from './calc';
 
 type BucketKey = '0-15' | '16-30' | '31-60' | '61-90' | '+90';
 
@@ -91,6 +92,16 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
 
   const bucketSum = (key: string) =>
     (byBucket[key] || []).reduce((a, inv) => a + remaining(inv, allocations), 0);
+
+  // 🆕 Deal aging buckets (Phase B3) — same pattern as invoice
+  const byDealBucket = useMemo(() => {
+    const map: Record<string, Deal[]> = { '0-15': [], '16-30': [], '31-60': [], '61-90': [], '+90': [] };
+    openDeals.forEach(d => {
+      const b = agingBucketFromDeal(d);
+      if (map[b]) map[b].push(d);
+    });
+    return map;
+  }, [openDeals]);
 
   const totalOpen = filtered.reduce((a, inv) => a + remaining(inv, allocations), 0);
   const overdueCount = openInvoices.filter(i => {
@@ -220,45 +231,66 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
         />
       ) : null}
 
-      {/* Deal list (Phase 1 — simple) */}
-      {kind === 'deal' && effectiveTotal > 0 ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)', marginBottom: 'var(--sp-3)' }}>
-          {openDeals.map(d => {
-            const bal = computeDealBalance(d);
-            const party = contacts.find(c => c.id === d.partyId);
-            const days = dealDaysUntilDue(d);
-            return (
-              <div
-                key={d.id}
-                style={{
-                  padding: 'var(--pad-normal)',
-                  background: 'var(--card)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--r-sm)',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {party?.name || '—'}
+          {/* Deal buckets (Phase B3) */}
+          {kind === 'deal' && effectiveTotal > 0 ? (
+            <>
+              {AGING_BUCKETS.map(({ key, label, color }) => {
+                const items = byDealBucket[key] || [];
+                if (items.length === 0) return null;
+                const sum = items.reduce((a, d) => a + Math.abs(computeDealBalance(d).balance), 0);
+                const isOpen = expandedBucket === key;
+                return (
+                  <div key={key} style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', overflow: 'hidden', marginBottom: 8 }}>
+                    <div role="button" tabIndex={0} onClick={() => toggleBucket(key as BucketKey)} style={{ padding: 'var(--pad-normal)', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                      <div style={{ width: 8, height: 8, borderRadius: '50%', background: `var(--${color})`, flexShrink: 0 }} />
+                      <div style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 600 }}>
+                        {label}
+                        <span style={{ color: 'var(--muted)', fontWeight: 400, marginRight: 6 }}> • {toFa(items.length)}</span>
+                      </div>
+                      <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: `var(--${color})`, fontVariantNumeric: 'tabular-nums' }}>
+                        {toFa(sum.toLocaleString('fa-IR'))} ت
+                      </div>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={isOpen ? `var(--${color})` : 'var(--dim)'} strokeWidth="2.5" strokeLinecap="round" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform .2s' }}>
+                        <path d="m6 9 6 6 6-6" />
+                      </svg>
                     </div>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {d.description || d.type}
-                      {days !== null ? ` • ${dueLabel(days)}` : ''}
+                    <div style={{ display: 'grid', gridTemplateRows: isOpen ? '1fr' : '0fr', transition: 'grid-template-rows 250ms cubic-bezier(.16,1,.3,1)' }}>
+                      <div style={{ overflow: 'hidden' }}>
+                        <div style={{ padding: '0 12px 10px', display: 'flex', flexDirection: 'column', gap: 5 }}>
+                          {items.map(d => {
+                            const bal = computeDealBalance(d);
+                            const party = contacts.find(c => c.id === d.partyId);
+                            const days = dealDaysUntilDue(d);
+                            return (
+                              <div key={d.id} style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                                  <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                      {party?.name || '—'}
+                                    </div>
+                                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                      {d.description || d.type}
+                                      {days !== null ? ` • ${dueLabel(days)}` : ''}
+                                    </div>
+                                  </div>
+                                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
+                                    <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: bal.balance >= 0 ? 'var(--accent)' : 'var(--danger)', fontVariantNumeric: 'tabular-nums' }}>
+                                      {toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} ت
+                                    </div>
+                                    <Btn size="sm" variant="outline" onClick={() => setDealPayTarget(d)} style={{ fontSize: 11, padding: '2px 8px', minHeight: 24, height: 24 }}>💳 ثبت</Btn>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
-                                      <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: bal.balance >= 0 ? 'var(--accent)' : 'var(--danger)', fontVariantNumeric: 'tabular-nums' }}>
-                    {toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} ت
-                    </div>
-                    <Btn size="sm" variant="outline" onClick={() => setDealPayTarget(d)} style={{ fontSize: 11, padding: '2px 8px', minHeight: 24, height: 24 }}>💳 ثبت</Btn>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      ) : null}
+                );
+              })}
+            </>
+          ) : null}
 
 
       {/* Buckets — فقط اگه پر باشن */}
