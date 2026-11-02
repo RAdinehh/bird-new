@@ -218,7 +218,7 @@ ${farmName} 🐔`;
             <input
               type="text"
               inputMode="tel"
-              value={isCustomInterval ? toFa(intervalDaysStr) : ''}
+              value={toFa(intervalDaysStr)}
               onChange={e => {
                 const v = e.target.value.replace(/[^0-9۰-۹]/g, '');
                 setIntervalDaysStr(v);
