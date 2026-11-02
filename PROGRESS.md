@@ -870,3 +870,40 @@ Deals (معاملات خاص) — چرخه کامل: Deal → Settlement → Inv
 - **Gap ۲**: MSG در ۱۰ فایل rules
 - **L11 tests**: `getDealPaymentFormSchema`
 - **RHF Pilot** — تصمیم نهایی
+
+---
+
+## 📅 جلسه ۱۴۰۵/۱۱/۰۲ (ادامه) — Intelligence فاز ۱ کامل
+
+### ✅ DONE — ۶ commit اضافه
+
+| # | Commit | موضوع |
+|---|--------|-------|
+| ۱۴ | `2644a9a2` | Intelligence: normalize tra.price_* to baseUnit (Gap 8) |
+| ۱۵ | `c880e557`* | feat(intelligence): species_temp resolver (Gap 6) |
+| ۱۶ | `d3e8f04c`* | feat(intelligence): rule mode n>=2 (Gap 9) |
+| ۱۷ | `60edebdc` | feat(intelligence): wire inc.temperature FieldHint (Gap 5 partial) |
+| ۱۸ | (current) | refactor(validation): MSG tra + whs (Gap 2 partial) |
+
+*commit hash تقریبی
+
+### 🎯 Intelligence Gaps رفع‌شده امروز
+
+| Gap | قبل | بعد |
+|---|---|---|
+| **Gap 6** — species_temp resolver | ❌ پیاده نشده | ✅ inc/rent/dlg/hal: biological + species_temp |
+| **Gap 8** — Unit normalization | ❌ 1L vs 500ml کاذب | ✅ basePrice با UOM factor |
+| **Gap 9** — Rule mode n≥2 | ❌ تجهیزات 5M→10M کور | ✅ last vs prev (ratio ≥1.5) |
+| **Gap 10** — Dedup + time-span | ❌ 6 save در 2 دقیقه = break | ✅ same-day same-value no-op + 7d guard |
+| **Gap 2** — MSG hardcoded | ⚠️ 9 باقی‌مونده | ✅ 4 تبدیل (76 = business logic، استاندارد) |
+| **Gap 5** — FieldHint wiring | ⚠️ hal/inc بدون hint | ✅ inc.temperature اضافه شد (hal.targetTemp از OverrideHint استفاده می‌کنه — بهتر) |
+
+### 📊 Test coverage
+- intelligence.test.ts: 37/37
+- tra-over-sale-and-merge.test.ts: 7/7
+
+### ⏸ PENDING (جلسه بعد)
+- **Gap 5 (broader)**: FieldHint به hal/egg/fed/ctc/cal (کل UI wiring)
+- **Gap 2 (business)**: بررسی 76 hardcoded — کدوم واقعاً business؟
+- **L11 tests**: getDealPaymentFormSchema
+- **RHF Pilot** — تصمیم نهایی
