@@ -213,14 +213,14 @@ ${farmName} 🐔`;
               {toFa(d)}
             </button>
           ))}
-          <div style={{ position: 'relative', flexShrink: 0 }}>
+          <div style={{ position: 'relative', width: 75, flexShrink: 0 }}>
             <Input
               inputMode="tel"
               value={intervalDaysStr}
               onChange={e => setIntervalDaysStr(e.target.value.replace(/[^0-9۰-۹]/g, ''))}
-              style={{ width: 60, textAlign: 'center', paddingLeft: 24, paddingRight: 4 }}
+              style={{ width: '100%', textAlign: 'center', paddingLeft: 24, paddingRight: 4 }}
             />
-            <span style={{ position: 'absolute', left: 4, top: '50%', transform: 'translateY(-50%)', fontSize: '10px', color: 'var(--muted)', pointerEvents: 'none' }}>روز</span>
+            <span style={{ position: 'absolute', left: 6, top: '50%', transform: 'translateY(-50%)', fontSize: '10px', color: 'var(--muted)', pointerEvents: 'none' }}>روز</span>
           </div>
         </div>
       </Field>
