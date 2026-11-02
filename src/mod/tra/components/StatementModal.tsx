@@ -147,13 +147,19 @@ export default function StatementModal({ open, onClose, kind }: Props) {
     raw.sort((a, b) => a.date.localeCompare(b.date));
     let running = 0;
     return raw.map(l => {
-      running += l.debit - l.credit;
+      // 🆕 Skip pending checks from running balance (only cleared checks count as paid)
+      const effectiveCredit = (l.kind === 'payment_check' && l.checkStatus !== 'cleared') ? 0 : l.credit;
+      running += l.debit - effectiveCredit;
       return { ...l, balance: running };
     });
   }, [invoices, deals, partyId, fromDate, toDate]);
 
   const totalDebit = lines.reduce((s, l) => s + l.debit, 0);
-  const totalCredit = lines.reduce((s, l) => s + l.credit, 0);
+  const totalCredit = lines.reduce((s, l) => {
+    // 🆕 Skip pending checks (only cleared checks counted)
+    if (l.kind === 'payment_check' && l.checkStatus !== 'cleared') return s;
+    return s + l.credit;
+  }, 0);
   const netBalance = totalDebit - totalCredit;
 
   const groupedLines = useMemo(() => {
