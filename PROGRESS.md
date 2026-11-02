@@ -1,11 +1,59 @@
 # PROGRESS.md — وضعیت ۲۰۵ مفهوم
 
 ## 🎯 CURRENT
-- بخش: tra (dunning) — تکمیل‌شده
-- وضعیت: Dunning C4+C5 ✅ | L11 ctc/validation tests ✅ (۹۲ تست جدید)
-- آخرین commit: 4a8dc7ac
-- PENDING بعدی: DealPrint | Phase F (Lot Tracking) | Phase G-2
+- بخش: tra (همه ماژول‌ها تکمیل)
+- وضعیت: Dunning C4+C5 کامل (شامل gap) ✅ | ChecksModal ✅ | DealPrint ✅
+- آخرین commit: e626e13d
+- PENDING بعدی: Phase F (Lot Tracking) | Phase G-2 (40 file) | bounce gap
 - فاز: done
+
+## 🎯 جلسه ۱۴۰۵/۱۱/۰۳ — تکمیل Dunning + ChecksModal + DealPrint (~۱۶ commit)
+
+### کارهای انجام‌شده
+
+#### Dunning — تکمیل کامل
+- **`0c753940`** — fix: `clearPartyPayment`/`bouncePartyPayment` همگام با `deals.payments` (باگ: چک‌های معامله بعد از پاس شدن در StatementModal همچنان «در انتظار» می‌ماندن)
+- **`0ec0a9fd`** — C5 gap: `addAllocation` → auto-cancel `nextReminderAt` وقتی فاکتور کامل پرداخت شد (۷ تست)
+- **`e626e13d`** — C5 gap: `clearPartyPayment` → auto-cancel `nextReminderAt` وقتی فاکتور کامل پرداخت شد (۲ تست)
+
+**نتیجه:** Dunning حالا در ۳ مسیر auto-cancel دارد: `updateInvoice` + `addAllocation` + `clearPartyPayment`
+
+#### Checks — مدیریت چک
+- **`c3a5be49`** — افزودن `in_transit` (در جریان وصول) به `CheckStatus` + `depositPartyPayment` action
+- **ChecksModal** — کامپوننت جدید در `components/ChecksModal.tsx`:
+  - ۴ وضعیت: در دست / در جریان / وصول شده / برگشتی
+  - خلاصه مالی ۲×۲ + فیلتر ۶ گزینه‌ای
+  - گروه‌بندی ۳ سطح: فوری (≤۷ روز) / باز / بسته‌شده
+  - سلسله‌مراتب بصری ۳ سطح: نام+مبلغ ← موضوع+سرسید ← چک+فاکتور
+  - دکمه در `ReceivablesPage` (۳ دکمه کنار: دریافت گروهی / صورت‌حساب / چک‌ها)
+- **`ad04db9a`** — L11 test: sync clear/bounce/deposit در ۳ منبع (۱۴ تست)
+
+#### DealPrint
+- **`353675ff`** — `components/DealPrint.tsx` — سند چاپ قرارداد معامله (SAP MRKO style)
+  - پیش‌نمایش modal + چاپ PDF
+  - جدول کالاها، خلاصه مالی (فروش/کمیسیون/سهم/مانده)، جدول پرداخت‌ها با وضعیت چک
+  - امضا دوگانه + تاریخ چاپ
+  - دکمه «🖨️ چاپ قرارداد» در `DealsPage`
+
+### 🔍 کشف‌ها و تصمیمات
+- **`bouncePartyPayment` gap:** بعد از برگشت چک، `nextReminderAt` دوباره فعال نمی‌شود (چون هنوز قابل توجه است) — ثبت برای جلسه بعد
+- **`addPartyPayment` نیازی به patch ندارد:** چون `remaining` را تغییر نمی‌دهد؛ فقط رکورد `PartyPayment` می‌سازد. تمام impact از `addAllocation` می‌آید
+- **Strip-based patch** برای `clearPartyPayment` — چون indent دقیق `});` با `cat -A` متفاوت بود
+
+### 🧪 تست‌های جدید (جمع: ۲۳)
+- `store-tra-checks.test.ts` — ۱۴ (deposit/clear/bounce sync در ۳ منبع)
+- `store-tra-c5-gap.test.ts` — ۹ (auto-cancel در addAllocation + clearPartyPayment)
+
+### ⏸ PENDING (جلسه بعد)
+- **bounce gap:** `bouncePartyPayment` → بازگرداندن `nextReminderAt` (بررسی منطق business)
+- Phase F (Lot Tracking) — بزرگ
+- Phase G-2 (40 file migration) — بزرگ
+
+### 🧪 توصیه جلسه بعد
+اول: **bounce gap** (کوچک، ۱ ساعت)
+یا: **Phase F** (بزرگ، نیاز به جلسه کامل)
+
+---
 
 ## 🎯 جلسه ۱۴۰۵/۱۱/۰۲ — Dunning C4+C5 + L11 tests (۶ commit)
 
