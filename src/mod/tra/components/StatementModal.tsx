@@ -6,7 +6,7 @@ import { useState, useMemo } from 'react';
 import { Modal, Btn, BtnRow, ModalFooter, Field, Grid2, Select } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 import { useTra, computeDealBalance, DEAL_LABEL } from '../store';
-import { useCtc } from '../../ctc/store';
+import { useCtc, ROLE_LABEL } from '../../ctc/store';
 import { useSet } from '../../set/store';
 import { toFa, numberToWords } from '../../../shr/utils/fa';
 import { printHTML } from '../../../shr/utils/export';
@@ -367,11 +367,13 @@ export default function StatementModal({ open, onClose, kind }: Props) {
         <Field label="طرف حساب" required>
           <Select value={partyId} onChange={e => setPartyId(e.target.value)}>
             <option value="">— انتخاب —</option>
-            {parties.map(c => (
-              <option key={c.id} value={c.id}>
-                {c.name}{(c as any).phone ? ` (${toFa(String((c as any).phone))})` : ''}
-              </option>
-            ))}
+            {parties.map(c => {
+              const rolesStr = (c.roles || []).map((r: any) => ROLE_LABEL[r as keyof typeof ROLE_LABEL] || r).join('، ');
+              const suffix = rolesStr ? ` — ${rolesStr}` : '';
+              return (
+                <option key={c.id} value={c.id}>{c.name}{suffix}</option>
+              );
+            })}
           </Select>
         </Field>
         
