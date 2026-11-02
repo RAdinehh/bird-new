@@ -611,14 +611,14 @@ export const DealSchema = z.object({
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'درصد کمیسیون نمی‌تواند بیشتر از ۱۰۰ باشد', path: ['settlementValue'] });
       }
       if (d.settlementValue < 0) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'درصد کمیسیون نمی‌تواند منفی باشد', path: ['settlementValue'] });
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.nonNegativeNumber('درصد کمیسیون'), path: ['settlementValue'] });
       }
     }
     if (d.status === 'cancelled' && (!d.cancelReason || String(d.cancelReason).trim() === '')) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('دلیل لغو'), path: ['cancelReason'] });
   }
   if (d.settlementType && d.settlementType !== 'barter_direct' && (d.settlementValue == null || d.settlementValue <= 0)) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'مقدار تسویه را وارد کنید', path: ['settlementValue'] });
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('مقدار تسویه'), path: ['settlementValue'] });
   }
   // جمع تحویل هر کالا ≤ مقدار کل
   (d.goods || []).forEach((good: any, gi: number) => {

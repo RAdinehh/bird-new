@@ -6,6 +6,7 @@ import {
   requiredStr, optionalStr, optionalId, requiredId,
   floatNonNeg, floatPos, intNonNeg, persianDate, persianDateOpt, oneOf,
 } from '../helpers';
+import { MSG } from '../errorMessages';
 import type { ValidationContext } from '../types';
 
 const CATEGORIES = ['feed', 'medicine', 'vaccine', 'herbal', 'equipment', 'consumable', 'egg', 'manure', 'broken'] as const;
@@ -62,14 +63,14 @@ export function createMovementSchema(_ctx: ValidationContext = {}) {
     if (data.type !== 'adjust' && data.quantity <= 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'مقدار باید بیشتر از صفر باشد',
+        message: MSG.positiveNumber('مقدار'),
         path: ['quantity'],
       });
     }
     if ((data.reason === 'purchase' || data.reason === 'sale') && !data.partyId) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'طرف معامله را انتخاب کنید',
+        message: MSG.select('طرف معامله'),
         path: ['partyId'],
       });
     }
