@@ -13,7 +13,7 @@ import { bus } from '../../cor/events';
 
 import type { Invoice, InvoiceItem, State, DeletedInvoiceSnapshot, DeletedDealSnapshot, Deal, Settlement } from './types';
 import { saveToRecycleBin, removeFromRecycleBin, listRecycleBin } from '../../shr/utils/recycleBin';
-import { applyPaymentsToInstallments, paidSumAllocated, computeCashDiscount, getTodayJalali, addJalaliDays } from './calc';
+import { applyPaymentsToInstallments, paidSumAllocated, computeCashDiscount, getTodayJalali, addJalaliDays, remaining } from './calc';
 import { applyInvoiceFlocks, applyInvoiceEquipment, applyInvoiceEgg, BIRD_CATS } from './invoiceHelpers';
 import { applyInvoiceStock } from './applyStock';
 import { generateInvoiceNumber, paidSum } from './calc';
@@ -233,6 +233,14 @@ export const useTra = create<State>()(
             }
           } catch(e) { console.error('[updateInvoice] alloc sync:', e); }
         }
+
+      // 🆕 dunning C5 — auto-cancel reminder if fully paid
+      try {
+        const cur = get().invoices.find(x => x.id === id);
+        if (cur && cur.nextReminderAt && remaining(cur, get().allocations) <= 0) {
+          set({ invoices: get().invoices.map(x => x.id === id ? { ...x, nextReminderAt: undefined, updatedAt: now() } : x) });
+        }
+      } catch(e) { console.error('[updateInvoice] auto-cancel reminder:', e); }
       },
       restoreInvoice: (id) => {
         const snapshot = removeFromRecycleBin<DeletedInvoiceSnapshot>(
