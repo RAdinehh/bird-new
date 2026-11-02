@@ -206,6 +206,12 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
   useFab(active ? { label: 'ثبت فاکتور', onClick: openNew, wakeMode: false } : null);
 
   // ═══ اعتبارسنجی زنده ═══
+  // 🆕 Filter empty items/payments to match save() behavior in useInvoiceForm.ts
+  const _cleanItemsForValidation = form.items.filter(it =>
+    !((Number(it.quantity) || 0) === 0 && (Number(it.unitPrice) || 0) === 0 && !String(it.description || '').trim())
+  );
+  const _cleanPaymentsForValidation = form.payments.filter(pp => (Number(pp.amount) || 0) > 0);
+
   const { errors: vErrors } = useValidation(
     createInvoiceSchema({ flocks, whsItems, contacts, invoices, allocations, isEdit: !!form.id }),
     {
@@ -213,14 +219,14 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
       date: form.date || '',
       partyId: form.partyId || '',
       category: form.category || '',
-      items: form.items.map(it => ({
+      items: _cleanItemsForValidation.map(it => ({
         ...it,
         category: it.category || form.category,
       })),
       discount: 0,
       shipping: 0,
       total: Number(total) || 0,
-      payments: form.payments.map(pp => ({
+      payments: _cleanPaymentsForValidation.map(pp => ({
         date: pp.date || '',
         amount: Number(pp.amount) || 0,
         method: pp.method,
