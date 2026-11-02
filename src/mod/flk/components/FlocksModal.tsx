@@ -141,7 +141,6 @@ export default function FlocksModal(props: FlocksModalProps) {
         </BtnRow>
       }
     >
-      <FlockIntegrityWarning form={form} setForm={setForm} />
       <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>🏷 هویت</div>
       <Grid2>
   <Field label="نام گله" required error={showError('name')} onTouch={() => markTouched('name')}>
@@ -386,7 +385,7 @@ export default function FlocksModal(props: FlocksModalProps) {
         <DepBox title="اطلاعات گله مادر" tone="purple">
           <Grid3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-              <Field label="تعداد خروس" error={showError('maleCount')} onTouch={() => markTouched('maleCount')}>
+              <Field label="تعداد خروس">
                 <NumField placeholder="۸۰" value={form.maleCount} onChange={e => setForm({ ...form, maleCount: e.target.value })} min={0} max={100000} unit="پرنده" />
               </Field>
               {!showError('maleCount') && <FieldHint fieldPath="flk.maleCount" value={form.maleCount} context={{ initialCount: form.initialCount }} />}
@@ -404,6 +403,7 @@ export default function FlocksModal(props: FlocksModalProps) {
             {!showError('unknownCount') && <FieldHint fieldPath="flk.unknownCount" value={form.unknownCount} context={{ initialCount: form.initialCount }} />}
           </div>
           </Grid3>
+          <FlockIntegrityWarning form={form} setForm={setForm} />
           {form.maleCount && form.femaleCount && (() => {
             const male = parseInt(toEn(form.maleCount)) || 0;
             const female = parseInt(toEn(form.femaleCount)) || 0;
@@ -416,22 +416,6 @@ export default function FlocksModal(props: FlocksModalProps) {
                 <div style={{ padding: 'var(--pad-normal)', background: 'var(--purple-soft)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--purple)', fontWeight: 600 }}>
                   نسبت خروس به مرغ: {sexRatio(male, female)}
                 </div>
-                {mismatch && (
-                  <div style={{
-                    padding: '8px 12px',
-                    background: 'var(--warn-soft)',
-                    border: '1px solid rgba(245,158,11,.4)',
-                    borderRadius: 'var(--r-md)',
-                    color: 'var(--warn)',
-                    fontSize: 'var(--fs-xs)',
-                    fontWeight: 600,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6,
-                  }}>
-                    مجموع ({toFa(sum)}) ≠ تعداد اولیه ({toFa(init)})
-                  </div>
-                )}
               </>
             );
           })()}
