@@ -157,7 +157,6 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
                   }
                 }}
                 options={[
-                  { value: '', label: '— بدون بانک —' },
                   ...BANKS_BY_GROUP.gov.map(b => ({
                     value: b.key,
                     label: b.label,
