@@ -6,6 +6,7 @@ import { useState, useMemo } from 'react';
 import { Modal, Btn, BtnRow, ModalFooter, Field, Grid2, Select } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 import { useTra, computeDealBalance, DEAL_LABEL } from '../store';
+import type { CheckStatus } from '../types';
 import { useCtc, ROLE_LABEL } from '../../ctc/store';
 import { useSet } from '../../set/store';
 import { toFa, numberToWords } from '../../../shr/utils/fa';
@@ -19,7 +20,6 @@ interface Props {
 }
 
 type LineKind = 'invoice_sale' | 'invoice_purchase' | 'deal' | 'payment_cash' | 'payment_card' | 'payment_check';
-type CheckStatus = 'pending' | 'cleared' | 'bounced';
 
 interface StatementLine {
   date: string;
@@ -46,6 +46,7 @@ const KIND_INFO: Record<LineKind, { icon: string; label: string; color: string }
 
 const CHECK_INFO: Record<CheckStatus, { label: string; bg: string; color: string }> = {
   pending: { label: 'در انتظار', bg: 'var(--warn-soft)', color: 'var(--warn)' },
+  in_transit: { label: 'در جریان', bg: 'var(--info-soft, rgba(2,132,199,.12))', color: 'var(--info, #0284c7)' },
   cleared: { label: 'پاس شده', bg: 'var(--accent-soft)', color: 'var(--accent)' },
   bounced: { label: 'برگشتی', bg: 'var(--danger-soft)', color: 'var(--danger)' },
 };

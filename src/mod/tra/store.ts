@@ -638,6 +638,41 @@ export const useTra = create<State>()(
         }),
       });
       },
+      depositPartyPayment: (ppId: string) => {
+        const pp = get().partyPayments.find(x => x.id === ppId);
+        if (!pp) return;
+        set({
+          partyPayments: get().partyPayments.map(x => x.id === ppId
+            ? { ...x, status: 'in_transit' as const }
+            : x),
+        });
+        set({
+          invoices: get().invoices.map(inv => {
+            const payments = inv.payments || [];
+            if (!payments.some((p: any) => p.partyPaymentId === ppId)) return inv;
+            return {
+              ...inv,
+              payments: payments.map((p: any) => p.partyPaymentId === ppId
+                ? { ...p, status: 'in_transit' as const }
+                : p),
+              updatedAt: new Date().toISOString(),
+            };
+          }),
+        });
+        set({
+          deals: get().deals.map(deal => {
+            const payments = deal.payments || [];
+            if (!payments.some((p: any) => p.partyPaymentId === ppId)) return deal;
+            return {
+              ...deal,
+              payments: payments.map((p: any) => p.partyPaymentId === ppId
+                ? { ...p, status: 'in_transit' as const }
+                : p),
+              updatedAt: new Date().toISOString(),
+            };
+          }),
+        });
+      },
       clearPartyPayment: (ppId: string) => {
         const pp = get().partyPayments.find(x => x.id === ppId);
         if (!pp) return;

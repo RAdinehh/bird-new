@@ -12,7 +12,7 @@ export type DealType = 'consignment' | 'partnership' | 'barter' | 'conditional';
 
 export type PaymentTerms = 'cash' | 'installment' | 'custom';
 export type WorkflowStatus = 'draft' | 'confirmed' | 'received' | 'paid';
-export type CheckStatus = 'pending' | 'cleared' | 'bounced';
+export type CheckStatus = 'pending' | 'in_transit' | 'cleared' | 'bounced';
 
 export interface Installment {
   id: string;
@@ -54,7 +54,8 @@ export const WORKFLOW_LABEL: Record<WorkflowStatus, string> = {
 };
 
 export const CHECK_STATUS_LABEL: Record<CheckStatus, string> = {
-  pending: '🟡 در جریان',
+  pending: '🟡 در دست',
+  in_transit: '🔵 در جریان وصول',
   cleared: '✅ نقد شد',
   bounced: '❌ برگشتی',
 };
@@ -326,7 +327,7 @@ export interface DealPayment {
   bank?: string;
   dueDate?: string;
   /** 🆕 وضعیت چک (فقط برای method='check') */
-  status?: 'pending' | 'cleared' | 'bounced';
+  status?: 'pending' | 'in_transit' | 'cleared' | 'bounced';
   /** 🆕 تاریخ پاس شدن چک */
   clearedDate?: string;
   /** 🆕 تاریخ برگشت چک */
@@ -452,6 +453,7 @@ export interface State {
   deletePartyPayment: (id: string) => void;
   bouncePartyPayment: (ppId: string) => void;
   clearPartyPayment: (ppId: string) => void;
+  depositPartyPayment: (ppId: string) => void;
 }
 
 
