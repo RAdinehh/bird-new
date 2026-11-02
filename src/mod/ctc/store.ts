@@ -6,6 +6,9 @@ import { showToast } from '../../cor/store/toast';
 
 export type Role = 'customer' | 'supplier' | 'worker';
 
+/** 🆕 عنوان/جنسیت برای پیام‌های محترمانه (یادآوری، صورت‌حساب) */
+export type Salutation = 'mr' | 'mrs' | 'company' | 'unspecified';
+
 export interface Person {
   id: string;
   name: string;
@@ -40,6 +43,10 @@ export interface Person {
   updatedAt: string;
   /** موجودی اعتباری: مثبت=طلبکار، منفی=بدهکار */
   creditBalance?: number;
+  /** 🆕 عنوان: آقا/خانم/شرکت/بی‌طرف (برای پیام‌های محترمانه) */
+  salutation?: Salutation;
+  /** 🆕 فاصله پیش‌فرض یادآوری (روز) برای این شخص. undefined → global (7) */
+  reminderIntervalDays?: number;
 }
 
 interface State {
