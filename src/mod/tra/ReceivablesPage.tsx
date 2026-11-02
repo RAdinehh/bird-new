@@ -4,6 +4,7 @@
 import { useState, useMemo } from 'react';
 import { daysUntilDue, dueTone, dueLabel } from './helpers';
 import DeferModal from './components/DeferModal';
+import ReminderModal from './components/ReminderModal';
 import { useTra, remaining, ageDays, agingBucket, AGING_BUCKETS, paidSumAllocated, WORKFLOW_LABEL, computeDealBalance, dealDaysUntilDue, isDealOpen, type Invoice, type Deal, type Deferral } from './store';
 import { useCtc } from '../ctc/store';
 import { Btn, Empty, PageContainer } from '../../shr/components/ui';
@@ -36,6 +37,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   const [showUpcoming, setShowUpcoming] = useState(false);
   const [dealPayTarget, setDealPayTarget] = useState<Deal | null>(null);
   const [statementOpen, setStatementOpen] = useState(false);
+  const [reminderTarget, setReminderTarget] = useState<Invoice | null>(null);
 
   const openInvoices = useMemo(
     () => invoices.filter(i => i.type === kind && remaining(i, allocations) > 0),
@@ -393,7 +395,10 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                               }}>
                                 {toFa(rem.toLocaleString('fa-IR'))} تومان
                               </div>
-                              <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setMultiPayPrefill({ partyId: inv.partyId, invoiceId: inv.id }); setMultiPayOpen(true); }} style={{ fontSize: 11, padding: '2px 8px', minHeight: 24, height: 24 }}>💳</Btn>
+                              <div style={{ display: 'flex', gap: 4 }}>
+                                <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setMultiPayPrefill({ partyId: inv.partyId, invoiceId: inv.id }); setMultiPayOpen(true); }} style={{ fontSize: 11, padding: '2px 8px', minHeight: 24, height: 24 }}>💳</Btn>
+                                <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setReminderTarget(inv); }} style={{ fontSize: 11, padding: '2px 8px', minHeight: 24, height: 24 }}>📨</Btn>
+                              </div>
                             </div>
 
                             <div style={{
@@ -415,6 +420,9 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                                   ) : null}
                                   {inv.deferrals && inv.deferrals.length > 0 ? (
                                     <Line l="تعویق‌ها" v={toFa(inv.deferrals.length)} />
+                                  ) : null}
+                                  {inv.reminderLog && inv.reminderLog.length > 0 ? (
+                                    <Line l="آخرین یادآوری" v={`${toFa(inv.reminderLog[inv.reminderLog.length - 1].date)}${inv.reminderLog[inv.reminderLog.length - 1].methodLabel ? ' — ' + inv.reminderLog[inv.reminderLog.length - 1].methodLabel : ''}`} />
                                   ) : null}
 
                                   <div style={{ marginTop: 4 }}>
@@ -438,6 +446,11 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
       ) : null}
 
       {/* Modal تعویق */}
+      <ReminderModal
+        open={!!reminderTarget}
+        onClose={() => setReminderTarget(null)}
+        invoice={reminderTarget}
+      />
       <DeferModal
         deferModal={deferModal}
         onClose={() => setDeferModal(null)}
