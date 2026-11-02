@@ -682,10 +682,12 @@ export const useTra = create<State>()(
             ? { ...x, status: 'cleared' as const, clearedDate: today, bouncedDate: '' }
             : x),
         });
+        const targetInvoiceIds: string[] = [];
         set({
           invoices: get().invoices.map(inv => {
             const payments = inv.payments || [];
             if (!payments.some((p: any) => p.partyPaymentId === ppId)) return inv;
+            targetInvoiceIds.push(inv.id);
             return {
               ...inv,
               payments: payments.map((p: any) => p.partyPaymentId === ppId
@@ -708,6 +710,30 @@ export const useTra = create<State>()(
           };
         }),
       });
+        // 🆕 dunning C5 gap: auto-cancel reminders on invoices now fully paid
+        try {
+          const st = get();
+          let changed = false;
+          const updatedInvoices = st.invoices.map(inv => {
+            if (!targetInvoiceIds.includes(inv.id)) return inv;
+            if (!inv.nextReminderAt) return inv;
+            const invAllocs = st.allocations.filter(al => al.invoiceId === inv.id);
+            let paid = 0;
+            for (const al of invAllocs) {
+              const p = (inv.payments || []).find(pp2 => pp2.id === al.paymentId);
+              if (!p) continue;
+              if (p.method === 'check' && p.status !== 'cleared') continue;
+              if (p.type === 'refund') paid -= al.amount;
+              else paid += al.amount;
+            }
+            if (paid >= (inv.total || 0)) {
+              changed = true;
+              return { ...inv, nextReminderAt: undefined, updatedAt: new Date().toISOString() };
+            }
+            return inv;
+          });
+          if (changed) set({ invoices: updatedInvoices });
+        } catch(e) { console.error('[clearPartyPayment] auto-cancel reminder:', e); }
       },
 
       addDeal: (d) => set({ deals: [...get().deals, {...d, id: uuid(), createdAt: now(), updatedAt: now()}] }),
