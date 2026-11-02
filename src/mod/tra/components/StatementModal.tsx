@@ -131,7 +131,7 @@ export default function StatementModal({ open, onClose }: Props) {
           checkNo: p.method === 'check' ? p.checkNo : undefined,
           bank: p.method === 'check' ? p.bank : undefined,
           dueDate: p.method === 'check' ? p.dueDate : undefined,
-          checkStatus: p.method === 'check' ? 'pending' : undefined,
+          checkStatus: p.method === 'check' ? (p.status || 'pending') : undefined,
           description: p.notes || (p.direction === 'in' ? 'دریافت از طرف' : 'پرداخت به طرف'),
           debit: p.direction === 'out' ? p.amount : 0,
           credit: p.direction === 'in' ? p.amount : 0,

@@ -155,7 +155,7 @@ export default function MultiPayModal({ open, onClose, kind }: Props) {
             value={partyId}
             onChange={v => { setPartyId(v); setSelectedIds(new Set()); }}
             options={contacts
-              .filter(c => kind === 'sale' ? true : true)
+              .filter(c => kind === 'sale' ? c.roles?.includes('customer') : c.roles?.includes('supplier'))
               .map(c => ({ value: c.id, label: c.name }))}
             placeholder="— انتخاب —"
             modalTitle="انتخاب طرف حساب"

@@ -309,6 +309,12 @@ export interface DealPayment {
   checkNo?: string;
   bank?: string;
   dueDate?: string;
+  /** 🆕 وضعیت چک (فقط برای method='check') */
+  status?: 'pending' | 'cleared' | 'bounced';
+  /** 🆕 تاریخ پاس شدن چک */
+  clearedDate?: string;
+  /** 🆕 تاریخ برگشت چک */
+  bouncedDate?: string;
 }
 
 export interface DealSale {
