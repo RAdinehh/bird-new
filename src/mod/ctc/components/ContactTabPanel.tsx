@@ -13,6 +13,8 @@ import HelpBanner from '../../../shr/components/HelpBanner';
 import { toFa } from '../../../shr/utils/fa';
 import UndoBar from '../../../cor/ui/UndoBar';
 import { toastMsg } from '../../../cor/store/toast';
+import { copyText, shareText } from '../../../shr/utils/clipboard';
+import { formatContactSection, formatAddressSection, formatBankSection, formatFullContact } from '../format';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { logAction } from '../../../cor/logger/auditLog';
 import { Row } from '../helpers';
@@ -24,6 +26,50 @@ interface Props {
   active: boolean;
   onEdit: (p: Person) => void;
   onAdd: () => void;
+}
+
+function CopyBtn({ text }: { text: string }) {
+  if (!text) return null;
+  return (
+    <button type="button"
+      onClick={async (e) => {
+        e.stopPropagation();
+        const ok = await copyText(text);
+        if (ok) toastMsg.success('کپی شد');
+        else toastMsg.error('کپی نشد');
+      }}
+      title="کپی"
+      aria-label="کپی"
+      style={{ background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer', padding: '4px', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center' }}
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+      </svg>
+    </button>
+  );
+}
+
+function ShareBtn({ title, text }: { title: string; text: string }) {
+  if (!text) return null;
+  return (
+    <button type="button"
+      onClick={async (e) => {
+        e.stopPropagation();
+        const result = await shareText({ title, text });
+        if (result.status === 'shared') toastMsg.success('ارسال شد');
+        else if (result.status === 'copied') toastMsg.info('کپی شد — در اپ دیگر paste کنید');
+        else if (result.status === 'failed') toastMsg.error('اشتراک ناموفق');
+      }}
+      title="اشتراک"
+      aria-label="اشتراک"
+      style={{ background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer', padding: '4px', fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center' }}
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
+      </svg>
+    </button>
+  );
 }
 
 export default function ContactTabPanel({ tab, active, onEdit, onAdd }: Props) {
@@ -186,7 +232,13 @@ export default function ContactTabPanel({ tab, active, onEdit, onAdd }: Props) {
                   {p.roles.includes('supplier') && p.supplierTypes.length > 0 ? <span>کالاها: <b style={{ color: 'var(--text)' }}>{toFa(p.supplierTypes.length)}</b></span> : null}
                 </>}
               >
-                <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📞 اطلاعات تماس</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📞 اطلاعات تماس</div>
+                  <div style={{ display: 'flex', gap: 4 }}>
+                    <CopyBtn text={formatContactSection(p)} />
+                    <ShareBtn title={`تماس ${p.name}`} text={formatContactSection(p)} />
+                  </div>
+                </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <Row l="تلفن اصلی" v={p.phone || '—'} />
                   {p.phone2 && <Row l="تلفن دوم" v={p.phone2} />}
@@ -196,11 +248,32 @@ export default function ContactTabPanel({ tab, active, onEdit, onAdd }: Props) {
 
                 {(p.city || p.address) && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📍 آدرس</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📍 آدرس</div>
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        <CopyBtn text={formatAddressSection(p)} />
+                        <ShareBtn title={`آدرس ${p.name}`} text={formatAddressSection(p)} />
+                      </div>
+                    </div>
                     <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)',
                        background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', lineHeight: 1.7 }}>
                       {p.city && <div>{p.city}</div>}
                       {p.address && <div style={{ color: 'var(--muted)' }}>{p.address}</div>}
+                    </div>
+                  </>
+                )}
+
+                {p.bankAccount && (p.bankAccount.bank || p.bankAccount.accountHolder || p.bankAccount.accountNumber || p.bankAccount.cardNumber || p.bankAccount.shaba) && (
+                  <>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🏦 اطلاعات بانکی</div>
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        <CopyBtn text={formatBankSection(p)} />
+                        <ShareBtn title={`بانک ${p.name}`} text={formatBankSection(p)} />
+                      </div>
+                    </div>
+                    <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
+                      {formatBankSection(p)}
                     </div>
                   </>
                 )}
@@ -255,6 +328,21 @@ export default function ContactTabPanel({ tab, active, onEdit, onAdd }: Props) {
                 )}
 
                 <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-1)' }}>
+                  <Btn size="sm" onClick={async (e) => { e.stopPropagation(); const ok = await copyText(formatFullContact(p)); if (ok) toastMsg.success('همه کپی شد'); else toastMsg.error('کپی نشد'); }} style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    </svg>
+                    کپی همه
+                  </Btn>
+                  <Btn size="sm" onClick={async (e) => { e.stopPropagation(); const r = await shareText({ title: p.name, text: formatFullContact(p) }); if (r.status === 'shared') toastMsg.success('ارسال شد'); else if (r.status === 'copied') toastMsg.info('کپی شد — paste کنید'); else if (r.status === 'failed') toastMsg.error('ناموفق'); }} style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
+                    </svg>
+                    اشتراک
+                  </Btn>
+                </div>
+                <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>
                   <Btn size="sm" onClick={() => onEdit(p)} style={{ flex: 1 }}>ویرایش</Btn>
                   <Btn size="sm" onClick={async () => {
                     const ok = await showConfirmAsync('تأیید حذف', 'این مخاطب حذف شود؟', { danger: true });
