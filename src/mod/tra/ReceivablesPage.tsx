@@ -18,6 +18,7 @@ import DealPayModal from './components/DealPayModal';
 import SummaryBox from './components/SummaryBox';
 import UpcomingDueSection from './components/UpcomingDueSection';
 import StatementModal from './components/StatementModal';
+import ChecksModal from './components/ChecksModal';
 import { agingBucketFromDue } from './formulas';
 import { agingBucketFromDeal } from './calc';
 
@@ -37,6 +38,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   const [showUpcoming, setShowUpcoming] = useState(false);
   const [dealPayTarget, setDealPayTarget] = useState<Deal | null>(null);
   const [statementOpen, setStatementOpen] = useState(false);
+  const [checksOpen, setChecksOpen] = useState(false);
   const [reminderTarget, setReminderTarget] = useState<Invoice | null>(null);
 
   const openInvoices = useMemo(
@@ -172,32 +174,35 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
         </button>
       </div>
 
-      {/* Actions: دریافت گروهی + صورت‌حساب */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: kind === 'deal' ? '1fr' : '1fr 1fr',
-          gap: 8,
-          marginBottom: 8,
-        }}
-      >
-        {kind !== 'deal' && (
-          <Btn
-            size="sm"
-            variant="outline"
-            onClick={() => { setMultiPayPrefill(null); setMultiPayOpen(true); }}
-          >
-            💳 {kind === 'sale' ? 'دریافت گروهی' : 'پرداخت گروهی'}
-          </Btn>
-        )}
-        <Btn
-          size="sm"
-          variant="outline"
-          onClick={() => setStatementOpen(true)}
-        >
-          📄 صورت‌حساب
-        </Btn>
-      </div>
+                {/* Actions: دریافت گروهی + صورت‌حساب + چک‌ها */}
+                <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+                  {kind !== 'deal' && (
+                    <Btn
+                      size="sm"
+                      variant="outline"
+                      style={{ flex: 1, minWidth: 0 }}
+                      onClick={() => { setMultiPayPrefill(null); setMultiPayOpen(true); }}
+                    >
+                      💳 {kind === 'sale' ? 'دریافت گروهی' : 'پرداخت گروهی'}
+                    </Btn>
+                  )}
+                  <Btn
+                    size="sm"
+                    variant="outline"
+                    style={{ flex: 1, minWidth: 0 }}
+                    onClick={() => setStatementOpen(true)}
+                  >
+                    📄 صورت‌حساب
+                  </Btn>
+                  <Btn
+                    size="sm"
+                    variant="outline"
+                    style={{ flex: 1, minWidth: 0 }}
+                    onClick={() => setChecksOpen(true)}
+                  >
+                    🧾 چک‌ها
+                  </Btn>
+                </div>
 
       {/* خلاصه — یه خط */}
       <SummaryBox kind={kind} totalInvoiced={kind === 'deal' ? dealTotalOpen : totalInvoiced} totalOpen={effectiveTotal} settledAmount={settledAmount} dueSoonAmount={dueSoonAmount} openCount={kind === 'deal' ? openDeals.length : openInvoices.length} />
@@ -475,6 +480,10 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
         open={statementOpen}
         onClose={() => setStatementOpen(false)}
         kind={kind}
+      />
+      <ChecksModal
+        open={checksOpen}
+        onClose={() => setChecksOpen(false)}
       />
     </PageContainer>
   );
