@@ -87,28 +87,6 @@ export default function ReminderModal({ open, onClose, invoice }: Props) {
 
   const generateMessage = (): string => {
     if (!invoice || !party) return '';
-    if (method === 'phone') {
-      return `«سلام ${salutation} ${lastName}، روزتون بخیر 🌹
-مزاحم شدم درباره یادآوری خرید «${itemName}»
-به مبلغ ${amountFa} تومان که ${daysPhrase}.
-ان‌شاءالله فرصتی داشتید، لطف می‌کنید تسویه بفرمایید.
-ممنونم از همراهی و اعتمادتون 🙏»`;
-    }
-    if (method === 'in_person') {
-      return `🚶 مراجعه محترمانه به: ${salutation} ${lastName}
-
-📦 خرید: ${itemName}
-💰 مبلغ: ${amountFa} تومان
-📅 ${daysPhrase}
-
-چک‌لیست:
-☐ کپی فاکتور همراه
-☐ سلام و احوال‌پرسی گرم
-☐ یادآوری دوستانه مبلغ و خرید
-☐ رسید در صورت پرداخت
-
-لحن: صمیمی و محترمانه (نه طلبکارانه)`;
-    }
     return `سلام ${salutation} ${lastName} عزیز 🌹
 امیدوارم حالتون خوب باشه
 
@@ -125,7 +103,7 @@ ${farmName} 🐔`;
   };
 
   useEffect(() => {
-    if (open && invoice && party) {
+    if (open && invoice && party && method === 'other') {
       setMessage(generateMessage());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -220,7 +198,7 @@ ${farmName} 🐔`;
         </Field>
       )}
 
-      {method === 'other' ? (
+      {method === 'other' && (
         <Field label="پیام" hint="قابل ویرایش">
           <Textarea
             value={message}
@@ -228,24 +206,6 @@ ${farmName} 🐔`;
             rows={8}
             maxHeight={240}
           />
-        </Field>
-      ) : (
-        <Field
-          label={method === 'phone' ? 'متن گفتگو' : 'چک‌لیست'}
-          hint="فقط راهنما — ذخیره نمی‌شه"
-        >
-          <div style={{
-            padding: 'var(--pad-normal)',
-            background: 'var(--input-bg)',
-            border: '1px dashed var(--border)',
-            borderRadius: 'var(--r-sm)',
-            fontSize: 'var(--fs-xs)',
-            lineHeight: 1.9,
-            whiteSpace: 'pre-wrap',
-            color: 'var(--muted)',
-          }}>
-            {message}
-          </div>
         </Field>
       )}
 
