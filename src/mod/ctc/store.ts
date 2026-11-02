@@ -7,7 +7,74 @@ import { showToast } from '../../cor/store/toast';
 export type Role = 'customer' | 'supplier' | 'worker';
 
 /** 🆕 عنوان/جنسیت برای پیام‌های محترمانه (یادآوری، صورت‌حساب) */
-export type Salutation = 'mr' | 'mrs' | 'company' | 'unspecified';
+export type Gender = 'male' | 'female' | 'unspecified';
+
+export type BankGroup = 'gov' | 'private' | 'other';
+
+export type BankCode =
+  | 'melli' | 'mellat' | 'saderat' | 'tejarat' | 'sepah' | 'keshavarzi' | 'maskan' | 'refah' | 'postbank' | 'tosee'
+  | 'pasargad' | 'saman' | 'parsian' | 'en' | 'sina' | 'day' | 'shahr' | 'resalat' | 'iranzamin' | 'karafarin' | 'gardeshgari' | 'mehr'
+  | 'other';
+
+export interface BankInfo {
+  key: BankCode;
+  label: string;
+  shortLabel: string;
+  code: string;
+  group: BankGroup;
+}
+
+export const BANKS: BankInfo[] = [
+  { key: 'melli', label: 'بانک ملی', shortLabel: 'ملی', code: '017', group: 'gov' },
+  { key: 'mellat', label: 'بانک ملت', shortLabel: 'ملت', code: '012', group: 'gov' },
+  { key: 'saderat', label: 'بانک صادرات', shortLabel: 'صادرات', code: '019', group: 'gov' },
+  { key: 'tejarat', label: 'بانک تجارت', shortLabel: 'تجارت', code: '018', group: 'gov' },
+  { key: 'sepah', label: 'بانک سپه', shortLabel: 'سپه', code: '015', group: 'gov' },
+  { key: 'keshavarzi', label: 'بانک کشاورزی', shortLabel: 'کشاورزی', code: '016', group: 'gov' },
+  { key: 'maskan', label: 'بانک مسکن', shortLabel: 'مسکن', code: '014', group: 'gov' },
+  { key: 'refah', label: 'بانک رفاه', shortLabel: 'رفاه', code: '013', group: 'gov' },
+  { key: 'postbank', label: 'پست بانک', shortLabel: 'پست بانک', code: '021', group: 'gov' },
+  { key: 'tosee', label: 'بانک توسعه صادرات', shortLabel: 'توسعه صادرات', code: '020', group: 'gov' },
+  { key: 'pasargad', label: 'بانک پاسارگاد', shortLabel: 'پاسارگاد', code: '057', group: 'private' },
+  { key: 'saman', label: 'بانک سامان', shortLabel: 'سامان', code: '056', group: 'private' },
+  { key: 'parsian', label: 'بانک پارسیان', shortLabel: 'پارسیان', code: '054', group: 'private' },
+  { key: 'en', label: 'بانک اقتصاد نوین', shortLabel: 'اقتصاد نوین', code: '055', group: 'private' },
+  { key: 'sina', label: 'بانک سینا', shortLabel: 'سینا', code: '059', group: 'private' },
+  { key: 'day', label: 'بانک دی', shortLabel: 'دی', code: '066', group: 'private' },
+  { key: 'shahr', label: 'بانک شهر', shortLabel: 'شهر', code: '061', group: 'private' },
+  { key: 'resalat', label: 'بانک رسالت', shortLabel: 'رسالت', code: '070', group: 'private' },
+  { key: 'iranzamin', label: 'بانک ایران زمین', shortLabel: 'ایران زمین', code: '069', group: 'private' },
+  { key: 'karafarin', label: 'بانک کارآفرین', shortLabel: 'کارآفرین', code: '053', group: 'private' },
+  { key: 'gardeshgari', label: 'بانک گردشگری', shortLabel: 'گردشگری', code: '064', group: 'private' },
+  { key: 'mehr', label: 'بانک مهر ایران', shortLabel: 'مهر ایران', code: '060', group: 'private' },
+  { key: 'other', label: 'سایر', shortLabel: 'سایر', code: '', group: 'other' },
+];
+
+export const BANKS_BY_GROUP = {
+  gov: BANKS.filter(b => b.group === 'gov').sort((a, b) => a.label.localeCompare(b.label, 'fa')),
+  private: BANKS.filter(b => b.group === 'private').sort((a, b) => a.label.localeCompare(b.label, 'fa')),
+  other: BANKS.filter(b => b.group === 'other'),
+};
+
+export function isGender(v: string): v is Gender {
+  return v === 'male' || v === 'female' || v === 'unspecified';
+}
+
+export function isBankCode(v: string): v is BankCode {
+  return BANKS.some(b => b.key === v);
+}
+
+export function findBankByShabaCode(code: string): BankInfo | undefined {
+  return BANKS.find(b => b.code !== '' && b.code === code);
+}
+
+export interface BankAccount {
+  bank?: BankCode;
+  accountHolder?: string;
+  accountNumber?: string;
+  cardNumber?: string;
+  shaba?: string;
+}
 
 export interface Person {
   id: string;
@@ -43,10 +110,10 @@ export interface Person {
   updatedAt: string;
   /** موجودی اعتباری: مثبت=طلبکار، منفی=بدهکار */
   creditBalance?: number;
-  /** 🆕 عنوان: آقا/خانم/شرکت/بی‌طرف (برای پیام‌های محترمانه) */
-  salutation?: Salutation;
-  /** 🆕 فاصله پیش‌فرض یادآوری (روز) برای این شخص. undefined → global (7) */
-  reminderIntervalDays?: number;
+  /** 🆕 جنسیت: مرد/زن/بی‌طرف (برای پیام‌های محترمانه) */
+  gender?: Gender;
+  /** 🆕 حساب بانکی (MVP: یک حساب) */
+  bankAccount?: BankAccount;
 }
 
 interface State {

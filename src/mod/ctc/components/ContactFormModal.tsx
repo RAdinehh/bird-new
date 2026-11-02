@@ -1,8 +1,14 @@
 /**
  * ContactFormModal — فرم افزودن/ویرایش مخاطب
  */
-import { Btn, BtnRow, DigitField, Field, Grid2, Input, Modal, PhoneField, Textarea, ErrorBox } from '../../../shr/components/ui';
-import { ROLE_LABEL, CUSTOMER_TYPES, type Role } from '../store';
+import { Btn, BtnRow, DigitField, Field, Grid2, Input, Modal, PhoneField, Select, Textarea, ErrorBox } from '../../../shr/components/ui';
+import { ROLE_LABEL, CUSTOMER_TYPES, BANKS_BY_GROUP, isBankCode, findBankByShabaCode, type Role, type Gender, type BankAccount } from '../store';
+
+const GENDER_OPTIONS: { value: Gender; label: string; icon: string }[] = [
+  { value: 'unspecified', label: 'بی‌طرف', icon: '—' },
+  { value: 'male', label: 'مرد', icon: '♂️' },
+  { value: 'female', label: 'زن', icon: '♀️' },
+];
 
 interface F {
   id?: string; name: string; phone: string; phone2: string; email: string;
@@ -10,7 +16,10 @@ interface F {
   customerType: string; customerTypes: string[]; trustScore: string; defaultDiscount: string;
   supplierTypes: string[]; position: string; startDate: string; salaryType: string; salaryAmount: string; insurance: boolean;
 
-  creditLimit?: number | null;}
+  creditLimit?: number | null;
+  gender?: Gender;
+  bankAccount?: BankAccount;
+}
 
 interface Props {
   open: boolean;
@@ -91,6 +100,131 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
             <Field label="کد ملی"><DigitField maxLength={10} placeholder="..." value={form.nationalId} onChange={e => setForm({...form, nationalId: e.target.value})} /></Field>
             <Field label="آدرس"><Input placeholder="..." value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
           </Grid2>
+
+          <Field label="جنسیت" hint="برای پیام‌های محترمانه (یادآوری، صورت‌حساب)">
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              {GENDER_OPTIONS.map(opt => {
+                const active = (form.gender || 'unspecified') === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setForm({ ...form, gender: opt.value })}
+                    style={{
+                      padding: '6px 12px', fontSize: 'var(--fs-sm)',
+                      background: active ? 'var(--accent-soft)' : 'var(--btn-bg)',
+                      border: `1px solid ${active ? 'var(--accent-border)' : 'var(--border)'}`,
+                      borderRadius: 'var(--r-sm)',
+                      color: active ? 'var(--accent)' : 'var(--muted)',
+                      fontWeight: active ? 600 : 500,
+                      cursor: 'pointer', fontFamily: 'inherit',
+                    }}
+                  >
+                    {opt.icon} {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </Field>
+
+          <div style={{ paddingTop: 8, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>🏦 اطلاعات بانکی (اختیاری)</div>
+
+          <Grid2>
+            <Field label="بانک">
+              <Select
+                value={form.bankAccount?.bank || ''}
+                onChange={e => {
+                  const v = e.target.value;
+                  if (v === '') {
+                    setForm(f => ({ ...f, bankAccount: { ...f.bankAccount, bank: undefined } }));
+                  } else if (isBankCode(v)) {
+                    setForm(f => ({ ...f, bankAccount: { ...f.bankAccount, bank: v } }));
+                  }
+                }}
+              >
+                <option value="">— انتخاب —</option>
+                <optgroup label="🏛 دولتی">
+                  {BANKS_BY_GROUP.gov.map(b => (
+                    <option key={b.key} value={b.key}>{b.label}</option>
+                  ))}
+                </optgroup>
+                <optgroup label="🏦 خصوصی">
+                  {BANKS_BY_GROUP.private.map(b => (
+                    <option key={b.key} value={b.key}>{b.label}</option>
+                  ))}
+                </optgroup>
+                <optgroup label="📋 سایر">
+                  {BANKS_BY_GROUP.other.map(b => (
+                    <option key={b.key} value={b.key}>{b.label}</option>
+                  ))}
+                </optgroup>
+              </Select>
+            </Field>
+            <Field label="نام صاحب حساب" hint="اگر با نام مخاطب فرق دارد">
+              <Input
+                placeholder="..."
+                value={form.bankAccount?.accountHolder || ''}
+                onChange={e => setForm(f => ({ ...f, bankAccount: { ...f.bankAccount, accountHolder: e.target.value } }))}
+              />
+            </Field>
+          </Grid2>
+
+          <Grid2>
+            <Field label="شماره حساب">
+              <Input
+                dir="ltr"
+                inputMode="numeric"
+                maxLength={20}
+                placeholder="۱۰-۲۰ رقم"
+                value={form.bankAccount?.accountNumber || ''}
+                onChange={e => {
+                  const v = e.target.value.replace(/\D/g, '').slice(0, 20);
+                  setForm(f => ({ ...f, bankAccount: { ...f.bankAccount, accountNumber: v } }));
+                }}
+              />
+            </Field>
+            <Field label="شماره کارت" hint="۱۶ رقم">
+              <Input
+                dir="ltr"
+                inputMode="numeric"
+                maxLength={16}
+                placeholder="۶۰۳۷..."
+                value={form.bankAccount?.cardNumber || ''}
+                onChange={e => {
+                  const v = e.target.value.replace(/\D/g, '').slice(0, 16);
+                  setForm(f => ({ ...f, bankAccount: { ...f.bankAccount, cardNumber: v } }));
+                }}
+              />
+            </Field>
+          </Grid2>
+
+          <Field
+            label="شماره شبا"
+            hint={
+              form.bankAccount?.bank
+                ? `بانک تشخیص‌داده‌شده: ${BANKS_BY_GROUP.gov.concat(BANKS_BY_GROUP.private, BANKS_BY_GROUP.other).find(b => b.key === form.bankAccount?.bank)?.label || '—'}`
+                : 'IR + ۲۴ رقم — با ورود، بانک خودکار تشخیص داده می‌شود'
+            }
+          >
+            <Input
+              dir="ltr"
+              maxLength={26}
+              placeholder="IR..."
+              value={form.bankAccount?.shaba || ''}
+              onChange={e => {
+                const raw = e.target.value.toUpperCase();
+                const v = raw.replace(/[^IR0-9]/g, '').slice(0, 26);
+                const digits = v.replace(/\D/g, '');
+                let detectedBank = form.bankAccount?.bank;
+                if (digits.length >= 5) {
+                  const bankCode = digits.slice(2, 5);
+                  const found = findBankByShabaCode(bankCode);
+                  if (found) detectedBank = found.key;
+                }
+                setForm(f => ({ ...f, bankAccount: { ...f.bankAccount, shaba: v, bank: detectedBank } }));
+              }}
+            />
+          </Field>
 
           <Field label="یادداشت">
             <Textarea placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />

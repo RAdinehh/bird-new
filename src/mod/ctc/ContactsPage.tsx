@@ -2,7 +2,7 @@
  * ContactsPage — مخاطبین (carousel tabs مثل hal)
  */
 import { useState } from 'react';
-import { useCtc, type Person, type Role, type Salutation, CUSTOMER_TYPES } from './store';
+import { useCtc, type Person, type Role, type Gender, type BankAccount, CUSTOMER_TYPES } from './store';
 import { useCarousel } from '../../shr/hooks/useCarousel';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showConfirmAsync } from '../../cor/store/dialog';
@@ -15,16 +15,16 @@ interface F {
   customerType: string;
   customerTypes: string[]; trustScore: string; defaultDiscount: string;
   supplierTypes: string[]; position: string; startDate: string; salaryType: string; salaryAmount: string; insurance: boolean;
-  salutation?: Salutation;
-  reminderIntervalDays?: string;
+  gender?: Gender;
+  bankAccount?: BankAccount;
 }
 
 const empty: F = {
   name: '', phone: '', phone2: '', email: '', address: '', city: '', nationalId: '', roles: ['customer'], notes: '',
   customerType: 'wholesale', customerTypes: [], trustScore: '', defaultDiscount: '', supplierTypes: [],
   position: '', startDate: '', salaryType: 'monthly', salaryAmount: '', insurance: false,
-  salutation: 'unspecified',
-  reminderIntervalDays: '7',
+  gender: 'unspecified',
+  bankAccount: {},
 };
 
 type TabId = 'all' | 'customer' | 'supplier' | 'worker';
@@ -51,8 +51,8 @@ export default function ContactsPage() {
       salaryType: p.salaryType || 'monthly',
       salaryAmount: p.salaryAmount ? toFa(p.salaryAmount) : '',
       insurance: p.insurance,
-      salutation: p.salutation || 'unspecified',
-      reminderIntervalDays: p.reminderIntervalDays ? toFa(String(p.reminderIntervalDays)) : '7',
+      gender: p.gender || 'unspecified',
+      bankAccount: p.bankAccount || {},
     });
     setErr(''); setOpen(true);
   };
@@ -99,6 +99,20 @@ export default function ContactsPage() {
       defaultDiscount: num(form.defaultDiscount), supplierTypes: form.supplierTypes,
       position: form.position.trim(), startDate: form.startDate.trim(), salaryType: form.salaryType,
       salaryAmount: num(form.salaryAmount), insurance: form.insurance,
+      gender: form.gender || 'unspecified',
+      bankAccount: (() => {
+        const bk = form.bankAccount;
+        if (!bk) return undefined;
+        if (!bk.bank && !bk.accountHolder && !bk.accountNumber && !bk.cardNumber && !bk.shaba) return undefined;
+        const result: BankAccount = {
+          bank: bk.bank,
+          accountHolder: bk.accountHolder?.trim() || undefined,
+          accountNumber: bk.accountNumber || undefined,
+          cardNumber: bk.cardNumber || undefined,
+          shaba: bk.shaba || undefined,
+        };
+        return result;
+      })(),
     };
     if (form.id) update(form.id, data); else add(data);
     setOpen(false);
