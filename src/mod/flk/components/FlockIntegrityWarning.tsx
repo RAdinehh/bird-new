@@ -28,31 +28,46 @@ export default function FlockIntegrityWarning({ form, setForm }: Props) {
 
   // ═══ حالت ۱: Bug — sum mismatch ═══
   if (cc > 0 && sum !== cc) {
-    const diff = cc - sum;
-    const fixU = Math.max(0, u + diff);
+    const mf = m + f;
+    const canAutoFix = mf <= cc && mf !== sum;  // نر+ماده از cc بیشتر نباشه و جمع هم برابر نباشه
+    const fixU = canAutoFix ? Math.max(0, cc - mf) : u;
     return (
       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 600, lineHeight: 1.7, marginTop: 4 }}>
-        ⚠️ جمع (نر {toFa(String(m))} + ماده {toFa(String(f))} + نامشخص {toFa(String(u))}) = {toFa(String(sum))} — باید با تعداد فعلی ({toFa(String(cc))}) برابر باشد
-        {' '}
-        <button
-          type="button"
-          onClick={() =>
-            setForm((prev: any) => ({ ...prev, unknownCount: toFa(String(fixU)) }))
-          }
-          style={{
-            background: 'none',
-            color: 'var(--danger)',
-            border: 'none',
-            padding: 0,
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-            fontWeight: 700,
-            fontSize: 'var(--fs-xs)',
-            textDecoration: 'underline',
-          }}
-        >
-          [اصلاح: نامشخص → {toFa(String(fixU))}]
-        </button>
+        {mf > cc ? (
+          <>
+            ⚠️ نر ({toFa(String(m))}) + ماده ({toFa(String(f))}) = {toFa(String(mf))} بیشتر از تعداد فعلی ({toFa(String(cc))}) است
+            {' '}
+            — ابتدا نر یا ماده را کاهش دهید
+          </>
+        ) : (
+          <>
+            ⚠️ جمع (نر {toFa(String(m))} + ماده {toFa(String(f))} + نامشخص {toFa(String(u))}) = {toFa(String(sum))} — باید با تعداد فعلی ({toFa(String(cc))}) برابر باشد
+            {canAutoFix && (
+              <>
+                {' '}
+                <button
+                  type="button"
+                  onClick={() =>
+                    setForm((prev: any) => ({ ...prev, unknownCount: toFa(String(fixU)) }))
+                  }
+                  style={{
+                    background: 'none',
+                    color: 'var(--danger)',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    fontWeight: 700,
+                    fontSize: 'var(--fs-xs)',
+                    textDecoration: 'underline',
+                  }}
+                >
+                  [اصلاح: نامشخص → {toFa(String(fixU))}]
+                </button>
+              </>
+            )}
+          </>
+        )}
       </div>
     );
   }

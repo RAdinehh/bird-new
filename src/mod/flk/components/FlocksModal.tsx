@@ -387,14 +387,14 @@ export default function FlocksModal(props: FlocksModalProps) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
               <Field label="تعداد خروس">
                 <NumField placeholder="۸۰" value={form.maleCount} onChange={e => {
-                  const maleStr = e.target.value;
-                  const male = parseInt(toEn(maleStr || '0')) || 0;
+                  const maleRaw = parseInt(toEn(e.target.value || '0')) || 0;
                   const female = parseInt(toEn(form.femaleCount || '0')) || 0;
                   const cc = parseInt(toEn(form.currentCount || form.initialCount || '0')) || 0;
-                  const newUnknown = cc > 0 ? Math.max(0, cc - male - female) : (parseInt(toEn(form.unknownCount || '0')) || 0);
+                  const maleClamped = cc > 0 ? Math.min(maleRaw, Math.max(0, cc - female)) : maleRaw;
+                  const newUnknown = cc > 0 ? Math.max(0, cc - maleClamped - female) : (parseInt(toEn(form.unknownCount || '0')) || 0);
                   setForm({
                     ...form,
-                    maleCount: maleStr,
+                    maleCount: maleClamped > 0 ? String(maleClamped) : (maleRaw === 0 ? '' : String(maleClamped)),
                     unknownCount: cc > 0 ? String(newUnknown) : form.unknownCount,
                   });
                 }} min={0} max={100000} unit="پرنده" />
@@ -404,14 +404,14 @@ export default function FlocksModal(props: FlocksModalProps) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
               <Field label="تعداد مرغ" error={showError('femaleCount')} onTouch={() => markTouched('femaleCount')}>
                 <NumField placeholder="۸۰۰" value={form.femaleCount} onChange={e => {
-                  const femaleStr = e.target.value;
-                  const female = parseInt(toEn(femaleStr || '0')) || 0;
+                  const femaleRaw = parseInt(toEn(e.target.value || '0')) || 0;
                   const male = parseInt(toEn(form.maleCount || '0')) || 0;
                   const cc = parseInt(toEn(form.currentCount || form.initialCount || '0')) || 0;
-                  const newUnknown = cc > 0 ? Math.max(0, cc - male - female) : (parseInt(toEn(form.unknownCount || '0')) || 0);
+                  const femaleClamped = cc > 0 ? Math.min(femaleRaw, Math.max(0, cc - male)) : femaleRaw;
+                  const newUnknown = cc > 0 ? Math.max(0, cc - male - femaleClamped) : (parseInt(toEn(form.unknownCount || '0')) || 0);
                   setForm({
                     ...form,
-                    femaleCount: femaleStr,
+                    femaleCount: femaleClamped > 0 ? String(femaleClamped) : (femaleRaw === 0 ? '' : String(femaleClamped)),
                     unknownCount: cc > 0 ? String(newUnknown) : form.unknownCount,
                   });
                 }} min={0} max={100000} unit="پرنده" />
