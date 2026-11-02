@@ -200,7 +200,7 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
             })()}>
               <Input
                 dir="ltr"
-                inputMode="numeric"
+                inputMode="tel"
                 maxLength={20}
                 placeholder="۱۰-۲۰ رقم"
                 value={form.bankAccount?.accountNumber || ''}
@@ -220,7 +220,7 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
             })()}>
               <Input
                 dir="ltr"
-                inputMode="numeric"
+                inputMode="tel"
                 maxLength={16}
                 placeholder="۶۰۳۷..."
                 value={form.bankAccount?.cardNumber || ''}
