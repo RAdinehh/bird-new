@@ -907,3 +907,39 @@ Deals (معاملات خاص) — چرخه کامل: Deal → Settlement → Inv
 - **Gap 2 (business)**: بررسی 76 hardcoded — کدوم واقعاً business؟
 - **L11 tests**: getDealPaymentFormSchema
 - **RHF Pilot** — تصمیم نهایی
+
+---
+
+## 📅 جلسه ۱۴۰۵/۱۱/۰۲ (شماره ۶ — Receivables/Deal fixes)
+
+### ✅ DONE — Phase A (Critical bugs)
+
+| # | Bug | Commit |
+|---|---|---|
+| ۱ | MultiPayModal party filter (`customer`/`supplier`) | 7e04f5d6 |
+| ۲ | DealPayment status/clearedDate/bouncedDate | 7e04f5d6 |
+| ۳ | StatementModal checkStatus از p.status | 7e04f5d6 |
+| ۴ | StatementModal kind prop + parties filter | d371eb8d |
+| ۵ | computeDealBalance skip non-cleared checks | d371eb8d |
+
+### ✅ DONE — Phase B (UX consistency)
+
+| # | Feature | Commit |
+|---|---|---|
+| ۱ | DealPayModal → addPartyPayment sync | 3b819d40 |
+| ۲ | Single-invoice payment (💳 per-row) | 605e74cc |
+| ۳ | Deal aging buckets (5 buckets) | 1790505d |
+
+### 🎯 Result
+- Payment Deal در Statement دیده می‌شه
+- پرداخت تک‌فاکتور با ۱ کلیک
+- Deal aging analysis هماهنگ با Invoice
+- Check status هر دو Deal و Invoice از یک منبع
+
+### ⏸ PENDING (Phase C — deferred)
+- Advance Payment entity
+- Refund UI (type='refund')
+- Dunning / Write-off
+- Gap 9 (MSG در ۱۰ فایل rules)
+- L11 tests: getDealPaymentFormSchema
+- RHF Pilot
