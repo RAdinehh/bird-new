@@ -368,7 +368,9 @@ export default function StatementModal({ open, onClose, kind }: Props) {
           <Select value={partyId} onChange={e => setPartyId(e.target.value)}>
             <option value="">— انتخاب —</option>
             {parties.map(c => (
-              <option key={c.id} value={c.id}>{c.name}</option>
+              <option key={c.id} value={c.id}>
+                {c.name}{(c as any).phone ? ` (${toFa(String((c as any).phone))})` : ''}
+              </option>
             ))}
           </Select>
         </Field>
