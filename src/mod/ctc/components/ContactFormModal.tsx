@@ -137,9 +137,15 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
               const card = form.bankAccount?.cardNumber || '';
               if (card.length < 4) return undefined;
               const det = findBankByCardBin(card);
+              const current = form.bankAccount?.bank;
+
               if (det.bank) {
                 const bank = BANKS.find(b => b.key === det.bank);
-                return `✓ تشخیص: ${bank?.label || det.bank}`;
+                if (current && current !== det.bank) {
+                  const selected = BANKS.find(b => b.key === current);
+                  return `انتخاب شما: ${selected?.label || current}`;
+                }
+                return `✓ تشخیص از کارت: ${bank?.label || det.bank}`;
               }
               if (det.possibleBanks && det.possibleBanks.length > 0) {
                 const names = det.possibleBanks.map(b => BANKS.find(x => x.key === b)?.shortLabel || b).join(' / ');
@@ -247,9 +253,6 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
               if (v.state === 'invalid') return v.message;
               if (v.state === 'partial') return v.message;
               if (v.state === 'valid') return '✓ شماره شبا معتبر است (MOD-97)';
-              if (form.bankAccount?.bank) {
-                return `بانک تشخیص‌داده‌شده: ${BANKS.find(b => b.key === form.bankAccount?.bank)?.label || '—'}`;
-              }
               return 'IR + ۲۴ رقم — با ورود، بانک خودکار تشخیص داده می‌شود';
             })()}
           >
