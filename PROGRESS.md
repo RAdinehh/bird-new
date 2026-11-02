@@ -943,3 +943,58 @@ Deals (معاملات خاص) — چرخه کامل: Deal → Settlement → Inv
 - Gap 9 (MSG در ۱۰ فایل rules)
 - L11 tests: getDealPaymentFormSchema
 - RHF Pilot
+
+---
+
+## 📅 جلسه ۱۴۰۵/۱۱/۰۲ (شماره ۷ — بخش مخاطبین کامل)
+
+### ✅ DONE — بخش مخاطبین از ۵۷٪ → ۹۲٪
+
+| # | کار | Commit |
+|---|---|---|
+| ۱ | Gender (male/female/unspecified) + bank account base | 532affd0 |
+| ۲ | Copy/Share (SVG Material + Web Share API) | b017b041 |
+| ۳ | BIN mapping ۳۰ بانک ایرانی | 6d8d492f |
+| ۴ | Validators (Luhn + MOD-97) + Persian digits | bdf4ea0b |
+| ۵ | SmartSelect برای بانک (Sheet searchable) | 059d2bef |
+| ۶ | حذف «بدون بانک» از SmartSelect | c05463c6 |
+
+### 📚 مستند کامل
+- `docs/modules/ctc-contacts.md` (۲۵۰+ خط)
+- شامل: سیستم بانکی، BIN mapping، validators، UX pattern، PENDING
+
+### 🎯 الگوهای جدید
+
+- **Reward Early / Punish Late** در اعتبارسنجی کارت/شبا/حساب
+- **SmartSelect** برای لیست بلند (۳۰+ بانک) با Sheet + search + group
+- **BIN auto-detect** کارت → بانک (۶ رقم) + prefix ambiguous (۴ رقم)
+- **SHABA code** آبشاری (۳ رقم اول شبا → بانک)
+- **Copy/Share** با navigator.share + clipboard fallback
+- **inputMode=tel** برای عدد (کیبورد عددی بدون کاما/کلمات)
+
+### ⚠️ نکات مهم برای AI بعدی
+
+1. **همیشه `toEn`** قبل از `\D` (ارقام فارسی)
+2. **`inputMode=tel`** نه `numeric` (جلوگیری از کاما/کلمات)
+3. **hint رفع تناقض:** اگر کاربر override کرد → «انتخاب شما: X»
+4. **SHABA hint:** فقط وقتی پر است، «تشخیص: X»
+
+### 🚧 PENDING (فاز B — جلسه بعد)
+
+- کد اقتصادی (شرکت‌ها)
+- کد پستی
+- شرایط پرداخت (Net 30/60)
+- تگ‌ها
+- فعال/غیرفعال
+- آدرس دوم
+- روش ارتباط ترجیحی
+- تاریخچه معاملات per contact
+- BankAccount[] (چند حساب)
+- **L11 tests for ctc** (GAP — هیچ test نداره)
+
+### 🎯 پیشنهاد جلسه بعد
+
+اول: **L11 tests** (پوشش ctc).
+بعد: فاز B بخش مخاطبین.
+یا: Dunning/Reminder (که قبلاً بحث شد — ReminderModal پچ ۱+۲ آماده بود ولی UI نیمه‌کاره).
+
