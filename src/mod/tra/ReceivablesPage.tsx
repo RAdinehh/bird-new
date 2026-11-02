@@ -2,7 +2,7 @@
  * ReceivablesPage — مطالبات/بدهی با aging
  */
 import { useState, useMemo } from 'react';
-import { daysUntilDue, dueTone, dueLabel } from './helpers';
+import { daysUntilDue, dueTone, dueLabel, computeUpcoming } from './helpers';
 import DeferModal from './components/DeferModal';
 import ReminderModal from './components/ReminderModal';
 import { useTra, remaining, ageDays, agingBucket, AGING_BUCKETS, paidSumAllocated, WORKFLOW_LABEL, computeDealBalance, dealDaysUntilDue, isDealOpen, type Invoice, type Deal, type Deferral } from './store';
@@ -72,13 +72,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
     initialSort: config.initialSort,
   });
 
-  const upcoming = useMemo(() => {
-    return openInvoices
-      .filter(i => i.dueDate && !i.remindersMuted)
-      .map(i => ({ inv: i, days: daysUntilDue(i) }))
-      .filter(x => x.days !== null && x.days <= 7)
-      .sort((a, b) => (a.days ?? 0) - (b.days ?? 0));
-  }, [openInvoices]);
+  const upcoming = useMemo(() => computeUpcoming(openInvoices), [openInvoices]);
 
   const byBucket = useMemo(() => {
     const map: Record<string, Invoice[]> = {

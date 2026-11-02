@@ -74,10 +74,10 @@ export { AccordionSection } from '../../shr/components/AccordionSection';
 // ═══ توابع کمکی ReceivablesPage ═══
 import type { Invoice } from './store';
 
-export function daysUntilDue(inv: Invoice): number | null {
-  if (!inv.dueDate) return null;
+export function daysUntilJalali(dateStr: string | null | undefined): number | null {
+  if (!dateStr) return null;
   try {
-    const en = inv.dueDate.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+    const en = dateStr.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
     const d = parseJ(en, 'yyyy/MM/dd', new Date());
     if (isNaN(d.getTime())) return null;
     d.setHours(0, 0, 0, 0);
@@ -85,6 +85,27 @@ export function daysUntilDue(inv: Invoice): number | null {
     today.setHours(0, 0, 0, 0);
     return diffDaysJ(d, today);
   } catch { return null; }
+}
+
+export function daysUntilDue(inv: Invoice): number | null {
+  return daysUntilJalali(inv.dueDate);
+}
+
+export function computeUpcoming(
+  invoices: Invoice[],
+): Array<{ inv: Invoice; days: number | null }> {
+  return invoices
+    .filter(i => i.dueDate && !i.remindersMuted)
+    .filter(i => {
+      if (i.nextReminderAt) {
+        const nrDays = daysUntilJalali(i.nextReminderAt);
+        if (nrDays !== null && nrDays > 0) return false;
+      }
+      return true;
+    })
+    .map(i => ({ inv: i, days: daysUntilDue(i) }))
+    .filter(x => x.days !== null && x.days <= 7)
+    .sort((a, b) => (a.days ?? 0) - (b.days ?? 0));
 }
 
 export function dueTone(days: number | null): 'green' | 'amber' | 'orange' | 'red' {
