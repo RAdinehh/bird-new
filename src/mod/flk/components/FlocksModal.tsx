@@ -390,11 +390,10 @@ export default function FlocksModal(props: FlocksModalProps) {
                   const maleRaw = parseInt(toEn(e.target.value || '0')) || 0;
                   const female = parseInt(toEn(form.femaleCount || '0')) || 0;
                   const cc = parseInt(toEn(form.currentCount || form.initialCount || '0')) || 0;
-                  const maleClamped = cc > 0 ? Math.min(maleRaw, Math.max(0, cc - female)) : maleRaw;
-                  const newUnknown = cc > 0 ? Math.max(0, cc - maleClamped - female) : (parseInt(toEn(form.unknownCount || '0')) || 0);
+                  const newUnknown = cc > 0 ? Math.max(0, cc - maleRaw - female) : (parseInt(toEn(form.unknownCount || '0')) || 0);
                   setForm({
                     ...form,
-                    maleCount: maleClamped > 0 ? String(maleClamped) : (maleRaw === 0 ? '' : String(maleClamped)),
+                    maleCount: e.target.value,
                     unknownCount: cc > 0 ? String(newUnknown) : form.unknownCount,
                   });
                 }} min={0} max={100000} unit="پرنده" />
@@ -407,11 +406,10 @@ export default function FlocksModal(props: FlocksModalProps) {
                   const femaleRaw = parseInt(toEn(e.target.value || '0')) || 0;
                   const male = parseInt(toEn(form.maleCount || '0')) || 0;
                   const cc = parseInt(toEn(form.currentCount || form.initialCount || '0')) || 0;
-                  const femaleClamped = cc > 0 ? Math.min(femaleRaw, Math.max(0, cc - male)) : femaleRaw;
-                  const newUnknown = cc > 0 ? Math.max(0, cc - male - femaleClamped) : (parseInt(toEn(form.unknownCount || '0')) || 0);
+                  const newUnknown = cc > 0 ? Math.max(0, cc - male - femaleRaw) : (parseInt(toEn(form.unknownCount || '0')) || 0);
                   setForm({
                     ...form,
-                    femaleCount: femaleClamped > 0 ? String(femaleClamped) : (femaleRaw === 0 ? '' : String(femaleClamped)),
+                    femaleCount: e.target.value,
                     unknownCount: cc > 0 ? String(newUnknown) : form.unknownCount,
                   });
                 }} min={0} max={100000} unit="پرنده" />

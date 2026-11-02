@@ -113,7 +113,7 @@ export default function CandlingFormModal(props: CandlingFormModalProps) {
           <NumField
             value={modalDay}
             onChange={e => setModalDay(e.target.value)}
-            unit="روز" min={1} max={30} autoClamp
+            unit="روز" min={1} max={30}
           />
         </Field>
         <Field label="تاریخ" required>

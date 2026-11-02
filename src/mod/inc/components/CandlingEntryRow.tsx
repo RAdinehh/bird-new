@@ -113,7 +113,7 @@ export default function CandlingEntryRow(props: CandlingEntryRowProps) {
                 placeholder="۰"
                 value={d.infertile}
                 onChange={ev => onUpdate({ infertile: ev.target.value })}
-                max={count || 0} min={0} unit="عدد" autoClamp
+                max={count || 0} min={0} unit="عدد"
               />
             </Field>
             <Field label="سالم" hint="خودکار">
@@ -133,14 +133,14 @@ export default function CandlingEntryRow(props: CandlingEntryRowProps) {
               <NumField
                 placeholder="۰" value={d.dead}
                 onChange={ev => onUpdate({ dead: ev.target.value })}
-                max={count || 0} min={0} unit="عدد" autoClamp
+                max={count || 0} min={0} unit="عدد"
               />
             </Field>
             <Field label="شکسته">
               <NumField
                 placeholder="۰" value={d.broken}
                 onChange={ev => onUpdate({ broken: ev.target.value })}
-                max={count || 0} min={0} unit="عدد" autoClamp
+                max={count || 0} min={0} unit="عدد"
               />
             </Field>
           </Grid2>

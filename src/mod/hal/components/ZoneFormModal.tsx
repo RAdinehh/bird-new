@@ -112,7 +112,6 @@ export default function ZoneFormModal({
             unit="پرنده"
             min={0}
             max={hallRemaining != null && hallRemaining > 0 ? hallRemaining : 100000}
-            autoClamp
           />
         </Field>
       </Grid2>
