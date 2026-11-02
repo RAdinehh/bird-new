@@ -58,7 +58,6 @@ export default function ReminderModal({ open, onClose, invoice }: Props) {
   const [channel, setChannel] = useState('واتس‌اپ');
   const [note, setNote] = useState('');
   const [intervalDaysStr, setIntervalDaysStr] = useState('7');
-  const [isCustomInterval, setIsCustomInterval] = useState(false);
   const [message, setMessage] = useState('');
 
   const party = invoice ? contacts.find(c => c.id === invoice.partyId) : null;
@@ -144,6 +143,7 @@ ${farmName} 🐔`;
   });
 
   const isCustomChannel = !CHANNEL_PRESETS.includes(channel);
+  const isCustomInterval = intervalDaysStr !== '' && !['3', '7', '30'].includes(intervalDaysStr);
 
   return (
     <Modal
@@ -210,7 +210,7 @@ ${farmName} 🐔`;
       <Field label="یادآوری بعدی">
         <div style={{ display: 'flex', gap: 4, alignItems: 'center', width: '100%' }}>
           {[3, 7, 30].map(d => (
-            <button key={d} type="button" onClick={() => { setIntervalDaysStr(String(d)); setIsCustomInterval(false); }} style={{ ...chipStyle(!isCustomInterval && intervalDaysStr === String(d)), flex: 1, height: 32, padding: 0, fontSize: 'var(--fs-sm)', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <button key={d} type="button" onClick={() => setIntervalDaysStr(String(d))} style={{ ...chipStyle(!isCustomInterval && intervalDaysStr === String(d)), flex: 1, height: 32, padding: 0, fontSize: 'var(--fs-sm)', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {toFa(d)}
             </button>
           ))}
@@ -219,10 +219,7 @@ ${farmName} 🐔`;
               type="text"
               inputMode="tel"
               value={toFa(intervalDaysStr)}
-              onChange={e => {
-                setIntervalDaysStr(e.target.value.replace(/[^0-9۰-۹]/g, ''));
-                setIsCustomInterval(true);
-              }}
+              onChange={e => setIntervalDaysStr(e.target.value.replace(/[^0-9۰-۹]/g, ''))}
               placeholder="دلخواه"
               style={{
                 width: '100%',
