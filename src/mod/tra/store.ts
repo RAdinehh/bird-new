@@ -852,6 +852,25 @@ export const useTra = create<State>()(
       addAllocation: (a) => {
         const id = uuid();
         set({ allocations: [...get().allocations, { ...a, id }] });
+        // 🆕 dunning C5 gap: auto-cancel reminder if invoice fully paid
+        try {
+          const st = get();
+          const inv = st.invoices.find(x => x.id === a.invoiceId);
+          if (inv && inv.nextReminderAt) {
+            const invAllocs = st.allocations.filter(al => al.invoiceId === a.invoiceId);
+            let paid = 0;
+            for (const al of invAllocs) {
+              const p = (inv.payments || []).find(pp => pp.id === al.paymentId);
+              if (!p) continue;
+              if (p.method === 'check' && p.status !== 'cleared') continue;
+              if (p.type === 'refund') paid -= al.amount;
+              else paid += al.amount;
+            }
+            if (paid >= (inv.total || 0)) {
+              set({ invoices: get().invoices.map(x => x.id === a.invoiceId ? { ...x, nextReminderAt: undefined, updatedAt: now() } : x) });
+            }
+          }
+        } catch(e) { console.error('[addAllocation] auto-cancel reminder:', e); }
         return id;
       },
       addReminder: (invoiceId, params) => {
