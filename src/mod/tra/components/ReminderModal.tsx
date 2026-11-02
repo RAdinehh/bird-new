@@ -207,10 +207,10 @@ ${farmName} 🐔`;
 
 
       <Field label="یادآوری بعدی">
-        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'nowrap' }}>
+        <div style={{ display: 'flex', gap: 4, alignItems: 'center', width: '100%' }}>
           {[3, 7, 14, 30].map(d => (
-            <button key={d} type="button" onClick={() => setIntervalDaysStr(String(d))} style={{ ...chipStyle(intervalDaysStr === String(d)), flexShrink: 0 }}>
-              {toFa(d)} روز
+            <button key={d} type="button" onClick={() => setIntervalDaysStr(String(d))} style={{ ...chipStyle(intervalDaysStr === String(d)), flex: 1, padding: '6px 2px', fontSize: 'var(--fs-xs)', minWidth: 0 }}>
+              {toFa(d)}
             </button>
           ))}
           <div style={{ position: 'relative', flexShrink: 0 }}>
@@ -218,9 +218,9 @@ ${farmName} 🐔`;
               inputMode="tel"
               value={intervalDaysStr}
               onChange={e => setIntervalDaysStr(e.target.value.replace(/[^0-9۰-۹]/g, ''))}
-              style={{ width: 70, textAlign: 'center', paddingLeft: 28 }}
+              style={{ width: 60, textAlign: 'center', paddingLeft: 24, paddingRight: 4 }}
             />
-            <span style={{ position: 'absolute', left: 6, top: '50%', transform: 'translateY(-50%)', fontSize: 'var(--fs-xs)', color: 'var(--muted)', pointerEvents: 'none' }}>روز</span>
+            <span style={{ position: 'absolute', left: 4, top: '50%', transform: 'translateY(-50%)', fontSize: '10px', color: 'var(--muted)', pointerEvents: 'none' }}>روز</span>
           </div>
         </div>
       </Field>
