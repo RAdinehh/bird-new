@@ -8,27 +8,29 @@ import PurchasesPage from './PurchasesPage';
 import SalesPage from './SalesPage';
 import DealsPage from './DealsPage';
 import ReceivablesPage from './ReceivablesPage';
+import ChecksPage from './ChecksPage';
 
 const tabs = [
   { id: 'purchases', label: 'خرید' },
   { id: 'sales', label: 'فروش' },
   { id: 'deals', label: 'معاملات خاص' },
-  { id: 'receivables', label: 'مطالبات' }
+  { id: 'receivables', label: 'مطالبات' },
+  { id: 'checks', label: 'چک‌ها' }
 ] as const;
 
 type TabId = typeof tabs[number]['id'];
 
-const TAB_IDS = ['purchases', 'sales', 'deals', 'receivables'];
+const TAB_IDS = ['purchases', 'sales', 'deals', 'receivables', 'checks'];
 
 export default function Tra() {
   const [searchParams] = useSearchParams();
   const tabParam = searchParams.get('tab');
   const [tab, setTab] = useState<TabId>(() => {
-    const valid: TabId[] = ['purchases', 'sales', 'deals', 'receivables'];
+    const valid: TabId[] = ['purchases', 'sales', 'deals', 'receivables', 'checks'];
     return (tabParam && (valid as string[]).includes(tabParam)) ? (tabParam as TabId) : 'purchases';
   });
   useEffect(() => {
-    if (tabParam && ['purchases','sales','deals','receivables'].includes(tabParam) && tabParam !== tab) {
+        if (tabParam && ['purchases','sales','deals','receivables','checks'].includes(tabParam) && tabParam !== tab) {
       setTab(tabParam as TabId);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -108,6 +110,9 @@ export default function Tra() {
           </div>
           <div key="receivables" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <ReceivablesPage active={tab === 'receivables'} />
+          </div>
+          <div key="checks" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
+            <ChecksPage active={tab === 'checks'} />
           </div>
         </div>
       </div>
