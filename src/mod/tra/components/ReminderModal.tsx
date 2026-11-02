@@ -220,17 +220,34 @@ ${farmName} 🐔`;
         </Field>
       )}
 
-      <Field
-        label={method === 'phone' ? 'متن گفتگو' : method === 'in_person' ? 'چک‌لیست' : 'پیام'}
-        hint="قابل ویرایش"
-      >
-        <Textarea
-          value={message}
-          onChange={e => setMessage(e.target.value)}
-          rows={8}
-          maxHeight={240}
-        />
-      </Field>
+      {method === 'other' ? (
+        <Field label="پیام" hint="قابل ویرایش">
+          <Textarea
+            value={message}
+            onChange={e => setMessage(e.target.value)}
+            rows={8}
+            maxHeight={240}
+          />
+        </Field>
+      ) : (
+        <Field
+          label={method === 'phone' ? 'متن گفتگو' : 'چک‌لیست'}
+          hint="فقط راهنما — ذخیره نمی‌شه"
+        >
+          <div style={{
+            padding: 'var(--pad-normal)',
+            background: 'var(--input-bg)',
+            border: '1px dashed var(--border)',
+            borderRadius: 'var(--r-sm)',
+            fontSize: 'var(--fs-xs)',
+            lineHeight: 1.9,
+            whiteSpace: 'pre-wrap',
+            color: 'var(--muted)',
+          }}>
+            {message}
+          </div>
+        </Field>
+      )}
 
       {method === 'other' && (
         <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
