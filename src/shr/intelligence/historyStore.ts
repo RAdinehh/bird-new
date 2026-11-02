@@ -13,6 +13,30 @@ const STORAGE_KEY = 'bird-intel-history-v1';
 const HISTORY_LIMIT = 100;  // حداکثر ۱۰۰ رکورد per field
 const TTL_DAYS = 180;
 
+// 🆕 Migration: version marker for breaking data changes
+const HISTORY_VERSION_KEY = 'bird-intel-history-version';
+const CURRENT_HISTORY_VERSION = 2;
+
+function runHistoryMigration(): void {
+  try {
+    if (typeof localStorage === 'undefined') return;
+    const v = localStorage.getItem(HISTORY_VERSION_KEY);
+    if (v === String(CURRENT_HISTORY_VERSION)) return;
+    // v1 → v2: clear tra.price_* (mixed units before normalization; Gap 8)
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const all = JSON.parse(raw) as Record<string, unknown>;
+      for (const key of Object.keys(all)) {
+        if (key.startsWith('tra.price_')) delete all[key];
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+    }
+    localStorage.setItem(HISTORY_VERSION_KEY, String(CURRENT_HISTORY_VERSION));
+  } catch { /* silent */ }
+}
+
+runHistoryMigration();
+
 // ══════════════════════════════════════════════════════════════════
 // In-memory fallback (برای تست و محیط‌های بدون localStorage)
 // ══════════════════════════════════════════════════════════════════

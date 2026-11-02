@@ -541,7 +541,22 @@ export function useInvoiceForm(params: {
     try {
       for (const it of form.items) {
         const cat = it.category || form.category;
-        if (it.unitPrice && it.unitPrice > 0) recordHistory(`tra.price_${cat}`, it.unitPrice, {});
+        // 🆕 Gap 8: normalize to baseUnit price (was: raw unitPrice)
+        if (it.unitPrice && it.unitPrice > 0) {
+          const uom = UOM_CATEGORIES[cat];
+          const unitValue = it.unit || (uom as any)?.default || 'pcs';
+          const unitDef = uom?.units.find((u: any) => u.value === unitValue);
+          const effFactor = (() => {
+            if (unitDef && unitDef.factor !== null && unitDef.factor > 0) return unitDef.factor;
+            if (it.unitWeight && it.unitWeight > 0) return it.unitWeight;
+            if ((it.priceUnit === 'perKg' || it.priceUnit === 'per_kg') && it.liveWeight && it.liveWeight > 0 && it.quantity && it.quantity > 0) {
+              return it.liveWeight / it.quantity;
+            }
+            return 1;
+          })();
+          const basePrice = it.unitPrice / effFactor;
+          recordHistory(`tra.price_${cat}`, basePrice, {});
+        }
         if (it.quantity && it.quantity > 0) recordHistory('tra.quantity', it.quantity, {});
         if (it.discountValue && it.discountValue > 0) recordHistory('tra.discountValue', it.discountValue, {});
         if (it.shipping && it.shipping > 0) recordHistory('tra.shipping', it.shipping, {});
