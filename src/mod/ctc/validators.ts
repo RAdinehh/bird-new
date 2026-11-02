@@ -6,7 +6,7 @@
  * - شبا: MOD-97-10 (ISO 13616) — IBAN ایران
  * - شماره حساب: فقط طول (۱۰-۲۰) — الگوریتم ریاضی نداره
  */
-import { toFa } from '../../shr/utils/fa';
+import { toFa, toEn } from '../../shr/utils/fa';
 
 export type ValidationState = 'empty' | 'partial' | 'invalid' | 'valid';
 export interface ValidationResult {
@@ -18,7 +18,7 @@ export interface ValidationResult {
 // Luhn (ISO/IEC 7812) — شماره کارت
 // ═══════════════════════════════════════════
 export function isValidCardNumber(card: string): boolean {
-  const digits = card.replace(/\D/g, '');
+  const digits = toEn(card).replace(/\D/g, '');
   if (digits.length !== 16) return false;
   let sum = 0;
   let double = false;
@@ -35,7 +35,7 @@ export function isValidCardNumber(card: string): boolean {
 }
 
 export function cardValidation(card: string): ValidationResult {
-  const digits = (card || '').replace(/\D/g, '');
+  const digits = toEn(card || '').replace(/\D/g, '');
   if (digits.length === 0) return { state: 'empty' };
   if (digits.length < 16) return { state: 'partial', message: `${toFa(digits.length)}/۱۶ رقم` };
   if (digits.length === 16) {
@@ -49,7 +49,7 @@ export function cardValidation(card: string): ValidationResult {
 // MOD-97-10 (ISO 13616) — شبا
 // ═══════════════════════════════════════════
 export function isValidShaba(shaba: string): boolean {
-  const clean = (shaba || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  const clean = toEn(shaba || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
   if (!clean.startsWith('IR')) return false;
   if (clean.length !== 26) return false;
   const rearranged = clean.slice(4) + clean.slice(0, 4);
@@ -67,7 +67,7 @@ export function isValidShaba(shaba: string): boolean {
 }
 
 export function shabaValidation(shaba: string): ValidationResult {
-  const clean = (shaba || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  const clean = toEn(shaba || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
   if (clean.length === 0) return { state: 'empty' };
   if (!clean.startsWith('IR')) return { state: 'invalid', message: 'شبا باید با IR شروع شود' };
   if (clean.length < 26) return { state: 'partial', message: `${toFa(clean.length)}/۲۶ کاراکتر` };
@@ -82,12 +82,12 @@ export function shabaValidation(shaba: string): ValidationResult {
 // شماره حساب — فقط طول
 // ═══════════════════════════════════════════
 export function isValidAccountNumber(account: string): boolean {
-  const digits = (account || '').replace(/\D/g, '');
+  const digits = toEn(account || '').replace(/\D/g, '');
   return digits.length >= 10 && digits.length <= 20;
 }
 
 export function accountValidation(account: string): ValidationResult {
-  const digits = (account || '').replace(/\D/g, '');
+  const digits = toEn(account || '').replace(/\D/g, '');
   if (digits.length === 0) return { state: 'empty' };
   if (digits.length < 10) return { state: 'partial', message: `${toFa(digits.length)}/۱۰ رقم` };
   if (digits.length <= 20) return { state: 'valid' };

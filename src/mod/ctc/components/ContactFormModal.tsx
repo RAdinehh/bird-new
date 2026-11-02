@@ -3,6 +3,7 @@
  */
 import { Btn, BtnRow, DigitField, Field, Grid2, Input, Modal, PhoneField, Select, Textarea, ErrorBox } from '../../../shr/components/ui';
 import { ROLE_LABEL, CUSTOMER_TYPES, BANKS_BY_GROUP, BANKS, isBankCode, findBankByShabaCode, findBankByCardBin, type Role, type Gender, type BankAccount } from '../store';
+import { toEn } from '../../../shr/utils/fa';
 import { cardValidation, shabaValidation, accountValidation } from '../validators';
 
 const GENDER_OPTIONS: { value: Gender; label: string; icon: string }[] = [
@@ -197,7 +198,7 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
                 placeholder="۱۰-۲۰ رقم"
                 value={form.bankAccount?.accountNumber || ''}
                 onChange={e => {
-                  const v = e.target.value.replace(/\D/g, '').slice(0, 20);
+                  const v = toEn(e.target.value).replace(/\D/g, '').slice(0, 20);
                   setForm(f => ({ ...f, bankAccount: { ...f.bankAccount, accountNumber: v } }));
                 }}
               />
@@ -217,7 +218,7 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
                 placeholder="۶۰۳۷..."
                 value={form.bankAccount?.cardNumber || ''}
                 onChange={e => {
-                  const v = e.target.value.replace(/\D/g, '').slice(0, 16);
+                  const v = toEn(e.target.value).replace(/\D/g, '').slice(0, 16);
                   const det = findBankByCardBin(v);
                   setForm(f => ({
                     ...f,
@@ -251,7 +252,7 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
               placeholder="IR..."
               value={form.bankAccount?.shaba || ''}
               onChange={e => {
-                const raw = e.target.value.toUpperCase();
+                const raw = toEn(e.target.value).toUpperCase();
                 const v = raw.replace(/[^IR0-9]/g, '').slice(0, 26);
                 const digits = v.replace(/\D/g, '');
                 let detectedBank = form.bankAccount?.bank;

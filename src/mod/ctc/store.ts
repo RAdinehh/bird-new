@@ -1,3 +1,4 @@
+import { toEn } from '../../shr/utils/fa';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
@@ -128,7 +129,7 @@ export interface CardDetectionResult {
 }
 
 export function findBankByCardBin(cardNumber: string): CardDetectionResult {
-  const digits = (cardNumber || '').replace(/\D/g, '');
+  const digits = toEn(cardNumber || '').replace(/\D/g, '');
   const prefix = digits.slice(0, 6);
   if (digits.length < 4) return { prefix };
   if (digits.length >= 6) {
