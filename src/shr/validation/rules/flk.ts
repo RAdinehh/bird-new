@@ -125,7 +125,7 @@ export function createFlkSchema(context: ValidationContext = {}) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: `مجموع نر (${male.toLocaleString('fa-IR')}) + ماده (${female.toLocaleString('fa-IR')}) + نامشخص (${unknown.toLocaleString('fa-IR')}) = ${(male+female+unknown).toLocaleString('fa-IR')} — باید با تعداد فعلی (${targetCount.toLocaleString('fa-IR')}) برابر باشد`,
-          path: ['maleCount'],
+          path: ['_genderSum'],
         });
       }
     }
