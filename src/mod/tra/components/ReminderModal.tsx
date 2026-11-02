@@ -219,7 +219,7 @@ ${farmName} 🐔`;
               type="text"
               inputMode="tel"
               value={toFa(intervalDaysStr)}
-              onChange={e => setIntervalDaysStr(e.target.value.replace(/[^0-9۰-۹]/g, ''))}
+              onChange={e => setIntervalDaysStr(toEn(e.target.value.replace(/[^0-9۰-۹]/g, '')))}
               placeholder="دلخواه"
               style={{
                 width: '100%',
