@@ -188,9 +188,9 @@ export default function ChecksModal({ open, onClose }: Props) {
         borderBottom: '1px solid var(--border)',
         borderLeft: '1px solid var(--border)',
         borderRight: rightBorder,
-        borderRadius: 'var(--r-lg)', padding: 12, marginBottom: 8,
+        borderRadius: 'var(--r-lg)', padding: '10px 12px', marginBottom: 6,
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, color: 'var(--text)' }}>{row.partyName}</span>
             {row.roleLabel !== '—' && (
@@ -202,17 +202,17 @@ export default function ChecksModal({ open, onClose }: Props) {
             <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 500 }}>تومان</span>
           </div>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
           <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', fontWeight: 500 }}>{row.subjectLabel}</span>
           {dueLabel && <span style={{ fontSize: 'var(--fs-xs)', color: dueTone, fontWeight: 600, whiteSpace: 'nowrap' }}>{dueLabel}</span>}
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
           <span style={{ fontSize: 10, color: 'var(--dim)', fontWeight: 400 }}>
-            چک {row.pp.checkNo || '—'}{row.pp.bank ? ` • ${row.pp.bank}` : ''}
+            چک شماره {row.pp.checkNo || '—'}{row.pp.bank ? ` • ${row.pp.bank}` : ''}
           </span>
           {row.docNumber && <span style={{ fontSize: 10, color: 'var(--dim)', fontWeight: 400 }}>{row.docNumber}</span>}
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: 6 }}>
           <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 'var(--r-sm)', background: info.bg, color: info.color }}>{info.icon} {info.label}</span>
           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
             {row.status === 'pending' && <Btn size="sm" variant="outline" onClick={() => void handleAction(row, 'deposit')}>↑ واریز</Btn>}
