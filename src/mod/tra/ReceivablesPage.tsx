@@ -428,6 +428,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
       <StatementModal
         open={statementOpen}
         onClose={() => setStatementOpen(false)}
+        kind={kind}
       />
     </PageContainer>
   );

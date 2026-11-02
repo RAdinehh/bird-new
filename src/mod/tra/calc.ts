@@ -508,11 +508,13 @@ export function computeDealBalance(d: Deal): {
   const pct = Number(d.settlementValue) || 0;
   const commission = d.settlementType === 'percent' ? Math.round(totalSales * pct / 100) : 0;
   const myShare = totalSales - commission;
+  // 🆕 Skip non-cleared checks (match invoice paidSum logic)
+  const isEffectivelyPaid = (p: any) => p.method !== 'check' || p.status === 'cleared';
   const paidIn = (d.payments || [])
-    .filter(p => p.direction === 'in')
+    .filter(p => p.direction === 'in' && isEffectivelyPaid(p))
     .reduce((s, p) => s + (Number(p.amount) || 0), 0);
   const paidOut = (d.payments || [])
-    .filter(p => p.direction === 'out')
+    .filter(p => p.direction === 'out' && isEffectivelyPaid(p))
     .reduce((s, p) => s + (Number(p.amount) || 0), 0);
   return { totalSales, commission, myShare, paidIn, paidOut, balance: myShare - paidIn + paidOut };
 }

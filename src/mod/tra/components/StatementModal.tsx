@@ -15,6 +15,7 @@ import { getTodayJalali } from '../calc';
 interface Props {
   open: boolean;
   onClose: () => void;
+  kind?: 'sale' | 'purchase' | 'deal';
 }
 
 type LineKind = 'invoice_sale' | 'invoice_purchase' | 'deal' | 'payment_cash' | 'payment_card' | 'payment_check';
@@ -49,7 +50,7 @@ const CHECK_INFO: Record<CheckStatus, { label: string; bg: string; color: string
   bounced: { label: 'برگشتی', bg: 'var(--danger-soft)', color: 'var(--danger)' },
 };
 
-export default function StatementModal({ open, onClose }: Props) {
+export default function StatementModal({ open, onClose, kind }: Props) {
   const { invoices, deals } = useTra();
   const { contacts } = useCtc();
   const settings: any = useSet();
@@ -59,8 +60,12 @@ export default function StatementModal({ open, onClose }: Props) {
   const [toDate, setToDate] = useState(getTodayJalali());
 
   const parties = useMemo(
-    () => contacts.filter(c => c.roles.includes('customer') || c.roles.includes('supplier')),
-    [contacts],
+    () => contacts.filter(c => {
+      if (kind === 'sale') return c.roles.includes('customer');
+      if (kind === 'purchase') return c.roles.includes('supplier');
+      return c.roles.includes('customer') || c.roles.includes('supplier');
+    }),
+    [contacts, kind],
   );
 
   const party = contacts.find(c => c.id === partyId);
