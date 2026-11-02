@@ -123,12 +123,10 @@ export function sexRatio(male: number | null, female: number | null): string {
   if (female === 0) return `${toFa(String(male))} : ۰`;
   const r = female / male;
   if (r >= 1) {
-    const rounded = r >= 10 ? Math.round(r) : Number(r.toFixed(1));
-    return `${toFa('1')} : ${toFa(String(rounded))}`;
+    return `${toFa('1')} : ${toFa(String(Math.round(r)))}`;
   }
   const inv = male / female;
-  const rounded = inv >= 10 ? Math.round(inv) : Number(inv.toFixed(1));
-  return `${toFa(String(rounded))} : ${toFa('1')}`;
+  return `${toFa(String(Math.round(inv)))} : ${toFa('1')}`;
 }
 
 /** سن پیش‌فرض تخم‌گذاری (اگه استاندارد نژاد موجود نبود) — استاندارد ایران */

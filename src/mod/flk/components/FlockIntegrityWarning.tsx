@@ -31,43 +31,27 @@ export default function FlockIntegrityWarning({ form, setForm }: Props) {
     const diff = cc - sum;
     const fixU = Math.max(0, u + diff);
     return (
-      <div
-        style={{
-          padding: '8px 12px',
-          background: 'var(--danger-soft)',
-          border: '1px solid var(--danger)',
-          borderRadius: 'var(--r-md)',
-          fontSize: 'var(--fs-xs)',
-          color: 'var(--danger)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: 8,
-          flexWrap: 'wrap',
-          marginBottom: 8,
-        }}
-      >
-        <span style={{ flex: 1, minWidth: 200 }}>
-          ⚠️ جمع (نر {toFa(String(m))} + ماده {toFa(String(f))} + نامشخص {toFa(String(u))}) = {toFa(String(sum))} — باید با تعداد فعلی ({toFa(String(cc))}) برابر باشد
-        </span>
+      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 600, lineHeight: 1.7, marginTop: 4 }}>
+        ⚠️ جمع (نر {toFa(String(m))} + ماده {toFa(String(f))} + نامشخص {toFa(String(u))}) = {toFa(String(sum))} — باید با تعداد فعلی ({toFa(String(cc))}) برابر باشد
+        {' '}
         <button
           type="button"
           onClick={() =>
             setForm((prev: any) => ({ ...prev, unknownCount: toFa(String(fixU)) }))
           }
           style={{
-            background: 'var(--danger)',
-            color: '#fff',
+            background: 'none',
+            color: 'var(--danger)',
             border: 'none',
-            borderRadius: 4,
-            padding: '3px 10px',
+            padding: 0,
             cursor: 'pointer',
             fontFamily: 'inherit',
             fontWeight: 700,
             fontSize: 'var(--fs-xs)',
+            textDecoration: 'underline',
           }}
         >
-          اصلاح خودکار (نامشخص: {toFa(String(fixU))})
+          [اصلاح: نامشخص → {toFa(String(fixU))}]
         </button>
       </div>
     );
@@ -76,19 +60,8 @@ export default function FlockIntegrityWarning({ form, setForm }: Props) {
   // ═══ حالت ۲: Partial split (اطلاع) ═══
   if (m + f > 0 && u > 0) {
     return (
-      <div
-        style={{
-          padding: '8px 12px',
-          background: 'var(--accent-soft)',
-          border: '1px solid var(--accent-border)',
-          borderRadius: 'var(--r-md)',
-          fontSize: 'var(--fs-xs)',
-          color: 'var(--accent)',
-          marginBottom: 8,
-          lineHeight: 1.7,
-        }}
-      >
-        ℹ️ این گله {toFa(String(u))} پرنده با جنسیت نامشخص دارد (از مجموع {toFa(String(cc))}). می‌توانید جنسیت را در فیلدهای نر/ماده/نامشخص مشخص کنید.
+      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7, marginTop: 4 }}>
+        ℹ️ این گله {toFa(String(u))} پرنده با جنسیت نامشخص دارد (از مجموع {toFa(String(cc))}).
       </div>
     );
   }

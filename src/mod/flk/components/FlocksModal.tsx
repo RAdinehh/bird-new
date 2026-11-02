@@ -382,7 +382,7 @@ export default function FlocksModal(props: FlocksModalProps) {
       <FlockCapacityCard hallCapacity={hallCapacity} />
 
       {form.type === 'breeder' && (
-        <DepBox title="اطلاعات گله مادر" tone="purple">
+        <DepBox title="اطلاعات گله مادر">
           <Grid3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
               <Field label="تعداد خروس">
@@ -413,7 +413,7 @@ export default function FlocksModal(props: FlocksModalProps) {
             const mismatch = init > 0 && sum !== init;
             return (
               <>
-                <div style={{ padding: 'var(--pad-normal)', background: 'var(--purple-soft)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--purple)', fontWeight: 600 }}>
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
                   نسبت خروس به مرغ: {sexRatio(male, female)}
                 </div>
               </>
