@@ -100,6 +100,9 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   }, [openDeals]);
 
   const totalOpen = filtered.reduce((a, inv) => a + remaining(inv, allocations), 0);
+  const totalInvoiced = filtered.reduce((a, inv) => a + (inv.total || 0), 0);
+  const settledAmount = Math.max(0, totalInvoiced - totalOpen);
+  const dueSoonAmount = upcoming.reduce((a, u) => a + remaining(u.inv, allocations), 0);
   const overdueCount = openInvoices.filter(i => {
     const d = daysUntilDue(i);
     return d !== null && d < 0;
@@ -197,7 +200,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
       </div>
 
       {/* خلاصه — یه خط */}
-      <SummaryBox kind={kind} totalOpen={effectiveTotal} openCount={kind === 'deal' ? openDeals.length : openInvoices.length} overdueCount={effectiveOverdueCount} soonCount={effectiveSoonCount} />
+      <SummaryBox kind={kind} totalInvoiced={kind === 'deal' ? dealTotalOpen : totalInvoiced} totalOpen={effectiveTotal} settledAmount={settledAmount} dueSoonAmount={dueSoonAmount} openCount={kind === 'deal' ? openDeals.length : openInvoices.length} />
 
       {/* ⏰ سرسیدهای نزدیک — collapsible */}
       <UpcomingDueSection upcoming={upcoming} contacts={contacts} showUpcoming={showUpcoming} onToggle={() => setShowUpcoming(!showUpcoming)} onDefer={openDefer} />
