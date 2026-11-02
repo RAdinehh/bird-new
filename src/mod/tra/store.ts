@@ -624,6 +624,19 @@ export const useTra = create<State>()(
             };
           }),
         });
+      set({
+        deals: get().deals.map(deal => {
+          const payments = deal.payments || [];
+          if (!payments.some((p: any) => p.partyPaymentId === ppId)) return deal;
+          return {
+            ...deal,
+            payments: payments.map((p: any) => p.partyPaymentId === ppId
+              ? { ...p, status: 'bounced' as const, bouncedDate: today, clearedDate: '' }
+              : p),
+            updatedAt: new Date().toISOString(),
+          };
+        }),
+      });
       },
       clearPartyPayment: (ppId: string) => {
         const pp = get().partyPayments.find(x => x.id === ppId);
@@ -647,6 +660,19 @@ export const useTra = create<State>()(
             };
           }),
         });
+      set({
+        deals: get().deals.map(deal => {
+          const payments = deal.payments || [];
+          if (!payments.some((p: any) => p.partyPaymentId === ppId)) return deal;
+          return {
+            ...deal,
+            payments: payments.map((p: any) => p.partyPaymentId === ppId
+              ? { ...p, status: 'cleared' as const, clearedDate: today, bouncedDate: '' }
+              : p),
+            updatedAt: new Date().toISOString(),
+          };
+        }),
+      });
       },
 
       addDeal: (d) => set({ deals: [...get().deals, {...d, id: uuid(), createdAt: now(), updatedAt: now()}] }),
