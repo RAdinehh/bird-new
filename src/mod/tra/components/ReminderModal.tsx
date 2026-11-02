@@ -218,8 +218,9 @@ ${farmName} 🐔`;
             <input
               type="text"
               inputMode="tel"
-              value={toFa(intervalDaysStr)}
+              value={isCustomInterval ? toFa(intervalDaysStr) : ''}
               onChange={e => setIntervalDaysStr(e.target.value.replace(/[^0-9۰-۹]/g, ''))}
+              placeholder="دلخواه"
               style={{
                 width: '100%',
                 height: 32,
@@ -230,7 +231,7 @@ ${farmName} 🐔`;
                 background: isCustomInterval ? 'var(--accent-soft)' : 'var(--input-bg)',
                 border: `1px solid ${isCustomInterval ? 'var(--accent-border)' : 'var(--border)'}`,
                 borderRadius: 'var(--r-sm)',
-                color: isCustomInterval ? 'var(--accent)' : 'var(--text)',
+                color: isCustomInterval ? 'var(--accent)' : 'var(--muted)',
                 fontWeight: isCustomInterval ? 700 : 500,
                 fontFamily: 'inherit',
                 outline: 'none',
