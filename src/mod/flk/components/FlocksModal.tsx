@@ -353,7 +353,7 @@ export default function FlocksModal(props: FlocksModalProps) {
         <Field
           label={isSourceLinked ? <span>تعداد اولیه <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'تعداد اولیه'}
           required
-          hint={isSourceLinked ? '🔒 از فاکتور — برای تغییر، فاکتور را ویرایش کنید' : undefined}
+          hint={isSourceLinked ? 'برای تغییر، فاکتور را ویرایش کنید' : undefined}
           error={showError('initialCount')}
           onTouch={() => markTouched('initialCount')}
         >
@@ -386,13 +386,35 @@ export default function FlocksModal(props: FlocksModalProps) {
           <Grid3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
               <Field label="تعداد خروس">
-                <NumField placeholder="۸۰" value={form.maleCount} onChange={e => setForm({ ...form, maleCount: e.target.value })} min={0} max={100000} unit="پرنده" />
+                <NumField placeholder="۸۰" value={form.maleCount} onChange={e => {
+                  const maleStr = e.target.value;
+                  const male = parseInt(toEn(maleStr || '0')) || 0;
+                  const female = parseInt(toEn(form.femaleCount || '0')) || 0;
+                  const cc = parseInt(toEn(form.currentCount || form.initialCount || '0')) || 0;
+                  const newUnknown = cc > 0 ? Math.max(0, cc - male - female) : (parseInt(toEn(form.unknownCount || '0')) || 0);
+                  setForm({
+                    ...form,
+                    maleCount: maleStr,
+                    unknownCount: cc > 0 ? String(newUnknown) : form.unknownCount,
+                  });
+                }} min={0} max={100000} unit="پرنده" />
               </Field>
               {!showError('maleCount') && <FieldHint fieldPath="flk.maleCount" value={form.maleCount} context={{ initialCount: form.initialCount }} />}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
               <Field label="تعداد مرغ" error={showError('femaleCount')} onTouch={() => markTouched('femaleCount')}>
-                <NumField placeholder="۸۰۰" value={form.femaleCount} onChange={e => setForm({ ...form, femaleCount: e.target.value })} min={0} max={100000} unit="پرنده" />
+                <NumField placeholder="۸۰۰" value={form.femaleCount} onChange={e => {
+                  const femaleStr = e.target.value;
+                  const female = parseInt(toEn(femaleStr || '0')) || 0;
+                  const male = parseInt(toEn(form.maleCount || '0')) || 0;
+                  const cc = parseInt(toEn(form.currentCount || form.initialCount || '0')) || 0;
+                  const newUnknown = cc > 0 ? Math.max(0, cc - male - female) : (parseInt(toEn(form.unknownCount || '0')) || 0);
+                  setForm({
+                    ...form,
+                    femaleCount: femaleStr,
+                    unknownCount: cc > 0 ? String(newUnknown) : form.unknownCount,
+                  });
+                }} min={0} max={100000} unit="پرنده" />
               </Field>
               {!showError('femaleCount') && <FieldHint fieldPath="flk.femaleCount" value={form.femaleCount} context={{ initialCount: form.initialCount }} />}
             </div>
