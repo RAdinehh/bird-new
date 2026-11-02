@@ -31,6 +31,7 @@ import { createInvoiceFromSettlement } from './settlement';
 import { applyDealMovements } from './applyDeal';
 import DealRecycleBinModal from './components/DealRecycleBinModal';
 import SettlementPrint from './components/SettlementPrint';
+import DealPrint from './components/DealPrint';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
@@ -183,6 +184,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [printDeal, setPrintDeal] = useState<Deal | null>(null);
   const [settlementOpen, setSettlementOpen] = useState(false);
   const [recycleOpen, setRecycleOpen] = useState(false);
   const [printSettlement, setPrintSettlement] = useState<{ settlement: Settlement; deal: Deal } | null>(null);
@@ -689,6 +691,12 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   <Row l="فروش کل" v={`${toFa((d.sales || []).reduce((s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)), 0).toLocaleString('fa-IR'))} ت`} />
                   <Row l="دریافت‌شده" v={`${toFa((d.payments || []).filter(p => p.direction === 'in').reduce((s, p) => s + (Number(p.amount) || 0), 0).toLocaleString('fa-IR'))} ت`} />
                 </Grid2>
+                                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 6 }}>
+                                          <button type="button" onClick={(e) => { e.stopPropagation(); setPrintDeal(d); }}
+                                            style={{ padding: '6px 12px', background: 'var(--btn-bg)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', fontFamily: 'inherit', fontSize: 'var(--fs-xs)', fontWeight: 600, cursor: 'pointer' }}>
+                                            🖨️ چاپ قرارداد
+                                          </button>
+                                        </div>
 
                 {(d.payments || []).length > 0 && (
                   <>
@@ -783,6 +791,9 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
           onClose={() => setPrintSettlement(null)}
         />
       )}
+        {printDeal && (
+          <DealPrint deal={printDeal} onClose={() => setPrintDeal(null)} />
+        )}
       
       <SettlementModal
         key={settlementDeal?.id || 'none'}
