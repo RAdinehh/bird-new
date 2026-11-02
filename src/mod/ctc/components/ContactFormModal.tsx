@@ -2,6 +2,7 @@
  * ContactFormModal — فرم افزودن/ویرایش مخاطب
  */
 import { Btn, BtnRow, DigitField, Field, Grid2, Input, Modal, PhoneField, Select, Textarea, ErrorBox } from '../../../shr/components/ui';
+import SmartSelect from '../../../shr/components/SmartSelect';
 import { ROLE_LABEL, CUSTOMER_TYPES, BANKS_BY_GROUP, BANKS, isBankCode, findBankByShabaCode, findBankByCardBin, type Role, type Gender, type BankAccount } from '../store';
 import { toEn } from '../../../shr/utils/fa';
 import { cardValidation, shabaValidation, accountValidation } from '../validators';
@@ -146,34 +147,41 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
               }
               return undefined;
             })()}>
-              <Select
+              <SmartSelect
                 value={form.bankAccount?.bank || ''}
-                onChange={e => {
-                  const v = e.target.value;
+                onChange={v => {
                   if (v === '') {
                     setForm(f => ({ ...f, bankAccount: { ...f.bankAccount, bank: undefined } }));
                   } else if (isBankCode(v)) {
                     setForm(f => ({ ...f, bankAccount: { ...f.bankAccount, bank: v } }));
                   }
                 }}
-              >
-                <option value="">— انتخاب —</option>
-                <optgroup label="🏛 دولتی">
-                  {BANKS_BY_GROUP.gov.map(b => (
-                    <option key={b.key} value={b.key}>{b.label}</option>
-                  ))}
-                </optgroup>
-                <optgroup label="🏦 خصوصی">
-                  {BANKS_BY_GROUP.private.map(b => (
-                    <option key={b.key} value={b.key}>{b.label}</option>
-                  ))}
-                </optgroup>
-                <optgroup label="📋 سایر">
-                  {BANKS_BY_GROUP.other.map(b => (
-                    <option key={b.key} value={b.key}>{b.label}</option>
-                  ))}
-                </optgroup>
-              </Select>
+                options={[
+                  { value: '', label: '— بدون بانک —' },
+                  ...BANKS_BY_GROUP.gov.map(b => ({
+                    value: b.key,
+                    label: b.label,
+                    subtitle: `کد شبا: ${b.code}`,
+                    group: 'gov',
+                  })),
+                  ...BANKS_BY_GROUP.private.map(b => ({
+                    value: b.key,
+                    label: b.label,
+                    subtitle: `کد شبا: ${b.code}`,
+                    group: 'private',
+                  })),
+                  ...BANKS_BY_GROUP.other.map(b => ({
+                    value: b.key,
+                    label: b.label,
+                    group: 'other',
+                  })),
+                ]}
+                groupLabels={{ gov: 'دولتی', private: 'خصوصی', other: 'سایر' }}
+                groupIcons={{ gov: '🏛', private: '🏦', other: '📋' }}
+                placeholder="— انتخاب بانک —"
+                modalTitle="انتخاب بانک"
+                autoThreshold={6}
+              />
             </Field>
             <Field label="نام صاحب حساب" hint="اگر با نام مخاطب فرق دارد">
               <Input
