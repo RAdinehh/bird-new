@@ -208,7 +208,7 @@ ${farmName} 🐔`;
 
       <Field label="یادآوری بعدی">
         <div style={{ display: 'flex', gap: 4, alignItems: 'center', width: '100%' }}>
-          {[3, 7, 14, 30].map(d => (
+          {[3, 7, 30].map(d => (
             <button key={d} type="button" onClick={() => setIntervalDaysStr(String(d))} style={{ ...chipStyle(intervalDaysStr === String(d)), flex: 1, padding: '6px 2px', fontSize: 'var(--fs-xs)', minWidth: 0 }}>
               {toFa(d)}
             </button>
