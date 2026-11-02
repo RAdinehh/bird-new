@@ -137,6 +137,38 @@ export function analyzeAnomaly(
   // ═══ ۲. اگر hard_only → بدون هشدار نرم ═══
   if (profile.expectedFrom === 'hard_only') return null;
 
+  // ═══ ۲.۵ Rule mode (n>=2): last vs prev (برای تجهیزات/اجاره با خرید نادر) ═══
+  if (profile.mode === 'rule') {
+    const hist = getHistory(profile.fieldPath, opts);
+    const values = hist?.values ?? [];
+    if (values.length < 2) return null;
+    const last = values[values.length - 1].v;
+    const prev = values[values.length - 2].v;
+    if (!prev || prev <= 0) return null;
+    const ratio = last / prev;
+    if (ratio >= 1.5) {
+      const pct = Math.round((ratio - 1) * 100);
+      return {
+        level: 'orange',
+        field: profile.fieldPath,
+        value,
+        reason: `قیمت ${pct}٪ افزایش نسبت به خرید قبلی`,
+        signals: [{ type: 'rule_ratio', weight: 3, detail: `${ratio.toFixed(2)}x` }],
+      };
+    }
+    if (ratio <= 0.66) {
+      const pct = Math.round((1 - ratio) * 100);
+      return {
+        level: 'yellow',
+        field: profile.fieldPath,
+        value,
+        reason: `قیمت ${pct}٪ کاهش نسبت به خرید قبلی`,
+        signals: [{ type: 'rule_ratio', weight: 2, detail: `${ratio.toFixed(2)}x` }],
+      };
+    }
+    return null;
+  }
+
   // ═══ ۳. جمع‌آوری سیگنال‌ها ═══
   const signals: Signal[] = [];
 

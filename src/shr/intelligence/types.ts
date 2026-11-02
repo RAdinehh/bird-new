@@ -39,6 +39,8 @@ export interface FieldProfile {
   structuralBreakAware?: boolean;
   /** اگر تاریخچه کافی نبود، هیچ هشدار نرمی نده */
   suppressIfNoHistory?: boolean;
+  /** حالت تشخیص: statistical (آماری، n>=6) | rule (last vs prev، n>=2) */
+  mode?: 'statistical' | 'rule';
 }
 
 export interface Signal {

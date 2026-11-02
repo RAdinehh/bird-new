@@ -273,6 +273,7 @@ export const FIELD_PROFILES: Record<string, FieldProfile> = {
   'flk.layingStartDay': P('flk.layingStartDay', 'age', 100, 1_000, { expectedFrom: 'species', comparison: 'range' }),
   'flk.endOfCycleDay': P('flk.endOfCycleDay', 'age', 365, 1_825, { expectedFrom: 'species', comparison: 'range' }),
   'flk.purchasePrice': P('flk.purchasePrice', 'price', 1_000, 300_000_000, {
+    mode: 'rule',
     expectedFrom: 'history_refbook', structuralBreakAware: true,
   }),
   'flk.deliveryCost': P('flk.deliveryCost', 'price', 1_000, 50_000_000_000, {
@@ -282,6 +283,7 @@ export const FIELD_PROFILES: Record<string, FieldProfile> = {
     expectedFrom: 'history_refbook', structuralBreakAware: true,
   }),
   'flk.rentAmount': P('flk.rentAmount', 'price', 100_000, 500_000_000_000, {
+    mode: 'rule',
     expectedFrom: 'history', structuralBreakAware: true,
   }),
 
@@ -291,7 +293,7 @@ export const FIELD_PROFILES: Record<string, FieldProfile> = {
   'tra.price_egg': P('tra.price_egg', 'price', 1_000, 10_000_000, { structuralBreakAware: true }),
   'tra.price_fertile_egg': P('tra.price_fertile_egg', 'price', 1_000, 10_000_000, { structuralBreakAware: true }),
   'tra.price_medicine': P('tra.price_medicine', 'price', 1_000, 200_000_000, { structuralBreakAware: true }),
-  'tra.price_equipment': P('tra.price_equipment', 'price', 1_000, 20_000_000_000, { structuralBreakAware: true }),
+  'tra.price_equipment': P('tra.price_equipment', 'price', 1_000, 20_000_000_000, { structuralBreakAware: true, mode: 'rule' }),
   'tra.price_other': P('tra.price_other', 'price', 1_000, 5_000_000_000, { structuralBreakAware: true }),
   'tra.price_broken': P('tra.price_broken', 'price', 1_000, 5_000_000, { structuralBreakAware: true }),
   'tra.price_manure': P('tra.price_manure', 'price', 1_000, 5_000_000, { structuralBreakAware: true }),
@@ -310,6 +312,7 @@ export const FIELD_PROFILES: Record<string, FieldProfile> = {
     expectedFrom: 'user_pattern', comparison: 'deviation',
   }),
   'inc.rentAmount': P('inc.rentAmount', 'price', 1_000, 50_000_000_000, {
+    mode: 'rule',
     expectedFrom: 'history', structuralBreakAware: true,
   }),
 
