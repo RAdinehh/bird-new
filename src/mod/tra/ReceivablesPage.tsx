@@ -175,32 +175,32 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
       </div>
 
                 {/* Actions: دریافت گروهی + صورت‌حساب + چک‌ها */}
-                <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: kind === 'deal' ? '1fr 1fr' : 'repeat(3, 1fr)', gap: 6, marginBottom: 8 }}>
                   {kind !== 'deal' && (
                     <Btn
                       size="sm"
                       variant="outline"
-                      style={{ flex: 1, minWidth: 0 }}
+                      style={{ fontSize: 'var(--fs-xs)', padding: '0 4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
                       onClick={() => { setMultiPayPrefill(null); setMultiPayOpen(true); }}
                     >
-                      💳 {kind === 'sale' ? 'دریافت گروهی' : 'پرداخت گروهی'}
+                      {kind === 'sale' ? 'دریافت گروهی' : 'پرداخت گروهی'}
                     </Btn>
                   )}
                   <Btn
                     size="sm"
                     variant="outline"
-                    style={{ flex: 1, minWidth: 0 }}
+                    style={{ fontSize: 'var(--fs-xs)', padding: '0 4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
                     onClick={() => setStatementOpen(true)}
                   >
-                    📄 صورت‌حساب
+                    صورت‌حساب
                   </Btn>
                   <Btn
                     size="sm"
                     variant="outline"
-                    style={{ flex: 1, minWidth: 0 }}
+                    style={{ fontSize: 'var(--fs-xs)', padding: '0 4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
                     onClick={() => setChecksOpen(true)}
                   >
-                    🧾 چک‌ها
+                    چک‌ها
                   </Btn>
                 </div>
 
