@@ -30,8 +30,8 @@ export default function AddEventModal({ open, onClose, prefillDate }: Props) {
   };
 
   const handleSave = () => {
-    if (title.trim() === '') { setErr('عنوان اجباری است'); return; }
-    if (date.trim() === '') { setErr('تاریخ اجباری است'); return; }
+    if (title.trim() === '') { setErr('عنوان را وارد کنید'); return; }
+    if (date.trim() === '') { setErr('تاریخ را وارد کنید'); return; }
 
     add({
       title: title.trim(),

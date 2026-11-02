@@ -160,7 +160,7 @@ export default function FormulasPage() {
       }
     }
 
-    if (form.name.trim() === '') { setErr('نام جیره اجباری است'); return; }
+    if (form.name.trim() === '') { setErr('نام جیره را وارد کنید'); return; }
     if (form.lines.length === 0) { setErr('حداقل یک ماده اضافه کنید'); return; }
     const v = formulaValid(form.lines, ingredients);
     if (!v.valid) { setErr(v.errors[0]); return; }

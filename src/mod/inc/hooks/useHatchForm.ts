@@ -117,7 +117,7 @@ export function useHatchForm(p: UseHatchFormParams) {
   }, [entriesData]);
 
   const save = () => {
-    if (!formDate.trim()) { setErr('تاریخ اجباری است'); return; }
+    if (!formDate.trim()) { setErr('تاریخ را وارد کنید'); return; }
     if (editingId) {
       const d = dataFor(formEntryId);
       const hatchedNum = int(d.hatched) || 0;

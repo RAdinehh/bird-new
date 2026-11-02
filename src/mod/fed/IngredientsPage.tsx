@@ -189,7 +189,7 @@ export default function IngredientsPage() {
       }
     }
 
-    if (form.name.trim() === '') { setErr('نام ماده اجباری است'); return; }
+    if (form.name.trim() === '') { setErr('نام ماده را وارد کنید'); return; }
     const data = {
       name: form.name.trim(), category: form.category,
       protein: num(form.protein), energy: num(form.energy),

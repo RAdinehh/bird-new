@@ -153,7 +153,7 @@ export default function RequirementsPage() {
       }
     }
 
-    if (form.name.trim() === '') { setErr('نام نیاز اجباری است'); return; }
+    if (form.name.trim() === '') { setErr('نام نیاز را وارد کنید'); return; }
 
     const data = {
       name: form.name.trim(),

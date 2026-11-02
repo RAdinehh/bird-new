@@ -54,7 +54,7 @@ export default function ContactsPage() {
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫', '.')) || null : null;
 
   const save = async () => {
-    if (!form.name.trim()) { setErr('نام اجباری است'); return; }
+    if (!form.name.trim()) { setErr('نام را وارد کنید'); return; }
     if (form.roles.length === 0) { setErr('حداقل یک نقش انتخاب کنید'); return; }
 
     if (!form.id) {

@@ -165,8 +165,8 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
   const eatingPercent = healthy > 0 ? Math.round((int(form.eatingCount) / healthy) * 100) : 0;
 
   const save = () => {
-    if (form.flockId === '') { setErr('گله اجباری است'); return; }
-    if (form.date.trim() === '') { setErr('تاریخ اجباری است'); return; }
+    if (form.flockId === '') { setErr('گله را انتخاب کنید'); return; }
+    if (form.date.trim() === '') { setErr('تاریخ را وارد کنید'); return; }
     const eating = int(form.eatingCount);
     const fertile = int(form.fertileCount);
     const broken = int(form.brokenCount);
