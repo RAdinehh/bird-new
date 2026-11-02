@@ -219,7 +219,12 @@ ${farmName} 🐔`;
               type="text"
               inputMode="tel"
               value={isCustomInterval ? toFa(intervalDaysStr) : ''}
-              onChange={e => { setIntervalDaysStr(e.target.value.replace(/[^0-9۰-۹]/g, '')); setIsCustomInterval(true); }}
+              onChange={e => {
+                const v = e.target.value.replace(/[^0-9۰-۹]/g, '');
+                setIntervalDaysStr(v);
+                const presets = ['3', '7', '30'];
+                setIsCustomInterval(v !== '' && !presets.includes(v));
+              }}
               placeholder="دلخواه"
               style={{
                 width: '100%',
