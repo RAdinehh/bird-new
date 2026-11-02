@@ -13,7 +13,9 @@ export type BankGroup = 'gov' | 'private' | 'other';
 
 export type BankCode =
   | 'melli' | 'mellat' | 'saderat' | 'tejarat' | 'sepah' | 'keshavarzi' | 'maskan' | 'refah' | 'postbank' | 'tosee'
-  | 'pasargad' | 'saman' | 'parsian' | 'en' | 'sina' | 'day' | 'shahr' | 'resalat' | 'iranzamin' | 'karafarin' | 'gardeshgari' | 'mehr'
+  | 'sanatmadan' | 'mehreiran' | 'resalat' | 'tosee_coop' | 'markazi'
+  | 'pasargad' | 'saman' | 'parsian' | 'en' | 'ayande' | 'sina' | 'day' | 'shahr' | 'sarmaye'
+  | 'gardeshgari' | 'iranzamin' | 'karafarin' | 'khavarmiane' | 'mellal'
   | 'other';
 
 export interface BankInfo {
@@ -35,18 +37,25 @@ export const BANKS: BankInfo[] = [
   { key: 'refah', label: 'بانک رفاه', shortLabel: 'رفاه', code: '013', group: 'gov' },
   { key: 'postbank', label: 'پست بانک', shortLabel: 'پست بانک', code: '021', group: 'gov' },
   { key: 'tosee', label: 'بانک توسعه صادرات', shortLabel: 'توسعه صادرات', code: '020', group: 'gov' },
+  { key: 'sanatmadan', label: 'بانک صنعت و معدن', shortLabel: 'صنعت و معدن', code: '011', group: 'gov' },
+  { key: 'tosee_coop', label: 'بانک توسعه تعاون', shortLabel: 'توسعه تعاون', code: '022', group: 'gov' },
+  { key: 'markazi', label: 'بانک مرکزی', shortLabel: 'مرکزی', code: '010', group: 'gov' },
   { key: 'pasargad', label: 'بانک پاسارگاد', shortLabel: 'پاسارگاد', code: '057', group: 'private' },
   { key: 'saman', label: 'بانک سامان', shortLabel: 'سامان', code: '056', group: 'private' },
   { key: 'parsian', label: 'بانک پارسیان', shortLabel: 'پارسیان', code: '054', group: 'private' },
   { key: 'en', label: 'بانک اقتصاد نوین', shortLabel: 'اقتصاد نوین', code: '055', group: 'private' },
+  { key: 'ayande', label: 'بانک آینده', shortLabel: 'آینده', code: '062', group: 'private' },
   { key: 'sina', label: 'بانک سینا', shortLabel: 'سینا', code: '059', group: 'private' },
   { key: 'day', label: 'بانک دی', shortLabel: 'دی', code: '066', group: 'private' },
   { key: 'shahr', label: 'بانک شهر', shortLabel: 'شهر', code: '061', group: 'private' },
-  { key: 'resalat', label: 'بانک رسالت', shortLabel: 'رسالت', code: '070', group: 'private' },
+  { key: 'sarmaye', label: 'بانک سرمایه', shortLabel: 'سرمایه', code: '058', group: 'private' },
+  { key: 'gardeshgari', label: 'بانک گردشگری', shortLabel: 'گردشگری', code: '064', group: 'private' },
   { key: 'iranzamin', label: 'بانک ایران زمین', shortLabel: 'ایران زمین', code: '069', group: 'private' },
   { key: 'karafarin', label: 'بانک کارآفرین', shortLabel: 'کارآفرین', code: '053', group: 'private' },
-  { key: 'gardeshgari', label: 'بانک گردشگری', shortLabel: 'گردشگری', code: '064', group: 'private' },
-  { key: 'mehr', label: 'بانک مهر ایران', shortLabel: 'مهر ایران', code: '060', group: 'private' },
+  { key: 'khavarmiane', label: 'بانک خاورمیانه', shortLabel: 'خاورمیانه', code: '078', group: 'private' },
+  { key: 'mellal', label: 'بانک ملل', shortLabel: 'ملل', code: '075', group: 'private' },
+  { key: 'mehreiran', label: 'قرض‌الحسنه مهر ایران', shortLabel: 'مهر ایران', code: '060', group: 'private' },
+  { key: 'resalat', label: 'قرض‌الحسنه رسالت', shortLabel: 'رسالت', code: '070', group: 'private' },
   { key: 'other', label: 'سایر', shortLabel: 'سایر', code: '', group: 'other' },
 ];
 
@@ -55,6 +64,86 @@ export const BANKS_BY_GROUP = {
   private: BANKS.filter(b => b.group === 'private').sort((a, b) => a.label.localeCompare(b.label, 'fa')),
   other: BANKS.filter(b => b.group === 'other'),
 };
+
+/** پیشوندهای کارت (BIN) — بر اساس ۶ رقم اول کارت */
+export const CARD_BINS: Partial<Record<BankCode, string[]>> = {
+  melli: ['603799', '170019'],
+  sepah: ['589210'],
+  saderat: ['603769', '903769'],
+  mellat: ['610433', '991975'],
+  tejarat: ['627353', '585983'],
+  maskan: ['628023'],
+  keshavarzi: ['603770', '639217'],
+  refah: ['589463'],
+  postbank: ['627760'],
+  tosee_coop: ['502908'],
+  tosee: ['627648', '207177'],
+  sanatmadan: ['627961'],
+  mehreiran: ['606373'],
+  resalat: ['504172'],
+  parsian: ['622106', '627884', '639194'],
+  pasargad: ['502229', '639347'],
+  saman: ['621986'],
+  en: ['627412'],
+  ayande: ['636214'],
+  shahr: ['502806', '504706'],
+  day: ['502938'],
+  sina: ['639346'],
+  sarmaye: ['639607'],
+  gardeshgari: ['505416', '505426'],
+  iranzamin: ['505785'],
+  karafarin: ['627488', '502910'],
+  khavarmiane: ['585947'],
+  mellal: ['606256'],
+  markazi: ['636795', '636797'],
+};
+
+/** جدول BIN → BankCode (برای lookup سریع) */
+const BIN_MAP: Record<string, BankCode> = (() => {
+  const map: Record<string, BankCode> = {};
+  for (const [bank, bins] of Object.entries(CARD_BINS)) {
+    if (bins) for (const bin of bins) map[bin] = bank as BankCode;
+  }
+  return map;
+})();
+
+/** پیشوندهای ۴ رقمی → بانک‌های ممکن (برای hint وقتی ۶ رقم ناقصه) */
+const PREFIX4_MAP: Record<string, BankCode[]> = (() => {
+  const map: Record<string, BankCode[]> = {};
+  for (const [bin, bank] of Object.entries(BIN_MAP)) {
+    const p4 = bin.slice(0, 4);
+    if (!map[p4]) map[p4] = [];
+    if (!map[p4].includes(bank)) map[p4].push(bank);
+  }
+  return map;
+})();
+
+export interface CardDetectionResult {
+  /** بانک تشخیص‌داده‌شده (فقط وقتی ۶ رقم کامل و یکتا) */
+  bank?: BankCode;
+  /** پیشوند فعلی */
+  prefix: string;
+  /** اگر ۴-۵ رقم داشت و مبهم بود، لیست بانک‌های ممکن */
+  possibleBanks?: BankCode[];
+}
+
+export function findBankByCardBin(cardNumber: string): CardDetectionResult {
+  const digits = (cardNumber || '').replace(/\D/g, '');
+  const prefix = digits.slice(0, 6);
+  if (digits.length < 4) return { prefix };
+  if (digits.length >= 6) {
+    const bank = BIN_MAP[prefix];
+    if (bank) return { bank, prefix };
+    return { prefix };
+  }
+  // ۴ یا ۵ رقم — ambiguous
+  const p4 = digits.slice(0, 4);
+  const possible = PREFIX4_MAP[p4];
+  if (possible && possible.length > 0) {
+    return { prefix: digits, possibleBanks: possible };
+  }
+  return { prefix: digits };
+}
 
 export function isGender(v: string): v is Gender {
   return v === 'male' || v === 'female' || v === 'unspecified';
