@@ -2,6 +2,7 @@
  * ReceivablesPage — مطالبات/بدهی با aging
  */
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { daysUntilDue, dueTone, dueLabel, computeUpcoming } from './helpers';
 import DeferModal from './components/DeferModal';
 import ReminderModal from './components/ReminderModal';
@@ -28,6 +29,7 @@ import { agingBucketFromDeal } from './calc';
 
 export default function ReceivablesPage({ active = true }: { active?: boolean } = {}) {
   const { invoices, deals, updateInvoice, allocations, addReminder } = useTra();
+  const navigate = useNavigate();
   const { contacts } = useCtc();
   const [multiPayOpen, setMultiPayOpen] = useState(false);
   const [multiPayPrefill, setMultiPayPrefill] = useState<{ partyId: string; invoiceId: string } | null>(null);
@@ -326,6 +328,24 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                 {checkPending.length > 0 && (
                   <Line l="چک‌ها" v={`${toFa(checkPending.length)} در جریان (${toFa(checkPending.reduce((s, p) => s + (p.amount || 0), 0).toLocaleString('fa-IR'))} ت)`} />
                 )}
+                <div style={{ marginTop: 6, display: 'flex', gap: 6 }}>
+                  <Btn
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const tab = kind === 'sale' ? 'sales' : 'purchases';
+                      navigate('/tra?tab=' + tab + '&edit=' + inv.id);
+                    }}
+                  >✏️ ویرایش</Btn>
+                  <Btn
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setReminderTarget(inv);
+                    }}
+                  >📨 یادآوری</Btn>
+                </div>
               </>
             );
           }}

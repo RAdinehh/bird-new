@@ -1,7 +1,7 @@
 /**
  * InvoicePage — صفحه مشترک خرید و فروش
  */
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useInvoiceSelection } from './hooks/useInvoiceSelection';
 import { useFab } from '../../shr/hooks/useFab';
 import {
@@ -73,6 +73,20 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
     addPayment, updatePayment, removePayment,
     openNew, openEdit, save,
   } = useInvoiceForm({ kind, invoices, contacts, flocks, whsItems, allocations, addInvoice, updateInvoice });
+
+  // 🆕 باز کردن فرم ویرایش از URL (از Aging در ReceivablesPage)
+  const lastProcessedEdit = useRef<string | null>(null);
+  useEffect(() => {
+    const editId = searchParams.get('edit');
+    if (!editId || lastProcessedEdit.current === editId) return;
+    const inv = _allInvoices.find(i => i.id === editId);
+    if (!inv) return;
+    lastProcessedEdit.current = editId;
+    openEdit(inv);
+    const next = new URLSearchParams(searchParams);
+    next.delete('edit');
+    setSearchParams(next, { replace: true });
+  }, [searchParams, _allInvoices, openEdit, setSearchParams]);
 
   // آبشار: اگه partyId دیگه در لیست فیلترشده نیست، پاک شه
   useEffect(() => {
