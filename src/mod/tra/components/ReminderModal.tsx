@@ -4,7 +4,7 @@
  * ۳ روش: تلفنی / حضوری / سایر (با کانال آزاد)
  * پیام قابل ویرایش با لحن صمیمی و محترمانه
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Btn, BtnRow, Field, Input, Modal, Textarea } from '../../../shr/components/ui';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { daysUntilDue } from '../helpers';
@@ -62,7 +62,6 @@ export default function ReminderModal({ open, onClose, invoice }: Props) {
   const [promisedDate, setPromisedDate] = useState('');
   const [message, setMessage] = useState('');
   const [isMessageExpanded, setIsMessageExpanded] = useState(false);
-  const [customMode, setCustomMode] = useState(false);
 
   const party = invoice ? contacts.find(c => c.id === invoice.partyId) : null;
   const salutation = party?.gender === 'male' ? 'جناب آقای' : party?.gender === 'female' ? 'سرکار خانم' : 'جناب';
@@ -106,6 +105,23 @@ ${farmName} 🐔`;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, invoice?.id]);
 
+  // 🆕 scroll reset on open
+  const modalContentRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const id = setTimeout(() => {
+      let el: HTMLElement | null = modalContentRef.current;
+      while (el && el !== document.body) {
+        if (el.scrollHeight > el.clientHeight + 10) {
+          el.scrollTop = 0;
+          break;
+        }
+        el = el.parentElement;
+      }
+    }, 100);
+    return () => clearTimeout(id);
+  }, [open]);
+
   const handleSave = () => {
     if (!invoice) return;
     const intervalDays = Math.max(1, Math.min(365, parseInt(toEn(intervalDaysStr)) || 7));
@@ -148,7 +164,7 @@ ${farmName} 🐔`;
   });
 
   const isCustomChannel = !CHANNEL_PRESETS.includes(channel);
-  const isCustomInterval = customMode && intervalDaysStr !== '';
+  const isCustomInterval = intervalDaysStr !== '' && !['3', '7', '30'].includes(intervalDaysStr);
 
   return (
     <Modal
@@ -163,7 +179,7 @@ ${farmName} 🐔`;
         </div>
       }
     >
-      <div style={{ padding: 0, fontFamily: 'inherit', lineHeight: 1.6 }}>
+      <div ref={modalContentRef} style={{ padding: 0, fontFamily: 'inherit', lineHeight: 1.6 }}>
 
         {/* Context */}
         <div style={{ background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 3, marginBottom: 16 }}>
@@ -204,7 +220,7 @@ ${farmName} 🐔`;
           </div>
           <Textarea value={message} onChange={e => setMessage(e.target.value)} rows={isMessageExpanded ? 8 : 4} maxHeight={isMessageExpanded ? 240 : 120} />
           <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: 4 }}>
-            <button type="button" onClick={() => setIsMessageExpanded(v => !v)} style={{ background: 'transparent', border: 'none', color: 'var(--muted)', fontSize: 'var(--fs-2xs)', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline', textUnderlineOffset: 2, padding: 0 }}>
+            <button type="button" onClick={() => setIsMessageExpanded(v => !v)} style={{ background: 'transparent', border: 'none', color: 'var(--muted)', fontSize: 'var(--fs-xs)', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline', textUnderlineOffset: 2, padding: 0 }}>
               {isMessageExpanded ? 'بستن' : 'باز کردن'}
             </button>
           </div>
@@ -216,7 +232,7 @@ ${farmName} 🐔`;
         {/* زمان‌بندی */}
         <div>
           <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, marginBottom: 8 }}>زمان‌بندی</div>
-          <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', marginBottom: 6 }}>تاریخ قول مشتری (اختیاری)</div>
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 6 }}>تاریخ قول مشتری (اختیاری)</div>
           <DatePicker value={promisedDate} onChange={setPromisedDate} />
           {promisedDate && (
             <div style={{ padding: '6px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--accent)', marginTop: 6 }}>
@@ -225,13 +241,13 @@ ${farmName} 🐔`;
           )}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '14px 0' }}>
             <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-            <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--dim)', fontWeight: 600 }}>یا</span>
+            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--dim)', fontWeight: 600 }}>یا</span>
             <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
           </div>
-          <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', marginBottom: 6 }}>یادآوری بعدی</div>
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 6 }}>یادآوری بعدی</div>
           <div style={{ display: 'flex', gap: 4, alignItems: 'center', width: '100%', opacity: promisedDate ? 0.5 : 1, pointerEvents: promisedDate ? 'none' : 'auto' }}>
             {[3, 7, 30].map(d => (
-              <button key={d} type="button" onClick={() => { setIntervalDaysStr(String(d)); setCustomMode(false); }} style={{ ...chipStyle(!customMode && intervalDaysStr === String(d)), flex: 1, height: 32, padding: 0, fontSize: 'var(--fs-xs)', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <button key={d} type="button" onClick={() => setIntervalDaysStr(String(d))} style={{ ...chipStyle(intervalDaysStr === String(d)), flex: 1, height: 32, padding: 0, fontSize: 'var(--fs-xs)', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {toFa(d)}
               </button>
             ))}
@@ -239,12 +255,8 @@ ${farmName} 🐔`;
               <input
                 type="text"
                 inputMode="tel"
-                value={customMode ? toFa(intervalDaysStr) : ''}
-                onChange={e => {
-                  const v = toEn(e.target.value.replace(/[^0-9۰-۹]/g, ''));
-                  setIntervalDaysStr(v);
-                  setCustomMode(v !== '');
-                }}
+                value={toFa(intervalDaysStr)}
+                onChange={e => setIntervalDaysStr(toEn(e.target.value.replace(/[^0-9۰-۹]/g, '')))}
                 placeholder="دلخواه"
                 style={{
                   width: '100%',
@@ -260,7 +272,7 @@ ${farmName} 🐔`;
                   color: isCustomInterval ? 'var(--accent)' : 'var(--text)',
                 }}
               />
-              <span style={{ position: 'absolute', left: 4, top: '50%', transform: 'translateY(-50%)', fontSize: 9, color: isCustomInterval ? 'var(--accent)' : 'var(--muted)', pointerEvents: 'none' }}>روز</span>
+              <span style={{ position: 'absolute', left: 4, top: '50%', transform: 'translateY(-50%)', fontSize: 11, color: isCustomInterval ? 'var(--accent)' : 'var(--muted)', pointerEvents: 'none' }}>روز</span>
             </div>
           </div>
         </div>
