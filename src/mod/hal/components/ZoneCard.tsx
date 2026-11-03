@@ -76,7 +76,7 @@ export default function ZoneCard({
       <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-1)' }}>
         <CardActions actions={[
           { label: 'ویرایش', onClick: onEdit, variant: 'outline' },
-          { label: 'حذف', onClick: onDelete, variant: 'danger' }
+          { label: 'حذف', onClick: onDelete, variant: 'danger-outline' }
         ]} />
       </div>
     </ExpandableCard>

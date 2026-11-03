@@ -163,7 +163,7 @@ export default function EggEntryCard(props: EggEntryCardProps) {
       <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
         <CardActions actions={[
           { label: 'ویرایش', onClick: onEdit, variant: 'outline' },
-          { label: 'حذف', onClick: onDelete, variant: 'danger' }
+          { label: 'حذف', onClick: onDelete, variant: 'danger-outline' }
         ]} />
       </div>
     </ExpandableCard>

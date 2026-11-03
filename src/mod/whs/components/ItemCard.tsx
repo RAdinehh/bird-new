@@ -142,7 +142,7 @@ export default function ItemCard(props: ItemCardProps) {
         <CardActions actions={[
           { label: '🔄 اصلاح', onClick: onAdjust, variant: 'primary' },
           { label: 'ویرایش', onClick: onEdit, variant: 'outline' },
-          { label: 'حذف', onClick: handleDelete, variant: 'danger' }
+          { label: 'حذف', onClick: handleDelete, variant: 'danger-outline' }
         ]} />
       </div>
     </ExpandableCard>

@@ -473,7 +473,7 @@ export default function FlockCard(props: FlockCardProps) {
       {isArchived ? (
         <CardActions actions={[
           { label: 'بازگردانی', onClick: onRestore, variant: 'primary' },
-          { label: 'حذف', onClick: onDelete, variant: 'danger' }
+          { label: 'حذف', onClick: onDelete, variant: 'danger-outline' }
         ]} />
       ) : (
         <>

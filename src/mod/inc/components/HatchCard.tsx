@@ -131,7 +131,7 @@ export default function HatchCard(props: HatchCardProps) {
 
                 <CardActions actions={[
                   { label: 'ویرایش', onClick: onEdit, variant: 'outline' },
-                  { label: 'حذف', onClick: onDelete, variant: 'danger' }
+                  { label: 'حذف', onClick: onDelete, variant: 'danger-outline' }
                 ]} />
               </ExpandableCard>
   );

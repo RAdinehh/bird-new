@@ -204,7 +204,7 @@ export default function LogCard(props: LogCardProps) {
         { label: 'ویرایش', onClick: onEdit, variant: 'outline', hidden: (l.status || 'active') !== 'active' },
         { label: '📦 آرشیو', onClick: onArchive, variant: 'outline', hidden: (l.status || 'active') !== 'active' },
         { label: '♻️ بازگردانی', onClick: onRestore, variant: 'primary', hidden: (l.status || 'active') === 'active' },
-        { label: 'حذف', onClick: onDelete, variant: 'danger', hidden: (l.status || 'active') === 'active' }
+        { label: 'حذف', onClick: onDelete, variant: 'danger-outline', hidden: (l.status || 'active') === 'active' }
       ]} />
     </ExpandableCard>
   );

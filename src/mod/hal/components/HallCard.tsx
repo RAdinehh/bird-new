@@ -226,7 +226,7 @@ export default function HallCard(props: HallCardProps) {
       <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-1)' }}>
         <CardActions actions={[
           { label: 'ویرایش', onClick: onEdit, variant: 'outline' },
-          { label: 'حذف', onClick: handleDelete, variant: 'danger' }
+          { label: 'حذف', onClick: handleDelete, variant: 'danger-outline' }
         ]} />
       </div>
     </ExpandableCard>

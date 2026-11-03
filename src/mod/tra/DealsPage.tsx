@@ -773,7 +773,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   },
                   {
                     label: 'حذف',
-                    variant: 'danger',
+                    variant: 'danger-outline',
                     onClick: () => { void handleDeleteFromCard(d); },
                   },
                 ]} />

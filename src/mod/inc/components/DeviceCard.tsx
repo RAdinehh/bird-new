@@ -169,7 +169,7 @@ export default function DeviceCard({
                 <div style={{ display: 'flex', gap: 'var(--sp-2)' as any, paddingTop: 4 }}>
                   <CardActions actions={[
                     { label: 'ویرایش', onClick: onEdit, variant: 'outline' },
-                    { label: 'حذف', onClick: onDelete, variant: 'danger' }
+                    { label: 'حذف', onClick: onDelete, variant: 'danger-outline' }
                   ]} />
                 </div>
               </ExpandableCard>

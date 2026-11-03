@@ -224,7 +224,7 @@ export default function BirdCard({
       <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
         <CardActions actions={[
           { label: 'ویرایش', onClick: () => onEdit(b), variant: 'outline' },
-          { label: 'حذف', onClick: handleDelete, variant: 'danger' }
+          { label: 'حذف', onClick: handleDelete, variant: 'danger-outline' }
         ]} />
       </div>
     </ExpandableCard>
