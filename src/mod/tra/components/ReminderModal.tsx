@@ -5,7 +5,7 @@
  * پیام قابل ویرایش با لحن صمیمی و محترمانه
  */
 import { useState, useEffect, useRef } from 'react';
-import { Btn, BtnRow, Field, Input, Modal, SectionTitle, Textarea } from '../../../shr/components/ui';
+import { Btn, BtnRow, Field, Grid2, Input, Modal, SectionTitle, Textarea } from '../../../shr/components/ui';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { daysUntilDue, daysUntilJalali } from '../helpers';
 import { useSet } from '../../set/store';
@@ -256,9 +256,8 @@ ${farmName} 🐔`;
 
       {/* زمان‌بندی */}
       <SectionTitle>زمان‌بندی</SectionTitle>
-      <div>
-        {/* یادآوری بعدی — کادر اصلی */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+      <div style={{ marginTop: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 600 }}>یادآوری بعدی</span>
           {(promisedDate || intervalDaysStr) && (
             <button
@@ -267,31 +266,28 @@ ${farmName} 🐔`;
               aria-label="پاک کردن یادآوری"
               title="پاک کردن"
               style={{
-                width: 22, height: 22, borderRadius: '50%',
-                border: 'none', background: 'var(--danger-soft)',
+                width: 24, height: 24, borderRadius: 'var(--r-sm)',
+                border: '1px solid var(--danger)',
+                background: 'var(--danger-soft)',
                 color: 'var(--danger)', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 13, padding: 0, fontFamily: 'inherit',
+                fontSize: 14, padding: 0, fontFamily: 'inherit',
                 fontWeight: 700, lineHeight: 1,
               }}
             >×</button>
           )}
         </div>
-        <div style={{ display: 'flex', gap: 4 }}>
+        <Grid2>
+          <DatePicker value={promisedDate} onChange={handleDateChange} />
           <Input
             value={toFa(intervalDaysStr)}
             onChange={e => handleDaysChange(e.target.value)}
             placeholder="دستی"
             unit="روز"
             inputMode="tel"
-            style={{ width: 90, flexShrink: 0, textAlign: 'center' }}
+            style={{ textAlign: 'center' }}
           />
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <DatePicker value={promisedDate} onChange={handleDateChange} />
-          </div>
-        </div>
-
-        {/* یادآوری قبلی — زیرنویس */}
+        </Grid2>
         {invoice?.lastRemindedAt && (() => {
           const d = daysUntilJalali(invoice.lastRemindedAt);
           const ago = d === null ? null : Math.abs(d);
@@ -306,9 +302,9 @@ ${farmName} 🐔`;
               gap: 4,
               flexWrap: 'wrap',
             }}>
-              <span>یادآوری قبلی:</span>
+              <span>آخرین ثبت:</span>
               <span style={{ color: 'var(--text)', fontWeight: 600 }}>{toFa(invoice.lastRemindedAt)}</span>
-              {agoLabel && <span style={{ color: 'var(--muted)' }}>— {agoLabel}</span>}
+              {agoLabel && <span>— {agoLabel}</span>}
             </div>
           );
         })()}
