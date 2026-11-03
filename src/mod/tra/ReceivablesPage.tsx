@@ -8,11 +8,12 @@ import ReminderModal from './components/ReminderModal';
 import { useTra, remaining, paidSumAllocated, WORKFLOW_LABEL, DEAL_LABEL, computeDealBalance, dealDaysUntilDue, isDealOpen, type Invoice, type Deal, type Deferral } from './store';
 import { useCtc } from '../ctc/store';
 import { Btn, Empty, PageContainer } from '../../shr/components/ui';
+import EntityLink from '../../shr/components/EntityLink';
 import { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import { toFa } from '../../shr/utils/fa';
 import { showSuccess, showConfirmAsync } from '../../cor/store/dialog';
 import { toastMsg } from '../../cor/store/toast';
-import { Line, tab } from './helpers';
+import { Line, Row, tab } from './helpers';
 import { useFilterSort, FilterBar, getTraReceivablesConfig } from '../../shr/filter';
 import MultiPayModal from './components/MultiPayModal';
 import DealPayModal from './components/DealPayModal';
@@ -300,18 +301,34 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
               </>
             );
           }}
-          renderDetails={(inv) => (
-            <>
-              <Line l="جمع فاکتور" v={`${toFa(inv.total.toLocaleString('fa-IR'))} تومان`} />
-              <Line l="پرداخت‌شده" v={`${toFa(paidSumAllocated(inv, allocations).toLocaleString('fa-IR'))} تومان`} />
-              {inv.dueDate ? <Line l="سرسید" v={toFa(inv.dueDate)} /> : null}
-              {inv.workflowStatus ? <Line l="وضعیت" v={WORKFLOW_LABEL[inv.workflowStatus].replace(/^[^\u0600-\u06FFA-Za-z0-9]+/u, '')} /> : null}
-              {inv.deferrals && inv.deferrals.length > 0 ? <Line l="تعویق‌ها" v={toFa(inv.deferrals.length)} /> : null}
-              {inv.reminderLog && inv.reminderLog.length > 0 ? (
-                <Line l="آخرین یادآوری" v={`${toFa(inv.reminderLog[inv.reminderLog.length - 1].date)}${inv.reminderLog[inv.reminderLog.length - 1].methodLabel ? ' — ' + inv.reminderLog[inv.reminderLog.length - 1].methodLabel : ''}`} />
-              ) : null}
-            </>
-          )}
+          renderDetails={(inv) => {
+            const checkPending = (inv.payments || []).filter(p => p.method === 'check' && (p.status === 'pending' || p.status === 'in_transit'));
+            const relatedDeal = inv.relatedDealId ? deals.find(d => d.id === inv.relatedDealId) : null;
+            return (
+              <>
+                <Line l="جمع فاکتور" v={`${toFa(inv.total.toLocaleString('fa-IR'))} تومان`} />
+                <Line l="پرداخت‌شده" v={`${toFa(paidSumAllocated(inv, allocations).toLocaleString('fa-IR'))} تومان`} />
+                {inv.dueDate ? <Line l="سرسید" v={toFa(inv.dueDate)} /> : null}
+                {inv.workflowStatus ? <Line l="وضعیت" v={WORKFLOW_LABEL[inv.workflowStatus].replace(/^[^\u0600-\u06FFA-Za-z0-9]+/u, '')} /> : null}
+                {inv.deferrals && inv.deferrals.length > 0 ? <Line l="تعویق‌ها" v={toFa(inv.deferrals.length)} /> : null}
+                {inv.reminderLog && inv.reminderLog.length > 0 ? (
+                  <Line l="آخرین یادآوری" v={`${toFa(inv.reminderLog[inv.reminderLog.length - 1].date)}${inv.reminderLog[inv.reminderLog.length - 1].methodLabel ? ' — ' + inv.reminderLog[inv.reminderLog.length - 1].methodLabel : ''}`} />
+                ) : null}
+                {relatedDeal && (
+                  <Line l="معامله" v={relatedDeal.dealNumber || relatedDeal.id.slice(0, 6)} />
+                )}
+                {inv.relatedFlockId && (
+                  <Row l="گله" v={<EntityLink type="flock" id={inv.relatedFlockId} label={inv.items?.[0]?.flockName || 'مشاهده'} />} />
+                )}
+                {inv.relatedSettlementId && (
+                  <Line l="🔒 از تسویه" v="برای تغییر، تسویه را ویرایش کنید" />
+                )}
+                {checkPending.length > 0 && (
+                  <Line l="چک‌ها" v={`${toFa(checkPending.length)} در جریان (${toFa(checkPending.reduce((s, p) => s + (p.amount || 0), 0).toLocaleString('fa-IR'))} ت)`} />
+                )}
+              </>
+            );
+          }}
           groupActions={[
             {
               label: 'یادآوری گروهی',
