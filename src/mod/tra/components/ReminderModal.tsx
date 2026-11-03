@@ -220,7 +220,7 @@ ${farmName} 🐔`;
       </div>
 
       {/* کانال */}
-      <SectionTitle>کانال</SectionTitle>
+      <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)', marginBottom: 8, marginTop: 4 }}>کانال</div>
       <div style={{ display: 'flex', gap: 4, width: '100%', marginTop: 8 }}>
         {CHANNEL_PRESETS.map(c => (
           <button key={c} type="button" onClick={() => setChannel(c)} style={{ ...chipStyle(channel === c), flex: 1, padding: '6px 2px', fontSize: 'var(--fs-sm)', minWidth: 0 }}>
@@ -237,7 +237,7 @@ ${farmName} 🐔`;
 
       {/* پیام */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, paddingTop: 12, borderTop: '1px dashed var(--border)', marginBottom: 8 }}>
-        <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>پیام</span>
+        <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)' }}>پیام</span>
         <div style={{ display: 'flex', gap: 4 }}>
           <button type="button" onClick={handleShare} title="ارسال" style={{ width: 30, height: 30, borderRadius: 'var(--r-sm)', background: 'var(--btn-bg)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📤</button>
           <button type="button" onClick={handleCopy} title="کپی" style={{ width: 30, height: 30, borderRadius: 'var(--r-sm)', background: 'var(--btn-bg)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📋</button>
@@ -253,12 +253,9 @@ ${farmName} 🐔`;
       </div>
 
       {/* زمان‌بندی */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, paddingTop: 12, borderTop: '1px dashed var(--border)', marginBottom: 8 }}>
-        <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>زمان‌بندی</span>
-      </div>
-      <div>
+      <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px dashed var(--border)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 600 }}>یادآوری بعدی</span>
+          <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)' }}>یادآوری بعدی</span>
           {(promisedDate || intervalDaysStr) && (
             <button
               type="button"
@@ -308,7 +305,7 @@ ${farmName} 🐔`;
 
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, paddingTop: 12, borderTop: '1px dashed var(--border)', marginBottom: 8 }}>
-        <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>یادداشت داخلی (اختیاری)</span>
+        <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)' }}>یادداشت داخلی (اختیاری)</span>
       </div>
       <div>
         <Input value={note} onChange={e => setNote(e.target.value)} placeholder="توضیح دلخواه" />
