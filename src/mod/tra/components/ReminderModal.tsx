@@ -7,10 +7,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Btn, BtnRow, Field, Input, Modal, SectionTitle, Textarea } from '../../../shr/components/ui';
 import { toFa, toEn } from '../../../shr/utils/fa';
-import { daysUntilDue } from '../helpers';
+import { daysUntilDue, daysUntilJalali } from '../helpers';
 import { useSet } from '../../set/store';
 import { useCtc } from '../../ctc/store';
 import { useTra } from '../store';
+import { getTodayJalali, addJalaliDays } from '../calc';
 import { remaining } from '../calc';
 import { copyText, shareText } from '../../../shr/utils/clipboard';
 import { toastMsg } from '../../../cor/store/toast';
@@ -58,7 +59,7 @@ export default function ReminderModal({ open, onClose, invoice }: Props) {
 
   const [channel, setChannel] = useState('واتس‌اپ');
   const [note, setNote] = useState('');
-  const [intervalDaysStr, setIntervalDaysStr] = useState('7');
+  const [intervalDaysStr, setIntervalDaysStr] = useState('');
   const [promisedDate, setPromisedDate] = useState('');
   const [message, setMessage] = useState('');
   const [isMessageExpanded, setIsMessageExpanded] = useState(false);
@@ -122,6 +123,24 @@ ${farmName} 🐔`;
     return () => clearTimeout(id);
   }, [open]);
 
+  const handleDateChange = (newDate: string) => {
+    setPromisedDate(newDate);
+    if (!newDate) { setIntervalDaysStr(''); return; }
+    const days = daysUntilJalali(newDate);
+    if (days !== null && days >= 0) setIntervalDaysStr(String(days));
+    else setIntervalDaysStr('');
+  };
+
+  const handleDaysChange = (rawVal: string) => {
+    const cleaned = toEn(rawVal.replace(/[^0-9۰-۹]/g, ''));
+    setIntervalDaysStr(cleaned);
+    if (cleaned && parseInt(cleaned) > 0) {
+      setPromisedDate(addJalaliDays(getTodayJalali(), parseInt(cleaned)));
+    } else {
+      setPromisedDate('');
+    }
+  };
+
   const handleSave = () => {
     if (!invoice) return;
     const intervalDays = Math.max(1, Math.min(365, parseInt(toEn(intervalDaysStr)) || 7));
@@ -164,7 +183,6 @@ ${farmName} 🐔`;
   });
 
   const isCustomChannel = !CHANNEL_PRESETS.includes(channel);
-  const isCustomInterval = intervalDaysStr !== '' && !['3', '7', '30'].includes(intervalDaysStr);
 
   return (
     <Modal
@@ -223,40 +241,21 @@ ${farmName} 🐔`;
 
       {/* زمان‌بندی */}
       <SectionTitle>زمان‌بندی</SectionTitle>
-      <div style={{ marginTop: 8 }}>
-        <Field label="تاریخ قول مشتری (اختیاری)">
-          <DatePicker value={promisedDate} onChange={setPromisedDate} />
-        </Field>
-        {promisedDate && (
-          <div style={{ padding: '6px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--accent)', marginTop: -4, marginBottom: 4 }}>
-            یادآوری بعدی خودکار روی {toFa(promisedDate)} تنظیم شد
-          </div>
-        )}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '10px 0' }}>
-          <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--dim)', fontWeight: 600 }}>یا</span>
-          <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+      <Field label="یادآوری بعدی">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          <DatePicker value={promisedDate} onChange={handleDateChange} />
+          <Input
+            value={toFa(intervalDaysStr)}
+            onChange={e => handleDaysChange(e.target.value)}
+            placeholder="دستی"
+            unit="روز"
+            inputMode="tel"
+            style={{ textAlign: 'center' }}
+          />
         </div>
-        <Field label="یادآوری بعدی">
-          <div style={{ display: 'flex', gap: 4, alignItems: 'stretch', width: '100%', opacity: promisedDate ? 0.5 : 1, pointerEvents: promisedDate ? 'none' : 'auto' }}>
-            {[3, 7, 30].map(d => (
-              <button key={d} type="button" onClick={() => setIntervalDaysStr(String(d))} style={{ ...chipStyle(intervalDaysStr === String(d)), flex: 1, height: 36, padding: 0, fontSize: 'var(--fs-base)', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {toFa(d)}
-              </button>
-            ))}
-            <Input
-              value={toFa(intervalDaysStr)}
-              onChange={e => setIntervalDaysStr(toEn(e.target.value.replace(/[^0-9۰-۹]/g, '')))}
-              placeholder="دلخواه"
-              unit="روز"
-              inputMode="tel"
-              style={{ flex: 1, height: 36, textAlign: 'center' }}
-            />
-          </div>
-        </Field>
-      </div>
+      </Field>
 
-      {/* یادداشت */}
+
       <SectionTitle>یادداشت داخلی (اختیاری)</SectionTitle>
       <div style={{ marginTop: 8 }}>
         <Input value={note} onChange={e => setNote(e.target.value)} placeholder="توضیح دلخواه" />
