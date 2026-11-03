@@ -239,11 +239,11 @@ ${farmName} 🐔`;
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, paddingTop: 12, borderTop: '1px dashed var(--border)' }}>
         <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)' }}>پیام</span>
         <div style={{ display: 'flex', gap: 4 }}>
-          <button type="button" onClick={handleShare} title="ارسال" style={{ width: 30, height: 30, borderRadius: 'var(--r-sm)', background: 'var(--btn-bg)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📤</button>
+          <button type="button" onClick={handleShare} title="ارسال" style={{ width: 24, height: 24, borderRadius: 'var(--r-sm)', background: 'var(--btn-bg)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📤</button>
           <button type="button" onClick={handleCopy} title="کپی" style={{ width: 30, height: 30, borderRadius: 'var(--r-sm)', background: 'var(--btn-bg)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📋</button>
         </div>
       </div>
-      <div style={{ marginTop: 6 }}>
+      <div style={{ marginTop: 0 }}>
         <Textarea value={message} onChange={e => setMessage(e.target.value)} rows={isMessageExpanded ? 8 : 4} maxHeight={isMessageExpanded ? 240 : 120} />
         <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: 4 }}>
           <button type="button" onClick={() => setIsMessageExpanded(v => !v)} style={{ background: 'transparent', border: 'none', color: 'var(--muted)', fontSize: 'var(--fs-xs)', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline', textUnderlineOffset: 2, padding: 0 }}>
@@ -254,7 +254,7 @@ ${farmName} 🐔`;
 
       {/* زمان‌بندی */}
       <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px dashed var(--border)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
           <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)' }}>یادآوری بعدی</span>
           {(promisedDate || intervalDaysStr) && (
             <button
@@ -304,7 +304,7 @@ ${farmName} 🐔`;
       </div>
 
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, paddingTop: 12, borderTop: '1px dashed var(--border)', marginBottom: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, paddingTop: 12, borderTop: '1px dashed var(--border)', marginBottom: 6 }}>
         <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)' }}>یادداشت داخلی (اختیاری)</span>
       </div>
       <div>
