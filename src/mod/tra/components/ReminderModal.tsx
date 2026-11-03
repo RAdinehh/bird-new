@@ -256,7 +256,7 @@ ${farmName} 🐔`;
 
       {/* زمان‌بندی */}
       <SectionTitle>زمان‌بندی</SectionTitle>
-      <div style={{ marginTop: 8 }}>
+      <div style={{ marginTop: 12 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 600 }}>یادآوری بعدی</span>
           {(promisedDate || intervalDaysStr) && (
