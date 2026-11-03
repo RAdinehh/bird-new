@@ -119,6 +119,8 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
 
   // Deal computations (Phase 1)
   const dealTotalOpen = openDeals.reduce((s, d) => s + computeDealBalance(d).balance, 0);
+  // 🆕 «کل معاملات» = Σ myShare (سهم طرف)، نه مانده — استاندارد Odoo/SAP FI-AR
+  const dealTotalMyShare = openDeals.reduce((s, d) => s + computeDealBalance(d).myShare, 0);
   // 🆕 Stage 3-4: پرداخت‌های خالص‌شده معاملات (settledAmount)
   const dealSettledAmount = openDeals.reduce((s, d) => {
     const bal = computeDealBalance(d);
@@ -227,7 +229,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                 </div>
 
       {/* خلاصه — یه خط */}
-      <SummaryBox kind={kind} totalInvoiced={kind === 'deal' ? Math.abs(dealTotalOpen) : totalInvoiced} totalOpen={effectiveTotal} settledAmount={kind === 'deal' ? dealSettledAmount : settledAmount} dueSoonAmount={kind === 'deal' ? dealDueSoonAmount : dueSoonAmount} openCount={kind === 'deal' ? openDeals.length : openInvoices.length} />
+      <SummaryBox kind={kind} totalInvoiced={kind === 'deal' ? dealTotalMyShare : totalInvoiced} totalOpen={effectiveTotal} settledAmount={kind === 'deal' ? dealSettledAmount : settledAmount} dueSoonAmount={kind === 'deal' ? dealDueSoonAmount : dueSoonAmount} openCount={kind === 'deal' ? openDeals.length : openInvoices.length} />
 
       {/* ⏰ سرسیدهای نزدیک — collapsible */}
       {kind === 'deal' ? (
