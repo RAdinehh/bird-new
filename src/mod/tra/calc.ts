@@ -5,6 +5,16 @@ import { parse as parseJ, differenceInDays as diffDaysJ, format as formatJ, addD
 import type { PaymentAllocation } from './types';
 import type { Invoice, InvoiceItem, Payment, WorkflowStatus, CheckStatus, InvoiceStatus, InvoiceType, PaymentTerms, Installment, Deal, SettlementType } from './types';
 
+/** تبدیل ارقام فارسی/عربی به لاتین — Single Source of Truth (S1) */
+export function toEnDigits(s: string | null | undefined): string {
+  return String(s || '').replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+}
+
+/** تبدیل ارقام لاتین به فارسی — Single Source of Truth (S1) */
+export function toFaDigits(s: string | null | undefined): string {
+  return String(s || '').replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d, 10)]);
+}
+
 export function generateInvoiceNumber(
   type: InvoiceType,
   date: string,
@@ -34,7 +44,7 @@ export function generateDealNumber(
   date: string,
   existingDeals: Array<{ dealNumber?: string }>
 ): string {
-  const norm = (date || '').replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+  const norm = toEnDigits(date);
   const parts = norm.split('/');
   const year = parts[0] || '1400';
   const pattern = `${year}-`;
@@ -43,7 +53,7 @@ export function generateDealNumber(
   existingDeals.forEach(d => {
     if (!d.dealNumber) return;
     // 🆕 M6: normalize فارسی قبل از startsWith (سازگار با سایر توابع)
-    const normDealNum = d.dealNumber.replace(/[۰-۹]/g, x => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(x)));
+    const normDealNum = toEnDigits(d.dealNumber);
     if (!normDealNum.startsWith(pattern)) return;
     const suffix = normDealNum.slice(pattern.length);
     const num = parseInt(suffix, 10);
@@ -72,7 +82,7 @@ export function calcDueDate(
     // ولی سرسید اولین قسط = تاریخ + فاصله
     const gap = gapDays || 30;
     try {
-      const en = invoiceDate.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+      const en = toEnDigits(invoiceDate);
       const base = parseJ(en, 'yyyy/MM/dd', new Date());
       if (isNaN(base.getTime())) return invoiceDate;
       const due = addDays(base, gap);
@@ -244,7 +254,7 @@ function migrateInvDates(inv: any): any {
   if (!inv) return inv;
   const fix = (str: string) => {
     if (!str) return str;
-    const en = String(str).replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+    const en = toEnDigits(str);
     const m = en.match(/^(\d{4})\/(\d{2})\/(\d{2})$/);
     if (!m) return str;
     const y = parseInt(m[1], 10);
@@ -284,7 +294,7 @@ export function remaining(inv: Invoice, allocations?: PaymentAllocation[]): numb
 export function ageDays(inv: Invoice): number {
   if (!inv.date) return 0;
   try {
-    const en = inv.date.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+    const en = toEnDigits(inv.date);
     const d = parseJ(en, 'yyyy/MM/dd', new Date());
     if (isNaN(d.getTime())) return 0;
     const diff = diffDaysJ(new Date(), d);
@@ -332,7 +342,7 @@ export function computeCashDiscount(inv: Invoice): number {
   const days = (inv as any).cashDiscountDays || 0;
   if (pct <= 0 || days <= 0 || !inv.date) return 0;
   
-  const toEnDigits = (s: string) => String(s || '').replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+  // toEnDigits از helper ماژول استفاده می‌شود
   const invDate = parseJ(toEnDigits(inv.date), 'yyyy/MM/dd', new Date());
   if (isNaN(invDate.getTime())) return 0;
   
@@ -389,16 +399,16 @@ export function formatInvoiceNumber(num: string | undefined | null): string {
   let rest = num;
   if (num.startsWith('P')) { prefix = 'P'; rest = num.slice(1); }
   else if (num.startsWith('S')) { prefix = 'S'; rest = num.slice(1); }
-  // حذف ۲ رقم اول سال: 140507001 → 0507001
+  // حذف ۲ رقم اول از شماره بعد از P/S — 140507001 → 0507001
   if (rest.length >= 6) rest = rest.slice(2);
-  const faDigits = rest.replace(/\d/g, (d: string) => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]);
+  const faDigits = toFaDigits(rest);
   return prefix ? `${prefix}${faDigits}` : faDigits;
 }
 /** افزودن N روز به تاریخ شمسی */
 export function addJalaliDays(dateStr: string, days: number): string {
   if (!dateStr) return '';
   try {
-    const en = dateStr.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+    const en = toEnDigits(dateStr);
     const base = parseJ(en, 'yyyy/MM/dd', new Date());
     if (isNaN(base.getTime())) return dateStr;
     return formatJ(addDays(base, days), 'yyyy/MM/dd');
@@ -513,7 +523,7 @@ export function calcInvoiceTotal(items: any[]): number {
 export function dealDaysUntilDue(d: Deal): number | null {
   if (!d.dueDate) return null;
   try {
-    const en = d.dueDate.replace(/[۰-۹]/g, (x: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(x)));
+    const en = toEnDigits(d.dueDate);
     const dueDate = parseJ(en, 'yyyy/MM/dd', new Date());
     if (isNaN(dueDate.getTime())) return null;
     dueDate.setHours(0, 0, 0, 0);
@@ -537,7 +547,7 @@ function dealOverdueDays(d: Deal): number {
 function monthsBetween(start: string, end: string): number {
   if (!start || !end) return 1;
   try {
-    const norm = (s: string) => s.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+    const norm = toEnDigits;
     const s = new Date(norm(start).replace(/\//g, '-'));
     const e = new Date(norm(end).replace(/\//g, '-'));
     if (isNaN(s.getTime()) || isNaN(e.getTime())) return 1;
