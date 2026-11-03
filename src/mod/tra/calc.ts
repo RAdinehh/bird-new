@@ -41,10 +41,12 @@ export function generateDealNumber(
 
   let maxNum = 0;
   existingDeals.forEach(d => {
-    if (!d.dealNumber || !d.dealNumber.startsWith(pattern)) return;
-    const suffix = d.dealNumber.slice(pattern.length);
-    const normSuffix = suffix.replace(/[۰-۹]/g, x => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(x)));
-    const num = parseInt(normSuffix, 10);
+    if (!d.dealNumber) return;
+    // 🆕 M6: normalize فارسی قبل از startsWith (سازگار با سایر توابع)
+    const normDealNum = d.dealNumber.replace(/[۰-۹]/g, x => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(x)));
+    if (!normDealNum.startsWith(pattern)) return;
+    const suffix = normDealNum.slice(pattern.length);
+    const num = parseInt(suffix, 10);
     if (!isNaN(num) && num > maxNum) maxNum = num;
   });
 
@@ -221,10 +223,17 @@ export function paidPendingSum(payments: Payment[]): number {
 export function invoiceStatus(inv: Invoice, allocations?: PaymentAllocation[]): InvoiceStatus {
   const paid = paidSumAllocated(inv, allocations);
   const total = inv.total || 0;
+  const writtenOff = Math.round(inv.writtenOffAmount || 0);
   // 🆕 فیکس: remaining باید 0 باشه، نه فقط paid >= total
   const rem = remaining(inv, allocations);
-  if (rem <= 0 && total > 0) return 'paid';
-  if (paid > 0) return 'partial';
+  if (rem <= 0 && total > 0) {
+    // 🆕 M7: write-off = بدهی سوخته، نه پرداخت (SAP FI-AR / Odoo)
+    // اگر paid + writtenOff >= total، ولی paid خودش کل مبلغ را پوشش نمی‌دهد
+    // → 'partial' تا UI بتواند بج «بدحساب» را نشان دهد
+    if (writtenOff > 0 && paid < total) return 'partial';
+    return 'paid';
+  }
+  if (paid > 0 || writtenOff > 0) return 'partial';
   return 'unpaid';
 }
 
