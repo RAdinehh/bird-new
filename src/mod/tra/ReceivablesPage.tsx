@@ -10,7 +10,8 @@ import { useCtc } from '../ctc/store';
 import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import { toFa } from '../../shr/utils/fa';
-import { showSuccess } from '../../cor/store/dialog';
+import { showSuccess, showConfirmAsync } from '../../cor/store/dialog';
+import { toastMsg } from '../../cor/store/toast';
 import { Line, tab } from './helpers';
 import { useFilterSort, FilterBar, getTraReceivablesConfig } from '../../shr/filter';
 import MultiPayModal from './components/MultiPayModal';
@@ -18,6 +19,7 @@ import DealPayModal from './components/DealPayModal';
 import SummaryBox from './components/SummaryBox';
 import UpcomingDueSection from './components/UpcomingDueSection';
 import StatementModal from './components/StatementModal';
+import AgingBuckets from './components/AgingBuckets';
 import ChecksModal from './components/ChecksModal';
 import { agingBucketFromDue } from './formulas';
 import { agingBucketFromDeal } from './calc';
@@ -25,13 +27,12 @@ import { agingBucketFromDeal } from './calc';
 type BucketKey = '0-15' | '16-30' | '31-60' | '61-90' | '+90';
 
 export default function ReceivablesPage({ active = true }: { active?: boolean } = {}) {
-  const { invoices, deals, updateInvoice, allocations } = useTra();
+  const { invoices, deals, updateInvoice, allocations, addReminder } = useTra();
   const { contacts } = useCtc();
   const [multiPayOpen, setMultiPayOpen] = useState(false);
   const [multiPayPrefill, setMultiPayPrefill] = useState<{ partyId: string; invoiceId: string } | null>(null);
   const [kind, setKind] = useState<'sale' | 'purchase' | 'deal'>('sale');
   const [expandedBucket, setExpandedBucket] = useState<BucketKey | null>(null);
-  const [expandedInvoice, setExpandedInvoice] = useState<string | null>(null);
   const [deferModal, setDeferModal] = useState<{ id: string; oldDate: string } | null>(null);
   const [deferDate, setDeferDate] = useState('');
   const [deferReason, setDeferReason] = useState('');
@@ -130,7 +131,6 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
 
   const toggleBucket = (key: BucketKey) => {
     setExpandedBucket(expandedBucket === key ? null : key);
-    setExpandedInvoice(null);
   };
 
   const openDefer = (inv: Invoice) => {
@@ -296,152 +296,80 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
 
       {/* Buckets — فقط اگه پر باشن */}
       {kind !== 'deal' && effectiveTotal > 0 ? (
-        <>
-          {AGING_BUCKETS.map(({ key, label, color }) => {
-            const items = byBucket[key] || [];
-            if (items.length === 0) return null; // ← خالی‌ها پنهان
-            const sum = bucketSum(key);
-            const isOpen = expandedBucket === key;
-
+        <AgingBuckets
+          items={filtered}
+          bucketOf={(inv) => agingBucketFromDue(inv)}
+          sumOf={(inv) => remaining(inv, allocations)}
+          renderSummary={(inv) => {
+            const party = contacts.find(c => c.id === inv.partyId);
+            const dUntil = daysUntilDue(inv);
             return (
-              <div key={key} style={{
-                background: 'var(--card)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--r-md)',
-                overflow: 'hidden',
-              }}>
-                <div role="button" tabIndex={0}
-                  onClick={() => toggleBucket(key as BucketKey)}
-                  style={{
-                    padding: 'var(--pad-normal)',
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    cursor: 'pointer',
-                  }}
-                >
-                  <div style={{
-                    width: 8, height: 8, borderRadius: '50%',
-                    background: `var(--${color})`, flexShrink: 0
-                  }} />
-                  <div style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 600 }}>
-                    {label}
-                    <span style={{ color: 'var(--muted)', fontWeight: 400, marginRight: 6 }}>
-                      • {toFa(items.length)}
-                    </span>
+              <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
+                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{party?.name || '—'}</span>
+                    <span style={{ fontSize: 9, fontWeight: 600, padding: '1px 6px', borderRadius: 4, color: 'var(--muted)', border: '1px solid var(--border)' }}>{inv.type === 'sale' ? 'خریدار' : 'فروشنده'}</span>
                   </div>
-                  <div style={{
-                    fontSize: 'var(--fs-sm)', fontWeight: 700,
-                    color: `var(--${color})`, fontVariantNumeric: 'tabular-nums'
-                  }}>
-                    {toFa(sum.toLocaleString('fa-IR'))} تومان
-                  </div>
-                  <svg width="12" height="12" viewBox="0 0 24 24"
-                    fill="none" stroke={isOpen ? `var(--${color})` : 'var(--dim)'}
-                    strokeWidth="2.5" strokeLinecap="round"
-                    style={{
-                      transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                      transition: 'transform .2s',
-                    }}>
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
+                  <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{toFa(remaining(inv, allocations).toLocaleString('fa-IR'))} ت</span>
                 </div>
-
-                <div style={{
-                  display: 'grid',
-                  gridTemplateRows: isOpen ? '1fr' : '0fr',
-                  transition: 'grid-template-rows 250ms cubic-bezier(.16,1,.3,1)',
-                }}>
-                  <div style={{ overflow: 'hidden' }}>
-                    <div style={{ padding: '0 12px 10px', display: 'flex', flexDirection: 'column', gap: 5 }}>
-                      {items.map(inv => {
-                        const party = contacts.find(c => c.id === inv.partyId);
-                        const rem = remaining(inv, allocations);
-                        const days = ageDays(inv);
-                        const invOpen = expandedInvoice === inv.id;
-                        const dUntil = daysUntilDue(inv);
-                        return (
-                          <div
-                            key={inv.id}
-                            onClick={() => setExpandedInvoice(invOpen ? null : inv.id)}
-                            style={{
-                              padding: 'var(--pad-normal)',
-                              background: 'var(--input-bg)',
-                              border: '1px solid var(--border)',
-                              borderRadius: 'var(--r-sm)',
-                              cursor: 'pointer',
-                            }}
-                          >
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{
-                                  fontSize: 'var(--fs-sm)', fontWeight: 600,
-                                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
-                                }}>
-                                  {party?.name || '—'}
-                                </div>
-                                <div style={{
-                                  fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 1,
-                                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
-                                }}>
-                                  {toFa(days)} روز • {inv.number || ''}
-                                  {dUntil !== null ? ` • ${dueLabel(dUntil)}` : ''}
-                                </div>
-                              </div>
-                              <div style={{
-                                fontSize: 'var(--fs-sm)', fontWeight: 700,
-                                color: `var(--${color})`,
-                                fontVariantNumeric: 'tabular-nums',
-                                flexShrink: 0
-                              }}>
-                                {toFa(rem.toLocaleString('fa-IR'))} تومان
-                              </div>
-                              <div style={{ display: 'flex', gap: 4 }}>
-                                <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setMultiPayPrefill({ partyId: inv.partyId, invoiceId: inv.id }); setMultiPayOpen(true); }} style={{ fontSize: 11, padding: '2px 8px', minHeight: 24, height: 24 }}>💳</Btn>
-                                <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setReminderTarget(inv); }} style={{ fontSize: 11, padding: '2px 8px', minHeight: 24, height: 24 }}>📨</Btn>
-                              </div>
-                            </div>
-
-                            <div style={{
-                              display: 'grid',
-                              gridTemplateRows: invOpen ? '1fr' : '0fr',
-                              transition: 'grid-template-rows 200ms cubic-bezier(.16,1,.3,1)',
-                            }}>
-                              <div style={{ overflow: 'hidden' }}>
-                                <div style={{
-                                  paddingTop: 6, marginTop: 6,
-                                  borderTop: '1px dashed var(--border)',
-                                  display: 'flex', flexDirection: 'column', gap: 3
-                                }}>
-                                  <Line l="جمع فاکتور" v={`${toFa(inv.total.toLocaleString('fa-IR'))} تومان`} />
-                                  <Line l="پرداخت‌شده" v={`${toFa(paidSumAllocated(inv, allocations).toLocaleString('fa-IR'))} تومان`} />
-                                  {inv.dueDate ? <Line l="سرسید" v={toFa(inv.dueDate)} /> : null}
-                                  {inv.workflowStatus ? (
-                                    <Line l="وضعیت" v={WORKFLOW_LABEL[inv.workflowStatus]} />
-                                  ) : null}
-                                  {inv.deferrals && inv.deferrals.length > 0 ? (
-                                    <Line l="تعویق‌ها" v={toFa(inv.deferrals.length)} />
-                                  ) : null}
-                                  {inv.reminderLog && inv.reminderLog.length > 0 ? (
-                                    <Line l="آخرین یادآوری" v={`${toFa(inv.reminderLog[inv.reminderLog.length - 1].date)}${inv.reminderLog[inv.reminderLog.length - 1].methodLabel ? ' — ' + inv.reminderLog[inv.reminderLog.length - 1].methodLabel : ''}`} />
-                                  ) : null}
-
-                                  <div style={{ marginTop: 4 }}>
-                                    <Btn size="sm" onClick={(e) => { e.stopPropagation(); openDefer(inv); }}>
-                                      ⏰ تعویق
-                                    </Btn>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-xs)' }}>
+                  {dUntil !== null ? <span style={{ color: dUntil <= 3 ? 'var(--danger)' : dUntil <= 7 ? 'var(--warn)' : 'var(--muted)', fontWeight: 600 }}>⏰ {dueLabel(dUntil)}</span> : <span style={{ color: 'var(--muted)' }}>—</span>}
+                  <span style={{ color: 'var(--dim)', fontFamily: 'monospace', direction: 'ltr', fontSize: 10 }}>{inv.number || ''}</span>
                 </div>
-              </div>
+              </>
             );
-          })}
-        </>
+          }}
+          renderDetails={(inv) => (
+            <>
+              <Line l="جمع فاکتور" v={`${toFa(inv.total.toLocaleString('fa-IR'))} تومان`} />
+              <Line l="پرداخت‌شده" v={`${toFa(paidSumAllocated(inv, allocations).toLocaleString('fa-IR'))} تومان`} />
+              {inv.dueDate ? <Line l="سرسید" v={toFa(inv.dueDate)} /> : null}
+              {inv.workflowStatus ? <Line l="وضعیت" v={WORKFLOW_LABEL[inv.workflowStatus]} /> : null}
+              {inv.deferrals && inv.deferrals.length > 0 ? <Line l="تعویق‌ها" v={toFa(inv.deferrals.length)} /> : null}
+              {inv.reminderLog && inv.reminderLog.length > 0 ? (
+                <Line l="آخرین یادآوری" v={`${toFa(inv.reminderLog[inv.reminderLog.length - 1].date)}${inv.reminderLog[inv.reminderLog.length - 1].methodLabel ? ' — ' + inv.reminderLog[inv.reminderLog.length - 1].methodLabel : ''}`} />
+              ) : null}
+              <div style={{ marginTop: 4 }}>
+                <Btn size="sm" onClick={(e) => { e.stopPropagation(); openDefer(inv); }}>⏰ تعویق</Btn>
+              </div>
+            </>
+          )}
+          groupActions={[
+            {
+              label: 'پرداخت گروهی',
+              icon: '💳',
+              primary: true,
+              onClick: (items) => {
+                if (items.length === 0) return;
+                setMultiPayPrefill({ partyId: items[0].partyId, invoiceId: items.length === 1 ? items[0].id : '' });
+                setMultiPayOpen(true);
+              },
+            },
+            {
+              label: 'یادآوری گروهی',
+              icon: '📨',
+              onClick: async (items) => {
+                if (items.length === 0) return;
+                const ok = await showConfirmAsync(
+                  'یادآوری گروهی',
+                  `برای ${toFa(items.length)} فاکتور یادآوری ۷ روزه ثبت شود؟`,
+                  { confirmText: 'بله، ثبت کن' },
+                );
+                if (!ok) return;
+                items.forEach(inv => addReminder(inv.id, { method: 'other', note: '', intervalDays: 7 }));
+                toastMsg.success(`${toFa(items.length)} یادآوری ثبت شد`);
+              },
+            },
+            {
+              label: 'تعویق گروهی',
+              icon: '⏰',
+              onClick: (items) => {
+                if (items.length === 1) { openDefer(items[0]); return; }
+                toastMsg.warn('برای تعویق گروهی، هر فاکتور را جدا باز کنید');
+              },
+            },
+          ]}
+        />
       ) : null}
 
       {/* Modal تعویق */}
