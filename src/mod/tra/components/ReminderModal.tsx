@@ -196,14 +196,14 @@ ${farmName} 🐔`;
         )}
       </Field>
 
-      <Field label="پیام" hint="قابل ویرایش">
+      <Field label="پیام">
         <Textarea
           value={message}
           onChange={e => setMessage(e.target.value)}
-          rows={isMessageExpanded ? 8 : 3}
-          maxHeight={isMessageExpanded ? 240 : 90}
+          rows={isMessageExpanded ? 8 : 4}
+          maxHeight={isMessageExpanded ? 240 : 120}
         />
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 2 }}>
           <button
             type="button"
             onClick={() => setIsMessageExpanded(v => !v)}
@@ -211,13 +211,13 @@ ${farmName} 🐔`;
               background: 'transparent',
               border: 'none',
               color: 'var(--muted)',
-              fontSize: 'var(--fs-xs)',
+              fontSize: 'var(--fs-2xs, 10px)',
               fontWeight: 500,
               cursor: 'pointer',
               padding: 0,
               fontFamily: 'inherit',
               textDecoration: 'underline',
-              textUnderlineOffset: 3,
+              textUnderlineOffset: 2,
             }}
           >
             {isMessageExpanded ? 'بستن' : 'باز کردن'}
@@ -225,9 +225,9 @@ ${farmName} 🐔`;
         </div>
       </Field>
 
-      <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-        <Btn size="sm" variant="outline" onClick={handleShare} style={{ flex: 1 }}>📤 ارسال پیام</Btn>
-        <Btn size="sm" variant="outline" onClick={handleCopy} style={{ flex: 1 }}>📋 کپی</Btn>
+      <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
+        <Btn size="sm" variant="subtle" onClick={handleShare} style={{ flex: 1, fontSize: 'var(--fs-xs)', height: 30 }}>📤 ارسال پیام</Btn>
+        <Btn size="sm" variant="subtle" onClick={handleCopy} style={{ flex: 1, fontSize: 'var(--fs-xs)', height: 30 }}>📋 کپی</Btn>
       </div>
 
 
