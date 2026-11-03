@@ -154,140 +154,124 @@ ${farmName} 🐔`;
     <Modal
       open={open}
       onClose={onClose}
-      title="📨 ثبت یادآوری"
+      title="ثبت یادآوری"
       size="md"
       footer={
-        <BtnRow>
-          <Btn variant="primary" onClick={handleSave}>ثبت یادآوری</Btn>
-          <Btn onClick={onClose}>لغو</Btn>
-        </BtnRow>
+        <div style={{ display: 'flex', gap: 8, paddingTop: 16, marginTop: 16, borderTop: '1px solid var(--border)' }}>
+          <Btn variant="primary" onClick={handleSave} style={{ flex: 1, padding: '11px 16px', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', fontWeight: 700 }}>ثبت یادآوری</Btn>
+          <Btn onClick={onClose} style={{ flex: 1, padding: '11px 16px', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', fontWeight: 600 }}>لغو</Btn>
+        </div>
       }
     >
-      <div style={{
-        padding: 'var(--pad-normal)',
-        background: 'var(--input-bg)',
-        borderRadius: 'var(--r-sm)',
-        marginBottom: 'var(--sp-2)',
-        fontSize: 'var(--fs-sm)',
-        lineHeight: 1.8,
-      }}>
-        <div style={{ fontWeight: 700 }}>{salutation} {party?.name || '—'}</div>
-        <div style={{ color: 'var(--muted)' }}>📦 {itemName} • 💰 {amountFa} تومان</div>
-        <div style={{ color: 'var(--muted)' }}>📅 {daysPhrase}</div>
-      </div>
+      <div style={{ padding: 0, fontFamily: 'inherit', lineHeight: 1.6 }}>
 
-      <Field label="کانال">
-        <div style={{ display: 'flex', gap: 4, width: '100%', marginBottom: isCustomChannel ? 6 : 0 }}>
-          {CHANNEL_PRESETS.map(c => (
-            <button key={c} type="button" onClick={() => setChannel(c)} style={{ ...chipStyle(channel === c), flex: 1, padding: '6px 2px', fontSize: 'var(--fs-xs)', minWidth: 0 }}>
-              {c}
+        {/* Context */}
+        <div style={{ background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 3, marginBottom: 16 }}>
+          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 800 }}>{salutation} {party?.name || '—'}</div>
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: 4 }}>📦 {itemName} • <strong style={{ color: 'var(--text)', fontWeight: 700 }}>{amountFa} تومان</strong></div>
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: 4 }}>📅 {daysPhrase}</div>
+        </div>
+
+        {/* کانال */}
+        <div>
+          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, marginBottom: 8 }}>کانال</div>
+          <div style={{ display: 'flex', gap: 4, width: '100%' }}>
+            {CHANNEL_PRESETS.map(c => (
+              <button key={c} type="button" onClick={() => setChannel(c)} style={{ ...chipStyle(channel === c), flex: 1, padding: '6px 2px', fontSize: 'var(--fs-xs)', minWidth: 0 }}>
+                {c}
+              </button>
+            ))}
+            <button type="button" onClick={() => setChannel('')} style={{ ...chipStyle(isCustomChannel), flex: 1, padding: '6px 2px', fontSize: 'var(--fs-xs)', minWidth: 0 }}>
+              سایر
             </button>
-          ))}
-          <button type="button" onClick={() => setChannel('')} style={{ ...chipStyle(isCustomChannel), flex: 1, padding: '6px 2px', fontSize: 'var(--fs-xs)', minWidth: 0 }}>
-            سایر
-          </button>
+          </div>
+          {isCustomChannel && (
+            <Input value={channel} onChange={e => setChannel(e.target.value)} placeholder="نام کانال..." style={{ marginTop: 8 }} />
+          )}
         </div>
-        {isCustomChannel && (
-          <Input
-            value={channel}
-            onChange={e => setChannel(e.target.value)}
-            placeholder="نام کانال..."
-            autoFocus={false}
-          />
-        )}
-      </Field>
 
-      <Field label="پیام">
-        <Textarea
-          value={message}
-          onChange={e => setMessage(e.target.value)}
-          rows={isMessageExpanded ? 8 : 4}
-          maxHeight={isMessageExpanded ? 240 : 120}
-        />
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 2 }}>
-          <button
-            type="button"
-            onClick={() => setIsMessageExpanded(v => !v)}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--muted)',
-              fontSize: 'var(--fs-2xs, 10px)',
-              fontWeight: 500,
-              cursor: 'pointer',
-              padding: 0,
-              fontFamily: 'inherit',
-              textDecoration: 'underline',
-              textUnderlineOffset: 2,
-            }}
-          >
-            {isMessageExpanded ? 'بستن' : 'باز کردن'}
-          </button>
-        </div>
-      </Field>
+        {/* خط */}
+        <div style={{ borderTop: '1px solid var(--border)', margin: '16px 0' }} />
 
-      <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
-        <Btn size="sm" variant="subtle" onClick={handleShare} style={{ flex: 1, fontSize: 'var(--fs-xs)', height: 30 }}>📤 ارسال پیام</Btn>
-        <Btn size="sm" variant="subtle" onClick={handleCopy} style={{ flex: 1, fontSize: 'var(--fs-xs)', height: 30 }}>📋 کپی</Btn>
-      </div>
-
-
-      <Field label="تاریخ قول (اختیاری)" hint="اگر مشتری تاریخی برای پرداخت وعده داد">
-        <DatePicker value={promisedDate} onChange={setPromisedDate} />
-      </Field>
-
-      {promisedDate && (
-        <div style={{ padding: '6px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--accent)', marginTop: -6 }}>
-          یادآوری بعدی خودکار روی {toFa(promisedDate)} تنظیم شد
-        </div>
-      )}
-
-      <Field label="یادآوری بعدی" hint={promisedDate ? 'غیرفعال — تاریخ قول جایگزین شد' : undefined}>
-        <div style={{ display: 'flex', gap: 4, alignItems: 'center', width: '100%', opacity: promisedDate ? 0.5 : 1, pointerEvents: promisedDate ? 'none' : 'auto' }}>
-          {[3, 7, 30].map(d => (
-            <button key={d} type="button" onClick={() => { setIntervalDaysStr(String(d)); setCustomMode(false); }} style={{ ...chipStyle(!isCustomInterval && intervalDaysStr === String(d)), flex: 1, height: 32, padding: 0, fontSize: 'var(--fs-sm)', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {toFa(d)}
+        {/* پیام */}
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700 }}>پیام</div>
+            <div style={{ display: 'flex', gap: 2 }}>
+              <button type="button" onClick={handleShare} title="ارسال" style={{ width: 30, height: 30, borderRadius: 'var(--r-sm)', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📤</button>
+              <button type="button" onClick={handleCopy} title="کپی" style={{ width: 30, height: 30, borderRadius: 'var(--r-sm)', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📋</button>
+            </div>
+          </div>
+          <Textarea value={message} onChange={e => setMessage(e.target.value)} rows={isMessageExpanded ? 8 : 4} maxHeight={isMessageExpanded ? 240 : 120} />
+          <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: 4 }}>
+            <button type="button" onClick={() => setIsMessageExpanded(v => !v)} style={{ background: 'transparent', border: 'none', color: 'var(--muted)', fontSize: 'var(--fs-2xs)', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline', textUnderlineOffset: 2, padding: 0 }}>
+              {isMessageExpanded ? 'بستن' : 'باز کردن'}
             </button>
-          ))}
-          <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
-            <input
-              type="text"
-              inputMode="tel"
-              value={toFa(intervalDaysStr)}
-              onChange={e => {
-                const v = toEn(e.target.value.replace(/[^0-9۰-۹]/g, ''));
-                setIntervalDaysStr(v);
-                setCustomMode(v !== '');
-              }}
-              placeholder="دلخواه"
-              style={{
-                width: '100%',
-                height: 32,
-                boxSizing: 'border-box',
-                padding: '0 0 0 16px',
-                fontSize: 'var(--fs-sm)',
-                textAlign: 'center',
-                background: isCustomInterval ? 'var(--accent-soft)' : 'var(--input-bg)',
-                border: `1px solid ${isCustomInterval ? 'var(--accent-border)' : 'var(--border)'}`,
-                borderRadius: 'var(--r-sm)',
-                color: isCustomInterval ? 'var(--accent)' : 'var(--muted)',
-                fontWeight: isCustomInterval ? 700 : 500,
-                fontFamily: 'inherit',
-                outline: 'none',
-              }}
-            />
-            <span style={{ position: 'absolute', left: 6, top: '50%', transform: 'translateY(-50%)', fontSize: '10px', color: isCustomInterval ? 'var(--accent)' : 'var(--muted)', pointerEvents: 'none' }}>روز</span>
           </div>
         </div>
-      </Field>
 
-      <Field label="یادداشت داخلی (اختیاری)">
-        <Input
-          value={note}
-          onChange={e => setNote(e.target.value)}
-          placeholder="گفت تا آخر هفته می‌آره"
-        />
-      </Field>
+        {/* خط */}
+        <div style={{ borderTop: '1px solid var(--border)', margin: '16px 0' }} />
+
+        {/* زمان‌بندی */}
+        <div>
+          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, marginBottom: 8 }}>زمان‌بندی</div>
+          <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', marginBottom: 6 }}>تاریخ قول مشتری (اختیاری)</div>
+          <DatePicker value={promisedDate} onChange={setPromisedDate} />
+          {promisedDate && (
+            <div style={{ padding: '6px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--accent)', marginTop: 6 }}>
+              یادآوری بعدی خودکار روی {toFa(promisedDate)} تنظیم شد
+            </div>
+          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '14px 0' }}>
+            <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+            <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--dim)', fontWeight: 600 }}>یا</span>
+            <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+          </div>
+          <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', marginBottom: 6 }}>یادآوری بعدی</div>
+          <div style={{ display: 'flex', gap: 4, alignItems: 'center', width: '100%', opacity: promisedDate ? 0.5 : 1, pointerEvents: promisedDate ? 'none' : 'auto' }}>
+            {[3, 7, 30].map(d => (
+              <button key={d} type="button" onClick={() => { setIntervalDaysStr(String(d)); setCustomMode(false); }} style={{ ...chipStyle(!customMode && intervalDaysStr === String(d)), flex: 1, height: 32, padding: 0, fontSize: 'var(--fs-xs)', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {toFa(d)}
+              </button>
+            ))}
+            <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
+              <input
+                type="text"
+                inputMode="tel"
+                value={customMode ? toFa(intervalDaysStr) : ''}
+                onChange={e => {
+                  const v = toEn(e.target.value.replace(/[^0-9۰-۹]/g, ''));
+                  setIntervalDaysStr(v);
+                  setCustomMode(v !== '');
+                }}
+                placeholder="دلخواه"
+                style={{
+                  width: '100%',
+                  height: 32,
+                  boxSizing: 'border-box',
+                  padding: '0 22px 0 4px',
+                  fontSize: 'var(--fs-xs)',
+                  textAlign: 'center',
+                  background: isCustomInterval ? 'var(--accent-soft)' : 'var(--input-bg)',
+                  border: `1px solid ${isCustomInterval ? 'var(--accent-border)' : 'var(--border)'}`,
+                  borderRadius: 'var(--r-sm)',
+                  fontFamily: 'inherit',
+                  color: isCustomInterval ? 'var(--accent)' : 'var(--text)',
+                }}
+              />
+              <span style={{ position: 'absolute', left: 4, top: '50%', transform: 'translateY(-50%)', fontSize: 9, color: isCustomInterval ? 'var(--accent)' : 'var(--muted)', pointerEvents: 'none' }}>روز</span>
+            </div>
+          </div>
+        </div>
+
+        {/* یادداشت */}
+        <div style={{ marginTop: 16 }}>
+          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, marginBottom: 8 }}>یادداشت داخلی (اختیاری)</div>
+          <Input value={note} onChange={e => setNote(e.target.value)} placeholder="توضیح دلخواه" />
+        </div>
+
+      </div>
     </Modal>
   );
 }
