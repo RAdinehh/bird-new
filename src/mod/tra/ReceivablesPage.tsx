@@ -41,7 +41,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   const [dealPayTarget, setDealPayTarget] = useState<Deal | null>(null);
   const [statementOpen, setStatementOpen] = useState(false);
   const [checksOpen, setChecksOpen] = useState(false);
-  const [reminderTarget, setReminderTarget] = useState<Invoice | null>(null);
+  const [reminderInvoiceId, setReminderInvoiceId] = useState<string | null>(null);
 
   const openInvoices = useMemo(
     () => invoices.filter(i => i.type === kind && remaining(i, allocations) > 0 && i.disputeStatus !== 'open'),
@@ -352,7 +352,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                     variant="outline"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setReminderTarget(inv);
+                      setReminderInvoiceId(inv.id);
                     }}
                   >📨 یادآوری</Btn>
                 </div>
@@ -364,9 +364,9 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
 
       {/* Modal تعویق */}
       <ReminderModal
-        open={!!reminderTarget}
-        onClose={() => setReminderTarget(null)}
-        invoice={reminderTarget}
+        open={!!reminderInvoiceId}
+        onClose={() => setReminderInvoiceId(null)}
+        invoiceId={reminderInvoiceId}
       />
       <DeferModal
         deferModal={deferModal}

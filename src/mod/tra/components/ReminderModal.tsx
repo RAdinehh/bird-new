@@ -48,10 +48,11 @@ const CHANNEL_PRESETS = ['واتس‌اپ', 'پیامک', 'تلگرام', 'ای�
 interface Props {
   open: boolean;
   onClose: () => void;
-  invoice: Invoice | null;
+  invoiceId: string | null;
 }
 
-export default function ReminderModal({ open, onClose, invoice }: Props) {
+export default function ReminderModal({ open, onClose, invoiceId }: Props) {
+  const invoice = useTra(s => invoiceId ? s.invoices.find(i => i.id === invoiceId) ?? null : null);
   const addReminder = useTra(s => s.addReminder);
   const allocations = useTra(s => s.allocations);
   const contacts = useCtc(s => s.contacts);
@@ -118,7 +119,7 @@ ${farmName} 🐔`;
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, invoice?.id]);
+  }, [open, invoice?.id, invoice?.lastRemindedAt, invoice?.nextReminderAt]);
 
   // 🆕 scroll reset on open
   const modalContentRef = useRef<HTMLDivElement>(null);
@@ -255,7 +256,7 @@ ${farmName} 🐔`;
 
       {/* زمان‌بندی */}
       <SectionTitle>زمان‌بندی</SectionTitle>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, alignItems: 'flex-start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 8, alignItems: 'flex-start' }}>
         <div>
           <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginBottom: 6 }}>یادآوری قبلی</div>
           <div style={{
@@ -319,16 +320,18 @@ ${farmName} 🐔`;
               </button>
             )}
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+          <div style={{ display: 'flex', gap: 4 }}>
             <Input
               value={toFa(intervalDaysStr)}
               onChange={e => handleDaysChange(e.target.value)}
               placeholder="دستی"
               unit="روز"
               inputMode="tel"
-              style={{ textAlign: 'center' }}
+              style={{ flex: 1, textAlign: 'center' }}
             />
-            <DatePicker value={promisedDate} onChange={handleDateChange} />
+            <div style={{ flex: 1.5, minWidth: 0 }}>
+              <DatePicker value={promisedDate} onChange={handleDateChange} />
+            </div>
           </div>
         </div>
       </div>
