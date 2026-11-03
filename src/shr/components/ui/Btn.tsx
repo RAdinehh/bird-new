@@ -1,7 +1,7 @@
 /** components/ui/Btn.tsx */
 import React, { forwardRef } from 'react';
 
-type BtnVariant = 'primary' | 'ghost' | 'danger' | 'outline';
+type BtnVariant = 'primary' | 'ghost' | 'danger' | 'outline' | 'subtle' | 'danger-outline';
 interface BtnProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: BtnVariant;
   size?: 'md' | 'sm';
@@ -14,7 +14,9 @@ export const Btn = forwardRef<HTMLButtonElement, BtnProps>(({  variant = 'ghost'
     primary: { background: 'var(--accent)', color: 'var(--avatar-text)' },
     ghost: { background: 'var(--btn-bg)', color: 'var(--muted)', border: '1px solid var(--border)' },
     danger: { background: 'var(--danger)', color: '#fff' },
-    outline: { background: 'transparent', color: 'var(--accent)', border: '1.5px solid var(--accent-border)' }
+    outline: { background: 'transparent', color: 'var(--accent)', border: '1.5px solid var(--accent-border)' },
+    subtle: { background: 'transparent', color: 'var(--muted)', border: 'none' },
+    'danger-outline': { background: 'transparent', color: 'var(--danger)', border: '1.5px solid var(--danger)' }
   };
   const isDisabled = disabled || loading;
   return (

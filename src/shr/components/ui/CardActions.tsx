@@ -3,8 +3,9 @@ import { Btn } from './index';
 export interface CardAction {
   label: string;
   onClick: () => void;
-  variant?: 'primary' | 'danger' | 'outline';
+  variant?: 'primary' | 'danger' | 'outline' | 'subtle' | 'danger-outline';
   hidden?: boolean;
+  disabled?: boolean;
 }
 
 export function CardActions({ actions }: { actions: CardAction[] }) {
@@ -24,6 +25,7 @@ export function CardActions({ actions }: { actions: CardAction[] }) {
           key={i}
           size="sm"
           variant={action.variant || 'outline'}
+          disabled={action.disabled}
           onClick={(e) => { e.stopPropagation(); action.onClick(); }}
           style={{
             width: '100%',
