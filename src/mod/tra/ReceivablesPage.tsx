@@ -253,17 +253,6 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                 </>
               );
             }}
-            groupActions={[
-              {
-                label: 'تسویه گروهی',
-                  primary: true,
-                onClick: (items) => {
-                  if (items.length === 0) return;
-                  if (items.length === 1) { setDealPayTarget(items[0]); return; }
-                  toastMsg.warn('برای تسویه گروهی، هر معامله را جدا باز کنید');
-                },
-              },
-            ]}
           />
           {(() => {
             const excluded = openDeals.filter(d => d.type === 'consignment' || d.type === 'barter');
@@ -297,7 +286,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                   <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{toFa(remaining(inv, allocations).toLocaleString('fa-IR'))} ت</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-xs)' }}>
-                  {dUntil !== null ? <span style={{ color: dUntil <= 3 ? 'var(--danger)' : dUntil <= 7 ? 'var(--warn)' : 'var(--muted)', fontWeight: 600 }}>{dueLabel(dUntil)}</span> : <span style={{ color: 'var(--muted)' }}>—</span>}
+                  {dUntil !== null ? <span style={{ color: dUntil < 0 ? 'var(--danger)' : dUntil <= 7 ? 'var(--warn)' : 'var(--muted)', fontWeight: 600 }}>{dueLabel(dUntil)}</span> : <span style={{ color: 'var(--muted)' }}>—</span>}
                   <span style={{ color: 'var(--dim)', fontFamily: 'monospace', direction: 'ltr', fontSize: 10 }}>{inv.number || ''}</span>
                 </div>
               </>
@@ -358,29 +347,6 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
               </>
             );
           }}
-          groupActions={[
-            {
-              label: 'یادآوری گروهی',
-              onClick: async (items) => {
-                if (items.length === 0) return;
-                const ok = await showConfirmAsync(
-                  'یادآوری گروهی',
-                  `برای ${toFa(items.length)} فاکتور یادآوری ۷ روزه ثبت شود؟`,
-                  { confirmText: 'بله، ثبت کن' },
-                );
-                if (!ok) return;
-                items.forEach(inv => addReminder(inv.id, { method: 'other', note: '', intervalDays: 7 }));
-                toastMsg.success(`${toFa(items.length)} یادآوری ثبت شد`);
-              },
-            },
-            {
-              label: 'تعویق گروهی',
-              onClick: (items) => {
-                if (items.length === 1) { openDefer(items[0]); return; }
-                toastMsg.warn('برای تعویق گروهی، هر فاکتور را جدا باز کنید');
-              },
-            },
-          ]}
         />
       ) : null}
 
