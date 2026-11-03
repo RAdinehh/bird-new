@@ -571,6 +571,23 @@ export function agingBucketFromDeal(d: Deal): '0-15' | '16-30' | '31-60' | '61-9
 }
 
 /**
+ * dealAgingLevel — سطح aging (ok/warn/danger) + روزهای overdue
+ * استاندارد FASB/IFRS 9: Aging بر مبنای due date
+ * - settled/cancelled → null
+ * - بدون dueDate → null (طبق استاندارد: بدون سرسید، aging ندارد)
+ * - هنوز سرسید نرسیده (dueDate > today) → null
+ */
+export function dealAgingLevel(d: Deal): { days: number; tone: 'ok' | 'warn' | 'danger' } | null {
+  if (d.status === 'settled' || d.status === 'cancelled') return null;
+  const daysUntil = dealDaysUntilDue(d);
+  if (daysUntil === null) return null;
+  const overdue = -daysUntil;
+  if (overdue <= 0) return null;
+  const tone: 'ok' | 'warn' | 'danger' = overdue < 30 ? 'ok' : overdue < 60 ? 'warn' : 'danger';
+  return { days: overdue, tone };
+}
+
+/**
  * isDealOpen — آیا معامله باید در مطالبات نمایش داده شود؟
  * - status باید 'open' باشد
  * - نباید به Invoice تبدیل شده باشد (relatedDealId در Invoice)

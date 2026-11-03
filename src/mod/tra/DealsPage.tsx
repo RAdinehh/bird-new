@@ -4,7 +4,7 @@
 import { useState, useMemo , useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useTra, DEAL_LABEL, type Deal, type DealType, type SettlementType, type DealGood, type DealDelivery, type DealSale, type DealPayment, type Settlement } from './store';
-import { generateDealNumber, calcDealCommission, getTodayJalali } from './calc';
+import { generateDealNumber, calcDealCommission, getTodayJalali, dealAgingLevel } from './calc';
 import { Row, SectionTitle, chip } from './helpers';
 import { useNavigate } from 'react-router-dom';
 import { useCtc } from '../ctc/store';
@@ -36,7 +36,7 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
 import { toastMsg } from '../../cor/store/toast';
-import { parse as parseJ, format as formatJ } from 'date-fns-jalali';
+import { format as formatJ } from 'date-fns-jalali';
 import { logAction } from '../../cor/logger/auditLog';
 import { useValidation } from '../../shr/validation/useValidation';
 import { useFormErrors } from '../../shr/hooks/useFormErrors';
@@ -366,20 +366,8 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
   // applyDealMovements moved to ./applyDeal (test extraction)
 
 
-  const dealAging = (d: Deal): { days: number; tone: 'ok' | 'warn' | 'danger' } | null => {
-    if (d.status === 'settled' || d.status === 'cancelled') return null;
-    const target = d.dueDate || d.startDate || d.date;
-    if (!target) return null;
-    try {
-      const en = target.replace(/[۰-۹]/g, (c: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(c)));
-      const t = parseJ(en, 'yyyy/MM/dd', new Date());
-      if (isNaN(t.getTime())) return null;
-      const days = Math.floor((Date.now() - t.getTime()) / 86400000);
-      if (days <= 0) return null;
-      const tone: 'ok' | 'warn' | 'danger' = days < 30 ? 'ok' : days < 60 ? 'warn' : 'danger';
-      return { days, tone };
-    } catch { return null; }
-  };
+  // 🆕 B1: یکسان‌سازی با ReceivablesPage — منبع واحد در calc.ts
+  const dealAging = dealAgingLevel;
 
   const handleReopenDeal = async (deal: Deal) => {
   const statusLabel = deal.status === 'settled' ? 'تسویه‌شده' : 'لغو‌شده';
