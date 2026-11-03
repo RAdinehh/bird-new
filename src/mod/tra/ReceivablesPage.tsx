@@ -24,7 +24,7 @@ import StatementModal from './components/StatementModal';
 import AgingBuckets from './components/AgingBuckets';
 import ChecksModal from './components/ChecksModal';
 import { agingBucketFromDue } from './formulas';
-import { agingBucketFromDeal } from './calc';
+import { agingBucketFromDeal, computeOverpayment } from './calc';
 
 
 export default function ReceivablesPage({ active = true }: { active?: boolean } = {}) {
@@ -371,6 +371,10 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                 )}
                 <Line l="جمع فاکتور" v={`${toFa(inv.total.toLocaleString('fa-IR'))} تومان`} />
                 <Line l="پرداخت‌شده" v={`${toFa(paidSumAllocated(inv, allocations).toLocaleString('fa-IR'))} تومان`} />
+                {(() => {
+                  const op = computeOverpayment(inv, allocations);
+                  return op > 0.5 ? <Line l="پیش‌پرداخت" v={`${toFa(op.toLocaleString('fa-IR'))} تومان`} /> : null;
+                })()}
                 {inv.dueDate ? <Line l="سرسید" v={toFa(inv.dueDate)} /> : null}
                 {inv.workflowStatus ? <Line l="وضعیت" v={WORKFLOW_LABEL[inv.workflowStatus].replace(/^[^\u0600-\u06FFA-Za-z0-9]+/u, '')} /> : null}
                 {inv.deferrals && inv.deferrals.length > 0 ? <Line l="تعویق‌ها" v={toFa(inv.deferrals.length)} /> : null}

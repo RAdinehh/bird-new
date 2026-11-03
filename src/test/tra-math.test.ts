@@ -3,7 +3,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import {
-  calcItemTotal, paidSum, remaining, computeCashDiscount, generateInstallments,
+  calcItemTotal, paidSum, remaining, computeCashDiscount, computeOverpayment, generateInstallments,
 } from '../mod/tra/calc';
 
 describe('calcItemTotal', () => {
@@ -92,6 +92,44 @@ describe('computeCashDiscount', () => {
   });
   it('payment outside window', () => {
     expect(computeCashDiscount({ total: 1000, date: '1405/01/01', cashDiscountPct: 5, cashDiscountDays: 10, payments: [{ date: '1405/02/15', amount: 500 }] } as any)).toBe(0);
+  });
+});
+
+describe('computeOverpayment', () => {
+  it('overpay با cash discount', () => {
+    const inv = {
+      total: 1000,
+      date: '1405/01/01',
+      cashDiscountPct: 2,
+      cashDiscountDays: 10,
+      payments: [{ date: '1405/01/05', amount: 985, method: 'cash' }],
+    } as any;
+    expect(computeOverpayment(inv)).toBe(5);
+  });
+
+  it('پرداخت دقیقاً به اندازه (بدون overpay)', () => {
+    const inv = {
+      total: 1000,
+      payments: [{ date: '1405/01/01', amount: 1000, method: 'cash' }],
+    } as any;
+    expect(computeOverpayment(inv)).toBe(0);
+  });
+
+  it('پرداخت ناقص (بدون overpay)', () => {
+    const inv = {
+      total: 1000,
+      payments: [{ date: '1405/01/01', amount: 500, method: 'cash' }],
+    } as any;
+    expect(computeOverpayment(inv)).toBe(0);
+  });
+
+  it('overpay با writeOff', () => {
+    const inv = {
+      total: 1000,
+      writtenOffAmount: 100,
+      payments: [{ date: '1405/01/01', amount: 950, method: 'cash' }],
+    } as any;
+    expect(computeOverpayment(inv)).toBe(50);
   });
 });
 

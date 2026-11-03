@@ -262,6 +262,19 @@ function migrateInvDates(inv: any): any {
   return inv;
 }
 
+/**
+ * computeOverpayment — مقدار اضافه‌پرداخت مشتری
+ * استاندارد: Odoo advance/credit، SAP FI-AR customer credit
+ * خروجی > 0 → مبلغ به عنوان بستانکار طرف ثبت شده (پیش‌پرداخت)
+ */
+export function computeOverpayment(inv: Invoice, allocations?: PaymentAllocation[]): number {
+  const paid = paidSumAllocated(inv, allocations);
+  const writtenOff = Math.round(inv.writtenOffAmount || 0);
+  const discount = computeCashDiscount(inv);
+  const effectiveOwed = Math.max(0, (inv.total || 0) - writtenOff - discount);
+  return Math.max(0, paid - effectiveOwed);
+}
+
 export function remaining(inv: Invoice, allocations?: PaymentAllocation[]): number {
   const paid = paidSumAllocated(inv, allocations);
   const writtenOff = Math.round(inv.writtenOffAmount || 0);
