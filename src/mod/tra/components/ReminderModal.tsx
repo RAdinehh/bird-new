@@ -238,7 +238,7 @@ ${farmName} 🐔`;
       {/* پیام */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, paddingTop: 12, borderTop: '1px dashed var(--border)', marginBottom: 6 }}>
         <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)' }}>پیام</span>
-        <div style={{ display: 'flex', gap: 2 }}>
+        <div style={{ display: 'flex', gap: 0 }}>
           <button type="button" onClick={handleShare} title="ارسال" style={{ width: 28, height: 28, borderRadius: 'var(--r-sm)', background: 'var(--btn-bg)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📤</button>
           <button type="button" onClick={handleCopy} title="کپی" style={{ width: 28, height: 28, borderRadius: 'var(--r-sm)', background: 'var(--btn-bg)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📋</button>
         </div>
@@ -252,7 +252,7 @@ ${farmName} 🐔`;
 
       {/* زمان‌بندی */}
       <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px dashed var(--border)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
           <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)' }}>یادآوری بعدی</span>
           {(promisedDate || intervalDaysStr) && (
             <button
