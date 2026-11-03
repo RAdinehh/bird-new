@@ -306,8 +306,18 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
           renderDetails={(inv) => {
             const checkPending = (inv.payments || []).filter(p => p.method === 'check' && (p.status === 'pending' || p.status === 'in_transit'));
             const relatedDeal = inv.relatedDealId ? deals.find(d => d.id === inv.relatedDealId) : null;
+            const isLockedFromSettlement = !!inv.relatedSettlementId;
             return (
               <>
+                {isLockedFromSettlement && (
+                  <div style={{ padding: '6px 8px', background: 'var(--warn-soft)', border: '1px solid var(--warn-border, rgba(234,88,12,.35))', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 2, marginBottom: 4 }}>
+                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                      از تسویه
+                      <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span>
+                    </span>
+                    <span style={{ fontSize: 10, color: 'var(--muted)' }}>برای تغییر، تسویه را ویرایش کنید</span>
+                  </div>
+                )}
                 <Line l="جمع فاکتور" v={`${toFa(inv.total.toLocaleString('fa-IR'))} تومان`} />
                 <Line l="پرداخت‌شده" v={`${toFa(paidSumAllocated(inv, allocations).toLocaleString('fa-IR'))} تومان`} />
                 {inv.dueDate ? <Line l="سرسید" v={toFa(inv.dueDate)} /> : null}
@@ -322,21 +332,20 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                 {inv.relatedFlockId && (
                   <Row l="گله" v={<EntityLink type="flock" id={inv.relatedFlockId} label={inv.items?.[0]?.flockName || 'مشاهده'} />} />
                 )}
-                {inv.relatedSettlementId && (
-                  <Line l="🔒 از تسویه" v="برای تغییر، تسویه را ویرایش کنید" />
-                )}
                 {checkPending.length > 0 && (
                   <Line l="چک‌ها" v={`${toFa(checkPending.length)} در جریان (${toFa(checkPending.reduce((s, p) => s + (p.amount || 0), 0).toLocaleString('fa-IR'))} ت)`} />
                 )}
                 <div style={{ marginTop: 6, display: 'flex', gap: 6 }}>
-                  <Btn
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const tab = kind === 'sale' ? 'sales' : 'purchases';
-                      navigate('/tra?tab=' + tab + '&edit=' + inv.id);
-                    }}
-                  >✏️ ویرایش</Btn>
+                  {!isLockedFromSettlement && (
+                    <Btn
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const tab = kind === 'sale' ? 'sales' : 'purchases';
+                        navigate('/tra?tab=' + tab + '&edit=' + inv.id);
+                      }}
+                    >✏️ ویرایش</Btn>
+                  )}
                   <Btn
                     size="sm"
                     variant="outline"
