@@ -417,7 +417,9 @@ export function applyPaymentsToInstallments(
   let pool = 0;
   for (const p of payments || []) {
     if ((p as { type?: string }).type === 'refund') continue;
-    if (p.method === 'check' && p.status === 'bounced') continue;
+    // 🆕 B3: مطابق paidSum — چک فقط بعد از cleared شدن شمرده می‌شود
+    // (استاندارد IFRS 9 / استاندارد حسابداری ۱۱ ایران: چک در جریان وصول = مطالبه، نه نقد)
+    if (p.method === 'check' && p.status !== 'cleared') continue;
     pool += p.amount || 0;
   }
 
