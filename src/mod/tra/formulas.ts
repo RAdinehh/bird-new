@@ -27,8 +27,9 @@ export function partyBalance(
     .reduce((acc, inv) => {
       const total = inv.total || 0;
       const paid = paidSumAllocated(inv, allocations);
+      const writtenOff = inv.writtenOffAmount || 0;
       const cashDiscount = computeCashDiscount(inv);
-      return acc + (paid - (total - cashDiscount));
+      return acc + ((paid + writtenOff) - (total - cashDiscount));
     }, 0);
 }
 

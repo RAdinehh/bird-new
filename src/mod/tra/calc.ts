@@ -255,7 +255,8 @@ function migrateInvDates(inv: any): any {
 
 export function remaining(inv: Invoice, allocations?: PaymentAllocation[]): number {
   const paid = paidSumAllocated(inv, allocations);
-  return Math.max(0, (Math.round(Math.max(0, (inv.total || 0) - paid))) - computeCashDiscount(inv));
+  const writtenOff = Math.round(inv.writtenOffAmount || 0);
+  return Math.max(0, (Math.round(Math.max(0, (inv.total || 0) - paid - writtenOff))) - computeCashDiscount(inv));
 }
 
 export function ageDays(inv: Invoice): number {

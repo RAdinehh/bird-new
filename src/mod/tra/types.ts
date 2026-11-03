@@ -194,6 +194,10 @@ export interface ReminderLogEntry {
   methodLabel?: string;
   note: string;
   intervalDays: number;
+  /** 🆕 تاریخ قول پرداخت از طرف مشتری (jalali) */
+  promisedDate?: string;
+  /** 🆕 مبلغ قول (اختیاری) */
+  promisedAmount?: number;
 }
 
 export interface Invoice {
@@ -254,6 +258,26 @@ export interface Invoice {
   nextReminderAt?: string;
   /** 🆕 تاریخچه یادآوری‌ها */
   reminderLog?: ReminderLogEntry[];
+
+  // ===== فاز E — اختلاف و بدحساب =====
+  /** 🆕 وضعیت اختلاف (اگر open → از aging خارج) */
+  disputeStatus?: 'open' | 'resolved';
+  /** 🆕 دلیل اختلاف */
+  disputeReason?: 'price' | 'quantity' | 'quality' | 'other';
+  /** 🆕 توضیح اختلاف */
+  disputeNote?: string;
+  /** 🆕 زمان باز کردن اختلاف */
+  disputeOpenedAt?: string;
+  /** 🆕 زمان حل اختلاف */
+  disputeResolvedAt?: string;
+  /** 🆕 وضعیت حذف بدحساب */
+  writtenOff?: boolean;
+  /** 🆕 مبلغ حذف‌شده (از remaining کم می‌شود) */
+  writtenOffAmount?: number;
+  /** 🆕 دلیل حذف */
+  writtenOffReason?: string;
+  /** 🆕 زمان حذف */
+  writtenOffAt?: string;
 }
 
 export type DealUnit = 'kg' | 'g' | 'L' | 'l' | 'ml' | 'pcs' | 'vial' | 'pack' | 'ton' | 'bag' | 'dose';
