@@ -1,11 +1,38 @@
 # PROGRESS.md — وضعیت ۲۰۵ مفهوم
 
 ## 🎯 CURRENT
-- بخش: tra (همه ماژول‌ها تکمیل)
-- وضعیت: Dunning C4+C5 کامل (شامل gap) ✅ | ChecksModal ✅ | DealPrint ✅
-- آخرین commit: e626e13d
-- PENDING بعدی: Phase F (Lot Tracking) | Phase G-2 (40 file) | bounce gap
+- بخش: tra — AgingBuckets یکپارچه‌سازی کامل
+- وضعیت: AgingBuckets (۳ تب) ✅ | Dunning کامل ✅ | ChecksModal ✅ | DealPrint ✅
+- آخرین commit: 3e803de9
+- PENDING بعدی: bounce gap | Phase F | Phase G-2
 - فاز: done
+
+## 🎯 جلسه ۱۴۰۵/۱۱/۰۳ (ادامه) — AgingBuckets (~۴ commit)
+
+### کارهای انجام‌شده
+
+#### AgingBuckets — کامپوننت ژنریک
+- **`0c7d5df8`** — `components/AgingBuckets.tsx` (generic، ۲ سطح، بدون رنگ اضافه)
+
+#### ادغام در ReceivablesPage
+- **`119b15c9`** — بلوک invoice (فروش/بدهی): گروه‌اکشن‌ها (پرداخت/یادآوری/تعویق)
+- **`491d3183`** — بلوک deal (فقط partnership + conditional): تسویه گروهی + هشدار شفاف
+- **`3e803de9`** — پاک‌سازی کد مرده: حذف `byBucket`, `byDealBucket`, `bucketSum`, `toggleBucket`, `expandedBucket`, `BucketKey`
+
+**جمع:** ۹۹ خط کد حذف، بدون از دست دادن قابلیت.
+
+### 🔍 تصمیمات
+- ظاهر یکسان در ۳ تب (Stripe/Odoo standard)
+- Aging برای consignment/barter معنی نداره — حذف با هشدار شفاف
+- کامپوننت generic با props
+- بدون رنگ اضافه
+
+### ⏸ PENDING (جلسه بعد)
+- **bounce gap** — کوچک
+- Phase F (Lot Tracking) — بزرگ
+- Phase G-2 (40 file) — بزرگ
+
+---
 
 ## 🎯 جلسه ۱۴۰۵/۱۱/۰۳ — تکمیل Dunning + ChecksModal + DealPrint (~۱۶ commit)
 
