@@ -12,10 +12,13 @@ export function CardActions({ actions }: { actions: CardAction[] }) {
   const visibleActions = actions.filter(a => !a.hidden);
   if (visibleActions.length === 0) return null;
 
+  const n = visibleActions.length;
+  const cols = n === 1 ? 1 : n === 2 ? 2 : n === 3 ? 3 : n === 4 ? 2 : 3;
+
   return (
     <div style={{
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
+      gridTemplateColumns: `repeat(${cols}, 1fr)`,
       gap: 'var(--sp-2)',
       paddingTop: 'var(--sp-2)',
       width: '100%',
