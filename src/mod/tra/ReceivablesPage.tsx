@@ -3,7 +3,7 @@
  */
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { daysUntilDue, dueLabel, computeUpcoming } from './helpers';
+import { daysUntilDue, dueLabel, computeUpcoming , computeUpcomingDeals } from './helpers';
 import DeferModal from './components/DeferModal';
 import ReminderModal from './components/ReminderModal';
 import { useTra, remaining, paidSumAllocated, WORKFLOW_LABEL, DEAL_LABEL, computeDealBalance, dealDaysUntilDue, isDealOpen, type Invoice, type Deal, type Deferral } from './store';
@@ -18,6 +18,7 @@ import MultiPayModal from './components/MultiPayModal';
 import DealPayModal from './components/DealPayModal';
 import SummaryBox from './components/SummaryBox';
 import UpcomingDueSection from './components/UpcomingDueSection';
+import UpcomingDealsSection from './components/UpcomingDealsSection';
 import StatementModal from './components/StatementModal';
 import AgingBuckets from './components/AgingBuckets';
 import ChecksModal from './components/ChecksModal';
@@ -96,6 +97,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   });
 
   const upcoming = useMemo(() => computeUpcoming(openInvoices), [openInvoices]);
+  const upcomingDeals = useMemo(() => computeUpcomingDeals(openDeals), [openDeals]);
 
 
 
@@ -212,7 +214,11 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
       <SummaryBox kind={kind} totalInvoiced={kind === 'deal' ? Math.abs(dealTotalOpen) : totalInvoiced} totalOpen={effectiveTotal} settledAmount={kind === 'deal' ? dealSettledAmount : settledAmount} dueSoonAmount={kind === 'deal' ? dealDueSoonAmount : dueSoonAmount} openCount={kind === 'deal' ? openDeals.length : openInvoices.length} />
 
       {/* ⏰ سرسیدهای نزدیک — collapsible */}
-      <UpcomingDueSection upcoming={upcoming} contacts={contacts} showUpcoming={showUpcoming} onToggle={() => setShowUpcoming(!showUpcoming)} onDefer={openDefer} />
+      {kind === 'deal' ? (
+        <UpcomingDealsSection deals={upcomingDeals} contacts={contacts} showUpcoming={showUpcoming} onToggle={() => setShowUpcoming(!showUpcoming)} />
+      ) : (
+        <UpcomingDueSection upcoming={upcoming} contacts={contacts} showUpcoming={showUpcoming} onToggle={() => setShowUpcoming(!showUpcoming)} onDefer={openDefer} />
+      )}
 
       {/* FilterBar */}
       {kind === 'deal' ? (

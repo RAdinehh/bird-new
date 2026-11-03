@@ -3,6 +3,8 @@
  */
 import { parse as parseJ, differenceInDays as diffDaysJ } from 'date-fns-jalali';
 import type { ReactNode } from 'react';
+import { dealDaysUntilDue } from './calc';
+import type { Deal } from './types';
 
 export function Row({ l, v }: { l: string; v: ReactNode }) {
   return (
@@ -150,3 +152,16 @@ export const CAT_LABEL: Record<string, string> = {
   manure: 'کود',
   other: 'سایر',
 };
+
+/**
+ * computeUpcomingDeals — معاملات با سرسید نزدیک (۰ تا ۷ روز آینده)
+ * استاندارد: Odoo Aged Receivable — upcoming receivables شامل deals هم می‌شود
+ */
+export function computeUpcomingDeals(
+  deals: Deal[],
+): Array<{ deal: Deal; days: number | null }> {
+  return deals
+    .map(d => ({ deal: d, days: dealDaysUntilDue(d) }))
+    .filter(x => x.days !== null && x.days >= 0 && x.days <= 7)
+    .sort((a, b) => (a.days ?? 0) - (b.days ?? 0));
+}
