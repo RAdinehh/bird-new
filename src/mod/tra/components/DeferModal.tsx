@@ -30,7 +30,10 @@ export default function DeferModal({ deferModal, onClose, deferDate, setDeferDat
       >
         {deferModal ? (
           <>
-            <Field label="سرسید جدید" required>
+            <div style={{ marginBottom: 12, fontSize: 'var(--fs-sm)', color: 'var(--muted)', background: 'var(--input-bg)', padding: '8px 12px', borderRadius: 'var(--r-sm)' }}>
+                    سرسید فعلی: <b>{deferModal.oldDate || '—'}</b>
+                  </div>
+                  <Field label="سرسید جدید" required>
               <DatePicker value={deferDate} onChange={v => setDeferDate(v)}  autoToday />
             </Field>
             <Field label="دلیل تعویق">

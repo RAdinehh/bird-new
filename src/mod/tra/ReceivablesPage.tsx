@@ -426,6 +426,14 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                       setReminderInvoiceId(inv.id);
                     }}
                   >📨 یادآوری</Btn>
+                  <Btn
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openDefer(inv);
+                    }}
+                  >⏰ تعویق</Btn>
                 </div>
               </>
             );

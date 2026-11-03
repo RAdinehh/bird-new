@@ -1517,6 +1517,24 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
               </Select>
             </Field>
           </Grid2>
+                {p.method === 'check' && (
+                  <>
+                    <Grid2>
+                      <Field label="شماره چک" required error={showError?.(`payments.${pi}.checkNo`)} onTouch={() => markTouched?.(`payments.${pi}.checkNo`)}>
+                        <Input value={p.checkNo || ''} onChange={e => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, checkNo: e.target.value } : x) }))} placeholder="۱۲۳۴۵۶" />
+                      </Field>
+                      <Field label="بانک">
+                        <Input value={p.bank || ''} onChange={e => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, bank: e.target.value } : x) }))} placeholder="ملی..." />
+                      </Field>
+                    </Grid2>
+                    <Field label="سرسید چک">
+                      <DatePicker value={p.dueDate || ''} onChange={v => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, dueDate: v } : x) }))} />
+                    </Field>
+                  </>
+                )}
+                <Field label="توضیحات">
+                  <Input value={p.notes || ''} onChange={e => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, notes: e.target.value } : x) }))} placeholder="..." />
+                </Field>
         </div>
       ))}
       <button type="button" onClick={() => setForm(f => ({ ...f, payments: [...f.payments, { id: crypto.randomUUID(), date: form.date || '', amount: 0, direction: 'in', method: 'cash', notes: '' }] }))} style={{ background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--accent, var(--text))', fontFamily: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', height: 40, padding: 0, boxSizing: 'border-box', fontSize: 'var(--fs-sm)', fontWeight: 600, marginTop: 4 }}>+ {form.payments.length === 0 ? 'افزودن اولین پرداخت' : 'افزودن پرداخت دیگر'}</button>
