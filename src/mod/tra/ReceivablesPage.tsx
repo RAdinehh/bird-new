@@ -5,7 +5,7 @@ import { useState, useMemo } from 'react';
 import { daysUntilDue, dueTone, dueLabel, computeUpcoming } from './helpers';
 import DeferModal from './components/DeferModal';
 import ReminderModal from './components/ReminderModal';
-import { useTra, remaining, ageDays, agingBucket, AGING_BUCKETS, paidSumAllocated, WORKFLOW_LABEL, DEAL_LABEL, computeDealBalance, dealDaysUntilDue, isDealOpen, type Invoice, type Deal, type Deferral } from './store';
+import { useTra, remaining, paidSumAllocated, WORKFLOW_LABEL, DEAL_LABEL, computeDealBalance, dealDaysUntilDue, isDealOpen, type Invoice, type Deal, type Deferral } from './store';
 import { useCtc } from '../ctc/store';
 import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import { StatBox, Dot } from '../../shr/components/ExpandableCard';
@@ -24,7 +24,6 @@ import ChecksModal from './components/ChecksModal';
 import { agingBucketFromDue } from './formulas';
 import { agingBucketFromDeal } from './calc';
 
-type BucketKey = '0-15' | '16-30' | '31-60' | '61-90' | '+90';
 
 export default function ReceivablesPage({ active = true }: { active?: boolean } = {}) {
   const { invoices, deals, updateInvoice, allocations, addReminder } = useTra();
@@ -32,7 +31,6 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   const [multiPayOpen, setMultiPayOpen] = useState(false);
   const [multiPayPrefill, setMultiPayPrefill] = useState<{ partyId: string; invoiceId: string } | null>(null);
   const [kind, setKind] = useState<'sale' | 'purchase' | 'deal'>('sale');
-  const [expandedBucket, setExpandedBucket] = useState<BucketKey | null>(null);
   const [deferModal, setDeferModal] = useState<{ id: string; oldDate: string } | null>(null);
   const [deferDate, setDeferDate] = useState('');
   const [deferReason, setDeferReason] = useState('');
@@ -77,30 +75,9 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
 
   const upcoming = useMemo(() => computeUpcoming(openInvoices), [openInvoices]);
 
-  const byBucket = useMemo(() => {
-    const map: Record<string, Invoice[]> = {
-      '0-15': [], '16-30': [], '31-60': [], '61-90': [], '+90': []
-    };
-    filtered.forEach(inv => {
-      // SINGLE SOURCE OF TRUTH — formulas.ts
-      const b = agingBucketFromDue(inv);
-      if (map[b]) map[b].push(inv);
-    });
-    return map;
-  }, [filtered]);
 
-  const bucketSum = (key: string) =>
-    (byBucket[key] || []).reduce((a, inv) => a + remaining(inv, allocations), 0);
 
   // 🆕 Deal aging buckets (Phase B3) — same pattern as invoice
-  const byDealBucket = useMemo(() => {
-    const map: Record<string, Deal[]> = { '0-15': [], '16-30': [], '31-60': [], '61-90': [], '+90': [] };
-    openDeals.forEach(d => {
-      const b = agingBucketFromDeal(d);
-      if (map[b]) map[b].push(d);
-    });
-    return map;
-  }, [openDeals]);
 
   const totalOpen = filtered.reduce((a, inv) => a + remaining(inv, allocations), 0);
   const totalInvoiced = filtered.reduce((a, inv) => a + (inv.total || 0), 0);
@@ -129,9 +106,6 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   const effectiveOverdueCount = kind === 'deal' ? dealOverdueCount : overdueCount;
   const effectiveSoonCount = kind === 'deal' ? dealSoonCount : soonCount;
 
-  const toggleBucket = (key: BucketKey) => {
-    setExpandedBucket(expandedBucket === key ? null : key);
-  };
 
   const openDefer = (inv: Invoice) => {
     setDeferModal({ id: inv.id, oldDate: inv.dueDate || inv.date });
