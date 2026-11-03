@@ -314,15 +314,6 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
           )}
           groupActions={[
             {
-              label: 'پرداخت گروهی',
-              primary: true,
-              onClick: (items) => {
-                if (items.length === 0) return;
-                setMultiPayPrefill({ partyId: items[0].partyId, invoiceId: items.length === 1 ? items[0].id : '' });
-                setMultiPayOpen(true);
-              },
-            },
-            {
               label: 'یادآوری گروهی',
               onClick: async (items) => {
                 if (items.length === 0) return;
