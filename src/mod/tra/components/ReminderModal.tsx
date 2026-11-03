@@ -239,12 +239,12 @@ ${farmName} 🐔`;
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span>پیام</span>
           <div style={{ display: 'flex', gap: 2 }}>
-            <button type="button" onClick={handleShare} title="ارسال" style={{ width: 30, height: 30, borderRadius: 'var(--r-sm)', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📤</button>
-            <button type="button" onClick={handleCopy} title="کپی" style={{ width: 30, height: 30, borderRadius: 'var(--r-sm)', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📋</button>
+            <button type="button" onClick={handleShare} title="ارسال" style={{ width: 26, height: 26, borderRadius: 'var(--r-sm)', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📤</button>
+            <button type="button" onClick={handleCopy} title="کپی" style={{ width: 26, height: 26, borderRadius: 'var(--r-sm)', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📋</button>
           </div>
         </div>
       </SectionTitle>
-      <div style={{ marginTop: 8 }}>
+      <div style={{ marginTop: 2 }}>
         <Textarea value={message} onChange={e => setMessage(e.target.value)} rows={isMessageExpanded ? 8 : 4} maxHeight={isMessageExpanded ? 240 : 120} />
         <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: 4 }}>
           <button type="button" onClick={() => setIsMessageExpanded(v => !v)} style={{ background: 'transparent', border: 'none', color: 'var(--muted)', fontSize: 'var(--fs-xs)', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline', textUnderlineOffset: 2, padding: 0 }}>
@@ -255,19 +255,83 @@ ${farmName} 🐔`;
 
       {/* زمان‌بندی */}
       <SectionTitle>زمان‌بندی</SectionTitle>
-      <Field label="یادآوری بعدی">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-          <DatePicker value={promisedDate} onChange={handleDateChange} />
-          <Input
-            value={toFa(intervalDaysStr)}
-            onChange={e => handleDaysChange(e.target.value)}
-            placeholder="دستی"
-            unit="روز"
-            inputMode="tel"
-            style={{ textAlign: 'center' }}
-          />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, alignItems: 'flex-start' }}>
+        <div>
+          <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginBottom: 6 }}>یادآوری قبلی</div>
+          <div style={{
+            height: 40,
+            padding: '0 12px',
+            background: 'var(--input-bg)',
+            border: '1px dashed var(--border)',
+            borderRadius: 'var(--r-sm)',
+            display: 'flex',
+            alignItems: 'center',
+            fontSize: 'var(--fs-sm)',
+            color: invoice?.lastRemindedAt ? 'var(--text)' : 'var(--dim)',
+            fontWeight: invoice?.lastRemindedAt ? 600 : 400,
+            fontVariantNumeric: 'tabular-nums',
+            gap: 4,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}>
+            {invoice?.lastRemindedAt ? (() => {
+              const d = daysUntilJalali(invoice.lastRemindedAt);
+              const ago = d === null ? null : Math.abs(d);
+              const agoLabel = ago === null ? '' : ago === 0 ? 'امروز' : `${toFa(ago)} روز پیش`;
+              return (
+                <>
+                  <span>{toFa(invoice.lastRemindedAt)}</span>
+                  {agoLabel && <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>({agoLabel})</span>}
+                </>
+              );
+            })() : '—'}
+          </div>
         </div>
-      </Field>
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+            <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>یادآوری بعدی</span>
+            {(promisedDate || intervalDaysStr) && (
+              <button
+                type="button"
+                onClick={() => { setPromisedDate(''); setIntervalDaysStr(''); }}
+                aria-label="پاک کردن یادآوری"
+                title="پاک کردن"
+                style={{
+                  width: 22,
+                  height: 22,
+                  borderRadius: '50%',
+                  border: 'none',
+                  background: 'var(--danger-soft)',
+                  color: 'var(--danger)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 13,
+                  padding: 0,
+                  fontFamily: 'inherit',
+                  fontWeight: 700,
+                  lineHeight: 1,
+                }}
+              >
+                ×
+              </button>
+            )}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+            <Input
+              value={toFa(intervalDaysStr)}
+              onChange={e => handleDaysChange(e.target.value)}
+              placeholder="دستی"
+              unit="روز"
+              inputMode="tel"
+              style={{ textAlign: 'center' }}
+            />
+            <DatePicker value={promisedDate} onChange={handleDateChange} />
+          </div>
+        </div>
+      </div>
 
 
       <SectionTitle>یادداشت داخلی (اختیاری)</SectionTitle>
