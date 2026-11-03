@@ -111,6 +111,8 @@ export function Modal({
   // Esc + body scroll lock + focus return
   useEffect(() => {
     if (!open) return;
+    // 🆕 M-fix: local timer برای cleanup تمیز (React docs: useEffect cleanup)
+    let focusTimer: ReturnType<typeof setTimeout> | null = null;
     const myDepth = (window.__modalDepth || 0);
     window.__modalDepth = myDepth + 1;
     setZDepth(myDepth);
@@ -128,7 +130,7 @@ export function Modal({
     // autofocus فقط بار اول — فقط روی دکمه‌ها (کیبورد خودکار باز نشود)
     if (!focusedRef.current) {
       focusedRef.current = true;
-      const t = setTimeout(() => {
+      focusTimer = setTimeout(() => {
         // اگه کاربر خودش چیزی focus کرده، دست نزن
         const active = document.activeElement as HTMLElement | null;
         if (active && modalRef.current?.contains(active)) return;
@@ -150,15 +152,17 @@ export function Modal({
           try { target.focus({ preventScroll: true }); } catch { /* silent */ }
         }
       }, 250);
-      // اگه Modal بسته شد، تایمر پاک شه
-      (window as any).__modalFocusTimers = (window as any).__modalFocusTimers || [];
-      (window as any).__modalFocusTimers.push(() => clearTimeout(t));
     }
 
     return () => {
       window.__modalDepth = Math.max(0, (window.__modalDepth || 0) - 1);
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = '';
+      // 🆕 M-fix: clear timer در unmount — جلوگیری از ReferenceError
+      if (focusTimer !== null) {
+        clearTimeout(focusTimer);
+        focusTimer = null;
+      }
       // برگشت focus
       try {
         previousFocus.current?.focus();
