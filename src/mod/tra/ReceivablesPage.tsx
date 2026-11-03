@@ -15,7 +15,7 @@ import { toFa } from '../../shr/utils/fa';
 import { showSuccess, showConfirmAsync } from '../../cor/store/dialog';
 import { toastMsg } from '../../cor/store/toast';
 import { Line, Row, tab, CAT_LABEL } from './helpers';
-import { useFilterSort, FilterBar, getTraReceivablesConfig } from '../../shr/filter';
+import { useFilterSort, FilterBar, getTraReceivablesConfig, getTraDealsConfig } from '../../shr/filter';
 import MultiPayModal from './components/MultiPayModal';
 import DealPayModal from './components/DealPayModal';
 import SummaryBox from './components/SummaryBox';
@@ -67,6 +67,18 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
     });
     return getTraReceivablesConfig({ partyNames });
   }, [openInvoices, contacts]);
+
+  // 🆕 B7: config معاملات — برای تب «معاملات»
+  const dealConfig = useMemo(() => {
+    const partyNames: Record<string, string> = {};
+    openDeals.forEach(d => {
+      if (d.partyId && !partyNames[d.partyId]) {
+        const c = contacts.find(x => x.id === d.partyId);
+        if (c) partyNames[d.partyId] = c.name;
+      }
+    });
+    return getTraDealsConfig({ partyNames });
+  }, [openDeals, contacts]);
   const { filtered, filters, setFilter, clearFilter, sort, setSort, toggleSort,
           resetAll, hasActiveFilters, total: totalFiltered, count, sortStack, appendSort } = useFilterSort<Invoice>({
     items: openInvoices,
@@ -74,6 +86,15 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
     sorts: config.sortDefs,
     persistKey: config.persistKey,
     initialSort: config.initialSort,
+  });
+
+  // 🆕 B7: filter/sort موازی برای معاملات
+  const dealFS = useFilterSort<Deal>({
+    items: openDeals,
+    filters: dealConfig.filterDefs,
+    sorts: dealConfig.sortDefs,
+    persistKey: dealConfig.persistKey,
+    initialSort: dealConfig.initialSort,
   });
 
   const upcoming = useMemo(() => computeUpcoming(openInvoices), [openInvoices]);
@@ -185,20 +206,41 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
       <UpcomingDueSection upcoming={upcoming} contacts={contacts} showUpcoming={showUpcoming} onToggle={() => setShowUpcoming(!showUpcoming)} onDefer={openDefer} />
 
       {/* FilterBar */}
-      <FilterBar
-        filterDefs={config.filterDefs}
-        sortDefs={config.sortDefs}
-        filterState={filters}
-        sortState={sort}
-        setFilter={setFilter}
-        clearFilter={clearFilter}
-        setSort={setSort}
-        toggleSort={toggleSort} sortStack={sortStack} appendSort={appendSort}
-        resetAll={resetAll}
-        hasActiveFilters={hasActiveFilters}
-        total={totalFiltered}
-        count={count}
-      />
+      {kind === 'deal' ? (
+        <FilterBar
+          filterDefs={dealConfig.filterDefs}
+          sortDefs={dealConfig.sortDefs}
+          filterState={dealFS.filters}
+          sortState={dealFS.sort}
+          setFilter={dealFS.setFilter}
+          clearFilter={dealFS.clearFilter}
+          setSort={dealFS.setSort}
+          toggleSort={dealFS.toggleSort}
+          sortStack={dealFS.sortStack}
+          appendSort={dealFS.appendSort}
+          resetAll={dealFS.resetAll}
+          hasActiveFilters={dealFS.hasActiveFilters}
+          total={dealFS.total}
+          count={dealFS.count}
+        />
+      ) : (
+        <FilterBar
+          filterDefs={config.filterDefs}
+          sortDefs={config.sortDefs}
+          filterState={filters}
+          sortState={sort}
+          setFilter={setFilter}
+          clearFilter={clearFilter}
+          setSort={setSort}
+          toggleSort={toggleSort}
+          sortStack={sortStack}
+          appendSort={appendSort}
+          resetAll={resetAll}
+          hasActiveFilters={hasActiveFilters}
+          total={totalFiltered}
+          count={count}
+        />
+      )}
 
       {/* خالی */}
       {effectiveTotal === 0 ? (
@@ -213,7 +255,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
       {kind === 'deal' && effectiveTotal > 0 ? (
         <>
           <AgingBuckets
-            items={openDeals.filter(d => d.type === 'partnership' || d.type === 'conditional')}
+            items={dealFS.filtered.filter(d => d.type === 'partnership' || d.type === 'conditional')}
             bucketOf={(d) => agingBucketFromDeal(d)}
             sumOf={(d) => Math.abs(computeDealBalance(d).balance)}
             renderSummary={(d) => {
