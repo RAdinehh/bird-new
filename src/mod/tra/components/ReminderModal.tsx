@@ -236,7 +236,7 @@ ${farmName} 🐔`;
       )}
 
       {/* پیام */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, paddingTop: 12, borderTop: '1px dashed var(--border)', marginBottom: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, paddingTop: 12, borderTop: '1px dashed var(--border)', marginBottom: 4 }}>
         <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)' }}>پیام</span>
         <div style={{ display: 'flex', gap: 4 }}>
           <button type="button" onClick={handleShare} title="ارسال" style={{ width: 30, height: 30, borderRadius: 'var(--r-sm)', background: 'var(--btn-bg)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📤</button>
