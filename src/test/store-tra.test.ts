@@ -305,14 +305,14 @@ describe('pendingChecksSum', () => {
 // ═══════════════════════════════════════════════
 // aging
 // ═══════════════════════════════════════════════
-describe('agingBucket', () => {
-  it('<=15 → 0-15', () => {
-    expect(agingBucket(0)).toBe('0-15');
-    expect(agingBucket(15)).toBe('0-15');
+describe('agingBucket — IFRS 9 / بانک مرکزی ایران', () => {
+  it('<=0 → current', () => {
+    expect(agingBucket(0)).toBe('current');
+    expect(agingBucket(-5)).toBe('current');
   });
-  it('16-30 → 16-30', () => {
-    expect(agingBucket(16)).toBe('16-30');
-    expect(agingBucket(30)).toBe('16-30');
+  it('1-30', () => {
+    expect(agingBucket(1)).toBe('1-30');
+    expect(agingBucket(30)).toBe('1-30');
   });
   it('31-60', () => {
     expect(agingBucket(31)).toBe('31-60');
@@ -322,9 +322,16 @@ describe('agingBucket', () => {
     expect(agingBucket(61)).toBe('61-90');
     expect(agingBucket(90)).toBe('61-90');
   });
-  it('>90 → +90', () => {
-    expect(agingBucket(91)).toBe('+90');
-    expect(agingBucket(365)).toBe('+90');
+  it('91-180', () => {
+    expect(agingBucket(91)).toBe('91-180');
+    expect(agingBucket(180)).toBe('91-180');
+  });
+  it('181-365', () => {
+    expect(agingBucket(181)).toBe('181-365');
+    expect(agingBucket(365)).toBe('181-365');
+  });
+  it('>365 → +365', () => {
+    expect(agingBucket(366)).toBe('+365');
   });
 });
 

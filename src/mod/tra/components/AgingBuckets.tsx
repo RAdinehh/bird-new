@@ -4,10 +4,10 @@
  * استاندارد: Stripe/Odoo — بدون رنگ اضافه، سلسله‌مراتب ۲ سطحی
  */
 import { useState, useMemo, type ReactNode } from 'react';
-import { AGING_BUCKETS } from '../calc';
+import { AGING_BUCKETS, type AgingBucket } from '../calc';
 import { toFa } from '../../../shr/utils/fa';
 
-type BucketKey = '0-15' | '16-30' | '31-60' | '61-90' | '+90';
+type BucketKey = AgingBucket;
 
 interface BucketAction<T> {
   label: string;
@@ -33,7 +33,7 @@ export default function AgingBuckets<T extends { id: string }>({
   const [openItem, setOpenItem] = useState<string | null>(null);
 
   const byBucket = useMemo(() => {
-    const map: Record<BucketKey, T[]> = { '0-15': [], '16-30': [], '31-60': [], '61-90': [], '+90': [] };
+    const map: Record<BucketKey, T[]> = { 'current': [], '1-30': [], '31-60': [], '61-90': [], '91-180': [], '181-365': [], '+365': [] };
     items.forEach(it => { map[bucketOf(it)].push(it); });
     return map;
   }, [items, bucketOf]);

@@ -26,10 +26,11 @@ interface AgingRow {
   bucket: string;
 }
 
-type BucketKey = '0-15' | '16-30' | '31-60' | '61-90' | '+90';
+import type { AgingBucket } from '../calc';
+type BucketKey = AgingBucket;
 
 function bucketFromDate(dueDate: string, today: string): BucketKey {
-  if (!dueDate) return '0-15';
+  if (!dueDate) return 'current';
   try {
     const en = (s: string) => s.replace(/[۰-۹]/g, (x) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(x)));
     const [y, m, d] = en(dueDate).split('/').map(Number);
@@ -37,13 +38,15 @@ function bucketFromDate(dueDate: string, today: string): BucketKey {
     const dueTime = new Date(y, m - 1, d).getTime();
     const todayTime = new Date(ty, tm - 1, td).getTime();
     const days = Math.floor((todayTime - dueTime) / 86400000);
-    if (days <= 15) return '0-15';
-    if (days <= 30) return '16-30';
+    if (days <= 0) return 'current';
+    if (days <= 30) return '1-30';
     if (days <= 60) return '31-60';
     if (days <= 90) return '61-90';
-    return '+90';
+    if (days <= 180) return '91-180';
+    if (days <= 365) return '181-365';
+    return '+365';
   } catch {
-    return '0-15';
+    return 'current';
   }
 }
 
@@ -104,11 +107,13 @@ export default function AgingReportModal({ open, onClose }: Props) {
 
   const bucketSummary = useMemo(() => {
     const map: Record<BucketKey, { count: number; sum: number }> = {
-      '0-15': { count: 0, sum: 0 },
-      '16-30': { count: 0, sum: 0 },
+      'current': { count: 0, sum: 0 },
+      '1-30': { count: 0, sum: 0 },
       '31-60': { count: 0, sum: 0 },
       '61-90': { count: 0, sum: 0 },
-      '+90': { count: 0, sum: 0 },
+      '91-180': { count: 0, sum: 0 },
+      '181-365': { count: 0, sum: 0 },
+      '+365': { count: 0, sum: 0 },
     };
     for (const r of rows) {
       const k = r.bucket as BucketKey;

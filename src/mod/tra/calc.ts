@@ -281,20 +281,37 @@ export function ageDays(inv: Invoice): number {
   }
 }
 
-export function agingBucket(days: number): string {
-  if (days <= 15) return '0-15';
-  if (days <= 30) return '16-30';
-  if (days <= 60) return '31-60';
-  if (days <= 90) return '61-90';
-  return '+90';
+export type AgingBucket =
+  | 'current'
+  | '1-30'
+  | '31-60'
+  | '61-90'
+  | '91-180'
+  | '181-365'
+  | '+365';
+
+/**
+ * agingBucket — طبقه‌بندی سنی مطالبات (IFRS 9 / بانک مرکزی ایران)
+ * ورودی: daysOverdue (۰ یا منفی = جاری، ۱+ = معوق)
+ */
+export function agingBucket(overdueDays: number): AgingBucket {
+  if (overdueDays <= 0) return 'current';
+  if (overdueDays <= 30) return '1-30';
+  if (overdueDays <= 60) return '31-60';
+  if (overdueDays <= 90) return '61-90';
+  if (overdueDays <= 180) return '91-180';
+  if (overdueDays <= 365) return '181-365';
+  return '+365';
 }
 
-export const AGING_BUCKETS = [
-  { key: '0-15', label: '۰-۱۵ روز', color: 'green' },
-  { key: '16-30', label: '۱۶-۳۰ روز', color: 'blue' },
+export const AGING_BUCKETS: Array<{ key: AgingBucket; label: string; color: string }> = [
+  { key: 'current', label: 'جاری', color: 'green' },
+  { key: '1-30', label: '۱-۳۰ روز', color: 'blue' },
   { key: '31-60', label: '۳۱-۶۰ روز', color: 'amber' },
   { key: '61-90', label: '۶۱-۹۰ روز', color: 'amber' },
-  { key: '+90', label: 'بیش از ۹۰ روز', color: 'red' }
+  { key: '91-180', label: '۹۱-۱۸۰ روز', color: 'red' },
+  { key: '181-365', label: '۱۸۱-۳۶۵ روز', color: 'red' },
+  { key: '+365', label: 'بیش از ۱ سال', color: 'red' },
 ];
 
 export function computeCashDiscount(inv: Invoice): number {
@@ -572,13 +589,8 @@ export function computeDealBalance(d: Deal): {
 /**
  * agingBucketFromDeal — aging از dueDate معامله
  */
-export function agingBucketFromDeal(d: Deal): '0-15' | '16-30' | '31-60' | '61-90' | '+90' {
-  const days = dealOverdueDays(d);
-  if (days <= 15) return '0-15';
-  if (days <= 30) return '16-30';
-  if (days <= 60) return '31-60';
-  if (days <= 90) return '61-90';
-  return '+90';
+export function agingBucketFromDeal(d: Deal): AgingBucket {
+  return agingBucket(dealOverdueDays(d));
 }
 
 /**

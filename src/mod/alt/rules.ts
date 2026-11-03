@@ -153,7 +153,7 @@ export function detectAllAlerts(): RuleAlert[] {
 
     if (inv.type === 'sale') {
       // طلب از مشتری
-      if (bucket === '61-90' || bucket === '+90') {
+      if (bucket === '61-90' || bucket === '91-180' || bucket === '181-365' || bucket === '+365') {
         alerts.push({
           level: 'critical',
           category: 'payment',
@@ -176,7 +176,7 @@ export function detectAllAlerts(): RuleAlert[] {
       }
     } else if (inv.type === 'purchase') {
       // بدهی به فروشنده
-      if (bucket === '61-90' || bucket === '+90') {
+      if (bucket === '61-90' || bucket === '91-180' || bucket === '181-365' || bucket === '+365') {
         alerts.push({
           level: 'critical',
           category: 'payment',

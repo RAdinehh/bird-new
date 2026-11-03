@@ -5,7 +5,7 @@
  * duplicate logic = باگ آینده.
  * ═════════════════════════════════════════════════════════════
  */
-import { remaining, paidSumAllocated, computeCashDiscount } from './calc';
+import { remaining, paidSumAllocated, computeCashDiscount, agingBucket, type AgingBucket } from './calc';
 import { daysUntilDue } from './helpers';
 import type { Invoice } from './types';
 
@@ -37,15 +37,8 @@ export function partyBalance(
  * Aging bucket از dueDate — SINGLE SOURCE OF TRUTH
  * استاندارد Accounting (FASB): aging of receivables از dueDate، نه invoice date
  */
-export function agingBucketFromDue(
-  inv: Invoice
-): '0-15' | '16-30' | '31-60' | '61-90' | '+90' {
-  const days = overdueDays(inv);
-  if (days <= 15) return '0-15';
-  if (days <= 30) return '16-30';
-  if (days <= 60) return '31-60';
-  if (days <= 90) return '61-90';
-  return '+90';
+export function agingBucketFromDue(inv: Invoice): AgingBucket {
+  return agingBucket(overdueDays(inv));
 }
 
 /** آیا فاکتور overdue است؟ */

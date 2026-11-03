@@ -81,23 +81,23 @@ describe('agingBucketFromDue — از dueDate (نه invoice date)', () => {
     return fmtJ(d);
   };
 
-  it('dueDate آینده → 0-15', () => {
+  it('dueDate آینده → current', () => {
     const inv = makeInv({ dueDate: daysAhead(5) });
-    expect(agingBucketFromDue(inv)).toBe('0-15');
+    expect(agingBucketFromDue(inv)).toBe('current');
     expect(isOverdue(inv)).toBe(false);
     expect(overdueDays(inv)).toBe(0);
   });
 
-  it('overdue 10 روز → 0-15', () => {
+  it('overdue 10 روز → 1-30', () => {
     const inv = makeInv({ dueDate: daysAgo(10) });
-    expect(agingBucketFromDue(inv)).toBe('0-15');
+    expect(agingBucketFromDue(inv)).toBe('1-30');
     expect(isOverdue(inv)).toBe(true);
     expect(overdueDays(inv)).toBeGreaterThanOrEqual(9);
   });
 
-  it('overdue 25 روز → 16-30', () => {
+  it('overdue 25 روز → 1-30', () => {
     const inv = makeInv({ dueDate: daysAgo(25) });
-    expect(agingBucketFromDue(inv)).toBe('16-30');
+    expect(agingBucketFromDue(inv)).toBe('1-30');
   });
 
   it('overdue 45 روز → 31-60', () => {
@@ -110,14 +110,14 @@ describe('agingBucketFromDue — از dueDate (نه invoice date)', () => {
     expect(agingBucketFromDue(inv)).toBe('61-90');
   });
 
-  it('overdue 100 روز → +90', () => {
+  it('overdue 100 روز → 91-180', () => {
     const inv = makeInv({ dueDate: daysAgo(100) });
-    expect(agingBucketFromDue(inv)).toBe('+90');
+    expect(agingBucketFromDue(inv)).toBe('91-180');
   });
 
   it('invoice قدیمی با dueDate آینده → not overdue', () => {
     const inv = makeInv({ date: daysAgo(200), dueDate: daysAhead(10) });
     expect(isOverdue(inv)).toBe(false);
-    expect(agingBucketFromDue(inv)).toBe('0-15');
+    expect(agingBucketFromDue(inv)).toBe('current');
   });
 });

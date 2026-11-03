@@ -88,8 +88,8 @@ describe('dealDaysUntilDue', () => {
 // agingBucketFromDeal
 // ══════════════════════════════════════════════════════════
 describe('agingBucketFromDeal', () => {
-  it('بدون dueDate → 0-15 (پیش‌فرض)', () => {
-    expect(agingBucketFromDeal(mkDeal())).toBe('0-15');
+  it('بدون dueDate → current (پیش‌فرض)', () => {
+    expect(agingBucketFromDeal(mkDeal())).toBe('current');
   });
 });
 
