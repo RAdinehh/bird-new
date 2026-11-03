@@ -3,7 +3,7 @@
  * پوشش: computeDealBalance + dealDaysUntilDue + agingBucketFromDeal + isDealOpen
  */
 import { describe, it, expect } from 'vitest';
-import { computeDealBalance, dealDaysUntilDue, agingBucketFromDeal, isDealOpen } from '../mod/tra/calc';
+import { computeDealBalance, computeDealInHand, dealDaysUntilDue, agingBucketFromDeal, isDealOpen } from '../mod/tra/calc';
 import type { Deal } from '../mod/tra/types';
 
 const mkDeal = (o: Partial<Deal> = {}): Deal => ({
@@ -120,5 +120,74 @@ describe('isDealOpen', () => {
   it('باز + مانده غیرصفر → true', () => {
     const d = mkDeal({ status: 'open', sales: [{ id: 's1', goodId: 'g1', date: '', quantity: 1, unitPrice: 100 }] });
     expect(isDealOpen(d, [])).toBe(true);
+  });
+});describe('isDealOpen', () => {
+  it('وضعیت settled → false', () => {
+    const d = mkDeal({ status: 'settled' });
+    expect(isDealOpen(d, [])).toBe(false);
+  });
+
+  it('وضعیت cancelled → false', () => {
+    const d = mkDeal({ status: 'cancelled' });
+    expect(isDealOpen(d, [])).toBe(false);
+  });
+
+  it('تبدیل به فاکتور شده (relatedDealId) → false', () => {
+    const d = mkDeal({ status: 'open', sales: [{ id: 's1', goodId: 'g1', date: '', quantity: 1, unitPrice: 100 }] });
+    expect(isDealOpen(d, [{ relatedDealId: d.id }])).toBe(false);
+  });
+
+  it('مانده صفر → false', () => {
+    const d = mkDeal({ status: 'open', sales: [], payments: [] });
+    expect(isDealOpen(d, [])).toBe(false);
+  });
+
+  it('باز + مانده غیرصفر → true', () => {
+    const d = mkDeal({ status: 'open', sales: [{ id: 's1', goodId: 'g1', date: '', quantity: 1, unitPrice: 100 }] });
+    expect(isDealOpen(d, [])).toBe(true);
+  });
+});
+
+describe('computeDealInHand', () => {
+  it('inHand = out - return - loss - sold', () => {
+    const d = mkDeal({
+      deliveries: [
+        { id: 'd1', goodId: 'g1', type: 'out', quantity: 100, date: '1405/08/15' } as any,
+        { id: 'd2', goodId: 'g1', type: 'return', quantity: 5, date: '1405/08/20' } as any,
+        { id: 'd3', goodId: 'g1', type: 'loss', quantity: 3, date: '1405/08/21' } as any,
+      ],
+      sales: [{ id: 's1', goodId: 'g1', date: '1405/08/22', quantity: 85, unitPrice: 100 }],
+    });
+    expect(computeDealInHand(d)).toBe(7);
+  });
+
+  it('بدون تحویل → 0', () => {
+    expect(computeDealInHand(mkDeal())).toBe(0);
+  });
+});
+
+describe('isDealOpen — inHand', () => {
+  it('balance=0 ولی inHand>0 → true', () => {
+    const d = mkDeal({
+      status: 'open',
+      deliveries: [
+        { id: 'd1', goodId: 'g1', type: 'out', quantity: 100, date: '1405/08/15' } as any,
+      ],
+      sales: [{ id: 's1', goodId: 'g1', date: '1405/08/22', quantity: 85, unitPrice: 100 }],
+      payments: [{ id: 'p1', date: '1405/08/22', amount: 8500, direction: 'in', method: 'cash' } as any],
+    });
+    expect(isDealOpen(d, [])).toBe(true);
+  });
+
+  it('balance=0 AND inHand=0 → false', () => {
+    const d = mkDeal({
+      status: 'open',
+      deliveries: [
+        { id: 'd1', goodId: 'g1', type: 'out', quantity: 85, date: '1405/08/15' } as any,
+      ],
+      sales: [{ id: 's1', goodId: 'g1', date: '1405/08/22', quantity: 85, unitPrice: 100 }],
+      payments: [{ id: 'p1', date: '1405/08/22', amount: 8500, direction: 'in', method: 'cash' } as any],
+    });
+    expect(isDealOpen(d, [])).toBe(false);
   });
 });

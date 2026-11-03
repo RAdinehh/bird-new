@@ -1488,6 +1488,8 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                 const otherPaidOut = form.payments.filter(x => x.direction === 'out' && x.id !== p.id).reduce((s, x) => s + (Number(x.amount) || 0), 0);
                 const rem = calc.myShare - otherPaidIn + otherPaidOut;
                 if (rem <= 0.5) return null;
+                  // 🆕 اگر کاربر خودش مبلغ را پر کرده، متن «باقی‌مانده» را نشان نده
+                  if (Number(p.amount) >= rem - 0.5) return null;
                 return (
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
                     <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>باقی‌مانده: {toFa(rem.toLocaleString('fa-IR'))} تومان</span>

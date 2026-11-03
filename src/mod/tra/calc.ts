@@ -634,14 +634,31 @@ export function dealAgingLevel(d: Deal): { days: number; tone: 'ok' | 'warn' | '
 }
 
 /**
+ * computeDealInHand — مقدار کالای هنوز در دست طرف (تحویل - برگشت - تلفات - فروش)
+ * استاندارد: Odoo/SAP — معامله تا وقتی هم پول تسویه شود هم کالا برگردد/فروش برود، بسته نیست
+ */
+export function computeDealInHand(d: Deal): number {
+  const out = (d.deliveries || []).filter(x => x.type === 'out')
+    .reduce((s, x) => s + (Number(x.quantity) || 0), 0);
+  const ret = (d.deliveries || []).filter(x => x.type === 'return')
+    .reduce((s, x) => s + (Number(x.quantity) || 0), 0);
+  const loss = (d.deliveries || []).filter(x => x.type === 'loss')
+    .reduce((s, x) => s + (Number(x.quantity) || 0), 0);
+  const sold = (d.sales || []).reduce((s, x) => s + (Number(x.quantity) || 0), 0);
+  return out - ret - loss - sold;
+}
+
+/**
  * isDealOpen — آیا معامله باید در مطالبات نمایش داده شود؟
  * - status باید 'open' باشد
  * - نباید به Invoice تبدیل شده باشد (relatedDealId در Invoice)
- * - balance != 0 (بدهی یا طلب دارد)
+ * - balance != 0 (بدهی یا طلب دارد)  OR  inHand != 0 (کالا هنوز دست طرف)
  */
 export function isDealOpen(d: Deal, invoices: Array<{ relatedDealId?: string }>): boolean {
   if (d.status !== 'open') return false;
   if (invoices.some(inv => inv.relatedDealId === d.id)) return false;
-  return computeDealBalance(d).balance !== 0;
+  if (computeDealBalance(d).balance !== 0) return true;
+  if (computeDealInHand(d) !== 0) return true;
+  return false;
 }
 
