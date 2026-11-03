@@ -232,7 +232,7 @@ ${farmName} 🐔`;
         {/* زمان‌بندی */}
         <div>
           <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, marginBottom: 8 }}>زمان‌بندی</div>
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 6 }}>تاریخ قول مشتری (اختیاری)</div>
+          <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 600, marginBottom: 6 }}>تاریخ قول مشتری (اختیاری)</div>
           <DatePicker value={promisedDate} onChange={setPromisedDate} />
           {promisedDate && (
             <div style={{ padding: '6px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--accent)', marginTop: 6 }}>
@@ -244,10 +244,10 @@ ${farmName} 🐔`;
             <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--dim)', fontWeight: 600 }}>یا</span>
             <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
           </div>
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 6 }}>یادآوری بعدی</div>
+          <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 600, marginBottom: 6 }}>یادآوری بعدی</div>
           <div style={{ display: 'flex', gap: 4, alignItems: 'center', width: '100%', opacity: promisedDate ? 0.5 : 1, pointerEvents: promisedDate ? 'none' : 'auto' }}>
             {[3, 7, 30].map(d => (
-              <button key={d} type="button" onClick={() => setIntervalDaysStr(String(d))} style={{ ...chipStyle(intervalDaysStr === String(d)), flex: 1, height: 32, padding: 0, fontSize: 'var(--fs-xs)', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <button key={d} type="button" onClick={() => setIntervalDaysStr(String(d))} style={{ ...chipStyle(intervalDaysStr === String(d)), flex: 1, height: 32, padding: 0, fontSize: 'var(--fs-sm)', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {toFa(d)}
               </button>
             ))}
@@ -262,17 +262,18 @@ ${farmName} 🐔`;
                   width: '100%',
                   height: 32,
                   boxSizing: 'border-box',
-                  padding: '0 22px 0 4px',
-                  fontSize: 'var(--fs-xs)',
+                  padding: '0 24px 0 4px',
+                  fontSize: 'var(--fs-sm)',
                   textAlign: 'center',
-                  background: isCustomInterval ? 'var(--accent-soft)' : 'var(--input-bg)',
-                  border: `1px solid ${isCustomInterval ? 'var(--accent-border)' : 'var(--border)'}`,
+                  background: isCustomInterval ? 'var(--accent-soft)' : 'var(--card)',
+                  border: `1.5px solid ${isCustomInterval ? 'var(--accent)' : 'var(--dim)'}`,
                   borderRadius: 'var(--r-sm)',
                   fontFamily: 'inherit',
                   color: isCustomInterval ? 'var(--accent)' : 'var(--text)',
+                  fontWeight: 600,
                 }}
               />
-              <span style={{ position: 'absolute', left: 4, top: '50%', transform: 'translateY(-50%)', fontSize: 11, color: isCustomInterval ? 'var(--accent)' : 'var(--muted)', pointerEvents: 'none' }}>روز</span>
+              <span style={{ position: 'absolute', left: 4, top: '50%', transform: 'translateY(-50%)', fontSize: 'var(--fs-xs)', color: isCustomInterval ? 'var(--accent)' : 'var(--muted)', pointerEvents: 'none' }}>روز</span>
             </div>
           </div>
         </div>
