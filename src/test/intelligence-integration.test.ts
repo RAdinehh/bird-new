@@ -18,9 +18,9 @@ describe('Integration — end-to-end', () => {
     // 42°C = biological (>35) + zscore (>2) → 2 signals → yellow
     // 39°C با تاریخچه ثابت 33°C فقط 18٪ اختلاف دارد → زیر آستانه (درست)
     for (let i = 0; i < 5; i++) {
-      recordHistory('dlg.temperature', 33, {}, STORE);
+      recordHistory('dlg.temperature', 33, {}, { ...STORE, today: `2026-10-${15 + i}` });
     }
-    const w = analyzeAnomaly('dlg.temperature', 42, {}, STORE);
+    const w = analyzeAnomaly('dlg.temperature', 42, {}, { ...STORE, today: '2026-10-20' });
     expect(w).not.toBeNull();
     expect(w!.level).toMatch(/yellow|orange|red/);
     expect(w!.signals.length).toBeGreaterThanOrEqual(2);
@@ -28,9 +28,9 @@ describe('Integration — end-to-end', () => {
 
   it('قیمت جوجه: ۱۰ برابر → هشدار + متن فارسی', () => {
     for (let i = 0; i < 5; i++) {
-      recordHistory('tra.price_chick', 500_000, {}, STORE);
+      recordHistory('tra.price_chick', 500_000, {}, { ...STORE, today: `2026-10-${15 + i}` });
     }
-    const w = analyzeAnomaly('tra.price_chick', 5_000_000, {}, STORE);
+    const w = analyzeAnomaly('tra.price_chick', 5_000_000, {}, { ...STORE, today: '2026-10-20' });
     expect(w).not.toBeNull();
     expect(w!.level).toMatch(/orange|red/);
     const msg = formatWarning(w!);
@@ -42,9 +42,9 @@ describe('Integration — end-to-end', () => {
   it('feedAmount: cascade fallback از cross_field به history', () => {
     // بدون perBirdGramsPerDay → cross_field null → fallback history
     for (let i = 0; i < 5; i++) {
-      recordHistory('dlg.feedAmount', 120, { flockSize: 1000 }, STORE);
+      recordHistory('dlg.feedAmount', 120, { flockSize: 1000 }, { ...STORE, today: `2026-10-${15 + i}` });
     }
-    const w = analyzeAnomaly('dlg.feedAmount', 720, { flockSize: 1000 }, STORE);
+    const w = analyzeAnomaly('dlg.feedAmount', 720, { flockSize: 1000 }, { ...STORE, today: '2026-10-20' });
     expect(w).not.toBeNull();
     expect(w!.level).toMatch(/orange|red/);
   });
