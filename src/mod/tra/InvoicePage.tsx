@@ -32,6 +32,7 @@ import { useInvoiceForm } from './hooks/useInvoiceForm';
 import TransferModal from './components/TransferModal';
 import InvoiceCard from './components/InvoiceCard';
 import InvoiceFormModal from './components/InvoiceFormModal';
+import { showPromptAsync } from '../../cor/store/dialog';
 import DisputeModal from './components/DisputeModal';
 import RecycleBinModal from './components/RecycleBinModal';
 import { AccordionSection } from '../../shr/components/AccordionSection';
@@ -39,7 +40,7 @@ import FlockCreateStandalone from '../flk/components/FlockCreateStandalone';
 
 export default function InvoicePage({ kind, active = true }: { kind: 'purchase' | 'sale'; active?: boolean }) {
   const isPurchase = kind === 'purchase';
-  const { invoices: _allInvoices, deals, addInvoice, updateInvoice, deleteInvoice, reopenInvoice, allocations, resolveDispute } = useTra();
+  const { invoices: _allInvoices, deals, addInvoice, updateInvoice, deleteInvoice, reopenInvoice, allocations, resolveDispute, writeOffInvoice } = useTra();
   const { contacts } = useCtc();
   const { flocks } = useFlk();
   const { items: whsItems } = useWhs();
@@ -427,6 +428,17 @@ return (
                     onEdit={remaining(inv) > 0 && !inv.paidAt ? () => openEdit(inv) : undefined}
           onDispute={!inv.disputeStatus ? () => setDisputeTarget(inv) : undefined}
           onResolveDispute={inv.disputeStatus === 'open' ? () => resolveDispute(inv.id) : undefined}
+          onWriteOff={!inv.writtenOff && remaining(inv, allocations) > 0 ? async () => {
+            const rem = remaining(inv, allocations);
+            const reason = await showPromptAsync(
+              'حذف بدحساب',
+              `مبلغ ${toFa(rem.toLocaleString('fa-IR'))} تومان به عنوان بدحساب حذف می‌شود. این عمل قابل بازگشت نیست.`,
+              { label: 'دلیل', placeholder: 'مثلاً: وصول نشد — مبلغ کم', required: true, multiline: true, rows: 2, danger: true, confirmText: 'حذف کن' },
+            );
+            if (!reason || !reason.trim()) return;
+            writeOffInvoice(inv.id, rem, reason.trim());
+            toastMsg.success('مبلغ به عنوان بدحساب حذف شد');
+          } : undefined}
                     index={i}
                   />
                 );
@@ -452,6 +464,17 @@ return (
           onEdit={remaining(inv) > 0 && !inv.paidAt ? () => openEdit(inv) : undefined}
           onDispute={!inv.disputeStatus ? () => setDisputeTarget(inv) : undefined}
           onResolveDispute={inv.disputeStatus === 'open' ? () => resolveDispute(inv.id) : undefined}
+          onWriteOff={!inv.writtenOff && remaining(inv, allocations) > 0 ? async () => {
+            const rem = remaining(inv, allocations);
+            const reason = await showPromptAsync(
+              'حذف بدحساب',
+              `مبلغ ${toFa(rem.toLocaleString('fa-IR'))} تومان به عنوان بدحساب حذف می‌شود. این عمل قابل بازگشت نیست.`,
+              { label: 'دلیل', placeholder: 'مثلاً: وصول نشد — مبلغ کم', required: true, multiline: true, rows: 2, danger: true, confirmText: 'حذف کن' },
+            );
+            if (!reason || !reason.trim()) return;
+            writeOffInvoice(inv.id, rem, reason.trim());
+            toastMsg.success('مبلغ به عنوان بدحساب حذف شد');
+          } : undefined}
                 index={i}
               />
             );

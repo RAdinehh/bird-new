@@ -464,6 +464,7 @@ export interface State {
   updateInvoice: (id: string, patch: Partial<Invoice>) => void;
   markDispute: (invoiceId: string, reason: 'price' | 'quantity' | 'quality' | 'other', note: string) => void;
   resolveDispute: (invoiceId: string, note?: string) => void;
+  writeOffInvoice: (invoiceId: string, amount: number, reason: string) => void;
   deleteInvoice: (id: string) => void;
   restoreInvoice: (id: string) => boolean;
   listDeletedInvoices: () => DeletedInvoiceSnapshot[];

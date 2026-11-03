@@ -268,6 +268,19 @@ export const useTra = create<State>()(
           } : i),
         });
       },
+      writeOffInvoice: (invoiceId, amount, reason) => {
+        const today = getTodayJalali();
+        set({
+          invoices: get().invoices.map(i => i.id === invoiceId ? {
+            ...i,
+            writtenOff: true,
+            writtenOffAmount: amount,
+            writtenOffReason: reason,
+            writtenOffAt: today,
+            updatedAt: new Date().toISOString(),
+          } : i),
+        });
+      },
       restoreInvoice: (id) => {
         const snapshot = removeFromRecycleBin<DeletedInvoiceSnapshot>(
           'tra',

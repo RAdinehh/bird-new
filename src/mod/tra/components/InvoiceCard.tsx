@@ -26,10 +26,11 @@ interface Props {
   onEdit?: () => void;
   onDispute?: () => void;
   onResolveDispute?: () => void;
+  onWriteOff?: () => void;
   index: number;
 }
 
-export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTransferClick, onReopen, onEdit, onDispute, onResolveDispute, index }: Props) {
+export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTransferClick, onReopen, onEdit, onDispute, onResolveDispute, onWriteOff, index }: Props) {
   const { updateInvoice, allocations } = useTra();
   const { flocks, restore, update: updateFlock } = useFlk();
   const [flockPickerOpen, setFlockPickerOpen] = useState(false);
@@ -245,7 +246,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
           📦 تحویل گرفتم (ایجاد گله و موجودی)
         </Btn>
       )}
-      {(onEdit || nextWorkflowStatus(inv.workflowStatus) || onReopen || linkedFlock) ? (
+      {(onEdit || nextWorkflowStatus(inv.workflowStatus) || onReopen || linkedFlock || onDispute || onResolveDispute || onWriteOff) ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
           {(onEdit || linkedFlock || (inv.type === 'purchase' && inv.items?.some(it => it.birdId))) && (
             <BtnRow>
@@ -275,7 +276,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
               )}
             </BtnRow>
           )}
-          {(nextWorkflowStatus(inv.workflowStatus) || onReopen) && (
+          {(nextWorkflowStatus(inv.workflowStatus) || onReopen || onDispute || onResolveDispute || onWriteOff) && (
             <BtnRow>
               {nextWorkflowStatus(inv.workflowStatus) && 
                 !((String(inv.paymentTerms) === 'cash' || String(inv.paymentTerms) === 'card')
@@ -291,6 +292,9 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
               )}
               {onResolveDispute && (
                 <Btn size="sm" variant="primary" onClick={onResolveDispute}>✅ حل شد</Btn>
+              )}
+              {onWriteOff && (
+                <Btn size="sm" variant="outline" onClick={onWriteOff}>🗑️ حذف بدحساب</Btn>
               )}
               {onReopen && (
                 <Btn size="sm" variant="primary" onClick={onReopen}>
