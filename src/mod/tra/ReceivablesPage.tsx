@@ -117,7 +117,18 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   }).length;
 
   // Deal computations (Phase 1)
-  const dealTotalOpen = openDeals.reduce((s, d) => s + Math.abs(computeDealBalance(d).balance), 0);
+  const dealTotalOpen = openDeals.reduce((s, d) => s + computeDealBalance(d).balance, 0);
+  // 🆕 Stage 3-4: پرداخت‌های خالص‌شده معاملات (settledAmount)
+  const dealSettledAmount = openDeals.reduce((s, d) => {
+    const bal = computeDealBalance(d);
+    return s + Math.max(0, bal.paidIn - bal.paidOut);
+  }, 0);
+  // 🆕 Stage 3-4: معاملات نزدیک سرسید (۰-۷ روز)
+  const dealDueSoonAmount = openDeals.reduce((s, d) => {
+    const days = dealDaysUntilDue(d);
+    if (days === null || days < 0 || days > 7) return s;
+    return s + Math.abs(computeDealBalance(d).balance);
+  }, 0);
   const dealOverdueCount = openDeals.filter(d => {
     const days = dealDaysUntilDue(d);
     return days !== null && days < 0;
@@ -200,7 +211,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                 </div>
 
       {/* خلاصه — یه خط */}
-      <SummaryBox kind={kind} totalInvoiced={kind === 'deal' ? dealTotalOpen : totalInvoiced} totalOpen={effectiveTotal} settledAmount={settledAmount} dueSoonAmount={dueSoonAmount} openCount={kind === 'deal' ? openDeals.length : openInvoices.length} />
+      <SummaryBox kind={kind} totalInvoiced={kind === 'deal' ? Math.abs(dealTotalOpen) : totalInvoiced} totalOpen={effectiveTotal} settledAmount={kind === 'deal' ? dealSettledAmount : settledAmount} dueSoonAmount={kind === 'deal' ? dealDueSoonAmount : dueSoonAmount} openCount={kind === 'deal' ? openDeals.length : openInvoices.length} />
 
       {/* ⏰ سرسیدهای نزدیک — collapsible */}
       <UpcomingDueSection upcoming={upcoming} contacts={contacts} showUpcoming={showUpcoming} onToggle={() => setShowUpcoming(!showUpcoming)} onDefer={openDefer} />
@@ -252,12 +263,12 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
       ) : null}
 
           {/* Deal buckets (Phase B3) */}
-      {kind === 'deal' && effectiveTotal > 0 ? (
+      {kind === 'deal' && effectiveTotal !== 0 ? (
         <>
           <AgingBuckets
             items={dealFS.filtered.filter(d => d.type === 'partnership' || d.type === 'conditional')}
             bucketOf={(d) => agingBucketFromDeal(d)}
-            sumOf={(d) => Math.abs(computeDealBalance(d).balance)}
+            sumOf={(d) => computeDealBalance(d).balance}
             renderSummary={(d) => {
               const bal = computeDealBalance(d);
               const party = contacts.find(c => c.id === d.partyId);
