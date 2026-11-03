@@ -3,17 +3,15 @@
  */
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { daysUntilDue, dueTone, dueLabel, computeUpcoming } from './helpers';
+import { daysUntilDue, dueLabel, computeUpcoming } from './helpers';
 import DeferModal from './components/DeferModal';
 import ReminderModal from './components/ReminderModal';
 import { useTra, remaining, paidSumAllocated, WORKFLOW_LABEL, DEAL_LABEL, computeDealBalance, dealDaysUntilDue, isDealOpen, type Invoice, type Deal, type Deferral } from './store';
 import { useCtc } from '../ctc/store';
 import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import EntityLink from '../../shr/components/EntityLink';
-import { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import { toFa } from '../../shr/utils/fa';
-import { showSuccess, showConfirmAsync } from '../../cor/store/dialog';
-import { toastMsg } from '../../cor/store/toast';
+import { showSuccess } from '../../cor/store/dialog';
 import { Line, Row, tab, CAT_LABEL } from './helpers';
 import { useFilterSort, FilterBar, getTraReceivablesConfig, getTraDealsConfig } from '../../shr/filter';
 import MultiPayModal from './components/MultiPayModal';
