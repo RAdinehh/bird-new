@@ -455,6 +455,8 @@ export interface State {
     methodLabel?: string;
     note: string;
     intervalDays: number;
+    promisedDate?: string;
+    promisedAmount?: number;
   }) => void;
   updateAllocation: (id: string, patch: Partial<PaymentAllocation>) => void;
   deleteAllocation: (id: string) => void;

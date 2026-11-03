@@ -14,6 +14,7 @@ import { useTra } from '../store';
 import { remaining } from '../calc';
 import { copyText, shareText } from '../../../shr/utils/clipboard';
 import { toastMsg } from '../../../cor/store/toast';
+import DatePicker from '../../../shr/components/DatePicker';
 import type { Invoice } from '../types';
 
 const CAT_LABEL: Record<string, string> = {
@@ -58,6 +59,7 @@ export default function ReminderModal({ open, onClose, invoice }: Props) {
   const [channel, setChannel] = useState('واتس‌اپ');
   const [note, setNote] = useState('');
   const [intervalDaysStr, setIntervalDaysStr] = useState('7');
+  const [promisedDate, setPromisedDate] = useState('');
   const [message, setMessage] = useState('');
 
   const party = invoice ? contacts.find(c => c.id === invoice.partyId) : null;
@@ -110,6 +112,7 @@ ${farmName} 🐔`;
       methodLabel: channel.trim() || undefined,
       note: note.trim(),
       intervalDays,
+      ...(promisedDate ? { promisedDate } : {}),
     });
     toastMsg.saved();
     onClose();
@@ -207,8 +210,18 @@ ${farmName} 🐔`;
       </div>
 
 
-      <Field label="یادآوری بعدی">
-        <div style={{ display: 'flex', gap: 4, alignItems: 'center', width: '100%' }}>
+      <Field label="تاریخ قول (اختیاری)" hint="اگر مشتری تاریخی برای پرداخت وعده داد">
+        <DatePicker value={promisedDate} onChange={setPromisedDate} />
+      </Field>
+
+      {promisedDate && (
+        <div style={{ padding: '6px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--accent)', marginTop: -6 }}>
+          یادآوری بعدی خودکار روی {toFa(promisedDate)} تنظیم شد
+        </div>
+      )}
+
+      <Field label="یادآوری بعدی" hint={promisedDate ? 'غیرفعال — تاریخ قول جایگزین شد' : undefined}>
+        <div style={{ display: 'flex', gap: 4, alignItems: 'center', width: '100%', opacity: promisedDate ? 0.5 : 1, pointerEvents: promisedDate ? 'none' : 'auto' }}>
           {[3, 7, 30].map(d => (
             <button key={d} type="button" onClick={() => setIntervalDaysStr(String(d))} style={{ ...chipStyle(!isCustomInterval && intervalDaysStr === String(d)), flex: 1, height: 32, padding: 0, fontSize: 'var(--fs-sm)', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {toFa(d)}

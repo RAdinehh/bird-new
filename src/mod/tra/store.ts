@@ -903,13 +903,15 @@ export const useTra = create<State>()(
         const inv = get().invoices.find(i => i.id === invoiceId);
         if (!inv) return;
         const today = getTodayJalali();
-        const nextDate = addJalaliDays(today, params.intervalDays);
+        const nextDate = params.promisedDate || addJalaliDays(today, params.intervalDays);
         const logEntry = {
           date: today,
           method: params.method,
           methodLabel: params.methodLabel,
           note: params.note,
           intervalDays: params.intervalDays,
+          ...(params.promisedDate ? { promisedDate: params.promisedDate } : {}),
+          ...(params.promisedAmount !== undefined ? { promisedAmount: params.promisedAmount } : {}),
         };
         set({
           invoices: get().invoices.map(i => i.id === invoiceId ? {
