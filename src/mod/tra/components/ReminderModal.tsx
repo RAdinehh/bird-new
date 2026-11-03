@@ -256,84 +256,62 @@ ${farmName} 🐔`;
 
       {/* زمان‌بندی */}
       <SectionTitle>زمان‌بندی</SectionTitle>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 8, alignItems: 'flex-start' }}>
-        <div>
-          <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginBottom: 6 }}>یادآوری قبلی</div>
-          <div style={{
-            height: 40,
-            padding: '0 12px',
-            background: 'var(--input-bg)',
-            border: '1px dashed var(--border)',
-            borderRadius: 'var(--r-sm)',
-            display: 'flex',
-            alignItems: 'center',
-            fontSize: 'var(--fs-sm)',
-            color: invoice?.lastRemindedAt ? 'var(--text)' : 'var(--dim)',
-            fontWeight: invoice?.lastRemindedAt ? 600 : 400,
-            fontVariantNumeric: 'tabular-nums',
-            gap: 4,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}>
-            {invoice?.lastRemindedAt ? (() => {
-              const d = daysUntilJalali(invoice.lastRemindedAt);
-              const ago = d === null ? null : Math.abs(d);
-              const agoLabel = ago === null ? '' : ago === 0 ? 'امروز' : `${toFa(ago)} روز پیش`;
-              return (
-                <>
-                  <span>{toFa(invoice.lastRemindedAt)}</span>
-                  {agoLabel && <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>({agoLabel})</span>}
-                </>
-              );
-            })() : '—'}
+      <div>
+        {/* یادآوری بعدی — کادر اصلی */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+          <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 600 }}>یادآوری بعدی</span>
+          {(promisedDate || intervalDaysStr) && (
+            <button
+              type="button"
+              onClick={() => { setPromisedDate(''); setIntervalDaysStr(''); }}
+              aria-label="پاک کردن یادآوری"
+              title="پاک کردن"
+              style={{
+                width: 22, height: 22, borderRadius: '50%',
+                border: 'none', background: 'var(--danger-soft)',
+                color: 'var(--danger)', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 13, padding: 0, fontFamily: 'inherit',
+                fontWeight: 700, lineHeight: 1,
+              }}
+            >×</button>
+          )}
+        </div>
+        <div style={{ display: 'flex', gap: 4 }}>
+          <Input
+            value={toFa(intervalDaysStr)}
+            onChange={e => handleDaysChange(e.target.value)}
+            placeholder="دستی"
+            unit="روز"
+            inputMode="tel"
+            style={{ width: 90, flexShrink: 0, textAlign: 'center' }}
+          />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <DatePicker value={promisedDate} onChange={handleDateChange} />
           </div>
         </div>
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-            <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>یادآوری بعدی</span>
-            {(promisedDate || intervalDaysStr) && (
-              <button
-                type="button"
-                onClick={() => { setPromisedDate(''); setIntervalDaysStr(''); }}
-                aria-label="پاک کردن یادآوری"
-                title="پاک کردن"
-                style={{
-                  width: 22,
-                  height: 22,
-                  borderRadius: '50%',
-                  border: 'none',
-                  background: 'var(--danger-soft)',
-                  color: 'var(--danger)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 13,
-                  padding: 0,
-                  fontFamily: 'inherit',
-                  fontWeight: 700,
-                  lineHeight: 1,
-                }}
-              >
-                ×
-              </button>
-            )}
-          </div>
-          <div style={{ display: 'flex', gap: 4 }}>
-            <Input
-              value={toFa(intervalDaysStr)}
-              onChange={e => handleDaysChange(e.target.value)}
-              placeholder="دستی"
-              unit="روز"
-              inputMode="tel"
-              style={{ flex: 1, textAlign: 'center' }}
-            />
-            <div style={{ flex: 1.5, minWidth: 0 }}>
-              <DatePicker value={promisedDate} onChange={handleDateChange} />
+
+        {/* یادآوری قبلی — زیرنویس */}
+        {invoice?.lastRemindedAt && (() => {
+          const d = daysUntilJalali(invoice.lastRemindedAt);
+          const ago = d === null ? null : Math.abs(d);
+          const agoLabel = ago === null ? '' : ago === 0 ? 'امروز' : `${toFa(ago)} روز پیش`;
+          return (
+            <div style={{
+              fontSize: 'var(--fs-xs)',
+              color: 'var(--muted)',
+              marginTop: 8,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              flexWrap: 'wrap',
+            }}>
+              <span>یادآوری قبلی:</span>
+              <span style={{ color: 'var(--text)', fontWeight: 600 }}>{toFa(invoice.lastRemindedAt)}</span>
+              {agoLabel && <span style={{ color: 'var(--muted)' }}>— {agoLabel}</span>}
             </div>
-          </div>
-        </div>
+          );
+        })()}
       </div>
 
 
