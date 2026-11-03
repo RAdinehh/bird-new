@@ -27,13 +27,13 @@ import { agingBucketFromDeal, computeOverpayment } from './calc';
 
 
 export default function ReceivablesPage({ active = true }: { active?: boolean } = {}) {
-  const { invoices, deals, updateInvoice, allocations, addReminder } = useTra();
+  const { invoices, deals, updateInvoice, updateDeal, allocations, addReminder } = useTra();
   const navigate = useNavigate();
   const { contacts } = useCtc();
   const [multiPayOpen, setMultiPayOpen] = useState(false);
   const [multiPayPrefill, setMultiPayPrefill] = useState<{ partyId: string; invoiceId: string } | null>(null);
   const [kind, setKind] = useState<'sale' | 'purchase' | 'deal'>('sale');
-  const [deferModal, setDeferModal] = useState<{ id: string; oldDate: string } | null>(null);
+  const [deferModal, setDeferModal] = useState<{ kind: 'invoice' | 'deal'; id: string; oldDate: string } | null>(null);
   const [deferDate, setDeferDate] = useState('');
   const [deferReason, setDeferReason] = useState('');
   const [showUpcoming, setShowUpcoming] = useState(false);
@@ -144,15 +144,19 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
 
 
   const openDefer = (inv: Invoice) => {
-    setDeferModal({ id: inv.id, oldDate: inv.dueDate || inv.date });
+    setDeferModal({ kind: 'invoice', id: inv.id, oldDate: inv.dueDate || inv.date });
     setDeferDate(inv.dueDate || inv.date);
+    setDeferReason('');
+  };
+
+  const openDealDefer = (d: Deal) => {
+    setDeferModal({ kind: 'deal', id: d.id, oldDate: d.dueDate || d.date });
+    setDeferDate(d.dueDate || d.date);
     setDeferReason('');
   };
 
   const doDefer = () => {
     if (!deferModal || !deferDate) return;
-    const inv = invoices.find(i => i.id === deferModal.id);
-    if (!inv) return;
     const newDeferral: Deferral = {
       id: crypto.randomUUID(),
       fromDate: deferModal.oldDate,
@@ -160,11 +164,22 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
       reason: deferReason,
       createdAt: new Date().toISOString(),
     };
-    updateInvoice(inv.id, {
-      dueDate: deferDate,
-      deferrals: [...(inv.deferrals || []), newDeferral],
-      remindersMuted: false,
-    });
+    if (deferModal.kind === 'invoice') {
+      const inv = invoices.find(i => i.id === deferModal.id);
+      if (!inv) return;
+      updateInvoice(inv.id, {
+        dueDate: deferDate,
+        deferrals: [...(inv.deferrals || []), newDeferral],
+        remindersMuted: false,
+      });
+    } else {
+      const d = deals.find(x => x.id === deferModal.id);
+      if (!d) return;
+      updateDeal(d.id, {
+        dueDate: deferDate,
+        deferrals: [...(d.deferrals || []), newDeferral],
+      });
+    }
     showSuccess('سرسید به تعویق افتاد');
     setDeferModal(null);
   };
@@ -216,7 +231,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
 
       {/* ⏰ سرسیدهای نزدیک — collapsible */}
       {kind === 'deal' ? (
-        <UpcomingDealsSection deals={upcomingDeals} contacts={contacts} showUpcoming={showUpcoming} onToggle={() => setShowUpcoming(!showUpcoming)} />
+        <UpcomingDealsSection deals={upcomingDeals} contacts={contacts} showUpcoming={showUpcoming} onToggle={() => setShowUpcoming(!showUpcoming)} onDefer={openDealDefer} />
       ) : (
         <UpcomingDueSection upcoming={upcoming} contacts={contacts} showUpcoming={showUpcoming} onToggle={() => setShowUpcoming(!showUpcoming)} onDefer={openDefer} />
       )}
@@ -305,9 +320,11 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                   <Line l="سهم طرف" v={`${toFa(bal.myShare.toLocaleString('fa-IR'))} تومان`} />
                   <Line l="دریافت‌شده" v={`${toFa(bal.paidIn.toLocaleString('fa-IR'))} تومان`} />
                   <Line l="مانده" v={`${toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} تومان`} />
+                  {d.deferrals && d.deferrals.length > 0 ? <Line l="تعویق‌ها" v={toFa(d.deferrals.length)} /> : null}
                   <div style={{ marginTop: 4, display: 'flex', gap: 6 }}>
                     <Btn size="sm" onClick={(e) => { e.stopPropagation(); setDealPayTarget(d); }}>ثبت پرداخت</Btn>
                     <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setReminderDealId(d.id); }}>📨 یادآوری</Btn>
+                    <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); openDealDefer(d); }}>⏰ تعویق</Btn>
                   </div>
                 </>
               );

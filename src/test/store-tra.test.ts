@@ -374,3 +374,24 @@ describe('addDealReminder', () => {
     expect(d.reminderLog?.[0].methodLabel).toBe('تست');
   });
 });
+
+describe('Deal deferrals (S5)', () => {
+  it('updateDeal dueDate + deferrals', () => {
+    const st = useTra.getState();
+    st.addDeal({
+      type: 'partnership', date: '1405/08/15', partyId: 'p1', description: 'defer-test-marker',
+      value: 0, percent: null, dueDate: '1405/09/15', status: 'open', notes: '',
+      goods: [], deliveries: [], sales: [], payments: [],
+    } as any);
+    const created = useTra.getState().deals.find(x => x.description === 'defer-test-marker')!;
+    const id = created.id;
+    useTra.getState().updateDeal(id, {
+      dueDate: '1405/10/01',
+      deferrals: [{ id: 'd1', fromDate: '1405/09/15', toDate: '1405/10/01', reason: 'تست', createdAt: '2026-11-04T00:00:00Z' }],
+    });
+    const d = useTra.getState().deals.find(x => x.id === id)!;
+    expect(d.dueDate).toBe('1405/10/01');
+    expect(d.deferrals?.length).toBe(1);
+    expect(d.deferrals?.[0].reason).toBe('تست');
+  });
+});

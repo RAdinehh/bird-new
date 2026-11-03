@@ -11,9 +11,10 @@ interface Props {
   contacts: Array<{ id: string; name?: string }>;
   showUpcoming: boolean;
   onToggle: () => void;
+  onDefer?: (deal: Deal) => void;
 }
 
-export default function UpcomingDealsSection({ deals, contacts, showUpcoming, onToggle }: Props) {
+export default function UpcomingDealsSection({ deals, contacts, showUpcoming, onToggle, onDefer }: Props) {
   if (deals.length === 0) return null;
   return (
     <div style={{ background: 'var(--card)', border: '1px solid var(--amber)', borderRadius: 'var(--r-md)', overflow: 'hidden' }}>
@@ -72,6 +73,13 @@ export default function UpcomingDealsSection({ deals, contacts, showUpcoming, on
                   <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: `var(--${tone})`, flexShrink: 0 }}>
                     {toFa(Math.abs(bal).toLocaleString('fa-IR'))} تومان
                   </div>
+                  {onDefer && (
+                    <button
+                      type="button"
+                      onClick={() => onDefer(deal)}
+                      style={{ padding: '3px 8px', background: 'transparent', border: `1px solid var(--${tone})`, borderRadius: 'var(--r-sm)', color: `var(--${tone})`, fontSize: 'var(--fs-xs)', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0 }}
+                    >⏰</button>
+                  )}
                 </div>
               );
             })}

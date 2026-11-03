@@ -426,6 +426,7 @@ export interface Deal {
   reopenHistory?: Array<{ from: 'settled' | 'cancelled'; to: 'open'; reason: string; at: string }>;
   /** 🆕 Phase C — یادآوری معامله */
   lastRemindedAt?: string;
+  deferrals?: Deferral[];
   nextReminderAt?: string;
   reminderLog?: ReminderLogEntry[];
   createdAt: string;
