@@ -61,6 +61,7 @@ export default function ReminderModal({ open, onClose, invoice }: Props) {
   const [intervalDaysStr, setIntervalDaysStr] = useState('7');
   const [promisedDate, setPromisedDate] = useState('');
   const [message, setMessage] = useState('');
+  const [isMessageExpanded, setIsMessageExpanded] = useState(false);
 
   const party = invoice ? contacts.find(c => c.id === invoice.partyId) : null;
   const salutation = party?.gender === 'male' ? 'جناب آقای' : party?.gender === 'female' ? 'سرکار خانم' : 'جناب';
@@ -195,13 +196,34 @@ ${farmName} 🐔`;
         )}
       </Field>
 
-      <Field label="پیام">
+      <Field label="پیام" hint="قابل ویرایش">
         <Textarea
           value={message}
           onChange={e => setMessage(e.target.value)}
-          rows={8}
-          maxHeight={240}
+          rows={isMessageExpanded ? 8 : 4}
+          maxHeight={isMessageExpanded ? 240 : 120}
         />
+        <button
+          type="button"
+          onClick={() => setIsMessageExpanded(v => !v)}
+          style={{
+            marginTop: 6,
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--accent)',
+            fontSize: 'var(--fs-xs)',
+            fontWeight: 600,
+            cursor: 'pointer',
+            padding: 0,
+            fontFamily: 'inherit',
+            textAlign: 'right',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+          }}
+        >
+          {isMessageExpanded ? '▲ بستن' : '▼ باز کردن'}
+        </button>
       </Field>
 
       <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
