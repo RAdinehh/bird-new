@@ -102,6 +102,20 @@ ${farmName} 🐔`;
   useEffect(() => {
     if (open && invoice && party) {
       setMessage(generateMessage());
+
+      // 🆕 Pre-fill from existing nextReminderAt
+      if (invoice.nextReminderAt) {
+        setPromisedDate(invoice.nextReminderAt);
+        const days = daysUntilJalali(invoice.nextReminderAt);
+        if (days !== null && days >= 0) {
+          setIntervalDaysStr(String(days));
+        } else {
+          setIntervalDaysStr('');
+        }
+      } else {
+        setPromisedDate('');
+        setIntervalDaysStr('');
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, invoice?.id]);
