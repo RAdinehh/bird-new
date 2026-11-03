@@ -229,7 +229,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                     </span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-xs)' }}>
-                    {days !== null ? <span style={{ color: days <= 3 ? 'var(--danger)' : days <= 7 ? 'var(--warn)' : 'var(--muted)', fontWeight: 600 }}>⏰ {dueLabel(days)}</span> : <span style={{ color: 'var(--muted)' }}>{d.description || '—'}</span>}
+                    {days !== null ? <span style={{ color: days <= 3 ? 'var(--danger)' : days <= 7 ? 'var(--warn)' : 'var(--muted)', fontWeight: 600 }}>{dueLabel(days)}</span> : <span style={{ color: 'var(--muted)' }}>{d.description || '—'}</span>}
                     <span style={{ color: 'var(--dim)', fontFamily: 'monospace', direction: 'ltr', fontSize: 10 }}>{d.dealNumber || ''}</span>
                   </div>
                 </>
@@ -245,7 +245,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                   <Line l="دریافت‌شده" v={`${toFa(bal.paidIn.toLocaleString('fa-IR'))} تومان`} />
                   <Line l="مانده" v={`${toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} تومان`} />
                   <div style={{ marginTop: 4 }}>
-                    <Btn size="sm" onClick={(e) => { e.stopPropagation(); setDealPayTarget(d); }}>💳 ثبت پرداخت</Btn>
+                    <Btn size="sm" onClick={(e) => { e.stopPropagation(); setDealPayTarget(d); }}>ثبت پرداخت</Btn>
                   </div>
                 </>
               );
@@ -253,8 +253,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
             groupActions={[
               {
                 label: 'تسویه گروهی',
-                icon: '🤝',
-                primary: true,
+                  primary: true,
                 onClick: (items) => {
                   if (items.length === 0) return;
                   if (items.length === 1) { setDealPayTarget(items[0]); return; }
@@ -295,7 +294,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                   <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{toFa(remaining(inv, allocations).toLocaleString('fa-IR'))} ت</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-xs)' }}>
-                  {dUntil !== null ? <span style={{ color: dUntil <= 3 ? 'var(--danger)' : dUntil <= 7 ? 'var(--warn)' : 'var(--muted)', fontWeight: 600 }}>⏰ {dueLabel(dUntil)}</span> : <span style={{ color: 'var(--muted)' }}>—</span>}
+                  {dUntil !== null ? <span style={{ color: dUntil <= 3 ? 'var(--danger)' : dUntil <= 7 ? 'var(--warn)' : 'var(--muted)', fontWeight: 600 }}>{dueLabel(dUntil)}</span> : <span style={{ color: 'var(--muted)' }}>—</span>}
                   <span style={{ color: 'var(--dim)', fontFamily: 'monospace', direction: 'ltr', fontSize: 10 }}>{inv.number || ''}</span>
                 </div>
               </>
@@ -306,20 +305,16 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
               <Line l="جمع فاکتور" v={`${toFa(inv.total.toLocaleString('fa-IR'))} تومان`} />
               <Line l="پرداخت‌شده" v={`${toFa(paidSumAllocated(inv, allocations).toLocaleString('fa-IR'))} تومان`} />
               {inv.dueDate ? <Line l="سرسید" v={toFa(inv.dueDate)} /> : null}
-              {inv.workflowStatus ? <Line l="وضعیت" v={WORKFLOW_LABEL[inv.workflowStatus]} /> : null}
+              {inv.workflowStatus ? <Line l="وضعیت" v={WORKFLOW_LABEL[inv.workflowStatus].replace(/^[^\u0600-\u06FFA-Za-z0-9]+/u, '')} /> : null}
               {inv.deferrals && inv.deferrals.length > 0 ? <Line l="تعویق‌ها" v={toFa(inv.deferrals.length)} /> : null}
               {inv.reminderLog && inv.reminderLog.length > 0 ? (
                 <Line l="آخرین یادآوری" v={`${toFa(inv.reminderLog[inv.reminderLog.length - 1].date)}${inv.reminderLog[inv.reminderLog.length - 1].methodLabel ? ' — ' + inv.reminderLog[inv.reminderLog.length - 1].methodLabel : ''}`} />
               ) : null}
-              <div style={{ marginTop: 4 }}>
-                <Btn size="sm" onClick={(e) => { e.stopPropagation(); openDefer(inv); }}>⏰ تعویق</Btn>
-              </div>
             </>
           )}
           groupActions={[
             {
               label: 'پرداخت گروهی',
-              icon: '💳',
               primary: true,
               onClick: (items) => {
                 if (items.length === 0) return;
@@ -329,7 +324,6 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
             },
             {
               label: 'یادآوری گروهی',
-              icon: '📨',
               onClick: async (items) => {
                 if (items.length === 0) return;
                 const ok = await showConfirmAsync(
@@ -344,7 +338,6 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
             },
             {
               label: 'تعویق گروهی',
-              icon: '⏰',
               onClick: (items) => {
                 if (items.length === 1) { openDefer(items[0]); return; }
                 toastMsg.warn('برای تعویق گروهی، هر فاکتور را جدا باز کنید');
