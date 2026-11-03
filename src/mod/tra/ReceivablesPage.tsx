@@ -319,9 +319,9 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                 <>
                   <Line l="فروش کل" v={`${toFa(bal.totalSales.toLocaleString('fa-IR'))} تومان`} />
                   <Line l="کمیسیون" v={`${toFa(bal.commission.toLocaleString('fa-IR'))} تومان`} />
-                  <Line l="سهم طرف" v={`${toFa(bal.myShare.toLocaleString('fa-IR'))} تومان`} />
+                  <Line l="سهم شما" v={`${toFa(bal.myShare.toLocaleString('fa-IR'))} تومان`} />
                   <Line l="دریافت‌شده" v={`${toFa(bal.paidIn.toLocaleString('fa-IR'))} تومان`} />
-                  <Line l="مانده" v={`${toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} تومان`} />
+                  <Line l="باقی‌مانده" v={`${toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} تومان`} />
                   {d.deferrals && d.deferrals.length > 0 ? <Line l="تعویق‌ها" v={toFa(d.deferrals.length)} /> : null}
                   <div style={{ marginTop: 4, display: 'flex', gap: 6 }}>
                     <Btn size="sm" onClick={(e) => { e.stopPropagation(); setDealPayTarget(d); }}>ثبت پرداخت</Btn>
