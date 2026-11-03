@@ -236,16 +236,14 @@ ${farmName} 🐔`;
       )}
 
       {/* پیام */}
-      <SectionTitle>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span>پیام</span>
-          <div style={{ display: 'flex', gap: 2 }}>
-            <button type="button" onClick={handleShare} title="ارسال" style={{ width: 26, height: 26, borderRadius: 'var(--r-sm)', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📤</button>
-            <button type="button" onClick={handleCopy} title="کپی" style={{ width: 26, height: 26, borderRadius: 'var(--r-sm)', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📋</button>
-          </div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, paddingTop: 12, borderTop: '1px dashed var(--border)', marginBottom: 8 }}>
+        <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>پیام</span>
+        <div style={{ display: 'flex', gap: 4 }}>
+          <button type="button" onClick={handleShare} title="ارسال" style={{ width: 30, height: 30, borderRadius: 'var(--r-sm)', background: 'var(--btn-bg)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📤</button>
+          <button type="button" onClick={handleCopy} title="کپی" style={{ width: 30, height: 30, borderRadius: 'var(--r-sm)', background: 'var(--btn-bg)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📋</button>
         </div>
-      </SectionTitle>
-      <div style={{ marginTop: 2 }}>
+      </div>
+      <div>
         <Textarea value={message} onChange={e => setMessage(e.target.value)} rows={isMessageExpanded ? 8 : 4} maxHeight={isMessageExpanded ? 240 : 120} />
         <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: 4 }}>
           <button type="button" onClick={() => setIsMessageExpanded(v => !v)} style={{ background: 'transparent', border: 'none', color: 'var(--muted)', fontSize: 'var(--fs-xs)', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline', textUnderlineOffset: 2, padding: 0 }}>
@@ -255,26 +253,24 @@ ${farmName} 🐔`;
       </div>
 
       {/* زمان‌بندی */}
-      <SectionTitle>زمان‌بندی</SectionTitle>
-      <div style={{ marginTop: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, paddingTop: 12, borderTop: '1px dashed var(--border)', marginBottom: 8 }}>
+        <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>زمان‌بندی</span>
+      </div>
+      <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 600 }}>یادآوری بعدی</span>
           {(promisedDate || intervalDaysStr) && (
             <button
               type="button"
               onClick={() => { setPromisedDate(''); setIntervalDaysStr(''); }}
-              aria-label="پاک کردن یادآوری"
-              title="پاک کردن"
+              title="پاک کردن یادآوری"
               style={{
-                width: 24, height: 24, borderRadius: 'var(--r-sm)',
-                border: '1px solid var(--danger)',
-                background: 'var(--danger-soft)',
-                color: 'var(--danger)', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 14, padding: 0, fontFamily: 'inherit',
-                fontWeight: 700, lineHeight: 1,
+                background: 'transparent', border: 'none',
+                color: 'var(--muted)', cursor: 'pointer',
+                fontSize: 'var(--fs-xs)', padding: '2px 4px', fontFamily: 'inherit',
+                fontWeight: 500, textDecoration: 'underline', textUnderlineOffset: 2,
               }}
-            >×</button>
+            >پاک کردن</button>
           )}
         </div>
         <Grid2>
@@ -311,8 +307,10 @@ ${farmName} 🐔`;
       </div>
 
 
-      <SectionTitle>یادداشت داخلی (اختیاری)</SectionTitle>
-      <div style={{ marginTop: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, paddingTop: 12, borderTop: '1px dashed var(--border)', marginBottom: 8 }}>
+        <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>یادداشت داخلی (اختیاری)</span>
+      </div>
+      <div>
         <Input value={note} onChange={e => setNote(e.target.value)} placeholder="توضیح دلخواه" />
       </div>
     </Modal>
