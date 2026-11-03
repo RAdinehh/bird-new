@@ -14,7 +14,7 @@ import { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import { toFa } from '../../shr/utils/fa';
 import { showSuccess, showConfirmAsync } from '../../cor/store/dialog';
 import { toastMsg } from '../../cor/store/toast';
-import { Line, Row, tab } from './helpers';
+import { Line, Row, tab, CAT_LABEL } from './helpers';
 import { useFilterSort, FilterBar, getTraReceivablesConfig } from '../../shr/filter';
 import MultiPayModal from './components/MultiPayModal';
 import DealPayModal from './components/DealPayModal';
@@ -285,6 +285,15 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                   </div>
                   <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{toFa(remaining(inv, allocations).toLocaleString('fa-IR'))} ت</span>
                 </div>
+                {(() => {
+                  const subject = inv.items?.[0]?.description || CAT_LABEL[inv.category] || inv.category || '—';
+                  const verb = inv.type === 'sale' ? 'فروش' : 'خرید';
+                  return (
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {verb} {subject}
+                    </div>
+                  );
+                })()}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-xs)' }}>
                   {dUntil !== null ? <span style={{ color: dUntil < 0 ? 'var(--danger)' : dUntil <= 7 ? 'var(--warn)' : 'var(--muted)', fontWeight: 600 }}>{dueLabel(dUntil)}</span> : <span style={{ color: 'var(--muted)' }}>—</span>}
                   <span style={{ color: 'var(--dim)', fontFamily: 'monospace', direction: 'ltr', fontSize: 10 }}>{inv.number || ''}</span>

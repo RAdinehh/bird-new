@@ -135,3 +135,18 @@ export function RowGrid({ children }: { children: ReactNode }) {
     </div>
   );
 }
+
+export const CAT_LABEL: Record<string, string> = {
+  chick: 'جوجه یک‌روزه',
+  adult: 'پرنده بالغ',
+  egg: 'تخم',
+  fertile_egg: 'تخم نطفه‌دار',
+  broken: 'تخم شکسته',
+  feed: 'دان',
+  medicine: 'دارو',
+  vaccine: 'واکسن',
+  herbal: 'داروی گیاهی',
+  equipment: 'تجهیزات',
+  manure: 'کود',
+  other: 'سایر',
+};
