@@ -78,18 +78,17 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
   } = useInvoiceForm({ kind, invoices, contacts, flocks, whsItems, allocations, addInvoice, updateInvoice });
 
   // 🆕 باز کردن فرم ویرایش از URL (از Aging در ReceivablesPage)
-  const lastProcessedEdit = useRef<string | null>(null);
   useEffect(() => {
     const editId = searchParams.get('edit');
-    if (!editId || lastProcessedEdit.current === editId) return;
+    if (!editId) return;
     const inv = _allInvoices.find(i => i.id === editId);
     if (!inv) return;
-    lastProcessedEdit.current = editId;
     openEdit(inv);
     const next = new URLSearchParams(searchParams);
     next.delete('edit');
     setSearchParams(next, { replace: true });
-  }, [searchParams, _allInvoices, openEdit, setSearchParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   // آبشار: اگه partyId دیگه در لیست فیلترشده نیست، پاک شه
   useEffect(() => {
