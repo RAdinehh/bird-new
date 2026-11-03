@@ -62,6 +62,7 @@ export default function ReminderModal({ open, onClose, invoice }: Props) {
   const [promisedDate, setPromisedDate] = useState('');
   const [message, setMessage] = useState('');
   const [isMessageExpanded, setIsMessageExpanded] = useState(false);
+  const [customMode, setCustomMode] = useState(false);
 
   const party = invoice ? contacts.find(c => c.id === invoice.partyId) : null;
   const salutation = party?.gender === 'male' ? 'جناب آقای' : party?.gender === 'female' ? 'سرکار خانم' : 'جناب';
@@ -147,7 +148,7 @@ ${farmName} 🐔`;
   });
 
   const isCustomChannel = !CHANNEL_PRESETS.includes(channel);
-  const isCustomInterval = intervalDaysStr !== '' && !['3', '7', '30'].includes(intervalDaysStr);
+  const isCustomInterval = customMode && intervalDaysStr !== '';
 
   return (
     <Modal
@@ -244,7 +245,7 @@ ${farmName} 🐔`;
       <Field label="یادآوری بعدی" hint={promisedDate ? 'غیرفعال — تاریخ قول جایگزین شد' : undefined}>
         <div style={{ display: 'flex', gap: 4, alignItems: 'center', width: '100%', opacity: promisedDate ? 0.5 : 1, pointerEvents: promisedDate ? 'none' : 'auto' }}>
           {[3, 7, 30].map(d => (
-            <button key={d} type="button" onClick={() => setIntervalDaysStr(String(d))} style={{ ...chipStyle(!isCustomInterval && intervalDaysStr === String(d)), flex: 1, height: 32, padding: 0, fontSize: 'var(--fs-sm)', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <button key={d} type="button" onClick={() => { setIntervalDaysStr(String(d)); setCustomMode(false); }} style={{ ...chipStyle(!isCustomInterval && intervalDaysStr === String(d)), flex: 1, height: 32, padding: 0, fontSize: 'var(--fs-sm)', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {toFa(d)}
             </button>
           ))}
@@ -253,7 +254,11 @@ ${farmName} 🐔`;
               type="text"
               inputMode="tel"
               value={toFa(intervalDaysStr)}
-              onChange={e => setIntervalDaysStr(toEn(e.target.value.replace(/[^0-9۰-۹]/g, '')))}
+              onChange={e => {
+                const v = toEn(e.target.value.replace(/[^0-9۰-۹]/g, ''));
+                setIntervalDaysStr(v);
+                setCustomMode(v !== '');
+              }}
               placeholder="دلخواه"
               style={{
                 width: '100%',
