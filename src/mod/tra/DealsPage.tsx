@@ -4,7 +4,7 @@
 import { useState, useMemo , useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useTra, DEAL_LABEL, type Deal, type DealType, type SettlementType, type DealGood, type DealDelivery, type DealSale, type DealPayment, type Settlement } from './store';
-import { generateDealNumber } from './calc';
+import { generateDealNumber, calcDealCommission, getTodayJalali } from './calc';
 import { Row, SectionTitle, chip } from './helpers';
 import { useNavigate } from 'react-router-dom';
 import { useCtc } from '../ctc/store';
@@ -503,8 +503,10 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
     const totalSold = form.sales.reduce((s, x) => s + (Number(x.quantity) || 0), 0);
     const inHand = totalDelivered - totalSold;
     const totalSales = form.sales.reduce((s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)), 0);
-    const pct = Number(form.settlementValue) || 0;
-    const commission = (form.settlementType === 'percent') ? Math.round(totalSales * pct / 100) : 0;
+    const commission = calcDealCommission(
+      form.settlementType, Number(form.settlementValue) || 0, totalSales, totalSold,
+      form.startDate || form.date, form.endDate || getTodayJalali(),
+    );
     const myShare = totalSales - commission;
     const paidIn = form.payments.filter(p => p.direction === 'in').reduce((s, p) => s + (Number(p.amount) || 0), 0);
     const paidOut = form.payments.filter(p => p.direction === 'out').reduce((s, p) => s + (Number(p.amount) || 0), 0);
@@ -529,8 +531,11 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
       if (d.status === 'settled') { settled++; continue; }
       active++;
       const sales = (d.sales || []).reduce((s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)), 0);
-      const pct = Number(d.settlementValue) || 0;
-      const comm = (d.settlementType === 'percent') ? Math.round(sales * pct / 100) : 0;
+      const totalQty = (d.sales || []).reduce((s, x) => s + (Number(x.quantity) || 0), 0);
+      const comm = calcDealCommission(
+        d.settlementType, d.settlementValue, sales, totalQty,
+        d.startDate || d.date, d.endDate || getTodayJalali(),
+      );
       const myShare = sales - comm;
       const paidIn = (d.payments || []).filter(p => p.direction === 'in').reduce((s, p) => s + (Number(p.amount) || 0), 0);
       const paidOut = (d.payments || []).filter(p => p.direction === 'out').reduce((s, p) => s + (Number(p.amount) || 0), 0);

@@ -3,7 +3,7 @@
  */
 import { parse as parseJ, differenceInDays as diffDaysJ, format as formatJ, addDays } from 'date-fns-jalali';
 import type { PaymentAllocation } from './types';
-import type { Invoice, InvoiceItem, Payment, WorkflowStatus, CheckStatus, InvoiceStatus, InvoiceType, PaymentTerms, Installment, Deal } from './types';
+import type { Invoice, InvoiceItem, Payment, WorkflowStatus, CheckStatus, InvoiceStatus, InvoiceType, PaymentTerms, Installment, Deal, SettlementType } from './types';
 
 export function generateInvoiceNumber(
   type: InvoiceType,
@@ -491,6 +491,41 @@ function dealOverdueDays(d: Deal): number {
 }
 
 /**
+ * monthsBetween — تعداد ماه بین دو تاریخ (Jalali/Gregorian)
+ */
+function monthsBetween(start: string, end: string): number {
+  if (!start || !end) return 1;
+  try {
+    const norm = (s: string) => s.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+    const s = new Date(norm(start).replace(/\//g, '-'));
+    const e = new Date(norm(end).replace(/\//g, '-'));
+    if (isNaN(s.getTime()) || isNaN(e.getTime())) return 1;
+    const months = (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth());
+    return Math.max(1, months);
+  } catch { return 1; }
+}
+
+/**
+ * calcDealCommission — کمیسیون معامله بر اساس ۵ نوع تسویه
+ * استاندارد: Odoo/SAP settlement types (منطبق با settlement.ts)
+ */
+export function calcDealCommission(
+  settlementType: SettlementType | '' | undefined,
+  settlementValue: number | null | undefined,
+  totalSales: number,
+  totalQty: number,
+  startDate: string,
+  endDate: string,
+): number {
+  const value = Number(settlementValue) || 0;
+  if (settlementType === 'percent') return Math.round(totalSales * value / 100);
+  if (settlementType === 'per_unit') return Math.round(totalQty * value);
+  if (settlementType === 'fixed') return Math.round(value);
+  if (settlementType === 'rental') return Math.round(value * monthsBetween(startDate, endDate));
+  return 0;
+}
+
+/**
  * computeDealBalance — محاسبه مالی معامله (DRY از DealsPage:504-507)
  * منطبق با استاندارد Odoo: totalSales - commission - paidIn + paidOut
  */
@@ -506,8 +541,11 @@ export function computeDealBalance(d: Deal): {
     (s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)),
     0,
   );
-  const pct = Number(d.settlementValue) || 0;
-  const commission = d.settlementType === 'percent' ? Math.round(totalSales * pct / 100) : 0;
+  const totalQty = (d.sales || []).reduce((s, x) => s + (Number(x.quantity) || 0), 0);
+  const commission = calcDealCommission(
+    d.settlementType, d.settlementValue, totalSales, totalQty,
+    d.startDate || d.date, d.endDate || getTodayJalali(),
+  );
   const myShare = totalSales - commission;
   // 🆕 Skip non-cleared checks (match invoice paidSum logic)
   const isEffectivelyPaid = (p: any) => p.method !== 'check' || p.status === 'cleared';

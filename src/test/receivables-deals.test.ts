@@ -30,14 +30,14 @@ describe('computeDealBalance', () => {
     expect(b.balance).toBe(85000);
   });
 
-  it('تسویه مبلغ ثابت — کمیسیون صفر است', () => {
+  it('تسویه مبلغ ثابت — کمیسیون = مقدار ثابت', () => {
     const d = mkDeal({
       settlementType: 'fixed', settlementValue: 5000,
       sales: [{ id: 's1', goodId: 'g1', date: '', quantity: 10, unitPrice: 1000 }],
     });
     const b = computeDealBalance(d);
-    expect(b.commission).toBe(0);
-    expect(b.myShare).toBe(10000);
+    expect(b.commission).toBe(5000);
+    expect(b.myShare).toBe(5000);
   });
 
   it('پرداخت‌های ورودی (دریافت) از مانده کم می‌کند', () => {
