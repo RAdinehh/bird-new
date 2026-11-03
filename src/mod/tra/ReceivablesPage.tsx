@@ -324,6 +324,9 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                 {inv.reminderLog && inv.reminderLog.length > 0 ? (
                   <Line l="آخرین یادآوری" v={`${toFa(inv.reminderLog[inv.reminderLog.length - 1].date)}${inv.reminderLog[inv.reminderLog.length - 1].methodLabel ? ' — ' + inv.reminderLog[inv.reminderLog.length - 1].methodLabel : ''}`} />
                 ) : null}
+                {inv.nextReminderAt ? (
+                  <Line l="یادآوری بعدی" v={toFa(inv.nextReminderAt)} />
+                ) : null}
                 {relatedDeal && (
                   <Line l="معامله" v={relatedDeal.dealNumber || relatedDeal.id.slice(0, 6)} />
                 )}
