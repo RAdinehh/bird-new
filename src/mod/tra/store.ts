@@ -242,6 +242,32 @@ export const useTra = create<State>()(
         }
       } catch(e) { console.error('[updateInvoice] auto-cancel reminder:', e); }
       },
+      markDispute: (invoiceId, reason, note) => {
+        const today = getTodayJalali();
+        set({
+          invoices: get().invoices.map(i => i.id === invoiceId ? {
+            ...i,
+            disputeStatus: 'open' as const,
+            disputeReason: reason,
+            disputeNote: note,
+            disputeOpenedAt: today,
+            disputeResolvedAt: undefined,
+            updatedAt: new Date().toISOString(),
+          } : i),
+        });
+      },
+      resolveDispute: (invoiceId, note) => {
+        const today = getTodayJalali();
+        set({
+          invoices: get().invoices.map(i => i.id === invoiceId ? {
+            ...i,
+            disputeStatus: 'resolved' as const,
+            disputeResolvedAt: today,
+            disputeNote: note ? (i.disputeNote ? i.disputeNote + ' | ' + note : note) : i.disputeNote,
+            updatedAt: new Date().toISOString(),
+          } : i),
+        });
+      },
       restoreInvoice: (id) => {
         const snapshot = removeFromRecycleBin<DeletedInvoiceSnapshot>(
           'tra',

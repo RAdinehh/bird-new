@@ -24,10 +24,12 @@ interface Props {
   onTransferClick: () => void;
   onReopen?: () => void;
   onEdit?: () => void;
+  onDispute?: () => void;
+  onResolveDispute?: () => void;
   index: number;
 }
 
-export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTransferClick, onReopen, onEdit, index }: Props) {
+export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTransferClick, onReopen, onEdit, onDispute, onResolveDispute, index }: Props) {
   const { updateInvoice, allocations } = useTra();
   const { flocks, restore, update: updateFlock } = useFlk();
   const [flockPickerOpen, setFlockPickerOpen] = useState(false);
@@ -283,6 +285,12 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
                   {nextWorkflowStatus(inv.workflowStatus) === 'received' && '📦 کالا رسید'}
                   {nextWorkflowStatus(inv.workflowStatus) === 'paid' && '💰 پرداخت کردم'}
                 </Btn>
+              )}
+              {onDispute && (
+                <Btn size="sm" variant="outline" onClick={onDispute}>⚠️ اختلاف</Btn>
+              )}
+              {onResolveDispute && (
+                <Btn size="sm" variant="primary" onClick={onResolveDispute}>✅ حل شد</Btn>
               )}
               {onReopen && (
                 <Btn size="sm" variant="primary" onClick={onReopen}>

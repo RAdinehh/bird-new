@@ -32,18 +32,20 @@ import { useInvoiceForm } from './hooks/useInvoiceForm';
 import TransferModal from './components/TransferModal';
 import InvoiceCard from './components/InvoiceCard';
 import InvoiceFormModal from './components/InvoiceFormModal';
+import DisputeModal from './components/DisputeModal';
 import RecycleBinModal from './components/RecycleBinModal';
 import { AccordionSection } from '../../shr/components/AccordionSection';
 import FlockCreateStandalone from '../flk/components/FlockCreateStandalone';
 
 export default function InvoicePage({ kind, active = true }: { kind: 'purchase' | 'sale'; active?: boolean }) {
   const isPurchase = kind === 'purchase';
-  const { invoices: _allInvoices, deals, addInvoice, updateInvoice, deleteInvoice, reopenInvoice, allocations } = useTra();
+  const { invoices: _allInvoices, deals, addInvoice, updateInvoice, deleteInvoice, reopenInvoice, allocations, resolveDispute } = useTra();
   const { contacts } = useCtc();
   const { flocks } = useFlk();
   const { items: whsItems } = useWhs();
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [recycleOpen, setRecycleOpen] = useState(false);
+  const [disputeTarget, setDisputeTarget] = useState<Invoice | null>(null);
   const [groupBy, setGroupBy] = useState<string>('none');
   const { listDeletedInvoices } = useTra();
   const recycleCount = listDeletedInvoices().length;
@@ -423,6 +425,8 @@ return (
                     onTransferClick={() => setTransferModal({ id: inv.id, to: nextWorkflowStatus(inv.workflowStatus)! })}
                     onReopen={remaining(inv) <= 0 ? () => handleReopen(inv) : undefined}
                     onEdit={remaining(inv) > 0 && !inv.paidAt ? () => openEdit(inv) : undefined}
+          onDispute={!inv.disputeStatus ? () => setDisputeTarget(inv) : undefined}
+          onResolveDispute={inv.disputeStatus === 'open' ? () => resolveDispute(inv.id) : undefined}
                     index={i}
                   />
                 );
@@ -446,6 +450,8 @@ return (
                 onTransferClick={() => setTransferModal({ id: inv.id, to: nextWorkflowStatus(inv.workflowStatus)! })}
                 onReopen={remaining(inv) <= 0 ? () => handleReopen(inv) : undefined}
           onEdit={remaining(inv) > 0 && !inv.paidAt ? () => openEdit(inv) : undefined}
+          onDispute={!inv.disputeStatus ? () => setDisputeTarget(inv) : undefined}
+          onResolveDispute={inv.disputeStatus === 'open' ? () => resolveDispute(inv.id) : undefined}
                 index={i}
               />
             );
@@ -492,6 +498,8 @@ return (
         updatePayment={updatePayment}
         removePayment={removePayment}
       />
+      <DisputeModal open={!!disputeTarget} onClose={() => setDisputeTarget(null)} invoice={disputeTarget} />
+
 
       <FlockCreateStandalone
         open={newFlockModalOpen}

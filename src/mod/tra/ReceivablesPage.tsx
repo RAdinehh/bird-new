@@ -44,7 +44,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   const [reminderTarget, setReminderTarget] = useState<Invoice | null>(null);
 
   const openInvoices = useMemo(
-    () => invoices.filter(i => i.type === kind && remaining(i, allocations) > 0),
+    () => invoices.filter(i => i.type === kind && remaining(i, allocations) > 0 && i.disputeStatus !== 'open'),
     [invoices, kind]
   );
 

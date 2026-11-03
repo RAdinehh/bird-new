@@ -462,6 +462,8 @@ export interface State {
   deleteAllocation: (id: string) => void;
   addInvoice: (i: Omit<Invoice, 'id'|'createdAt'|'updatedAt'>) => string;
   updateInvoice: (id: string, patch: Partial<Invoice>) => void;
+  markDispute: (invoiceId: string, reason: 'price' | 'quantity' | 'quality' | 'other', note: string) => void;
+  resolveDispute: (invoiceId: string, note?: string) => void;
   deleteInvoice: (id: string) => void;
   restoreInvoice: (id: string) => boolean;
   listDeletedInvoices: () => DeletedInvoiceSnapshot[];
