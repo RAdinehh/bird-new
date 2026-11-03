@@ -1,4 +1,4 @@
-import { Tag, Btn } from '../../../shr/components/ui';
+import { Tag, Btn, CardActions } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { toFa , formatQty } from '../../../shr/utils/fa';
 import {
@@ -8,7 +8,6 @@ import { Row, RowGrid, SectionTitle } from '../helpers';
 import type { MultiSelectState } from '../../../shr/multiSelect/useMultiSelect';
 import { formatInvoiceNumber } from '../calc';
 import { useTra } from '../store';
-import { BtnRow } from '../../../shr/components/ui/Btn';
 import PickFlockModal from './PickFlockModal';
 import { useFlk, type Flock } from '../../flk/store';
 import { useState } from 'react';
@@ -246,65 +245,27 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
           📦 تحویل گرفتم (ایجاد گله و موجودی)
         </Btn>
       )}
-      {(onEdit || nextWorkflowStatus(inv.workflowStatus) || onReopen || linkedFlock || onDispute || onResolveDispute || onWriteOff) ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
-          {(onEdit || linkedFlock || (inv.type === 'purchase' && inv.items?.some(it => it.birdId))) && (
-            <BtnRow>
-              {onEdit && (
-                <Btn size="sm" variant="outline" onClick={onEdit}>
-                  ✏️ ویرایش فاکتور
-                </Btn>
-              )}
-              {!linkedFlock && inv.type === 'purchase' && inv.items?.some(it => it.birdId) && (
-                <Btn size="sm" variant="outline" onClick={() => setFlockPickerOpen(true)}>
-                  🔗 اتصال دستی
-                </Btn>
-              )}
-              {linkedFlock && (
-                linkedFlock.status === 'archived' || linkedFlock.status === 'sold' ? (
-                  <Btn size="sm" variant="primary" onClick={() => {
-                    restore(linkedFlock.id);
-                    toastMsg.success('گله با موفقیت بازیابی شد');
-                  }}>
-                    ♻️ بازیابی گله
-                  </Btn>
-                ) : (
-                  <Btn size="sm" variant="outline" onClick={() => window.location.href = '/flk?focus=' + linkedFlock.id}>
-                    🐔 مشاهده گله
-                  </Btn>
-                )
-              )}
-            </BtnRow>
-          )}
-          {(nextWorkflowStatus(inv.workflowStatus) || onReopen || onDispute || onResolveDispute || onWriteOff) && (
-            <BtnRow>
-              {nextWorkflowStatus(inv.workflowStatus) && 
-                !((String(inv.paymentTerms) === 'cash' || String(inv.paymentTerms) === 'card')
-                 && nextWorkflowStatus(inv.workflowStatus) === 'received') && (
-                <Btn size="sm" variant="primary" onClick={onTransferClick}>
-                  {nextWorkflowStatus(inv.workflowStatus) === 'confirmed' && '✅ ثبت نهایی'}
-                  {nextWorkflowStatus(inv.workflowStatus) === 'received' && '📦 کالا رسید'}
-                  {nextWorkflowStatus(inv.workflowStatus) === 'paid' && '💰 پرداخت کردم'}
-                </Btn>
-              )}
-              {onDispute && (
-                <Btn size="sm" variant="outline" onClick={onDispute}>⚠️ اختلاف</Btn>
-              )}
-              {onResolveDispute && (
-                <Btn size="sm" variant="primary" onClick={onResolveDispute}>✅ حل شد</Btn>
-              )}
-              {onWriteOff && (
-                <Btn size="sm" variant="outline" onClick={onWriteOff}>🗑️ حذف بدحساب</Btn>
-              )}
-              {onReopen && (
-                <Btn size="sm" variant="primary" onClick={onReopen}>
-                  🔓 بازگشایی
-                </Btn>
-              )}
-            </BtnRow>
-          )}
-        </div>
-      ) : null}
+{(onEdit || nextWorkflowStatus(inv.workflowStatus) || onReopen || linkedFlock || onDispute || onResolveDispute || onWriteOff) && (() => {
+        const nextWs = nextWorkflowStatus(inv.workflowStatus);
+        const skipCashReceived = (String(inv.paymentTerms) === 'cash' || String(inv.paymentTerms) === 'card') && nextWs === 'received';
+        const hasBirdItems = inv.type === 'purchase' && !!inv.items?.some(it => it.birdId);
+        const isFlockArchived = !!(linkedFlock && (linkedFlock.status === 'archived' || linkedFlock.status === 'sold'));
+        const isFlockActive = !!(linkedFlock && !isFlockArchived);
+
+        return (
+          <CardActions actions={[
+            { label: nextWs === 'confirmed' ? '✅ ثبت نهایی' : nextWs === 'received' ? '📦 کالا رسید' : '💰 پرداخت کردم', onClick: onTransferClick, variant: 'primary', hidden: !nextWs || skipCashReceived },
+            { label: '✅ حل شد', onClick: onResolveDispute || (() => {}), variant: 'primary', hidden: !onResolveDispute },
+            { label: '♻️ بازگردانی', onClick: () => { if (linkedFlock) { restore(linkedFlock.id); toastMsg.success('گله با موفقیت بازیابی شد'); } }, variant: 'primary', hidden: !isFlockArchived },
+            { label: 'ویرایش', onClick: onEdit || (() => {}), variant: 'outline', hidden: !onEdit },
+            { label: '🔗 اتصال دستی', onClick: () => setFlockPickerOpen(true), variant: 'outline', hidden: !(!linkedFlock && hasBirdItems) },
+            { label: '🐔 مشاهده گله', onClick: () => { if (linkedFlock) window.location.href = '/flk?focus=' + linkedFlock.id; }, variant: 'outline', hidden: !isFlockActive },
+            { label: '⚠️ اختلاف', onClick: onDispute || (() => {}), variant: 'outline', hidden: !onDispute },
+            { label: '🔓 بازگشایی', onClick: onReopen || (() => {}), variant: 'outline', hidden: !onReopen },
+            { label: 'حذف بدحساب', onClick: onWriteOff || (() => {}), variant: 'danger', hidden: !onWriteOff },
+          ]} />
+        );
+      })()}
 
       <PickFlockModal 
         open={flockPickerOpen} 
