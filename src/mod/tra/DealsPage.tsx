@@ -84,7 +84,8 @@ function isSameIdentity(a: DealGood, b: DealGood): boolean {
     (a.existingFlockId || '') === (b.existingFlockId || '') &&
     (a.hatchId || '') === (b.hatchId || '') &&
     (a.stockItemId || '') === (b.stockItemId || '') &&
-    (a.unit || '') === (b.unit || '')
+    (a.unit || '') === (b.unit || '') &&
+    Number(a.estimatedPrice || 0) === Number(b.estimatedPrice || 0)
   );
 }
 
