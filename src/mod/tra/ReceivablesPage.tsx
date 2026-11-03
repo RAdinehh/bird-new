@@ -41,6 +41,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   const [statementOpen, setStatementOpen] = useState(false);
   const [checksOpen, setChecksOpen] = useState(false);
   const [reminderInvoiceId, setReminderInvoiceId] = useState<string | null>(null);
+  const [reminderDealId, setReminderDealId] = useState<string | null>(null);
 
   const openInvoices = useMemo(
     () => invoices.filter(i => i.type === kind && remaining(i, allocations) > 0 && i.disputeStatus !== 'open'),
@@ -304,8 +305,9 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                   <Line l="سهم طرف" v={`${toFa(bal.myShare.toLocaleString('fa-IR'))} تومان`} />
                   <Line l="دریافت‌شده" v={`${toFa(bal.paidIn.toLocaleString('fa-IR'))} تومان`} />
                   <Line l="مانده" v={`${toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} تومان`} />
-                  <div style={{ marginTop: 4 }}>
+                  <div style={{ marginTop: 4, display: 'flex', gap: 6 }}>
                     <Btn size="sm" onClick={(e) => { e.stopPropagation(); setDealPayTarget(d); }}>ثبت پرداخت</Btn>
+                    <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setReminderDealId(d.id); }}>📨 یادآوری</Btn>
                   </div>
                 </>
               );
@@ -416,9 +418,10 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
 
       {/* Modal تعویق */}
       <ReminderModal
-        open={!!reminderInvoiceId}
-        onClose={() => setReminderInvoiceId(null)}
+        open={!!reminderInvoiceId || !!reminderDealId}
+        onClose={() => { setReminderInvoiceId(null); setReminderDealId(null); }}
         invoiceId={reminderInvoiceId}
+        dealId={reminderDealId}
       />
       <DeferModal
         deferModal={deferModal}

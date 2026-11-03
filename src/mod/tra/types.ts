@@ -424,6 +424,10 @@ export interface Deal {
   cancelledAt?: string;
   /** 🆕 undo/reopen: تاریخچه بازگشایی */
   reopenHistory?: Array<{ from: 'settled' | 'cancelled'; to: 'open'; reason: string; at: string }>;
+  /** 🆕 Phase C — یادآوری معامله */
+  lastRemindedAt?: string;
+  nextReminderAt?: string;
+  reminderLog?: ReminderLogEntry[];
   createdAt: string;
   updatedAt: string;
 }
@@ -451,6 +455,15 @@ export interface State {
   addAllocation: (a: Omit<PaymentAllocation, 'id'>) => string;
   /** 🆕 ثبت یادآوری برای فاکتور (Phase C1) */
   addReminder: (invoiceId: string, params: {
+    method: ReminderMethod;
+    methodLabel?: string;
+    note: string;
+    intervalDays: number;
+    promisedDate?: string;
+    promisedAmount?: number;
+  }) => void;
+  /** 🆕 Phase C — ثبت یادآوری برای معامله */
+  addDealReminder: (dealId: string, params: {
     method: ReminderMethod;
     methodLabel?: string;
     note: string;

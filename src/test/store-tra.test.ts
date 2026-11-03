@@ -352,3 +352,25 @@ describe('constants', () => {
     expect(STATUS_LABEL.paid).toBeTruthy();
   });
 });
+
+describe('addDealReminder', () => {
+  it('updates reminderLog + nextReminderAt', () => {
+    const st = useTra.getState();
+    st.addDeal({
+      type: 'partnership', date: '1405/08/15', partyId: 'p1', description: 'reminder-test-marker',
+      value: 0, percent: null, dueDate: '1405/09/15', status: 'open', notes: '',
+      goods: [], deliveries: [], sales: [], payments: [],
+    } as any);
+    const created = useTra.getState().deals.find(x => x.description === 'reminder-test-marker')!;
+    expect(created).toBeTruthy();
+    const id = created.id;
+    useTra.getState().addDealReminder(id, {
+      method: 'other', methodLabel: 'تست', note: 'note', intervalDays: 7, promisedDate: '1405/09/01',
+    });
+    const d = useTra.getState().deals.find(x => x.id === id)!;
+    expect(d.nextReminderAt).toBe('1405/09/01');
+    expect(d.lastRemindedAt).toBeTruthy();
+    expect(d.reminderLog?.length).toBe(1);
+    expect(d.reminderLog?.[0].methodLabel).toBe('تست');
+  });
+});

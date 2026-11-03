@@ -962,6 +962,30 @@ export const useTra = create<State>()(
           } : i),
         });
       },
+      addDealReminder: (dealId, params) => {
+        const d = get().deals.find(x => x.id === dealId);
+        if (!d) return;
+        const today = getTodayJalali();
+        const nextDate = params.promisedDate || addJalaliDays(today, params.intervalDays);
+        const logEntry = {
+          date: today,
+          method: params.method,
+          methodLabel: params.methodLabel,
+          note: params.note,
+          intervalDays: params.intervalDays,
+          ...(params.promisedDate ? { promisedDate: params.promisedDate } : {}),
+          ...(params.promisedAmount !== undefined ? { promisedAmount: params.promisedAmount } : {}),
+        };
+        set({
+          deals: get().deals.map(x => x.id === dealId ? {
+            ...x,
+            lastRemindedAt: today,
+            nextReminderAt: nextDate,
+            reminderLog: [...(x.reminderLog || []), logEntry],
+            updatedAt: new Date().toISOString(),
+          } : x),
+        });
+      },
       updateAllocation: (id, patch) => {
         set({ allocations: get().allocations.map(x => x.id === id ? { ...x, ...patch } : x) });
       },

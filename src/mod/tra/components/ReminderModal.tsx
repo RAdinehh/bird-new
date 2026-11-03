@@ -17,6 +17,7 @@ import { copyText, shareText } from '../../../shr/utils/clipboard';
 import { toastMsg } from '../../../cor/store/toast';
 import DatePicker from '../../../shr/components/DatePicker';
 import type { Invoice } from '../types';
+import { computeDealBalance, dealDaysUntilDue } from '../calc';
 
 const CAT_LABEL: Record<string, string> = {
   chick: 'جوجه یک‌روزه',
@@ -49,11 +50,14 @@ interface Props {
   open: boolean;
   onClose: () => void;
   invoiceId: string | null;
+  dealId?: string | null;
 }
 
-export default function ReminderModal({ open, onClose, invoiceId }: Props) {
+export default function ReminderModal({ open, onClose, invoiceId, dealId = null }: Props) {
   const invoice = useTra(s => invoiceId ? s.invoices.find(i => i.id === invoiceId) ?? null : null);
+  const deal = useTra(s => dealId ? s.deals.find(d => d.id === dealId) ?? null : null);
   const addReminder = useTra(s => s.addReminder);
+  const addDealReminder = useTra(s => s.addDealReminder);
   const allocations = useTra(s => s.allocations);
   const contacts = useCtc(s => s.contacts);
   const settingsState = useSet();
@@ -65,15 +69,20 @@ export default function ReminderModal({ open, onClose, invoiceId }: Props) {
   const [message, setMessage] = useState('');
   const [isMessageExpanded, setIsMessageExpanded] = useState(false);
 
-  const party = invoice ? contacts.find(c => c.id === invoice.partyId) : null;
+  const partyId = (invoice?.partyId ?? deal?.partyId) ?? null;
+  const party = partyId ? contacts.find(c => c.id === partyId) : null;
   const salutation = party?.gender === 'male' ? 'جناب آقای' : party?.gender === 'female' ? 'سرکار خانم' : 'جناب';
   const lastName = party?.name?.trim().split(/\s+/).slice(-1)[0] || party?.name || '';
   const farmName = getFarmName(settingsState);
-  const amount = invoice ? remaining(invoice, allocations) : 0;
-  const days = invoice ? daysUntilDue(invoice) : null;
+  const amount = invoice ? remaining(invoice, allocations) : deal ? Math.abs(computeDealBalance(deal).balance) : 0;
+  const days = invoice ? daysUntilDue(invoice) : deal ? dealDaysUntilDue(deal) : null;
   const itemName = invoice
     ? (invoice.items?.[0]?.description || CAT_LABEL[invoice.category] || invoice.category || '—')
-    : '';
+    : deal
+      ? `معامله ${deal.dealNumber || deal.id.slice(0, 6)}`
+      : '';
+  const lastRemindedAt = invoice?.lastRemindedAt ?? deal?.lastRemindedAt;
+  const nextReminderAt = invoice?.nextReminderAt ?? deal?.nextReminderAt;
   const amountFa = toFa(amount.toLocaleString('fa-IR'));
   const daysPhrase = days === null
     ? ''
@@ -84,7 +93,7 @@ export default function ReminderModal({ open, onClose, invoiceId }: Props) {
         : `${toFa(days)} روز تا سررسید مانده`;
 
   const generateMessage = (): string => {
-    if (!invoice || !party) return '';
+    if (!(invoice || deal) || !party) return '';
     return `سلام ${salutation} ${lastName} عزیز 🌹
 امیدوارم حالتون خوب باشه
 
@@ -101,25 +110,20 @@ ${farmName} 🐔`;
   };
 
   useEffect(() => {
-    if (open && invoice && party) {
+    if (open && (invoice || deal) && party) {
       setMessage(generateMessage());
-
-      // 🆕 Pre-fill from existing nextReminderAt
-      if (invoice.nextReminderAt) {
-        setPromisedDate(invoice.nextReminderAt);
-        const days = daysUntilJalali(invoice.nextReminderAt);
-        if (days !== null && days >= 0) {
-          setIntervalDaysStr(String(days));
-        } else {
-          setIntervalDaysStr('');
-        }
+      if (nextReminderAt) {
+        setPromisedDate(nextReminderAt);
+        const days = daysUntilJalali(nextReminderAt);
+        if (days !== null && days >= 0) { setIntervalDaysStr(String(days)); }
+        else { setIntervalDaysStr(''); }
       } else {
         setPromisedDate('');
         setIntervalDaysStr('');
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, invoice?.id, invoice?.lastRemindedAt, invoice?.nextReminderAt]);
+  }, [open, invoice?.id, deal?.id, lastRemindedAt, nextReminderAt]);
 
   // 🆕 scroll reset on open
   const modalContentRef = useRef<HTMLDivElement>(null);
@@ -157,15 +161,18 @@ ${farmName} 🐔`;
   };
 
   const handleSave = () => {
-    if (!invoice) return;
+    if (!invoice && !deal) return;
     const intervalDays = Math.max(1, Math.min(365, parseInt(toEn(intervalDaysStr)) || 7));
-    addReminder(invoice.id, {
-      method: 'other',
+    const params = {
+      method: 'other' as const,
       methodLabel: channel.trim() || undefined,
       note: note.trim(),
       intervalDays,
       ...(promisedDate ? { promisedDate } : {}),
-    });
+    };
+    if (invoice) addReminder(invoice.id, params);
+    else if (deal) addDealReminder(deal.id, params);
+    else return;
     toastMsg.saved();
     onClose();
   };
@@ -183,7 +190,7 @@ ${farmName} 🐔`;
     else if (result.status === 'failed') toastMsg.error('اشتراک ناموفق');
   };
 
-  if (!invoice) return null;
+  if (!invoice && !deal) return null;
 
   const chipStyle = (active: boolean) => ({
     padding: '6px 12px',
@@ -279,8 +286,8 @@ ${farmName} 🐔`;
             style={{ textAlign: 'center' }}
           />
         </Grid2>
-        {invoice?.lastRemindedAt && (() => {
-          const d = daysUntilJalali(invoice.lastRemindedAt);
+        {lastRemindedAt && (() => {
+                      const d = daysUntilJalali(lastRemindedAt);
           const ago = d === null ? null : Math.abs(d);
           const agoLabel = ago === null ? '' : ago === 0 ? 'امروز' : `${toFa(ago)} روز پیش`;
           return (
@@ -294,7 +301,7 @@ ${farmName} 🐔`;
               flexWrap: 'wrap',
             }}>
               <span>آخرین ثبت:</span>
-              <span style={{ color: 'var(--text)', fontWeight: 600 }}>{toFa(invoice.lastRemindedAt)}</span>
+              <span style={{ color: 'var(--text)', fontWeight: 600 }}>{toFa(lastRemindedAt!)}</span>
               {agoLabel && <span>— {agoLabel}</span>}
             </div>
           );
