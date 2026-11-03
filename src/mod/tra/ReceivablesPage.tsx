@@ -5,7 +5,7 @@ import { useState, useMemo } from 'react';
 import { daysUntilDue, dueTone, dueLabel, computeUpcoming } from './helpers';
 import DeferModal from './components/DeferModal';
 import ReminderModal from './components/ReminderModal';
-import { useTra, remaining, ageDays, agingBucket, AGING_BUCKETS, paidSumAllocated, WORKFLOW_LABEL, computeDealBalance, dealDaysUntilDue, isDealOpen, type Invoice, type Deal, type Deferral } from './store';
+import { useTra, remaining, ageDays, agingBucket, AGING_BUCKETS, paidSumAllocated, WORKFLOW_LABEL, DEAL_LABEL, computeDealBalance, dealDaysUntilDue, isDealOpen, type Invoice, type Deal, type Deferral } from './store';
 import { useCtc } from '../ctc/store';
 import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import { StatBox, Dot } from '../../shr/components/ExpandableCard';
@@ -233,65 +233,73 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
       ) : null}
 
           {/* Deal buckets (Phase B3) */}
-          {kind === 'deal' && effectiveTotal > 0 ? (
-            <>
-              {AGING_BUCKETS.map(({ key, label, color }) => {
-                const items = byDealBucket[key] || [];
-                if (items.length === 0) return null;
-                const sum = items.reduce((a, d) => a + Math.abs(computeDealBalance(d).balance), 0);
-                const isOpen = expandedBucket === key;
-                return (
-                  <div key={key} style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', overflow: 'hidden', marginBottom: 8 }}>
-                    <div role="button" tabIndex={0} onClick={() => toggleBucket(key as BucketKey)} style={{ padding: 'var(--pad-normal)', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                      <div style={{ width: 8, height: 8, borderRadius: '50%', background: `var(--${color})`, flexShrink: 0 }} />
-                      <div style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 600 }}>
-                        {label}
-                        <span style={{ color: 'var(--muted)', fontWeight: 400, marginRight: 6 }}> • {toFa(items.length)}</span>
-                      </div>
-                      <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: `var(--${color})`, fontVariantNumeric: 'tabular-nums' }}>
-                        {toFa(sum.toLocaleString('fa-IR'))} ت
-                      </div>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={isOpen ? `var(--${color})` : 'var(--dim)'} strokeWidth="2.5" strokeLinecap="round" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform .2s' }}>
-                        <path d="m6 9 6 6 6-6" />
-                      </svg>
+      {kind === 'deal' && effectiveTotal > 0 ? (
+        <>
+          <AgingBuckets
+            items={openDeals.filter(d => d.type === 'partnership' || d.type === 'conditional')}
+            bucketOf={(d) => agingBucketFromDeal(d)}
+            sumOf={(d) => Math.abs(computeDealBalance(d).balance)}
+            renderSummary={(d) => {
+              const bal = computeDealBalance(d);
+              const party = contacts.find(c => c.id === d.partyId);
+              const days = dealDaysUntilDue(d);
+              return (
+                <>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
+                      <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{party?.name || '—'}</span>
+                      <span style={{ fontSize: 9, fontWeight: 600, padding: '1px 6px', borderRadius: 4, color: 'var(--muted)', border: '1px solid var(--border)' }}>{DEAL_LABEL[d.type]}</span>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateRows: isOpen ? '1fr' : '0fr', transition: 'grid-template-rows 250ms cubic-bezier(.16,1,.3,1)' }}>
-                      <div style={{ overflow: 'hidden' }}>
-                        <div style={{ padding: '0 12px 10px', display: 'flex', flexDirection: 'column', gap: 5 }}>
-                          {items.map(d => {
-                            const bal = computeDealBalance(d);
-                            const party = contacts.find(c => c.id === d.partyId);
-                            const days = dealDaysUntilDue(d);
-                            return (
-                              <div key={d.id} style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                                  <div style={{ flex: 1, minWidth: 0 }}>
-                                    <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                      {party?.name || '—'}
-                                    </div>
-                                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                      {d.description || d.type}
-                                      {days !== null ? ` • ${dueLabel(days)}` : ''}
-                                    </div>
-                                  </div>
-                                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
-                                    <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: bal.balance >= 0 ? 'var(--accent)' : 'var(--danger)', fontVariantNumeric: 'tabular-nums' }}>
-                                      {toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} ت
-                                    </div>
-                                    <Btn size="sm" variant="outline" onClick={() => setDealPayTarget(d)} style={{ fontSize: 11, padding: '2px 8px', minHeight: 24, height: 24 }}>💳 ثبت</Btn>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
+                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', flexShrink: 0, color: bal.balance >= 0 ? 'var(--accent)' : 'var(--danger)' }}>
+                      {toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} ت
+                    </span>
                   </div>
-                );
-              })}
-            </>
-          ) : null}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-xs)' }}>
+                    {days !== null ? <span style={{ color: days <= 3 ? 'var(--danger)' : days <= 7 ? 'var(--warn)' : 'var(--muted)', fontWeight: 600 }}>⏰ {dueLabel(days)}</span> : <span style={{ color: 'var(--muted)' }}>{d.description || '—'}</span>}
+                    <span style={{ color: 'var(--dim)', fontFamily: 'monospace', direction: 'ltr', fontSize: 10 }}>{d.dealNumber || ''}</span>
+                  </div>
+                </>
+              );
+            }}
+            renderDetails={(d) => {
+              const bal = computeDealBalance(d);
+              return (
+                <>
+                  <Line l="فروش کل" v={`${toFa(bal.totalSales.toLocaleString('fa-IR'))} تومان`} />
+                  <Line l="کمیسیون" v={`${toFa(bal.commission.toLocaleString('fa-IR'))} تومان`} />
+                  <Line l="سهم طرف" v={`${toFa(bal.myShare.toLocaleString('fa-IR'))} تومان`} />
+                  <Line l="دریافت‌شده" v={`${toFa(bal.paidIn.toLocaleString('fa-IR'))} تومان`} />
+                  <Line l="مانده" v={`${toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} تومان`} />
+                  <div style={{ marginTop: 4 }}>
+                    <Btn size="sm" onClick={(e) => { e.stopPropagation(); setDealPayTarget(d); }}>💳 ثبت پرداخت</Btn>
+                  </div>
+                </>
+              );
+            }}
+            groupActions={[
+              {
+                label: 'تسویه گروهی',
+                icon: '🤝',
+                primary: true,
+                onClick: (items) => {
+                  if (items.length === 0) return;
+                  if (items.length === 1) { setDealPayTarget(items[0]); return; }
+                  toastMsg.warn('برای تسویه گروهی، هر معامله را جدا باز کنید');
+                },
+              },
+            ]}
+          />
+          {(() => {
+            const excluded = openDeals.filter(d => d.type === 'consignment' || d.type === 'barter');
+            if (excluded.length === 0) return null;
+            return (
+              <div style={{ marginTop: 8, padding: '8px 12px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--muted)', textAlign: 'center' }}>
+                {toFa(excluded.length)} معامله امانی/تهاتر (بدون سرسید) در aging نمایش داده نمی‌شود
+              </div>
+            );
+          })()}
+        </>
+      ) : null}
 
 
       {/* Buckets — فقط اگه پر باشن */}
