@@ -220,8 +220,8 @@ ${farmName} 🐔`;
       </div>
 
       {/* کانال */}
-      <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)', marginBottom: 4, marginTop: 4 }}>کانال</div>
-      <div style={{ display: 'flex', gap: 4, width: '100%', marginTop: 8 }}>
+      <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)', marginBottom: 6 }}>کانال</div>
+      <div style={{ display: 'flex', gap: 4, width: '100%' }}>
         {CHANNEL_PRESETS.map(c => (
           <button key={c} type="button" onClick={() => setChannel(c)} style={{ ...chipStyle(channel === c), flex: 1, padding: '6px 2px', fontSize: 'var(--fs-sm)', minWidth: 0 }}>
             {c}
