@@ -220,7 +220,7 @@ ${farmName} 🐔`;
       </div>
 
       {/* کانال */}
-      <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)', marginBottom: 8, marginTop: 4 }}>کانال</div>
+      <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)', marginBottom: 4, marginTop: 4 }}>کانال</div>
       <div style={{ display: 'flex', gap: 4, width: '100%', marginTop: 8 }}>
         {CHANNEL_PRESETS.map(c => (
           <button key={c} type="button" onClick={() => setChannel(c)} style={{ ...chipStyle(channel === c), flex: 1, padding: '6px 2px', fontSize: 'var(--fs-sm)', minWidth: 0 }}>
@@ -236,7 +236,7 @@ ${farmName} 🐔`;
       )}
 
       {/* پیام */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 16, paddingTop: 12, borderTop: '1px dashed var(--border)', marginBottom: 6 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, paddingTop: 12, borderTop: '1px dashed var(--border)', marginBottom: 6 }}>
         <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)' }}>پیام</span>
           <button type="button" onClick={handleShare} title="ارسال" style={{ width: 24, height: 24, borderRadius: 'var(--r-sm)', background: 'var(--btn-bg)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📤</button>
           <button type="button" onClick={handleCopy} title="کپی" style={{ width: 24, height: 24, borderRadius: 'var(--r-sm)', background: 'var(--btn-bg)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📋</button>
