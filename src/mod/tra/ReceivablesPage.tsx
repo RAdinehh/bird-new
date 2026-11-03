@@ -266,7 +266,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
       {kind === 'deal' && effectiveTotal !== 0 ? (
         <>
           <AgingBuckets
-            items={dealFS.filtered.filter(d => d.type === 'partnership' || d.type === 'conditional')}
+            items={dealFS.filtered}
             bucketOf={(d) => agingBucketFromDeal(d)}
             sumOf={(d) => computeDealBalance(d).balance}
             renderSummary={(d) => {
@@ -307,15 +307,6 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
               );
             }}
           />
-          {(() => {
-            const excluded = openDeals.filter(d => d.type === 'consignment' || d.type === 'barter');
-            if (excluded.length === 0) return null;
-            return (
-              <div style={{ marginTop: 8, padding: '8px 12px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--muted)', textAlign: 'center' }}>
-                {toFa(excluded.length)} معامله امانی/تهاتر (بدون سرسید) در aging نمایش داده نمی‌شود
-              </div>
-            );
-          })()}
         </>
       ) : null}
 
