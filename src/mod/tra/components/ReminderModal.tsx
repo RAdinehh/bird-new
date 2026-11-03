@@ -200,30 +200,29 @@ ${farmName} 🐔`;
         <Textarea
           value={message}
           onChange={e => setMessage(e.target.value)}
-          rows={isMessageExpanded ? 8 : 4}
-          maxHeight={isMessageExpanded ? 240 : 120}
+          rows={isMessageExpanded ? 8 : 3}
+          maxHeight={isMessageExpanded ? 240 : 90}
         />
-        <button
-          type="button"
-          onClick={() => setIsMessageExpanded(v => !v)}
-          style={{
-            marginTop: 6,
-            background: 'transparent',
-            border: 'none',
-            color: 'var(--accent)',
-            fontSize: 'var(--fs-xs)',
-            fontWeight: 600,
-            cursor: 'pointer',
-            padding: 0,
-            fontFamily: 'inherit',
-            textAlign: 'right',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-          }}
-        >
-          {isMessageExpanded ? '▲ بستن' : '▼ باز کردن'}
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
+          <button
+            type="button"
+            onClick={() => setIsMessageExpanded(v => !v)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--muted)',
+              fontSize: 'var(--fs-xs)',
+              fontWeight: 500,
+              cursor: 'pointer',
+              padding: 0,
+              fontFamily: 'inherit',
+              textDecoration: 'underline',
+              textUnderlineOffset: 3,
+            }}
+          >
+            {isMessageExpanded ? 'بستن' : 'باز کردن'}
+          </button>
+        </div>
       </Field>
 
       <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
