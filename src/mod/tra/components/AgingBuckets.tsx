@@ -149,7 +149,11 @@ export default function AgingBuckets<T extends { id: string }>({
                           {renderSummary(item)}
                         </div>
                         {isItemOpen && renderDetails && (
-                          <div style={{ padding: '0 12px 12px' }}>
+                          <div style={{
+                            borderTop: '1px solid var(--border)',
+                            padding: '12px',
+                            display: 'flex', flexDirection: 'column', gap: 12,
+                          }}>
                             {renderDetails(item)}
                           </div>
                         )}
