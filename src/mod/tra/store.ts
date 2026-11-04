@@ -13,7 +13,7 @@ import { bus } from '../../cor/events';
 
 import type { Invoice, InvoiceItem, State, DeletedInvoiceSnapshot, DeletedDealSnapshot, Deal, Settlement } from './types';
 import { saveToRecycleBin, removeFromRecycleBin, listRecycleBin } from '../../shr/utils/recycleBin';
-import { applyPaymentsToInstallments, paidSumAllocated, computeCashDiscount, getTodayJalali, addJalaliDays, remaining } from './calc';
+import { applyPaymentsToInstallments, paidSumAllocated, computeCashDiscount, getTodayJalali, addJalaliDays, remaining , isEffectivelyPaid} from './calc';
 import { applyInvoiceFlocks, applyInvoiceEquipment, applyInvoiceEgg, BIRD_CATS } from './invoiceHelpers';
 import { applyInvoiceStock } from './applyStock';
 import { generateInvoiceNumber, paidSum } from './calc';
@@ -761,7 +761,7 @@ export const useTra = create<State>()(
             for (const al of invAllocs) {
               const p = (inv.payments || []).find(pp2 => pp2.id === al.paymentId);
               if (!p) continue;
-              if (p.method === 'check' && p.status !== 'cleared') continue;
+              if (!isEffectivelyPaid(p)) continue;
               if (p.type === 'refund') paid -= al.amount;
               else paid += al.amount;
             }

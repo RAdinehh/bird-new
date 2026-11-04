@@ -185,14 +185,22 @@ export function itemsSum(items: InvoiceItem[]): number {
   return Math.round(items.reduce((a, x) => a + (x.total || 0), 0));
 }
 
+/**
+ * isEffectivelyPaid — آیا پرداخت باید در محاسبات "پرداخت‌شده" شمرده شود؟
+ * استاندارد IFRS 9 / استاندارد حسابداری ۱۱ ایران:
+ *   - چک فقط بعد از cleared شدن (نقد) قابل شمارش است
+ *   - سایر روش‌ها (نقدی/کارت) همیشه
+ */
+export function isEffectivelyPaid(p: { method: string; status?: string | null }): boolean {
+  return p.method !== 'check' || p.status === 'cleared';
+}
+
 export function paidSum(payments: Payment[]): number {
   // استاندارد ERP: فقط پرداخت‌های قطعی (cash، card، چک نقد‌شده)
   return Math.round(payments.reduce((a, x) => {
+    if (!isEffectivelyPaid(x)) return a;
     const amt = x.amount || 0;
     if ((x as any).type === 'refund') return a - amt;
-    if (x.method === 'check') {
-      return x.status === 'cleared' ? a + amt : a;
-    }
     return a + amt;
   }, 0));
 }
@@ -210,7 +218,7 @@ export function paidSumAllocated(inv: Invoice, allocations?: PaymentAllocation[]
       return Math.round(invAllocs.reduce((sum, a) => {
         const p = (inv.payments || []).find(x => x.id === a.paymentId);
         if (!p) return sum;
-        if (p.method === 'check' && p.status !== 'cleared') return sum;
+        if (!isEffectivelyPaid(p)) return sum;
         if (p.type === 'refund') return sum - a.amount;
         return sum + a.amount;
       }, 0));
@@ -466,9 +474,7 @@ export function applyPaymentsToInstallments(
   let pool = 0;
   for (const p of payments || []) {
     if ((p as { type?: string }).type === 'refund') continue;
-    // 🆕 B3: مطابق paidSum — چک فقط بعد از cleared شدن شمرده می‌شود
-    // (استاندارد IFRS 9 / استاندارد حسابداری ۱۱ ایران: چک در جریان وصول = مطالبه، نه نقد)
-    if (p.method === 'check' && p.status !== 'cleared') continue;
+    if (!isEffectivelyPaid(p)) continue;
     pool += p.amount || 0;
   }
 
@@ -598,8 +604,7 @@ export function computeDealBalance(d: Deal): {
     d.startDate || d.date, d.endDate || getTodayJalali(),
   );
   const myShare = totalSales - commission;
-  // 🆕 Skip non-cleared checks (match invoice paidSum logic)
-  const isEffectivelyPaid = (p: any) => p.method !== 'check' || p.status === 'cleared';
+  // 🆕 Skip non-cleared checks (منطق مشترک با paidSum)
   const paidIn = (d.payments || [])
     .filter(p => p.direction === 'in' && isEffectivelyPaid(p))
     .reduce((s, p) => s + (Number(p.amount) || 0), 0);
