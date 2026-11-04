@@ -33,7 +33,6 @@ export default function DeferModal({ deferModal, onClose, deferDate, setDeferDat
   return (
     <Modal
       open={!!deferModal}
-      center
       onClose={() => onClose()}
       title="⏰ تعویق سرسید"
       footer={

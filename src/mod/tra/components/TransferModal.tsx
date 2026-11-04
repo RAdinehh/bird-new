@@ -21,7 +21,6 @@ export default function TransferModal(props: TransferModalProps) {
   return (
     <Modal
       open={!!transferModal}
-      center
       onClose={onClose}
       title={transferModal ? `تغییر به ${WORKFLOW_LABEL[transferModal.to]}` : ''}
       footer={<BtnRow><Btn variant="primary" onClick={onConfirm}>تأیید</Btn><Btn onClick={onClose}>لغو</Btn></BtnRow>}
