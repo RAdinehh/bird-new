@@ -737,7 +737,7 @@ export function getDealPaymentFormSchema(maxAmount: number) {
 export function getDeferSchema(oldDate: string) {
   return z.object({
     deferDate: z.string().min(1, 'تاریخ سرسید جدید را وارد کنید'),
-    deferReason: z.string().optional(),
+    deferReason: z.string().min(3, 'دلیل تعویق حداقل ۳ کاراکتر'),
   }).superRefine((data, ctx) => {
     if (oldDate && data.deferDate <= oldDate) {
       ctx.addIssue({

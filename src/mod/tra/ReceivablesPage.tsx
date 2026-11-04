@@ -12,7 +12,8 @@ import { useCtc } from '../ctc/store';
 import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import EntityLink from '../../shr/components/EntityLink';
 import { toFa } from '../../shr/utils/fa';
-import { showSuccess } from '../../cor/store/dialog';
+import { showSuccess, showConfirmAsync } from '../../cor/store/dialog';
+import { toastMsg } from '../../cor/store/toast';
 import { Line, Row, tab, CAT_LABEL } from './helpers';
 import { useFilterSort, FilterBar, getTraReceivablesConfig, getTraDealsConfig } from '../../shr/filter';
 import MultiPayModal from './components/MultiPayModal';
@@ -43,7 +44,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   const [checksOpen, setChecksOpen] = useState(false);
   const [reminderInvoiceId, setReminderInvoiceId] = useState<string | null>(null);
   const [reminderDealId, setReminderDealId] = useState<string | null>(null);
-  const [historyTarget, setHistoryTarget] = useState<{ id: string; label: string; deferrals: Deferral[] | undefined } | null>(null);
+  const [historyTarget, setHistoryTarget] = useState<{ kind: 'invoice' | 'deal'; id: string; label: string; deferrals: Deferral[] | undefined } | null>(null);
 
   const openInvoices = useMemo(
     () => invoices.filter(i => i.type === kind && remaining(i, allocations) > 0 && i.disputeStatus !== 'open'),
@@ -188,6 +189,37 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
     }
     showSuccess('سرسید به تعویق افتاد');
     setDeferModal(null);
+  };
+
+  const handleVoidLatestDeferral = async () => {
+    if (!historyTarget) return;
+    const defs = historyTarget.deferrals || [];
+    if (defs.length === 0) return;
+
+    const ok = await showConfirmAsync(
+      'حذف آخرین تعویق',
+      'آخرین تعویق حذف شود؟ تاریخ سرسید به تعویق قبلی بازخواهد گشت.',
+      { danger: true, confirmText: 'حذف' }
+    );
+    if (!ok) return;
+
+    const remaining = defs.slice(0, -1);
+    const newDueDate = remaining.length > 0
+      ? remaining[remaining.length - 1].toDate
+      : defs[0].fromDate;
+
+    try {
+      if (historyTarget.kind === 'invoice') {
+        updateInvoice(historyTarget.id, { deferrals: remaining, dueDate: newDueDate });
+      } else {
+        updateDeal(historyTarget.id, { deferrals: remaining, dueDate: newDueDate });
+      }
+      toastMsg.success('آخرین تعویق حذف شد');
+      setHistoryTarget(null);
+    } catch (e) {
+      console.error('[void-deferral]', e);
+      toastMsg.error('خطا در حذف تعویق');
+    }
   };
 
   return (
@@ -348,7 +380,7 @@ renderDetails={(d) => {
                           {d.dueDate && <Line l="سرسید" v={toFa(d.dueDate)} />}
                           {d.deferrals && d.deferrals.length > 0 && (
                             <Line l="⏰ تعویق‌ها" v={
-                              <button type="button" onClick={(e) => { e.stopPropagation(); setHistoryTarget({ id: d.id, label: d.dealNumber || d.id.slice(0,6), deferrals: d.deferrals }); }} style={{ background: 'transparent', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>
+                              <button type="button" onClick={(e) => { e.stopPropagation(); setHistoryTarget({ kind: 'deal', id: d.id, label: d.dealNumber || d.id.slice(0,6), deferrals: d.deferrals }); }} style={{ background: 'transparent', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>
                                 {toFa(d.deferrals.length)} بار (مشاهده تاریخچه)
                               </button>
                             } />
@@ -443,7 +475,7 @@ renderDetails={(inv) => {
                   <div>
                     {inv.dueDate && <Line l="سرسید" v={toFa(inv.dueDate)} />}
                     {inv.deferrals && inv.deferrals.length > 0 && (
-                      <Line l="⏰ تعویق‌ها" v={<button type="button" onClick={(e) => { e.stopPropagation(); setHistoryTarget({ id: inv.id, label: inv.number || inv.id.slice(0,6), deferrals: inv.deferrals }); }} style={{ background: 'transparent', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>{toFa(inv.deferrals.length)} بار (مشاهده تاریخچه)</button>} />
+                      <Line l="⏰ تعویق‌ها" v={<button type="button" onClick={(e) => { e.stopPropagation(); setHistoryTarget({ kind: 'invoice', id: inv.id, label: inv.number || inv.id.slice(0,6), deferrals: inv.deferrals }); }} style={{ background: 'transparent', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>{toFa(inv.deferrals.length)} بار (مشاهده تاریخچه)</button>} />
                     )}
                     {inv.reminderLog && inv.reminderLog.length > 0 && <Line l="آخرین یادآوری" v={`${toFa(inv.reminderLog[inv.reminderLog.length - 1].date)}${inv.reminderLog[inv.reminderLog.length - 1].methodLabel ? ' — ' + inv.reminderLog[inv.reminderLog.length - 1].methodLabel : ''}`} />}
                     {inv.nextReminderAt && <Line l="یادآوری بعدی" v={toFa(inv.nextReminderAt)} />}
@@ -480,6 +512,7 @@ renderDetails={(inv) => {
         onClose={() => setHistoryTarget(null)}
         deferrals={historyTarget?.deferrals}
         invoiceNumber={historyTarget?.label || '—'}
+        onVoidLatest={handleVoidLatestDeferral}
       />
       <DeferModal
         deferModal={deferModal}

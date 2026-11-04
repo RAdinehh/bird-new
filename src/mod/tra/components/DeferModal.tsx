@@ -63,7 +63,7 @@ export default function DeferModal({ deferModal, onClose, deferDate, setDeferDat
           </Field>
           
           <Field 
-            label="دلیل تعویق" 
+            label="دلیل تعویق" required 
             error={showError('deferReason')} 
             onTouch={() => markTouched('deferReason')}
           >
