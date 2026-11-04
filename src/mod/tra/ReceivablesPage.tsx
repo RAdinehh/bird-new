@@ -43,7 +43,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   const [checksOpen, setChecksOpen] = useState(false);
   const [reminderInvoiceId, setReminderInvoiceId] = useState<string | null>(null);
   const [reminderDealId, setReminderDealId] = useState<string | null>(null);
-  const [historyInvoice, setHistoryInvoice] = useState<Invoice | null>(null);
+  const [historyTarget, setHistoryTarget] = useState<{ id: string; label: string; deferrals: Deferral[] | undefined } | null>(null);
 
   const openInvoices = useMemo(
     () => invoices.filter(i => i.type === kind && remaining(i, allocations) > 0 && i.disputeStatus !== 'open'),
@@ -326,7 +326,19 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                   <Line l="سهم شما" v={`${toFa(bal.myShare.toLocaleString('fa-IR'))} تومان`} />
                   <Line l="دریافت‌شده" v={`${toFa(bal.paidIn.toLocaleString('fa-IR'))} تومان`} />
                   <Line l="باقی‌مانده" v={`${toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} تومان`} />
-                  {d.deferrals && d.deferrals.length > 0 ? <Line l="تعویق‌ها" v={toFa(d.deferrals.length)} /> : null}
+                  {d.dueDate ? <Line l="سرسید" v={toFa(d.dueDate)} /> : null}
+                  {d.deferrals && d.deferrals.length > 0 ? (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0' }}>
+                      <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>⏰ تعویق‌ها:</span>
+                      <button type="button" onClick={(e) => { e.stopPropagation(); setHistoryTarget({ id: d.id, label: d.dealNumber || d.id.slice(0,6), deferrals: d.deferrals }); }} style={{ background: 'transparent', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit' }}>
+                        {toFa(d.deferrals.length)} بار (مشاهده تاریخچه)
+                      </button>
+                    </div>
+                  ) : null}
+                  {d.reminderLog && d.reminderLog.length > 0 ? (
+                    <Line l="آخرین یادآوری" v={`${toFa(d.reminderLog[d.reminderLog.length - 1].date)}${d.reminderLog[d.reminderLog.length - 1].methodLabel ? ' — ' + d.reminderLog[d.reminderLog.length - 1].methodLabel : ''}`} />
+                  ) : null}
+                  {d.nextReminderAt ? <Line l="یادآوری بعدی" v={toFa(d.nextReminderAt)} /> : null}
                   <div style={{ marginTop: 4, display: 'flex', gap: 6 }}>
                     <Btn size="sm" onClick={(e) => { e.stopPropagation(); setDealPayTarget(d); }}>ثبت پرداخت</Btn>
                     <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setReminderDealId(d.id); }}>📨 یادآوری</Btn>
@@ -395,12 +407,13 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                   const op = computeOverpayment(inv, allocations);
                   return op > 0.5 ? <Line l="پیش‌پرداخت" v={`${toFa(op.toLocaleString('fa-IR'))} تومان`} /> : null;
                 })()}
+                <Line l="باقی‌مانده" v={`${toFa(remaining(inv, allocations).toLocaleString('fa-IR'))} تومان`} />
                 {inv.dueDate ? <Line l="سرسید" v={toFa(inv.dueDate)} /> : null}
                 {inv.workflowStatus ? <Line l="وضعیت" v={WORKFLOW_LABEL[inv.workflowStatus].replace(/^[^\u0600-\u06FFA-Za-z0-9]+/u, '')} /> : null}
                 {inv.deferrals && inv.deferrals.length > 0 ? (
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0' }}>
                     <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>⏰ تعویق‌ها:</span>
-                    <button type="button" onClick={(e) => { e.stopPropagation(); setHistoryInvoice(inv); }} style={{ background: 'transparent', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit' }}>
+                    <button type="button" onClick={(e) => { e.stopPropagation(); setHistoryTarget({ id: inv.id, label: inv.number || inv.id.slice(0,6), deferrals: inv.deferrals }); }} style={{ background: 'transparent', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit' }}>
                       {toFa(inv.deferrals.length)} بار (مشاهده تاریخچه)
                     </button>
                   </div>
@@ -462,10 +475,10 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
         dealId={reminderDealId}
       />
       <DeferHistoryModal
-        open={!!historyInvoice}
-        onClose={() => setHistoryInvoice(null)}
-        deferrals={historyInvoice?.deferrals}
-        invoiceNumber={historyInvoice?.number || historyInvoice?.id?.slice(0,6) || '—'}
+        open={!!historyTarget}
+        onClose={() => setHistoryTarget(null)}
+        deferrals={historyTarget?.deferrals}
+        invoiceNumber={historyTarget?.label || '—'}
       />
       <DeferModal
         deferModal={deferModal}
