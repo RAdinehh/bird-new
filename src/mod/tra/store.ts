@@ -49,6 +49,34 @@ function createPartyPaymentFor(
   } catch (e) { console.error(logLabel, e); return p; }
 }
 
+function syncAllocations(
+  get: () => any,
+  invoiceId: string,
+  payments: any[],
+  prevAllocations: any[],
+  logLabel: string,
+): void {
+  try {
+    const newIds = new Set(payments.map(p => p.id));
+    const oldByPaymentId = new Map(prevAllocations.map((a: any) => [a.paymentId, a]));
+    for (const a of prevAllocations) {
+      if (!newIds.has(a.paymentId)) get().deleteAllocation(a.id);
+    }
+    for (const p of payments) {
+      const existing = oldByPaymentId.get(p.id);
+      if (!existing) {
+        get().addAllocation({
+          paymentId: p.id, invoiceId,
+          amount: p.amount, date: p.date,
+          notes: 'auto',
+        });
+      } else if ((existing as any).amount !== p.amount || (existing as any).date !== p.date) {
+        get().updateAllocation((existing as any).id, { amount: p.amount, date: p.date });
+      }
+    }
+  } catch(e) { console.error(logLabel, e); }
+}
+
 export const useTra = create<State>()(
   persist(
     (set, get) => ({
@@ -95,15 +123,7 @@ export const useTra = create<State>()(
           try { final.installments = applyPaymentsToInstallments(final.installments, syncedPayments); } catch(e) {}
         }
         set({ invoices: [...get().invoices, final] });
-      try {
-        for (const p of (final.payments || [])) {
-          get().addAllocation({
-            paymentId: p.id, invoiceId: final.id,
-            amount: p.amount, date: p.date,
-            notes: 'auto',
-          });
-        }
-      } catch(e) { console.error('[addInvoice] alloc:', e); }
+      syncAllocations(get, final.id, final.payments || [], [], '[addInvoice] alloc:');
         try { setPartyCredit(final.partyId, computePartyCredit(final.partyId, get().invoices, get().allocations)); } catch(e) { console.error('[tra add] setPartyCredit failed:', e); }
         return id;
       },
@@ -210,28 +230,9 @@ export const useTra = create<State>()(
           if (prev.partyId && prev.partyId !== final.partyId) setPartyCredit(prev.partyId, computePartyCredit(prev.partyId, get().invoices, get().allocations));
         } catch(e) {}
         if (patch.payments) {
-          try {
-            const oldAllocs = get().allocations.filter(a => a.invoiceId === id);
-            const newPayments = merged.payments || [];
-            const newIds = new Set(newPayments.map(p => p.id));
-            for (const a of oldAllocs) {
-              if (!newIds.has(a.paymentId)) get().deleteAllocation(a.id);
-            }
-            const oldByPaymentId = new Map(oldAllocs.map(a => [a.paymentId, a]));
-            for (const p of newPayments) {
-              const existing = oldByPaymentId.get(p.id);
-              if (!existing) {
-                get().addAllocation({
-                  paymentId: p.id, invoiceId: id,
-                  amount: p.amount, date: p.date,
-                  notes: 'auto',
-                });
-              } else if (existing.amount !== p.amount || existing.date !== p.date) {
-                get().updateAllocation(existing.id, { amount: p.amount, date: p.date });
-              }
-            }
-          } catch(e) { console.error('[updateInvoice] alloc sync:', e); }
-        }
+      const oldAllocs = get().allocations.filter(a => a.invoiceId === id);
+      syncAllocations(get, id, merged.payments || [], oldAllocs, '[updateInvoice] alloc sync:');
+    }
 
       // 🆕 dunning C5 — auto-cancel reminder if fully paid
       try {
