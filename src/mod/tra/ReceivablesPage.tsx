@@ -315,19 +315,19 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                       {toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} ت
                     </span>
                   </div>
-                  {/* خط دوم: توضیحات + سرسید + شماره معامله */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-sm)', gap: 8 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
-                      <span style={{ color: 'var(--muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {/* خط دوم: موضوع + تاریخ (ستون راست) | شماره فاکتور (ستون چپ) */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', fontSize: 'var(--fs-sm)', gap: 8 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1, minWidth: 0 }}>
+                      <span style={{ color: 'var(--text)', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {d.description || '—'}
                       </span>
                       {days !== null && (
-                        <span style={{ color: days <= 3 ? 'var(--danger)' : days <= 7 ? 'var(--warn)' : 'var(--muted)', fontWeight: 600, flexShrink: 0 }}>
-                          • {dueLabel(days)}
+                        <span style={{ color: days <= 3 ? 'var(--danger)' : days <= 7 ? 'var(--warn)' : 'var(--muted)', fontWeight: 600, fontSize: 'var(--fs-xs)' }}>
+                          {dueLabel(days)}
                         </span>
                       )}
                     </div>
-                    <span style={{ color: 'var(--dim)', fontVariantNumeric: 'tabular-nums', fontWeight: 600, flexShrink: 0 }}>
+                    <span style={{ color: 'var(--dim)', fontVariantNumeric: 'tabular-nums', fontWeight: 600, flexShrink: 0, paddingTop: 2 }}>
                       {d.dealNumber || ''}
                     </span>
                   </div>
@@ -349,7 +349,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
                         <Line l="دریافت‌شده" v={`${toFa(bal.paidIn.toLocaleString('fa-IR'))} تومان`} />
                         <Line l="باقی‌مانده" v={
-                          <span style={{ fontSize: 'var(--fs-md)', fontWeight: 800, color: bal.balance >= 0 ? 'var(--accent)' : 'var(--danger)' }}>
+                          <span style={{ fontWeight: 800, color: bal.balance >= 0 ? 'var(--accent)' : 'var(--danger)' }}>
                             {toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} تومان
                           </span>
                         } />
@@ -420,21 +420,21 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                     {toFa(remaining(inv, allocations).toLocaleString('fa-IR'))} ت
                   </span>
                 </div>
-                  {/* خط دوم: موضوع + سرسید + شماره فاکتور */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-sm)', gap: 8 }}>
-                    <span style={{ color: 'var(--muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1, minWidth: 0 }}>
-                      {verb} {subject}
-                    </span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                  {/* خط دوم: موضوع + تاریخ (ستون راست) | شماره فاکتور (ستون چپ) */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', fontSize: 'var(--fs-sm)', gap: 8 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1, minWidth: 0 }}>
+                      <span style={{ color: 'var(--text)', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {verb} {subject}
+                      </span>
                       {dUntil !== null && (
-                        <span style={{ color: dUntil < 0 ? 'var(--danger)' : dUntil <= 7 ? 'var(--warn)' : 'var(--muted)', fontWeight: 600 }}>
+                        <span style={{ color: dUntil < 0 ? 'var(--danger)' : dUntil <= 7 ? 'var(--warn)' : 'var(--muted)', fontWeight: 600, fontSize: 'var(--fs-xs)' }}>
                           {dueLabel(dUntil)}
                         </span>
                       )}
-                      <span style={{ color: 'var(--dim)', fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
-                        {inv.number || ''}
-                      </span>
                     </div>
+                    <span style={{ color: 'var(--dim)', fontVariantNumeric: 'tabular-nums', fontWeight: 600, flexShrink: 0, paddingTop: 2 }}>
+                      {inv.number || ''}
+                    </span>
                   </div>
               </div>
             );
@@ -465,7 +465,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
                   <Line l="پرداخت‌شده" v={`${toFa(paidSumAllocated(inv, allocations).toLocaleString('fa-IR'))} تومان`} />
                   <Line l="باقی‌مانده" v={
-                    <span style={{ fontSize: 'var(--fs-md)', fontWeight: 800, color: 'var(--warn)' }}>
+                    <span style={{ fontWeight: 800, color: 'var(--warn)' }}>
                       {toFa(remaining(inv, allocations).toLocaleString('fa-IR'))} تومان
                     </span>
                   } />
