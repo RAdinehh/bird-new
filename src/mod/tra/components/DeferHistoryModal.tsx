@@ -1,5 +1,5 @@
 /**
- * DeferHistoryModal — تاریخچه تعویق‌ها (Audit Trail)
+ * DeferHistoryModal — تاریخچه تعویق‌ها (UI Optimized)
  */
 import { Modal, Btn, BtnRow, Empty } from '../../../shr/components/ui';
 import { toFa } from '../../../shr/utils/fa';
@@ -11,6 +11,7 @@ interface Props {
   onClose: () => void;
   deferrals: Deferral[] | undefined;
   invoiceNumber: string;
+  kind?: 'invoice' | 'deal';
   onVoidLatest?: () => void;
 }
 
@@ -33,17 +34,19 @@ function toJalaliDate(iso: string | undefined): string {
   } catch { return toFa(iso || '—'); }
 }
 
-export default function DeferHistoryModal({ open, onClose, deferrals, invoiceNumber, onVoidLatest }: Props) {
+export default function DeferHistoryModal({ open, onClose, deferrals, invoiceNumber, kind = 'invoice', onVoidLatest }: Props) {
   if (!open) return null;
   const list = deferrals || [];
+  const label = kind === 'deal' ? 'معامله' : 'فاکتور';
 
   return (
     <Modal open={open} onClose={onClose} title="📋 تاریخچه تعویق‌ها" size="md"
       footer={<BtnRow><Btn onClick={onClose}>بستن</Btn></BtnRow>}
     >
       <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginBottom: 8 }}>
-        فاکتور: {invoiceNumber}
+        {label}: {invoiceNumber}
       </div>
+
       {list.length === 0 ? (
         <Empty icon="📭" title="تاریخچه‌ای وجود ندارد" desc="تاکنون تعویقی ثبت نشده است." />
       ) : (
@@ -51,29 +54,41 @@ export default function DeferHistoryModal({ open, onClose, deferrals, invoiceNum
           {list.slice().reverse().map((d, idx) => {
             const isLatest = idx === 0;
             const delta = daysBetween(d.fromDate, d.toDate);
+            const hasReason = d.reason && d.reason.trim() !== '' && d.reason !== '—';
+
             return (
-              <div key={d.id} style={{ padding: '8px 12px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div key={d.id} style={{ padding: '8px 12px', background: 'var(--card-solid, #fff)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 3 }}>
+                {/* خط اول: تاریخ + مدت زمان */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', flex: 1, minWidth: 0 }}>
-                    🗓️ {toFa(d.fromDate)} ← {toFa(d.toDate)}
+                    <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', fontWeight: 500 }}>از</span> {toFa(d.fromDate)}
+                    <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', fontWeight: 500, margin: '0 4px' }}>به</span> {toFa(d.toDate)}
+                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                     {delta !== null && (
-                      <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color: 'var(--accent)', marginRight: 8 }}>
-                        ({toFa(delta)} روز)
+                      <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, color: delta < 0 ? 'var(--danger)' : 'var(--accent)' }}>
+                        {delta < 0 ? '⚠️ ' : ''}{toFa(Math.abs(delta))} روز
                       </span>
                     )}
-                  </span>
-                  {isLatest && onVoidLatest && (
-                    <button
-                      type="button"
-                      onClick={onVoidLatest}
-                      style={{ background: 'transparent', border: 'none', color: 'var(--danger)', fontSize: 'var(--fs-xs)', cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit', flexShrink: 0, padding: 0 }}
-                    >
-                      🗑️ حذف
-                    </button>
-                  )}
+                    {isLatest && onVoidLatest && (
+                      <button
+                        type="button"
+                        onClick={onVoidLatest}
+                        style={{ background: 'transparent', border: 'none', color: 'var(--danger)', fontSize: 'var(--fs-xs)', cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}
+                      >
+                        🗑️ حذف
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>📝 {d.reason || '—'}</div>
-                <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--dim)' }}>🕒 ثبت: {toJalaliDate(d.createdAt)}</div>
+
+                {/* خط دوم: دلیل (اگر وجود داشته باشد) */}
+                {hasReason && (
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text)', marginTop: 2 }}>📝 {d.reason}</div>
+                )}
+
+                {/* خط سوم: تاریخ ثبت */}
+                <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--dim)', marginTop: 1 }}>🕒 {toJalaliDate(d.createdAt)}</div>
               </div>
             );
           })}

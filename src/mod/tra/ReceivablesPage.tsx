@@ -512,6 +512,7 @@ renderDetails={(inv) => {
         onClose={() => setHistoryTarget(null)}
         deferrals={historyTarget?.deferrals}
         invoiceNumber={historyTarget?.label || '—'}
+        kind={historyTarget?.kind}
         onVoidLatest={handleVoidLatestDeferral}
       />
       <DeferModal
