@@ -27,17 +27,24 @@ interface Props {
   badgeBg?: string;
   /** 🆕 رنگ متن بج */
   badgeColor?: string;
+  /** 🆕 بازنویسی تب (برای invoice: sales/purchases) */
+  tab?: string;
+  /** 🆕 برای invoice: باز کردن فرم ویرایش (به جای focus) */
+  edit?: boolean;
 }
 
-export default function EntityLink({ type, id, label, sub, badge, badgeBg, badgeColor }: Props) {
+export default function EntityLink({ type, id, label, sub, badge, badgeBg, badgeColor, tab, edit }: Props) {
   const nav = useNavigate();
   const conf = MAP[type];
   if (!conf || !id) return <span>{label}</span>;
+  const finalTab = tab || conf.tab;
+  const param = edit ? 'edit' : 'focus';
+  const url = `${conf.path}?${finalTab ? `tab=${finalTab}&` : ''}${param}=${id}`;
 
   return (
     <button
       type="button"
-      onClick={() => nav(`${conf.path}?${conf.tab ? `tab=${conf.tab}&` : ''}focus=${id}`)}
+      onClick={() => nav(url)}
       aria-label={`برو به ${label}`}
       style={badge ? {
         display: 'inline-flex',

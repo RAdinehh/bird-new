@@ -441,8 +441,14 @@ renderSummary={(inv) => {
                       </span>
                     )}
                   </div>
-                  <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color: 'var(--dim)', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
-                    {inv.number || ''}
+                  <span style={{ fontSize: 'var(--fs-xs)', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                    <EntityLink
+                      type="invoice"
+                      id={inv.id}
+                      label={inv.number || '—'}
+                      tab={inv.type === 'sale' ? 'sales' : 'purchases'}
+                      edit
+                    />
                   </span>
                 </div>
               </div>
@@ -490,7 +496,7 @@ renderDetails={(inv) => {
                   </div>
                 )}
                 <div style={{ display: 'flex', gap: 6, borderTop: '1px solid var(--border)', paddingTop: 12, marginTop: 8 }}>
-                  {!isLockedFromSettlement && <Btn size="sm" onClick={(e) => { e.stopPropagation(); const tab = kind === 'sale' ? 'sales' : 'purchases'; navigate('/tra?tab=' + tab + '&edit=' + inv.id); }}>✏️ ویرایش</Btn>}
+                  
                   <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setReminderInvoiceId(inv.id); }}>📨 یادآوری</Btn>
                   <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); openDefer(inv); }}>⏰ تعویق</Btn>
                 </div>
