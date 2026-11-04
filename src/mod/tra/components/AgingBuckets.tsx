@@ -81,8 +81,8 @@ export default function AgingBuckets<T extends { id: string }>({
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, color: 'var(--text)' }}>{label}</span>
                 <span style={{
-                  fontSize: 10, fontWeight: 600, color: 'var(--muted)',
-                  padding: '1px 7px', borderRadius: 10, border: '1px solid var(--border)',
+                  fontSize: 'var(--fs-2xs)', fontWeight: 600, color: 'var(--muted)',
+                  padding: '2px 8px', borderRadius: 12, border: '1px solid var(--border)',
                 }}>
                   {toFa(bucketItems.length)} مورد
                 </span>
@@ -151,7 +151,7 @@ export default function AgingBuckets<T extends { id: string }>({
                         {isItemOpen && renderDetails && (
                           <div style={{
                             borderTop: '1px solid var(--border)',
-                            padding: '12px 12px 0',
+                            padding: '12px',
                             display: 'flex', flexDirection: 'column', gap: 0,
                           }}>
                             {renderDetails(item)}

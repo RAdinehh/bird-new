@@ -295,41 +295,35 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
             items={dealFS.filtered}
             bucketOf={(d) => agingBucketFromDeal(d)}
             sumOf={(d) => computeDealBalance(d).balance}
-            renderSummary={(d) => {
+renderSummary={(d) => {
               const bal = computeDealBalance(d);
               const party = contacts.find(c => c.id === d.partyId);
               const days = dealDaysUntilDue(d);
+              const dueColor = days === null ? 'var(--muted)' : days < 0 ? 'var(--danger)' : days <= 7 ? 'var(--warn)' : 'var(--muted)';
               return (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {/* خط اول: نام + تگ + مبلغ */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
-                      <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text)' }}>
-                        {party?.name || '—'}
-                      </span>
-                      <span style={{ fontSize: 'var(--fs-2xs)', fontWeight: 700, padding: '2px 6px', borderRadius: 4, color: 'var(--muted)', border: '1px solid var(--border)', whiteSpace: 'nowrap' }}>
-                        {DEAL_LABEL[d.type]}
-                      </span>
-                    </div>
+                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text)' }}>
+                      {party?.name || '—'}
+                    </span>
                     <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', flexShrink: 0, color: bal.balance > 0 ? 'var(--danger)' : bal.balance < 0 ? 'var(--accent)' : 'var(--muted)' }}>
                       {toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} ت
                     </span>
                   </div>
-                  {/* خط دوم: موضوع + تاریخ (ستون راست) | شماره فاکتور (ستون چپ) */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', fontSize: 'var(--fs-sm)', gap: 8 }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1, minWidth: 0 }}>
-                      <span style={{ color: 'var(--text)', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {d.description || '—'}
-                      </span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 500, color: 'var(--muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>
+                      {d.description || '—'}
+                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                       {days !== null && (
-                        <span style={{ color: days <= 3 ? 'var(--danger)' : days <= 7 ? 'var(--warn)' : 'var(--muted)', fontWeight: 600, fontSize: 'var(--fs-xs)' }}>
+                        <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color: dueColor }}>
                           {dueLabel(days)}
                         </span>
                       )}
+                      <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color: 'var(--dim)', fontVariantNumeric: 'tabular-nums' }}>
+                        {d.dealNumber || ''}
+                      </span>
                     </div>
-                    <span style={{ color: 'var(--dim)', fontVariantNumeric: 'tabular-nums', fontWeight: 600, flexShrink: 0, paddingTop: 2 }}>
-                      {d.dealNumber || ''}
-                    </span>
                   </div>
                 </div>
               );
@@ -383,43 +377,39 @@ renderDetails={(d) => {
           items={filtered}
           bucketOf={(inv) => agingBucketFromDue(inv)}
           sumOf={(inv) => remaining(inv, allocations)}
-          renderSummary={(inv) => {
+renderSummary={(inv) => {
             const party = contacts.find(c => c.id === inv.partyId);
             const dUntil = daysUntilDue(inv);
             const subject = inv.items?.[0]?.description || CAT_LABEL[inv.category] || inv.category || '—';
             const verb = inv.type === 'sale' ? 'فروش' : 'خرید';
+            const dueColor = dUntil === null ? 'var(--muted)' : dUntil < 0 ? 'var(--danger)' : dUntil <= 7 ? 'var(--warn)' : 'var(--muted)';
+            const rem = remaining(inv, allocations);
+            const balColor = rem > 0 ? 'var(--danger)' : rem < 0 ? 'var(--accent)' : 'var(--muted)';
             return (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {/* خط اول: نام + تگ + مبلغ */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
-                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text)' }}>
-                      {party?.name || '—'}
-                    </span>
-                    <span style={{ fontSize: 'var(--fs-2xs)', fontWeight: 700, padding: '2px 6px', borderRadius: 4, color: 'var(--muted)', border: '1px solid var(--border)', whiteSpace: 'nowrap' }}>
-                      {inv.type === 'sale' ? 'خریدار' : 'فروشنده'}
-                    </span>
-                  </div>
-                  <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', flexShrink: 0, color: remaining(inv, allocations) > 0 ? 'var(--danger)' : remaining(inv, allocations) < 0 ? 'var(--accent)' : 'var(--muted)' }}>
-                    {toFa(remaining(inv, allocations).toLocaleString('fa-IR'))} ت
+                  <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text)' }}>
+                    {party?.name || '—'}
+                  </span>
+                  <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', flexShrink: 0, color: balColor }}>
+                    {toFa(rem.toLocaleString('fa-IR'))} ت
                   </span>
                 </div>
-                  {/* خط دوم: موضوع + تاریخ (ستون راست) | شماره فاکتور (ستون چپ) */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', fontSize: 'var(--fs-sm)', gap: 8 }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1, minWidth: 0 }}>
-                      <span style={{ color: 'var(--text)', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {verb} {subject}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 500, color: 'var(--muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>
+                    {verb} {subject}
+                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                    {dUntil !== null && (
+                      <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color: dueColor }}>
+                        {dueLabel(dUntil)}
                       </span>
-                      {dUntil !== null && (
-                        <span style={{ color: dUntil < 0 ? 'var(--danger)' : dUntil <= 7 ? 'var(--warn)' : 'var(--muted)', fontWeight: 600, fontSize: 'var(--fs-xs)' }}>
-                          {dueLabel(dUntil)}
-                        </span>
-                      )}
-                    </div>
-                    <span style={{ color: 'var(--dim)', fontVariantNumeric: 'tabular-nums', fontWeight: 600, flexShrink: 0, paddingTop: 2 }}>
+                    )}
+                    <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color: 'var(--dim)', fontVariantNumeric: 'tabular-nums' }}>
                       {inv.number || ''}
                     </span>
                   </div>
+                </div>
               </div>
             );
           }}
