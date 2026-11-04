@@ -44,7 +44,7 @@ export default function EntityLink({ type, id, label, sub, badge, badgeBg, badge
   return (
     <button
       type="button"
-      onClick={() => nav(url)}
+      onClick={(e) => { e.stopPropagation(); nav(url); }}
       aria-label={`برو به ${label}`}
       style={badge ? {
         display: 'inline-flex',

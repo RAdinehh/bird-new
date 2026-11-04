@@ -78,17 +78,28 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
   } = useInvoiceForm({ kind, invoices, contacts, flocks, whsItems, allocations, addInvoice, updateInvoice });
 
   // 🆕 باز کردن فرم ویرایش از URL (از Aging در ReceivablesPage)
+  const processedEditRef = useRef<string | null>(null);
   useEffect(() => {
+    // فقط صفحه‌ی فعال (تب جاری) اجازه دارد modal باز کند
+    if (!active) return;
     const editId = searchParams.get('edit');
-    if (!editId) return;
+    if (!editId) {
+      processedEditRef.current = null;
+      return;
+    }
+    // جلوگیری از double-processing (StrictMode / re-render)
+    if (processedEditRef.current === editId) return;
     const inv = _allInvoices.find(i => i.id === editId);
     if (!inv) return;
+    // فقط اگر نوع فاکتور با این صفحه مطابقت دارد
+    if (inv.type !== kind) return;
+    processedEditRef.current = editId;
     openEdit(inv);
     const next = new URLSearchParams(searchParams);
     next.delete('edit');
     setSearchParams(next, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [searchParams, active, kind]);
 
   // آبشار: اگه partyId دیگه در لیست فیلترشده نیست، پاک شه
   useEffect(() => {
