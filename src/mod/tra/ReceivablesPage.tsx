@@ -320,37 +320,55 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
             renderDetails={(d) => {
                   const bal = computeDealBalance(d);
                   return (
-                    <>
-                      {/* 💰 مبالغ */}
-                      <Line l="فروش کل" v={`${toFa(bal.totalSales.toLocaleString('fa-IR'))} تومان`} />
-                      <Line l="کمیسیون" v={`${toFa(bal.commission.toLocaleString('fa-IR'))} تومان`} />
-                      <Line l="سهم شما" v={`${toFa(bal.myShare.toLocaleString('fa-IR'))} تومان`} />
-                      <Line l="دریافت‌شده" v={`${toFa(bal.paidIn.toLocaleString('fa-IR'))} تومان`} />
-                      <Line l="باقی‌مانده" v={`${toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} تومان`} />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {/* 💰 خلاصه مالی */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        <Line l="فروش کل" v={`${toFa(bal.totalSales.toLocaleString('fa-IR'))} تومان`} />
+                        <Line l="کمیسیون" v={`${toFa(bal.commission.toLocaleString('fa-IR'))} تومان`} />
+                        <Line l="سهم شما" v={`${toFa(bal.myShare.toLocaleString('fa-IR'))} تومان`} />
+                      </div>
+
+                      {/* 📥 وضعیت تسویه */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                        <Line l="دریافت‌شده" v={`${toFa(bal.paidIn.toLocaleString('fa-IR'))} تومان`} />
+                        <Line l="باقی‌مانده" v={
+                          <span style={{ fontSize: 'var(--fs-md)', fontWeight: 800, color: bal.balance >= 0 ? 'var(--accent)' : 'var(--danger)' }}>
+                            {toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} تومان
+                          </span>
+                        } />
+                      </div>
 
                       {/* ⏰ زمان‌بندی */}
-                      {d.dueDate ? <Line l="سرسید" v={toFa(d.dueDate)} /> : null}
-                      {d.deferrals && d.deferrals.length > 0 ? (
-                        <Line l="⏰ تعویق‌ها" v={
-                          <button type="button" onClick={(e) => { e.stopPropagation(); setHistoryTarget({ id: d.id, label: d.dealNumber || d.id.slice(0,6), deferrals: d.deferrals }); }} style={{ background: 'transparent', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>
-                            {toFa(d.deferrals.length)} بار (مشاهده تاریخچه)
-                          </button>
-                        } />
-                      ) : null}
+                      {(d.dueDate || (d.deferrals && d.deferrals.length > 0)) && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                          {d.dueDate && <Line l="سرسید" v={toFa(d.dueDate)} />}
+                          {d.deferrals && d.deferrals.length > 0 && (
+                            <Line l="⏰ تعویق‌ها" v={
+                              <button type="button" onClick={(e) => { e.stopPropagation(); setHistoryTarget({ id: d.id, label: d.dealNumber || d.id.slice(0,6), deferrals: d.deferrals }); }} style={{ background: 'transparent', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>
+                                {toFa(d.deferrals.length)} بار (مشاهده تاریخچه)
+                              </button>
+                            } />
+                          )}
+                        </div>
+                      )}
 
                       {/* 📨 یادآوری‌ها */}
-                      {d.reminderLog && d.reminderLog.length > 0 ? (
-                        <Line l="آخرین یادآوری" v={`${toFa(d.reminderLog[d.reminderLog.length - 1].date)}${d.reminderLog[d.reminderLog.length - 1].methodLabel ? ' — ' + d.reminderLog[d.reminderLog.length - 1].methodLabel : ''}`} />
+                      {(d.reminderLog && d.reminderLog.length > 0) || d.nextReminderAt ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                          {d.reminderLog && d.reminderLog.length > 0 && (
+                            <Line l="آخرین یادآوری" v={`${toFa(d.reminderLog[d.reminderLog.length - 1].date)}${d.reminderLog[d.reminderLog.length - 1].methodLabel ? ' — ' + d.reminderLog[d.reminderLog.length - 1].methodLabel : ''}`} />
+                          )}
+                          {d.nextReminderAt && <Line l="یادآوری بعدی" v={toFa(d.nextReminderAt)} />}
+                        </div>
                       ) : null}
-                      {d.nextReminderAt ? <Line l="یادآوری بعدی" v={toFa(d.nextReminderAt)} /> : null}
 
                       {/* 🎬 دکمه‌ها */}
-                      <div style={{ marginTop: 6, display: 'flex', gap: 6 }}>
+                      <div style={{ display: 'flex', gap: 6, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
                         <Btn size="sm" onClick={(e) => { e.stopPropagation(); setDealPayTarget(d); }}>ثبت پرداخت</Btn>
                         <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setReminderDealId(d.id); }}>📨 یادآوری</Btn>
                         <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); openDealDefer(d); }}>⏰ تعویق</Btn>
                       </div>
-                    </>
+                    </div>
                   );
                 }}
           />
@@ -398,56 +416,69 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
             const isLockedFromSettlement = !!inv.relatedSettlementId;
             const op = computeOverpayment(inv, allocations);
             return (
-              <>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {isLockedFromSettlement && (
-                  <div style={{ padding: '6px 8px', background: 'var(--warn-soft)', border: '1px solid var(--warn-border, rgba(234,88,12,.35))', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 2, marginBottom: 4 }}>
+                  <div style={{ padding: '6px 8px', background: 'var(--warn-soft)', border: '1px solid var(--warn-border, rgba(234,88,12,.35))', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 2 }}>
                     <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-                      از تسویه
-                      <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span>
+                      از تسویه <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span>
                     </span>
                     <span style={{ fontSize: 10, color: 'var(--muted)' }}>برای تغییر، تسویه را ویرایش کنید</span>
                   </div>
                 )}
-                
-                {/* 💰 مبالغ */}
-                <Line l="جمع فاکتور" v={`${toFa(inv.total.toLocaleString('fa-IR'))} تومان`} />
-                <Line l="پرداخت‌شده" v={`${toFa(paidSumAllocated(inv, allocations).toLocaleString('fa-IR'))} تومان`} />
-                {op > 0.5 && <Line l="پیش‌پرداخت" v={`${toFa(op.toLocaleString('fa-IR'))} تومان`} />}
-                <Line l="باقی‌مانده" v={`${toFa(remaining(inv, allocations).toLocaleString('fa-IR'))} تومان`} />
 
-                {/* ⏰ زمان‌بندی */}
-                {inv.dueDate ? <Line l="سرسید" v={toFa(inv.dueDate)} /> : null}
-                {inv.deferrals && inv.deferrals.length > 0 ? (
-                  <Line l="⏰ تعویق‌ها" v={
-                    <button type="button" onClick={(e) => { e.stopPropagation(); setHistoryTarget({ id: inv.id, label: inv.number || inv.id.slice(0,6), deferrals: inv.deferrals }); }} style={{ background: 'transparent', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>
-                      {toFa(inv.deferrals.length)} بار (مشاهده تاریخچه)
-                    </button>
+                {/* 💰 خلاصه مالی */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <Line l="جمع فاکتور" v={`${toFa(inv.total.toLocaleString('fa-IR'))} تومان`} />
+                  {op > 0.5 && <Line l="پیش‌پرداخت" v={`${toFa(op.toLocaleString('fa-IR'))} تومان`} />}
+                </div>
+
+                {/* 📥 وضعیت تسویه */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                  <Line l="پرداخت‌شده" v={`${toFa(paidSumAllocated(inv, allocations).toLocaleString('fa-IR'))} تومان`} />
+                  <Line l="باقی‌مانده" v={
+                    <span style={{ fontSize: 'var(--fs-md)', fontWeight: 800, color: 'var(--warn)' }}>
+                      {toFa(remaining(inv, allocations).toLocaleString('fa-IR'))} تومان
+                    </span>
                   } />
-                ) : null}
+                </div>
 
-                {/* 📨 یادآوری‌ها */}
-                {inv.reminderLog && inv.reminderLog.length > 0 ? (
-                  <Line l="آخرین یادآوری" v={`${toFa(inv.reminderLog[inv.reminderLog.length - 1].date)}${inv.reminderLog[inv.reminderLog.length - 1].methodLabel ? ' — ' + inv.reminderLog[inv.reminderLog.length - 1].methodLabel : ''}`} />
-                ) : null}
-                {inv.nextReminderAt ? (
-                  <Line l="یادآوری بعدی" v={toFa(inv.nextReminderAt)} />
-                ) : null}
+                {/* ⏰ زمان‌بندی و یادآوری */}
+                {(inv.dueDate || (inv.deferrals && inv.deferrals.length > 0) || inv.nextReminderAt || (inv.reminderLog && inv.reminderLog.length > 0)) && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                    {inv.dueDate && <Line l="سرسید" v={toFa(inv.dueDate)} />}
+                    {inv.deferrals && inv.deferrals.length > 0 && (
+                      <Line l="⏰ تعویق‌ها" v={
+                        <button type="button" onClick={(e) => { e.stopPropagation(); setHistoryTarget({ id: inv.id, label: inv.number || inv.id.slice(0,6), deferrals: inv.deferrals }); }} style={{ background: 'transparent', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>
+                          {toFa(inv.deferrals.length)} بار (مشاهده تاریخچه)
+                        </button>
+                      } />
+                    )}
+                    {inv.reminderLog && inv.reminderLog.length > 0 && (
+                      <Line l="آخرین یادآوری" v={`${toFa(inv.reminderLog[inv.reminderLog.length - 1].date)}${inv.reminderLog[inv.reminderLog.length - 1].methodLabel ? ' — ' + inv.reminderLog[inv.reminderLog.length - 1].methodLabel : ''}`} />
+                    )}
+                    {inv.nextReminderAt && <Line l="یادآوری بعدی" v={toFa(inv.nextReminderAt)} />}
+                  </div>
+                )}
 
-                {/* 🔗 مرتبط */}
-                {inv.workflowStatus && <Line l="وضعیت" v={WORKFLOW_LABEL[inv.workflowStatus].replace(/^[^؀-ۿA-Za-z0-9]+/u, '')} />}
-                {relatedDeal && <Line l="معامله" v={relatedDeal.dealNumber || relatedDeal.id.slice(0, 6)} />}
-                {inv.relatedFlockId && <Row l="گله" v={<EntityLink type="flock" id={inv.relatedFlockId} label={inv.items?.[0]?.flockName || 'مشاهده'} />} />}
-                {checkPending.length > 0 && <Line l="چک‌ها" v={`${toFa(checkPending.length)} در جریان (${toFa(checkPending.reduce((s, p) => s + (p.amount || 0), 0).toLocaleString('fa-IR'))} ت)`} />}
+                {/* 🔗 اطلاعات مرتبط */}
+                {(inv.workflowStatus || relatedDeal || inv.relatedFlockId || checkPending.length > 0) && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                    {inv.workflowStatus && <Line l="وضعیت" v={WORKFLOW_LABEL[inv.workflowStatus].replace(/^[^؀-ۿA-Za-z0-9]+/u, '')} />}
+                    {relatedDeal && <Line l="معامله" v={relatedDeal.dealNumber || relatedDeal.id.slice(0, 6)} />}
+                    {inv.relatedFlockId && <Row l="گله" v={<EntityLink type="flock" id={inv.relatedFlockId} label={inv.items?.[0]?.flockName || 'مشاهده'} />} />}
+                    {checkPending.length > 0 && <Line l="چک‌ها" v={`${toFa(checkPending.length)} در جریان (${toFa(checkPending.reduce((s, p) => s + (p.amount || 0), 0).toLocaleString('fa-IR'))} ت)`} />}
+                  </div>
+                )}
 
                 {/* 🎬 دکمه‌ها */}
-                <div style={{ marginTop: 6, display: 'flex', gap: 6 }}>
+                <div style={{ display: 'flex', gap: 6, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
                   {!isLockedFromSettlement && (
                     <Btn size="sm" onClick={(e) => { e.stopPropagation(); const tab = kind === 'sale' ? 'sales' : 'purchases'; navigate('/tra?tab=' + tab + '&edit=' + inv.id); }}>✏️ ویرایش</Btn>
                   )}
                   <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setReminderInvoiceId(inv.id); }}>📨 یادآوری</Btn>
                   <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); openDefer(inv); }}>⏰ تعویق</Btn>
                 </div>
-              </>
+              </div>
             );
           }}
         />
