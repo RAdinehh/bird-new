@@ -1,5 +1,5 @@
 /**
- * DeferHistoryModal — تاریخچه تعویق‌ها (UI Optimized)
+ * DeferHistoryModal — تاریخچه تعویق‌ها (UI Final)
  */
 import { Modal, Btn, BtnRow, Empty } from '../../../shr/components/ui';
 import { toFa } from '../../../shr/utils/fa';
@@ -57,38 +57,34 @@ export default function DeferHistoryModal({ open, onClose, deferrals, invoiceNum
             const hasReason = d.reason && d.reason.trim() !== '' && d.reason !== '—';
 
             return (
-              <div key={d.id} style={{ padding: '8px 12px', background: 'var(--card-solid, #fff)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 3 }}>
-                {/* خط اول: تاریخ + مدت زمان */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', flex: 1, minWidth: 0 }}>
-                    <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', fontWeight: 500 }}>از</span> {toFa(d.fromDate)}
-                    <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', fontWeight: 500, margin: '0 4px' }}>به</span> {toFa(d.toDate)}
-                  </span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                    {delta !== null && (
-                      <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, color: delta < 0 ? 'var(--danger)' : 'var(--accent)' }}>
-                        {delta < 0 ? '⚠️ ' : ''}{toFa(Math.abs(delta))} روز
-                      </span>
-                    )}
-                    {isLatest && onVoidLatest && (
-                      <button
-                        type="button"
-                        onClick={onVoidLatest}
-                        style={{ background: 'transparent', border: 'none', color: 'var(--danger)', fontSize: 'var(--fs-xs)', cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}
-                      >
-                        🗑️ حذف
-                      </button>
-                    )}
+              <div key={d.id} style={{ padding: '8px 12px', background: 'var(--card-solid, #fff)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                {/* بخش راست: اطلاعات */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
+                    از {toFa(d.fromDate)} به {toFa(d.toDate)}
                   </div>
+                  {delta !== null && (
+                    <div style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color: delta < 0 ? 'var(--danger)' : 'var(--accent)' }}>
+                      {delta < 0 ? '⚠️ ' : ''}{toFa(Math.abs(delta))} روز
+                    </div>
+                  )}
+                  {hasReason && (
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text)' }}>📝 {d.reason}</div>
+                  )}
+                  <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--dim)' }}>🕒 ثبت: {toJalaliDate(d.createdAt)}</div>
                 </div>
 
-                {/* خط دوم: دلیل (اگر وجود داشته باشد) */}
-                {hasReason && (
-                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text)', marginTop: 2 }}>📝 {d.reason}</div>
+                {/* بخش چپ: دکمه حذف (سطل زباله) */}
+                {isLatest && onVoidLatest && (
+                  <button
+                    type="button"
+                    onClick={onVoidLatest}
+                    title="حذف آخرین تعویق"
+                    style={{ background: 'transparent', border: 'none', color: 'var(--danger)', fontSize: 'var(--fs-md)', cursor: 'pointer', fontFamily: 'inherit', padding: 2, flexShrink: 0, display: 'flex', alignItems: 'flex-start', marginTop: 2 }}
+                  >
+                    🗑️
+                  </button>
                 )}
-
-                {/* خط سوم: تاریخ ثبت */}
-                <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--dim)', marginTop: 1 }}>🕒 {toJalaliDate(d.createdAt)}</div>
               </div>
             );
           })}
