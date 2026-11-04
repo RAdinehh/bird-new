@@ -337,16 +337,16 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
             renderDetails={(d) => {
                   const bal = computeDealBalance(d);
                   return (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                       {/* 💰 خلاصه مالی */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                         <Line l="فروش کل" v={`${toFa(bal.totalSales.toLocaleString('fa-IR'))} تومان`} />
                         <Line l="کمیسیون" v={`${toFa(bal.commission.toLocaleString('fa-IR'))} تومان`} />
                         <Line l="سهم شما" v={`${toFa(bal.myShare.toLocaleString('fa-IR'))} تومان`} />
                       </div>
 
                       {/* 📥 وضعیت تسویه */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 4 }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                         <Line l="دریافت‌شده" v={`${toFa(bal.paidIn.toLocaleString('fa-IR'))} تومان`} />
                         <Line l="باقی‌مانده" v={
                           <span style={{ fontWeight: 800, color: bal.balance >= 0 ? 'var(--accent)' : 'var(--danger)' }}>
@@ -357,7 +357,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
 
                       {/* ⏰ زمان‌بندی */}
                       {(d.dueDate || (d.deferrals && d.deferrals.length > 0)) && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 4 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                           {d.dueDate && <Line l="سرسید" v={toFa(d.dueDate)} />}
                           {d.deferrals && d.deferrals.length > 0 && (
                             <Line l="⏰ تعویق‌ها" v={
@@ -380,7 +380,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                       ) : null}
 
                       {/* 🎬 دکمه‌ها */}
-                      <div style={{ display: 'flex', gap: 6, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                      <div style={{ display: 'flex', gap: 6, borderTop: '1px solid var(--border)', paddingTop: 12 }}>
                         <Btn size="sm" onClick={(e) => { e.stopPropagation(); setDealPayTarget(d); }}>ثبت پرداخت</Btn>
                         <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setReminderDealId(d.id); }}>📨 یادآوری</Btn>
                         <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); openDealDefer(d); }}>⏰ تعویق</Btn>
@@ -445,7 +445,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
             const isLockedFromSettlement = !!inv.relatedSettlementId;
             const op = computeOverpayment(inv, allocations);
             return (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                 {isLockedFromSettlement && (
                   <div style={{ padding: '6px 8px', background: 'var(--warn-soft)', border: '1px solid var(--warn-border, rgba(234,88,12,.35))', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 2 }}>
                     <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -456,13 +456,13 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                 )}
 
                 {/* 💰 خلاصه مالی */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                   <Line l="جمع فاکتور" v={`${toFa(inv.total.toLocaleString('fa-IR'))} تومان`} />
                   {op > 0.5 && <Line l="پیش‌پرداخت" v={`${toFa(op.toLocaleString('fa-IR'))} تومان`} />}
                 </div>
 
                 {/* 📥 وضعیت تسویه */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 4 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                   <Line l="پرداخت‌شده" v={`${toFa(paidSumAllocated(inv, allocations).toLocaleString('fa-IR'))} تومان`} />
                   <Line l="باقی‌مانده" v={
                     <span style={{ fontWeight: 800, color: 'var(--warn)' }}>
@@ -473,7 +473,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
 
                 {/* ⏰ زمان‌بندی و یادآوری */}
                 {(inv.dueDate || (inv.deferrals && inv.deferrals.length > 0) || inv.nextReminderAt || (inv.reminderLog && inv.reminderLog.length > 0)) && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 4 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                     {inv.dueDate && <Line l="سرسید" v={toFa(inv.dueDate)} />}
                     {inv.deferrals && inv.deferrals.length > 0 && (
                       <Line l="⏰ تعویق‌ها" v={
@@ -500,7 +500,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                 )}
 
                 {/* 🎬 دکمه‌ها */}
-                <div style={{ display: 'flex', gap: 6, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                <div style={{ display: 'flex', gap: 6, borderTop: '1px solid var(--border)', paddingTop: 12 }}>
                   {!isLockedFromSettlement && (
                     <Btn size="sm" onClick={(e) => { e.stopPropagation(); const tab = kind === 'sale' ? 'sales' : 'purchases'; navigate('/tra?tab=' + tab + '&edit=' + inv.id); }}>✏️ ویرایش</Btn>
                   )}
