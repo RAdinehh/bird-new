@@ -334,7 +334,7 @@ export function Modal({
         {/* Body */}
         <div
           style={{
-            padding: '0 14px 14px 14px',
+            padding: '16px 14px 14px 14px',
             overflowY: 'auto',
             overscrollBehavior: 'contain',
             WebkitOverflowScrolling: 'touch',

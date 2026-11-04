@@ -44,22 +44,14 @@ export default function DeferHistoryModal({ open, onClose, deferrals, invoiceNum
       footer={<BtnRow><Btn onClick={onClose}>بستن</Btn></BtnRow>}
     >
       <div style={{
-        padding: '10px 14px',
         marginBottom: 12,
-        background: 'var(--input-bg)',
-        borderRadius: 'var(--r-sm)',
-        border: '1px solid var(--border)',
         display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        gap: 8,
+        alignItems: 'baseline',
+        gap: 6,
+        fontSize: 'var(--fs-sm)',
       }}>
-        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 500 }}>
-          {label}
-        </span>
-        <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
-          {invoiceNumber}
-        </span>
+        <span style={{ color: 'var(--muted)', fontWeight: 500 }}>{label}:</span>
+        <span style={{ color: 'var(--text)', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{invoiceNumber}</span>
       </div>
 
       {list.length === 0 ? (
