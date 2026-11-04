@@ -36,9 +36,9 @@ export function chip(active: boolean): React.CSSProperties {
   };
 }
 
-export function Line({ l, v }: { l: string; v: string }) {
+export function Line({ l, v }: { l: string; v: ReactNode }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-sm)', padding: '4px 0' }}>
       <span style={{ color: 'var(--muted)' }}>{l}:</span>
       <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
     </div>

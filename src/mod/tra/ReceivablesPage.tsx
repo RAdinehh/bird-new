@@ -331,12 +331,11 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                       {/* ⏰ زمان‌بندی */}
                       {d.dueDate ? <Line l="سرسید" v={toFa(d.dueDate)} /> : null}
                       {d.deferrals && d.deferrals.length > 0 ? (
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0' }}>
-                          <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>⏰ تعویق‌ها:</span>
-                          <button type="button" onClick={(e) => { e.stopPropagation(); setHistoryTarget({ id: d.id, label: d.dealNumber || d.id.slice(0,6), deferrals: d.deferrals }); }} style={{ background: 'transparent', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit' }}>
+                        <Line l="⏰ تعویق‌ها" v={
+                          <button type="button" onClick={(e) => { e.stopPropagation(); setHistoryTarget({ id: d.id, label: d.dealNumber || d.id.slice(0,6), deferrals: d.deferrals }); }} style={{ background: 'transparent', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>
                             {toFa(d.deferrals.length)} بار (مشاهده تاریخچه)
                           </button>
-                        </div>
+                        } />
                       ) : null}
 
                       {/* 📨 یادآوری‌ها */}
@@ -419,12 +418,11 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                 {/* ⏰ زمان‌بندی */}
                 {inv.dueDate ? <Line l="سرسید" v={toFa(inv.dueDate)} /> : null}
                 {inv.deferrals && inv.deferrals.length > 0 ? (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0' }}>
-                    <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>⏰ تعویق‌ها:</span>
-                    <button type="button" onClick={(e) => { e.stopPropagation(); setHistoryTarget({ id: inv.id, label: inv.number || inv.id.slice(0,6), deferrals: inv.deferrals }); }} style={{ background: 'transparent', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit' }}>
+                  <Line l="⏰ تعویق‌ها" v={
+                    <button type="button" onClick={(e) => { e.stopPropagation(); setHistoryTarget({ id: inv.id, label: inv.number || inv.id.slice(0,6), deferrals: inv.deferrals }); }} style={{ background: 'transparent', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>
                       {toFa(inv.deferrals.length)} بار (مشاهده تاریخچه)
                     </button>
-                  </div>
+                  } />
                 ) : null}
 
                 {/* 📨 یادآوری‌ها */}
