@@ -357,7 +357,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
 
                       {/* ⏰ زمان‌بندی */}
                       {(d.dueDate || (d.deferrals && d.deferrals.length > 0)) && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 4 }}>
                           {d.dueDate && <Line l="سرسید" v={toFa(d.dueDate)} />}
                           {d.deferrals && d.deferrals.length > 0 && (
                             <Line l="⏰ تعویق‌ها" v={
@@ -473,7 +473,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
 
                 {/* ⏰ زمان‌بندی و یادآوری */}
                 {(inv.dueDate || (inv.deferrals && inv.deferrals.length > 0) || inv.nextReminderAt || (inv.reminderLog && inv.reminderLog.length > 0)) && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 4 }}>
                     {inv.dueDate && <Line l="سرسید" v={toFa(inv.dueDate)} />}
                     {inv.deferrals && inv.deferrals.length > 0 && (
                       <Line l="⏰ تعویق‌ها" v={
