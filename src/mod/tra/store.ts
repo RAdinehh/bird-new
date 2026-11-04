@@ -30,6 +30,25 @@ export * from './types';
 export * from './calc';
 export * from './invoiceHelpers';
 
+function createPartyPaymentFor(
+  get: () => any,
+  p: any,
+  partyId: string,
+  logLabel: string,
+): any {
+  if (p.partyPaymentId) return p;
+  try {
+    const ppId = get().addPartyPayment({
+      partyId, date: p.date, amount: p.amount,
+      method: p.method, type: p.type || 'regular',
+      checkNo: p.checkNo || '', bank: p.bank || '', dueDate: p.dueDate || '',
+      notes: p.notes || '', status: p.status,
+      clearedDate: p.clearedDate, bouncedDate: p.bouncedDate,
+    });
+    return { ...p, partyPaymentId: ppId };
+  } catch (e) { console.error(logLabel, e); return p; }
+}
+
 export const useTra = create<State>()(
   persist(
     (set, get) => ({
@@ -67,19 +86,9 @@ export const useTra = create<State>()(
           // 🎯 ۴. اتصال به انبار از طریق Event Bus (حرکت‌ها + movementId)
           // ✅ آپدیت انبار فقط از طریق applyInvoiceStock انجام می‌شود
         }
-        const syncedPayments = (newInv.payments || []).map((p: any) => {
-          if (p.partyPaymentId) return p;
-          try {
-            const ppId = get().addPartyPayment({
-              partyId: newInv.partyId, date: p.date, amount: p.amount,
-              method: p.method, type: p.type || 'regular',
-              checkNo: p.checkNo || '', bank: p.bank || '', dueDate: p.dueDate || '',
-              notes: p.notes || '', status: p.status,
-              clearedDate: p.clearedDate, bouncedDate: p.bouncedDate,
-            });
-            return { ...p, partyPaymentId: ppId };
-          } catch (e) { console.error('[TRA sync add]', e); return p; }
-        });
+        const syncedPayments = (newInv.payments || []).map((p: any) =>
+          createPartyPaymentFor(get, p, newInv.partyId, '[TRA sync add]')
+        );
         const final: Invoice = { ...newInv, items, payments: syncedPayments };
         // 🆕 آبشار بانکی: تخصیص پرداخت‌ها به اقساط
         if (final.installments && final.installments.length > 0) {
@@ -167,19 +176,9 @@ export const useTra = create<State>()(
         }
         const prevPayments = (prev.payments || []) as any[];
         const newPaymentsInput = (mergedWithItems.payments || []) as any[];
-        const syncedPayments = newPaymentsInput.map((p: any) => {
-          if (p.partyPaymentId) return p;
-          try {
-            const ppId = get().addPartyPayment({
-              partyId: mergedWithItems.partyId, date: p.date, amount: p.amount,
-              method: p.method, type: p.type || 'regular',
-              checkNo: p.checkNo || '', bank: p.bank || '', dueDate: p.dueDate || '',
-              notes: p.notes || '', status: p.status,
-              clearedDate: p.clearedDate, bouncedDate: p.bouncedDate,
-            });
-            return { ...p, partyPaymentId: ppId };
-          } catch (e) { console.error('[TRA sync upd]', e); return p; }
-        });
+        const syncedPayments = newPaymentsInput.map((p: any) =>
+          createPartyPaymentFor(get, p, mergedWithItems.partyId, '[TRA sync upd]')
+        );
         const prevPPIds = new Set(prevPayments.map((p: any) => p.partyPaymentId).filter(Boolean));
         const newPPIds = new Set(syncedPayments.map((p: any) => p.partyPaymentId).filter(Boolean));
         for (const ppId of prevPPIds) {

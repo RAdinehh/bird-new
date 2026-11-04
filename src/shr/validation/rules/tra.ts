@@ -9,6 +9,17 @@ import {
 } from '../helpers';
 import type { ValidationContext } from '../types';
 
+function paymentRefine(dateLabel: string) {
+  return (data: any, ctx: z.RefinementCtx) => {
+    if (!data.date || String(data.date).trim() === '') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required(dateLabel), path: ['date'] });
+    }
+    if (data.method === 'check' && (!data.checkNo || data.checkNo.trim().length === 0)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('شماره چک'), path: ['checkNo'] });
+    }
+  };
+}
+
 export const PaymentSchema = z.object({
   date: persianDateOpt('تاریخ پرداخت'),
   amount: floatPos('مبلغ', 1_000_000_000_000),
@@ -19,17 +30,7 @@ export const PaymentSchema = z.object({
   dueDate: persianDateOpt('سرسید'),
   notes: optionalStr(300),
   status: oneOf('وضعیت چک', ['pending', 'cleared', 'bounced'] as const).optional(),
-}).superRefine((data, ctx) => {
-  const d = data as any;
-  if (!d.date || String(d.date).trim() === '') {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('تاریخ پرداخت'), path: ['date'] });
-  }
-  if (d.method === 'check') {
-    if (!d.checkNo || d.checkNo.trim().length === 0) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('شماره چک'), path: ['checkNo'] });
-    }
-  }
-});
+}).superRefine(paymentRefine('تاریخ پرداخت'));
 
 export function createInvoiceSchema(ctx: ValidationContext = {}) {
   const vFlocks = (ctx as any).flocks as any[] | undefined;
@@ -717,18 +718,7 @@ export function getDealPaymentFormSchema(maxAmount: number) {
     checkNo: optionalStr(50),
     bank: optionalStr(80),
     dueDate: persianDateOpt('سرسید'),
-  }).superRefine((data, ctx) => {
-    const d = data as any;
-    if (!d.date || String(d.date).trim() === '') {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('تاریخ'), path: ['date'] });
-    }
-    if (d.method === 'check') {
-      if (!d.checkNo || d.checkNo.trim().length === 0) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('شماره چک'), path: ['checkNo'] });
-      }
-
-    }
-  });
+  }).superRefine(paymentRefine('تاریخ'));
 }
 
 
