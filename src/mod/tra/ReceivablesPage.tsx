@@ -3,7 +3,7 @@
  */
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { daysUntilDue, dueLabel, computeUpcoming , computeUpcomingDeals } from './helpers';
+import { daysUntilDue, dueLabel, computeUpcoming, computeUpcomingDeals, dueTone } from './helpers';
 import DeferModal from './components/DeferModal';
 import DeferHistoryModal from './components/DeferHistoryModal';
 import ReminderModal from './components/ReminderModal';
@@ -299,7 +299,8 @@ renderSummary={(d) => {
               const bal = computeDealBalance(d);
               const party = contacts.find(c => c.id === d.partyId);
               const days = dealDaysUntilDue(d);
-              const dueColor = days === null ? 'var(--muted)' : days < 0 ? 'var(--danger)' : days <= 7 ? 'var(--warn)' : 'var(--muted)';
+              const tone = dueTone(days);
+              const dueColor = tone === 'green' ? 'var(--accent)' : tone === 'red' ? 'var(--danger)' : 'var(--warn)';
               return (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
@@ -310,20 +311,20 @@ renderSummary={(d) => {
                       {toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} ت
                     </span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 500, color: 'var(--muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>
-                      {d.description || '—'}
-                    </span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1, minWidth: 0 }}>
+                      <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 500, color: 'var(--muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {d.description || '—'}
+                      </span>
                       {days !== null && (
                         <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color: dueColor }}>
                           {dueLabel(days)}
                         </span>
                       )}
-                      <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color: 'var(--dim)', fontVariantNumeric: 'tabular-nums' }}>
-                        {d.dealNumber || ''}
-                      </span>
                     </div>
+                    <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color: 'var(--dim)', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                      {d.dealNumber || ''}
+                    </span>
                   </div>
                 </div>
               );
@@ -382,9 +383,11 @@ renderSummary={(inv) => {
             const dUntil = daysUntilDue(inv);
             const subject = inv.items?.[0]?.description || CAT_LABEL[inv.category] || inv.category || '—';
             const verb = inv.type === 'sale' ? 'فروش' : 'خرید';
-            const dueColor = dUntil === null ? 'var(--muted)' : dUntil < 0 ? 'var(--danger)' : dUntil <= 7 ? 'var(--warn)' : 'var(--muted)';
             const rem = remaining(inv, allocations);
             const balColor = rem > 0 ? 'var(--danger)' : rem < 0 ? 'var(--accent)' : 'var(--muted)';
+            const tone = dueTone(dUntil);
+            const dueColor = tone === 'green' ? 'var(--accent)' : tone === 'red' ? 'var(--danger)' : 'var(--warn)';
+
             return (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
@@ -395,20 +398,20 @@ renderSummary={(inv) => {
                     {toFa(rem.toLocaleString('fa-IR'))} ت
                   </span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 500, color: 'var(--muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>
-                    {verb} {subject}
-                  </span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1, minWidth: 0 }}>
+                    <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 500, color: 'var(--muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {verb} {subject}
+                    </span>
                     {dUntil !== null && (
                       <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color: dueColor }}>
                         {dueLabel(dUntil)}
                       </span>
                     )}
-                    <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color: 'var(--dim)', fontVariantNumeric: 'tabular-nums' }}>
-                      {inv.number || ''}
-                    </span>
                   </div>
+                  <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color: 'var(--dim)', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                    {inv.number || ''}
+                  </span>
                 </div>
               </div>
             );
