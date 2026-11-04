@@ -37,11 +37,10 @@ export function chip(active: boolean): React.CSSProperties {
 }
 
 export function Line({ l, v }: { l: string; v: ReactNode }) {
-  const isAmount = typeof v === 'string' && v.includes('تومان');
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-sm)', padding: '6px 0', gap: 8 }}>
       <span style={{ color: 'var(--muted)', flexShrink: 0 }}>{l}:</span>
-      <span style={{ fontWeight: 600, color: 'var(--text)', ...(isAmount ? { direction: 'ltr' as const } : {}) }}>{v}</span>
+      <span style={{ fontWeight: 600, color: 'var(--text)', fontVariantNumeric: 'tabular-nums', textAlign: 'left' }}>{v}</span>
     </div>
   );
 }
