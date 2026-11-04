@@ -57,7 +57,7 @@ export default function DeferHistoryModal({ open, onClose, deferrals, invoiceNum
             const hasReason = d.reason && d.reason.trim() !== '' && d.reason !== '—';
 
             return (
-              <div key={d.id} style={{ padding: '8px 12px', background: 'var(--card-solid, #fff)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+              <div key={d.id} style={{ padding: '8px 12px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
                 {/* بخش راست: اطلاعات */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
