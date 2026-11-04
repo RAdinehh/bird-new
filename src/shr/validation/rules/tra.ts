@@ -702,7 +702,7 @@ export type InvoiceFormData = z.infer<ReturnType<typeof createInvoiceSchema>>;
  * استاندارد: Cross-field validation (amount ≤ balance)
  * L3: فقط در shr/validation/rules/ — نه در components
  */
-export function getDealPaymentFormSchema(maxAmount: number) {
+function basePaymentFormSchema(maxAmount: number) {
   return z.object({
     date: persianDateOpt('تاریخ'),
     amount: z
@@ -712,13 +712,22 @@ export function getDealPaymentFormSchema(maxAmount: number) {
         maxAmount,
         `مبلغ نمی‌تواند بیشتر از بدهی فعلی (${maxAmount.toLocaleString('fa-IR')} تومان) باشد`,
       ),
-    direction: oneOf('جهت', ['in', 'out'] as const),
     method: oneOf('روش', ['cash', 'card', 'check'] as const),
     notes: optionalStr(300),
     checkNo: optionalStr(50),
     bank: optionalStr(80),
     dueDate: persianDateOpt('سرسید'),
-  }).superRefine(paymentRefine('تاریخ'));
+  });
+}
+
+export function getDealPaymentFormSchema(maxAmount: number) {
+  return basePaymentFormSchema(maxAmount)
+    .extend({ direction: oneOf('جهت', ['in', 'out'] as const) })
+    .superRefine(paymentRefine('تاریخ'));
+}
+
+export function getInvoicePaymentFormSchema(maxAmount: number) {
+  return basePaymentFormSchema(maxAmount).superRefine(paymentRefine('تاریخ'));
 }
 
 

@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { daysUntilDue, dueLabel, computeUpcoming, computeUpcomingDeals, dueTone } from './helpers';
 import DeferModal from './components/DeferModal';
+import InvoicePayModal from './components/InvoicePayModal';
 import DeferHistoryModal from './components/DeferHistoryModal';
 import ReminderModal from './components/ReminderModal';
 import { useTra, remaining, paidSumAllocated, WORKFLOW_LABEL, DEAL_LABEL, computeDealBalance, dealDaysUntilDue, isDealOpen, type Invoice, type Deal, type Deferral } from './store';
@@ -40,6 +41,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   const [deferReason, setDeferReason] = useState('');
   const [showUpcoming, setShowUpcoming] = useState(false);
   const [dealPayTarget, setDealPayTarget] = useState<Deal | null>(null);
+  const [invoicePayTarget, setInvoicePayTarget] = useState<Invoice | null>(null);
   const [statementOpen, setStatementOpen] = useState(false);
   const [checksOpen, setChecksOpen] = useState(false);
   const [reminderInvoiceId, setReminderInvoiceId] = useState<string | null>(null);
@@ -392,7 +394,7 @@ renderDetails={(d) => {
                         </div>
                       )}
                       <div style={{ display: 'flex', gap: 6, borderTop: '1px solid var(--border)', paddingTop: 12, marginTop: 8 }}>
-                        <Btn size="sm" onClick={(e) => { e.stopPropagation(); setDealPayTarget(d); }}>ثبت پرداخت</Btn>
+                        {bal.balance > 0 ? <Btn size="sm" onClick={(e) => { e.stopPropagation(); setDealPayTarget(d); }}>📥 ثبت دریافت</Btn> : <Btn size="sm" onClick={(e) => { e.stopPropagation(); setDealPayTarget(d); }}>📤 ثبت پرداخت</Btn>}
                         <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setReminderDealId(d.id); }}>📨 یادآوری</Btn>
                         <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); openDealDefer(d); }}>⏰ تعویق</Btn>
                       </div>
@@ -497,6 +499,11 @@ renderDetails={(inv) => {
                 )}
                 <div style={{ display: 'flex', gap: 6, borderTop: '1px solid var(--border)', paddingTop: 12, marginTop: 8 }}>
                   
+                  {!isLockedFromSettlement && rem > 0 && (
+                    <Btn size="sm" onClick={(e) => { e.stopPropagation(); setInvoicePayTarget(inv); }}>
+                      {inv.type === 'sale' ? '📥 ثبت دریافت' : '📤 ثبت پرداخت'}
+                    </Btn>
+                  )}
                   <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setReminderInvoiceId(inv.id); }}>📨 یادآوری</Btn>
                   <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); openDefer(inv); }}>⏰ تعویق</Btn>
                 </div>
@@ -529,6 +536,11 @@ renderDetails={(inv) => {
         deferReason={deferReason}
         setDeferReason={setDeferReason}
         onConfirm={doDefer}
+      />
+      <InvoicePayModal
+        open={!!invoicePayTarget}
+        onClose={() => setInvoicePayTarget(null)}
+        invoice={invoicePayTarget}
       />
       <DealPayModal
         open={!!dealPayTarget}
