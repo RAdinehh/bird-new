@@ -346,7 +346,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                       </div>
 
                       {/* 📥 وضعیت تسویه */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 4 }}>
                         <Line l="دریافت‌شده" v={`${toFa(bal.paidIn.toLocaleString('fa-IR'))} تومان`} />
                         <Line l="باقی‌مانده" v={
                           <span style={{ fontWeight: 800, color: bal.balance >= 0 ? 'var(--accent)' : 'var(--danger)' }}>
@@ -462,7 +462,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                 </div>
 
                 {/* 📥 وضعیت تسویه */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 4 }}>
                   <Line l="پرداخت‌شده" v={`${toFa(paidSumAllocated(inv, allocations).toLocaleString('fa-IR'))} تومان`} />
                   <Line l="باقی‌مانده" v={
                     <span style={{ fontWeight: 800, color: 'var(--warn)' }}>
