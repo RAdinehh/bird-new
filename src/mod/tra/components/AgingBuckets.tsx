@@ -135,9 +135,10 @@ export default function AgingBuckets<T extends { id: string }>({
                       <div
                         key={item.id}
                         style={{
-                          background: 'var(--card)',
+                          background: 'var(--card-solid, #fff)',
                           border: '1px solid var(--border)',
                           borderRadius: 'var(--r-sm)',
+                          boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
                           overflow: 'hidden',
                         }}
                       >
@@ -149,7 +150,6 @@ export default function AgingBuckets<T extends { id: string }>({
                         </div>
                         {isItemOpen && renderDetails && (
                           <div style={{
-                            borderTop: '1px solid var(--border)',
                             background: 'var(--input-bg)',
                             padding: '12px',
                             display: 'flex', flexDirection: 'column', gap: 12,
