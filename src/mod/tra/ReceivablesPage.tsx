@@ -491,7 +491,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
 
                 {/* 🔗 اطلاعات مرتبط */}
                 {(inv.workflowStatus || relatedDeal || inv.relatedFlockId || checkPending.length > 0) && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                     {inv.workflowStatus && <Line l="وضعیت" v={WORKFLOW_LABEL[inv.workflowStatus].replace(/^[^؀-ۿA-Za-z0-9]+/u, '')} />}
                     {relatedDeal && <Line l="معامله" v={relatedDeal.dealNumber || relatedDeal.id.slice(0, 6)} />}
                     {inv.relatedFlockId && <Row l="گله" v={<EntityLink type="flock" id={inv.relatedFlockId} label={inv.items?.[0]?.flockName || 'مشاهده'} />} />}
