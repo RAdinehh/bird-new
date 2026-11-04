@@ -23,7 +23,7 @@ import StatementModal from './components/StatementModal';
 import AgingBuckets from './components/AgingBuckets';
 import ChecksModal from './components/ChecksModal';
 import { agingBucketFromDue } from './formulas';
-import { agingBucketFromDeal, computeOverpayment } from './calc';
+import { agingBucketFromDeal, computeOverpayment , getTodayJalali} from './calc';
 
 
 export default function ReceivablesPage({ active = true }: { active?: boolean } = {}) {
@@ -146,14 +146,16 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
 
 
   const openDefer = (inv: Invoice) => {
-    setDeferModal({ kind: 'invoice', id: inv.id, oldDate: inv.dueDate || inv.date });
-    setDeferDate(inv.dueDate || inv.date);
+    const old = inv.dueDate || inv.date || getTodayJalali();
+    setDeferModal({ kind: 'invoice', id: inv.id, oldDate: old });
+    setDeferDate(old);
     setDeferReason('');
   };
 
   const openDealDefer = (d: Deal) => {
-    setDeferModal({ kind: 'deal', id: d.id, oldDate: d.dueDate || d.date });
-    setDeferDate(d.dueDate || d.date);
+    const old = d.dueDate || d.date || getTodayJalali();
+    setDeferModal({ kind: 'deal', id: d.id, oldDate: old });
+    setDeferDate(old);
     setDeferReason('');
   };
 

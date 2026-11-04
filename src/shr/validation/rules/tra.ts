@@ -731,3 +731,20 @@ export function getDealPaymentFormSchema(maxAmount: number) {
   });
 }
 
+
+
+/** 🆕 اسکیمای تعویق سرسید (استاندارد با بخش‌های دیگر) */
+export function getDeferSchema(oldDate: string) {
+  return z.object({
+    deferDate: z.string().min(1, 'تاریخ سرسید جدید را وارد کنید'),
+    deferReason: z.string().optional(),
+  }).superRefine((data, ctx) => {
+    if (oldDate && data.deferDate <= oldDate) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'سرسید جدید نمی‌تواند قبل از سرسید فعلی باشد.',
+        path: ['deferDate'],
+      });
+    }
+  });
+}
