@@ -315,16 +315,19 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                       {toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} ت
                     </span>
                   </div>
-                  {/* خط دوم: وضعیت + شماره معامله */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-xs)' }}>
-                    {days !== null ? (
-                      <span style={{ color: days <= 3 ? 'var(--danger)' : days <= 7 ? 'var(--warn)' : 'var(--muted)', fontWeight: 600 }}>
-                        {dueLabel(days)}
+                  {/* خط دوم: توضیحات + سرسید + شماره معامله */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-sm)', gap: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
+                      <span style={{ color: 'var(--muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {d.description || '—'}
                       </span>
-                    ) : (
-                      <span style={{ color: 'var(--muted)' }}>{d.description || '—'}</span>
-                    )}
-                    <span style={{ color: 'var(--dim)', fontFamily: 'monospace', direction: 'ltr', fontWeight: 600 }}>
+                      {days !== null && (
+                        <span style={{ color: days <= 3 ? 'var(--danger)' : days <= 7 ? 'var(--warn)' : 'var(--muted)', fontWeight: 600, flexShrink: 0 }}>
+                          • {dueLabel(days)}
+                        </span>
+                      )}
+                    </div>
+                    <span style={{ color: 'var(--dim)', fontVariantNumeric: 'tabular-nums', fontWeight: 600, flexShrink: 0 }}>
                       {d.dealNumber || ''}
                     </span>
                   </div>
@@ -417,22 +420,22 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                     {toFa(remaining(inv, allocations).toLocaleString('fa-IR'))} ت
                   </span>
                 </div>
-                {/* خط دوم: موضوع + روزهای گذشته + شماره فاکتور */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-xs)' }}>
-                  <span style={{ color: 'var(--muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {verb} {subject}
-                  </span>
-                  {dUntil !== null ? (
-                    <span style={{ color: dUntil < 0 ? 'var(--danger)' : dUntil <= 7 ? 'var(--warn)' : 'var(--muted)', fontWeight: 600, flexShrink: 0 }}>
-                      {dueLabel(dUntil)}
+                  {/* خط دوم: موضوع + سرسید + شماره فاکتور */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-sm)', gap: 8 }}>
+                    <span style={{ color: 'var(--muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1, minWidth: 0 }}>
+                      {verb} {subject}
                     </span>
-                  ) : (
-                    <span style={{ color: 'var(--muted)' }}>—</span>
-                  )}
-                  <span style={{ color: 'var(--dim)', fontFamily: 'monospace', direction: 'ltr', fontWeight: 600, flexShrink: 0 }}>
-                    {inv.number || ''}
-                  </span>
-                </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                      {dUntil !== null && (
+                        <span style={{ color: dUntil < 0 ? 'var(--danger)' : dUntil <= 7 ? 'var(--warn)' : 'var(--muted)', fontWeight: 600 }}>
+                          {dueLabel(dUntil)}
+                        </span>
+                      )}
+                      <span style={{ color: 'var(--dim)', fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
+                        {inv.number || ''}
+                      </span>
+                    </div>
+                  </div>
               </div>
             );
           }}
