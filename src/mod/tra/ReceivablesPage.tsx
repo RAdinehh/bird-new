@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { daysUntilDue, dueLabel, computeUpcoming , computeUpcomingDeals } from './helpers';
 import DeferModal from './components/DeferModal';
+import DeferHistoryModal from './components/DeferHistoryModal';
 import ReminderModal from './components/ReminderModal';
 import { useTra, remaining, paidSumAllocated, WORKFLOW_LABEL, DEAL_LABEL, computeDealBalance, dealDaysUntilDue, isDealOpen, type Invoice, type Deal, type Deferral } from './store';
 import { useCtc } from '../ctc/store';
@@ -42,6 +43,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   const [checksOpen, setChecksOpen] = useState(false);
   const [reminderInvoiceId, setReminderInvoiceId] = useState<string | null>(null);
   const [reminderDealId, setReminderDealId] = useState<string | null>(null);
+  const [historyInvoice, setHistoryInvoice] = useState<Invoice | null>(null);
 
   const openInvoices = useMemo(
     () => invoices.filter(i => i.type === kind && remaining(i, allocations) > 0 && i.disputeStatus !== 'open'),
@@ -395,7 +397,14 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
                 })()}
                 {inv.dueDate ? <Line l="سرسید" v={toFa(inv.dueDate)} /> : null}
                 {inv.workflowStatus ? <Line l="وضعیت" v={WORKFLOW_LABEL[inv.workflowStatus].replace(/^[^\u0600-\u06FFA-Za-z0-9]+/u, '')} /> : null}
-                {inv.deferrals && inv.deferrals.length > 0 ? <Line l="تعویق‌ها" v={toFa(inv.deferrals.length)} /> : null}
+                {inv.deferrals && inv.deferrals.length > 0 ? (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0' }}>
+                    <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>⏰ تعویق‌ها:</span>
+                    <button type="button" onClick={(e) => { e.stopPropagation(); setHistoryInvoice(inv); }} style={{ background: 'transparent', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit' }}>
+                      {toFa(inv.deferrals.length)} بار (مشاهده تاریخچه)
+                    </button>
+                  </div>
+                ) : null}
                 {inv.reminderLog && inv.reminderLog.length > 0 ? (
                   <Line l="آخرین یادآوری" v={`${toFa(inv.reminderLog[inv.reminderLog.length - 1].date)}${inv.reminderLog[inv.reminderLog.length - 1].methodLabel ? ' — ' + inv.reminderLog[inv.reminderLog.length - 1].methodLabel : ''}`} />
                 ) : null}
@@ -451,6 +460,12 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
         onClose={() => { setReminderInvoiceId(null); setReminderDealId(null); }}
         invoiceId={reminderInvoiceId}
         dealId={reminderDealId}
+      />
+      <DeferHistoryModal
+        open={!!historyInvoice}
+        onClose={() => setHistoryInvoice(null)}
+        deferrals={historyInvoice?.deferrals}
+        invoiceNumber={historyInvoice?.number || historyInvoice?.id?.slice(0,6) || '—'}
       />
       <DeferModal
         deferModal={deferModal}

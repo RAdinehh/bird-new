@@ -151,6 +151,63 @@ export function detectAllAlerts(): RuleAlert[] {
     const days = overdueDays(inv);
     const bucket = agingBucketFromDue(inv);
 
+    // 🆕 هشدارهای پیشگیرانه (مستقل از نوع فاکتور)
+    const _todayJ = todayJalali();
+    
+    // ۱. یادآوری امروز
+    if (inv.nextReminderAt === _todayJ) {
+      alerts.push({
+        level: 'important',
+        category: 'payment',
+        title: 'یادآوری پیگیری',
+        message: 'فاکتور ' + (inv.number || '—') + ' — امروز موعد یادآوری است',
+        source: 'tra',
+        sourceId: inv.id + ':reminder-today',
+        date: today(), notes: ''
+      });
+    }
+
+    // ۲. قول پرداخت رد شده
+    const _latestPromise = inv.reminderLog?.slice().reverse().find(r => r.promisedDate);
+    if (_latestPromise && _latestPromise.promisedDate && _latestPromise.promisedDate < _todayJ) {
+      alerts.push({
+        level: 'critical',
+        category: 'payment',
+        title: 'قول پرداخت رد شده',
+        message: 'فاکتور ' + (inv.number || '—') + ' — طرف حساب به قول خود عمل نکرده',
+        source: 'tra',
+        sourceId: inv.id + ':promise-broken',
+        date: today(), notes: ''
+      });
+    }
+
+    // ۳. تعویق مکرر
+    if (inv.deferrals && inv.deferrals.length > 3) {
+      alerts.push({
+        level: 'important',
+        category: 'payment',
+        title: 'تعویق مکرر',
+        message: 'فاکتور ' + (inv.number || '—') + ' — ' + toFa(inv.deferrals.length) + ' بار تعویق شده است',
+        source: 'tra',
+        sourceId: inv.id + ':frequent-deferrals',
+        date: today(), notes: ''
+      });
+    }
+
+    // ۴. چک برگشتی
+    const _bouncedChecks = (inv.payments || []).filter(p => p.method === 'check' && p.status === 'bounced');
+    if (_bouncedChecks.length > 0) {
+      alerts.push({
+        level: 'critical',
+        category: 'payment',
+        title: 'چک برگشتی',
+        message: 'فاکتور ' + (inv.number || '—') + ' — ' + toFa(_bouncedChecks.length) + ' چک برگشتی',
+        source: 'tra',
+        sourceId: inv.id + ':bounced-check',
+        date: today(), notes: ''
+      });
+    }
+
     if (inv.type === 'sale') {
       // طلب از مشتری
       if (bucket === '61-90' || bucket === '91-180' || bucket === '181-365' || bucket === '+365') {
