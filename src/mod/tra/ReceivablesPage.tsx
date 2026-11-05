@@ -8,7 +8,7 @@ import DeferModal from './components/DeferModal';
 import InvoicePayModal from './components/InvoicePayModal';
 import DeferHistoryModal from './components/DeferHistoryModal';
 import ReminderModal from './components/ReminderModal';
-import { useTra, remaining, paidSumAllocated, WORKFLOW_LABEL, DEAL_LABEL, computeDealBalance, dealDaysUntilDue, isDealOpen, type Invoice, type Deal, type Deferral } from './store';
+import { useTra, remaining, paidSumAllocated, WORKFLOW_LABEL, DEAL_LABEL, computeDealBalance, dealDaysUntilDue, isDealOpen, computeUnappliedAdvances, type Invoice, type Deal, type Deferral } from './store';
 import { useCtc } from '../ctc/store';
 import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import EntityLink from '../../shr/components/EntityLink';
@@ -23,6 +23,7 @@ import SummaryBox from './components/SummaryBox';
 import UpcomingDueSection from './components/UpcomingDueSection';
 import UpcomingDealsSection from './components/UpcomingDealsSection';
 import StatementModal from './components/StatementModal';
+import ApplyAdvanceModal from './components/ApplyAdvanceModal';
 import AgingBuckets from './components/AgingBuckets';
 import ChecksModal from './components/ChecksModal';
 import { agingBucketFromDue } from './formulas';
@@ -42,6 +43,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
   const [showUpcoming, setShowUpcoming] = useState(false);
   const [dealPayTarget, setDealPayTarget] = useState<Deal | null>(null);
   const [invoicePayTarget, setInvoicePayTarget] = useState<Invoice | null>(null);
+  const [applyAdvanceTarget, setApplyAdvanceTarget] = useState<Invoice | null>(null);
   const [statementOpen, setStatementOpen] = useState(false);
   const [checksOpen, setChecksOpen] = useState(false);
   const [reminderInvoiceId, setReminderInvoiceId] = useState<string | null>(null);
@@ -526,6 +528,9 @@ renderDetails={(inv) => {
                       {inv.type === 'sale' ? '📥 ثبت دریافت' : '📤 ثبت پرداخت'}
                     </Btn>
                   )}
+                  {!isLockedFromSettlement && rem > 0 && inv.partyId && computeUnappliedAdvances(inv.partyId) > 0.5 && (
+                    <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setApplyAdvanceTarget(inv); }}>⚡ پیش‌پرداخت</Btn>
+                  )}
                   <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setReminderInvoiceId(inv.id); }}>📨 یادآوری</Btn>
                   <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); openDefer(inv); }}>⏰ تعویق</Btn>
                 </div>
@@ -563,6 +568,11 @@ renderDetails={(inv) => {
         open={!!invoicePayTarget}
         onClose={() => setInvoicePayTarget(null)}
         invoice={invoicePayTarget}
+      />
+      <ApplyAdvanceModal
+        open={!!applyAdvanceTarget}
+        onClose={() => setApplyAdvanceTarget(null)}
+        invoice={applyAdvanceTarget}
       />
       <DealPayModal
         open={!!dealPayTarget}
