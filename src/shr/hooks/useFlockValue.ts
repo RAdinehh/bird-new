@@ -23,27 +23,40 @@ export function useFlockValue() {
   const marketPrices = useSet(s => s.marketPrices);
   const breedStd = useBreedStandard();
 
-  const estimateWeightG = (flock: FlockLike): { weightG: number | null; ageDays: number | null; reason?: string } => {
+  const estimateWeightG = (flock: any): { weightG: number | null; ageDays: number | null; reason?: string } => {
     const std = breedStd.byBreedId(flock.breedId) || breedStd.byName(flock.breedName);
     if (!std) return { weightG: null, ageDays: null, reason: 'نژاد تعریف نشده' };
 
     const curve = std.growth?.weightByAge;
-    if (!curve || curve.length === 0) return { weightG: null, ageDays: null, reason: 'جدول رشد نژاد تعریف نشده' };
+    const finalWeight = std.growth?.finalWeightG;
 
-    const startStr = flock.startDate || flock.date;
-    if (!startStr) return { weightG: null, ageDays: null, reason: 'تاریخ شروع ثبت نشده' };
+    if ((!curve || curve.length === 0) && (!finalWeight || finalWeight <= 0)) {
+      return { weightG: null, ageDays: null, reason: 'جدول رشد نژاد تعریف نشده' };
+    }
+
+    // 🆕 سن از هچ (برای جدول رشد صحیح است) > شروع > تاریخ
+    const hatchStr = flock.hatchDate || flock.startDate || flock.date;
+    if (!hatchStr) return { weightG: null, ageDays: null, reason: 'تاریخ شروع/هچ ثبت نشده' };
 
     try {
-      const start = parseJ(startStr, 'yyyy/MM/dd', new Date());
+      const start = parseJ(hatchStr, 'yyyy/MM/dd', new Date());
       if (isNaN(start.getTime())) return { weightG: null, ageDays: null, reason: 'تاریخ نامعتبر' };
 
       const ageDays = diffDaysJ(new Date(), start);
-      if (ageDays < 0) return { weightG: null, ageDays, reason: 'تاریخ شروع در آینده' };
+      if (ageDays < 0) return { weightG: null, ageDays, reason: 'تاریخ در آینده' };
 
-      const range = curve.find(r => ageDays >= r.dayFrom && ageDays <= r.dayTo);
-      if (!range) return { weightG: null, ageDays, reason: 'سن خارج از جدول رشد' };
+      // ۱. تلاش برای پیدا کردن بازه در جدول
+      if (curve && curve.length > 0) {
+        const range = curve.find(r => ageDays >= r.dayFrom && ageDays <= r.dayTo);
+        if (range) return { weightG: range.weightG, ageDays };
+      }
 
-      return { weightG: range.weightG, ageDays };
+      // ۲. Fallback به وزن نهایی (سن بیشتر از جدول)
+      if (finalWeight && finalWeight > 0) {
+        return { weightG: finalWeight, ageDays };
+      }
+
+      return { weightG: null, ageDays, reason: `سن ${ageDays} روز — خارج از جدول رشد` };
     } catch {
       return { weightG: null, ageDays: null, reason: 'خطا در محاسبه' };
     }
@@ -61,7 +74,7 @@ export function useFlockValue() {
     }
   };
 
-  const computeFlockValue = (flock: FlockLike): FlockValueResult => {
+  const computeFlockValue = (flock: any): FlockValueResult => {
     const count = Number(flock.currentCount) || 0;
     if (count <= 0) return { value: 0, weightG: null, pricePerKg: 0, kind: '', ageDays: null, reason: 'تعداد صفر' };
 

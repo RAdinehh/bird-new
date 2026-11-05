@@ -435,6 +435,18 @@ export default function FlockCard(props: FlockCardProps) {
       {(() => {
         const revenue = invoiceRevenue;
         if (revenue === 0 && costs.total === 0) return null;
+        // 🆕 اگر فروشی نبوده، "زیان" گمراه‌کننده است → نمایش وضعیت پرورش
+        if (revenue === 0 && costs.total > 0) {
+          return (
+            <>
+              <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📊 وضعیت گله</div>
+              <RowGrid>
+                <Row l="هزینه تا امروز" v={fmt.money(costs.grandTotalOwed)} />
+                <Row l="وضعیت" v="🐣 در حال پرورش" />
+              </RowGrid>
+            </>
+          );
+        }
         const profit = revenue - costs.grandTotalOwed;
         const roi = costs.grandTotalOwed > 0 ? (profit / costs.grandTotalOwed) * 100 : 0;
         const isProfit = profit >= 0;
