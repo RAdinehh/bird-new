@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useTra } from '../mod/tra/store';
+import { useCtc } from '../mod/ctc/store';
 import type { PartyPayment, Invoice, Deal, CheckStatus } from '../mod/tra/types';
 
 // ═══════════════════════════════════════════════
@@ -226,5 +227,66 @@ describe('bouncePartyPayment', () => {
     useTra.getState().bouncePartyPayment(pp.id);
     const inv2Payments = useTra.getState().invoices.find(i => i.id === 'inv2')?.payments;
     expect(inv2Payments?.[0]?.status).toBeUndefined();
+  });
+});
+
+// ═══════════════════════════════════════════════
+// Regression: creditBalance sync (fix 74a5060c)
+// ═══════════════════════════════════════════════
+
+describe('creditBalance sync پس از تغییر وضعیت چک', () => {
+  beforeEach(() => {
+    resetStore();
+    useCtc.setState({ contacts: [] });
+  });
+
+  it('clearPartyPayment → creditBalance sync', () => {
+    useCtc.setState({ contacts: [{ id: 'party-1', name: 'تست', creditBalance: -500000 } as any] });
+    const pp = makePartyPayment({ partyId: 'party-1', amount: 1000000, status: 'in_transit' });
+    const inv = makeInvoice({
+      partyId: 'party-1',
+      total: 1000000,
+      payments: [{
+        id: 'p1', date: '1405/08/01', amount: 1000000, method: 'check',
+        checkNo: '', bank: '', dueDate: '', notes: '',
+        partyPaymentId: pp.id, status: 'in_transit',
+      } as any],
+    });
+    useTra.setState({ partyPayments: [pp], invoices: [inv] });
+    useTra.getState().clearPartyPayment(pp.id);
+    const party = useCtc.getState().contacts.find((c: any) => c.id === 'party-1');
+    expect(party?.creditBalance).toBe(0);
+  });
+
+  it('bouncePartyPayment → creditBalance sync', () => {
+    useCtc.setState({ contacts: [{ id: 'party-1', name: 'تست', creditBalance: 999 } as any] });
+    const pp = makePartyPayment({ partyId: 'party-1', amount: 1000000, status: 'in_transit' });
+    const inv = makeInvoice({
+      partyId: 'party-1',
+      total: 1000000,
+      payments: [{
+        id: 'p1', date: '1405/08/01', amount: 1000000, method: 'check',
+        checkNo: '', bank: '', dueDate: '', notes: '',
+        partyPaymentId: pp.id, status: 'in_transit',
+      } as any],
+    });
+    useTra.setState({ partyPayments: [pp], invoices: [inv] });
+    useTra.getState().bouncePartyPayment(pp.id);
+    const party = useCtc.getState().contacts.find((c: any) => c.id === 'party-1');
+    expect(party?.creditBalance).toBe(-1000000);
+  });
+
+  it('depositPartyPayment → deal.payments[].status = in_transit', () => {
+    const pp = makePartyPayment({ partyId: 'party-1', amount: 1000000, status: 'pending' });
+    const deal = makeDeal({
+      payments: [{
+        id: 'dp1', date: '1405/08/01', amount: 1000000,
+        direction: 'in', method: 'check', partyPaymentId: pp.id,
+      } as any],
+    });
+    useTra.setState({ partyPayments: [pp], deals: [deal] });
+    useTra.getState().depositPartyPayment(pp.id);
+    const updated = useTra.getState().deals.find(d => d.id === deal.id);
+    expect(updated?.payments?.[0]?.status).toBe('in_transit');
   });
 });

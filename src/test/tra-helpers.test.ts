@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { format as formatJ, addDays as addDaysJ } from 'date-fns-jalali';
-import { daysUntilJalali, daysUntilDue, computeUpcoming } from '../mod/tra/helpers';
-import type { Invoice } from '../mod/tra/types';
+import { daysUntilJalali, daysUntilDue, computeUpcoming, computeUpcomingDeals } from '../mod/tra/helpers';
+import type { Invoice, Deal } from '../mod/tra/types';
 
 function makeInvoice(overrides: Partial<Invoice> = {}): Invoice {
   return {
@@ -65,5 +65,57 @@ describe('computeUpcoming (Dunning C4)', () => {
     const a = makeInvoice({ id: 'a', dueDate: minus5 });
     const b = makeInvoice({ id: 'b', dueDate: plus5 });
     expect(computeUpcoming([a, b]).map((r) => r.inv.id)).toEqual(['a', 'b']);
+  });
+});
+
+// ═══════════════════════════════════════════════
+// computeUpcomingDeals (regression: fix 74a5060c)
+// ═══════════════════════════════════════════════
+
+function makeDeal(overrides: Partial<Deal> = {}): Deal {
+  return {
+    id: 'deal-' + Math.random(),
+    type: 'consignment',
+    date: '1405/01/01',
+    partyId: 'p1',
+    description: 'test',
+    value: 0,
+    percent: null,
+    dueDate: '1405/01/01',
+    status: 'open',
+    notes: '',
+    createdAt: '',
+    updatedAt: '',
+    ...overrides,
+  };
+}
+
+describe('computeUpcomingDeals', () => {
+  it('no dueDate → excluded', () => {
+    expect(computeUpcomingDeals([makeDeal({ dueDate: '' })])).toEqual([]);
+  });
+
+  it('dueDate in future within 7 days → included', () => {
+    expect(computeUpcomingDeals([makeDeal({ dueDate: plus5 })])).toHaveLength(1);
+  });
+
+  it('dueDate far future (>7 days) → excluded', () => {
+    expect(computeUpcomingDeals([makeDeal({ dueDate: plus30 })])).toEqual([]);
+  });
+
+  it('snoozed (nextReminderAt > today) → excluded', () => {
+    expect(computeUpcomingDeals([makeDeal({ dueDate: plus5, nextReminderAt: plus30 })])).toEqual([]);
+  });
+
+  it('nextReminderAt past → included', () => {
+    expect(computeUpcomingDeals([makeDeal({ dueDate: plus5, nextReminderAt: minus5 })])).toHaveLength(1);
+  });
+
+  it('nextReminderAt today → included', () => {
+    expect(computeUpcomingDeals([makeDeal({ dueDate: plus5, nextReminderAt: today })])).toHaveLength(1);
+  });
+
+  it('no nextReminderAt → included', () => {
+    expect(computeUpcomingDeals([makeDeal({ dueDate: plus5 })])).toHaveLength(1);
   });
 });
