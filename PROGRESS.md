@@ -1146,3 +1146,23 @@ Deals (معاملات خاص) — چرخه کامل: Deal → Settlement → Inv
 - **C5**: `updateInvoice` — auto-cancel (اگر remaining=0 → `nextReminderAt = undefined`)
 - **C6** (اختیاری): Statement log (خط info برای یادآوری‌ها)
 
+
+## جلسه ۱۴۰۵/۱۱/۰۲ (شماره ۸ — Dunning Phase C1-3)
+
+آخرین commit: 1bf5598f
+
+### DONE — Dunning شروع شد
+- 6 commits: 628c8e68 → 1bf5598f
+- Schema: ReminderMethod + addReminder + reminderLog
+- UI: ReminderModal.tsx (3 methods: phone/in_person/other)
+- Wiring: 📨 button in ReceivablesPage
+
+### BUG شناخته‌شده
+- ReminderModal: textarea برای phone/in_person بی‌مصرف
+  → فقط «note» لازم دارن (طبق SAP F150)
+
+### PENDING
+- C4: UpcomingDueSection — filter با nextReminderAt (۷ روز بعد از یادآوری)
+- C5: auto-cancel (remaining=0 → nextReminderAt=undefined)
+- C6 (اختیاری): Statement log
+
