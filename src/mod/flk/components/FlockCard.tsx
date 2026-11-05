@@ -399,8 +399,6 @@ export default function FlockCard(props: FlockCardProps) {
         </>
       )}
 
-      <FlockValueSection flock={f} />
-
       {costs.total > 0 && (
         <>
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>💰 هزینه‌ها</div>
@@ -471,6 +469,8 @@ export default function FlockCard(props: FlockCardProps) {
           </>
         );
       })()}
+
+      <FlockValueSection flock={f} />
 
       {isArchived && f.archivedReason && (
         <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', color: 'var(--warn)' }}>
