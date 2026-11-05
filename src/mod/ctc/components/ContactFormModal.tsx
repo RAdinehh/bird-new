@@ -92,7 +92,9 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
                   placeholder="مثلاً ۵۰٬۰۰۰٬۰۰۰"
                   value={form.creditLimit != null && form.creditLimit > 0 ? String(form.creditLimit) : ''}
                   onChange={e => {
-                    const v = parseInt(String(e.target.value).replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/[,،]/g, '')) || 0;
+                    // 🆕 حذف همه کاراکترهای غیرعددی (شامل ٬ U+066C که formatNumWhileTyping اضافه می‌کند)
+                    const cleaned = String(e.target.value).replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/[^\d]/g, '');
+                    const v = parseInt(cleaned, 10) || 0;
                     setForm({ ...form, creditLimit: v > 0 ? v : null });
                   }}
                   unit="تومان"
