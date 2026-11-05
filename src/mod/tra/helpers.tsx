@@ -161,6 +161,13 @@ export function computeUpcomingDeals(
   deals: Deal[],
 ): Array<{ deal: Deal; days: number | null }> {
   return deals
+    .filter(d => {
+      if (d.nextReminderAt) {
+        const nrDays = daysUntilJalali(d.nextReminderAt);
+        if (nrDays !== null && nrDays > 0) return false;
+      }
+      return true;
+    })
     .map(d => ({ deal: d, days: dealDaysUntilDue(d) }))
     .filter(x => x.days !== null && x.days >= 0 && x.days <= 7)
     .sort((a, b) => (a.days ?? 0) - (b.days ?? 0));

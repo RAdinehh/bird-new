@@ -676,6 +676,13 @@ export const useTra = create<State>()(
           };
         }),
       });
+        // 🆕 sync creditBalance پس از تغییر وضعیت چک
+        try {
+          setPartyCredit(pp.partyId, computePartyCredit(pp.partyId, get().invoices, get().allocations));
+        } catch (e) {
+          console.error('[bouncePartyPayment] setPartyCredit failed:', e);
+        }
+
       },
       depositPartyPayment: (ppId: string) => {
         const pp = get().partyPayments.find(x => x.id === ppId);
@@ -711,6 +718,27 @@ export const useTra = create<State>()(
             };
           }),
         });
+        // 🆕 sync deals[].payments[] status (هماهنگی با clear/bounce)
+        set({
+          deals: get().deals.map(deal => {
+            const payments = deal.payments || [];
+            if (!payments.some((p: any) => p.partyPaymentId === ppId)) return deal;
+            return {
+              ...deal,
+              payments: payments.map((p: any) => p.partyPaymentId === ppId
+                ? { ...p, status: 'in_transit' as const }
+                : p),
+              updatedAt: new Date().toISOString(),
+            };
+          }),
+        });
+        // 🆕 sync creditBalance
+        try {
+          setPartyCredit(pp.partyId, computePartyCredit(pp.partyId, get().invoices, get().allocations));
+        } catch (e) {
+          console.error('[depositPartyPayment] setPartyCredit failed:', e);
+        }
+
       },
       clearPartyPayment: (ppId: string) => {
         const pp = get().partyPayments.find(x => x.id === ppId);
@@ -773,6 +801,13 @@ export const useTra = create<State>()(
           });
           if (changed) set({ invoices: updatedInvoices });
         } catch(e) { console.error('[clearPartyPayment] auto-cancel reminder:', e); }
+        // 🆕 sync creditBalance پس از تغییر وضعیت چک
+        try {
+          setPartyCredit(pp.partyId, computePartyCredit(pp.partyId, get().invoices, get().allocations));
+        } catch (e) {
+          console.error('[clearPartyPayment] setPartyCredit failed:', e);
+        }
+
       },
 
       addDeal: (d) => set({ deals: [...get().deals, {...d, id: uuid(), createdAt: now(), updatedAt: now()}] }),
