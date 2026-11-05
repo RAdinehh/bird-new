@@ -43,8 +43,14 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
       setPartyId(prefillPartyId);
       if (prefillInvoiceId) {
         setSelectedIds(new Set([prefillInvoiceId]));
+      } else {
+        const auto = invoices
+          .filter(inv => inv.type === kind && inv.partyId === prefillPartyId && remaining(inv) > 0)
+          .map(inv => inv.id);
+        setSelectedIds(new Set(auto));
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, prefillPartyId, prefillInvoiceId]);
 
   // فاکتورهای معوق این طرف حساب
@@ -209,7 +215,14 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
         <Field label="طرف حساب" required>
           <SmartSelect
             value={partyId}
-            onChange={v => { setPartyId(v); setSelectedIds(new Set()); }}
+            onChange={v => {
+                setPartyId(v);
+                // 🆕 auto-select all unpaid (SAP F-28 / Odoo standard)
+                const auto = invoices
+                  .filter(inv => inv.type === kind && inv.partyId === v && remaining(inv) > 0)
+                  .map(inv => inv.id);
+                setSelectedIds(new Set(auto));
+              }}
             options={contacts
               .filter(c => kind === 'sale' ? c.roles?.includes('customer') : c.roles?.includes('supplier'))
               .map(c => ({ value: c.id, label: c.name }))}
@@ -304,13 +317,25 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
                   {manualMode ? '✏️ تخصیص دستی' : '📊 تخصیص خودکار (FIFO)'}
                 </span>
-                <button
-                  type="button"
-                  onClick={toggleManualMode}
-                  style={{ padding: '4px 10px', fontSize: 'var(--fs-xs)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', cursor: 'pointer', color: 'var(--text)', fontFamily: 'inherit' }}
-                >
-                  {manualMode ? 'بازگشت به FIFO' : 'ویرایش دستی'}
-                </button>
+                <div style={{ display: 'flex', gap: 4 }}>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedIds(new Set(unpaid.map(i => i.id)))}
+                    style={{ padding: '4px 8px', fontSize: 'var(--fs-xs)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', cursor: 'pointer', color: 'var(--text)', fontFamily: 'inherit' }}
+                  >همه</button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedIds(new Set())}
+                    style={{ padding: '4px 8px', fontSize: 'var(--fs-xs)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', cursor: 'pointer', color: 'var(--text)', fontFamily: 'inherit' }}
+                  >هیچ</button>
+                  <button
+                    type="button"
+                    onClick={toggleManualMode}
+                    style={{ padding: '4px 10px', fontSize: 'var(--fs-xs)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', cursor: 'pointer', color: 'var(--text)', fontFamily: 'inherit' }}
+                  >
+                    {manualMode ? 'بازگشت به FIFO' : 'ویرایش دستی'}
+                  </button>
+                </div>
               </div>
               {unpaid.map(inv => {
                 const rem = remaining(inv);
