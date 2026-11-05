@@ -1099,5 +1099,34 @@ export const useTra = create<State>()(
 
 export function computePartyCredit(partyId: string, invoices: Invoice[], allocations?: any[]): number {
   // SINGLE SOURCE OF TRUTH — partyBalance (formulas.ts)
-  return partyBalance(partyId, invoices, allocations);
+  const base = partyBalance(partyId, invoices, allocations);
+  if (!partyId) return base;
+
+  // 🆕 فاز ۳.۵: اضافه کردن پیش‌پرداخت‌های استفاده‌نشده (type: 'advance')
+  // base فقط inv.payments را می‌شمارد → advance های unapplied را نمی‌بیند
+  const allPps = useTra.getState().partyPayments;
+  const advances = (allPps || []).filter(
+    (p: any) => p.partyId === partyId && p.type === 'advance'
+  );
+  if (advances.length === 0) return base;
+
+  // محاسبه مجموع استفاده‌شده از هر partyPaymentId (از طریق inv.payments)
+  const usedMap = new Map<string, number>();
+  for (const inv of invoices) {
+    for (const pay of (inv.payments || [])) {
+      if (pay.partyPaymentId) {
+        const amt = Number(pay.amount) || 0;
+        usedMap.set(pay.partyPaymentId, (usedMap.get(pay.partyPaymentId) || 0) + amt);
+      }
+    }
+  }
+
+  // unapplied = Σ max(0, advance.amount - used)
+  const unapplied = advances.reduce((s: number, a: any) => {
+    const used = usedMap.get(a.id) || 0;
+    const amt = Number(a.amount) || 0;
+    return s + Math.max(0, amt - used);
+  }, 0);
+
+  return base + unapplied;
 }
