@@ -553,6 +553,27 @@ export function useInvoiceForm(params: {
       }
     }
 
+    // 🆕 فاز ۱: چک سقف اعتبار
+    if (form.partyId && total > 0) {
+      const _contact = contacts.find((c) => c.id === form.partyId);
+      const _limit = Number(_contact?.creditLimit) || 0;
+      if (_limit > 0) {
+        const _currentCredit = computePartyCredit(form.partyId, invoices, allocations);
+        const _oldTotal = form.id ? (invoices.find((i) => i.id === form.id)?.total || 0) : 0;
+        const _newCredit = _currentCredit - total + _oldTotal;
+        const _newDebt = Math.max(0, -_newCredit);
+        if (_newDebt > _limit) {
+          const _over = _newDebt - _limit;
+          const _ok = await showConfirmAsync(
+            'عبور از سقف اعتبار',
+            `بدهی این طرف پس از این فاکتور ${_newDebt.toLocaleString('fa-IR')} تومان می‌شود که ${_over.toLocaleString('fa-IR')} تومان از سقف اعتبار (${_limit.toLocaleString('fa-IR')} تومان) بیشتر است. ادامه می‌دهید؟`,
+            { confirmText: 'ادامه', cancelText: 'لغو' }
+          );
+          if (!_ok) return;
+        }
+      }
+    }
+
     if (form.id) {
       updateInvoice(form.id, data);
       verifyInvariantsIfDev();

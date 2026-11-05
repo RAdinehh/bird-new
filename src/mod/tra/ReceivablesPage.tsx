@@ -338,9 +338,20 @@ renderSummary={(d) => {
               return (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text)' }}>
-                      {party?.name || '—'}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
+                      <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text)' }}>
+                        {party?.name || '—'}
+                      </span>
+                      {(() => {
+                        const _c = Number(party?.creditBalance) || 0;
+                        if (_c <= 0.5) return null;
+                        return (
+                          <span style={{ fontSize: 'var(--fs-2xs)', fontWeight: 700, padding: '2px 6px', borderRadius: 4, color: 'var(--accent)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                            ⚡ {toFa(_c.toLocaleString('fa-IR'))}
+                          </span>
+                        );
+                      })()}
+                    </div>
                     <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', flexShrink: 0, color: bal.balance > 0 ? 'var(--danger)' : bal.balance < 0 ? 'var(--accent)' : 'var(--muted)' }}>
                       {toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} ت
                     </span>
@@ -425,9 +436,20 @@ renderSummary={(inv) => {
             return (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text)' }}>
-                    {party?.name || '—'}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
+                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text)' }}>
+                      {party?.name || '—'}
+                    </span>
+                    {(() => {
+                      const _c = Number(party?.creditBalance) || 0;
+                      if (_c <= 0.5) return null;
+                      return (
+                        <span style={{ fontSize: 'var(--fs-2xs)', fontWeight: 700, padding: '2px 6px', borderRadius: 4, color: 'var(--accent)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                          ⚡ {toFa(_c.toLocaleString('fa-IR'))}
+                        </span>
+                      );
+                    })()}
+                  </div>
                   <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', flexShrink: 0, color: balColor }}>
                     {toFa(rem.toLocaleString('fa-IR'))} ت
                   </span>
