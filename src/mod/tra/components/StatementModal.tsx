@@ -19,7 +19,7 @@ interface Props {
   kind?: 'sale' | 'purchase' | 'deal';
 }
 
-type LineKind = 'invoice_sale' | 'invoice_purchase' | 'deal' | 'payment_cash' | 'payment_card' | 'payment_check';
+type LineKind = 'invoice_sale' | 'invoice_purchase' | 'deal' | 'payment_cash' | 'payment_card' | 'payment_check' | 'advance' | 'refund';
 
 interface StatementLine {
   date: string;
@@ -42,6 +42,8 @@ const KIND_INFO: Record<LineKind, { icon: string; label: string; color: string }
   payment_cash: { icon: '💰', label: 'دریافت نقدی', color: 'var(--accent)' },
   payment_card: { icon: '💳', label: 'دریافت کارت', color: 'var(--accent)' },
   payment_check: { icon: '📝', label: 'دریافت چک', color: 'var(--accent)' },
+  advance: { icon: '⚡', label: 'پیش‌پرداخت', color: 'var(--accent)' },
+  refund: { icon: '↩️', label: 'عودت وجه', color: 'var(--danger)' },
 };
 
 const CHECK_INFO: Record<CheckStatus, { label: string; bg: string; color: string }> = {
@@ -52,7 +54,7 @@ const CHECK_INFO: Record<CheckStatus, { label: string; bg: string; color: string
 };
 
 export default function StatementModal({ open, onClose, kind }: Props) {
-  const { invoices, deals } = useTra();
+  const { invoices, deals, partyPayments } = useTra();
   const { contacts } = useCtc();
   const settings: any = useSet();
 
@@ -90,6 +92,33 @@ export default function StatementModal({ open, onClose, kind }: Props) {
       });
 
       for (const p of (inv.payments || [])) {
+        const pType = (p as any).type;
+        if (pType === 'advance') {
+          raw.push({
+            date: p.date,
+            kind: 'advance',
+            docNumber: inv.number || '',
+            checkNo: p.method === 'check' ? p.checkNo : undefined,
+            bank: p.method === 'check' ? p.bank : undefined,
+            dueDate: p.method === 'check' ? p.dueDate : undefined,
+            checkStatus: p.method === 'check' ? (p.status || 'pending') : undefined,
+            description: p.notes || 'مصرف از پیش‌پرداخت',
+            debit: 0,
+            credit: p.amount,
+          });
+          continue;
+        }
+        if (pType === 'refund') {
+          raw.push({
+            date: p.date,
+            kind: 'refund',
+            docNumber: inv.number || '',
+            description: p.notes || 'عودت وجه',
+            debit: p.amount,
+            credit: 0,
+          });
+          continue;
+        }
         const kind: LineKind = p.method === 'cash' ? 'payment_cash' : p.method === 'card' ? 'payment_card' : 'payment_check';
         raw.push({
           date: p.date,
@@ -145,20 +174,57 @@ export default function StatementModal({ open, onClose, kind }: Props) {
       }
     }
 
+    const usedByPp = new Map<string, number>();
+    for (const inv2 of invoices) {
+      for (const p of (inv2.payments || [])) {
+        const ppid = (p as any).partyPaymentId;
+        if (ppid) usedByPp.set(ppid, (usedByPp.get(ppid) || 0) + (p.amount || 0));
+      }
+    }
+    for (const deal2 of deals) {
+      for (const p of (deal2.payments || [])) {
+        const ppid = (p as any).partyPaymentId;
+        if (ppid) usedByPp.set(ppid, (usedByPp.get(ppid) || 0) + (p.amount || 0));
+      }
+    }
+    for (const pp of (partyPayments || [])) {
+      if (pp.partyId !== partyId) continue;
+      if ((pp as any).type !== 'advance') continue;
+      if (fromDate && pp.date < fromDate) continue;
+      if (toDate && pp.date > toDate) continue;
+      if ((pp as any).method === 'check' && (pp as any).status !== 'cleared') continue;
+      const usedAmt = usedByPp.get(pp.id) || 0;
+      const unappliedAmt = (pp.amount || 0) - usedAmt;
+      if (unappliedAmt > 0.5) {
+        raw.push({
+          date: pp.date,
+          kind: 'advance',
+          docNumber: '',
+          description: 'پیش‌پرداخت موجود (استفاده‌نشده)',
+          debit: 0,
+          credit: unappliedAmt,
+        });
+      }
+    }
+
     raw.sort((a, b) => a.date.localeCompare(b.date));
     let running = 0;
     return raw.map(l => {
-      // 🆕 Skip pending checks from running balance (only cleared checks count as paid)
-      const effectiveCredit = (l.kind === 'payment_check' && l.checkStatus !== 'cleared') ? 0 : l.credit;
+      const isPendingCheck = (l.kind === 'payment_check' || l.kind === 'advance')
+        && l.checkStatus !== undefined
+        && l.checkStatus !== 'cleared';
+      const effectiveCredit = isPendingCheck ? 0 : l.credit;
       running += l.debit - effectiveCredit;
       return { ...l, balance: running };
     });
-  }, [invoices, deals, partyId, fromDate, toDate]);
+  }, [invoices, deals, partyPayments, partyId, fromDate, toDate]);
 
   const totalDebit = lines.reduce((s, l) => s + l.debit, 0);
   const totalCredit = lines.reduce((s, l) => {
-    // 🆕 Skip pending checks (only cleared checks counted)
-    if (l.kind === 'payment_check' && l.checkStatus !== 'cleared') return s;
+    const isPendingCheck = (l.kind === 'payment_check' || l.kind === 'advance')
+      && l.checkStatus !== undefined
+      && l.checkStatus !== 'cleared';
+    if (isPendingCheck) return s;
     return s + l.credit;
   }, 0);
   const netBalance = totalDebit - totalCredit;
@@ -448,7 +514,7 @@ export default function StatementModal({ open, onClose, kind }: Props) {
                           <div style={{ fontSize: '12px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
                             <span style={{ flexShrink: 0 }}>{info.icon}</span>
                             <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{info.label}</span>
-                            {l.docNumber && (l.kind === 'deal' || l.kind === 'invoice_sale' || l.kind === 'invoice_purchase') && <span style={{ fontSize: '11px', color: 'var(--dim)', fontWeight: 400 }}>({l.docNumber})</span>}
+                            {l.docNumber && (l.kind === 'deal' || l.kind === 'invoice_sale' || l.kind === 'invoice_purchase' || l.kind === 'advance') && <span style={{ fontSize: '11px', color: 'var(--dim)', fontWeight: 400 }}>({l.docNumber})</span>}
                           </div>
                           <div style={{ fontSize: '10.5px', color: 'var(--muted)', paddingRight: 22, display: 'flex', alignItems: 'center', gap: 4, minWidth: 0 }}>
                             {l.description ? <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>{l.description}</span> : null}
