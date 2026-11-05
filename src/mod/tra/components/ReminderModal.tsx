@@ -228,13 +228,13 @@ ${farmName} 🐔`;
 
       {/* کانال */}
       <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)', marginBottom: 6 }}>کانال</div>
-      <div style={{ display: 'flex', gap: 4, width: '100%' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, width: '100%' }}>
         {CHANNEL_PRESETS.map(c => (
-          <button key={c} type="button" onClick={() => setChannel(c)} style={{ ...chipStyle(channel === c), flex: 1, padding: '6px 2px', fontSize: 'var(--fs-sm)', minWidth: 0 }}>
+          <button key={c} type="button" onClick={() => setChannel(c)} style={{ ...chipStyle(channel === c), flex: '1 1 auto', padding: '6px 8px', fontSize: 'var(--fs-sm)', minWidth: '70px', whiteSpace: 'nowrap' }}>
             {c}
           </button>
         ))}
-        <button type="button" onClick={() => setChannel('')} style={{ ...chipStyle(isCustomChannel), flex: 1, padding: '6px 2px', fontSize: 'var(--fs-sm)', minWidth: 0 }}>
+        <button type="button" onClick={() => setChannel('')} style={{ ...chipStyle(isCustomChannel), flex: '1 1 auto', padding: '6px 8px', fontSize: 'var(--fs-sm)', minWidth: '70px', whiteSpace: 'nowrap' }}>
           سایر
         </button>
       </div>
@@ -245,9 +245,9 @@ ${farmName} 🐔`;
       {/* پیام */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, paddingTop: 12, borderTop: '1px dashed var(--border)', marginBottom: 6 }}>
         <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)' }}>پیام</span>
-        <div style={{ display: 'flex', gap: 0 }}>
-          <button type="button" onClick={handleShare} title="ارسال" style={{ width: 28, height: 28, borderRadius: 'var(--r-sm)', background: 'var(--btn-bg)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📤</button>
-          <button type="button" onClick={handleCopy} title="کپی" style={{ width: 28, height: 28, borderRadius: 'var(--r-sm)', background: 'var(--btn-bg)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📋</button>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <button type="button" onClick={handleShare} title="ارسال" style={{ width: 32, height: 32, borderRadius: 'var(--r-sm)', background: 'var(--btn-bg)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📤</button>
+          <button type="button" onClick={handleCopy} title="کپی" style={{ width: 32, height: 32, borderRadius: 'var(--r-sm)', background: 'var(--btn-bg)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📋</button>
         </div>
       </div>
         <Textarea value={message} onChange={e => setMessage(e.target.value)} rows={isMessageExpanded ? 8 : 4} maxHeight={isMessageExpanded ? 240 : 120} />
@@ -259,7 +259,7 @@ ${farmName} 🐔`;
 
       {/* زمان‌بندی */}
       <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px dashed var(--border)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)' }}>یادآوری بعدی</span>
           {(promisedDate || intervalDaysStr) && (
             <button
