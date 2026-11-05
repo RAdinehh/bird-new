@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useFlockValue } from '../../../shr/hooks/useFlockValue';
 import QuickPricesModal from '../../../shr/components/QuickPricesModal';
+import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
+import { HELP } from '../../../shr/help/helpTexts';
 import { toFa } from '../../../shr/utils/fa';
 import { Btn } from '../../../shr/components/ui';
 
@@ -23,12 +25,16 @@ export default function FlockValueSection({ flock }: Props) {
   const { computeFlockValue } = useFlockValue();
   const result = computeFlockValue(flock);
 
+  const initialCount = Number(flock.initialCount) || 0;
+  const currentCount = Number(flock.currentCount) || 0;
+  const deaths = Math.max(0, initialCount - currentCount);
+  const deathsPct = initialCount > 0 ? (deaths / initialCount) * 100 : 0;
+  const showDeaths = deaths > 0 && initialCount > 0;
+
   const header = (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
-        📊 ارزش روز گله
-      </div>
-      <Btn size="sm" variant="outline" onClick={() => setPricesOpen(true)}>✏️</Btn>
+    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', display: 'flex', alignItems: 'center', gap: 2 }}>
+      📊 ارزش روز گله
+      <HelpIcon text={HELP.flk.flockValue} />
     </div>
   );
 
@@ -36,11 +42,9 @@ export default function FlockValueSection({ flock }: Props) {
     return (
       <>
         {header}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 'var(--sp-1)' }}>
-          <div style={{ ...cellStyle, flexDirection: 'column', alignItems: 'stretch', gap: 6 }}>
-            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{result.reason || 'نامشخص'}</span>
-            <Btn size="sm" variant="outline" onClick={() => setPricesOpen(true)}>تنظیم قیمت‌ها</Btn>
-          </div>
+        <div style={{ ...cellStyle, flexDirection: 'column', alignItems: 'stretch', gap: 6 }}>
+          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{result.reason || 'نامشخص'}</span>
+          <Btn size="sm" variant="outline" onClick={() => setPricesOpen(true)}>تنظیم قیمت‌ها</Btn>
         </div>
         <QuickPricesModal
           open={pricesOpen}
@@ -65,9 +69,17 @@ export default function FlockValueSection({ flock }: Props) {
         </div>
         <div style={cellStyle}>
           <span style={{ color: 'var(--muted)' }}>تعداد زنده:</span>
-          <b style={{ fontWeight: 700 }}>{toFa((Number(flock.currentCount) || 0).toLocaleString('fa-IR'))}</b>
+          <b style={{ fontWeight: 700 }}>{toFa(currentCount.toLocaleString('fa-IR'))}</b>
         </div>
-        <div style={{ ...cellStyle, background: 'var(--accent-soft)', border: '1px solid var(--accent-border)' }}>
+        {showDeaths && (
+          <div style={cellStyle}>
+            <span style={{ color: 'var(--muted)' }}>تلفات:</span>
+            <b style={{ fontWeight: 700, color: 'var(--danger)' }}>
+              {toFa(deaths.toLocaleString('fa-IR'))} ({toFa(deathsPct.toFixed(1))}٪)
+            </b>
+          </div>
+        )}
+        <div style={{ ...cellStyle, gridColumn: '1 / -1', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)' }}>
           <span style={{ fontWeight: 700 }}>ارزش بازار:</span>
           <b style={{ fontWeight: 800, color: 'var(--accent)', fontSize: 'var(--fs-md)' }}>
             {toFa(result.value.toLocaleString('fa-IR'))} ت

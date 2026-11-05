@@ -166,6 +166,7 @@ export function HelpIcon({ text }: Props) {
             boxShadow: '0 6px 20px rgba(0,0,0,0.18)',
             textAlign: 'right',
             direction: 'rtl',
+            whiteSpace: 'pre-line',
           }}
         >{renderBold(text)}</div>,
         document.body
