@@ -1109,3 +1109,40 @@ Deals (معاملات خاص) — چرخه کامل: Deal → Settlement → Inv
 بعد: فاز B بخش مخاطبین.
 یا: Dunning/Reminder (که قبلاً بحث شد — ReminderModal پچ ۱+۲ آماده بود ولی UI نیمه‌کاره).
 
+
+---
+
+## 📅 جلسه ۱۴۰۵/۱۱/۰۲ (شماره ۸ — Dunning/Reminder Phase C1-3)
+
+### ✅ DONE — Dunning شروع شد
+
+| # | Commit | موضوع |
+|---|---|---|
+| ۱ | 628c8e68 | fix(ctc): prevent comma/words in card/account |
+| ۲ | 1d21b15b | fix(ctc): resolve bank hint conflicts + shaba clarity |
+| ۳ | 6160b04e | docs(ctc): contacts module reference (250+ lines) |
+| ۴ | 12623235 | feat(tra): Phase C1 — reminder schema + addReminder |
+| ۵ | 74940eca | feat(tra): ReminderModal (3 methods, warm tone) |
+| ۶ | 1bf5598f | feat(tra): wire ReminderModal to ReceivablesPage |
+
+### ✅ چه چیزی کار می‌کنه
+- Schema: `ReminderMethod` + `ReminderLogEntry` + `Invoice.lastRemindedAt/nextReminderAt/reminderLog`
+- Store: `addReminder(invoiceId, { method, methodLabel, note, intervalDays })`
+- UI: `ReminderModal.tsx` (271 خط)
+  - ۳ روش: 📞 تلفنی / 🚶 حضوری / 📝 سایر
+  - پیام صمیمی با salutation (از Contact.gender)
+  - فاصله: چیپ‌ها ۳/۷/۱۴/۳۰ + فیلد عددی
+  - Share/copy (فقط برای «سایر»)
+- Wiring: دکمه 📨 در ReceivablesPage (کنار 💳)
+- نمایش: «آخرین یادآوری: X — واتس‌اپ» در expanded row
+
+### 🚨 باگ شناخته‌شده
+- ReminderModal برای روش‌های «تلفنی» و «حضوری» textarea بی‌مصرف داره
+  → طبق SAP/Odoo، این روش‌ها فقط «نتیجه گفتگو» (فیلد note) لازم دارن
+  → textarea باید فقط برای «سایر» باشه
+
+### ⏸ PENDING (Phase C4-5)
+- **C4**: `UpcomingDueSection` — فیلتر با `nextReminderAt` (بعد از یادآوری ۷ روز حذف از لیست)
+- **C5**: `updateInvoice` — auto-cancel (اگر remaining=0 → `nextReminderAt = undefined`)
+- **C6** (اختیاری): Statement log (خط info برای یادآوری‌ها)
+
