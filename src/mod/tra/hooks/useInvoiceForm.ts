@@ -261,7 +261,8 @@ export function useInvoiceForm(params: {
     if (inv.paidAt) {
       // 🆕 فیکس: اگر paidAt دارد ولی remaining > 0 → داده ناسازگار
       // Aging این را نشان می‌دهد (چون remaining > 0)، پس ویرایش باید باز شود
-      const rem = remaining(inv);
+      // ⚠️ مهم: باید با allocations حساب شود (مثل Aging) — نه فقط از inv.payments
+      const rem = remaining(inv, allocations);
       if (rem > 0.5) {
         console.warn('[openEdit] paidAt set but remaining > 0, allowing edit:', inv.id, rem);
       } else {

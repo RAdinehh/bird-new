@@ -39,7 +39,7 @@ export default function EntityLink({ type, id, label, sub, badge, badgeBg, badge
   if (!conf || !id) return <span>{label}</span>;
   const finalTab = tab || conf.tab;
   const param = edit ? 'edit' : 'focus';
-  const url = `${conf.path}?${finalTab ? `tab=${finalTab}&` : ''}${param}=${id}`;
+  const url = `${conf.path}?${finalTab ? `tab=${finalTab}&` : ''}${param}=${id}${edit ? `&_t=${Date.now()}` : ''}`;
 
   return (
     <button

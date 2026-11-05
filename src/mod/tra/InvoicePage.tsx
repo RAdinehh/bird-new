@@ -78,40 +78,51 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
   } = useInvoiceForm({ kind, invoices, contacts, flocks, whsItems, allocations, addInvoice, updateInvoice });
 
   // 🆕 باز کردن فرم ویرایش از URL (از Aging در ReceivablesPage)
+  // ⚠️ روش dedupe: nonce `_t` در URL + sessionStorage
+  //   - هر بار EntityLink یک `_t` جدید می‌دهد → click موفق
+  //   - refresh همان `_t` را می‌آورد → sessionStorage می‌گوید «قبلاً پردازش شده» → باز نمی‌شود
   const processedEditRef = useRef<string | null>(null);
-  // 🆕 mount guard: جلوگیری از auto-open روی refresh با URL stale از browser session restore
-  const wasOnMountRef = useRef(true);
   useEffect(() => {
-    const wasOnMount = wasOnMountRef.current;
-    wasOnMountRef.current = false;
-
-    const editId = searchParams.get('edit');
-
-    // روی اولین mount: اگر URL edit دارد، احتمالاً از refresh/session restore است → پاک کن، باز نکن
-    if (wasOnMount && editId) {
-      console.warn('[InvoicePage] mount skip edit (stale URL):', editId);
-      const next = new URLSearchParams(searchParams);
-      next.delete('edit');
-      setSearchParams(next, { replace: true });
-      return;
-    }
-
-    // فقط صفحه‌ی فعال (تب جاری) اجازه دارد modal باز کند
     if (!active) return;
+    const editId = searchParams.get('edit');
     if (!editId) {
       processedEditRef.current = null;
+      // پاکسازی session keys — URL دیگر edit ندارد
+      try {
+        Object.keys(sessionStorage).forEach(k => {
+          if (k.startsWith('tra-edit-')) sessionStorage.removeItem(k);
+        });
+      } catch { /* silent */ }
       return;
     }
-    // جلوگیری از double-processing (StrictMode / re-render)
-    if (processedEditRef.current === editId) return;
+
+    const nonce = searchParams.get('_t') || '';
+    const key = `${editId}:${nonce}`;
+    if (processedEditRef.current === key) return;  // double-processing (StrictMode)
+
+    // refresh detection: همان URL قبلاً در این session پردازش شده
+    const sessionKey = `tra-edit-${key}`;
+    try {
+      if (sessionStorage.getItem(sessionKey)) {
+        // قبلاً پردازش شد (refresh) → پاک URL، باز نکن
+        const next = new URLSearchParams(searchParams);
+        next.delete('edit');
+        next.delete('_t');
+        setSearchParams(next, { replace: true });
+        return;
+      }
+    } catch { /* silent */ }
+
     const inv = _allInvoices.find(i => i.id === editId);
     if (!inv) return;
-    // فقط اگر نوع فاکتور با این صفحه مطابقت دارد
     if (inv.type !== kind) return;
-    processedEditRef.current = editId;
+
+    processedEditRef.current = key;
+    try { sessionStorage.setItem(sessionKey, '1'); } catch { /* silent */ }
     openEdit(inv);
     const next = new URLSearchParams(searchParams);
     next.delete('edit');
+    next.delete('_t');
     setSearchParams(next, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, active, kind]);
