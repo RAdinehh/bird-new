@@ -79,10 +79,25 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
 
   // 🆕 باز کردن فرم ویرایش از URL (از Aging در ReceivablesPage)
   const processedEditRef = useRef<string | null>(null);
+  // 🆕 mount guard: جلوگیری از auto-open روی refresh با URL stale از browser session restore
+  const wasOnMountRef = useRef(true);
   useEffect(() => {
+    const wasOnMount = wasOnMountRef.current;
+    wasOnMountRef.current = false;
+
+    const editId = searchParams.get('edit');
+
+    // روی اولین mount: اگر URL edit دارد، احتمالاً از refresh/session restore است → پاک کن، باز نکن
+    if (wasOnMount && editId) {
+      console.warn('[InvoicePage] mount skip edit (stale URL):', editId);
+      const next = new URLSearchParams(searchParams);
+      next.delete('edit');
+      setSearchParams(next, { replace: true });
+      return;
+    }
+
     // فقط صفحه‌ی فعال (تب جاری) اجازه دارد modal باز کند
     if (!active) return;
-    const editId = searchParams.get('edit');
     if (!editId) {
       processedEditRef.current = null;
       return;
