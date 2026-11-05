@@ -15,6 +15,7 @@ interface F {
   customerType: string;
   customerTypes: string[]; trustScore: string; defaultDiscount: string;
   supplierTypes: string[]; position: string; startDate: string; salaryType: string; salaryAmount: string; insurance: boolean;
+  creditLimit?: number | null;
   gender?: Gender;
   bankAccount?: BankAccount;
 }
@@ -23,6 +24,7 @@ const empty: F = {
   name: '', phone: '', phone2: '', email: '', address: '', city: '', nationalId: '', roles: ['customer'], notes: '',
   customerType: 'wholesale', customerTypes: [], trustScore: '', defaultDiscount: '', supplierTypes: [],
   position: '', startDate: '', salaryType: 'monthly', salaryAmount: '', insurance: false,
+  creditLimit: null,
   gender: 'unspecified',
   bankAccount: {},
 };
@@ -40,6 +42,7 @@ export default function ContactsPage() {
 
   const openEdit = (p: Person) => {
     setForm({
+      creditLimit: p.creditLimit ?? null,
       id: p.id, name: p.name, phone: p.phone, phone2: p.phone2, email: p.email,
       address: p.address, city: p.city, nationalId: p.nationalId, roles: p.roles, notes: p.notes,
       customerType: p.customerType || 'wholesale',
@@ -99,6 +102,7 @@ export default function ContactsPage() {
       defaultDiscount: num(form.defaultDiscount), supplierTypes: form.supplierTypes,
       position: form.position.trim(), startDate: form.startDate.trim(), salaryType: form.salaryType,
       salaryAmount: num(form.salaryAmount), insurance: form.insurance,
+      creditLimit: form.creditLimit ?? null,
       gender: form.gender || 'unspecified',
       bankAccount: (() => {
         const bk = form.bankAccount;

@@ -3,8 +3,8 @@
  */
 import { Btn, BtnRow, DigitField, Field, Grid2, Input, Modal, PhoneField, Select, Textarea, ErrorBox } from '../../../shr/components/ui';
 import SmartSelect from '../../../shr/components/SmartSelect';
-import { ROLE_LABEL, CUSTOMER_TYPES, BANKS_BY_GROUP, BANKS, isBankCode, findBankByShabaCode, findBankByCardBin, type Role, type Gender, type BankAccount } from '../store';
-import { toEn } from '../../../shr/utils/fa';
+import { ROLE_LABEL, CUSTOMER_TYPES, BANKS_BY_GROUP, BANKS, isBankCode, findBankByShabaCode, findBankByCardBin, type Role, type Gender, type BankAccount , useCtc} from '../store';
+import { toEn , toFa} from '../../../shr/utils/fa';
 import { cardValidation, shabaValidation, accountValidation } from '../validators';
 
 const GENDER_OPTIONS: { value: Gender; label: string; icon: string }[] = [
@@ -34,6 +34,7 @@ interface Props {
 }
 
 export default function ContactFormModal({ open, setOpen, form, setForm, err, onSave }: Props) {
+  const { contacts } = useCtc();
   const toggleRole = (r: Role) => setForm(f => ({ ...f, roles: f.roles.includes(r) ? f.roles.filter(x => x !== r) : [...f.roles, r] }));
 
   return (
@@ -85,7 +86,7 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
             <Field label="نام" required><Input placeholder="..." value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
             <Field label="تلفن"><PhoneField placeholder="۰۹..." value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} /></Field>
             {(form.roles || []).includes('customer') && (
-              <Field label="سقف اعتبار (تومان)" hint="۰ یا خالی = بدون سقف — فروش بیش از این مبلغ مسدود می‌شود">
+              <Field label="سقف اعتبار (تومان)" hint="خالی = بدون سقف">
                 <Input
                   mode="number"
                   placeholder="مثلاً ۵۰٬۰۰۰٬۰۰۰"
@@ -96,7 +97,27 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
                   }}
                   unit="تومان"
                 />
-              </Field>
+              
+                {form.id && (() => {
+                  const _c = contacts.find(c => c.id === form.id);
+                  const _debt = Math.max(0, -(_c?.creditBalance || 0));
+                  const _credit = Math.max(0, (_c?.creditBalance || 0));
+                  const _limit = form.creditLimit || 0;
+                  if (_debt === 0 && _credit === 0 && _limit === 0) return null;
+                  return (
+                    <div style={{ marginTop: 6, fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                      {_debt > 0 && (
+                        <span>📊 بدهی فعلی: <b style={{ color: 'var(--danger)' }}>{toFa(_debt.toLocaleString('fa-IR'))} ت</b></span>
+                      )}
+                      {_credit > 0 && (
+                        <span>⚡ پیش‌پرداخت: <b style={{ color: 'var(--accent)' }}>{toFa(_credit.toLocaleString('fa-IR'))} ت</b></span>
+                      )}
+                      {_limit > 0 && (
+                        <span>✅ فضای باقی‌مانده: <b style={{ color: 'var(--accent)' }}>{toFa(Math.max(0, _limit - _debt).toLocaleString('fa-IR'))} ت</b></span>
+                      )}
+                    </div>
+                  );
+                })()}</Field>
             )}
           </Grid2>
           <Grid2>
