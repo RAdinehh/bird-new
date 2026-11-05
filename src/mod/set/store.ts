@@ -8,6 +8,26 @@ import { DEFAULT_UNITS, type Units } from '../../shr/units';
 
 
 
+/** 🆕 قیمت‌های بازار (دستی) */
+export interface MarketPrices {
+  liveChicken: number;
+  liveTurkey: number;
+  liveGoose: number;
+  liveDuck: number;
+  liveQuail: number;
+  chickDay1: number;
+  eggTable: number;
+  eggFertile: number;
+  culledBird: number;
+  updatedAt: string;
+}
+
+export const DEFAULT_MARKET_PRICES: MarketPrices = {
+  liveChicken: 0, liveTurkey: 0, liveGoose: 0, liveDuck: 0, liveQuail: 0,
+  chickDay1: 0, eggTable: 0, eggFertile: 0, culledBird: 0,
+  updatedAt: '',
+};
+
 export interface Settings {
   schemaVersion: number;
   // پروفایل کاربر
@@ -61,6 +81,7 @@ export interface Settings {
   customStandards?: Record<string, BirdStandard>;
   /** 🆕 گونه‌های سفارشی (کبک، شترمرغ، ...) */
   customSpecies?: Array<{ kind: string; nameFa: string; nameEn?: string; icon: string; builtIn: boolean }>;
+  marketPrices?: MarketPrices;
 
   /** 🆕 تغییرات کاربر بر پایه Diff — سبک‌تر */
   customOverrides?: Record<string, StandardOverrides>;
@@ -99,6 +120,7 @@ const defaultSettings: Settings = {
   features: { vaccine: true, medicine: true, withdrawal: false },
   customStandards: {},
   customSpecies: [],
+  marketPrices: { ...DEFAULT_MARKET_PRICES },
   customOverrides: {},
 
   autoBackup: { enabled: true, intervalHours: 24, maxVersions: 5 },
@@ -111,6 +133,8 @@ interface State extends Settings {
   updateSection: <K extends keyof Settings>(key: K, patch: Partial<Settings[K]>) => void;
   reset: () => void;
   updateStandard: (key: string, std: BirdStandard) => void;
+  setMarketPrice: (key: keyof Omit<MarketPrices, 'updatedAt'>, value: number) => void;
+  setAllMarketPrices: (prices: Partial<MarketPrices>) => void;
   addSpecies: (species: { kind: string; nameFa: string; nameEn?: string; icon: string }) => void;
   removeSpecies: (kind: string) => void;
   resetStandard: (key: string) => void;
@@ -142,6 +166,20 @@ export const useSet = create<State>()(
       updateStandard: (key: string, std: BirdStandard) => set((state: any) => ({
         ...state,
         customStandards: { ...(state.customStandards || {}), [key]: std }
+      })),
+      setMarketPrice: (key, value) => set((state: any) => ({
+        marketPrices: {
+          ...(state.marketPrices || DEFAULT_MARKET_PRICES),
+          [key]: Number(value) || 0,
+          updatedAt: new Date().toISOString().slice(0, 10),
+        },
+      })),
+      setAllMarketPrices: (prices) => set((state: any) => ({
+        marketPrices: {
+          ...(state.marketPrices || DEFAULT_MARKET_PRICES),
+          ...prices,
+          updatedAt: new Date().toISOString().slice(0, 10),
+        },
       })),
       resetStandard: (key: string) => set((state: any) => {
         const next = { ...(state.customStandards || {}) };

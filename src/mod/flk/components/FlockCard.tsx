@@ -25,6 +25,7 @@ import type { Hall, Zone } from '../../hal/store';
 import type { useFormat } from '../../../shr/units';
 import type { MultiSelectState } from '../../../shr/multiSelect/useMultiSelect';
 import { CardActions } from '../../../shr/components/ui';
+import FlockValueSection from './FlockValueSection';
 
 type Fmt = ReturnType<typeof useFormat>;
 
@@ -397,6 +398,8 @@ export default function FlockCard(props: FlockCardProps) {
           </RowGrid>
         </>
       )}
+
+      <FlockValueSection flock={f} />
 
       {costs.total > 0 && (
         <>
