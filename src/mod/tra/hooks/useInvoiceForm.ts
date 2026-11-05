@@ -7,7 +7,7 @@ import { logAction } from '../../../cor/logger/auditLog';
 import { format as formatJ } from 'date-fns-jalali';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { useFlk } from '../../flk/store';
-import { paidSum, calcItemTotal, generateInstallments, type Invoice, type InvoiceItem, type Payment } from '../store';
+import { paidSum, calcItemTotal, generateInstallments, remaining, type Invoice, type InvoiceItem, type Payment } from '../store';
 import { createInvoiceSchema } from '../../../shr/validation/rules/tra';
 import { recordHistory } from '../../../shr/intelligence';
 import { emptyForm as empty, type F } from '../types-invoice';
@@ -259,8 +259,15 @@ export function useInvoiceForm(params: {
   // ویرایش
   const openEdit = (inv: Invoice) => {
     if (inv.paidAt) {
-      toastMsg.error('فاکتور تسویه‌شده — ابتدا Reopen کنید');
-      return;
+      // 🆕 فیکس: اگر paidAt دارد ولی remaining > 0 → داده ناسازگار
+      // Aging این را نشان می‌دهد (چون remaining > 0)، پس ویرایش باید باز شود
+      const rem = remaining(inv);
+      if (rem > 0.5) {
+        console.warn('[openEdit] paidAt set but remaining > 0, allowing edit:', inv.id, rem);
+      } else {
+        toastMsg.error('فاکتور تسویه‌شده — ابتدا Reopen کنید');
+        return;
+      }
     }
     setForm({
       id: inv.id, date: inv.date, partyId: inv.partyId, category: inv.category,

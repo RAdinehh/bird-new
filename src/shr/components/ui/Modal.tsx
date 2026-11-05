@@ -169,7 +169,7 @@ export function Modal({
       try {
         const pf = previousFocus.current;
         if (pf && document.contains(pf) && typeof pf.focus === 'function') {
-          pf.focus();
+          pf.focus({ preventScroll: true });
         }
       } catch {
         /* silent */
