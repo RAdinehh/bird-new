@@ -1097,6 +1097,63 @@ export const useTra = create<State>()(
 
 
 
+/**
+ * buildAdvanceAllocations — ساخت تخصیص پیش‌پرداخت به فاکتور جدید (FIFO)
+ */
+export function buildAdvanceAllocations(
+  partyId: string,
+  maxAmount: number,
+  date: string,
+): Array<{ partyPaymentId: string; amount: number; date: string }> {
+  const st = useTra.getState();
+  const advances = (st.partyPayments || [])
+    .filter((p: any) => p.partyId === partyId && p.type === 'advance')
+    .sort((a: any, b: any) => (a.date || '').localeCompare(b.date || ''));
+  if (advances.length === 0) return [];
+  const usedMap = new Map<string, number>();
+  for (const inv of st.invoices) {
+    for (const pay of (inv.payments || [])) {
+      if (pay.partyPaymentId) {
+        usedMap.set(pay.partyPaymentId, (usedMap.get(pay.partyPaymentId) || 0) + (Number(pay.amount) || 0));
+      }
+    }
+  }
+  const result: Array<{ partyPaymentId: string; amount: number; date: string }> = [];
+  let remaining = maxAmount;
+  for (const adv of advances) {
+    if (remaining <= 0) break;
+    const available = Math.max(0, (Number(adv.amount) || 0) - (usedMap.get(adv.id) || 0));
+    if (available <= 0) continue;
+    const amt = Math.min(remaining, available);
+    result.push({ partyPaymentId: adv.id, amount: amt, date });
+    remaining -= amt;
+  }
+  return result;
+}
+
+/**
+ * computeUnappliedAdvances — مجموع پیش‌پرداخت‌های استفاده‌نشده
+ */
+export function computeUnappliedAdvances(partyId: string): number {
+  const st = useTra.getState();
+  const advances = (st.partyPayments || []).filter(
+    (p: any) => p.partyId === partyId && p.type === 'advance'
+  );
+  if (advances.length === 0) return 0;
+  const usedMap = new Map<string, number>();
+  for (const inv of st.invoices) {
+    for (const pay of (inv.payments || [])) {
+      if (pay.partyPaymentId) {
+        usedMap.set(pay.partyPaymentId, (usedMap.get(pay.partyPaymentId) || 0) + (Number(pay.amount) || 0));
+      }
+    }
+  }
+  return advances.reduce((s: number, a: any) => {
+    const used = usedMap.get(a.id) || 0;
+    return s + Math.max(0, (Number(a.amount) || 0) - used);
+  }, 0);
+}
+
 export function computePartyCredit(partyId: string, invoices: Invoice[], allocations?: any[]): number {
   // SINGLE SOURCE OF TRUTH — partyBalance (formulas.ts)
   const base = partyBalance(partyId, invoices, allocations);

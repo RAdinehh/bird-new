@@ -7,7 +7,7 @@ import { logAction } from '../../../cor/logger/auditLog';
 import { format as formatJ } from 'date-fns-jalali';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { useFlk } from '../../flk/store';
-import { paidSum, calcItemTotal, generateInstallments, remaining, computePartyCredit, type Invoice, type InvoiceItem, type Payment } from '../store';
+import { paidSum, calcItemTotal, generateInstallments, remaining, computePartyCredit, buildAdvanceAllocations, type Invoice, type InvoiceItem, type Payment } from '../store';
 import { createInvoiceSchema } from '../../../shr/validation/rules/tra';
 import { recordHistory } from '../../../shr/intelligence';
 import { emptyForm as empty, type F } from '../types-invoice';
@@ -552,31 +552,30 @@ export function useInvoiceForm(params: {
         }
       }
     }
-
-    // 🆕 فاز ۱: چک سقف اعتبار
-    if (form.partyId && total > 0) {
-      const _contact = contacts.find((c) => c.id === form.partyId);
-      const _limit = Number(_contact?.creditLimit) || 0;
-      if (_limit > 0) {
-        const _currentCredit = computePartyCredit(form.partyId, invoices, allocations);
-        const _oldTotal = form.id ? (invoices.find((i) => i.id === form.id)?.total || 0) : 0;
-        const _newCredit = _currentCredit - total + _oldTotal;
-        const _newDebt = Math.max(0, -_newCredit);
-        if (_newDebt > _limit) {
-          const _over = _newDebt - _limit;
-          const _ok = await showConfirmAsync(
-            'عبور از سقف اعتبار',
-            `بدهی این طرف پس از این فاکتور ${_newDebt.toLocaleString('fa-IR')} تومان می‌شود که ${_over.toLocaleString('fa-IR')} تومان از سقف اعتبار (${_limit.toLocaleString('fa-IR')} تومان) بیشتر است. ادامه می‌دهید؟`,
-            { confirmText: 'ادامه', cancelText: 'لغو' }
-          );
-          if (!_ok) return;
-        }
+        // 🆕 فاز ۳: استفاده از پیش‌پرداخت (unapplied advances)
+    if (form.useAdvance && form.partyId && total > 0) {
+      const _advAllocs = buildAdvanceAllocations(form.partyId, total, form.date);
+      for (const _a of _advAllocs) {
+        data.payments = [
+          ...(data.payments || []),
+          {
+            id: crypto.randomUUID(),
+            date: _a.date,
+            amount: _a.amount,
+            method: 'cash',
+            type: 'advance',
+            partyPaymentId: _a.partyPaymentId,
+            checkNo: '',
+            bank: '',
+            dueDate: '',
+            notes: 'مصرف از پیش‌پرداخت',
+          },
+        ];
       }
     }
 
-    if (form.id) {
+if (form.id) {
       updateInvoice(form.id, data);
-      verifyInvariantsIfDev();
       verifyInvariantsIfDev();
     } else {
       try {

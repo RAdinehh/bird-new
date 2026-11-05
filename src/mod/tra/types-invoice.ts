@@ -20,6 +20,7 @@ export interface F {
   deliveryDate: string;
   advanceType: 'percent' | 'amount';
   advanceValue: string;
+  useAdvance?: boolean;
   dueDate: string;
   payments: Payment[];
   relatedFlockId: string;
@@ -35,6 +36,6 @@ export const emptyForm = (isPurchase: boolean): F => ({
   date: '', partyId: '', category: isPurchase ? 'egg' : 'fertile_egg', items: [],
   paymentTerms: 'cash', installmentCount: '1', installmentGapDays: '30',
   customDueDate: '', cashDiscountPct: '', cashDiscountDays: '', isPreorder: false, deliveryDate: '',
-  advanceType: 'percent', advanceValue: '',
+  advanceType: 'percent', advanceValue: '', useAdvance: false,
   dueDate: '', payments: [], relatedFlockId: '', notes: '', installments: [],
 });

@@ -14,7 +14,7 @@ import { HELP } from '../../../shr/help/helpTexts';
 import { getProfile, FieldHint } from '../../../shr/intelligence';
 import InvoiceSmartSummary from './InvoiceSmartSummary';
 import PaymentsSection from './PaymentsSection';
-import { type CheckStatus } from '../store';
+import { type CheckStatus , computeUnappliedAdvances} from '../store';
 import { CATEGORIES, generateInstallments, type InvoiceItem, type Payment } from '../store';
 import { UNIT_LABEL } from '../../whs/store';
 import type { F } from '../types-invoice';
@@ -593,6 +593,39 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
       {/* ====== پرداخت و تسویه ====== */}
       {(total > 0 || showPaymentSection) && form.items.length > 0 && (
+        <>
+        {form.partyId && (() => {
+          const _unapplied = computeUnappliedAdvances(form.partyId);
+          if (_unapplied <= 0.5) return null;
+          const _use = form.useAdvance || false;
+          return (
+            <div style={{
+              padding: '8px 12px',
+              background: 'var(--accent-soft)',
+              border: '1px solid var(--accent-border)',
+              borderRadius: 'var(--r-md)',
+              marginBottom: 8,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: 8,
+              flexWrap: 'wrap',
+            }}>
+              <div style={{ fontSize: 'var(--fs-sm)' }}>
+                ⚡ <b>پیش‌پرداخت موجود:</b> {toFa(_unapplied.toLocaleString('fa-IR'))} ت
+              </div>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 'var(--fs-sm)', fontWeight: 600 }}>
+                <input
+                  type="checkbox"
+                  checked={_use}
+                  onChange={e => setForm(f => ({ ...f, useAdvance: e.target.checked }))}
+                  style={{ accentColor: 'var(--accent)', cursor: 'pointer' }}
+                />
+                مصرف در این فاکتور
+              </label>
+            </div>
+          );
+        })()}
         <div style={{
           border: '1.5px solid var(--border)',
           borderRadius: 'var(--r-md)',
@@ -613,6 +646,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           markTouched={markTouched}
         />
         </div>
+        </>
       )}
 
       {form.items.length > 0 && total > 0 && <InvoiceSmartSummary form={form} total={total} paid={paid} />}
