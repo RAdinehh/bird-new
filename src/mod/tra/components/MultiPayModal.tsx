@@ -275,12 +275,6 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
                       fontSize: 'var(--fs-sm)',
                     }}
                   >
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => toggleInvoice(inv.id)}
-                      style={{ accentColor: 'var(--accent)', cursor: 'pointer' }}
-                    />
                     <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: 700, marginBottom: 2 }}>
                         فاکتور {inv.number || inv.id.slice(0, 8)}
