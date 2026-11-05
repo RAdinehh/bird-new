@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Debug pm-tra</title>
+<style>
+body{font-family:monospace;padding:12px;font-size:13px;line-height:1.5}
+pre{background:#eee;padding:8px;overflow-x:auto;white-space:pre-wrap;word-break:break-all;font-size:11px}
+.btn{padding:10px 16px;margin:4px 4px 4px 0;font-size:14px;background:#0284c7;color:#fff;border:0;border-radius:6px;cursor:pointer}
+.btn.red{background:#dc2626}
+.btn.green{background:#16a34a}
+h2{margin-top:16px;font-size:14px;color:#0369a1}
+h3{margin-top:12px;font-size:13px}
+.ok{color:#16a34a}
+.err{color:#dc2626}
+</style></head><body>
+<h1 style="font-size:16px">🔍 Debug pm-tra</h1>
+<button class="btn" onclick="show()">🔄 Refresh view</button>
+<button class="btn green" onclick="download()">💾 Download backup</button>
+<div id="output" style="margin-top:16px">Loading...</div>
+<script>
+function show() {
+  const el = document.getElementById('output');
+  const raw = localStorage.getItem('pm-tra');
+  if (!raw) { el.innerHTML = '<h2 class="err">❌ pm-tra NULL</h2><p>localStorage خالی است</p>'; return; }
+  let html = '<h2>📦 raw length: <span class="ok">' + raw.length + '</span> bytes</h2>';
+  try {
+    const p = JSON.parse(raw);
+    const summary = {
+      version: p.version,
+      hasState: !!p.state,
+      counts: {
+        invoices: p.state?.invoices?.length ?? 'MISSING',
+        deals: p.state?.deals?.length ?? 'MISSING',
+        partyPayments: p.state?.partyPayments?.length ?? 'MISSING',
+        allocations: p.state?.allocations?.length ?? 'MISSING',
+        settlements: p.state?.settlements?.length ?? 'MISSING',
+      },
+      firstInvoiceKeys: Object.keys(p.state?.invoices?.[0] || {}),
+      firstInvoiceSample: p.state?.invoices?.[0] || null,
+    };
+    html += '<h3>📊 Summary:</h3><pre>' + JSON.stringify(summary, null, 2).replace(/</g,'&lt;') + '</pre>';
+  } catch (e) {
+    html += '<h2 class="err">❌ JSON.parse failed: ' + e.message + '</h2>';
+    html += '<h3>Raw (first 3000):</h3><pre>' + raw.slice(0,3000).replace(/</g,'&lt;') + '</pre>';
+  }
+  el.innerHTML = html;
+}
+function download() {
+  const raw = localStorage.getItem('pm-tra');
+  if (!raw) return alert('pm-tra null');
+  const blob = new Blob([raw], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'pm-tra-' + Date.now() + '.json';
+  a.click();
+  alert('✅ Saved to Downloads');
+}
+show();
+</script>
+</body></html>
