@@ -10,6 +10,7 @@ import { toFa, toEn } from '../../../shr/utils/fa';
 import { useTra, remaining, paidSum, type Invoice, type PartyPayment } from '../store';
 import { useCtc } from '../../ctc/store';
 import { toastMsg } from '../../../cor/store/toast';
+import { showConfirmAsync } from '../../../cor/store/dialog';
 
 interface Props {
   open: boolean;
@@ -31,6 +32,8 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
   const [dueDate, setDueDate] = useState('');
   const [notes, setNotes] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [manualMode, setManualMode] = useState(false);
+  const [manualAllocations, setManualAllocations] = useState<Record<string, number>>({});
   const [err, setErr] = useState('');
 
   // 🆕 Prefill از props (دکمه 💳 روی ردیف فاکتور)
@@ -55,7 +58,7 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
   const totalAmount = parseFloat(toEn(amount)) || 0;
 
   // توزیع خودکار: از قدیمی‌ترین فاکتور تا سیر شدن مبلغ
-  const allocations = useMemo(() => {
+  const fifoAllocations = useMemo(() => {
     if (totalAmount <= 0 || unpaid.length === 0) return {} as Record<string, number>;
     let left = totalAmount;
     const result: Record<string, number> = {};
@@ -69,6 +72,17 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
     }
     return result;
   }, [totalAmount, unpaid, selectedIds]);
+
+  const allocations = manualMode ? manualAllocations : fifoAllocations;
+
+  const toggleManualMode = () => {
+    if (!manualMode) setManualAllocations({ ...fifoAllocations });
+    setManualMode(!manualMode);
+  };
+
+  const setManualAlloc = (invId: string, value: number) => {
+    setManualAllocations(prev => ({ ...prev, [invId]: Math.max(0, value) }));
+  };
 
   const totalAllocated = Object.values(allocations).reduce((a, b) => a + b, 0);
   const leftover = totalAmount - totalAllocated;
@@ -86,13 +100,14 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
     setPartyId(''); setDate(''); setAmount(''); setMethod('cash');
     setCheckNo(''); setBank(''); setDueDate(''); setNotes('');
     setSelectedIds(new Set()); setErr('');
+    setManualMode(false); setManualAllocations({});
   };
 
   const fail = (msg: string) => {
     setErr(msg);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     setErr('');
     if (!partyId) return fail('طرف حساب را انتخاب کنید');
     if (!date) return fail('تاریخ را انتخاب کنید');
@@ -101,18 +116,46 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
     if (totalAllocated <= 0) return fail('مبلغ توزیع‌شده صفر است');
     if (method === 'check' && !checkNo.trim()) return fail('شماره چک الزامی است');
 
+    // 🆕 محافظت اعداد ریز
+    if (totalAllocated < 1000) {
+      return fail('مبلغ توزیع‌شده خیلی کوچک است. حداقل ۱,۰۰۰ تومان.');
+    }
+    if (totalAllocated < 10000) {
+      const ok = await showConfirmAsync(
+        'تأیید مبلغ کوچک',
+        'مبلغ توزیع‌شده کمتر از ۱۰,۰۰۰ تومان است. ادامه می‌دهید؟',
+        { confirmText: 'ادامه' }
+      );
+      if (!ok) return;
+    }
+
+    // 🆕 محافظت در حالت دستی
+    if (manualMode && totalAllocated > totalAmount + 0.5) {
+      return fail('مجموع تخصیص دستی بیشتر از مبلغ کل است');
+    }
+
+    // 🆕 کانفرمیشن overpayment
+    if (leftover > 0.5) {
+      const ok = await showConfirmAsync(
+        'ثبت پیش‌پرداخت',
+        'مبلغ اضافه به عنوان «پیش‌پرداخت» برای این طرف حساب ثبت می‌شود. ادامه می‌دهید؟',
+        { confirmText: 'ثبت' }
+      );
+      if (!ok) return;
+    }
+
     try {
       // ۱. ساخت PartyPayment
       const ppId = addPartyPayment({
         partyId,
         date,
-        amount: totalAllocated,
+        amount: totalAmount,
         method,
-        type: 'regular',
+        type: leftover > 0.5 ? 'advance' : 'regular',
         checkNo: method === 'check' ? checkNo : '',
         bank: method === 'check' ? bank : '',
         dueDate: method === 'check' ? dueDate : '',
-        notes: notes || 'پرداخت گروهی به چند فاکتور',
+        notes: notes || (leftover > 0.5 ? 'پرداخت گروهی + پیش‌پرداخت' : 'پرداخت گروهی به چند فاکتور'),
       } as Omit<PartyPayment, 'id'|'createdAt'|'updatedAt'>);
 
       // ۲. افزودن Payment به هر فاکتور
@@ -257,6 +300,18 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+                  {manualMode ? '✏️ تخصیص دستی' : '📊 تخصیص خودکار (FIFO)'}
+                </span>
+                <button
+                  type="button"
+                  onClick={toggleManualMode}
+                  style={{ padding: '4px 10px', fontSize: 'var(--fs-xs)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', cursor: 'pointer', color: 'var(--text)', fontFamily: 'inherit' }}
+                >
+                  {manualMode ? 'بازگشت به FIFO' : 'ویرایش دستی'}
+                </button>
+              </div>
               {unpaid.map(inv => {
                 const rem = remaining(inv);
                 const isSelected = selectedIds.has(inv.id);
@@ -283,7 +338,22 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
                         📅 {toFa(inv.date)} • مانده: {toFa(rem.toLocaleString('fa-IR'))} تومان
                       </div>
                     </div>
-                    {isSelected && alloc > 0 && (
+                    {isSelected && manualMode && (
+                      <input
+                        type="number"
+                        min={0}
+                        max={rem}
+                        value={manualAllocations[inv.id] || ''}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          setManualAlloc(inv.id, Number(e.target.value) || 0);
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        placeholder={String(rem)}
+                        style={{ width: 110, padding: '4px 8px', fontSize: 'var(--fs-xs)', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', fontFamily: 'inherit', fontVariantNumeric: 'tabular-nums', textAlign: 'left' }}
+                      />
+                    )}
+                    {isSelected && !manualMode && alloc > 0 && (
                       <div style={{ fontWeight: 700, color: 'var(--accent)', fontSize: 'var(--fs-sm)' }}>
                         {toFa(alloc.toLocaleString('fa-IR'))} تومان
                       </div>
@@ -305,10 +375,13 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
             }}>
               <span>توزیع‌شده: <b>{toFa(totalAllocated.toLocaleString('fa-IR'))} تومان</b></span>
               {leftover > 0.5 && (
-                <span style={{ color: 'var(--warn)' }}>باقی‌مانده: <b>{toFa(leftover.toLocaleString('fa-IR'))} تومان</b></span>
+                <span style={{ color: 'var(--warn)' }}>پیش‌پرداخت: <b>{toFa(leftover.toLocaleString('fa-IR'))} تومان</b></span>
               )}
               {leftover <= 0.5 && leftover > -0.5 && (
                 <span style={{ color: 'var(--accent)' }}>✅ کامل توزیع شد</span>
+              )}
+              {leftover < -0.5 && (
+                <span style={{ color: 'var(--danger)' }}>⚠️ بیشتر از مبلغ کل</span>
               )}
             </div>
           )}
