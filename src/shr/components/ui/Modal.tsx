@@ -157,7 +157,9 @@ export function Modal({
     return () => {
       window.__modalDepth = Math.max(0, (window.__modalDepth || 0) - 1);
       document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
+      if (window.__modalDepth === 0) {
+        document.body.style.overflow = '';
+      }
       // 🆕 M-fix: clear timer در unmount — جلوگیری از ReferenceError
       if (focusTimer !== null) {
         clearTimeout(focusTimer);
@@ -165,7 +167,10 @@ export function Modal({
       }
       // برگشت focus
       try {
-        previousFocus.current?.focus();
+        const pf = previousFocus.current;
+        if (pf && document.contains(pf) && typeof pf.focus === 'function') {
+          pf.focus();
+        }
       } catch {
         /* silent */
       }
