@@ -391,7 +391,7 @@ export default function FlockCard(props: FlockCardProps) {
         </>
       )}
 
-      {costs.total > 0 && (
+      {(costs.total > 0 || consumption.totalCost > 0) && (
         <>
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>💰 هزینه‌ها</div>
           <RowGrid>
@@ -409,38 +409,28 @@ export default function FlockCard(props: FlockCardProps) {
                 )}
               </>
             )}
+            {consumption.totalCost > 0 && (
+              <>
+                <Row l="هزینه ثابت" v={fmt.money(costs.grandTotalOwed)} />
+                <Row l="مصرف انبار" v={fmt.money(consumption.totalCost)} />
+              </>
+            )}
             {costs.rentOwed > 0 ? (
               <>
                 <Row l="جمع خرید" v={fmt.money(costs.purchaseTotal)} />
-                <Row l="هزینه کل (با اجاره)" v={fmt.money(costs.grandTotalOwed)} accent />
+                <Row l="هزینه کل (با اجاره)" v={fmt.money(totalCost)} accent />
               </>
             ) : (
-              <Row l="جمع کل" v={fmt.money(costs.total)} accent />
+              <Row l={consumption.totalCost > 0 ? "هزینه کل" : "جمع کل"} v={fmt.money(totalCost)} accent />
             )}
-            {costs.perBird > 0 && !hasConsignmentLosses && <Row l="هر پرنده" v={fmt.money(Math.round(costs.perBird))} accent />}
+            {totalCost > 0 && !hasConsignmentLosses && (f.currentCount || 0) > 0 && <Row l="هر پرنده" v={fmt.money(Math.round(totalCost / (f.currentCount || 1)))} accent />}
           </RowGrid>
         </>
       )}
 
       {(() => {
         const revenue = invoiceRevenue;
-        if (revenue === 0 && costs.total === 0) return null;
-        // 🆕 اگر فروشی نبوده، "زیان" گمراه‌کننده است → نمایش وضعیت پرورش
-        if (revenue === 0 && costs.total > 0) {
-          return (
-            <>
-              <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📊 وضعیت گله</div>
-              <RowGrid>
-                <Row l="هزینه ثابت" v={fmt.money(costs.grandTotalOwed)} />
-                {consumption.totalCost > 0 && (
-                  <Row l="مصرف انبار" v={fmt.money(consumption.totalCost)} />
-                )}
-                <Row l="هزینه کل" v={fmt.money(totalCost)} accent />
-                <Row l="وضعیت" v="🐣 در حال پرورش" />
-              </RowGrid>
-            </>
-          );
-        }
+        if (revenue === 0) return null;
         const profit = revenue - totalCost;
         const roi = totalCost > 0 ? (profit / totalCost) * 100 : 0;
         const isProfit = profit >= 0;
@@ -513,7 +503,6 @@ export default function FlockCard(props: FlockCardProps) {
               {_all.map((s: any) => (
                 <Row key={s.flockId} l={s.flockName} v={`${fmt.int(s.count || 0)} پرنده`} />
               ))}
-              <Row l="جمع" v={`${fmt.int(_total)} پرنده`} />
             </div>
           </>
         );
