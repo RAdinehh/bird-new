@@ -399,51 +399,107 @@ export const useFlk = create<State>()(
         flocks: get().flocks.map(f => {
           if (f.id !== flockId) return f;
           const newEvent: FlockEvent = { ...ev, id: uuid(), flockId, createdAt: now() };
-          const cur = f.currentCount ?? 0;
-          let delta = 0;
-          if (ev.type === 'death' || ev.type === 'cull' || ev.type === 'sell') delta = -ev.count;
-          else if (ev.type === 'add' || ev.type === 'transfer') delta = +ev.count;
-          const next = Math.max(0, cur + delta);
-          // 🆕 قدم ۲: sync gender با unknown/male/female
-          const patch: any = { currentCount: next };
-          const hasSplit = !!f.genderSplitAt;
-          if (!hasSplit) {
-            // حالت A: unsplit
-            if (delta > 0 && (ev.sex === 'male' || ev.sex === 'female')) {
-              // اضافه کردن پرنده جنسیت‌دار → transition به split
-              patch.genderSplitAt = now();
-              patch.maleCount = ev.sex === 'male' ? ev.count : 0;
-              patch.femaleCount = ev.sex === 'female' ? ev.count : 0;
-              patch.unknownCount = cur;
-            } else {
-              // mixed → همه چیز unknown
-              patch.unknownCount = next;
-            }
-          } else {
-            // حالت B/C: split شده
-            if (ev.sex === 'male') {
-              patch.maleCount = Math.max(0, (f.maleCount ?? 0) + delta);
-            } else if (ev.sex === 'female') {
-              patch.femaleCount = Math.max(0, (f.femaleCount ?? 0) + delta);
-            } else {
-              // mixed → unknown با fallback
-              const nextU = (f.unknownCount ?? 0) + delta;
-              if (nextU >= 0) {
-                patch.unknownCount = nextU;
-              } else {
-                const rem = -nextU;
-                patch.unknownCount = 0;
-                const m = f.maleCount ?? 0;
-                const fe = f.femaleCount ?? 0;
-                if (fe >= m) {
-                  patch.femaleCount = Math.max(0, fe - rem);
-                } else {
-                  patch.maleCount = Math.max(0, m - rem);
-                }
-              }
+    const cur = f.currentCount ?? 0;
+    let delta = 0;
+    if (ev.type === 'death' || ev.type === 'cull' || ev.type === 'sell') delta = -ev.count;
+    else if (ev.type === 'add' || ev.type === 'transfer') delta = +ev.count;
+    const next = Math.max(0, cur + delta);
+    // 🆕 audit: capture before
+    const _before = {
+      male: f.maleCount ?? 0,
+      female: f.femaleCount ?? 0,
+      unknown: f.unknownCount ?? 0,
+    };
+    const patch: any = { currentCount: next };
+    const hasSplit = !!f.genderSplitAt;
+    if (!hasSplit) {
+      if (delta > 0 && (ev.sex === 'male' || ev.sex === 'female')) {
+        patch.genderSplitAt = now();
+        patch.maleCount = ev.sex === 'male' ? ev.count : 0;
+        patch.femaleCount = ev.sex === 'female' ? ev.count : 0;
+        patch.unknownCount = cur;
+      } else {
+        patch.unknownCount = next;
+      }
+    } else {
+      if (delta >= 0) {
+        // adding
+        if (ev.sex === 'male') patch.maleCount = (f.maleCount ?? 0) + delta;
+        else if (ev.sex === 'female') patch.femaleCount = (f.femaleCount ?? 0) + delta;
+        else patch.unknownCount = (f.unknownCount ?? 0) + delta;
+      } else {
+        // subtracting — با redistribution برای حفظ invariant
+        const want = Math.abs(delta);
+        if (ev.sex === 'male') {
+          const availM = f.maleCount ?? 0;
+          const takeM = Math.min(availM, want);
+          patch.maleCount = availM - takeM;
+          const rem = want - takeM;
+          if (rem > 0) {
+            const availU = f.unknownCount ?? 0;
+            const takeU = Math.min(availU, rem);
+            patch.unknownCount = availU - takeU;
+            const rem2 = rem - takeU;
+            if (rem2 > 0) {
+              patch.femaleCount = Math.max(0, (f.femaleCount ?? 0) - rem2);
             }
           }
-          return { ...f, ...patch, events: [...(f.events || []), newEvent], updatedAt: now() };
+        } else if (ev.sex === 'female') {
+          const availF = f.femaleCount ?? 0;
+          const takeF = Math.min(availF, want);
+          patch.femaleCount = availF - takeF;
+          const rem = want - takeF;
+          if (rem > 0) {
+            const availU = f.unknownCount ?? 0;
+            const takeU = Math.min(availU, rem);
+            patch.unknownCount = availU - takeU;
+            const rem2 = rem - takeU;
+            if (rem2 > 0) {
+              patch.maleCount = Math.max(0, (f.maleCount ?? 0) - rem2);
+            }
+          }
+        } else {
+          // mixed → unknown first, then larger sex
+          const availU = f.unknownCount ?? 0;
+          const takeU = Math.min(availU, want);
+          patch.unknownCount = availU - takeU;
+          const rem = want - takeU;
+          if (rem > 0) {
+            const m = f.maleCount ?? 0;
+            const fe = f.femaleCount ?? 0;
+            if (fe >= m) patch.femaleCount = Math.max(0, fe - rem);
+            else patch.maleCount = Math.max(0, m - rem);
+          }
+        }
+      }
+    }
+    // 🆕 audit: capture after + delta
+    const _after = {
+      male: patch.maleCount ?? _before.male,
+      female: patch.femaleCount ?? _before.female,
+      unknown: patch.unknownCount ?? _before.unknown,
+    };
+    const _sdelta = {
+      male: _after.male - _before.male,
+      female: _after.female - _before.female,
+      unknown: _after.unknown - _before.unknown,
+    };
+    const _hasChange = _sdelta.male !== 0 || _sdelta.female !== 0 || _sdelta.unknown !== 0;
+    const _bType: 'death' | 'sale' | 'correction' = ev.type === 'death' ? 'death' : ev.type === 'sell' ? 'sale' : 'correction';
+    const _newBalanceEvents = _hasChange
+      ? [...(f.sexBalanceEvents || []), {
+          id: uuid(),
+          date: ev.date,
+          type: _bType,
+          before: _before,
+          after: _after,
+          delta: _sdelta,
+          reason: ev.reason,
+          note: ev.notes,
+          createdAt: now(),
+        }]
+      : (f.sexBalanceEvents || []);
+    return { ...f, ...patch, events: [...(f.events || []), newEvent], sexBalanceEvents: _newBalanceEvents, updatedAt: now() };
         })
       }),
       addCorrection: (flockId, delta, reasonCode, reasonLabel, notes) => set({
