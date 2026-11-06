@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useFlockValue } from '../../../shr/hooks/useFlockValue';
+import { useFlockValue, KIND_LABEL } from '../../../shr/hooks/useFlockValue';
 import QuickPricesModal from '../../../shr/components/QuickPricesModal';
 import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
 import { HELP } from '../../../shr/help/helpTexts';
@@ -32,6 +32,9 @@ export default function FlockValueSection({ flock }: Props) {
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
       <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', display: 'flex', alignItems: 'center', gap: 2 }}>
         📊 ارزش روز گله
+        {result.kind && KIND_LABEL[result.kind] && (
+          <span style={{ fontSize: 'var(--fs-2xs)', padding: '1px 6px', background: 'var(--accent-soft)', color: 'var(--accent)', border: '1px solid var(--accent-border)', borderRadius: 4, fontWeight: 700 }}>{KIND_LABEL[result.kind]}</span>
+        )}
         <HelpIcon text={HELP.flk.flockValue} />
       </div>
       <button
@@ -63,9 +66,13 @@ export default function FlockValueSection({ flock }: Props) {
         <Row
           l="وضعیت"
           v={<span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-            {result.reason === 'قیمت تعریف نشده'
-              ? 'برای مشاهده ارزش، روی ✏️ بالا بزنید'
-              : (result.reason || 'نامشخص')}
+            {result.reason === 'قیمت تعریف نشده' ? (
+              <span>قیمت «{KIND_LABEL[result.kind] || 'پرنده'}» تعریف نشده — روی ✏️ بزنید</span>
+            ) : ((result.reason || '').includes('نامشخص') || (result.reason || '').includes('نژاد')) ? (
+              <span style={{ color: 'var(--warn)' }}>⚠️ {result.reason}</span>
+            ) : (
+              <span>{result.reason || 'نامشخص'}</span>
+            )}
           </span>}
         />
         <QuickPricesModal
