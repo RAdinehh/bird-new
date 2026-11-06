@@ -122,6 +122,9 @@ export default function FlockCard(props: FlockCardProps) {
   const ready = isLayingReady(f);
   const untilLay = daysUntilLaying(f);
   const costs = calcCosts(f);
+  // 🆕 بهای تمام‌شده شامل مصرف انبار (دان + دارو + گیاهی + واکسن)
+  const consumption = computeFlockConsumption(f.id, whsMovements, whsItems);
+  const totalCost = (costs.grandTotalOwed || 0) + (consumption.totalCost || 0);
   // 🆕 deal display helpers
   const dealData = (f as any).dealData || {};
   const dealType = (f as any).dealType || 'own';
@@ -428,14 +431,18 @@ export default function FlockCard(props: FlockCardProps) {
             <>
               <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📊 وضعیت گله</div>
               <RowGrid>
-                <Row l="هزینه تا امروز" v={fmt.money(costs.grandTotalOwed)} />
+                <Row l="هزینه ثابت" v={fmt.money(costs.grandTotalOwed)} />
+                {consumption.totalCost > 0 && (
+                  <Row l="مصرف انبار" v={fmt.money(consumption.totalCost)} />
+                )}
+                <Row l="هزینه کل" v={fmt.money(totalCost)} accent />
                 <Row l="وضعیت" v="🐣 در حال پرورش" />
               </RowGrid>
             </>
           );
         }
-        const profit = revenue - costs.grandTotalOwed;
-        const roi = costs.grandTotalOwed > 0 ? (profit / costs.grandTotalOwed) * 100 : 0;
+        const profit = revenue - totalCost;
+        const roi = totalCost > 0 ? (profit / totalCost) * 100 : 0;
         const isProfit = profit >= 0;
         const color = isProfit ? 'var(--accent)' : 'var(--danger)';
         return (
@@ -446,8 +453,13 @@ export default function FlockCard(props: FlockCardProps) {
                 <Row l="فاکتور خرید" v={<EntityLink type="invoice" id={f.sourceInvoiceId} label="مشاهده" />} />
               )}
               <Row l="فروش کل" v={fmt.money(revenue)} />
+              <Row l="هزینه ثابت" v={fmt.money(costs.grandTotalOwed)} />
+              {consumption.totalCost > 0 && (
+                <Row l="مصرف انبار" v={fmt.money(consumption.totalCost)} />
+              )}
+              <Row l="هزینه کل" v={fmt.money(totalCost)} />
               <Row l={isProfit ? 'سود خالص' : 'زیان'} v={fmt.money(Math.abs(profit))} accent={isProfit} />
-              {costs.total > 0 && <Row l="ROI" v={`${toFa(roi.toFixed(1))}٪`} />}
+              {totalCost > 0 && <Row l="ROI" v={`${toFa(roi.toFixed(1))}٪`} />}
               {dealType === 'partnership' && partnerShare > 0 && (
                 <>
                   <Row l={`سهم شریک (${toFa(partnerShare)}٪)`} v={fmt.money(Math.round(profit * partnerShare / 100))} />
