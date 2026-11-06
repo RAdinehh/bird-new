@@ -15,6 +15,7 @@ import type { Invoice, InvoiceItem, State, DeletedInvoiceSnapshot, DeletedDealSn
 import { saveToRecycleBin, removeFromRecycleBin, listRecycleBin } from '../../shr/utils/recycleBin';
 import { applyPaymentsToInstallments, paidSumAllocated, computeCashDiscount, getTodayJalali, addJalaliDays, remaining , isEffectivelyPaid} from './calc';
 import { applyInvoiceFlocks, applyInvoiceEquipment, applyInvoiceEgg, BIRD_CATS } from './invoiceHelpers';
+import { deriveSaleEvents, sumSexForFlock } from '../flk/helpers-sex';
 import { applyInvoiceStock } from './applyStock';
 import { generateInvoiceNumber, paidSum } from './calc';
 import { showToast } from '../../cor/store/toast';
@@ -173,19 +174,21 @@ export const useTra = create<State>()(
                     );
                     const qty4 = affected.get(f.id) || 0;
                     if (qty4 > 0) {
-                      newEvents.push({
-                        id: `sell-${id}-${f.id}-${Date.now()}`,
+                      // 🆕 B2 fix: sex-aware eventها (۱ تا ۳ event جدا)
+                      const sex4 = sumSexForFlock(itemsFinal || [], f.id);
+                      const evts4 = deriveSaleEvents({
+                        delta: qty4,
+                        maleCount: sex4.male,
+                        femaleCount: sex4.female,
+                        unknownCount: sex4.unknown,
                         flockId: f.id,
-                        date: mergedWithItems.date || '',
-                        type: 'sell',
-                        count: qty4,
-                        sex: 'mixed',
-                        direction: -1,
-                        buyerId: mergedWithItems.partyId,
                         invoiceId: id,
+                        invoiceNumber: mergedWithItems.number,
+                        partyId: mergedWithItems.partyId,
+                        date: mergedWithItems.deliveryDate || mergedWithItems.date || '',
                         notes: `ویرایش فروش از فاکتور ${mergedWithItems.number || ''}`,
-                        createdAt: new Date().toISOString(),
                       });
+                      newEvents.push(...evts4);
                     }
                     return { ...f, events: newEvents };
                   }),
@@ -282,29 +285,94 @@ export const useTra = create<State>()(
         });
       },
       restoreInvoice: (id) => {
-        const snapshot = removeFromRecycleBin<DeletedInvoiceSnapshot>(
-          'tra',
-          (existing) => existing.invoice.id === id,
-        );
-        if (!snapshot) {
+        // 🆕 Atomic: peek first، pre-flight ALL (simulation)، سپس mutate
+        const allEntries = listRecycleBin<DeletedInvoiceSnapshot>('tra');
+        const entry = allEntries.find(e => e.item.invoice.id === id);
+        if (!entry) {
           console.error('[restoreInvoice] not found in recycle bin:', id);
           return false;
         }
+        const snapshot = entry.item;
         if (get().invoices.some((x) => x.id === id)) {
           console.warn('[restoreInvoice] invoice already exists:', id);
           return false;
         }
-        set((s) => ({ invoices: [...s.invoices, snapshot.invoice] }));
+
+        // 🆕 Atomic pre-flight: simulate ALL items با stacking روی یک flock
+        const flkSt0 = useFlk.getState();
+        const inv = snapshot.invoice;
+        const simulated = new Map<string, { currentCount: number; maleCount: number; femaleCount: number; unknownCount: number }>();
+        if (inv.items) {
+          for (const it of inv.items) {
+            const item = it as any;
+            if (!item.birdId || !item.flockId) continue;
+            if (!BIRD_CATS.includes(item.category || inv.category)) continue;
+            const qty = (item.healthyCount ?? item.quantity) || 0;
+            if (qty <= 0) continue;
+            const f = flkSt0.flocks.find(x => x.id === item.flockId);
+            if (!f) continue;
+            const base = simulated.get(item.flockId) || {
+              currentCount: f.currentCount ?? 0,
+              maleCount: f.maleCount ?? 0,
+              femaleCount: f.femaleCount ?? 0,
+              unknownCount: f.unknownCount ?? 0,
+            };
+            const sign = inv.type === 'purchase' ? 1 : -1;
+            const _mD0 = Number(item.maleCount || 0);
+            const _fD0 = Number(item.femaleCount || 0);
+            const _uD0 = Number(item.unknownCount || 0);
+            const _gS0 = _mD0 + _fD0 + _uD0;
+            const _expectedCur = inv.type === 'purchase' ? base.currentCount + qty : Math.max(0, base.currentCount - qty);
+            let nextM = base.maleCount, nextF = base.femaleCount, nextU = base.unknownCount;
+            if (_gS0 > 0) {
+              const _nextM = inv.type === 'purchase' ? base.maleCount + _mD0 : Math.max(0, base.maleCount - _mD0);
+              const _nextF = inv.type === 'purchase' ? base.femaleCount + _fD0 : Math.max(0, base.femaleCount - _fD0);
+              const _nextU = inv.type === 'purchase' ? base.unknownCount + _uD0 : Math.max(0, base.unknownCount - _uD0);
+              if (_nextM + _nextF + _nextU !== _expectedCur) {
+                if (inv.type === 'sale' && _mD0 > base.maleCount) {
+                  throw new Error(`restore: موجودی نر کافی نیست: ${f.name} — نر ${base.maleCount}، درخواستی ${_mD0}`);
+                }
+                if (inv.type === 'sale' && _fD0 > base.femaleCount) {
+                  throw new Error(`restore: موجودی ماده کافی نیست: ${f.name} — ماده ${base.femaleCount}، درخواستی ${_fD0}`);
+                }
+                throw new Error(`restore: invariant نقض می‌شود برای ${f.name}`);
+              }
+              if (_mD0 > 0) nextM = Math.max(0, base.maleCount + sign * _mD0);
+              if (_fD0 > 0) nextF = Math.max(0, base.femaleCount + sign * _fD0);
+              if (_uD0 > 0) nextU = Math.max(0, base.unknownCount + sign * _uD0);
+              const rem = qty - _gS0;
+              if (rem > 0) nextU = Math.max(0, nextU + sign * rem);
+            } else {
+              nextU = Math.max(0, base.unknownCount + sign * qty);
+            }
+            simulated.set(item.flockId, {
+              currentCount: _expectedCur,
+              maleCount: nextM,
+              femaleCount: nextF,
+              unknownCount: nextU,
+            });
+          }
+        }
+
+        // ✓ همه چیز معتبر — حالا mutate
+        const confirmed = removeFromRecycleBin<DeletedInvoiceSnapshot>(
+          'tra',
+          (existing) => existing.invoice.id === id,
+        );
+        if (!confirmed) {
+          console.error('[restoreInvoice] race: already removed:', id);
+          return false;
+        }
+        set((s) => ({ invoices: [...s.invoices, confirmed.invoice] }));
+
         const flk = useFlk.getState();
-        for (const flock of snapshot.linkedFlocks) {
+        for (const flock of confirmed.linkedFlocks) {
           try {
-            // اگر birdId یا breedId در گله خالی بود، از فاکتور بخوان
-            const firstItem = snapshot.invoice.items.find(it => it.category === 'chick' || it.category === 'adult');
+            const firstItem = confirmed.invoice.items.find(it => it.category === 'chick' || it.category === 'adult');
             const birdId = flock.birdId || firstItem?.birdId || '';
             const breedId = flock.breedId || firstItem?.breedId || '';
-
-            flk.update(flock.id, { 
-              sourceInvoiceId: id, 
+            flk.update(flock.id, {
+              sourceInvoiceId: id,
               sourceCategory: flock.sourceCategory,
               birdId,
               breedId,
@@ -314,56 +382,22 @@ export const useTra = create<State>()(
             console.error('[restoreInvoice] relink flock:', flock.id, e);
           }
         }
-        console.info('[restoreInvoice] ♻️ restored:', id, '| flocks:', snapshot.linkedFlocks.length);
+        console.info('[restoreInvoice] ♻️ restored:', id, '| flocks:', confirmed.linkedFlocks.length);
 
-        // 🆕 Restore flock counts (reverse of deleteInvoice revert)
-        if (snapshot.invoice.items) {
-          const flkState = useFlk.getState();
-          const inv = snapshot.invoice;
-          for (const it of inv.items) {
-            const item = it as any;
-            if (!item.birdId || !item.flockId) continue;
-            if (!BIRD_CATS.includes(item.category || inv.category)) continue;
-            const qty = (item.healthyCount ?? item.quantity) || 0;
-            if (qty <= 0) continue;
-            const f = flkState.flocks.find(x => x.id === item.flockId);
-            if (!f) continue;
-
-            // Opposite of deleteInvoice: purchase → +qty, sale → -qty
-            const cur = f.currentCount ?? 0;
-            const sign = inv.type === 'purchase' ? 1 : -1;
-            const patch: any = {
-              currentCount: inv.type === 'purchase' ? cur + qty : Math.max(0, cur - qty),
-            };
-
-            const mDelta = Number(item.maleCount || 0);
-            const fDelta = Number(item.femaleCount || 0);
-            const uDelta = Number(item.unknownCount || 0);
-            const gSum = mDelta + fDelta + uDelta;
-            if (gSum > 0) {
-              if (mDelta > 0) patch.maleCount = Math.max(0, (f.maleCount ?? 0) + sign * mDelta);
-              if (fDelta > 0) patch.femaleCount = Math.max(0, (f.femaleCount ?? 0) + sign * fDelta);
-              if (uDelta > 0) patch.unknownCount = Math.max(0, (f.unknownCount ?? 0) + sign * uDelta);
-              const rem = qty - gSum;
-              if (rem > 0) {
-                const base = (uDelta > 0) ? (patch.unknownCount ?? f.unknownCount ?? 0) : (f.unknownCount ?? 0);
-                patch.unknownCount = Math.max(0, base + sign * rem);
-              }
-            } else {
-              patch.unknownCount = Math.max(0, (f.unknownCount ?? 0) + sign * qty);
-            }
-            try {
-              flkState.update(item.flockId, patch);
-              console.info('[restoreInvoice] flock counts restored:', item.flockId, 'currentCount:', patch.currentCount);
-            } catch (e) {
-              console.error('[restoreInvoice] restore flock counts:', item.flockId, e);
-            }
+        // اعمال simulated final states
+        const flkState = useFlk.getState();
+        for (const [flockId, finalState] of simulated) {
+          try {
+            flkState.update(flockId, finalState);
+            console.info('[restoreInvoice] flock counts restored:', flockId, 'currentCount:', finalState.currentCount);
+          } catch (e) {
+            console.error('[restoreInvoice] apply patch:', flockId, e);
           }
         }
 
         // Cascade restore: settlement
-        if (snapshot.linkedSettlement) {
-          const _st = get().settlements.find(x => x.id === snapshot.linkedSettlement!.id);
+        if (confirmed.linkedSettlement) {
+          const _st = get().settlements.find(x => x.id === confirmed.linkedSettlement!.id);
           if (_st) {
             set({
               settlements: get().settlements.map(x =>
@@ -375,6 +409,31 @@ export const useTra = create<State>()(
             try { console.info('[restoreInvoice] settlement re-linked:', _st.id); } catch (e) { console.error('[restoreInvoice] settlement relink:', e); }
           }
         }
+
+        // 🆕 B7 fix: un-revoke sell events
+        try {
+          const flkSt = useFlk.getState();
+          const needsRevoke = flkSt.flocks.some((ff: any) =>
+            (ff.events || []).some((e: any) => e.invoiceId === id && e.type === 'sell' && e.revoked === true)
+          );
+          if (needsRevoke) {
+            useFlk.setState({
+              flocks: flkSt.flocks.map((ff: any) => ({
+                ...ff,
+                events: (ff.events || []).map((e: any) =>
+                  e.invoiceId === id && e.type === 'sell' && e.revoked === true
+                    ? { ...e, revoked: false }
+                    : e
+                ),
+                updatedAt: now(),
+              })),
+            } as any);
+            console.info('[restoreInvoice] ♻️ sell events un-revoked:', id);
+          }
+        } catch (e) {
+          console.error('[restoreInvoice] un-revoke sell events failed:', e);
+        }
+
         console.warn('[restoreInvoice] ⚠️ موجودی گله/انبار را دستی بررسی کنید');
         return true;
       },
