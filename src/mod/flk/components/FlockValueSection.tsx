@@ -38,6 +38,25 @@ export default function FlockValueSection({ flock }: Props) {
     </div>
   );
 
+  const priceCell = (
+    <div
+      onClick={() => setPricesOpen(true)}
+      role="button"
+      style={{
+        ...cellStyle,
+        cursor: 'pointer',
+        border: '1px solid var(--accent-border)',
+        background: 'var(--accent-soft)',
+      }}
+      title="ویرایش قیمت"
+    >
+      <span style={{ color: 'var(--accent)', fontWeight: 600 }}>قیمت پایه ✏️:</span>
+      <b style={{ fontWeight: 700, color: 'var(--accent)' }}>
+        {toFa(result.pricePerKg.toLocaleString('fa-IR'))} ت/کیلو
+      </b>
+    </div>
+  );
+
   if (result.value === 0) {
     return (
       <>
@@ -63,10 +82,7 @@ export default function FlockValueSection({ flock }: Props) {
           <span style={{ color: 'var(--muted)' }}>وزن تخمینی:</span>
           <b style={{ fontWeight: 700 }}>{(result.weightG! / 1000).toFixed(2)} کیلو</b>
         </div>
-        <div style={cellStyle}>
-          <span style={{ color: 'var(--muted)' }}>قیمت پایه:</span>
-          <b style={{ fontWeight: 700 }}>{toFa(result.pricePerKg.toLocaleString('fa-IR'))} ت/کیلو</b>
-        </div>
+        {priceCell}
         <div style={cellStyle}>
           <span style={{ color: 'var(--muted)' }}>تعداد زنده:</span>
           <b style={{ fontWeight: 700 }}>{toFa(currentCount.toLocaleString('fa-IR'))}</b>
