@@ -477,16 +477,23 @@ export default function FlockCard(props: FlockCardProps) {
 
       {(() => {
         const cons = computeFlockConsumption(f.id, whsMovements, whsItems);
-        if (cons.totalCost === 0) return null;
+        const hasAnyQty = cons.feed.total > 0 || cons.medicine.total > 0 || cons.vaccine.total > 0 || cons.other.total > 0;
+        if (!hasAnyQty && cons.totalCost === 0) return null;
+        const fmtQty = (total: number, cost: number) => cost > 0
+          ? `${fmt.int(total)} ${total === cons.feed.total ? 'kg' : ''} • ${fmt.money(cost)}`.trim()
+          : `${fmt.int(total)} (قیمت نامشخص)`;
         return (
           <>
             <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🍽️ مصرف انبار</div>
             <RowGrid>
-              {cons.feed.total > 0 && <Row l="دان" v={`${fmt.int(cons.feed.total)} kg • ${fmt.money(cons.feed.cost)}`} />}
-              {cons.medicine.total > 0 && <Row l="دارو" v={fmt.money(cons.medicine.cost)} />}
-              {cons.vaccine.total > 0 && <Row l="واکسن" v={fmt.money(cons.vaccine.cost)} />}
-              {cons.other.total > 0 && <Row l="سایر" v={fmt.money(cons.other.cost)} />}
-              <Row l="جمع مصرف" v={fmt.money(cons.totalCost)} accent />
+              {cons.feed.total > 0 && <Row l="دان" v={fmtQty(cons.feed.total, cons.feed.cost)} />}
+              {cons.medicine.total > 0 && <Row l="دارو" v={fmtQty(cons.medicine.total, cons.medicine.cost)} />}
+              {cons.vaccine.total > 0 && <Row l="واکسن" v={fmtQty(cons.vaccine.total, cons.vaccine.cost)} />}
+              {cons.other.total > 0 && <Row l="سایر" v={fmtQty(cons.other.total, cons.other.cost)} />}
+              {cons.totalCost > 0 && <Row l="جمع مصرف" v={fmt.money(cons.totalCost)} accent />}
+              {cons.totalCost === 0 && hasAnyQty && (
+                <Row l="جمع مصرف" v="قیمت‌ها در انبار ثبت نشده" accent />
+              )}
             </RowGrid>
           </>
         );

@@ -104,9 +104,11 @@ export function useDlgSave(params: UseDlgSaveParams) {
         ingredients,
       });
       feedData.forEach(d => {
+        const item = whsItems.find(x => x.id === d.itemId);
+        const price = Number(item?.lastPrice) || Number(item?.avgPrice) || 0;
         const mid = addMovement({
           itemId: d.itemId, type: 'out',
-          quantity: d.quantity, unitPrice: 0, reason: 'consumption',
+          quantity: d.quantity, unitPrice: price, reason: 'consumption',
           date: form.date, partyId: '',
           notes: d.notes,
           flockId: form.flockId || undefined,
@@ -130,13 +132,17 @@ export function useDlgSave(params: UseDlgSaveParams) {
     const processedVaccines = form.vaccines.map(v => {
       const d = buildVaccineMovement(v);
       if (!d) return { ...v, movementId: '' };
-      const mid = addMovement({ ...d, type: 'out', unitPrice: 0, reason: 'consumption', date: form.date, partyId: '', flockId: form.flockId || undefined } as any);
+      const vacItem = whsItems.find(x => x.id === d.itemId);
+      const vacPrice = Number(vacItem?.lastPrice) || Number(vacItem?.avgPrice) || 0;
+      const mid = addMovement({ ...d, type: 'out', unitPrice: vacPrice, reason: 'consumption', date: form.date, partyId: '', flockId: form.flockId || undefined } as any);
       return { ...v, movementId: mid || '' };
     });
     const processedMedications = form.medications.map(m => {
       const d = buildMedicationMovement(m);
       if (!d) return { ...m, movementId: '' };
-      const mid = addMovement({ ...d, type: 'out', unitPrice: 0, reason: 'consumption', date: form.date, partyId: '', flockId: form.flockId || undefined } as any);
+      const medItem = whsItems.find(x => x.id === d.itemId);
+      const medPrice = Number(medItem?.lastPrice) || Number(medItem?.avgPrice) || 0;
+      const mid = addMovement({ ...d, type: 'out', unitPrice: medPrice, reason: 'consumption', date: form.date, partyId: '', flockId: form.flockId || undefined } as any);
       return { ...m, movementId: mid || '' };
     });
 
