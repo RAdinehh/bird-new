@@ -33,6 +33,8 @@ import { HELP } from '../../../shr/help/helpTexts';
 import UnmergeFlocksModal from './UnmergeFlocksModal';
 import MergedEditBlockModal from './MergedEditBlockModal';
 import SexingModal from './SexingModal';
+import SexingHistoryModal from './SexingHistoryModal';
+import { useBreedStandard } from '../../../shr/hooks/useBreedStandard';
 
 type Fmt = ReturnType<typeof useFormat>;
 
@@ -93,6 +95,7 @@ export default function FlockCard(props: FlockCardProps) {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [unmergeOpen, setUnmergeOpen] = useState(false);
   const [sexingOpen, setSexingOpen] = useState(false);
+  const [sexingHistoryOpen, setSexingHistoryOpen] = useState(false);
   const [editBlockOpen, setEditBlockOpen] = useState(false);
 
   const isMerged = f.status === 'merged' || (f.mergedInfo?.sources?.length || 0) >= 2;
@@ -118,7 +121,8 @@ export default function FlockCard(props: FlockCardProps) {
                        bird?.birdKind === 'goose' ? '🦢' :
                        bird?.birdKind === 'chicken' ? '🐔' :
                        '🐔';
-  const ageDays = getAgeDays(f);
+  const breedStd = useBreedStandard();
+    const ageDays = getAgeDays(f);
   const lc = getLifecycle(f.type, ageDays, f.endOfCycleDay ?? null, null, f.layingStartDay ?? null);
   const isArchived = f.status === 'archived' || f.status === 'sold';
   const ready = isLayingReady(f);
@@ -236,6 +240,17 @@ export default function FlockCard(props: FlockCardProps) {
         }}>🔗 ادغام‌شده ({toFa(_mergedSourcesCount)})</span>
       ),
     });
+  }
+
+  // 🆕 badge ⏰ زمان تفکیک (breeder بدون genderSplitAt که سن به sexingAge رسیده)
+  if (f.type === 'breeder' && !f.genderSplitAt) {
+    const _sexingAge = f.sexingAgeOverride ?? breedStd.byBreedId(f.breedId)?.sexingAgeDay;
+    if (_sexingAge != null && ageDays >= _sexingAge) {
+      allBadges.push({
+        key: 'sexing-reminder',
+        node: <Tag tone="amber">⏰ زمان تفکیک</Tag>,
+      });
+    }
   }
 
   flockGroups.forEach(g => {
@@ -558,6 +573,7 @@ export default function FlockCard(props: FlockCardProps) {
           <CardActions actions={[
             { label: 'ویرایش', onClick: handleEditGuard, variant: 'outline' },
             { label: '📋 تفکیک', onClick: () => setSexingOpen(true), variant: 'outline', hidden: f.type === 'broiler' },
+            { label: '📅 تاریخچه', onClick: () => setSexingHistoryOpen(true), variant: 'outline', hidden: (f.sexingEvents?.length || 0) === 0 },
             { label: '📜 تاریخچه', onClick: () => setHistoryOpen(true), variant: 'outline' },
             { label: '📁 گروه‌ها', onClick: onOpenGroups, variant: 'outline' },
             { label: f.hidden ? '👁 نمایان' : '👁 پنهان', onClick: onToggleHidden, variant: 'outline' },
@@ -573,6 +589,7 @@ export default function FlockCard(props: FlockCardProps) {
       />
           <UnmergeFlocksModal open={unmergeOpen} onClose={() => setUnmergeOpen(false)} targetFlockId={f.id} />
       <SexingModal open={sexingOpen} onClose={() => setSexingOpen(false)} flock={f} />
+      <SexingHistoryModal open={sexingHistoryOpen} onClose={() => setSexingHistoryOpen(false)} flock={f} />
       <MergedEditBlockModal open={editBlockOpen} onClose={() => setEditBlockOpen(false)} onUnmerge={() => setUnmergeOpen(true)} flockName={f.name} />
     </ExpandableCard>
     
