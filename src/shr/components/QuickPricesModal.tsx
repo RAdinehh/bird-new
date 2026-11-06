@@ -20,15 +20,15 @@ const ALL_FIELDS: Array<{
   kind?: string;
   hint: string;
 }> = [
-  { key: 'liveChicken', label: 'مرغ زنده', unit: 'تومان/کیلوگرم', icon: '🐔', kind: 'chicken', hint: '۸۵,۰۰۰' },
-  { key: 'liveTurkey', label: 'بوقلمون زنده', unit: 'تومان/کیلوگرم', icon: '🦃', kind: 'turkey', hint: '۱۲۰,۰۰۰' },
-  { key: 'liveGoose', label: 'غاز زنده', unit: 'تومان/کیلوگرم', icon: '🦢', kind: 'goose', hint: '۹۵,۰۰۰' },
-  { key: 'liveDuck', label: 'اردک زنده', unit: 'تومان/کیلوگرم', icon: '🦆', kind: 'duck', hint: '۷۰,۰۰۰' },
-  { key: 'liveQuail', label: 'بلدرچین زنده', unit: 'تومان/کیلوگرم', icon: '🐦', kind: 'quail', hint: '۶۰,۰۰۰' },
-  { key: 'chickDay1', label: 'جوجه یک‌روزه', unit: 'تومان/عدد', icon: '🐣', hint: '۲۵,۰۰۰' },
-  { key: 'eggTable', label: 'تخم‌مرغ خوراکی', unit: 'تومان/عدد', icon: '🥚', hint: '۸,۰۰۰' },
-  { key: 'eggFertile', label: 'تخم نطفه‌دار', unit: 'تومان/عدد', icon: '🥚', hint: '۱۵,۰۰۰' },
-  { key: 'culledBird', label: 'مرغ حذفی', unit: 'تومان/عدد', icon: '🐓', hint: '۴۰,۰۰۰' },
+  { key: 'liveChicken', label: 'مرغ زنده', unit: 'تومان/کیلوگرم', icon: '🐔', kind: 'chicken', hint: 'قیمت روز مرغ زنده — به ازای هر کیلوگرم' },
+  { key: 'liveTurkey', label: 'بوقلمون زنده', unit: 'تومان/کیلوگرم', icon: '🦃', kind: 'turkey', hint: 'قیمت روز بوقلمون زنده — به ازای هر کیلوگرم' },
+  { key: 'liveGoose', label: 'غاز زنده', unit: 'تومان/کیلوگرم', icon: '🦢', kind: 'goose', hint: 'قیمت روز غاز زنده — به ازای هر کیلوگرم' },
+  { key: 'liveDuck', label: 'اردک زنده', unit: 'تومان/کیلوگرم', icon: '🦆', kind: 'duck', hint: 'قیمت روز اردک زنده — به ازای هر کیلوگرم' },
+  { key: 'liveQuail', label: 'بلدرچین زنده', unit: 'تومان/کیلوگرم', icon: '🐦', kind: 'quail', hint: 'قیمت روز بلدرچین زنده — به ازای هر کیلوگرم' },
+  { key: 'chickDay1', label: 'جوجه یک‌روزه', unit: 'تومان/عدد', icon: '🐣', hint: 'قیمت خرید جوجه یک‌روزه از هچری — به ازای هر عدد' },
+  { key: 'eggTable', label: 'تخم‌مرغ خوراکی', unit: 'تومان/عدد', icon: '🥚', hint: 'قیمت فروش تخم‌مرغ خوراکی در بازار — به ازای هر عدد' },
+  { key: 'eggFertile', label: 'تخم نطفه‌دار', unit: 'تومان/عدد', icon: '🥚', hint: 'قیمت تخم نطفه‌دار برای جوجه‌کشی — به ازای هر عدد' },
+  { key: 'culledBird', label: 'مرغ حذفی', unit: 'تومان/عدد', icon: '🐓', hint: 'قیمت فروش مرغ حذفی (پایان دوره) — به ازای هر عدد' },
 ];
 
 interface Props {
@@ -102,7 +102,7 @@ export default function QuickPricesModal({ open, onClose, restrictToKinds }: Pro
             <Input
               value={formatWithSep(form[field.key] || '')}
               onChange={e => handleChange(field.key, e.target.value)}
-              placeholder={`${field.hint} ${field.unit === 'تومان/کیلوگرم' ? 'ت/ک' : 'ت'}`}
+              placeholder={field.hint}
               inputMode="tel"
             />
           </Field>
