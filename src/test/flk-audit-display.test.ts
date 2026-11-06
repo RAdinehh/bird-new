@@ -102,3 +102,64 @@ describe('toneFromRate', () => {
   it('rate=20 → danger', () => expect(toneFromRate(20)).toBe('var(--danger)'));
   it('rate=50 → danger', () => expect(toneFromRate(50)).toBe('var(--danger)'));
 });
+
+// ═════════════════════════════════════════════════════════════
+// فاز ۷.۳ — CSV export
+// ═════════════════════════════════════════════════════════════
+import { eventsToCSV, auditToCSV } from '../mod/flk/helpers-audit';
+
+describe('eventsToCSV', () => {
+  it('خالی → فقط header', () => {
+    const csv = eventsToCSV([]);
+    expect(csv.split('\n').length).toBe(1);
+    expect(csv).toContain('تاریخ');
+  });
+  it('یک event → header + ردیف', () => {
+    const csv = eventsToCSV([
+      { id: '1', date: '1405/08/01', type: 'death', count: 10, sex: 'male', reason: 'بیماری', notes: 'تست', revoked: false } as any,
+    ]);
+    const lines = csv.split('\n');
+    expect(lines.length).toBe(2);
+    expect(lines[1]).toContain('1405/08/01');
+    expect(lines[1]).toContain('death');
+    expect(lines[1]).toContain('10');
+    expect(lines[1]).toContain('male');
+    expect(lines[1]).toContain('خیر');
+  });
+  it('revoked → بله', () => {
+    const csv = eventsToCSV([
+      { id: '1', date: '1405/08/01', type: 'sell', count: 5, sex: 'mixed', reason: '', notes: '', revoked: true } as any,
+    ]);
+    expect(csv).toContain('بله');
+  });
+  it('کاراکتر کاما در cell → escape با quote', () => {
+    const csv = eventsToCSV([
+      { id: '1', date: '1405/08/01', type: 'death', count: 1, sex: 'male', reason: 'بیماری, ضعف', notes: '', revoked: false } as any,
+    ]);
+    expect(csv).toContain('"بیماری, ضعف"');
+  });
+});
+
+describe('auditToCSV', () => {
+  it('خالی → فقط header', () => {
+    const csv = auditToCSV([]);
+    expect(csv.split('\n').length).toBe(1);
+    expect(csv).toContain('نر قبل');
+    expect(csv).toContain('نر بعد');
+  });
+  it('یک audit → header + ردیف با delta', () => {
+    const csv = auditToCSV([{
+      id: 'a1', date: '1405/08/01', type: 'sale',
+      before: { male: 50, female: 50, unknown: 0 },
+      after: { male: 40, female: 50, unknown: 0 },
+      delta: { male: -10, female: 0, unknown: 0 },
+      note: 'فروش',
+      createdAt: '2026-01-01',
+    } as any]);
+    const lines = csv.split('\n');
+    expect(lines.length).toBe(2);
+    expect(lines[1]).toContain('-10');
+    expect(lines[1]).toContain('sale');
+    expect(lines[1]).toContain('"فروش"');
+  });
+});

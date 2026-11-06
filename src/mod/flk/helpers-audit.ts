@@ -71,3 +71,60 @@ export function toneFromRate(rate: number): string {
   if (rate >= 10) return 'var(--warn)';
   return 'var(--text)';
 }
+
+// ═════════════════════════════════════════════════════════════
+// فاز ۷.۳ — CSV export
+// ═════════════════════════════════════════════════════════════
+import type { FlockEvent } from './types-store';
+
+const csvCell = (v: any): string => {
+  const s = String(v ?? '').replace(/"/g, '""');
+  return `"${s}"`;
+};
+
+/**
+ * eventsToCSV — CSV ردیف‌های flock.events
+ * header: تاریخ,نوع,تعداد,جنس,دلیل,توضیح,لغوشده
+ */
+export function eventsToCSV(events: FlockEvent[] | undefined): string {
+  const header = ['تاریخ', 'نوع', 'تعداد', 'جنس', 'دلیل', 'توضیح', 'لغوشده'];
+  const rows: string[][] = [header];
+  for (const e of events || []) {
+    rows.push([
+      e.date || '',
+      e.type,
+      String(e.count ?? 0),
+      e.sex || '',
+      e.reason || '',
+      e.notes || '',
+      e.revoked ? 'بله' : 'خیر',
+    ]);
+  }
+  return rows.map(r => r.map(csvCell).join(',')).join('\n');
+}
+
+/**
+ * auditToCSV — CSV ردیف‌های sexBalanceEvents
+ * header: تاریخ,نوع,نر قبل,ماده قبل,نامشخص قبل,نر بعد,ماده بعد,نامشخص بعد,Δنر,Δماده,Δنامشخص,یادداشت
+ */
+export function auditToCSV(events: FlockSexBalanceEvent[] | undefined): string {
+  const header = ['تاریخ', 'نوع', 'نر قبل', 'ماده قبل', 'نامشخص قبل', 'نر بعد', 'ماده بعد', 'نامشخص بعد', 'Δنر', 'Δماده', 'Δنامشخص', 'یادداشت'];
+  const rows: string[][] = [header];
+  for (const e of events || []) {
+    rows.push([
+      e.date || '',
+      e.type,
+      String(e.before.male),
+      String(e.before.female),
+      String(e.before.unknown),
+      String(e.after.male),
+      String(e.after.female),
+      String(e.after.unknown),
+      String(e.delta.male),
+      String(e.delta.female),
+      String(e.delta.unknown),
+      e.note || '',
+    ]);
+  }
+  return rows.map(r => r.map(csvCell).join(',')).join('\n');
+}

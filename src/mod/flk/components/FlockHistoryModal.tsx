@@ -6,10 +6,12 @@
 import { useEffect, useState, useMemo, type ReactNode } from 'react';
 import { Modal, Btn, BtnRow, Field, Grid2, Select } from '../../../shr/components/ui';
 import type { Flock, FlockEvent, FlockEventType, FlockEventReasonCode, FlockSexBalanceEvent } from '../store';
-import { SEX_AUDIT_META, formatSexDelta, aggregateDeathsBySex, toneFromRate } from '../helpers-audit';
+import { SEX_AUDIT_META, formatSexDelta, aggregateDeathsBySex, toneFromRate, eventsToCSV, auditToCSV } from '../helpers-audit';
 import { useFlk } from '../store';
 import { todayJ } from '../api/flocksCalc';
 import { showConfirmAsync } from '../../../cor/store/dialog';
+import { toastMsg } from '../../../cor/store/toast';
+import { downloadCSV } from '../../../shr/utils/export';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import type { DailyLog as DlgLog } from '../../dlg/store';
 
@@ -127,6 +129,22 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
     }
     return order.map(k => ({ label: k, events: map.get(k)! }));
   }, [flock.events, filter]);
+
+  const handleExport = () => {
+    try {
+      const safeName = (flock.name || 'flock').replace(/[^\w\u0600-\u06FF-]+/g, '_');
+      if (showAudit) {
+        const csv = auditToCSV(flock.sexBalanceEvents);
+        downloadCSV(`flock-${safeName}-audit.csv`, '\uFEFF' + csv);
+      } else {
+        const csv = eventsToCSV(flock.events);
+        downloadCSV(`flock-${safeName}-events.csv`, '\uFEFF' + csv);
+      }
+      toastMsg.success('CSV دانلود شد');
+    } catch {
+      toastMsg.error('دانلود ناموفق');
+    }
+  };
 
   return (
     <Modal open={open} onClose={onClose} title={'📜 تاریخچه • ' + flock.name}>
@@ -292,7 +310,10 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
           ))}
         </div>
       )}
-      <BtnRow><Btn variant="primary" onClick={onClose}>بستن</Btn></BtnRow>
+      <BtnRow>
+        <Btn onClick={handleExport}>📥 CSV</Btn>
+        <Btn variant="primary" onClick={onClose}>بستن</Btn>
+      </BtnRow>
     </Modal>
   );
 }
