@@ -27,6 +27,25 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onConfirm }:
   const target = candidates.find(f => f.id === targetId);
   const others = candidates.filter(f => f.id !== targetId);
 
+  const _KIND_LBL: Record<string, string> = { chicken: 'مرغ', duck: 'اردک', turkey: 'بوقلمون', quail: 'بلدرچین', goose: 'غاز' };
+  const _TYPE_LBL: Record<string, string> = { layer: 'تخم‌گذار', broiler: 'گوشتی', breeder: 'مادر' };
+  const _kindLbl = (k: string) => _KIND_LBL[k] || k;
+  const _typeLbl = (t: string) => _TYPE_LBL[t] || t;
+
+  const incompatMap = new Map<string, string>();
+  if (target) {
+    for (const src of others) {
+      if ((src as any).birdKind && (target as any).birdKind && (src as any).birdKind !== (target as any).birdKind) {
+        incompatMap.set(src.id, 'پرنده: ' + _kindLbl((src as any).birdKind) + ' ≠ ' + _kindLbl((target as any).birdKind));
+        continue;
+      }
+      if (src.type !== target.type) {
+        incompatMap.set(src.id, 'نوع: ' + _typeLbl(src.type) + ' ≠ ' + _typeLbl(target.type));
+      }
+    }
+  }
+  const hasIncompat = incompatMap.size > 0;
+
   return (
     <Modal open={open} onClose={onClose} title="🔗 ادغام گله‌ها">
       <div style={{ padding: 'var(--pad-normal)', background: 'var(--info-soft)', border: '1px solid var(--info)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', marginBottom: 12 }}>
@@ -41,6 +60,7 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onConfirm }:
         {candidates.map(f => {
           const age = getAgeDays(f);
           const isTarget = f.id === targetId;
+          const _inc = incompatMap.get(f.id);
           return (
             <label
               key={f.id}
@@ -49,8 +69,8 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onConfirm }:
                 alignItems: 'center',
                 gap: 'var(--sp-2)',
                 padding: 'var(--pad-normal)',
-                background: isTarget ? 'var(--accent-soft)' : 'var(--input-bg)',
-                border: '1px solid ' + (isTarget ? 'var(--accent)' : 'var(--border)'),
+                background: isTarget ? 'var(--accent-soft)' : _inc ? 'var(--danger-soft)' : 'var(--input-bg)',
+                border: '1px solid ' + (isTarget ? 'var(--accent)' : _inc ? 'var(--danger)' : 'var(--border)'),
                 borderRadius: 'var(--r-md)',
                 cursor: 'pointer',
               }}
@@ -67,6 +87,7 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onConfirm }:
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
                   {toFa(f.currentCount || 0)} پرنده · {toFa(age)} روز · {f.type === 'layer' ? 'تخم‌گذار' : f.type === 'broiler' ? 'گوشتی' : 'مادر'}
                 </div>
+                  {_inc && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 600, marginTop: 4 }}>⚠️ {_inc}</div>}
               </div>
               {isTarget && <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>هدف</span>}
             </label>
@@ -74,9 +95,14 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onConfirm }:
         })}
       </div>
 
-      {target && others.length > 0 && (
+      {hasIncompat && (
+        <div style={{ marginTop: 12, padding: 'var(--pad-normal)', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>
+          ⚠️ گله‌های ناسازگار — ادغام ممکن نیست. همه باید از یک پرنده و نوع باشند.
+        </div>
+      )}
+      {!hasIncompat && target && others.length > 0 && (
         <div style={{ marginTop: 12, padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)' }}>
-          {toFa(others.length)} گله به «{target.name}» ادغام می‌شود. این عمل قابل بازگشت نیست (از طریق Undo).
+          {toFa(others.length)} گله به «{target.name}» ادغام می‌شود. از طریق «🔓 بازگردانی» در کارت گله قابل بازگشت است.
         </div>
       )}
 
@@ -99,7 +125,7 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onConfirm }:
             { confirmText: 'ادغام' }
           );
           if (ok) onConfirm(targetId);
-        }} disabled={!targetId}>
+        }} disabled={!targetId || hasIncompat}>
           🔗 ادغام {toFa(others.length + 1)} گله
         </Btn>
         <Btn onClick={onClose}>لغو</Btn>
