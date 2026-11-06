@@ -1,7 +1,7 @@
 /**
  * FlocksPage — گله‌ها (carousel tabs مثل hal)
  */
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef} from 'react';
 import { useFlk } from './store';
 import { useBrd, type Bird, type Breed } from '../brd/store';
 import { useHal, type Hall, type Zone } from '../hal/store';
@@ -26,7 +26,7 @@ import FlocksModal from './components/FlocksModal';
 import GroupsPage from './components/GroupsPage';
 import WithdrawalModal from './components/WithdrawalModal';
 import { showConfirmAsync } from '../../cor/store/dialog';
-import { showToast } from '../../cor/store/toast';
+import { showToast, toastMsg } from '../../cor/store/toast';
 
 export default function FlocksPage() {
   const fmt = useFormat();
@@ -39,6 +39,9 @@ export default function FlocksPage() {
   const { invoices } = useTra();
 
   const [tab, setTab] = useState<TabId>('all');
+
+  const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
   const [groupsOpen, setGroupsOpen] = useState(false);
   const [withdrawalOpen, setWithdrawalOpen] = useState(false);
   const { badge: newTabBadge, trigger: triggerBadge } = useTabBadge();
@@ -69,6 +72,10 @@ export default function FlocksPage() {
     open, setOpen, form, setForm, layingFromStd, setLayingFromStd, err, setErr,
     openNew, openEdit, save,
   } = useFlocksForm({ birds, halls, flocks, breedStd, add, update });
+  useEffect(() => {
+    if (!open) { setSaving(false); savingRef.current = false; }
+  }, [open]);
+
 
   const kpiData = useFlocksKpi(flocks);
   const breedsForBird = useMemo(() => breeds.filter(b => b.birdId === form.birdId), [breeds, form.birdId]);
@@ -309,7 +316,8 @@ export default function FlocksPage() {
       </div>
 
       <FlocksModal
-        open={open}
+        saving={saving}
+          open={open}
         onClose={() => setOpen(false)}
         form={form}
         setForm={setForm}
@@ -360,6 +368,10 @@ export default function FlocksPage() {
           setOpen(false);
         } : undefined}
         onSave={async () => {
+          if (savingRef.current) return;
+          savingRef.current = true;
+          setSaving(true);
+          try {
           attemptSave();
 
           // 🆕 نمایش خطاهای Zod در ErrorBox (به جای بی‌صدا کردن)
@@ -370,7 +382,9 @@ export default function FlocksPage() {
                 return m ? `${field}: ${m}` : '';
               })
               .filter(Boolean);
-            setErr(errs.length > 0 ? errs.join(' • ') : 'خطا در اعتبارسنجی — فیلدهای قرمز را بررسی کنید');
+            const _msg = errs.length > 0 ? errs.join(' • ') : 'خطا در اعتبارسنجی — فیلدهای قرمز را بررسی کنید';
+            setErr(_msg);
+            try { toastMsg.error(_msg); } catch {}
             return;
           }
 
@@ -466,7 +480,11 @@ export default function FlocksPage() {
           if (t === 'layer' || t === 'breeder' || t === 'broiler') {
             setTimeout(() => { setInstant(); setTab(t); }, 120);
           }
-        }}
+        
+          } finally {
+            savingRef.current = false;
+            setSaving(false);
+          }}}
       />
     
 

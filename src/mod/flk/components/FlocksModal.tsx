@@ -64,6 +64,7 @@ export interface FlocksModalProps {
   onSave: () => void;
   onArchive?: () => void;
   onRestore?: () => void;
+  saving?: boolean;
 }
 
 export default function FlocksModal(props: FlocksModalProps) {
@@ -136,7 +137,7 @@ export default function FlocksModal(props: FlocksModalProps) {
           {form.id && form.status !== 'archived' && onArchive && (
             <Btn onClick={onArchive}>📦 آرشیو</Btn>
           )}
-          <Btn variant="primary" onClick={onSave}>ذخیره</Btn>
+          <Btn variant="primary" onClick={onSave} disabled={props.saving}>ذخیره</Btn>
           <Btn onClick={onClose}>لغو</Btn>
         </BtnRow>
       }
