@@ -1,6 +1,7 @@
 import { PageContainer } from '../../shr/components/ui';
 import BenchmarkCard from './BenchmarkCard';
 import EquipmentCard from './EquipmentCard';
+import SexingWidget from './SexingWidget';
 import QuickActions from './QuickActions';
 import TopAlerts from './TopAlerts';
 import TodayCard from './TodayCard';
@@ -42,6 +43,7 @@ export default function Dashboard() {
       <AnalyticsCards survivalRate={survivalRate} survivalTone={survivalTone} henDay7={henDay7} henDayTone={henDayTone} brokenRate7={brokenRate7} brokenTone={brokenTone} cumulativeMortality={cumulativeMortality} eggTrend={eggTrend} trendDays={trendDays} setTrendDays={setTrendDays} fcr={fcr} waterFeedRatio={waterFeedRatio} weightMetrics={weightMetrics} costPerEgg={costPerEgg} salesThisMonth={salesThisMonth} purchasesThisMonth={purchasesThisMonth} profit={profit} receivables={receivables} inventoryValue={inventoryValue} momComparison={momComparison} nav={nav} />
 
           <BenchmarkCard />
+        <SexingWidget nav={nav} activeFlocks={activeFlocks} />
           <EquipmentCard nav={nav} />
         </>
       ) : null}
