@@ -481,16 +481,24 @@ export default function FlockCard(props: FlockCardProps) {
 
       {f.mergedInfo && (f.mergedInfo.sources?.length || 0) >= 2 && (
         <>
-          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🔗 گله ادغام‌شده</div>
-          <RowGrid>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+            <div style={{ fontSize: 'var(--fs-base)', color: 'var(--purple)', fontWeight: 700, letterSpacing: '.3px' }}>🔗 گله ادغام‌شده</div>
+            <Btn size="sm" variant="outline" onClick={() => setUnmergeOpen(true)} style={{ color: 'var(--purple)', borderColor: 'var(--purple)' }}>🔓 بازگردانی</Btn>
+          </div>
+          <div style={{
+            padding: 'var(--pad-tight)',
+            background: 'var(--purple-soft)',
+            border: '1px solid var(--purple)',
+            borderRadius: 'var(--r-md)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 4,
+          }}>
             {(f.mergedInfo.sources || [])
               .filter((s: any) => s.flockId !== f.id)
               .map((s: any) => (
                 <Row key={s.flockId} l={s.flockName} v={`${fmt.int(s.count || 0)} پرنده`} />
               ))}
-          </RowGrid>
-          <div style={{ marginTop: 8 }}>
-            <Btn size="sm" variant="outline" onClick={() => setUnmergeOpen(true)}>🔓 بازگردانی گله</Btn>
           </div>
         </>
       )}
