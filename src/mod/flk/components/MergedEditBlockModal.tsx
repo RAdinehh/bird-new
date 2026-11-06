@@ -16,8 +16,9 @@ export default function MergedEditBlockModal({ open, onClose, onUnmerge, flockNa
     <Modal
       open={open}
       onClose={onClose}
-      title="⚠️ گله ادغام‌شده"
+      title="گله ادغام‌شده"
       size="sm"
+      center
       footer={
         <BtnRow>
           <Btn variant="primary" onClick={() => { onClose(); onUnmerge(); }}>♻️ بازگردانی گله</Btn>
@@ -25,11 +26,11 @@ export default function MergedEditBlockModal({ open, onClose, onUnmerge, flockNa
         </BtnRow>
       }
     >
-      <div style={{ padding: 'var(--pad-normal)', display: 'flex', flexDirection: 'column', gap: 12, fontSize: 'var(--fs-sm)', lineHeight: 1.7 }}>
-        <div>
+      <div style={{ padding: 'var(--pad-normal)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 16 }}>
+        <div style={{ fontSize: 48, lineHeight: 1 }}>⚠️</div>
+        <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.8, color: 'var(--text)' }}>
           گله <b>«{flockName}»</b> از ادغام چند گله دیگر ساخته شده است و داده‌های آن با گله اصلی یکی شده است.
-        </div>
-        <div style={{ color: 'var(--muted)' }}>
+          <br /><br />
           برای ویرایش، ابتدا باید گله‌هایی که در آن ادغام شده‌اند را از این گله جدا (بازگردانی) کنید.
         </div>
       </div>
