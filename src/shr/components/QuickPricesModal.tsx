@@ -42,7 +42,7 @@ export default function QuickPricesModal({ open, onClose, restrictToKinds }: Pro
 
   const hasRestriction = !!(restrictToKinds && restrictToKinds.length > 0);
 
-  // 🆕 فیلتر strict: فقط قیمت گونه مربوطه — یا همه اگر toggle شد
+  // 🆕 فیلتر strict: فقط قیمت گونه مربوطه (نه فیلدهای generic)
   const fields = hasRestriction && !showAll
     ? ALL_FIELDS.filter(f => f.kind && restrictToKinds!.includes(f.kind))
     : ALL_FIELDS;
@@ -64,7 +64,6 @@ export default function QuickPricesModal({ open, onClose, restrictToKinds }: Pro
   const savedAt = marketPrices.updatedAt || '';
 
   const handleChange = (key: string, raw: string) => {
-    // Input خودش formatNumWhileTyping زده — فقط raw value ذخیره کن
     setForm(f => ({ ...f, [key]: raw }));
   };
 
@@ -91,17 +90,14 @@ export default function QuickPricesModal({ open, onClose, restrictToKinds }: Pro
       footer={<BtnRow><Btn variant="primary" onClick={handleSave}>💾 ذخیره</Btn><Btn onClick={onClose}>انصراف</Btn></BtnRow>}
     >
       <div style={{
-        padding: 10,
-        background: 'var(--accent-soft)',
+        padding: 10, background: 'var(--accent-soft)',
         border: '1px solid var(--accent-border)',
-        borderRadius: 'var(--r-sm)',
-        fontSize: 'var(--fs-sm)',
-        marginBottom: 10,
+        borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)', marginBottom: 10,
       }}>
-        {hasRestriction && !showAll ? (
+        {hasRestriction && !showAll && restrictionLabel ? (
           <>
             <div style={{ fontWeight: 600, color: 'var(--accent)', marginBottom: 4 }}>
-              {KIND_LABEL[restrictToKinds![0]] && `قیمت «${KIND_LABEL[restrictToKinds![0]]}» را وارد کنید.`}
+              قیمت «{restrictionLabel}» را وارد کنید.
             </div>
             <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
               برای مشاهده بقیه قیمت‌ها، دکمه «نمایش همه» را بزنید.
@@ -117,7 +113,7 @@ export default function QuickPricesModal({ open, onClose, restrictToKinds }: Pro
         )}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: fields.length === 1 ? '1fr' : '1fr 1fr', gap: 10 }}>
         {fields.map(field => (
           <Field key={field.key} label={`${field.icon} ${field.label}`}>
             <Input
@@ -137,14 +133,10 @@ export default function QuickPricesModal({ open, onClose, restrictToKinds }: Pro
             type="button"
             onClick={() => setShowAll(v => !v)}
             style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--muted)',
-              cursor: 'pointer',
-              fontSize: 'var(--fs-xs)',
-              padding: '4px 8px',
-              fontFamily: 'inherit',
-              textDecoration: 'underline',
+              background: 'transparent', border: 'none',
+              color: 'var(--muted)', cursor: 'pointer',
+              fontSize: 'var(--fs-xs)', padding: '4px 8px',
+              fontFamily: 'inherit', textDecoration: 'underline',
               textUnderlineOffset: 2,
             }}
           >
