@@ -24,6 +24,7 @@ export interface GroupFlockRow {
   profit: number;
   maleCount: number;
   femaleCount: number;
+  unknownCount: number;
   sexRatio: string;
   profitPerMale: number | null;
   profitPerFemale: number | null;
@@ -111,6 +112,7 @@ export function useGroupKpi(groupId: string): GroupKpi {
         profit: revenue - totalFlockCost,
         maleCount: f.maleCount || 0,
         femaleCount: f.femaleCount || 0,
+        unknownCount: f.unknownCount || 0,
         sexRatio: (f.type === 'breeder' || f.type === 'layer')
           ? sexRatio(f.maleCount, f.femaleCount)
           : '—',
@@ -126,6 +128,9 @@ export function useGroupKpi(groupId: string): GroupKpi {
     const live = byFlock.filter(f => f.status === 'active');
     const totalInitial = live.reduce((s, f) => s + f.initialCount, 0);
     const totalCurrent = live.reduce((s, f) => s + f.currentCount, 0);
+    const totalMale = live.reduce((s, f) => s + (f.maleCount || 0), 0);
+    const totalFemale = live.reduce((s, f) => s + (f.femaleCount || 0), 0);
+    const totalUnknown = live.reduce((s, f) => s + (f.unknownCount || 0), 0);
     // 🆕 تلفات از events (death + cull) — نه از تفاوت initial/current
     const totalDeaths = live.reduce((sum, row) => {
       const flock = flocks.find(f => f.id === row.id);
@@ -212,6 +217,7 @@ export function useMultiGroupKpi(groupIds: string[]): Record<string, GroupKpi> {
           profit: revenue - costs.grandTotalOwed,
           maleCount: f.maleCount || 0,
           femaleCount: f.femaleCount || 0,
+          unknownCount: f.unknownCount || 0,
           sexRatio: (f.type === 'breeder' || f.type === 'layer')
             ? sexRatio(f.maleCount, f.femaleCount)
             : '—',
