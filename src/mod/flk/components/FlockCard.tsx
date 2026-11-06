@@ -446,16 +446,17 @@ export default function FlockCard(props: FlockCardProps) {
         return (
           <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🔗 گله ادغام‌شده</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>گله ادغام‌شده</span>
+                <HelpIcon text={HELP.flk.merged} />
                 <span style={{
                   fontSize: 'var(--fs-2xs)',
-                  color: 'var(--purple)',
-                  background: 'var(--purple-soft)',
-                  border: '1px solid var(--purple)',
+                  color: 'var(--muted)',
+                  background: 'var(--input-bg)',
+                  border: '1px solid var(--border)',
                   padding: '1px 6px',
                   borderRadius: 4,
-                  fontWeight: 700,
+                  fontWeight: 600,
                 }}>از {toFa(_count)} گله</span>
               </div>
               <button
@@ -530,7 +531,7 @@ export default function FlockCard(props: FlockCardProps) {
       ) : (
         <>
           <CardActions actions={[
-            { label: 'ویرایش', onClick: handleEditGuard, variant: 'outline', hidden: f.status === 'merged' },
+            { label: 'ویرایش', onClick: handleEditGuard, variant: 'outline', hidden: f.status === 'merged' || f.mergedInto !== undefined },
             { label: '📜 تاریخچه', onClick: () => setHistoryOpen(true), variant: 'outline' },
             { label: '📁 گروه‌ها', onClick: onOpenGroups, variant: 'outline' },
             { label: f.hidden ? '👁 نمایان' : '👁 پنهان', onClick: onToggleHidden, variant: 'outline' },
