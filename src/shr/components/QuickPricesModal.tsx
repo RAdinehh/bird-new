@@ -23,6 +23,10 @@ const ALL_FIELDS: Array<{
   { key: 'culledBird', label: 'مرغ حذفی', unit: 'تومان/عدد', icon: '🐓', hint: 'قیمت حذفی (هر عدد)' },
 ];
 
+const KIND_LABEL: Record<string, string> = {
+  chicken: 'مرغ', turkey: 'بوقلمون', goose: 'غاز', duck: 'اردک', quail: 'بلدرچین',
+};
+
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -33,16 +37,23 @@ export default function QuickPricesModal({ open, onClose, restrictToKinds }: Pro
   const marketPrices = useSet(s => s.marketPrices) || DEFAULT_MARKET_PRICES;
   const setAllMarketPrices = useSet(s => s.setAllMarketPrices);
 
-  const fields = restrictToKinds && restrictToKinds.length > 0
-    ? ALL_FIELDS.filter(f => !f.kind || restrictToKinds.includes(f.kind))
+  const [form, setForm] = useState<Record<string, string>>({});
+  const [showAll, setShowAll] = useState(false);
+
+  const hasRestriction = !!(restrictToKinds && restrictToKinds.length > 0);
+
+  // 🆕 فیلتر strict: فقط قیمت گونه مربوطه — یا همه اگر toggle شد
+  const fields = hasRestriction && !showAll
+    ? ALL_FIELDS.filter(f => f.kind && restrictToKinds!.includes(f.kind))
     : ALL_FIELDS;
 
-  const [form, setForm] = useState<Record<string, string>>({});
-
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      setShowAll(false);
+      return;
+    }
     const f: Record<string, string> = {};
-    for (const field of fields) {
+    for (const field of ALL_FIELDS) {
       const v = marketPrices[field.key];
       f[field.key] = v > 0 ? String(v) : '';
     }
@@ -59,13 +70,17 @@ export default function QuickPricesModal({ open, onClose, restrictToKinds }: Pro
 
   const handleSave = () => {
     const prices: Record<string, number> = {};
-    for (const field of fields) {
+    for (const field of ALL_FIELDS) {
       prices[field.key] = Number(toEn(form[field.key] || '0')) || 0;
     }
     setAllMarketPrices(prices);
     toastMsg.success('قیمت‌ها ذخیره شد');
     onClose();
   };
+
+  const restrictionLabel = hasRestriction
+    ? (KIND_LABEL[restrictToKinds![0]] || 'پرنده')
+    : '';
 
   return (
     <Modal
@@ -76,11 +91,25 @@ export default function QuickPricesModal({ open, onClose, restrictToKinds }: Pro
       footer={<BtnRow><Btn variant="primary" onClick={handleSave}>💾 ذخیره</Btn><Btn onClick={onClose}>انصراف</Btn></BtnRow>}
     >
       <div style={{
-        padding: 10, background: 'var(--accent-soft)',
+        padding: 10,
+        background: 'var(--accent-soft)',
         border: '1px solid var(--accent-border)',
-        borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)', marginBottom: 10,
+        borderRadius: 'var(--r-sm)',
+        fontSize: 'var(--fs-sm)',
+        marginBottom: 10,
       }}>
-        قیمت‌ها را دستی وارد کنید. هر وقت خواستید آپدیت کنید.
+        {hasRestriction && !showAll ? (
+          <>
+            <div style={{ fontWeight: 600, color: 'var(--accent)', marginBottom: 4 }}>
+              {KIND_LABEL[restrictToKinds![0]] && `قیمت «${KIND_LABEL[restrictToKinds![0]]}» را وارد کنید.`}
+            </div>
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+              برای مشاهده بقیه قیمت‌ها، دکمه «نمایش همه» را بزنید.
+            </div>
+          </>
+        ) : (
+          <>قیمت‌ها را دستی وارد کنید. هر وقت خواستید آپدیت کنید.</>
+        )}
         {savedAt && (
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 4 }}>
             آخرین به‌روزرسانی: {toFa(savedAt)}
@@ -101,6 +130,28 @@ export default function QuickPricesModal({ open, onClose, restrictToKinds }: Pro
           </Field>
         ))}
       </div>
+
+      {hasRestriction && (
+        <div style={{ marginTop: 12, textAlign: 'center' }}>
+          <button
+            type="button"
+            onClick={() => setShowAll(v => !v)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--muted)',
+              cursor: 'pointer',
+              fontSize: 'var(--fs-xs)',
+              padding: '4px 8px',
+              fontFamily: 'inherit',
+              textDecoration: 'underline',
+              textUnderlineOffset: 2,
+            }}
+          >
+            {showAll ? '← فقط قیمت مربوطه' : 'نمایش همه قیمت‌ها →'}
+          </button>
+        </div>
+      )}
     </Modal>
   );
 }
