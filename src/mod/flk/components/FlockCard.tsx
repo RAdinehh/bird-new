@@ -31,6 +31,7 @@ import { useWhs } from '../../whs/store';
 import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
 import { HELP } from '../../../shr/help/helpTexts';
 import UnmergeFlocksModal from './UnmergeFlocksModal';
+import MergedEditBlockModal from './MergedEditBlockModal';
 
 type Fmt = ReturnType<typeof useFormat>;
 
@@ -90,17 +91,13 @@ export default function FlockCard(props: FlockCardProps) {
 
   const [historyOpen, setHistoryOpen] = useState(false);
   const [unmergeOpen, setUnmergeOpen] = useState(false);
+  const [editBlockOpen, setEditBlockOpen] = useState(false);
 
   const isMerged = f.status === 'merged' || (f.mergedInfo?.sources?.length || 0) >= 2;
 
-  const handleEditGuard = async () => {
-    if (f.status === 'merged') {
-      const ok = await showConfirmAsync(
-        'گله ادغام‌شده',
-        'این گله با گله دیگری ادغام شده است. برای ویرایش، ابتدا باید از طریق ♻️ بازگردانی کنید.',
-        { confirmText: '♻️ بازگردانی', cancelText: 'انصراف' }
-      );
-      if (ok) setUnmergeOpen(true);
+  const handleEditGuard = () => {
+    if (isMerged) {
+      setEditBlockOpen(true);
       return;
     }
     onEdit();
@@ -533,7 +530,7 @@ export default function FlockCard(props: FlockCardProps) {
       ) : (
         <>
           <CardActions actions={[
-            { label: 'ویرایش', onClick: handleEditGuard, variant: 'outline', hidden: isMerged },
+            { label: 'ویرایش', onClick: handleEditGuard, variant: 'outline' },
             { label: '📜 تاریخچه', onClick: () => setHistoryOpen(true), variant: 'outline' },
             { label: '📁 گروه‌ها', onClick: onOpenGroups, variant: 'outline' },
             { label: f.hidden ? '👁 نمایان' : '👁 پنهان', onClick: onToggleHidden, variant: 'outline' },
@@ -548,6 +545,7 @@ export default function FlockCard(props: FlockCardProps) {
         flock={f}
       />
           <UnmergeFlocksModal open={unmergeOpen} onClose={() => setUnmergeOpen(false)} targetFlockId={f.id} />
+      <MergedEditBlockModal open={editBlockOpen} onClose={() => setEditBlockOpen(false)} onUnmerge={() => setUnmergeOpen(true)} flockName={f.name} />
     </ExpandableCard>
     
     </>
