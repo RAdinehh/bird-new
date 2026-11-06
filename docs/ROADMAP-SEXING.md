@@ -121,6 +121,33 @@
 
 ---
 
+## 🎨 قاعده طلایی طراحی
+
+**قبل از هر UI جدید (Modal، Accordion، Error، Badge، Field):**
+حتماً `docs/DESIGN-CONSISTENCY.md` را بخوان.
+
+**۱۲ چک اجباری:**
+1. کامپوننت موجود (نه اختراع)
+2. رنگ از `var(--...)`
+3. فونت `var(--fs-...)`
+4. padding `var(--pad-...)`
+5. `toFa` برای اعداد
+6. جداکننده خودکار
+7. واحد درست
+8. `<Field label>`
+9. validation بعد از `saveAttempted`
+10. `toastMsg` نه `showAlert`
+11. RTL
+12. تست در build (port 4173)
+
+**ضدالگوها:**
+- `<div flex space-between>` → `<Row>`
+- `<input type="text">` → `<Input>`
+- `showAlert` → `toastMsg`
+- Accordion دستی → `<ExpandableCard>`
+
+---
+
 ## 🛡️ قوانین آهنین هر فاز
 
 1. هر commit ≤ ۳۰۰ خط
