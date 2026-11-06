@@ -40,7 +40,7 @@ import FlockCreateStandalone from '../flk/components/FlockCreateStandalone';
 
 export default function InvoicePage({ kind, active = true }: { kind: 'purchase' | 'sale'; active?: boolean }) {
   const isPurchase = kind === 'purchase';
-  const { invoices: _allInvoices, deals, addInvoice, updateInvoice, deleteInvoice, reopenInvoice, allocations, resolveDispute, writeOffInvoice } = useTra();
+  const { invoices: _allInvoices, deals, addInvoice, updateInvoice, deleteInvoice, reopenInvoice, allocations, resolveDispute, writeOffInvoice, settlements } = useTra();
   const { contacts } = useCtc();
   const { flocks } = useFlk();
   const { items: whsItems } = useWhs();
@@ -250,6 +250,8 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
     invoices,
     deleteInvoice,
     setUndoData,
+    flocks,
+    settlements,
   });
 
   useEffect(() => {
