@@ -62,11 +62,12 @@ export default function FlockValueSection({ flock }: Props) {
         {header}
         <Row
           l="وضعیت"
-          v={<span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{result.reason || 'نامشخص'}</span>}
+          v={<span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+            {result.reason === 'قیمت تعریف نشده'
+              ? 'برای مشاهده ارزش، روی ✏️ بالا بزنید'
+              : (result.reason || 'نامشخص')}
+          </span>}
         />
-        <div style={{ marginTop: 6 }}>
-          <Btn size="sm" variant="outline" onClick={() => setPricesOpen(true)}>تنظیم قیمت‌ها</Btn>
-        </div>
         <QuickPricesModal
           open={pricesOpen}
           onClose={() => setPricesOpen(false)}

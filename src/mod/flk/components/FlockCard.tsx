@@ -426,35 +426,47 @@ export default function FlockCard(props: FlockCardProps) {
       <FlockValueSection flock={f} />
 
       {f.mergedInfo && (f.mergedInfo.sources?.length || 0) >= 2 && (() => {
-        const _sources = (f.mergedInfo.sources || []).filter((s: any) => s.flockId !== f.id);
-        const _total = _sources.reduce((s: number, x: any) => s + (x.count || 0), 0);
-        const _count = f.mergedInfo.sources?.length || 0;
+        const _all = f.mergedInfo.sources || [];
+        const _total = _all.reduce((s: number, x: any) => s + (x.count || 0), 0);
+        const _count = _all.length;
         return (
           <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-              <div style={{ fontSize: 'var(--fs-base)', color: 'var(--purple)', fontWeight: 700, letterSpacing: '.3px' }}>🔗 گله ادغام‌شده</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🔗 گله ادغام‌شده</span>
+                <span style={{
+                  fontSize: 'var(--fs-2xs)',
+                  color: 'var(--purple)',
+                  background: 'var(--purple-soft)',
+                  border: '1px solid var(--purple)',
+                  padding: '1px 6px',
+                  borderRadius: 4,
+                  fontWeight: 700,
+                }}>{toFa(_count)} گله</span>
+              </div>
               <button
                 type="button"
                 onClick={() => setUnmergeOpen(true)}
                 title="بازگردانی گله"
                 style={{
-                  width: 28, height: 28,
+                  height: 28,
+                  padding: '0 10px',
                   background: 'var(--purple-soft)',
                   border: '1px solid var(--purple)',
                   borderRadius: 'var(--r-sm)',
                   cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 14, color: 'var(--purple)',
-                  fontFamily: 'inherit', padding: 0,
+                  fontSize: 'var(--fs-xs)', color: 'var(--purple)',
+                  fontFamily: 'inherit', gap: 4,
+                  fontWeight: 600,
                 }}
-              >🔓</button>
+              >♻️ بازگردانی</button>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-1)' }}>
-              {_sources.map((s: any) => (
+              {_all.map((s: any) => (
                 <Row key={s.flockId} l={s.flockName} v={`${fmt.int(s.count || 0)} پرنده`} />
               ))}
               <Row l="جمع" v={`${fmt.int(_total)} پرنده`} />
-              <Row l="تعداد منابع" v={`${toFa(_count)} گله`} />
             </div>
           </>
         );
