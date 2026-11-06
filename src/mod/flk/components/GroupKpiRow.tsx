@@ -36,6 +36,9 @@ export function GroupKpiRow({ group, onOpen }: GroupKpiRowProps) {
       title="کلیک برای گزارش کامل"
     >
       <span>🐔 <b style={{ color: 'var(--text)' }}>{toFa(kpi.totalCurrent)}</b></span>
+      {(kpi.totalMale > 0 || kpi.totalFemale > 0) && (
+        <span title="نر / ماده">♂ {toFa(kpi.totalMale)} / ♀ {toFa(kpi.totalFemale)}</span>
+      )}
       {kpi.totalDeaths > 0 && (
         <span>💀 <b style={{ color: mortalityTone }}>{toFa(kpi.totalDeaths)}</b> ({toFa(kpi.mortalityRate.toFixed(1))}٪)</span>
       )}

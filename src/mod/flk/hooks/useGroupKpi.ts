@@ -36,6 +36,10 @@ export interface GroupKpi {
   totalInitial: number;
   totalCurrent: number;
   totalDeaths: number;
+  /** 🆕 فاز ۶ — aggregate sex */
+  totalMale: number;
+  totalFemale: number;
+  totalUnknown: number;
   mortalityRate: number;
   totalCost: number;
   totalRevenue: number;
@@ -57,6 +61,9 @@ const EMPTY: GroupKpi = {
   totalInitial: 0,
   totalCurrent: 0,
   totalDeaths: 0,
+  totalMale: 0,
+  totalFemale: 0,
+  totalUnknown: 0,
   mortalityRate: 0,
   totalCost: 0,
   totalRevenue: 0,
@@ -176,6 +183,9 @@ export function useGroupKpi(groupId: string): GroupKpi {
       totalInitial,
       totalCurrent,
       totalDeaths,
+      totalMale,
+      totalFemale,
+      totalUnknown,
       mortalityRate,
       totalCost,
       totalRevenue,
@@ -237,6 +247,10 @@ export function useMultiGroupKpi(groupIds: string[]): Record<string, GroupKpi> {
       const mortalityRate = totalInitial > 0 ? (totalDeaths / totalInitial) * 100 : 0;
       const totalCost = byFlock.reduce((s, f) => s + f.cost, 0);
       const totalRevenue = byFlock.reduce((s, f) => s + f.revenue, 0);
+      // 🆕 فاز ۶ — aggregate sex (multi)
+      const totalMale = live.reduce((s, f) => s + (f.maleCount || 0), 0);
+      const totalFemale = live.reduce((s, f) => s + (f.femaleCount || 0), 0);
+      const totalUnknown = live.reduce((s, f) => s + (f.unknownCount || 0), 0);
 
       // 🆕 Egg/Feed aggregate
       const flockIdSet = new Set(flocks.map(f => f.id));
@@ -263,7 +277,9 @@ export function useMultiGroupKpi(groupIds: string[]): Record<string, GroupKpi> {
 
       result[groupId] = {
         flockCount: byFlock.length, liveFlockCount: live.length,
-        totalInitial, totalCurrent, totalDeaths, mortalityRate,
+        totalInitial, totalCurrent, totalDeaths,
+        totalMale, totalFemale, totalUnknown,
+        mortalityRate,
         totalCost, totalRevenue, totalProfit: totalRevenue - totalCost,
         totalEggs, totalFeed, eggByFlock, feedByFlock,
         byFlock,

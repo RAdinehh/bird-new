@@ -55,9 +55,9 @@ export default function GroupReportModal({ open, onClose, groupId }: Props) {
 
   const handleExportCSV = () => {
     try {
-      const header = 'نام گله,وضعیت,تعداد اولیه,تعداد فعلی,سن (روز),هزینه,درآمد,سود\n';
+      const header = 'نام گله,وضعیت,نر,ماده,نامشخص,تعداد اولیه,تعداد فعلی,سن (روز),هزینه,درآمد,سود\n';
       const rows = kpi.byFlock.map(f =>
-        [f.name, STATUS_LABEL[f.status] || f.status, f.initialCount, f.currentCount, f.ageDays,
+        [f.name, STATUS_LABEL[f.status] || f.status, f.maleCount, f.femaleCount, f.unknownCount, f.initialCount, f.currentCount, f.ageDays,
          Math.round(f.cost), Math.round(f.revenue), Math.round(f.profit)].join(',')
       ).join('\n');
       const csv = '\uFEFF' + header + rows;
@@ -117,6 +117,13 @@ export default function GroupReportModal({ open, onClose, groupId }: Props) {
           <span>💰 هزینه: <b>{fmtMoney(kpi.totalCost)}</b></span>
           <span>📈 فروش: <b>{fmtMoney(kpi.totalRevenue)}</b></span>
         </div>
+        {(kpi.totalMale > 0 || kpi.totalFemale > 0) && (
+          <div style={{ display: 'flex', gap: 12, marginTop: 6, paddingTop: 6, borderTop: '1px solid var(--accent-border)', fontSize: 11 }}>
+            <span>♂ نر: <b style={{ color: 'var(--text)' }}>{toFa(kpi.totalMale)}</b></span>
+            <span>♀ ماده: <b style={{ color: 'var(--text)' }}>{toFa(kpi.totalFemale)}</b></span>
+            {kpi.totalUnknown > 0 && <span>❓ نامشخص: <b style={{ color: 'var(--muted)' }}>{toFa(kpi.totalUnknown)}</b></span>}
+          </div>
+        )}
       </div>
 
       {/* Flocks Table */}

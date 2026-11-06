@@ -147,3 +147,32 @@ describe('useGroupKpi — هزینه جاری از whs', () => {
     expect(result.current.byFlock[0].cost).toBe(100000);
   });
 });
+
+
+describe('useGroupKpi — aggregate sex', () => {
+  it('totalMale/Female/Unknown از flocks live جمع می‌شوند', () => {
+    const f1 = makeFlock({ initialCount: 100, currentCount: 100, maleCount: 30, femaleCount: 70, unknownCount: 0, genderSplitAt: '1405/01/01' });
+    const f2 = makeFlock({ initialCount: 50, currentCount: 50, maleCount: 20, femaleCount: 30, unknownCount: 0, genderSplitAt: '1405/01/01' });
+    useFlk.setState({ flocks: [f1, f2] } as any);
+    useFlk.getState().addGroup({ name: 'G', type: 'custom' } as any);
+    const gid = useFlk.getState().groups[0].id;
+    useFlk.getState().addToGroup(gid, f1.id);
+    useFlk.getState().addToGroup(gid, f2.id);
+    const { result } = renderHook(() => useGroupKpi(gid));
+    expect((result.current as any).totalMale).toBe(50);
+    expect((result.current as any).totalFemale).toBe(100);
+    expect((result.current as any).totalUnknown).toBe(0);
+  });
+
+  it('unsplit flock → unknown فقط', () => {
+    const f = makeFlock({ initialCount: 100, currentCount: 100, maleCount: 0, femaleCount: 0, unknownCount: 100 });
+    useFlk.setState({ flocks: [f] } as any);
+    useFlk.getState().addGroup({ name: 'G', type: 'custom' } as any);
+    const gid = useFlk.getState().groups[0].id;
+    useFlk.getState().addToGroup(gid, f.id);
+    const { result } = renderHook(() => useGroupKpi(gid));
+    expect((result.current as any).totalMale).toBe(0);
+    expect((result.current as any).totalFemale).toBe(0);
+    expect((result.current as any).totalUnknown).toBe(100);
+  });
+});
