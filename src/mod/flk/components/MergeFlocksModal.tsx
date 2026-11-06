@@ -191,8 +191,10 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onMergeGroup
         return (
           <div key={g.key} dir="rtl" style={{
             marginBottom: 12, padding: 'var(--pad-normal)',
-            background: 'var(--input-bg)', borderRadius: 'var(--r-md)',
+            background: 'var(--card)', borderRadius: 'var(--r-lg)',
+            border: '1px solid var(--border)',
             borderRight: `3px solid ${g.color.border}`,
+            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
             opacity: enabled ? 1 : 0.5,
             transition: 'opacity 150ms',
           }}>
@@ -214,8 +216,8 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onMergeGroup
                   <div key={f.id} style={{
                     display: 'flex', alignItems: 'center', gap: 'var(--sp-2)',
                     padding: 'var(--pad-tight)',
-                    background: isTarget ? g.color.soft : 'transparent',
-                    border: `1px solid ${isTarget ? g.color.border : 'transparent'}`,
+                    background: isTarget ? g.color.soft : 'var(--input-bg)',
+                    border: `1px solid ${isTarget ? g.color.border : 'var(--border)'}`,
                     borderRadius: 'var(--r-sm)',
                     opacity: isIncluded ? 1 : 0.4,
                   }}>
