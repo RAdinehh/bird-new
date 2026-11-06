@@ -642,86 +642,66 @@ export const useFlk = create<State>()(
         )
       }),
       mergeFlocks: (targetId, sourceId, opts) => {
-      const _st = get();
-      const _t = _st.flocks.find(f => f.id === targetId);
-      const _s = _st.flocks.find(f => f.id === sourceId);
-      if (!_t || !_s) throw new Error('گله پیدا نشد');
-      if ((_t as any).birdKind && (_s as any).birdKind && (_t as any).birdKind !== (_s as any).birdKind) {
-        throw new Error('پرنده متفاوت است — ' + (_t as any).birdKind + ' و ' + (_s as any).birdKind);
-      }
-      if (_t.type !== _s.type) {
-        throw new Error('نوع گله متفاوت — ' + _t.type + ' و ' + _s.type);
-      }
-      set({
-        flocks: get().flocks.map(f => {
-          if (f.id === sourceId) {
+        const _st = get();
+        const _t = _st.flocks.find(f => f.id === targetId);
+        const _s = _st.flocks.find(f => f.id === sourceId);
+        if (!_t || !_s) throw new Error('گله پیدا نشد');
+        if ((_t as any).birdKind && (_s as any).birdKind && (_t as any).birdKind !== (_s as any).birdKind) throw new Error('پرنده متفاوت');
+        if (_t.type !== _s.type) throw new Error('نوع گله متفاوت');
+        set({
+          flocks: get().flocks.map(f => {
+            if (f.id === sourceId) return { ...f, status: 'merged' as FlockStatus, mergedInto: targetId, currentCount: 0, maleCount: 0, femaleCount: 0, unknownCount: 0, updatedAt: now() };
+            if (f.id !== targetId) return f;
+            const target = f;
+            const source = get().flocks.find(x => x.id === sourceId);
+            if (!source) return f;
+            const mkSrc = (fl: any, age: number) => ({
+              flockId: fl.id, flockName: fl.name,
+              count: fl.currentCount || 0, ageDays: age,
+              maleCount: fl.maleCount || 0, femaleCount: fl.femaleCount || 0,
+              unknownCount: fl.unknownCount || 0, initialCount: fl.initialCount || 0,
+              initialMaleCount: fl.initialMaleCount, initialFemaleCount: fl.initialFemaleCount,
+              genderSplitAt: fl.genderSplitAt, sexingAgeOverride: fl.sexingAgeOverride,
+              sexingEvents: fl.sexingEvents || [], sexBalanceEvents: fl.sexBalanceEvents || [],
+            });
+            const targetSources: any[] = (target as any).mergedInfo?.sources || [mkSrc(target, opts.targetAgeDays)];
+            const newSources: any[] = [...targetSources, mkSrc(source, opts.sourceAgeDays)];
+            const totalCount = newSources.reduce((s2, x) => s2 + x.count, 0);
+            const weightedAge = newSources.reduce((s2, x) => s2 + x.count * x.ageDays, 0);
+            const avgAgeDays = totalCount > 0 ? Math.round(weightedAge / totalCount) : 0;
+            const _mb = { male: target.maleCount ?? 0, female: target.femaleCount ?? 0, unknown: target.unknownCount ?? 0 };
+            const _ma = { male: _mb.male + (source.maleCount ?? 0), female: _mb.female + (source.femaleCount ?? 0), unknown: _mb.unknown + (source.unknownCount ?? 0) };
+            const mergeAudit = {
+              id: uuid(), date: todayJ(), type: 'merge' as const,
+              before: _mb, after: _ma,
+              delta: { male: _ma.male - _mb.male, female: _ma.female - _mb.female, unknown: _ma.unknown - _mb.unknown },
+              note: 'ادغام ' + source.name, createdAt: now(),
+            };
             return {
-              ...f,
-              status: 'merged' as FlockStatus,
-              mergedInto: targetId,
-              currentCount: 0,
-              maleCount: 0,
-              femaleCount: 0,
-              unknownCount: 0,
+              ...target,
+              initialCount: (target.initialCount || 0) + (source.initialCount || 0),
+              currentCount: (target.currentCount || 0) + (source.currentCount || 0),
+              maleCount: (target.maleCount || 0) + (source.maleCount || 0),
+              femaleCount: (target.femaleCount || 0) + (source.femaleCount || 0),
+              unknownCount: (target.unknownCount || 0) + (source.unknownCount || 0),
+              genderSplitAt: (() => {
+                const dates = [target.genderSplitAt, source.genderSplitAt].filter(Boolean) as string[];
+                return dates.length > 0 ? dates.sort()[0] : null;
+              })(),
+              hatchDate: opts.hatchDate || target.hatchDate,
+              mergedInfo: { sources: newSources, avgAgeDays, mergedAt: now() },
+              sexBalanceEvents: [...(target.sexBalanceEvents || []), mergeAudit],
               updatedAt: now(),
             };
-          }
-          if (f.id !== targetId) return f;
-          const target = f;
-          const source = get().flocks.find(x => x.id === sourceId);
-          if (!source) return f;
-          const targetSources: any[] = (target as any).mergedInfo?.sources || [{
-            flockId: target.id,
-            flockName: target.name,
-            count: target.currentCount || 0,
-            ageDays: opts.targetAgeDays,
-            maleCount: target.maleCount || 0,
-            femaleCount: target.femaleCount || 0,
-            unknownCount: target.unknownCount || 0,
-            initialCount: target.initialCount || 0,
-            genderSplitAt: target.genderSplitAt,
-          }];
-          const newSources: any[] = [...targetSources, {
-            flockId: source.id,
-            flockName: source.name,
-            count: source.currentCount || 0,
-            ageDays: opts.sourceAgeDays,
-            maleCount: source.maleCount || 0,
-            femaleCount: source.femaleCount || 0,
-            unknownCount: source.unknownCount || 0,
-            initialCount: source.initialCount || 0,
-            genderSplitAt: source.genderSplitAt,
-          }];
-          const totalCount = newSources.reduce((s, x) => s + x.count, 0);
-          const weightedAge = newSources.reduce((s, x) => s + x.count * x.ageDays, 0);
-          const avgAgeDays = totalCount > 0 ? Math.round(weightedAge / totalCount) : 0;
-          return {
-            ...target,
-            initialCount: (target.initialCount || 0) + (source.initialCount || 0),
-            currentCount: (target.currentCount || 0) + (source.currentCount || 0),
-            maleCount: (target.maleCount || 0) + (source.maleCount || 0),
-            femaleCount: (target.femaleCount || 0) + (source.femaleCount || 0),
-            unknownCount: (target.unknownCount || 0) + (source.unknownCount || 0),
-            genderSplitAt: (() => {
-              const dates = [target.genderSplitAt, source.genderSplitAt].filter(Boolean) as string[];
-              return dates.length > 0 ? dates.sort()[0] : null;
-            })(),
-            hatchDate: opts.hatchDate || target.hatchDate,
-            mergedInfo: { sources: newSources, avgAgeDays, mergedAt: now() },
-            updatedAt: now(),
-          };
-        }),
-      });
+          }),
+        });
       },
       unmergeFlocks: (targetId: string, sourceId?: string) => {
         const state = get();
         const target = state.flocks.find(f => f.id === targetId);
         if (!target || !target.mergedInfo || !target.mergedInfo.sources || target.mergedInfo.sources.length < 2) return;
-        const sources = target.mergedInfo.sources;
         const srcs: any[] = (target.mergedInfo!.sources as any[]);
-        const sourceToRestore: any = sourceId
-          ? srcs.find((s: any) => s.flockId === sourceId)
-          : srcs[srcs.length - 1];
+        const sourceToRestore: any = sourceId ? srcs.find((s: any) => s.flockId === sourceId) : srcs[srcs.length - 1];
         if (!sourceToRestore) return;
         const remainingSources = srcs.filter((s: any) => s.flockId !== sourceToRestore.flockId);
         const snap = {
@@ -730,24 +710,31 @@ export const useFlk = create<State>()(
           maleCount: sourceToRestore.maleCount || 0,
           femaleCount: sourceToRestore.femaleCount || 0,
           unknownCount: sourceToRestore.unknownCount !== undefined ? sourceToRestore.unknownCount : (sourceToRestore.count || 0),
+          initialMaleCount: sourceToRestore.initialMaleCount,
+          initialFemaleCount: sourceToRestore.initialFemaleCount,
           genderSplitAt: sourceToRestore.genderSplitAt,
+          sexingAgeOverride: sourceToRestore.sexingAgeOverride,
+          sexingEvents: sourceToRestore.sexingEvents || [],
+          sexBalanceEvents: sourceToRestore.sexBalanceEvents || [],
+        };
+        const _ub = { male: target.maleCount ?? 0, female: target.femaleCount ?? 0, unknown: target.unknownCount ?? 0 };
+        const _ua = { male: Math.max(0, _ub.male - snap.maleCount), female: Math.max(0, _ub.female - snap.femaleCount), unknown: Math.max(0, _ub.unknown - snap.unknownCount) };
+        const unmergeAudit = {
+          id: uuid(), date: todayJ(), type: 'unmerge' as const,
+          before: _ub, after: _ua,
+          delta: { male: _ua.male - _ub.male, female: _ua.female - _ub.female, unknown: _ua.unknown - _ub.unknown },
+          note: 'بازگردانی ' + sourceToRestore.flockName, createdAt: now(),
         };
         set({
           flocks: state.flocks.map(f => {
-            if (f.id === sourceToRestore.flockId) {
-              return {
-                ...f,
-                status: 'active' as FlockStatus,
-                mergedInto: undefined,
-                currentCount: snap.count,
-                initialCount: snap.initialCount,
-                maleCount: snap.maleCount,
-                femaleCount: snap.femaleCount,
-                unknownCount: snap.unknownCount,
-                genderSplitAt: snap.genderSplitAt,
-                updatedAt: now(),
-              };
-            }
+            if (f.id === sourceToRestore.flockId) return {
+              ...f, status: 'active' as FlockStatus, mergedInto: undefined,
+              currentCount: snap.count, initialCount: snap.initialCount,
+              maleCount: snap.maleCount, femaleCount: snap.femaleCount, unknownCount: snap.unknownCount,
+              initialMaleCount: snap.initialMaleCount, initialFemaleCount: snap.initialFemaleCount,
+              genderSplitAt: snap.genderSplitAt, sexingAgeOverride: snap.sexingAgeOverride,
+              sexingEvents: snap.sexingEvents, sexBalanceEvents: snap.sexBalanceEvents, updatedAt: now(),
+            };
             if (f.id !== targetId) return f;
             return {
               ...f,
@@ -756,9 +743,8 @@ export const useFlk = create<State>()(
               maleCount: Math.max(0, (f.maleCount || 0) - snap.maleCount),
               femaleCount: Math.max(0, (f.femaleCount || 0) - snap.femaleCount),
               unknownCount: Math.max(0, (f.unknownCount || 0) - snap.unknownCount),
-              mergedInfo: remainingSources.length > 1
-                ? { ...f.mergedInfo!, sources: remainingSources }
-                : undefined,
+              mergedInfo: remainingSources.length > 1 ? { ...f.mergedInfo!, sources: remainingSources } : undefined,
+              sexBalanceEvents: [...(f.sexBalanceEvents || []), unmergeAudit],
               updatedAt: now(),
             };
           }),
