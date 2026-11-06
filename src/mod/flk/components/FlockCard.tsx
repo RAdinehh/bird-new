@@ -32,6 +32,7 @@ import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
 import { HELP } from '../../../shr/help/helpTexts';
 import UnmergeFlocksModal from './UnmergeFlocksModal';
 import MergedEditBlockModal from './MergedEditBlockModal';
+import SexingModal from './SexingModal';
 
 type Fmt = ReturnType<typeof useFormat>;
 
@@ -91,6 +92,7 @@ export default function FlockCard(props: FlockCardProps) {
 
   const [historyOpen, setHistoryOpen] = useState(false);
   const [unmergeOpen, setUnmergeOpen] = useState(false);
+  const [sexingOpen, setSexingOpen] = useState(false);
   const [editBlockOpen, setEditBlockOpen] = useState(false);
 
   const isMerged = f.status === 'merged' || (f.mergedInfo?.sources?.length || 0) >= 2;
@@ -555,6 +557,7 @@ export default function FlockCard(props: FlockCardProps) {
         <>
           <CardActions actions={[
             { label: 'ویرایش', onClick: handleEditGuard, variant: 'outline' },
+            { label: '📋 تفکیک', onClick: () => setSexingOpen(true), variant: 'outline', hidden: f.type === 'broiler' },
             { label: '📜 تاریخچه', onClick: () => setHistoryOpen(true), variant: 'outline' },
             { label: '📁 گروه‌ها', onClick: onOpenGroups, variant: 'outline' },
             { label: f.hidden ? '👁 نمایان' : '👁 پنهان', onClick: onToggleHidden, variant: 'outline' },
@@ -569,6 +572,7 @@ export default function FlockCard(props: FlockCardProps) {
         flock={f}
       />
           <UnmergeFlocksModal open={unmergeOpen} onClose={() => setUnmergeOpen(false)} targetFlockId={f.id} />
+      <SexingModal open={sexingOpen} onClose={() => setSexingOpen(false)} flock={f} />
       <MergedEditBlockModal open={editBlockOpen} onClose={() => setEditBlockOpen(false)} onUnmerge={() => setUnmergeOpen(true)} flockName={f.name} />
     </ExpandableCard>
     

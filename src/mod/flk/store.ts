@@ -115,6 +115,13 @@ export interface State {
   groups: FlockGroup[];
   groupMembers: FlockGroupMember[];
   addEvent: (flockId: string, ev: Omit<FlockEvent, 'id'|'flockId'|'createdAt'>) => void;
+  /** 🆕 ثبت تفکیک جنسیت (تعادل پیوسته) */
+  recordSexing: (flockId: string, params: {
+    male: number;
+    female: number;
+    date: string;
+    note?: string;
+  }) => void;
   addCorrection: (flockId: string, delta: number, reasonCode: FlockEventReasonCode, reasonLabel: string, notes: string) => void;
   revokeEvent: (flockId: string, eventId: string) => void;
   removeEvent: (flockId: string, eventId: string) => void;
@@ -307,6 +314,85 @@ export const useFlk = create<State>()(
         return path;
       },
 
+      recordSexing: (flockId, params) => {
+        const flock = get().flocks.find(f => f.id === flockId);
+        if (!flock) return;
+
+        const currentCount = flock.currentCount ?? 0;
+        const before = {
+          male: flock.maleCount ?? 0,
+          female: flock.femaleCount ?? 0,
+          unknown: flock.unknownCount ?? 0,
+        };
+
+        const newMale = Math.max(0, Math.floor(Number(params.male) || 0));
+        const newFemale = Math.max(0, Math.floor(Number(params.female) || 0));
+        const newUnknown = Math.max(0, currentCount - newMale - newFemale);
+
+        if (newMale + newFemale > currentCount) {
+          throw new Error(`جمع نر (${newMale}) و ماده (${newFemale}) بیشتر از تعداد زنده (${currentCount}) است`);
+        }
+        if (newMale + newFemale === 0) {
+          throw new Error('حداقل یکی از نر یا ماده باید بیشتر از صفر باشد');
+        }
+
+        const after = { male: newMale, female: newFemale, unknown: newUnknown };
+        const delta = {
+          male: after.male - before.male,
+          female: after.female - before.female,
+          unknown: after.unknown - before.unknown,
+        };
+
+        const today = params.date;
+        const isFirst = !flock.genderSplitAt;
+        const isFinal = newUnknown === 0;
+
+        let source: 'purchase' | 'partial' | 'correction' | 'final';
+        if (isFirst && isFinal) source = 'purchase';
+        else if (isFirst) source = 'partial';
+        else if (isFinal && before.unknown > 0) source = 'final';
+        else source = 'correction';
+
+        const sexingEvent: FlockSexingEvent = {
+          id: uuid(),
+          date: today,
+          male: newMale,
+          female: newFemale,
+          unknown: newUnknown,
+          source,
+          note: params.note,
+          createdAt: now(),
+        };
+
+        const balanceEvent: FlockSexBalanceEvent = {
+          id: uuid(),
+          date: today,
+          type: 'sexing',
+          before,
+          after,
+          delta,
+          note: params.note,
+          createdAt: now(),
+        };
+
+        set({
+          flocks: get().flocks.map(f => {
+            if (f.id !== flockId) return f;
+            return {
+              ...f,
+              maleCount: newMale,
+              femaleCount: newFemale,
+              unknownCount: newUnknown,
+              genderSplitAt: f.genderSplitAt || today,
+              sexingEvents: [...(f.sexingEvents || []), sexingEvent],
+              sexBalanceEvents: [...(f.sexBalanceEvents || []), balanceEvent],
+              initialMaleCount: f.initialMaleCount ?? newMale,
+              initialFemaleCount: f.initialFemaleCount ?? newFemale,
+              updatedAt: now(),
+            };
+          }),
+        });
+      },
       addEvent: (flockId, ev) => set({
         flocks: get().flocks.map(f => {
           if (f.id !== flockId) return f;
