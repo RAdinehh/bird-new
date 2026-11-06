@@ -1,10 +1,11 @@
 /**
  * UnmergeFlocksModal — بازگردانی گله از ادغام
- * طراحی بر اساس استاندارد SAP/Odoo:
- * - جدول فشرده با هدر چسبان
- * - اسکرول داخلی برای بیش از ۵ منبع
- * - مرتب‌سازی بر اساس نام / تعداد / سن
- * - اطلاعات کلیدی در یک نگاه
+ * - کارت کامل برای هر گله (نه خط فشرده)
+ * - اطلاعات: تعداد، اولیه، نر/ماده/نامشخص، سن
+ * - تاریخ ادغام (per source)
+ * - پیش‌بینی قبل از تأیید
+ * - اسکرول داخلی + مرتب‌سازی
+ * - fallback برای snapshot قدیمی (unknownCount = count)
  */
 import { useState, useMemo } from 'react';
 import { Modal, Btn, BtnRow } from '../../../shr/components/ui';
@@ -30,10 +31,26 @@ interface SourceInfo {
   femaleCount?: number;
   unknownCount?: number;
   ageDays?: number;
+  genderSplitAt?: string;
   isTarget: boolean;
 }
 
 type SortKey = 'name' | 'count' | 'age';
+
+const cell = (label: string, value: React.ReactNode, danger = false) => (
+  <div style={{
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    fontSize: 'var(--fs-xs)',
+    gap: 6,
+    padding: '3px 0',
+    borderBottom: '1px dashed var(--border)',
+  }}>
+    <span style={{ color: 'var(--muted)', flexShrink: 0 }}>{label}:</span>
+    <span style={{ fontWeight: 600, color: danger ? 'var(--danger)' : 'var(--text)', textAlign: 'left', fontVariantNumeric: 'tabular-nums' }}>{value}</span>
+  </div>
+);
 
 export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Props) {
   const allFlocks = useFlk(s => s.flocks);
@@ -60,27 +77,50 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
     if (!target?.mergedInfo?.sources) return [];
     return (target.mergedInfo.sources as any[])
       .filter(s => s.flockId !== targetFlockId)
-      .map(s => ({ ...s, isTarget: false }));
+      .map(s => {
+        // fallback برای snapshot قدیمی
+        const c = s.count || 0;
+        const u = s.unknownCount !== undefined ? s.unknownCount : c;
+        return {
+          ...s,
+          count: c,
+          unknownCount: u,
+          initialCount: s.initialCount !== undefined ? s.initialCount : c,
+          maleCount: s.maleCount || 0,
+          femaleCount: s.femaleCount || 0,
+          isTarget: false,
+        };
+      });
   }, [target, targetFlockId]);
 
-  // مرتب‌سازی
   const [sortKey, setSortKey] = useState<SortKey>('count');
   const sortedSources = useMemo(() => {
-    return [...sourceItems].sort((a, b) => {
+    const arr = [...sourceItems];
+    arr.sort((a, b) => {
       if (sortKey === 'name') return (a.flockName || '').localeCompare(b.flockName || '', 'fa');
       if (sortKey === 'count') return (b.count || 0) - (a.count || 0);
       if (sortKey === 'age') return (b.ageDays || 0) - (a.ageDays || 0);
       return 0;
     });
+    return arr;
   }, [sourceItems, sortKey]);
 
   const [selectedId, setSelectedId] = useState<string>('');
-
   const effectiveSelectedId = sortedSources.some(s => s.flockId === selectedId)
     ? selectedId
     : (sortedSources[0]?.flockId || '');
-
   const selectedSrc = sortedSources.find(s => s.flockId === effectiveSelectedId);
+
+  // پیش‌بینی
+  const prediction = useMemo(() => {
+    if (!selectedSrc || !targetItem) return null;
+    const srcCount = selectedSrc.count || 0;
+    return {
+      sourceAfter: srcCount,
+      targetAfter: Math.max(0, (targetItem.count || 0) - srcCount),
+      remainingSources: sourceItems.length - 1,
+    };
+  }, [selectedSrc, targetItem, sourceItems.length]);
 
   const handleConfirm = async () => {
     if (!selectedSrc) return;
@@ -100,16 +140,16 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
     }
   };
 
-  const handleSortClick = (key: SortKey) => {
-    setSortKey(key);
-  };
+  const mergeDate = target?.mergedInfo?.mergedAt
+    ? target.mergedInfo.mergedAt.slice(0, 10)
+    : '';
 
   return (
     <Modal
       open={open}
       onClose={onClose}
       title="بازگردانی گله ادغام‌شده"
-      size="md"
+      size="lg"
       footer={
         sortedSources.length > 0
           ? <BtnRow><Btn variant="primary" onClick={handleConfirm} disabled={!effectiveSelectedId}>♻️ بازگردانی</Btn><Btn onClick={onClose}>انصراف</Btn></BtnRow>
@@ -122,53 +162,64 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
         </div>
       ) : (
         <>
-          {/* ── گله اصلی ── */}
+          {/* ═══ گله اصلی (live) ═══ */}
           {targetItem && (
             <div style={{
               marginBottom: 10,
-              padding: 'var(--pad-tight)',
+              padding: 'var(--pad-normal)',
               background: 'var(--input-bg)',
               border: '1px solid var(--border)',
               borderRight: '3px solid var(--info, #0284c7)',
               borderRadius: 'var(--r-md)',
-              opacity: 0.85,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              flexWrap: 'wrap',
-              fontSize: 'var(--fs-sm)',
             }}>
-              <span style={{ fontWeight: 700 }}>{targetItem.flockName}</span>
-              <span style={{
-                fontSize: 'var(--fs-2xs)',
-                color: 'var(--info, #0284c7)',
-                background: 'var(--info-soft, rgba(2,132,199,.08))',
-                border: '1px solid var(--info, #0284c7)',
-                padding: '1px 6px',
-                borderRadius: 4,
-                fontWeight: 700,
-              }}>گله اصلی</span>
-              <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginRight: 'auto' }}>
-                تعداد فعلی: <b>{fmtInt(targetItem.count)}</b> · سن: <b>{fmtInt(Math.round(targetItem.ageDays || 0))}</b> روز
-              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', flex: 1 }}>{targetItem.flockName}</span>
+                <span style={{
+                  fontSize: 'var(--fs-2xs)',
+                  color: 'var(--info, #0284c7)',
+                  background: 'var(--info-soft, rgba(2,132,199,.08))',
+                  border: '1px solid var(--info, #0284c7)',
+                  padding: '1px 6px',
+                  borderRadius: 4,
+                  fontWeight: 700,
+                }}>گله اصلی (فعلی)</span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 12 }}>
+                {cell('تعداد فعلی', `${fmtInt(targetItem.count)} پرنده`)}
+                {cell('سن فعلی', `${fmtInt(Math.round(targetItem.ageDays || 0))} روز`)}
+                {cell('نر', fmtInt(targetItem.maleCount))}
+                {cell('ماده', fmtInt(targetItem.femaleCount))}
+                {cell('نامشخص', fmtInt(targetItem.unknownCount))}
+                {mergeDate && cell('تاریخ ادغام', toFa(mergeDate))}
+              </div>
             </div>
           )}
 
-          {/* ── خلاصه + مرتب‌سازی ── */}
+          {/* ═══ خلاصه + مرتب‌سازی ═══ */}
           {sourceItems.length > 0 && (
             <>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, flexWrap: 'wrap', gap: 6 }}>
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-                  این گله از ادغام {toFa(sourceItems.length + 1)} گله ساخته شده. یکی را برای بازگردانی انتخاب کنید:
-                </span>
+              <div style={{
+                padding: 'var(--pad-tight)',
+                background: 'var(--warn-soft)',
+                border: '1px solid var(--warn)',
+                borderRadius: 'var(--r-sm)',
+                fontSize: 'var(--fs-xs)',
+                color: 'var(--warn)',
+                marginBottom: 8,
+              }}>
+                ⚠️ این گله از ادغام {toFa(sourceItems.length + 1)} گله ساخته شده. یکی را برای بازگردانی انتخاب کنید:
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, gap: 6 }}>
+                <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)' }}>مرتب‌سازی:</span>
                 <div style={{ display: 'flex', gap: 4 }}>
                   {(['name', 'count', 'age'] as SortKey[]).map(k => (
                     <button
                       key={k}
                       type="button"
-                      onClick={() => handleSortClick(k)}
+                      onClick={() => setSortKey(k)}
                       style={{
-                        padding: '2px 8px',
+                        padding: '2px 10px',
                         fontSize: 'var(--fs-2xs)',
                         background: sortKey === k ? 'var(--accent-soft)' : 'var(--btn-bg)',
                         border: `1px solid ${sortKey === k ? 'var(--accent-border)' : 'var(--border)'}`,
@@ -185,70 +236,108 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
                 </div>
               </div>
 
-              {/* ── لیست فشرده با اسکرول داخلی ── */}
+              {/* ═══ کارت‌های منابع (اسکرول داخلی) ═══ */}
               <div style={{
-                maxHeight: 260,
+                maxHeight: 280,
                 overflowY: 'auto',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 4,
+                gap: 8,
                 paddingRight: 2,
               }}>
                 {sortedSources.map(src => {
                   const isSelected = src.flockId === effectiveSelectedId;
-                  const m = src.maleCount || 0;
-                  const f = src.femaleCount || 0;
-                  const u = src.unknownCount || 0;
-                  const genderText = (m === 0 && f === 0 && u > 0) ? 'همه نامشخص'
-                    : (u === 0 && (m > 0 || f > 0)) ? 'تفکیک‌شده'
-                    : (m + f + u > 0) ? 'ترکیبی' : '—';
+                  const unknown = src.unknownCount || 0;
+                  const genderStatus = (src.maleCount === 0 && src.femaleCount === 0 && unknown > 0)
+                    ? 'همه نامشخص'
+                    : (unknown === 0 && ((src.maleCount || 0) + (src.femaleCount || 0) > 0))
+                      ? 'تفکیک‌شده'
+                      : 'ترکیبی';
                   return (
                     <div
                       key={src.flockId}
                       onClick={() => setSelectedId(src.flockId)}
                       style={{
-                        padding: '6px 10px',
+                        padding: 'var(--pad-normal)',
                         background: isSelected ? 'var(--accent-soft)' : 'var(--input-bg)',
                         border: '1px solid ' + (isSelected ? 'var(--accent)' : 'var(--border)'),
-                        borderRadius: 'var(--r-sm)',
+                        borderRadius: 'var(--r-md)',
                         cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 8,
-                        fontSize: 'var(--fs-xs)',
                       }}
                     >
-                      <input
-                        type="radio"
-                        name="unmerge-source"
-                        checked={isSelected}
-                        onChange={() => setSelectedId(src.flockId)}
-                        onClick={(e) => e.stopPropagation()}
-                        style={{ accentColor: 'var(--accent)', flexShrink: 0 }}
-                      />
-                      <span style={{ fontWeight: 700, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {src.flockName}
-                      </span>
-                      <span style={{ color: 'var(--muted)', flexShrink: 0 }}>
-                        {fmtInt(src.count)} پرنده · {fmtInt(Math.round(src.ageDays || 0))} روز · {genderText}
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                        <input
+                          type="radio"
+                          name="unmerge-source"
+                          checked={isSelected}
+                          onChange={() => setSelectedId(src.flockId)}
+                          onClick={(e) => e.stopPropagation()}
+                          style={{ accentColor: 'var(--accent)', flexShrink: 0 }}
+                        />
+                        <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', flex: 1 }}>{src.flockName}</span>
+                        <span style={{
+                          fontSize: 'var(--fs-2xs)',
+                          color: 'var(--muted)',
+                          background: 'var(--bg)',
+                          border: '1px solid var(--border)',
+                          padding: '1px 6px',
+                          borderRadius: 4,
+                          fontWeight: 600,
+                        }}>قبل از ادغام</span>
+                        {isSelected && (
+                          <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--accent)', fontWeight: 700 }}>انتخاب‌شده</span>
+                        )}
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 12 }}>
+                        {cell('تعداد', `${fmtInt(src.count)} پرنده`)}
+                        {cell('سن', `${fmtInt(Math.round(src.ageDays || 0))} روز`)}
+                        {cell('اولیه', fmtInt(src.initialCount))}
+                        {cell('نامشخص', fmtInt(src.unknownCount))}
+                        {cell('نر', fmtInt(src.maleCount))}
+                        {cell('ماده', fmtInt(src.femaleCount))}
+                        <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'flex-end', paddingTop: 4 }}>
+                          <span style={{
+                            fontSize: 'var(--fs-2xs)',
+                            color: 'var(--muted)',
+                            background: 'var(--bg)',
+                            border: '1px solid var(--border)',
+                            padding: '1px 6px',
+                            borderRadius: 4,
+                            fontWeight: 600,
+                          }}>{genderStatus}</span>
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
               </div>
 
-              {selectedSrc && (
+              {/* ═══ پیش‌بینی ═══ */}
+              {prediction && (
                 <div style={{
-                  marginTop: 8,
-                  padding: 'var(--pad-tight)',
+                  marginTop: 10,
+                  padding: 'var(--pad-normal)',
                   background: 'var(--accent-soft)',
                   border: '1px solid var(--accent-border)',
-                  borderRadius: 'var(--r-sm)',
+                  borderRadius: 'var(--r-md)',
                   fontSize: 'var(--fs-xs)',
-                  color: 'var(--accent)',
-                  fontWeight: 600,
                 }}>
-                  ℹ️ «{selectedSrc.flockName}» با {fmtInt(selectedSrc.count)} پرنده به حالت فعال بازمی‌گردد.
+                  <div style={{ fontWeight: 700, color: 'var(--accent)', marginBottom: 4 }}>
+                    📊 پیش‌بینی بازگردانی:
+                  </div>
+                  <div style={{ color: 'var(--text)', lineHeight: 1.7 }}>
+                    • <b>{selectedSrc?.flockName}</b> ← فعال با <b>{fmtInt(prediction.sourceAfter)}</b> پرنده
+                    <br />
+                    • <b>{targetItem?.flockName}</b> ← <b>{fmtInt(prediction.targetAfter)}</b> پرنده ({fmtInt(targetItem?.count)} − {fmtInt(prediction.sourceAfter)})
+                    {prediction.remainingSources > 0 && (
+                      <>
+                        <br />
+                        <span style={{ color: 'var(--muted)' }}>
+                          • {toFa(prediction.remainingSources)} منبع دیگر همچنان در گله اصلی باقی می‌ماند
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
               )}
             </>
