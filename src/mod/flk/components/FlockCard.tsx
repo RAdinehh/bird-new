@@ -210,6 +210,29 @@ export default function FlockCard(props: FlockCardProps) {
     });
   }
 
+  // 🆕 badge «ادغام‌شده» برای گله‌های ساخته‌شده از ادغام
+  const _mergedSourcesCount = f.mergedInfo?.sources?.length || 0;
+  if (_mergedSourcesCount >= 2) {
+    allBadges.push({
+      key: 'merged',
+      node: (
+        <span style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 3,
+          padding: '2px 7px',
+          background: 'var(--purple-soft)',
+          color: 'var(--purple)',
+          border: '1px solid var(--purple)',
+          borderRadius: 'var(--r-sm)',
+          fontSize: 10,
+          fontWeight: 700,
+          lineHeight: 1.6,
+        }}>🔗 ادغام‌شده ({toFa(_mergedSourcesCount)})</span>
+      ),
+    });
+  }
+
   flockGroups.forEach(g => {
     const c = GROUP_COLORS[g.type] || GROUP_COLORS.custom;
     allBadges.push({
