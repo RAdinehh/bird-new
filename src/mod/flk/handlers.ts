@@ -23,9 +23,11 @@ export function registerFlkHandlers(): () => void {
       const flock = flkState.flocks.find(f => f.id === flockId);
       if (!flock) return;
 
+      if (delta < 0) {
       flkState.update(flockId, {
-        currentCount: Math.max(0, (flock.currentCount ?? 0) - delta),
+        currentCount: (flock.currentCount ?? 0) - delta,
       });
+      }
 
       if (delta > 0) {
         const causeMap: Record<string, string> = {
