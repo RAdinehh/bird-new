@@ -32,9 +32,6 @@ export default function FlockValueSection({ flock }: Props) {
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
       <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', display: 'flex', alignItems: 'center', gap: 2 }}>
         📊 ارزش روز گله
-        {result.kind && KIND_LABEL[result.kind] && (
-          <span style={{ fontSize: 'var(--fs-2xs)', padding: '1px 6px', background: 'var(--accent-soft)', color: 'var(--accent)', border: '1px solid var(--accent-border)', borderRadius: 4, fontWeight: 700 }}>{KIND_LABEL[result.kind]}</span>
-        )}
         <HelpIcon text={HELP.flk.flockValue} />
       </div>
       <button
