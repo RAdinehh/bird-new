@@ -4,6 +4,7 @@ import { useInc } from '../../mod/inc/store';
  */
 import { parse as parseJ, format as formatJ, addDays } from 'date-fns-jalali';
 import { useFlk } from '../flk/store';
+import { deriveSaleEvents, buildSaleAudit } from '../flk/helpers-sex';
 import { useBrd } from '../brd/store';
 import { getBiology, getStandardFor } from '../set/standards/resolve';
 import { showToast } from '../../cor/store/toast';
@@ -526,6 +527,33 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
       if ((f.currentCount ?? 0) < delta) {
         throw new Error(`موجودی کافی نیست: ${f.name} — موجودی ${f.currentCount}، درخواستی ${delta}`);
       }
+      // 🆕 B1 fix: sex-aware pre-flight — shortage جنسیتی → throw (نه clamp)
+      const _mDelta = Number(ref.item.maleCount || 0);
+      const _fDelta = Number(ref.item.femaleCount || 0);
+      const _uDelta = Number(ref.item.unknownCount || 0);
+      const _gSum = _mDelta + _fDelta + _uDelta;
+      if (_gSum > 0) {
+        const _safeM = Math.min(_mDelta, delta);
+        const _safeF = Math.min(_fDelta, delta - _safeM);
+        const _safeU = Math.min(_uDelta, delta - _safeM - _safeF);
+        const _rem = delta - _safeM - _safeF - _safeU;
+        const _nextM = Math.max(0, (f.maleCount ?? 0) - _safeM);
+        const _nextF = Math.max(0, (f.femaleCount ?? 0) - _safeF);
+        const _nextU = Math.max(0, (f.unknownCount ?? 0) - _safeU - _rem);
+        const _expectedNext = Math.max(0, (f.currentCount ?? 0) - delta);
+        if (_nextM + _nextF + _nextU !== _expectedNext) {
+          if (_safeM > (f.maleCount ?? 0)) {
+            throw new Error(`موجودی نر کافی نیست: ${f.name} — نر ${f.maleCount ?? 0}، درخواستی ${_safeM}`);
+          }
+          if (_safeF > (f.femaleCount ?? 0)) {
+            throw new Error(`موجودی ماده کافی نیست: ${f.name} — ماده ${f.femaleCount ?? 0}، درخواستی ${_safeF}`);
+          }
+          if ((_safeU + _rem) > (f.unknownCount ?? 0)) {
+            throw new Error(`موجودی نامشخص کافی نیست: ${f.name} — نامشخص ${f.unknownCount ?? 0}، درخواستی ${_safeU + _rem}`);
+          }
+          throw new Error(`موجودی برای فروش ${delta} کافی نیست: ${f.name}`);
+        }
+      }
     }
   }
 
@@ -632,26 +660,48 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
       // 🆕 فیکس ۱: ثبت FlockEvent فروش در تاریخچه گله
       if (type === 'sale' && delta > 0) {
         try {
-          const st = useFlk.getState();
-          const evt = {
-            id: `sell-${inv.id}-${explicitFlockId}-${Date.now()}`,
+          // 🆕 B2 fix: sex-aware eventها (۱ تا ۳ event جدا)
+          const evts = deriveSaleEvents({
+            delta,
+            maleCount: it.maleCount,
+            femaleCount: it.femaleCount,
+            unknownCount: it.unknownCount,
             flockId: explicitFlockId,
+            invoiceId: inv.id,
+            invoiceNumber: inv.number,
+            partyId: inv.partyId,
             date: effectiveDate,
-            type: 'sell' as any,
-            count: delta,
-            sex: 'mixed' as any,
-            direction: -1 as any,
-            buyerId: inv.partyId,
             unitPrice: it.unitPrice,
             totalPrice: it.total,
-            invoiceId: inv.id,
-            notes: `فروش از فاکتور ${inv.number || ''}`,
-            createdAt: new Date().toISOString(),
-          };
+          });
+          // 🆕 B3 fix: audit trail (sexBalanceEvents)
+          const st = useFlk.getState();
+          const fAfter = st.flocks.find((x: any) => x.id === explicitFlockId);
+          const audit = fAfter ? buildSaleAudit({
+            flockBefore: {
+              male: f.maleCount ?? 0,
+              female: f.femaleCount ?? 0,
+              unknown: f.unknownCount ?? 0,
+            },
+            flockAfter: {
+              male: fAfter.maleCount ?? 0,
+              female: fAfter.femaleCount ?? 0,
+              unknown: fAfter.unknownCount ?? 0,
+            },
+            date: effectiveDate,
+            note: `فروش ${delta} از فاکتور ${inv.number || ''}`,
+          }) : null;
           useFlk.setState({
             flocks: st.flocks.map((ff: any) =>
               ff.id === explicitFlockId
-                ? { ...ff, events: [...(ff.events || []), evt], updatedAt: new Date().toISOString() }
+                ? {
+                    ...ff,
+                    events: [...(ff.events || []), ...evts],
+                    sexBalanceEvents: audit
+                      ? [...(ff.sexBalanceEvents || []), audit]
+                      : (ff.sexBalanceEvents || []),
+                    updatedAt: new Date().toISOString(),
+                  }
                 : ff
             ),
           } as any);
