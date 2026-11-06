@@ -19,6 +19,7 @@ const CHICKEN_INCUBATION_LOCAL = {
 // ═══════════════════════════════════════════════
 export const ROSS_308_BREEDER: BirdStandard = {
   key: 'ross-308-breeder',
+  sexingAgeDay: 42,
   source: 'Aviagen Ross 308 Parent Stock Guide',
   publishYear: 2022,
   region: 'international',
@@ -103,6 +104,7 @@ export const ROSS_308_BREEDER: BirdStandard = {
 // ═══════════════════════════════════════════════
 export const COBB_500_BREEDER: BirdStandard = {
   key: 'cobb-500-breeder',
+  sexingAgeDay: 42,
   source: 'Cobb-Vantress Breeder Guide',
   publishYear: 2021,
   region: 'international',
@@ -187,6 +189,7 @@ export const COBB_500_BREEDER: BirdStandard = {
 // ═══════════════════════════════════════════════
 export const HY_LINE_BROWN_BREEDER: BirdStandard = {
   key: 'hy-line-brown-breeder',
+  sexingAgeDay: 42,
   source: 'Hy-Line International Parent Stock Guide',
   publishYear: 2023,
   region: 'international',

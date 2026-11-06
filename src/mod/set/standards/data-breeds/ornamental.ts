@@ -8,6 +8,7 @@ import type { BirdStandard } from '../types';
 
 export const AUSTRALORP: BirdStandard = {
   key: 'australorp',
+  sexingAgeDay: 56,
   source: 'APA',
   publishYear: 2024,
   region: 'international',
@@ -80,6 +81,7 @@ export const AUSTRALORP: BirdStandard = {
 
 export const COCHIN: BirdStandard = {
   key: 'cochin',
+  sexingAgeDay: 56,
   source: 'APA',
   publishYear: 2024,
   region: 'international',
@@ -152,6 +154,7 @@ export const COCHIN: BirdStandard = {
 
 export const BRAHMA: BirdStandard = {
   key: 'brahma',
+  sexingAgeDay: 56,
   source: 'APA',
   publishYear: 2024,
   region: 'international',
@@ -224,6 +227,7 @@ export const BRAHMA: BirdStandard = {
 
 export const SULTAN: BirdStandard = {
   key: 'sultan',
+  sexingAgeDay: 56,
   source: 'APA',
   publishYear: 2024,
   region: 'international',
@@ -296,6 +300,7 @@ export const SULTAN: BirdStandard = {
 
 export const MINIATURE: BirdStandard = {
   key: 'miniature',
+  sexingAgeDay: 56,
   source: 'ABA',
   publishYear: 2024,
   region: 'international',

@@ -129,6 +129,7 @@ export const GOOSE_CHINESE: BirdStandard = {
 export const GOOSE_TOULOUSE: BirdStandard = {
   ...GOOSE_BASE,
   key: 'goose-toulouse',
+  sexingAgeDay: 84,
   source: 'Toulouse Goose Breeder Standard',
   publishYear: 1403,
   region: 'international',
@@ -216,6 +217,7 @@ export const GOOSE_AFRICAN: BirdStandard = {
 export const GOOSE_UKRAINIAN: BirdStandard = {
   ...GOOSE_BASE,
   key: 'goose-ukrainian',
+  sexingAgeDay: 84,
   source: 'Ukrainian Grey Goose Standard + منابع محلی',
   publishYear: 1403,
   region: 'international',

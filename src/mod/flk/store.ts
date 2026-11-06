@@ -10,6 +10,32 @@ import type { FlockType, FlockStatus, FlockEvent, FlockEventReasonCode, FlockEve
 export * from './types-store';
 export * from './helpers-store';
 
+/** 🆕 رکورد یک تفکیک جنسیت */
+export interface FlockSexingEvent {
+  id: string;
+  date: string;
+  male: number;
+  female: number;
+  unknown: number;
+  /** منبع تفکیک: خرید اولیه / جزئی / اصلاح / نهایی */
+  source: 'purchase' | 'partial' | 'correction' | 'final';
+  note?: string;
+  createdAt: string;
+}
+
+/** 🆕 رکورد تغییر تعادل جنسیتی (audit trail) */
+export interface FlockSexBalanceEvent {
+  id: string;
+  date: string;
+  type: 'sexing' | 'death' | 'sale' | 'return' | 'correction' | 'merge' | 'unmerge' | 'pre_sexing_observation';
+  before: { male: number; female: number; unknown: number };
+  after: { male: number; female: number; unknown: number };
+  delta: { male: number; female: number; unknown: number };
+  reason?: string;
+  note?: string;
+  createdAt: string;
+}
+
 export interface Flock {
   id: string;
   name: string;
@@ -72,6 +98,16 @@ export interface Flock {
     startedAt: string;    // تاریخ شروع دوره
     logId: string;        // شناسه لاگ ثبت روزانه مبدأ
   };
+  /** 🆕 سن تفکیک override (روز) — null → از استاندارد نژاد */
+  sexingAgeOverride?: number | null;
+  /** 🆕 تاریخچه تفکیک‌ها */
+  sexingEvents?: FlockSexingEvent[];
+  /** 🆕 تاریخچه تغییرات تعادل جنسیتی (audit trail) */
+  sexBalanceEvents?: FlockSexBalanceEvent[];
+  /** 🆕 تعداد اولیه نر (لحظه خرید/تفکیک) */
+  initialMaleCount?: number;
+  /** 🆕 تعداد اولیه ماده */
+  initialFemaleCount?: number;
 }
 
 export interface State {
@@ -592,3 +628,22 @@ export const useFlk = create<State>()(
     }
   )
 );
+
+/**
+ * validateSexBalance — بررسی Invariant تعادل جنسیتی
+ * قانون: maleCount + femaleCount + unknownCount === currentCount
+ *
+ * @returns true اگر معتبر، false اگر نقض شده
+ */
+export function validateSexBalance(f: {
+  currentCount?: number | null;
+  maleCount?: number | null;
+  femaleCount?: number | null;
+  unknownCount?: number | null;
+}): boolean {
+  const c = f.currentCount ?? 0;
+  const m = f.maleCount ?? 0;
+  const fe = f.femaleCount ?? 0;
+  const u = f.unknownCount ?? 0;
+  return m + fe + u === c;
+}

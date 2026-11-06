@@ -155,6 +155,7 @@ export const TURKEY_BOURBON: BirdStandard = {
 export const TURKEY_BREEDER: BirdStandard = {
   ...TURKEY_BASE,
   key: 'turkey-breeder',
+  sexingAgeDay: 84,
   source: 'BUT Breeder Guide + Aviagen Turkeys',
   publishYear: 2022,
   region: 'international',

@@ -242,6 +242,7 @@ export const DUCK_UKRAINIAN: BirdStandard = {
 // ═══════════════════════════════════════════════
 export const DUCK_PEKIN_BREEDER: BirdStandard = {
   key: 'duck-pekin-breeder',
+  sexingAgeDay: 42,
   source: 'Cherry Valley Pekin Breeder Guide',
   publishYear: 2022,
   region: 'international',
@@ -326,6 +327,7 @@ export const DUCK_PEKIN_BREEDER: BirdStandard = {
 // ═══════════════════════════════════════════════
 export const DUCK_MUSCOVY_BREEDER: BirdStandard = {
   key: 'duck-muscovy-breeder',
+  sexingAgeDay: 42,
   source: 'منابع پرورش اردک موسیقا ایران',
   publishYear: 1403,
   region: 'iran',

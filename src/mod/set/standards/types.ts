@@ -287,6 +287,8 @@ export interface HatchingParams {
 
 // ═══ استاندارد کامل پرنده ═══
 export interface BirdStandard {
+  /** 🆕 سن پیشنهادی تفکیک جنسیت (روز) — null/undefined = تفکیک لازم نیست (گوشتی/تخم‌گذار تجاری) */
+  sexingAgeDay?: number | null;
   // ═══ شناسه ═══
   key: string;
   birdName: string;

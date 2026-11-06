@@ -153,6 +153,7 @@ export const QUAIL_LAYER: BirdStandard = {
 // ═══════════════════════════════════════════════
 export const QUAIL_BREEDER: BirdStandard = {
   key: 'quail-breeder',
+  sexingAgeDay: 28,
   source: 'مرکز تحقیقات بلدرچین ایران + Japanese Quail Standards',
   publishYear: 1403,
   region: 'iran',

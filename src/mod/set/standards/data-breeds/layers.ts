@@ -8,6 +8,7 @@ import type { BirdStandard } from '../types';
 
 export const HY_LINE_W36: BirdStandard = {
   key: 'hy-line-w36',
+  sexingAgeDay: 42,
   source: 'Hy-Line International',
   publishYear: 2023,
   region: 'international',
@@ -95,6 +96,7 @@ export const HY_LINE_W36: BirdStandard = {
 
 export const IRAN_LAYER: BirdStandard = {
   key: 'iran-layer',
+  sexingAgeDay: 42,
   source: 'وزارت جهاد کشاورزی + مرغداری‌های نمونه',
   publishYear: 1403,
   region: 'iran',
@@ -172,6 +174,7 @@ export const IRAN_LAYER: BirdStandard = {
 
 export const LOHMANN: BirdStandard = {
   key: 'lohmann',
+  sexingAgeDay: 42,
   source: 'Lohmann Breeders',
   publishYear: 2024,
   region: 'international',
