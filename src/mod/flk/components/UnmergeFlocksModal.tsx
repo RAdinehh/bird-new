@@ -44,8 +44,6 @@ function normalizeGender(item: SourceInfo): SourceInfo {
   return { ...item, unknownCount: u };
 }
 
-type SortKey = 'name' | 'count' | 'age';
-
 const cell = (label: string, value: React.ReactNode) => (
   <div style={{
     display: 'flex',
@@ -97,17 +95,12 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
       }));
   }, [target, targetFlockId]);
 
-  const [sortKey, setSortKey] = useState<SortKey>('count');
+  // مرتب‌سازی ثابت: بزرگ‌ترین تعداد اول
   const sortedSources = useMemo(() => {
     const arr = [...sourceItems];
-    arr.sort((a, b) => {
-      if (sortKey === 'name') return (a.flockName || '').localeCompare(b.flockName || '', 'fa');
-      if (sortKey === 'count') return (b.count || 0) - (a.count || 0);
-      if (sortKey === 'age') return (b.ageDays || 0) - (a.ageDays || 0);
-      return 0;
-    });
+    arr.sort((a, b) => (b.count || 0) - (a.count || 0));
     return arr;
-  }, [sourceItems, sortKey]);
+  }, [sourceItems]);
 
   const [selectedId, setSelectedId] = useState<string>('');
   const effectiveSelectedId = sortedSources.some(s => s.flockId === selectedId)
@@ -183,6 +176,7 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 12 }}>
                   {cell('تعداد فعلی', `${fmtInt(targetItem.count)} پرنده`)}
                   {cell('سن فعلی', `${fmtInt(Math.round(targetItem.ageDays || 0))} روز`)}
+                  {target?.mergedInfo?.avgAgeDays != null && cell('سن میانگین وزنی', `${fmtInt(Math.round(target.mergedInfo.avgAgeDays))} روز`)}
                   {cell('نر', fmtInt(targetItem.maleCount))}
                   {cell('ماده', fmtInt(targetItem.femaleCount))}
                   {cell('نامشخص', fmtInt(targetItem.unknownCount))}
@@ -195,35 +189,10 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
           {/* ═══ بخش ۲: منابع ═══ */}
           {sourceItems.length > 0 && (
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 8, paddingBottom: 6, borderBottom: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-end', marginBottom: 8, paddingBottom: 6, borderBottom: '1px solid var(--border)' }}>
                 <div>
                   <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>📦 منابع ادغام‌شده</span>
-                  <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginRight: 6 }}>({toFa(sourceItems.length)} گله)</span>
-                </div>
-                {/* مرتب‌سازی */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'var(--btn-bg)', padding: 2, borderRadius: 'var(--r-sm)', border: '1px solid var(--border)' }}>
-                  <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', padding: '0 4px' }}>مرتب:</span>
-                  {(['name', 'count', 'age'] as SortKey[]).map(k => (
-                    <button
-                      key={k}
-                      type="button"
-                      onClick={() => setSortKey(k)}
-                      style={{
-                        padding: '2px 6px',
-                        fontSize: 'var(--fs-2xs)',
-                        background: sortKey === k ? 'var(--card)' : 'transparent',
-                        border: 'none',
-                        borderRadius: 2,
-                        color: sortKey === k ? 'var(--accent)' : 'var(--muted)',
-                        fontWeight: sortKey === k ? 700 : 500,
-                        cursor: 'pointer',
-                        boxShadow: sortKey === k ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
-                        fontFamily: 'inherit',
-                      }}
-                    >
-                      {k === 'name' ? 'نام' : k === 'count' ? 'تعداد' : 'سن'}
-                    </button>
-                  ))}
+                  <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginRight: 6 }}>({toFa(sourceItems.length)} گله — مرتب بر اساس تعداد)</span>
                 </div>
               </div>
 
