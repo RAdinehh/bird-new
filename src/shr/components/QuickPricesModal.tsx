@@ -4,14 +4,6 @@ import { useSet, DEFAULT_MARKET_PRICES, type MarketPrices } from '../../mod/set/
 import { toFa, toEn } from '../utils/fa';
 import { toastMsg } from '../../cor/store/toast';
 
-/** تبدیل عدد لاتین به فرمت با جداکننده فارسی */
-function formatWithSep(val: string | number): string {
-  if (val === '' || val === null || val === undefined) return '';
-  const s = String(val).replace(/[^0-9]/g, '');
-  if (s === '') return '';
-  return Number(s).toLocaleString('fa-IR');
-}
-
 const ALL_FIELDS: Array<{
   key: keyof Omit<MarketPrices, 'updatedAt'>;
   label: string;
@@ -61,8 +53,8 @@ export default function QuickPricesModal({ open, onClose, restrictToKinds }: Pro
   const savedAt = marketPrices.updatedAt || '';
 
   const handleChange = (key: string, raw: string) => {
-    const cleaned = toEn(raw.replace(/[^0-9۰-۹]/g, ''));
-    setForm(f => ({ ...f, [key]: cleaned }));
+    // Input خودش formatNumWhileTyping زده — فقط raw value ذخیره کن
+    setForm(f => ({ ...f, [key]: raw }));
   };
 
   const handleSave = () => {
@@ -100,10 +92,11 @@ export default function QuickPricesModal({ open, onClose, restrictToKinds }: Pro
         {fields.map(field => (
           <Field key={field.key} label={`${field.icon} ${field.label}`}>
             <Input
-              value={formatWithSep(form[field.key] || '')}
+              mode="number"
+              inputMode="numeric"
+              value={form[field.key] || ''}
               onChange={e => handleChange(field.key, e.target.value)}
               placeholder={field.hint}
-              inputMode="tel"
             />
           </Field>
         ))}
