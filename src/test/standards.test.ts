@@ -348,9 +348,9 @@ describe('FALLBACK', () => {
 // 🆕 getEffectiveGrowth
 // ═══════════════════════════════════════════════
 describe('getEffectiveGrowth', () => {
-  it('مرندی روز 3 → وزن ~320g (استارتر)', () => {
-    const g = getEffectiveGrowth('مرندی', 3);
-    expect(g.weightG).toBe(320);
+  it('مرندی روز 30 → وزن ~260g (استارتر)', () => {
+    const g = getEffectiveGrowth('مرندی', 30);
+    expect(g.weightG).toBe(260);
     expect(g.source).toBe('default');
   });
 
