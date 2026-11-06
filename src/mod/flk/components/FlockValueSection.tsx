@@ -35,6 +35,13 @@ export default function FlockValueSection({ flock }: Props) {
     <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', display: 'flex', alignItems: 'center', gap: 2 }}>
       📊 ارزش روز گله
       <HelpIcon text={HELP.flk.flockValue} />
+      <span
+        role="button"
+        tabIndex={0}
+        onClick={() => setPricesOpen(true)}
+        title="ویرایش قیمت‌ها"
+        style={{ cursor: 'pointer', marginRight: 4, fontSize: 13, opacity: 0.7, userSelect: 'none' }}
+      >✏️</span>
     </div>
   );
 
@@ -42,18 +49,11 @@ export default function FlockValueSection({ flock }: Props) {
     <div
       onClick={() => setPricesOpen(true)}
       role="button"
-      style={{
-        ...cellStyle,
-        cursor: 'pointer',
-        border: '1px solid var(--accent-border)',
-        background: 'var(--accent-soft)',
-      }}
+      style={{ ...cellStyle, cursor: 'pointer' }}
       title="ویرایش قیمت"
     >
-      <span style={{ color: 'var(--accent)', fontWeight: 600 }}>قیمت پایه ✏️:</span>
-      <b style={{ fontWeight: 700, color: 'var(--accent)' }}>
-        {toFa(result.pricePerKg.toLocaleString('fa-IR'))} ت/کیلو
-      </b>
+      <span style={{ color: 'var(--muted)' }}>قیمت پایه:</span>
+      <b style={{ fontWeight: 700 }}>{toFa(result.pricePerKg.toLocaleString('fa-IR'))} ت/کیلو</b>
     </div>
   );
 
