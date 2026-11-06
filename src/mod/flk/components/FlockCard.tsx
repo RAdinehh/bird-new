@@ -467,12 +467,12 @@ export default function FlockCard(props: FlockCardProps) {
                 title="بازگردانی گله"
                 style={{
                   width: 28, height: 28,
-                  background: 'var(--purple-soft)',
-                  border: '1px solid var(--purple)',
+                  background: 'var(--btn-bg)',
+                  border: '1px solid var(--border)',
                   borderRadius: 'var(--r-sm)',
                   cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 14, color: 'var(--purple)',
+                  fontSize: 14, color: 'var(--text)',
                   fontFamily: 'inherit', padding: 0,
                 }}
               >♻️</button>
