@@ -6,7 +6,7 @@
 import { useEffect, useState, useMemo, type ReactNode } from 'react';
 import { Modal, Btn, BtnRow, Field, Grid2, Select } from '../../../shr/components/ui';
 import type { Flock, FlockEvent, FlockEventType, FlockEventReasonCode, FlockSexBalanceEvent } from '../store';
-import { SEX_AUDIT_META, formatSexDelta } from '../helpers-audit';
+import { SEX_AUDIT_META, formatSexDelta, aggregateDeathsBySex, toneFromRate } from '../helpers-audit';
 import { useFlk } from '../store';
 import { todayJ } from '../api/flocksCalc';
 import { showConfirmAsync } from '../../../cor/store/dialog';
@@ -104,6 +104,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   const lossesPct = initial > 0 ? (losses / initial) * 100 : 0;
   const totalCount = flock.events?.length || 0;
   const auditCount = flock.sexBalanceEvents?.length || 0;
+  const deathRate = aggregateDeathsBySex(flock.sexBalanceEvents, flock.initialMaleCount, flock.initialFemaleCount);
 
   const typeCounts = useMemo(() => {
     const m = new Map<FlockEventType, number>();
@@ -206,6 +207,38 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <button type="button" onClick={handleSaveCorrection} disabled={num === 0 || newCount < 0} style={{ height: 38, background: (num === 0 || newCount < 0) ? 'var(--dim)' : 'var(--accent)', color: 'white', border: 'none', borderRadius: 'var(--r-md)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: (num === 0 || newCount < 0) ? 'not-allowed' : 'pointer' }}>ثبت اصلاح</button>
             <button type="button" onClick={() => { setCorrectionOpen(false); setDelta(''); setNotes(''); setValidationError(''); }} style={{ height: 38, background: 'var(--input-bg)', color: 'var(--muted)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer' }}>لغو</button>
+          </div>
+        </div>
+      )}
+
+      {deathRate.hasData && (
+        <div style={{
+          padding: '8px 10px',
+          background: 'var(--card)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--r-md)',
+          marginBottom: 10,
+          fontSize: 11,
+        }}>
+          <div style={{ fontWeight: 700, marginBottom: 6, color: 'var(--muted)', fontSize: 10 }}>
+            📊 نرخ تلفات به تفکیک جنسیت
+          </div>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <span>
+              ♂ نر: <b dir="ltr" style={{ color: toneFromRate(deathRate.male.rate) }}>
+                {toFa(deathRate.male.deaths)} / {toFa(deathRate.male.initial)} → {toFa(deathRate.male.rate.toFixed(1))}٪
+              </b>
+            </span>
+            <span>
+              ♀ ماده: <b dir="ltr" style={{ color: toneFromRate(deathRate.female.rate) }}>
+                {toFa(deathRate.female.deaths)} / {toFa(deathRate.female.initial)} → {toFa(deathRate.female.rate.toFixed(1))}٪
+              </b>
+            </span>
+            {deathRate.unknown.deaths > 0 && (
+              <span style={{ color: 'var(--muted)' }}>
+                ❓ نامشخص: <b>{toFa(deathRate.unknown.deaths)}</b>
+              </span>
+            )}
           </div>
         </div>
       )}
