@@ -13,6 +13,7 @@ import { toastMsg } from '../../../cor/store/toast';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toFa, formatNumWhileTyping } from '../../../shr/utils/fa';
 import { useFlk, getAgeDays } from '../store';
+import { format as formatJ } from 'date-fns-jalali';
 
 interface Props {
   open: boolean;
@@ -21,6 +22,18 @@ interface Props {
 }
 
 const fmtInt = (n: number | undefined | null): string => formatNumWhileTyping(String(n || 0)) || '۰';
+
+/** نرمال‌سازی: جمع نر+ماده+نامشخص = تعداد */
+function normalizeGender(item: SourceInfo): SourceInfo {
+  const c = item.count || 0;
+  const m = item.maleCount || 0;
+  const f = item.femaleCount || 0;
+  let u = item.unknownCount || 0;
+  if (m + f + u !== c) {
+    u = Math.max(0, c - m - f);
+  }
+  return { ...item, unknownCount: u };
+}
 
 interface SourceInfo {
   flockId: string;
@@ -60,7 +73,7 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
 
   const targetItem: SourceInfo | null = useMemo(() => {
     if (!target) return null;
-    return {
+    return normalizeGender({
       flockId: target.id,
       flockName: target.name,
       count: (target as any).currentCount || 0,
@@ -70,27 +83,22 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
       unknownCount: (target as any).unknownCount || 0,
       ageDays: getAgeDays(target),
       isTarget: true,
-    };
+    });
   }, [target]);
 
   const sourceItems: SourceInfo[] = useMemo(() => {
     if (!target?.mergedInfo?.sources) return [];
     return (target.mergedInfo.sources as any[])
       .filter(s => s.flockId !== targetFlockId)
-      .map(s => {
-        // fallback برای snapshot قدیمی
-        const c = s.count || 0;
-        const u = s.unknownCount !== undefined ? s.unknownCount : c;
-        return {
-          ...s,
-          count: c,
-          unknownCount: u,
-          initialCount: s.initialCount !== undefined ? s.initialCount : c,
-          maleCount: s.maleCount || 0,
-          femaleCount: s.femaleCount || 0,
-          isTarget: false,
-        };
-      });
+      .map(s => normalizeGender({
+        ...s,
+        count: s.count || 0,
+        initialCount: s.initialCount !== undefined ? s.initialCount : (s.count || 0),
+        maleCount: s.maleCount || 0,
+        femaleCount: s.femaleCount || 0,
+        unknownCount: s.unknownCount || 0,
+        isTarget: false,
+      }));
   }, [target, targetFlockId]);
 
   const [sortKey, setSortKey] = useState<SortKey>('count');
@@ -140,9 +148,14 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
     }
   };
 
-  const mergeDate = target?.mergedInfo?.mergedAt
-    ? target.mergedInfo.mergedAt.slice(0, 10)
-    : '';
+  const mergeDate = (() => {
+    if (!target?.mergedInfo?.mergedAt) return '';
+    try {
+      return formatJ(new Date(target.mergedInfo.mergedAt), 'yyyy/MM/dd');
+    } catch {
+      return target.mergedInfo.mergedAt.slice(0, 10);
+    }
+  })();
 
   return (
     <Modal
@@ -248,11 +261,17 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
                 {sortedSources.map(src => {
                   const isSelected = src.flockId === effectiveSelectedId;
                   const unknown = src.unknownCount || 0;
-                  const genderStatus = (src.maleCount === 0 && src.femaleCount === 0 && unknown > 0)
-                    ? 'همه نامشخص'
-                    : (unknown === 0 && ((src.maleCount || 0) + (src.femaleCount || 0) > 0))
-                      ? 'تفکیک‌شده'
-                      : 'ترکیبی';
+                  const c = src.count || 0;
+                  const m = src.maleCount || 0;
+                  const f = src.femaleCount || 0;
+                  const u = src.unknownCount || 0;
+                  const genderStatus = c === 0
+                    ? '—'
+                    : (m === 0 && f === 0 && u === c)
+                      ? 'همه نامشخص'
+                      : (u === 0 && (m + f === c))
+                        ? 'تفکیک‌شده'
+                        : 'ترکیبی';
                   return (
                     <div
                       key={src.flockId}
