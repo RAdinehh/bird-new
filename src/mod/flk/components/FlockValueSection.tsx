@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useFlockValue, KIND_LABEL } from '../../../shr/hooks/useFlockValue';
 import QuickPricesModal from '../../../shr/components/QuickPricesModal';
 import { formatNumWhileTyping } from '../../../shr/utils/fa';
+import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
+import { HELP } from '../../../shr/help/helpTexts';
 import { Btn } from '../../../shr/components/ui';
 import { Row } from '../helpers';
 
@@ -33,6 +35,7 @@ export default function FlockValueSection({ flock }: Props) {
         {result.kind && KIND_LABEL[result.kind] && (
           <span style={{ fontSize: 'var(--fs-2xs)', padding: '1px 6px', background: 'var(--accent-soft)', color: 'var(--accent)', border: '1px solid var(--accent-border)', borderRadius: 4, fontWeight: 700 }}>{KIND_LABEL[result.kind]}</span>
         )}
+        <HelpIcon text={HELP.flk.flockValue} />
       </div>
       <button
         type="button"
