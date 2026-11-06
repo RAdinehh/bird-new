@@ -1,11 +1,9 @@
 /**
  * UnmergeFlocksModal — بازگردانی گله از ادغام
- * - کارت کامل برای هر گله (نه خط فشرده)
- * - اطلاعات: تعداد، اولیه، نر/ماده/نامشخص، سن
- * - تاریخ ادغام (per source)
- * - پیش‌بینی قبل از تأیید
- * - اسکرول داخلی + مرتب‌سازی
- * - fallback برای snapshot قدیمی (unknownCount = count)
+ * سلسله‌مراتب:
+ *   ۱. گله اصلی (🏠) — target
+ *   ۲. منابع ادغام‌شده (📦) — با مرتب‌سازی در header
+ *   ۳. پیش‌بینی (📊) — نتیجه
  */
 import { useState, useMemo } from 'react';
 import { Modal, Btn, BtnRow } from '../../../shr/components/ui';
@@ -23,7 +21,18 @@ interface Props {
 
 const fmtInt = (n: number | undefined | null): string => formatNumWhileTyping(String(n || 0)) || '۰';
 
-/** نرمال‌سازی: جمع نر+ماده+نامشخص = تعداد */
+interface SourceInfo {
+  flockId: string;
+  flockName: string;
+  count?: number;
+  initialCount?: number;
+  maleCount?: number;
+  femaleCount?: number;
+  unknownCount?: number;
+  ageDays?: number;
+  isTarget: boolean;
+}
+
 function normalizeGender(item: SourceInfo): SourceInfo {
   const c = item.count || 0;
   const m = item.maleCount || 0;
@@ -35,22 +44,9 @@ function normalizeGender(item: SourceInfo): SourceInfo {
   return { ...item, unknownCount: u };
 }
 
-interface SourceInfo {
-  flockId: string;
-  flockName: string;
-  count?: number;
-  initialCount?: number;
-  maleCount?: number;
-  femaleCount?: number;
-  unknownCount?: number;
-  ageDays?: number;
-  genderSplitAt?: string;
-  isTarget: boolean;
-}
-
 type SortKey = 'name' | 'count' | 'age';
 
-const cell = (label: string, value: React.ReactNode, danger = false) => (
+const cell = (label: string, value: React.ReactNode) => (
   <div style={{
     display: 'flex',
     justifyContent: 'space-between',
@@ -61,7 +57,7 @@ const cell = (label: string, value: React.ReactNode, danger = false) => (
     borderBottom: '1px dashed var(--border)',
   }}>
     <span style={{ color: 'var(--muted)', flexShrink: 0 }}>{label}:</span>
-    <span style={{ fontWeight: 600, color: danger ? 'var(--danger)' : 'var(--text)', textAlign: 'left', fontVariantNumeric: 'tabular-nums' }}>{value}</span>
+    <span style={{ fontWeight: 600, color: 'var(--text)', textAlign: 'left', fontVariantNumeric: 'tabular-nums' }}>{value}</span>
   </div>
 );
 
@@ -119,7 +115,6 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
     : (sortedSources[0]?.flockId || '');
   const selectedSrc = sortedSources.find(s => s.flockId === effectiveSelectedId);
 
-  // پیش‌بینی
   const prediction = useMemo(() => {
     if (!selectedSrc || !targetItem) return null;
     const srcCount = selectedSrc.count || 0;
@@ -174,72 +169,55 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
           هیچ گله‌ای برای بازگردانی نیست.
         </div>
       ) : (
-        <>
-          {/* ═══ گله اصلی (live) ═══ */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+
+          {/* ═══ بخش ۱: گله اصلی ═══ */}
           {targetItem && (
-            <div style={{
-              marginBottom: 10,
-              padding: 'var(--pad-normal)',
-              background: 'var(--input-bg)',
-              border: '1px solid var(--border)',
-              borderRight: '3px solid var(--info, #0284c7)',
-              borderRadius: 'var(--r-md)',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', flex: 1 }}>{targetItem.flockName}</span>
-                <span style={{
-                  fontSize: 'var(--fs-2xs)',
-                  color: 'var(--info, #0284c7)',
-                  background: 'var(--info-soft, rgba(2,132,199,.08))',
-                  border: '1px solid var(--info, #0284c7)',
-                  padding: '1px 6px',
-                  borderRadius: 4,
-                  fontWeight: 700,
-                }}>گله اصلی (فعلی)</span>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>🏠 گله اصلی (فعلی)</span>
+                <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--info, #0284c7)', background: 'var(--info-soft, rgba(2,132,199,.08))', padding: '1px 6px', borderRadius: 4, fontWeight: 600 }}>فعال</span>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 12 }}>
-                {cell('تعداد فعلی', `${fmtInt(targetItem.count)} پرنده`)}
-                {cell('سن فعلی', `${fmtInt(Math.round(targetItem.ageDays || 0))} روز`)}
-                {cell('نر', fmtInt(targetItem.maleCount))}
-                {cell('ماده', fmtInt(targetItem.femaleCount))}
-                {cell('نامشخص', fmtInt(targetItem.unknownCount))}
-                {mergeDate && cell('تاریخ ادغام', toFa(mergeDate))}
+              <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-md)', border: '1px solid var(--border)' }}>
+                <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', marginBottom: 8 }}>{targetItem.flockName}</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 12 }}>
+                  {cell('تعداد فعلی', `${fmtInt(targetItem.count)} پرنده`)}
+                  {cell('سن فعلی', `${fmtInt(Math.round(targetItem.ageDays || 0))} روز`)}
+                  {cell('نر', fmtInt(targetItem.maleCount))}
+                  {cell('ماده', fmtInt(targetItem.femaleCount))}
+                  {cell('نامشخص', fmtInt(targetItem.unknownCount))}
+                  {mergeDate && cell('تاریخ ادغام', toFa(mergeDate))}
+                </div>
               </div>
             </div>
           )}
 
-          {/* ═══ خلاصه + مرتب‌سازی ═══ */}
+          {/* ═══ بخش ۲: منابع ═══ */}
           {sourceItems.length > 0 && (
-            <>
-              <div style={{
-                padding: 'var(--pad-tight)',
-                background: 'var(--warn-soft)',
-                border: '1px solid var(--warn)',
-                borderRadius: 'var(--r-sm)',
-                fontSize: 'var(--fs-xs)',
-                color: 'var(--warn)',
-                marginBottom: 8,
-              }}>
-                ⚠️ این گله از ادغام {toFa(sourceItems.length + 1)} گله ساخته شده. یکی را برای بازگردانی انتخاب کنید:
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, gap: 6 }}>
-                <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)' }}>مرتب‌سازی:</span>
-                <div style={{ display: 'flex', gap: 4 }}>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 8, paddingBottom: 6, borderBottom: '1px solid var(--border)' }}>
+                <div>
+                  <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>📦 منابع ادغام‌شده</span>
+                  <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginRight: 6 }}>({toFa(sourceItems.length)} گله)</span>
+                </div>
+                {/* مرتب‌سازی */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'var(--btn-bg)', padding: 2, borderRadius: 'var(--r-sm)', border: '1px solid var(--border)' }}>
+                  <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', padding: '0 4px' }}>مرتب:</span>
                   {(['name', 'count', 'age'] as SortKey[]).map(k => (
                     <button
                       key={k}
                       type="button"
                       onClick={() => setSortKey(k)}
                       style={{
-                        padding: '2px 10px',
+                        padding: '2px 6px',
                         fontSize: 'var(--fs-2xs)',
-                        background: sortKey === k ? 'var(--accent-soft)' : 'var(--btn-bg)',
-                        border: `1px solid ${sortKey === k ? 'var(--accent-border)' : 'var(--border)'}`,
-                        borderRadius: 'var(--r-sm)',
+                        background: sortKey === k ? 'var(--card)' : 'transparent',
+                        border: 'none',
+                        borderRadius: 2,
                         color: sortKey === k ? 'var(--accent)' : 'var(--muted)',
                         fontWeight: sortKey === k ? 700 : 500,
                         cursor: 'pointer',
+                        boxShadow: sortKey === k ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
                         fontFamily: 'inherit',
                       }}
                     >
@@ -249,29 +227,21 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
                 </div>
               </div>
 
-              {/* ═══ کارت‌های منابع (اسکرول داخلی) ═══ */}
-              <div style={{
-                maxHeight: 280,
-                overflowY: 'auto',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 8,
-                paddingRight: 2,
-              }}>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', marginBottom: 8, padding: '4px 8px', background: 'var(--warn-soft)', borderRadius: 'var(--r-sm)' }}>
+                ℹ️ این گله از ادغام {toFa(sourceItems.length + 1)} گله ساخته شده. برای بازگردانی یکی را انتخاب کنید:
+              </div>
+
+              <div style={{ maxHeight: 280, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8, paddingRight: 2 }}>
                 {sortedSources.map(src => {
                   const isSelected = src.flockId === effectiveSelectedId;
-                  const unknown = src.unknownCount || 0;
                   const c = src.count || 0;
                   const m = src.maleCount || 0;
                   const f = src.femaleCount || 0;
                   const u = src.unknownCount || 0;
-                  const genderStatus = c === 0
-                    ? '—'
-                    : (m === 0 && f === 0 && u === c)
-                      ? 'همه نامشخص'
-                      : (u === 0 && (m + f === c))
-                        ? 'تفکیک‌شده'
-                        : 'ترکیبی';
+                  const genderStatus = c === 0 ? '—'
+                    : (m === 0 && f === 0 && u === c) ? 'همه نامشخص'
+                    : (u === 0 && (m + f === c)) ? 'تفکیک‌شده'
+                    : 'ترکیبی';
                   return (
                     <div
                       key={src.flockId}
@@ -294,18 +264,8 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
                           style={{ accentColor: 'var(--accent)', flexShrink: 0 }}
                         />
                         <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', flex: 1 }}>{src.flockName}</span>
-                        <span style={{
-                          fontSize: 'var(--fs-2xs)',
-                          color: 'var(--muted)',
-                          background: 'var(--bg)',
-                          border: '1px solid var(--border)',
-                          padding: '1px 6px',
-                          borderRadius: 4,
-                          fontWeight: 600,
-                        }}>قبل از ادغام</span>
-                        {isSelected && (
-                          <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--accent)', fontWeight: 700 }}>انتخاب‌شده</span>
-                        )}
+                        <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', background: 'var(--bg)', border: '1px solid var(--border)', padding: '1px 6px', borderRadius: 4, fontWeight: 600 }}>قبل از ادغام</span>
+                        {isSelected && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--accent)', fontWeight: 700 }}>انتخاب‌شده</span>}
                       </div>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 12 }}>
                         {cell('تعداد', `${fmtInt(src.count)} پرنده`)}
@@ -315,53 +275,32 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
                         {cell('نر', fmtInt(src.maleCount))}
                         {cell('ماده', fmtInt(src.femaleCount))}
                         <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'flex-end', paddingTop: 4 }}>
-                          <span style={{
-                            fontSize: 'var(--fs-2xs)',
-                            color: 'var(--muted)',
-                            background: 'var(--bg)',
-                            border: '1px solid var(--border)',
-                            padding: '1px 6px',
-                            borderRadius: 4,
-                            fontWeight: 600,
-                          }}>{genderStatus}</span>
+                          <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', background: 'var(--bg)', border: '1px solid var(--border)', padding: '1px 6px', borderRadius: 4, fontWeight: 600 }}>{genderStatus}</span>
                         </div>
                       </div>
                     </div>
                   );
                 })}
               </div>
-
-              {/* ═══ پیش‌بینی ═══ */}
-              {prediction && (
-                <div style={{
-                  marginTop: 10,
-                  padding: 'var(--pad-normal)',
-                  background: 'var(--accent-soft)',
-                  border: '1px solid var(--accent-border)',
-                  borderRadius: 'var(--r-md)',
-                  fontSize: 'var(--fs-xs)',
-                }}>
-                  <div style={{ fontWeight: 700, color: 'var(--accent)', marginBottom: 4 }}>
-                    📊 پیش‌بینی بازگردانی:
-                  </div>
-                  <div style={{ color: 'var(--text)', lineHeight: 1.7 }}>
-                    • <b>{selectedSrc?.flockName}</b> ← فعال با <b>{fmtInt(prediction.sourceAfter)}</b> پرنده
-                    <br />
-                    • <b>{targetItem?.flockName}</b> ← <b>{fmtInt(prediction.targetAfter)}</b> پرنده ({fmtInt(targetItem?.count)} − {fmtInt(prediction.sourceAfter)})
-                    {prediction.remainingSources > 0 && (
-                      <>
-                        <br />
-                        <span style={{ color: 'var(--muted)' }}>
-                          • {toFa(prediction.remainingSources)} منبع دیگر همچنان در گله اصلی باقی می‌ماند
-                        </span>
-                      </>
-                    )}
-                  </div>
-                </div>
-              )}
-            </>
+            </div>
           )}
-        </>
+
+          {/* ═══ بخش ۳: پیش‌بینی ═══ */}
+          {prediction && (
+            <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)' }}>
+              <div style={{ fontWeight: 700, color: 'var(--accent)', marginBottom: 4 }}>📊 پیش‌بینی بازگردانی:</div>
+              <div style={{ color: 'var(--text)', lineHeight: 1.7 }}>
+                • <b>{selectedSrc?.flockName}</b> ← فعال با <b>{fmtInt(prediction.sourceAfter)}</b> پرنده
+                <br />
+                • <b>{targetItem?.flockName}</b> ← <b>{fmtInt(prediction.targetAfter)}</b> پرنده ({fmtInt(targetItem?.count)} − {fmtInt(prediction.sourceAfter)})
+                {prediction.remainingSources > 0 && (
+                  <><br /><span style={{ color: 'var(--muted)' }}>• {toFa(prediction.remainingSources)} منبع دیگر همچنان در گله اصلی باقی می‌ماند</span></>
+                )}
+              </div>
+            </div>
+          )}
+
+        </div>
       )}
     </Modal>
   );
