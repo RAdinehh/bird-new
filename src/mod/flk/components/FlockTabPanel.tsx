@@ -284,12 +284,11 @@ export default function FlockTabPanel({
     ] : [],
   });
 
-  const handleMergeConfirm = (targetId: string, sourceIds: string[]) => {
+  const handleMergeGroup = (targetId: string, sourceIds: string[]) => {
     const target = flocks.find(f => f.id === targetId);
     if (!target) return;
     const targetAgeDays = getAgeDays(target);
-    const sources = sourceIds;
-    for (const sourceId of sources) {
+    for (const sourceId of sourceIds) {
       const source = flocks.find(f => f.id === sourceId);
       if (!source) continue;
       mergeFlocks(targetId, sourceId, {
@@ -298,10 +297,10 @@ export default function FlockTabPanel({
         hatchDate: source.hatchDate || target.hatchDate,
       });
     }
-    const skipped = mergeIds.length - sourceIds.length - 1;
-    const msg = `${sources.length + 1} گله ادغام شد` + (skipped > 0 ? ` (${skipped} ناسازگار کنار)` : '');
-    toastMsg.success(msg);
-    logAction('update', 'flk', 'ادغام ' + (sources.length + 1) + ' گله در «' + target.name + '»' + (skipped > 0 ? ` — ${skipped} ناسازگار skip` : ''));
+    logAction('update', 'flk', `ادغام ${sourceIds.length + 1} گله در «${target.name}»`);
+  };
+
+  const handleMergeClose = () => {
     setMergeModalOpen(false);
     setMergeIds([]);
     ms.exitSelection();
@@ -494,9 +493,9 @@ export default function FlockTabPanel({
       <MultiSelectBar ms={ms} deleteLabel="حذف" archiveLabel={tab === 'archived' ? 'بازگردانی' : 'آرشیو'} />
       <MergeFlocksModal
         open={mergeModalOpen}
-        onClose={() => { setMergeModalOpen(false); setMergeIds([]); }}
+        onClose={handleMergeClose}
         flockIds={mergeIds}
-        onConfirm={handleMergeConfirm}
+        onMergeGroup={handleMergeGroup}
       />
       {groupFlockId && (() => {
         const target = flocks.find(f => f.id === groupFlockId);
