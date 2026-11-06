@@ -9,6 +9,7 @@ import { formatQty } from '../../../shr/utils/fa';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { DEATH_CAUSES } from '../store';
 import { useWhs } from '../../whs/store';
+import { useFlk } from '../../flk/store';
 import type { F } from '../types';
 import { FieldHint } from '../../../shr/intelligence';
 
@@ -25,6 +26,8 @@ interface Props {
 
 export default function HealthSection({ form, setForm, vErrors, flockAliveCount, vaccineEnabled, medicineEnabled, showError, markTouched }: Props) {
   const { items: whsItems } = useWhs();
+  const flock = useFlk(s => s.flocks.find(f => f.id === form.flockId));
+  const isSexed = !!flock?.genderSplitAt;
   const vaccineItems = useMemo(() => whsItems.filter(x => x.category === 'vaccine'), [whsItems]);
   const medicineItems = useMemo(() => whsItems.filter(x => x.category === 'medicine' || x.category === 'herbal'), [whsItems]);
 
@@ -65,6 +68,15 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
               </Select>
             </Field>
           </Grid2>
+          {isSexed && (
+            <Field label="جنسیت تلفات">
+              <Select value={d.sex || 'unknown'} onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, sex: e.target.value as 'male' | 'female' | 'unknown' } : x) }))}>
+                <option value="male">نر</option>
+                <option value="female">ماده</option>
+                <option value="unknown">نامشخص</option>
+              </Select>
+            </Field>
+          )}
           <Field label="توضیحات">
             <Textarea rows={2} placeholder="جزئیات..." value={d.notes || ''}
               onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, notes: e.target.value } : x) }))} />

@@ -10,6 +10,8 @@ export interface Death {
   count: number;
   cause: string;
   notes: string;
+  /** 🆕 جنسیت تلفات — undefined = unknown (قبل از تفکیک) */
+  sex?: 'male' | 'female' | 'unknown';
 }
 
 export type LogStatus = 'active' | 'archived';
