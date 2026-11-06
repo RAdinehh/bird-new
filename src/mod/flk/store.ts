@@ -119,6 +119,7 @@ export interface State {
   recordSexing: (flockId: string, params: {
     male: number;
     female: number;
+    unknown: number;
     date: string;
     note?: string;
   }) => void;
@@ -327,10 +328,11 @@ export const useFlk = create<State>()(
 
         const newMale = Math.max(0, Math.floor(Number(params.male) || 0));
         const newFemale = Math.max(0, Math.floor(Number(params.female) || 0));
-        const newUnknown = Math.max(0, currentCount - newMale - newFemale);
+        const newUnknown = Math.max(0, Math.floor(Number(params.unknown) || 0));
+        const total = newMale + newFemale + newUnknown;
 
-        if (newMale + newFemale > currentCount) {
-          throw new Error(`جمع نر (${newMale}) و ماده (${newFemale}) بیشتر از تعداد زنده (${currentCount}) است`);
+        if (total !== currentCount) {
+          throw new Error(`جمع (${newMale} + ${newFemale} + ${newUnknown} = ${total}) باید برابر تعداد زنده (${currentCount}) باشد — اختلاف: ${total - currentCount}`);
         }
         if (newMale + newFemale === 0) {
           throw new Error('حداقل یکی از نر یا ماده باید بیشتر از صفر باشد');

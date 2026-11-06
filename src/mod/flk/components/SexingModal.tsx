@@ -1,5 +1,7 @@
 /**
  * SexingModal — تفکیک جنسیت گله (اولین یا بازشماری)
+ * فیلدهای نر، ماده، نامشخص همه editable.
+ * Invariant: male + female + unknown === currentCount
  */
 import { useState, useEffect } from 'react';
 import { Modal, Btn, BtnRow, Field, Grid2, NumField, Input } from '../../../shr/components/ui';
@@ -16,7 +18,6 @@ interface Props {
   flock: Flock | null;
 }
 
-// تاریخ شمسی امروز — inline (بدون وابستگی)
 function todayJalali(): string {
   try {
     const d = new Date();
@@ -41,6 +42,7 @@ export default function SexingModal({ open, onClose, flock }: Props) {
 
   const [maleStr, setMaleStr] = useState('');
   const [femaleStr, setFemaleStr] = useState('');
+  const [unknownStr, setUnknownStr] = useState('');
   const [date, setDate] = useState(todayJalali());
   const [note, setNote] = useState('');
   const [err, setErr] = useState('');
@@ -48,15 +50,17 @@ export default function SexingModal({ open, onClose, flock }: Props) {
   const currentCount = flock?.currentCount ?? 0;
   const maleNum = toEnNum(maleStr);
   const femaleNum = toEnNum(femaleStr);
-  const totalInput = maleNum + femaleNum;
-  const unknownNum = Math.max(0, currentCount - totalInput);
-  const overLimit = totalInput > currentCount;
-  const noInput = totalInput === 0;
+  const unknownNum = toEnNum(unknownStr);
+  const totalInput = maleNum + femaleNum + unknownNum;
+  const diff = totalInput - currentCount;
+  const mismatch = diff !== 0;
+  const noInput = maleNum + femaleNum === 0;
 
   useEffect(() => {
     if (open && flock) {
       setMaleStr(String(flock.maleCount ?? 0));
       setFemaleStr(String(flock.femaleCount ?? 0));
+      setUnknownStr(String(flock.unknownCount ?? 0));
       setDate(todayJalali());
       setNote('');
       setErr('');
@@ -66,12 +70,16 @@ export default function SexingModal({ open, onClose, flock }: Props) {
 
   const handleSave = () => {
     if (!flock) return;
-    if (overLimit) { setErr('جمع نر و ماده بیشتر از تعداد زنده است'); return; }
+    if (mismatch) {
+      setErr(`جمع (${totalInput}) با تعداد زنده (${currentCount}) برابر نیست — اختلاف: ${diff}`);
+      return;
+    }
     if (noInput) { setErr('حداقل یکی از نر یا ماده باید بیشتر از صفر باشد'); return; }
     try {
       recordSexing(flock.id, {
         male: maleNum,
         female: femaleNum,
+        unknown: unknownNum,
         date: date || todayJalali(),
         note: note.trim() || undefined,
       });
@@ -95,7 +103,7 @@ export default function SexingModal({ open, onClose, flock }: Props) {
       size="md"
       footer={
         <BtnRow>
-          <Btn variant="primary" onClick={handleSave} disabled={overLimit || noInput}>
+          <Btn variant="primary" onClick={handleSave} disabled={mismatch || noInput}>
             ✓ ثبت تفکیک
           </Btn>
           <Btn onClick={onClose}>انصراف</Btn>
@@ -138,25 +146,32 @@ export default function SexingModal({ open, onClose, flock }: Props) {
         </Field>
       </Grid2>
 
-      <div style={{ marginTop: 8, marginBottom: 8 }}>
-        <Field label="تعداد نامشخص (خودکار)">
+      <Grid2>
+        <Field label="تعداد نامشخص">
+          <NumField
+            value={unknownStr}
+            onChange={e => setUnknownStr(e.target.value)}
+            placeholder="۰"
+            unit="پرنده"
+          />
+        </Field>
+        <Field label="جمع کل">
           <div style={{
             padding: '10px 12px',
-            background: overLimit ? 'var(--danger-soft)' : unknownNum > 0 ? 'var(--warn-soft)' : 'var(--input-bg)',
-            border: `1px solid ${overLimit ? 'var(--danger)' : unknownNum > 0 ? 'var(--warn)' : 'var(--border)'}`,
+            background: mismatch ? 'var(--danger-soft)' : 'var(--accent-soft)',
+            border: `1px solid ${mismatch ? 'var(--danger)' : 'var(--accent-border)'}`,
             borderRadius: 'var(--r-md)',
             fontSize: 'var(--fs-sm)',
-            fontWeight: 600,
-            color: overLimit ? 'var(--danger)' : unknownNum > 0 ? 'var(--warn)' : 'var(--muted)',
+            fontWeight: 700,
+            color: mismatch ? 'var(--danger)' : 'var(--accent)',
+            textAlign: 'center',
           }}>
-            {overLimit
-              ? `⚠️ ${toFa((totalInput - currentCount).toLocaleString('fa-IR'))} بیشتر از تعداد زنده`
-              : unknownNum === 0
-                ? '✓ همه تفکیک شدند'
-                : `${toFa(unknownNum.toLocaleString('fa-IR'))} پرنده`}
+            {mismatch
+              ? `${toFa(totalInput.toLocaleString('fa-IR'))} / ${toFa(currentCount.toLocaleString('fa-IR'))}`
+              : `✓ ${toFa(totalInput.toLocaleString('fa-IR'))} = ${toFa(currentCount.toLocaleString('fa-IR'))}`}
           </div>
         </Field>
-      </div>
+      </Grid2>
 
       <Field label="تاریخ تفکیک">
         <DatePicker value={date} onChange={setDate} />
