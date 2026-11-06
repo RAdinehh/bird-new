@@ -5,7 +5,8 @@
  */
 import { useEffect, useState, useMemo, type ReactNode } from 'react';
 import { Modal, Btn, BtnRow, Field, Grid2, Select } from '../../../shr/components/ui';
-import type { Flock, FlockEvent, FlockEventType, FlockEventReasonCode } from '../store';
+import type { Flock, FlockEvent, FlockEventType, FlockEventReasonCode, FlockSexBalanceEvent } from '../store';
+import { SEX_AUDIT_META, formatSexDelta } from '../helpers-audit';
 import { useFlk } from '../store';
 import { todayJ } from '../api/flocksCalc';
 import { showConfirmAsync } from '../../../cor/store/dialog';
@@ -37,6 +38,7 @@ interface Props {
 
 export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
+  const [showAudit, setShowAudit] = useState(false);
   const [dlgDeaths, setDlgDeaths] = useState<number>(0);
 
   useEffect(() => {
@@ -101,6 +103,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   const losses = Math.max(0, initial - current);
   const lossesPct = initial > 0 ? (losses / initial) * 100 : 0;
   const totalCount = flock.events?.length || 0;
+  const auditCount = flock.sexBalanceEvents?.length || 0;
 
   const typeCounts = useMemo(() => {
     const m = new Map<FlockEventType, number>();
@@ -207,7 +210,15 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
         </div>
       )}
 
-      {totalCount > 0 && (
+      {(totalCount > 0 || auditCount > 0) && (
+        <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+          <Chip active={!showAudit} onClick={() => setShowAudit(false)}>📜 رویدادها ({toFa(totalCount)})</Chip>
+          {auditCount > 0 && (
+            <Chip active={showAudit} onClick={() => setShowAudit(true)}>📊 تاریخچه جنسیت ({toFa(auditCount)})</Chip>
+          )}
+        </div>
+      )}
+      {!showAudit && totalCount > 0 && (
         <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
           <Chip active={filter === 'all'} onClick={() => setFilter('all')}>همه ({toFa(totalCount)})</Chip>
           {(['death', 'sell', 'correction'] as FlockEventType[]).map(t => {
@@ -218,7 +229,20 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
         </div>
       )}
 
-      {groups.length === 0 ? (
+      {showAudit ? (
+        auditCount === 0 ? (
+          <div style={{ padding: 'var(--sp-8)', textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>
+            <div style={{ fontSize: 40, marginBottom: 8 }}>📊</div>
+            <div>هنوز تغییر جنسیتی ثبت نشده</div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {(flock.sexBalanceEvents || []).slice().sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || '')).map(ev => (
+              <AuditRow key={ev.id} ev={ev} />
+            ))}
+          </div>
+        )
+      ) : groups.length === 0 ? (
         <div style={{ padding: 'var(--sp-8)', textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>
           <div style={{ fontSize: 40, marginBottom: 8 }}>📜</div>
           <div>هنوز رویدادی ثبت نشده</div>
@@ -237,6 +261,29 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
       )}
       <BtnRow><Btn variant="primary" onClick={onClose}>بستن</Btn></BtnRow>
     </Modal>
+  );
+}
+
+function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
+  const meta = SEX_AUDIT_META[ev.type] || { icon: '•', label: ev.type, tone: 'var(--muted)' };
+  const delta = formatSexDelta(ev.delta);
+  return (
+    <div style={{ display: 'flex', gap: 8, padding: '6px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)', fontSize: 'var(--fs-xs)' }}>
+      <span style={{ fontSize: 16, flexShrink: 0 }}>{meta.icon}</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 6 }}>
+          <b style={{ color: meta.tone }}>{meta.label}</b>
+          <span style={{ color: 'var(--muted)', fontSize: 10 }}>{toFa(ev.date)}</span>
+        </div>
+        <div dir="ltr" style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 2, fontFamily: 'monospace', fontSize: 11 }}>
+          <span>{toFa(ev.before.male)}/{toFa(ev.before.female)}/{toFa(ev.before.unknown)}</span>
+          <span style={{ color: 'var(--muted)' }}>→</span>
+          <span>{toFa(ev.after.male)}/{toFa(ev.after.female)}/{toFa(ev.after.unknown)}</span>
+          {delta && <span style={{ color: meta.tone, fontWeight: 600 }}>({delta})</span>}
+        </div>
+        {ev.note && <div style={{ color: 'var(--muted)', fontSize: 10, marginTop: 2 }}>{ev.note}</div>}
+      </div>
+    </div>
   );
 }
 
