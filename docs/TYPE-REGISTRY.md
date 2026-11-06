@@ -23,7 +23,7 @@
 | **doc** | `DocFile` · `DocCategory` | `@mod/doc/store` |
 | **egg** | `EggType` · `EggProduction` · `EggStock` · `EggSale` | `@mod/egg/store` |
 | **fed** | `IngredientCategory` · `Ingredient` · `Requirement` · `FormulaLine` · `Formula` | `@mod/fed/store` |
-| **flk** | `FlockType` · `FlockStatus` · `FlockEventType` · `FlockEventSex` · `FlockEvent` · `FlockMergeSource` · `FlockMergeInfo` · `FlockDealType` · `FlockDealData` · `FlockGroupType` · `FlockGroupRule` · `FlockGroup` · `FlockGroupMember` · `Flock` · `Lifecycle` | `@mod/flk/store` |
+| **flk** | `FlockType` · `FlockStatus` · `FlockEventType` · `FlockEventSex` · `FlockEvent` · `FlockSexingEvent` · `FlockSexBalanceEvent` · `FlockMergeSource` · `FlockMergeInfo` · `FlockDealType` · `FlockDealData` · `FlockGroupType` · `FlockGroupRule` · `FlockGroup` · `FlockGroupMember` · `Flock` · `Lifecycle` | `@mod/flk/store` |
 | **hal** | `HallSource` · `Hall` · `Zone` · `EquipmentKind` · `EquipmentStatus` · `EquipmentCategory` · `EquipmentUnit` · `Equipment` | `@mod/hal/store` |
 | **inc** | `DeviceMode` · `DeviceStatus` · `DealType` · `DealStatus` · `EntryStatus` · `MaintenanceLog` · `DeviceCapacity` · `DeviceReading` · `Device` · `HatchGroup` · `EggEntry` · `Candling` · `HatchResult` | `@mod/inc/store` |
 | **set** | `Settings` | `@mod/set/store` |

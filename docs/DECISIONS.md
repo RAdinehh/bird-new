@@ -367,3 +367,17 @@
 - سند: `docs/modules/validation-intelligence-map.md`
 
 *آخرین تصمیم: 1405/11/02*
+
+
+## جلسه ۱۴۰۵/۱۱/۰۶ (۸.۸) — verify و تصحیح تناقضات مستند↔کد
+
+**کشف:** verify عمیق فاز ۴b (۵ Batch کد + Docs) نشان داد کد شکسته است ولی سند می‌گوید ✅.
+
+**تصحیح شد:**
+- `CROSS-INTEGRATIONS.md`: `tra↔flk` از ✅ → 🚨 (کشف مسیر موازی `applyInvoiceFlocks` بدون `addEvent`)
+- `TYPE-REGISTRY.md`: افزودن `FlockSexingEvent` + `FlockSexBalanceEvent` (موجود در کد، گم‌شده در سند)
+- `HANDOFF-COMPLETE.md` (۸۱ بایت، خراب) → `_archive/HANDOFF-COMPLETE-BROKEN-1405-11-06.md`
+
+**درس:** «کد = حقیقت»، سند فقط فرضیه. verify قبل از هر patch.
+
+**باز:** فاز ۴b — سه باگ B1/B2/B3 در `applyInvoiceFlocks` + revoke logic در `updateInvoice`.

@@ -13,7 +13,11 @@
 ## ۳. flk ↔ set/standards — ✅
 ## ۴. tra ↔ ctc — ✅
 ## ۵. tra ↔ whs — ✅
-## ۶. tra ↔ flk — ✅
+## ۶. tra ↔ flk — 🚨 شکسته
+- **`applyInvoiceFlocks`** مسیر موازی (بدون `addEvent`) → `sexBalanceEvents` ثبت نمی‌شود
+- **`sex:'mixed'` هاردکد** در event فروش (دو مسیر: `invoiceHelpers.ts:648` + `store.ts:180` revoke)
+- **clamp بدون redistribution** در shortage جنسیتی → invariant `male+female+unknown===currentCount` نقض می‌شود
+- **وابسته:** فاز ۴b — سه باگ B1/B2/B3
 ## ۷. fed ↔ whs — 🚨 شکسته
 ## ۸. inc ↔ flk — ⚠️
 ## ۹. dlg ↔ flk — ⚠️
