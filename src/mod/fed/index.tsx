@@ -1,8 +1,9 @@
 /**
  * index.tsx — بخش fed
  */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCarousel } from '../../shr/hooks/useCarousel';
+import { useFed } from './store';
 import IngredientsPage from './IngredientsPage';
 import RequirementsPage from './RequirementsPage';
 import FormulasPage from './FormulasPage';
@@ -19,6 +20,13 @@ const TAB_IDS = ['ingredients', 'requirements', 'formulas'];
 
 export default function Fed() {
   const [tab, setTab] = useState<TabId>('ingredients');
+  const autoLinkAll = useFed(s => s.autoLinkAllIngredients);
+
+  useEffect(() => {
+    autoLinkAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const { containerRef, trackRef, setInstant } = useCarousel(
     TAB_IDS,
     tab,

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
+import { useWhs } from '../whs/store';
 
 export type IngredientCategory = 'energy' | 'protein' | 'mineral' | 'vitamin' | 'amino' | 'additive';
 
@@ -44,6 +45,58 @@ export interface Requirement {
   updatedAt: string;
 }
 
+/** نرمال‌سازی نام برای تطبیق (ذرت = ذرت، يك = یک) */
+function normalizeName(s: string): string {
+  return String(s || '').trim()
+    .replace(/ي/g, 'ی')
+    .replace(/ك/g, 'ک')
+    .replace(/\u200c/g, '')
+    .replace(/\s+/g, ' ')
+    .toLowerCase();
+}
+
+/** اتصال خودکار یک ماده اولیه به کالای انبار (پیدا کردن یا ساختن) */
+function autoLinkIngredient(ing: { name: string; category: string; price: number; stockItemId: string }): string {
+  if (ing.stockItemId) return ing.stockItemId;
+  try {
+    const whs = useWhs.getState();
+    const normalizedName = normalizeName(ing.name);
+    if (!normalizedName) return '';
+
+    // ۱. جستجو در کالاهای موجود انبار (feed یا concentrate)
+    const existing = whs.items.find(x =>
+      (x.category === 'feed' || (x as any).category === 'concentrate') &&
+      normalizeName(x.name) === normalizedName
+    );
+    if (existing) return existing.id;
+
+    // ۲. ساخت کالای جدید در انبار
+    const newId = whs.addItem({
+      name: ing.name.trim(),
+      category: 'feed',
+      unit: 'kg',
+      minStock: 0,
+      currentStock: 0,
+      lastPrice: ing.price || 0,
+      supplierId: '',
+      expireDate: '',
+      withdrawalDays: null,
+      storage: 'room',
+      notes: 'از جیره‌نویسی',
+      brand: '',
+      hallId: '',
+      equipmentStatus: '',
+      usageType: '',
+      purchaseDate: '',
+      purchasePrice: ing.price || 0,
+    } as any);
+    return newId || '';
+  } catch (e) {
+    console.error('[fed] autoLinkIngredient failed:', e);
+    return '';
+  }
+}
+
 export interface FormulaLine {
   id: string;
   ingredientId: string;
@@ -67,6 +120,7 @@ interface State {
   requirements: Requirement[];
   formulas: Formula[];
   addIngredient: (i: Omit<Ingredient, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  autoLinkAllIngredients: () => void;
   updateIngredient: (id: string, patch: Partial<Ingredient>) => void;
   deleteIngredient: (id: string) => void;
   dedupeCore: () => void;
@@ -87,7 +141,65 @@ export const useFed = create<State>()(
       requirements: [],
       formulas: [],
 
-      addIngredient: (i) => set({ ingredients: [...get().ingredients, { ...i, id: uuid(), createdAt: now(), updatedAt: now() }] }),
+      addIngredient: (i) => {
+        // 🆕 اتصال خودکار به کالای انبار (اگر stockItemId خالی بود)
+        const stockItemId = autoLinkIngredient({
+          name: i.name,
+          category: i.category,
+          price: i.price,
+          stockItemId: i.stockItemId || '',
+        });
+        set({
+          ingredients: [...get().ingredients, {
+            ...i,
+            stockItemId,
+            id: uuid(),
+            createdAt: now(),
+            updatedAt: now(),
+          }],
+        });
+      },
+      autoLinkAllIngredients: () => {
+        try {
+          const whs = useWhs.getState();
+          let linked = 0;
+          let created = 0;
+          const updated = get().ingredients.map(ing => {
+            if (ing.stockItemId) return ing;
+            const normalizedName = normalizeName(ing.name);
+            if (!normalizedName) return ing;
+
+            const existing = whs.items.find(x =>
+              (x.category === 'feed' || (x as any).category === 'concentrate') &&
+              normalizeName(x.name) === normalizedName
+            );
+
+            if (existing) {
+              linked++;
+              return { ...ing, stockItemId: existing.id, updatedAt: now() };
+            }
+
+            // اگر پیدا نشد، کالای جدید بساز
+            const newId = autoLinkIngredient({
+              name: ing.name,
+              category: ing.category,
+              price: ing.price,
+              stockItemId: '',
+            });
+            if (newId) {
+              created++;
+              return { ...ing, stockItemId: newId, updatedAt: now() };
+            }
+            return ing;
+          });
+          if (linked > 0 || created > 0) {
+            set({ ingredients: updated });
+            console.info(`[fed] auto-link: ${linked} linked, ${created} created`);
+          }
+        } catch (e) {
+          console.error('[fed] autoLinkAllIngredients failed:', e);
+        }
+      },
       updateIngredient: (id, patch) => set({ ingredients: get().ingredients.map(x => x.id === id ? { ...x, ...patch, updatedAt: now() } : x) }),
       dedupeCore: () => {
         const seen = new Set<string>();
