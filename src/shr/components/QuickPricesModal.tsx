@@ -7,9 +7,9 @@ import { toastMsg } from '../../cor/store/toast';
 /** تبدیل عدد لاتین به فرمت با جداکننده فارسی */
 function formatWithSep(val: string | number): string {
   if (val === '' || val === null || val === undefined) return '';
-  const num = Number(String(val).replace(/[^0-9]/g, ''));
-  if (isNaN(num) || num === 0) return '';
-  return num.toLocaleString('fa-IR');
+  const s = String(val).replace(/[^0-9]/g, '');
+  if (s === '') return '';
+  return Number(s).toLocaleString('fa-IR');
 }
 
 const ALL_FIELDS: Array<{
@@ -20,15 +20,15 @@ const ALL_FIELDS: Array<{
   kind?: string;
   hint: string;
 }> = [
-  { key: 'liveChicken', label: 'مرغ زنده', unit: 'تومان/کیلوگرم', icon: '🐔', kind: 'chicken', hint: 'قیمت روز مرغ زنده — به ازای هر کیلوگرم' },
-  { key: 'liveTurkey', label: 'بوقلمون زنده', unit: 'تومان/کیلوگرم', icon: '🦃', kind: 'turkey', hint: 'قیمت روز بوقلمون زنده — به ازای هر کیلوگرم' },
-  { key: 'liveGoose', label: 'غاز زنده', unit: 'تومان/کیلوگرم', icon: '🦢', kind: 'goose', hint: 'قیمت روز غاز زنده — به ازای هر کیلوگرم' },
-  { key: 'liveDuck', label: 'اردک زنده', unit: 'تومان/کیلوگرم', icon: '🦆', kind: 'duck', hint: 'قیمت روز اردک زنده — به ازای هر کیلوگرم' },
-  { key: 'liveQuail', label: 'بلدرچین زنده', unit: 'تومان/کیلوگرم', icon: '🐦', kind: 'quail', hint: 'قیمت روز بلدرچین زنده — به ازای هر کیلوگرم' },
-  { key: 'chickDay1', label: 'جوجه یک‌روزه', unit: 'تومان/عدد', icon: '🐣', hint: 'قیمت خرید جوجه یک‌روزه از هچری — به ازای هر عدد' },
-  { key: 'eggTable', label: 'تخم‌مرغ خوراکی', unit: 'تومان/عدد', icon: '🥚', hint: 'قیمت فروش تخم‌مرغ خوراکی در بازار — به ازای هر عدد' },
-  { key: 'eggFertile', label: 'تخم نطفه‌دار', unit: 'تومان/عدد', icon: '🥚', hint: 'قیمت تخم نطفه‌دار برای جوجه‌کشی — به ازای هر عدد' },
-  { key: 'culledBird', label: 'مرغ حذفی', unit: 'تومان/عدد', icon: '🐓', hint: 'قیمت فروش مرغ حذفی (پایان دوره) — به ازای هر عدد' },
+  { key: 'liveChicken', label: 'مرغ زنده', unit: 'تومان/کیلوگرم', icon: '🐔', kind: 'chicken', hint: 'قیمت روز (هر کیلو)' },
+  { key: 'liveTurkey', label: 'بوقلمون زنده', unit: 'تومان/کیلوگرم', icon: '🦃', kind: 'turkey', hint: 'قیمت روز (هر کیلو)' },
+  { key: 'liveGoose', label: 'غاز زنده', unit: 'تومان/کیلوگرم', icon: '🦢', kind: 'goose', hint: 'قیمت روز (هر کیلو)' },
+  { key: 'liveDuck', label: 'اردک زنده', unit: 'تومان/کیلوگرم', icon: '🦆', kind: 'duck', hint: 'قیمت روز (هر کیلو)' },
+  { key: 'liveQuail', label: 'بلدرچین زنده', unit: 'تومان/کیلوگرم', icon: '🐦', kind: 'quail', hint: 'قیمت روز (هر کیلو)' },
+  { key: 'chickDay1', label: 'جوجه یک‌روزه', unit: 'تومان/عدد', icon: '🐣', hint: 'قیمت خرید (هر عدد)' },
+  { key: 'eggTable', label: 'تخم‌مرغ خوراکی', unit: 'تومان/عدد', icon: '🥚', hint: 'قیمت فروش (هر عدد)' },
+  { key: 'eggFertile', label: 'تخم نطفه‌دار', unit: 'تومان/عدد', icon: '🥚', hint: 'قیمت نطفه‌دار (هر عدد)' },
+  { key: 'culledBird', label: 'مرغ حذفی', unit: 'تومان/عدد', icon: '🐓', hint: 'قیمت حذفی (هر عدد)' },
 ];
 
 interface Props {
