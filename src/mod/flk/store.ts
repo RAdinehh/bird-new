@@ -461,7 +461,18 @@ export const useFlk = create<State>()(
             : f
         )
       }),
-      mergeFlocks: (targetId, sourceId, opts) => set({
+      mergeFlocks: (targetId, sourceId, opts) => {
+      const _st = get();
+      const _t = _st.flocks.find(f => f.id === targetId);
+      const _s = _st.flocks.find(f => f.id === sourceId);
+      if (!_t || !_s) throw new Error('گله پیدا نشد');
+      if ((_t as any).birdKind && (_s as any).birdKind && (_t as any).birdKind !== (_s as any).birdKind) {
+        throw new Error('پرنده متفاوت است — ' + (_t as any).birdKind + ' و ' + (_s as any).birdKind);
+      }
+      if (_t.type !== _s.type) {
+        throw new Error('نوع گله متفاوت — ' + _t.type + ' و ' + _s.type);
+      }
+      set({
         flocks: get().flocks.map(f => {
           if (f.id === sourceId) {
             return {
@@ -520,7 +531,8 @@ export const useFlk = create<State>()(
             updatedAt: now(),
           };
         }),
-      }),
+      });
+      },
       unmergeFlocks: (targetId: string, sourceId?: string) => {
         const state = get();
         const target = state.flocks.find(f => f.id === targetId);

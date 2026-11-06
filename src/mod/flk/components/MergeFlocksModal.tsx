@@ -3,6 +3,8 @@
  */
 import { useMemo, useState } from 'react';
 import { Modal, Btn, BtnRow } from '../../../shr/components/ui';
+import { toastMsg } from '../../../cor/store/toast';
+import { showConfirmAsync } from '../../../cor/store/dialog';
 import { useFlk, getAgeDays, type Flock } from '../store';
 import { toFa } from '../../../shr/utils/fa';
 
@@ -79,7 +81,25 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onConfirm }:
       )}
 
       <BtnRow>
-        <Btn variant="primary" onClick={() => onConfirm(targetId)} disabled={!targetId}>
+        <Btn variant="primary" onClick={async () => {
+          if (!target) return;
+          for (const src of others) {
+            if ((src as any).birdKind && (target as any).birdKind && (src as any).birdKind !== (target as any).birdKind) {
+              toastMsg.error('پرنده گله «' + src.name + '» متفاوت است');
+              return;
+            }
+            if (src.type !== target.type) {
+              toastMsg.error('نوع گله «' + src.name + '» متفاوت است');
+              return;
+            }
+          }
+          const ok = await showConfirmAsync(
+            'تأیید ادغام',
+            others.length + ' گله در «' + target.name + '» ادغام می‌شود. با unmerge قابل بازگشت است.',
+            { confirmText: 'ادغام' }
+          );
+          if (ok) onConfirm(targetId);
+        }} disabled={!targetId}>
           🔗 ادغام {toFa(others.length + 1)} گله
         </Btn>
         <Btn onClick={onClose}>لغو</Btn>
