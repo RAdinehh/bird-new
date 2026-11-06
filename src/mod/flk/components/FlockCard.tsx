@@ -91,6 +91,8 @@ export default function FlockCard(props: FlockCardProps) {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [unmergeOpen, setUnmergeOpen] = useState(false);
 
+  const isMerged = f.status === 'merged' || (f.mergedInfo?.sources?.length || 0) >= 2;
+
   const handleEditGuard = async () => {
     if (f.status === 'merged') {
       const ok = await showConfirmAsync(
@@ -531,7 +533,7 @@ export default function FlockCard(props: FlockCardProps) {
       ) : (
         <>
           <CardActions actions={[
-            { label: 'ویرایش', onClick: handleEditGuard, variant: 'outline', hidden: f.status === 'merged' || f.mergedInto !== undefined },
+            { label: 'ویرایش', onClick: handleEditGuard, variant: 'outline', hidden: isMerged },
             { label: '📜 تاریخچه', onClick: () => setHistoryOpen(true), variant: 'outline' },
             { label: '📁 گروه‌ها', onClick: onOpenGroups, variant: 'outline' },
             { label: f.hidden ? '👁 نمایان' : '👁 پنهان', onClick: onToggleHidden, variant: 'outline' },
