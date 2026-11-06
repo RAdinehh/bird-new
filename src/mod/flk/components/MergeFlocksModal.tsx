@@ -88,7 +88,6 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onMergeGroup
   }, [candidates, breedKindMap]);
 
   const multiGroups = groups.filter(g => g.flocks.length >= 2);
-  const singles = groups.filter(g => g.flocks.length === 1);
 
   const isGroupEnabled = (key: string): boolean => groupEnabled.get(key) ?? true;
 
@@ -261,22 +260,11 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onMergeGroup
         );
       })}
 
-      {singles.length > 0 && (
-        <div style={{ marginTop: 12, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-md)', opacity: 0.7 }}>
-          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', marginBottom: 6 }}>
-            گله‌های تنها (بدون ادغام)
-          </div>
-          {singles.map(g => (
-            <div key={g.key} style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '2px 0' }}>
-              • {g.flocks[0].name} — {toFa(g.flocks[0].currentCount || 0)} پرنده
-            </div>
-          ))}
-        </div>
-      )}
-
       {multiGroups.length === 0 && (
-        <div style={{ padding: 'var(--pad-normal)', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--danger)', textAlign: 'center', marginTop: 12 }}>
-          ⚠️ هیچ گروه قابل ادغامی نیست — برای ادغام، حداقل ۲ گله از یک پرنده و نوع لازم است.
+        <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--warn)', textAlign: 'center', marginTop: 12 }}>
+          {showAll
+            ? '⚠️ هیچ گروهی با ۲ گله یا بیشتر وجود ندارد — ادغام ممکن نیست.'
+            : 'ℹ️ برای ادغام، حداقل ۲ گله از یک پرنده و نوع انتخاب کنید.'}
         </div>
       )}
     </Modal>
