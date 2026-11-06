@@ -71,8 +71,9 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onConfirm }:
                 alignItems: 'center',
                 gap: 'var(--sp-2)',
                 padding: 'var(--pad-normal)',
-                background: isTarget ? 'var(--accent-soft)' : _inc ? 'var(--danger-soft)' : 'var(--input-bg)',
-                border: '1px solid ' + (isTarget ? 'var(--accent)' : _inc ? 'var(--danger)' : 'var(--border)'),
+                background: isTarget ? 'var(--accent-soft)' : 'var(--input-bg)',
+                opacity: _inc ? 0.55 : 1,
+                border: '1px solid ' + (isTarget ? 'var(--accent)' : 'var(--border)'),
                 borderRadius: 'var(--r-md)',
                 cursor: _inc ? 'not-allowed' : 'pointer',
               }}
@@ -90,7 +91,7 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onConfirm }:
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
                   {toFa(f.currentCount || 0)} پرنده · {toFa(age)} روز · {f.type === 'layer' ? 'تخم‌گذار' : f.type === 'broiler' ? 'گوشتی' : 'مادر'}
                 </div>
-                  {_inc && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 600, marginTop: 4 }}>⚠️ {_inc}</div>}
+                  {_inc && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 500, marginTop: 4 }}>ⓘ {_inc}</div>}
               </div>
               {isTarget && <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>هدف</span>}
             </label>
@@ -99,10 +100,10 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onConfirm }:
       </div>
 
       {hasIncompat && (
-        <div style={{ marginTop: 12, padding: 'var(--pad-normal)', background: compatibleCount === 0 ? 'var(--danger-soft)' : 'var(--warn-soft)', border: '1px solid ' + (compatibleCount === 0 ? 'var(--danger)' : 'var(--warn)'), borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: compatibleCount === 0 ? 'var(--danger)' : 'var(--warn)' }}>
+        <div style={{ marginTop: 12, padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
           {compatibleCount === 0
-            ? '⚠️ هیچ گله سازگاری نیست — همه متفاوت با هدف هستند.'
-            : '⚠️ ' + toFa(incompatMap.size) + ' گله ناسازگار از ادغام کنار گذاشته می‌شود.'}
+            ? 'هیچ گله سازگاری نیست — همه متفاوت با هدف هستند.'
+            : toFa(incompatMap.size) + ' گله ناسازگار از ادغام کنار گذاشته می‌شود.'}
         </div>
       )}
       {!hasIncompat && target && others.length > 0 && (
