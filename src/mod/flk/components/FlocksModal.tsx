@@ -386,7 +386,7 @@ export default function FlocksModal(props: FlocksModalProps) {
         <DepBox title="اطلاعات گله مادر">
           <Grid3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-              <Field label="تعداد خروس">
+              <Field label="تعداد نر">
                 <NumField placeholder="۸۰" value={form.maleCount} onChange={e => {
                   const maleRaw = parseInt(toEn(e.target.value || '0')) || 0;
                   const female = parseInt(toEn(form.femaleCount || '0')) || 0;
@@ -402,7 +402,7 @@ export default function FlocksModal(props: FlocksModalProps) {
               {!showError('maleCount') && <FieldHint fieldPath="flk.maleCount" value={form.maleCount} context={{ initialCount: form.initialCount }} />}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-              <Field label="تعداد مرغ" error={showError('femaleCount')} onTouch={() => markTouched('femaleCount')}>
+              <Field label="تعداد ماده" error={showError('femaleCount')} onTouch={() => markTouched('femaleCount')}>
                 <NumField placeholder="۸۰۰" value={form.femaleCount} onChange={e => {
                   const femaleRaw = parseInt(toEn(e.target.value || '0')) || 0;
                   const male = parseInt(toEn(form.maleCount || '0')) || 0;
@@ -435,7 +435,7 @@ export default function FlocksModal(props: FlocksModalProps) {
             return (
               <>
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
-                  نسبت خروس به مرغ: {sexRatio(male, female)}
+                  نسبت نر به ماده: {sexRatio(male, female)}
                 </div>
               </>
             );
