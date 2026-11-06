@@ -109,7 +109,8 @@ export function useDlgSave(params: UseDlgSaveParams) {
           quantity: d.quantity, unitPrice: 0, reason: 'consumption',
           date: form.date, partyId: '',
           notes: d.notes,
-        });
+          flockId: form.flockId || undefined,
+        } as any);
         if (mid) newMovementIds.push(mid);
       });
     }
@@ -129,13 +130,13 @@ export function useDlgSave(params: UseDlgSaveParams) {
     const processedVaccines = form.vaccines.map(v => {
       const d = buildVaccineMovement(v);
       if (!d) return { ...v, movementId: '' };
-      const mid = addMovement({ ...d, type: 'out', unitPrice: 0, reason: 'consumption', date: form.date, partyId: '' });
+      const mid = addMovement({ ...d, type: 'out', unitPrice: 0, reason: 'consumption', date: form.date, partyId: '', flockId: form.flockId || undefined } as any);
       return { ...v, movementId: mid || '' };
     });
     const processedMedications = form.medications.map(m => {
       const d = buildMedicationMovement(m);
       if (!d) return { ...m, movementId: '' };
-      const mid = addMovement({ ...d, type: 'out', unitPrice: 0, reason: 'consumption', date: form.date, partyId: '' });
+      const mid = addMovement({ ...d, type: 'out', unitPrice: 0, reason: 'consumption', date: form.date, partyId: '', flockId: form.flockId || undefined } as any);
       return { ...m, movementId: mid || '' };
     });
 

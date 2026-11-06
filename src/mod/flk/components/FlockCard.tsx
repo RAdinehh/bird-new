@@ -12,7 +12,7 @@ import { toFa } from '../../../shr/utils/fa';
 import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import EntityLink from '../../../shr/components/EntityLink';
-import { Row, RowGrid } from '../helpers';
+import { Row, RowGrid, computeFlockConsumption } from '../helpers';
 import { useFlk, type FlockGroupType } from '../store';
 import { useTra } from '../../tra/store';
 import LifecycleBar from './LifecycleBar';
@@ -26,6 +26,7 @@ import type { useFormat } from '../../../shr/units';
 import type { MultiSelectState } from '../../../shr/multiSelect/useMultiSelect';
 import { CardActions } from '../../../shr/components/ui';
 import FlockValueSection from './FlockValueSection';
+import { useWhs } from '../../whs/store';
 
 type Fmt = ReturnType<typeof useFormat>;
 
@@ -86,6 +87,8 @@ export default function FlockCard(props: FlockCardProps) {
   const [historyOpen, setHistoryOpen] = useState(false);
 
   const getGroupsForFlock = useFlk(s => s.getGroupsForFlock);
+  const whsMovements = useWhs(s => s.movements);
+  const whsItems = useWhs(s => s.items);
   const flockGroups = getGroupsForFlock(f.id).slice().sort(
     (a, b) => (GROUP_PRIORITY[a.type] || 99) - (GROUP_PRIORITY[b.type] || 99)
   );
@@ -471,6 +474,23 @@ export default function FlockCard(props: FlockCardProps) {
       })()}
 
       <FlockValueSection flock={f} />
+
+      {(() => {
+        const cons = computeFlockConsumption(f.id, whsMovements, whsItems);
+        if (cons.totalCost === 0) return null;
+        return (
+          <>
+            <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🍽️ مصرف انبار</div>
+            <RowGrid>
+              {cons.feed.total > 0 && <Row l="دان" v={`${fmt.int(cons.feed.total)} kg • ${fmt.money(cons.feed.cost)}`} />}
+              {cons.medicine.total > 0 && <Row l="دارو" v={fmt.money(cons.medicine.cost)} />}
+              {cons.vaccine.total > 0 && <Row l="واکسن" v={fmt.money(cons.vaccine.cost)} />}
+              {cons.other.total > 0 && <Row l="سایر" v={fmt.money(cons.other.cost)} />}
+              <Row l="جمع مصرف" v={fmt.money(cons.totalCost)} accent />
+            </RowGrid>
+          </>
+        );
+      })()}
 
       {isArchived && f.archivedReason && (
         <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', color: 'var(--warn)' }}>
