@@ -50,14 +50,25 @@ export function registerFlkHandlers(): () => void {
           .filter((x: string) => x && x !== '—')
           .join('، ');
 
-        flkState.addEvent(flockId, {
-          date,
-          type: 'death',
-          count: delta,
-          sex: 'mixed',
-          reason: causes || undefined,
-          notes: 'ثبت روزانه',
-        });
+        // 🆕 Sex-aware: اگر non-edit و deaths دارای sex → چند رویداد
+        const _hasSex = !isEdit && deaths && (deaths as any[]).some((d: any) => d.sex);
+        if (_hasSex) {
+          const _bySex: Record<'male' | 'female' | 'unknown', number> = { male: 0, female: 0, unknown: 0 };
+          for (const _d of (deaths as any[])) {
+            const _s = ((_d.sex || 'unknown') as 'male' | 'female' | 'unknown');
+            _bySex[_s] += Number(_d.count) || 0;
+          }
+          const _sum = _bySex.male + _bySex.female + _bySex.unknown;
+          if (_sum === delta && (_bySex.male > 0 || _bySex.female > 0)) {
+            if (_bySex.male > 0) flkState.addEvent(flockId, { date, type: 'death', count: _bySex.male, sex: 'male', reason: causes || undefined, notes: 'ثبت روزانه (نر)' });
+            if (_bySex.female > 0) flkState.addEvent(flockId, { date, type: 'death', count: _bySex.female, sex: 'female', reason: causes || undefined, notes: 'ثبت روزانه (ماده)' });
+            if (_bySex.unknown > 0) flkState.addEvent(flockId, { date, type: 'death', count: _bySex.unknown, sex: 'mixed', reason: causes || undefined, notes: 'ثبت روزانه (نامشخص)' });
+          } else {
+            flkState.addEvent(flockId, { date, type: 'death', count: delta, sex: 'mixed', reason: causes || undefined, notes: 'ثبت روزانه' });
+          }
+        } else {
+          flkState.addEvent(flockId, { date, type: 'death', count: delta, sex: 'mixed', reason: causes || undefined, notes: 'ثبت روزانه' });
+        }
       }
 
       if (meta.traceId) {
