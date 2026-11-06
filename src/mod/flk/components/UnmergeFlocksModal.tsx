@@ -196,12 +196,18 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
                 </div>
               </div>
 
-              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', marginBottom: 8, padding: '4px 8px', background: 'var(--warn-soft)', borderRadius: 'var(--r-sm)', lineHeight: 1.7 }}>
-                ℹ️ <b>{toFa(sourceItems.length)} گله</b> در این گله ادغام شده‌اند. برای بازگردانی، یکی را انتخاب کنید:
+              <div style={{ marginBottom: 8, padding: 'var(--pad-normal)', background: 'var(--info-soft, rgba(2,132,199,.08))', border: '1px solid var(--info, #0284c7)', borderRadius: 'var(--r-md)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--info, #0284c7)', marginBottom: 4 }}>
+                  <span style={{ flexShrink: 0 }}>ℹ️</span>
+                  <span>این گله از ادغام {toFa(sourceItems.length)} گله ساخته شده است</span>
+                </div>
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.6 }}>
+                  برای جداسازی و بازگردانی، یکی از گله‌های زیر را انتخاب کنید.
+                </div>
               </div>
 
               <div style={{ maxHeight: 280, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8, paddingRight: 2 }}>
-                {sortedSources.map((src, idx) => {
+                {sortedSources.map((src) => {
                   const isSelected = src.flockId === effectiveSelectedId;
                   const c = src.count || 0;
                   const m = src.maleCount || 0;
@@ -232,7 +238,7 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
                           onClick={(e) => e.stopPropagation()}
                           style={{ accentColor: 'var(--accent)', flexShrink: 0 }}
                         />
-                        <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', flex: 1 }}>{toFa(idx + 1)}. {src.flockName}</span>
+                        <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', flex: 1 }}>{src.flockName}</span>
                         <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', background: 'var(--bg)', border: '1px solid var(--border)', padding: '1px 6px', borderRadius: 4, fontWeight: 600 }}>قبل از ادغام</span>
                         {isSelected && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--accent)', fontWeight: 700 }}>انتخاب‌شده</span>}
                       </div>
