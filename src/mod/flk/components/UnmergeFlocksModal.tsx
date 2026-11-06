@@ -171,7 +171,7 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
                 <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>🏠 گله اصلی (فعلی)</span>
                 <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--info, #0284c7)', background: 'var(--info-soft, rgba(2,132,199,.08))', padding: '1px 6px', borderRadius: 4, fontWeight: 600 }}>فعال</span>
               </div>
-              <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-md)', border: '1px solid var(--border)' }}>
+              <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
                 <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', marginBottom: 8 }}>{targetItem.flockName}</div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: 12 }}>
                   {cell('تعداد فعلی', `${fmtInt(targetItem.count)} پرنده`)}
@@ -189,20 +189,12 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
           {/* ═══ بخش ۲: منابع ═══ */}
           {sourceItems.length > 0 && (
             <div>
-              <div style={{ display: 'flex', alignItems: 'flex-end', marginBottom: 8, paddingBottom: 6, borderBottom: '1px solid var(--border)' }}>
-                <div>
-                  <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>📦 منابع ادغام‌شده</span>
-                  <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginRight: 6 }}>({toFa(sourceItems.length)} گله — مرتب بر اساس تعداد)</span>
-                </div>
-              </div>
-
-              <div style={{ marginBottom: 8, padding: 'var(--pad-normal)', background: 'var(--info-soft, rgba(2,132,199,.08))', border: '1px solid var(--info, #0284c7)', borderRadius: 'var(--r-md)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--info, #0284c7)', marginBottom: 4 }}>
-                  <span style={{ flexShrink: 0 }}>ℹ️</span>
-                  <span>این گله از ادغام {toFa(sourceItems.length)} گله ساخته شده است</span>
+              <div style={{ marginBottom: 8, paddingBottom: 6, borderBottom: '1px solid var(--border)' }}>
+                <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', marginBottom: 2 }}>
+                  📦 منابع ادغام‌شده ({toFa(sourceItems.length)} گله)
                 </div>
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.6 }}>
-                  برای جداسازی و بازگردانی، یکی از گله‌های زیر را انتخاب کنید.
+                  این گله از ادغام {toFa(sourceItems.length)} گله ساخته شده. برای بازگردانی یکی را انتخاب کنید.
                 </div>
               </div>
 
@@ -262,7 +254,7 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
 
           {/* ═══ بخش ۳: پیش‌بینی ═══ */}
           {prediction && (
-            <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)' }}>
+            <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)' }}>
               <div style={{ fontWeight: 700, color: 'var(--accent)', marginBottom: 4 }}>📊 پیش‌بینی بازگردانی:</div>
               <div style={{ color: 'var(--text)', lineHeight: 1.7 }}>
                 • <b>{selectedSrc?.flockName}</b> ← فعال با <b>{fmtInt(prediction.sourceAfter)}</b> پرنده
