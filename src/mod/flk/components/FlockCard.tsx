@@ -185,7 +185,7 @@ export default function FlockCard(props: FlockCardProps) {
             cursor: 'pointer', fontFamily: 'inherit', lineHeight: 1.6,
           }}
         >
-          🔗 بدون سند
+          بدون سند
         </button>
       ),
     });
