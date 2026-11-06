@@ -3,22 +3,14 @@ import { useFlockValue } from '../../../shr/hooks/useFlockValue';
 import QuickPricesModal from '../../../shr/components/QuickPricesModal';
 import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
 import { HELP } from '../../../shr/help/helpTexts';
-import { toFa } from '../../../shr/utils/fa';
+import { formatNumWhileTyping } from '../../../shr/utils/fa';
 import { Btn } from '../../../shr/components/ui';
+import { Row } from '../helpers';
 
 interface Props { flock: any; }
 
-const cellStyle = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'flex-start',
-  gap: 8,
-  fontSize: 'var(--fs-sm)',
-  padding: 'var(--pad-tight)',
-  background: 'var(--input-bg)',
-  borderRadius: 'var(--r-sm)',
-  minWidth: 0,
-} as const;
+const fmtInt = (n: number): string => formatNumWhileTyping(String(n)) || '۰';
+const fmtDec = (n: number, decimals = 2): string => formatNumWhileTyping(n.toFixed(decimals)) || '۰';
 
 export default function FlockValueSection({ flock }: Props) {
   const [pricesOpen, setPricesOpen] = useState(false);
@@ -28,12 +20,10 @@ export default function FlockValueSection({ flock }: Props) {
   const initialCount = Number(flock.initialCount) || 0;
   const currentCount = Number(flock.currentCount) || 0;
 
-  // 🆕 تلفات واقعی از events (نه از تفاضل!)
   const evDeaths = (flock.events || [])
     .filter((e: any) => e.type === 'death')
     .reduce((s: number, e: any) => s + (Number(e.count) || 0), 0);
 
-  // fallback: اگر events نداشت ولی initial > current
   const deaths = evDeaths > 0 ? evDeaths : Math.max(0, initialCount - currentCount);
   const deathsPct = initialCount > 0 ? (deaths / initialCount) * 100 : 0;
   const showDeaths = deaths > 0 && initialCount > 0;
@@ -66,19 +56,15 @@ export default function FlockValueSection({ flock }: Props) {
     </div>
   );
 
-  const priceCell = (
-    <div style={cellStyle}>
-      <span style={{ color: 'var(--muted)' }}>قیمت پایه:</span>
-      <b style={{ fontWeight: 700 }}>{toFa(result.pricePerKg.toLocaleString('fa-IR'))} ت/کیلو</b>
-    </div>
-  );
-
   if (result.value === 0) {
     return (
       <>
         {header}
-        <div style={{ ...cellStyle, flexDirection: 'column', alignItems: 'stretch', gap: 6 }}>
-          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{result.reason || 'نامشخص'}</span>
+        <Row
+          l="وضعیت"
+          v={<span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{result.reason || 'نامشخص'}</span>}
+        />
+        <div style={{ marginTop: 6 }}>
           <Btn size="sm" variant="outline" onClick={() => setPricesOpen(true)}>تنظیم قیمت‌ها</Btn>
         </div>
         <QuickPricesModal
@@ -94,28 +80,19 @@ export default function FlockValueSection({ flock }: Props) {
     <>
       {header}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-1)' }}>
-        <div style={cellStyle}>
-          <span style={{ color: 'var(--muted)' }}>وزن تخمینی:</span>
-          <b style={{ fontWeight: 700 }}>{(result.weightG! / 1000).toFixed(2)} کیلو</b>
-        </div>
-        {priceCell}
-        <div style={cellStyle}>
-          <span style={{ color: 'var(--muted)' }}>تعداد زنده:</span>
-          <b style={{ fontWeight: 700 }}>{toFa(currentCount.toLocaleString('fa-IR'))}</b>
-        </div>
-        {showDeaths && (
-          <div style={cellStyle}>
-            <span style={{ color: 'var(--muted)' }}>تلفات:</span>
-            <b style={{ fontWeight: 700, color: 'var(--danger)' }}>
-              {toFa(deaths.toLocaleString('fa-IR'))} ({toFa(deathsPct.toFixed(1))}٪)
-            </b>
-          </div>
+        <Row l="وزن تخمینی" v={`${fmtDec(result.weightG! / 1000)} کیلو`} />
+        <Row l="قیمت پایه" v={`${fmtInt(result.pricePerKg)} تومان/کیلو`} />
+        <Row l="تعداد زنده" v={fmtInt(currentCount)} />
+        {showDeaths ? (
+          <Row
+            l="تلفات"
+            v={<span style={{ color: 'var(--danger)' }}>{fmtInt(deaths)} ({fmtDec(deathsPct, 1)}٪)</span>}
+          />
+        ) : (
+          <Row l="تلفات" v="۰" />
         )}
-        <div style={{ ...cellStyle, gridColumn: '1 / -1', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)' }}>
-          <span style={{ fontWeight: 700 }}>ارزش بازار:</span>
-          <b style={{ fontWeight: 800, color: 'var(--accent)', fontSize: 'var(--fs-md)' }}>
-            {toFa(result.value.toLocaleString('fa-IR'))} ت
-          </b>
+        <div style={{ gridColumn: '1 / -1' }}>
+          <Row l="ارزش بازار" v={`${fmtInt(result.value)} تومان`} accent />
         </div>
       </div>
       <QuickPricesModal
