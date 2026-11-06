@@ -18,16 +18,17 @@ const ALL_FIELDS: Array<{
   unit: string;
   icon: string;
   kind?: string;
+  hint: string;
 }> = [
-  { key: 'liveChicken', label: 'مرغ زنده', unit: 'تومان/کیلوگرم', icon: '🐔', kind: 'chicken' },
-  { key: 'liveTurkey', label: 'بوقلمون زنده', unit: 'تومان/کیلوگرم', icon: '🦃', kind: 'turkey' },
-  { key: 'liveGoose', label: 'غاز زنده', unit: 'تومان/کیلوگرم', icon: '🦢', kind: 'goose' },
-  { key: 'liveDuck', label: 'اردک زنده', unit: 'تومان/کیلوگرم', icon: '🦆', kind: 'duck' },
-  { key: 'liveQuail', label: 'بلدرچین زنده', unit: 'تومان/کیلوگرم', icon: '🐦', kind: 'quail' },
-  { key: 'chickDay1', label: 'جوجه یک‌روزه', unit: 'تومان/عدد', icon: '🐣' },
-  { key: 'eggTable', label: 'تخم‌مرغ خوراکی', unit: 'تومان/عدد', icon: '🥚' },
-  { key: 'eggFertile', label: 'تخم نطفه‌دار', unit: 'تومان/عدد', icon: '🥚' },
-  { key: 'culledBird', label: 'مرغ حذفی', unit: 'تومان/عدد', icon: '🐓' },
+  { key: 'liveChicken', label: 'مرغ زنده', unit: 'تومان/کیلوگرم', icon: '🐔', kind: 'chicken', hint: '۸۵,۰۰۰' },
+  { key: 'liveTurkey', label: 'بوقلمون زنده', unit: 'تومان/کیلوگرم', icon: '🦃', kind: 'turkey', hint: '۱۲۰,۰۰۰' },
+  { key: 'liveGoose', label: 'غاز زنده', unit: 'تومان/کیلوگرم', icon: '🦢', kind: 'goose', hint: '۹۵,۰۰۰' },
+  { key: 'liveDuck', label: 'اردک زنده', unit: 'تومان/کیلوگرم', icon: '🦆', kind: 'duck', hint: '۷۰,۰۰۰' },
+  { key: 'liveQuail', label: 'بلدرچین زنده', unit: 'تومان/کیلوگرم', icon: '🐦', kind: 'quail', hint: '۶۰,۰۰۰' },
+  { key: 'chickDay1', label: 'جوجه یک‌روزه', unit: 'تومان/عدد', icon: '🐣', hint: '۲۵,۰۰۰' },
+  { key: 'eggTable', label: 'تخم‌مرغ خوراکی', unit: 'تومان/عدد', icon: '🥚', hint: '۸,۰۰۰' },
+  { key: 'eggFertile', label: 'تخم نطفه‌دار', unit: 'تومان/عدد', icon: '🥚', hint: '۱۵,۰۰۰' },
+  { key: 'culledBird', label: 'مرغ حذفی', unit: 'تومان/عدد', icon: '🐓', hint: '۴۰,۰۰۰' },
 ];
 
 interface Props {
@@ -95,13 +96,13 @@ export default function QuickPricesModal({ open, onClose, restrictToKinds }: Pro
         )}
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
         {fields.map(field => (
-          <Field key={field.key} label={`${field.icon} ${field.label} (${field.unit})`}>
+          <Field key={field.key} label={`${field.icon} ${field.label}`}>
             <Input
               value={formatWithSep(form[field.key] || '')}
               onChange={e => handleChange(field.key, e.target.value)}
-              placeholder="مثلاً ۸۵,۰۰۰"
+              placeholder={`${field.hint} ${field.unit === 'تومان/کیلوگرم' ? 'ت/ک' : 'ت'}`}
               inputMode="tel"
             />
           </Field>
