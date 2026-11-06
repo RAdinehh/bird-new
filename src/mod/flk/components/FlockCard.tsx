@@ -442,25 +442,23 @@ export default function FlockCard(props: FlockCardProps) {
                   padding: '1px 6px',
                   borderRadius: 4,
                   fontWeight: 700,
-                }}>{toFa(_count)} گله</span>
+                }}>از {toFa(_count)} گله</span>
               </div>
               <button
                 type="button"
                 onClick={() => setUnmergeOpen(true)}
                 title="بازگردانی گله"
                 style={{
-                  height: 28,
-                  padding: '0 10px',
+                  width: 28, height: 28,
                   background: 'var(--purple-soft)',
                   border: '1px solid var(--purple)',
                   borderRadius: 'var(--r-sm)',
                   cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 'var(--fs-xs)', color: 'var(--purple)',
-                  fontFamily: 'inherit', gap: 4,
-                  fontWeight: 600,
+                  fontSize: 14, color: 'var(--purple)',
+                  fontFamily: 'inherit', padding: 0,
                 }}
-              >♻️ بازگردانی</button>
+              >♻️</button>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-1)' }}>
               {_all.map((s: any) => (
