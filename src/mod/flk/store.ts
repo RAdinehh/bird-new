@@ -514,7 +514,7 @@ export const useFlk = create<State>()(
           }];
           const totalCount = newSources.reduce((s, x) => s + x.count, 0);
           const weightedAge = newSources.reduce((s, x) => s + x.count * x.ageDays, 0);
-          const avgAgeDays = totalCount > 0 ? Math.round((weightedAge / totalCount) * 10) / 10 : 0;
+          const avgAgeDays = totalCount > 0 ? Math.round(weightedAge / totalCount) : 0;
           return {
             ...target,
             initialCount: (target.initialCount || 0) + (source.initialCount || 0),
