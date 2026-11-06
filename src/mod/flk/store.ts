@@ -83,7 +83,7 @@ export interface State {
   revokeEvent: (flockId: string, eventId: string) => void;
   removeEvent: (flockId: string, eventId: string) => void;
   mergeFlocks: (targetId: string, sourceId: string, opts: { targetAgeDays: number; sourceAgeDays: number; hatchDate?: string }) => void;
-  unmergeFlocks: (targetId: string) => void;
+  unmergeFlocks: (targetId: string, sourceId?: string) => void;
   add: (f: Omit<Flock, 'id'|'createdAt'|'updatedAt'>) => string;
   update: (id: string, patch: Partial<Flock>) => void;
   remove: (id: string) => void;
@@ -479,17 +479,27 @@ export const useFlk = create<State>()(
           const target = f;
           const source = get().flocks.find(x => x.id === sourceId);
           if (!source) return f;
-          const targetSources = target.mergedInfo?.sources || [{
+          const targetSources: any[] = (target as any).mergedInfo?.sources || [{
             flockId: target.id,
             flockName: target.name,
             count: target.currentCount || 0,
             ageDays: opts.targetAgeDays,
+            maleCount: target.maleCount || 0,
+            femaleCount: target.femaleCount || 0,
+            unknownCount: target.unknownCount || 0,
+            initialCount: target.initialCount || 0,
+            genderSplitAt: target.genderSplitAt,
           }];
-          const newSources = [...targetSources, {
+          const newSources: any[] = [...targetSources, {
             flockId: source.id,
             flockName: source.name,
             count: source.currentCount || 0,
             ageDays: opts.sourceAgeDays,
+            maleCount: source.maleCount || 0,
+            femaleCount: source.femaleCount || 0,
+            unknownCount: source.unknownCount || 0,
+            initialCount: source.initialCount || 0,
+            genderSplitAt: source.genderSplitAt,
           }];
           const totalCount = newSources.reduce((s, x) => s + x.count, 0);
           const weightedAge = newSources.reduce((s, x) => s + x.count * x.ageDays, 0);
@@ -511,30 +521,49 @@ export const useFlk = create<State>()(
           };
         }),
       }),
-      unmergeFlocks: (targetId) => {
+      unmergeFlocks: (targetId: string, sourceId?: string) => {
         const state = get();
         const target = state.flocks.find(f => f.id === targetId);
         if (!target || !target.mergedInfo || !target.mergedInfo.sources || target.mergedInfo.sources.length < 2) return;
         const sources = target.mergedInfo.sources;
-        const lastSource = sources[sources.length - 1];
-        const remainingSources = sources.slice(0, -1);
+        const srcs: any[] = (target.mergedInfo!.sources as any[]);
+        const sourceToRestore: any = sourceId
+          ? srcs.find((s: any) => s.flockId === sourceId)
+          : srcs[srcs.length - 1];
+        if (!sourceToRestore) return;
+        const remainingSources = srcs.filter((s: any) => s.flockId !== sourceToRestore.flockId);
+        const snap = {
+          count: sourceToRestore.count || 0,
+          initialCount: sourceToRestore.initialCount || sourceToRestore.count || 0,
+          maleCount: sourceToRestore.maleCount || 0,
+          femaleCount: sourceToRestore.femaleCount || 0,
+          unknownCount: sourceToRestore.unknownCount !== undefined ? sourceToRestore.unknownCount : (sourceToRestore.count || 0),
+          genderSplitAt: sourceToRestore.genderSplitAt,
+        };
         set({
           flocks: state.flocks.map(f => {
-            if (f.id === lastSource.flockId) {
+            if (f.id === sourceToRestore.flockId) {
               return {
                 ...f,
                 status: 'active' as FlockStatus,
                 mergedInto: undefined,
-                currentCount: lastSource.count,
-                initialCount: lastSource.count,
+                currentCount: snap.count,
+                initialCount: snap.initialCount,
+                maleCount: snap.maleCount,
+                femaleCount: snap.femaleCount,
+                unknownCount: snap.unknownCount,
+                genderSplitAt: snap.genderSplitAt,
                 updatedAt: now(),
               };
             }
             if (f.id !== targetId) return f;
             return {
               ...f,
-              currentCount: Math.max(0, (f.currentCount || 0) - lastSource.count),
-              initialCount: Math.max(0, (f.initialCount || 0) - lastSource.count),
+              currentCount: Math.max(0, (f.currentCount || 0) - snap.count),
+              initialCount: Math.max(0, (f.initialCount || 0) - snap.initialCount),
+              maleCount: Math.max(0, (f.maleCount || 0) - snap.maleCount),
+              femaleCount: Math.max(0, (f.femaleCount || 0) - snap.femaleCount),
+              unknownCount: Math.max(0, (f.unknownCount || 0) - snap.unknownCount),
               mergedInfo: remainingSources.length > 1
                 ? { ...f.mergedInfo!, sources: remainingSources }
                 : undefined,
