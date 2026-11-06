@@ -29,6 +29,7 @@ import FlockValueSection from './FlockValueSection';
 import { useWhs } from '../../whs/store';
 import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
 import { HELP } from '../../../shr/help/helpTexts';
+import UnmergeFlocksModal from './UnmergeFlocksModal';
 
 type Fmt = ReturnType<typeof useFormat>;
 
@@ -87,6 +88,7 @@ export default function FlockCard(props: FlockCardProps) {
   } = props;
 
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [unmergeOpen, setUnmergeOpen] = useState(false);
 
   const getGroupsForFlock = useFlk(s => s.getGroupsForFlock);
   const whsMovements = useWhs(s => s.movements);
@@ -477,6 +479,22 @@ export default function FlockCard(props: FlockCardProps) {
 
       <FlockValueSection flock={f} />
 
+      {f.mergedInfo && (f.mergedInfo.sources?.length || 0) >= 2 && (
+        <>
+          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🔗 گله ادغام‌شده</div>
+          <RowGrid>
+            {(f.mergedInfo.sources || [])
+              .filter((s: any) => s.flockId !== f.id)
+              .map((s: any) => (
+                <Row key={s.flockId} l={s.flockName} v={`${fmt.int(s.count || 0)} پرنده`} />
+              ))}
+          </RowGrid>
+          <div style={{ marginTop: 8 }}>
+            <Btn size="sm" variant="outline" onClick={() => setUnmergeOpen(true)}>🔓 بازگردانی گله</Btn>
+          </div>
+        </>
+      )}
+
       {(() => {
         const cons = computeFlockConsumption(f.id, whsMovements, whsItems);
         const hasAnyQty = cons.feed.total > 0 || cons.medicine.total > 0 || cons.vaccine.total > 0 || cons.other.total > 0;
@@ -537,6 +555,7 @@ export default function FlockCard(props: FlockCardProps) {
         onClose={() => setHistoryOpen(false)}
         flock={f}
       />
+          <UnmergeFlocksModal open={unmergeOpen} onClose={() => setUnmergeOpen(false)} targetFlockId={f.id} />
     </ExpandableCard>
     
     </>
