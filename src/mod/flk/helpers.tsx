@@ -77,6 +77,7 @@ export interface FlockConsumptionBucket {
 export interface FlockConsumption {
   feed: FlockConsumptionBucket;
   medicine: FlockConsumptionBucket;
+  herbal: FlockConsumptionBucket;
   vaccine: FlockConsumptionBucket;
   other: FlockConsumptionBucket;
   totalCost: number;
@@ -92,6 +93,7 @@ export function computeFlockConsumption(
   const result: FlockConsumption = {
     feed: emptyBucket(),
     medicine: emptyBucket(),
+    herbal: emptyBucket(),
     vaccine: emptyBucket(),
     other: emptyBucket(),
     totalCost: 0,
@@ -111,9 +113,10 @@ export function computeFlockConsumption(
     const cost = price * qty;
 
     const cat = item?.category || 'other';
-    let bucket: 'feed' | 'medicine' | 'vaccine' | 'other' = 'other';
+    let bucket: 'feed' | 'medicine' | 'herbal' | 'vaccine' | 'other' = 'other';
     if (cat === 'feed' || cat === 'concentrate') bucket = 'feed';
     else if (cat === 'medicine') bucket = 'medicine';
+    else if (cat === 'herbal') bucket = 'herbal';
     else if (cat === 'vaccine') bucket = 'vaccine';
 
     result[bucket].total += qty;

@@ -27,6 +27,8 @@ import type { MultiSelectState } from '../../../shr/multiSelect/useMultiSelect';
 import { CardActions } from '../../../shr/components/ui';
 import FlockValueSection from './FlockValueSection';
 import { useWhs } from '../../whs/store';
+import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
+import { HELP } from '../../../shr/help/helpTexts';
 
 type Fmt = ReturnType<typeof useFormat>;
 
@@ -481,10 +483,14 @@ export default function FlockCard(props: FlockCardProps) {
         if (!hasAnyQty && cons.totalCost === 0) return null;
         return (
           <>
-            <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🍽️ مصرف انبار</div>
+            <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', display: 'flex', alignItems: 'center', gap: 4 }}>
+              📦 مصرف انبار
+              <HelpIcon text={HELP.flk.consumption} />
+            </div>
             <RowGrid>
               {cons.feed.total > 0 && <Row l="دان" v={`${fmt.int(cons.feed.total)} کیلو`} />}
               {cons.medicine.total > 0 && <Row l="دارو" v={cons.medicine.cost > 0 ? fmt.money(cons.medicine.cost) : `${fmt.int(cons.medicine.total)}`} />}
+              {cons.herbal.total > 0 && <Row l="دارو گیاهی" v={cons.herbal.cost > 0 ? fmt.money(cons.herbal.cost) : `${fmt.int(cons.herbal.total)}`} />}
               {cons.vaccine.total > 0 && <Row l="واکسن" v={cons.vaccine.cost > 0 ? fmt.money(cons.vaccine.cost) : `${fmt.int(cons.vaccine.total)}`} />}
               {cons.other.total > 0 && <Row l="سایر" v={cons.other.cost > 0 ? fmt.money(cons.other.cost) : `${fmt.int(cons.other.total)}`} />}
               {cons.totalCost > 0 && <Row l="جمع هزینه" v={fmt.money(cons.totalCost)} accent />}
