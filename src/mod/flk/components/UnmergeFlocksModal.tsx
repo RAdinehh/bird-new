@@ -196,12 +196,12 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
                 </div>
               </div>
 
-              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', marginBottom: 8, padding: '4px 8px', background: 'var(--warn-soft)', borderRadius: 'var(--r-sm)' }}>
-                ℹ️ این گله از ادغام {toFa(sourceItems.length + 1)} گله ساخته شده. برای بازگردانی یکی را انتخاب کنید:
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', marginBottom: 8, padding: '4px 8px', background: 'var(--warn-soft)', borderRadius: 'var(--r-sm)', lineHeight: 1.7 }}>
+                ℹ️ <b>{toFa(sourceItems.length)} گله</b> در این گله ادغام شده‌اند. برای بازگردانی، یکی را انتخاب کنید:
               </div>
 
               <div style={{ maxHeight: 280, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8, paddingRight: 2 }}>
-                {sortedSources.map(src => {
+                {sortedSources.map((src, idx) => {
                   const isSelected = src.flockId === effectiveSelectedId;
                   const c = src.count || 0;
                   const m = src.maleCount || 0;
@@ -232,7 +232,7 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
                           onClick={(e) => e.stopPropagation()}
                           style={{ accentColor: 'var(--accent)', flexShrink: 0 }}
                         />
-                        <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', flex: 1 }}>{src.flockName}</span>
+                        <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', flex: 1 }}>{toFa(idx + 1)}. {src.flockName}</span>
                         <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', background: 'var(--bg)', border: '1px solid var(--border)', padding: '1px 6px', borderRadius: 4, fontWeight: 600 }}>قبل از ادغام</span>
                         {isSelected && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--accent)', fontWeight: 700 }}>انتخاب‌شده</span>}
                       </div>
