@@ -249,7 +249,16 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onMergeGroup
               })}
             </div>
             {enabled && isValid && (
-              <div style={{ marginTop: 6, padding: 'var(--pad-tight)', background: g.color.soft, borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: g.color.text, fontWeight: 600 }}>
+              <div style={{
+                marginTop: 6,
+                padding: 'var(--pad-tight)',
+                background: g.color.soft,
+                borderRight: `3px solid ${g.color.border}`,
+                borderRadius: 'var(--r-sm)',
+                fontSize: 'var(--fs-xs)',
+                color: 'var(--text)',
+                fontWeight: 600,
+              }}>
                 ℹ️ نتیجه: {toFa(total)} پرنده در «{targetFlock?.name}»
               </div>
             )}
