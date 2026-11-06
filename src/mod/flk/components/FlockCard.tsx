@@ -2,6 +2,7 @@
  * FlockCard.tsx — کارت نمایش یک گله
  * طراحی: Grid2 برای فیلدهای کوتاه + EntityLink بین‌ماژولی
  */
+import { showConfirmAsync } from '../../../cor/store/dialog';
 import {
   type Flock, SOURCE_LABEL, getAgeDays, getLifecycle,
   sexRatio, daysUntilLaying, isLayingReady, calcCosts,
@@ -90,6 +91,19 @@ export default function FlockCard(props: FlockCardProps) {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [unmergeOpen, setUnmergeOpen] = useState(false);
 
+  const handleEditGuard = async () => {
+    if (f.status === 'merged') {
+      const ok = await showConfirmAsync(
+        'گله ادغام‌شده',
+        'این گله با گله دیگری ادغام شده است. برای ویرایش، ابتدا باید از طریق ♻️ بازگردانی کنید.',
+        { confirmText: '♻️ بازگردانی', cancelText: 'انصراف' }
+      );
+      if (ok) setUnmergeOpen(true);
+      return;
+    }
+    onEdit();
+  };
+
   const getGroupsForFlock = useFlk(s => s.getGroupsForFlock);
   const whsMovements = useWhs(s => s.movements);
   const whsItems = useWhs(s => s.items);
@@ -160,7 +174,7 @@ export default function FlockCard(props: FlockCardProps) {
       node: (
         <button
           type="button"
-          onClick={(e) => { e.stopPropagation(); onEdit(); }}
+          onClick={(e) => { e.stopPropagation(); void handleEditGuard(); }}
           title="این گله به هیچ سند لینک نیست — کلیک برای اتصال"
           aria-label="اتصال گله به سند"
           style={{
@@ -516,7 +530,7 @@ export default function FlockCard(props: FlockCardProps) {
       ) : (
         <>
           <CardActions actions={[
-            { label: 'ویرایش', onClick: onEdit, variant: 'outline' },
+            { label: 'ویرایش', onClick: handleEditGuard, variant: 'outline', hidden: f.status === 'merged' },
             { label: '📜 تاریخچه', onClick: () => setHistoryOpen(true), variant: 'outline' },
             { label: '📁 گروه‌ها', onClick: onOpenGroups, variant: 'outline' },
             { label: f.hidden ? '👁 نمایان' : '👁 پنهان', onClick: onToggleHidden, variant: 'outline' },
