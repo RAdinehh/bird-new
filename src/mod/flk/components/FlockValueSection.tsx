@@ -81,7 +81,7 @@ export default function FlockValueSection({ flock }: Props) {
       {header}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-1)' }}>
         <Row l="وزن تخمینی" v={`${fmtDec(result.weightG! / 1000)} کیلو`} />
-        <Row l="قیمت پایه" v={`${fmtInt(result.pricePerKg)} تومان/کیلو`} />
+        <Row l="قیمت پایه" v={`${fmtInt(result.pricePerKg)} ت/ک`} />
         <Row l="تعداد زنده" v={fmtInt(currentCount)} />
         {showDeaths ? (
           <Row
