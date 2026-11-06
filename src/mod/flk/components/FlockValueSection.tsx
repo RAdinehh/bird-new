@@ -27,31 +27,47 @@ export default function FlockValueSection({ flock }: Props) {
 
   const initialCount = Number(flock.initialCount) || 0;
   const currentCount = Number(flock.currentCount) || 0;
-  const deaths = Math.max(0, initialCount - currentCount);
+
+  // 🆕 تلفات واقعی از events (نه از تفاضل!)
+  const evDeaths = (flock.events || [])
+    .filter((e: any) => e.type === 'death')
+    .reduce((s: number, e: any) => s + (Number(e.count) || 0), 0);
+
+  // fallback: اگر events نداشت ولی initial > current
+  const deaths = evDeaths > 0 ? evDeaths : Math.max(0, initialCount - currentCount);
   const deathsPct = initialCount > 0 ? (deaths / initialCount) * 100 : 0;
   const showDeaths = deaths > 0 && initialCount > 0;
 
   const header = (
-    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', display: 'flex', alignItems: 'center', gap: 2 }}>
-      📊 ارزش روز گله
-      <HelpIcon text={HELP.flk.flockValue} />
-      <span
-        role="button"
-        tabIndex={0}
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', display: 'flex', alignItems: 'center', gap: 2 }}>
+        📊 ارزش روز گله
+        <HelpIcon text={HELP.flk.flockValue} />
+      </div>
+      <button
+        type="button"
         onClick={() => setPricesOpen(true)}
         title="ویرایش قیمت‌ها"
-        style={{ cursor: 'pointer', marginRight: 4, fontSize: 13, opacity: 0.7, userSelect: 'none' }}
-      >✏️</span>
+        style={{
+          width: 28, height: 28,
+          background: 'var(--btn-bg)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--r-sm)',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 14,
+          color: 'var(--text)',
+          fontFamily: 'inherit',
+          padding: 0,
+        }}
+      >✏️</button>
     </div>
   );
 
   const priceCell = (
-    <div
-      onClick={() => setPricesOpen(true)}
-      role="button"
-      style={{ ...cellStyle, cursor: 'pointer' }}
-      title="ویرایش قیمت"
-    >
+    <div style={cellStyle}>
       <span style={{ color: 'var(--muted)' }}>قیمت پایه:</span>
       <b style={{ fontWeight: 700 }}>{toFa(result.pricePerKg.toLocaleString('fa-IR'))} ت/کیلو</b>
     </div>
