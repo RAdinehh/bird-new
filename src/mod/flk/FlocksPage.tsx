@@ -362,10 +362,15 @@ export default function FlocksPage() {
         onSave={async () => {
           attemptSave();
 
-          // 🆕 خطاهای Zod به صورت inline نمایش داده می‌شن — فقط ذخیره رو بلاک کن
-          // (کتاب قواعد، Anti-pattern #1 و #2: setErr + Zod همزمان نکن)
+          // 🆕 نمایش خطاهای Zod در ErrorBox (به جای بی‌صدا کردن)
           if (Object.keys(vErrors).length > 0) {
-            setErr('');
+            const errs = Object.entries(vErrors)
+              .map(([field, msg]) => {
+                const m = Array.isArray(msg) ? msg.join('، ') : String(msg || '');
+                return m ? `${field}: ${m}` : '';
+              })
+              .filter(Boolean);
+            setErr(errs.length > 0 ? errs.join(' • ') : 'خطا در اعتبارسنجی — فیلدهای قرمز را بررسی کنید');
             return;
           }
 
