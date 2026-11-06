@@ -12,7 +12,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   flockIds: string[];
-  onConfirm: (targetId: string) => void;
+  onConfirm: (targetId: string, sourceIds: string[]) => void;
 }
 
 export default function MergeFlocksModal({ open, onClose, flockIds, onConfirm }: Props) {
@@ -99,8 +99,10 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onConfirm }:
       </div>
 
       {hasIncompat && (
-        <div style={{ marginTop: 12, padding: 'var(--pad-normal)', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>
-          ⚠️ گله‌های ناسازگار — ادغام ممکن نیست. همه باید از یک پرنده و نوع باشند.
+        <div style={{ marginTop: 12, padding: 'var(--pad-normal)', background: compatibleCount === 0 ? 'var(--danger-soft)' : 'var(--warn-soft)', border: '1px solid ' + (compatibleCount === 0 ? 'var(--danger)' : 'var(--warn)'), borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: compatibleCount === 0 ? 'var(--danger)' : 'var(--warn)' }}>
+          {compatibleCount === 0
+            ? '⚠️ هیچ گله سازگاری نیست — همه متفاوت با هدف هستند.'
+            : '⚠️ ' + toFa(incompatMap.size) + ' گله ناسازگار از ادغام کنار گذاشته می‌شود.'}
         </div>
       )}
       {!hasIncompat && target && others.length > 0 && (
@@ -112,23 +114,15 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onConfirm }:
       <BtnRow>
         <Btn variant="primary" onClick={async () => {
           if (!target) return;
-          for (const src of others) {
-            if ((src as any).birdKind && (target as any).birdKind && (src as any).birdKind !== (target as any).birdKind) {
-              toastMsg.error('پرنده گله «' + src.name + '» متفاوت است');
-              return;
-            }
-            if (src.type !== target.type) {
-              toastMsg.error('نوع گله «' + src.name + '» متفاوت است');
-              return;
-            }
-          }
-          const ok = await showConfirmAsync(
-            'تأیید ادغام',
-            others.length + ' گله در «' + target.name + '» ادغام می‌شود. با unmerge قابل بازگشت است.',
-            { confirmText: 'ادغام' }
-          );
-          if (ok) onConfirm(targetId);
-        }} disabled={!targetId || hasIncompat}>
+          const _compatSrc = others.filter(o => !incompatMap.has(o.id)).map(o => o.id);
+          if (_compatSrc.length === 0) return;
+          const _skipped = others.length - _compatSrc.length;
+          const _msg = (_compatSrc.length + 1) + ' گله در «' + target.name + '» ادغام می‌شود.' +
+                       (_skipped > 0 ? '\n⚠️ ' + _skipped + ' گله ناسازگار کنار گذاشته می‌شود.' : '') +
+                       '\nاز طریق 🔓 بازگردانی قابل بازگشت است.';
+          const ok = await showConfirmAsync('تأیید ادغام', _msg, { confirmText: 'ادغام' });
+          if (ok) onConfirm(targetId, _compatSrc);
+        }} disabled={!targetId || compatibleCount === 0}>
           🔗 {compatibleCount > 0 ? 'ادغام ' + toFa(compatibleCount + 1) + ' گله' : 'گله سازگار نیست'}
         </Btn>
         <Btn onClick={onClose}>لغو</Btn>

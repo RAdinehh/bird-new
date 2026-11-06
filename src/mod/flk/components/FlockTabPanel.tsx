@@ -284,11 +284,11 @@ export default function FlockTabPanel({
     ] : [],
   });
 
-  const handleMergeConfirm = (targetId: string) => {
+  const handleMergeConfirm = (targetId: string, sourceIds: string[]) => {
     const target = flocks.find(f => f.id === targetId);
     if (!target) return;
     const targetAgeDays = getAgeDays(target);
-    const sources = mergeIds.filter(id => id !== targetId);
+    const sources = sourceIds;
     for (const sourceId of sources) {
       const source = flocks.find(f => f.id === sourceId);
       if (!source) continue;
@@ -298,8 +298,10 @@ export default function FlockTabPanel({
         hatchDate: source.hatchDate || target.hatchDate,
       });
     }
-    toastMsg.success(`${sources.length + 1} گله ادغام شد`);
-    logAction('update', 'flk', 'ادغام ' + (sources.length + 1) + ' گله در «' + target.name + '»');
+    const skipped = mergeIds.length - sourceIds.length - 1;
+    const msg = `${sources.length + 1} گله ادغام شد` + (skipped > 0 ? ` (${skipped} ناسازگار کنار)` : '');
+    toastMsg.success(msg);
+    logAction('update', 'flk', 'ادغام ' + (sources.length + 1) + ' گله در «' + target.name + '»' + (skipped > 0 ? ` — ${skipped} ناسازگار skip` : ''));
     setMergeModalOpen(false);
     setMergeIds([]);
     ms.exitSelection();
