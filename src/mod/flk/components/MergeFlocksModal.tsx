@@ -45,6 +45,7 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onConfirm }:
     }
   }
   const hasIncompat = incompatMap.size > 0;
+  const compatibleCount = others.length - incompatMap.size;
 
   return (
     <Modal open={open} onClose={onClose} title="🔗 ادغام گله‌ها">
@@ -64,6 +65,7 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onConfirm }:
           return (
             <label
               key={f.id}
+              onClick={(e) => { if (_inc) e.preventDefault(); }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -72,15 +74,16 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onConfirm }:
                 background: isTarget ? 'var(--accent-soft)' : _inc ? 'var(--danger-soft)' : 'var(--input-bg)',
                 border: '1px solid ' + (isTarget ? 'var(--accent)' : _inc ? 'var(--danger)' : 'var(--border)'),
                 borderRadius: 'var(--r-md)',
-                cursor: 'pointer',
+                cursor: _inc ? 'not-allowed' : 'pointer',
               }}
             >
               <input
                 type="radio"
                 name="merge-target"
                 checked={isTarget}
-                onChange={() => setTargetId(f.id)}
-                style={{ accentColor: 'var(--accent)' }}
+                onChange={() => { if (!_inc) setTargetId(f.id); }}
+                disabled={!!_inc}
+                style={{ accentColor: 'var(--accent)', cursor: _inc ? 'not-allowed' : 'pointer' }}
               />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{f.name}</div>
@@ -126,7 +129,7 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onConfirm }:
           );
           if (ok) onConfirm(targetId);
         }} disabled={!targetId || hasIncompat}>
-          🔗 ادغام {toFa(others.length + 1)} گله
+          🔗 {compatibleCount > 0 ? 'ادغام ' + toFa(compatibleCount + 1) + ' گله' : 'گله سازگار نیست'}
         </Btn>
         <Btn onClick={onClose}>لغو</Btn>
       </BtnRow>
