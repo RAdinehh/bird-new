@@ -755,7 +755,7 @@ function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
         display: 'flex',
         alignItems: 'center',
         padding: '4px 0',
-        borderBottom: '1px dashed var(--border)',
+        borderBottom: isLast ? 'none' : '1px dashed var(--border)',
       }}>
         {/* برچسب جنسیت */}
         <div style={{ width: 70, display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700, color: tone, flexShrink: 0, fontSize: 'var(--fs-sm)' }}>
