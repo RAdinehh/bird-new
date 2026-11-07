@@ -380,7 +380,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
             <div />
           )}
           {!correctionOpen && (
-            <Btn size="sm" onClick={() => setCorrectionOpen(true)}>+ ثبت اصلاح</Btn>
+            <Btn size="sm" variant="outline" onClick={() => setCorrectionOpen(true)} style={{ borderColor: 'var(--warn)', color: 'var(--warn)' }}>+ ثبت اصلاح</Btn>
           )}
         </div>
       )}
@@ -708,18 +708,18 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
           {e.type === 'correction' && !e.linkedEventId && !e.revoked && (
             <span
               style={{
-                fontSize: 10,
-                fontWeight: 700,
-                padding: '1px 6px',
-                background: 'var(--warn-soft)',
-                color: 'var(--warn)',
+                fontSize: 'var(--fs-xs)',
+                fontWeight: 600,
+                padding: '0 4px',
+                background: 'transparent',
+                color: 'var(--muted)',
                 borderRadius: 3,
-                border: '1px solid var(--warn)',
+                border: '1px solid var(--border)',
                 cursor: 'help',
               }}
               title="این عدد دستی وارد شد — در فرم «ثبت روزانه» ثبت نشده"
             >
-              ✋ ثبت دستی
+              ✋ دستی
             </span>
           )}
           {isRevoked && (
