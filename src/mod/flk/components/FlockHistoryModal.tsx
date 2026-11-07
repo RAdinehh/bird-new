@@ -324,9 +324,78 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
         )}
       </div>
 
-      {/* ═══ فرم اصلاح ═══ */}
-      {correctionOpen && (
-        <div style={{ marginBottom: 12, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {/* ═══ تب‌ها (Segmented Control) ═══ */}
+      <div style={{
+        display: 'flex',
+        gap: 0,
+        marginBottom: 12,
+        background: 'var(--input-bg)',
+        borderRadius: 'var(--r-md)',
+        padding: 3,
+        border: '1px solid var(--border)',
+      }}>
+        <TabButton active={tabMode === 'events'} onClick={() => setTabMode('events')}>
+          📋 رویدادها ({toFa(totalCount)})
+        </TabButton>
+        {auditCount > 0 && (
+          <TabButton active={tabMode === 'audit'} onClick={() => setTabMode('audit')}>
+            ⚥ تغییرات ({toFa(auditCount)})
+          </TabButton>
+        )}
+        {consumptionCount > 0 && (
+          <TabButton active={tabMode === 'consumption'} onClick={() => setTabMode('consumption')}>
+            🍽️ مصرف ({toFa(consumptionCount)})
+          </TabButton>
+        )}
+      </div>
+
+      {/* ═══ فیلتر (فقط تب رویدادها) ═══ */}
+      {tabMode === 'events' && totalCount > 0 && (
+        <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, marginLeft: 4 }}>فیلتر:</span>
+          <Chip active={filter === 'all'} onClick={() => setFilter('all')}>همه</Chip>
+          {FILTER_TYPES.map(t => {
+            const n = typeCounts.get(t) || 0;
+            if (n === 0) return null;
+            return (
+              <Chip key={t} active={filter === t} onClick={() => setFilter(filter === t ? 'all' : t)}>
+                {TYPE_INFO[t].icon} {TYPE_INFO[t].label} ({toFa(n)})
+              </Chip>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ═══ دکمه ثبت اصلاح — فقط در تب رویدادها ═══ */}
+      {tabMode === 'events' && !correctionOpen && (
+        <button
+          type="button"
+          onClick={() => setCorrectionOpen(true)}
+          style={{
+            width: '100%',
+            padding: '10px',
+            background: 'var(--warn-soft)',
+            border: '1px dashed var(--warn)',
+            borderRadius: 'var(--r-sm)',
+            color: 'var(--warn)',
+            fontWeight: 600,
+            fontSize: 'var(--fs-sm)',
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+            marginBottom: 10,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+          }}
+        >
+          ✏️ ثبت اصلاح موجودی
+        </button>
+      )}
+
+      {/* ═══ فرم اصلاح — فقط در تب رویدادها ═══ */}
+      {tabMode === 'events' && correctionOpen && (
+        <div style={{ marginBottom: 12, background: 'var(--card)', border: '1px solid var(--warn)', borderRadius: 'var(--r-md)', padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px dashed var(--border)', paddingBottom: 8 }}>
             <span style={{ fontWeight: 700, color: 'var(--warn)', fontSize: 'var(--fs-sm)' }}>✏️ ثبت اصلاح موجودی</span>
             <button type="button" onClick={() => { setCorrectionOpen(false); setDelta(''); setNotes(''); setValidationError(''); }} style={{ background: 'none', border: 'none', color: 'var(--muted)', fontSize: 16, cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>✕</button>
@@ -375,48 +444,6 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
             <button type="button" onClick={handleSaveCorrection} disabled={num === 0 || newCount < 0} style={{ height: 38, background: (num === 0 || newCount < 0) ? 'var(--dim)' : 'var(--accent)', color: 'white', border: 'none', borderRadius: 'var(--r-md)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: (num === 0 || newCount < 0) ? 'not-allowed' : 'pointer' }}>ثبت اصلاح</button>
             <button type="button" onClick={() => { setCorrectionOpen(false); setDelta(''); setNotes(''); setValidationError(''); }} style={{ height: 38, background: 'var(--input-bg)', color: 'var(--muted)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer' }}>لغو</button>
           </div>
-        </div>
-      )}
-
-      {/* ═══ تب‌ها (Segmented Control) ═══ */}
-      <div style={{
-        display: 'flex',
-        gap: 0,
-        marginBottom: 12,
-        background: 'var(--input-bg)',
-        borderRadius: 'var(--r-md)',
-        padding: 3,
-        border: '1px solid var(--border)',
-      }}>
-        <TabButton active={tabMode === 'events'} onClick={() => setTabMode('events')}>
-          📋 رویدادها ({toFa(totalCount)})
-        </TabButton>
-        {auditCount > 0 && (
-          <TabButton active={tabMode === 'audit'} onClick={() => setTabMode('audit')}>
-            ⚥ تغییرات ({toFa(auditCount)})
-          </TabButton>
-        )}
-        {consumptionCount > 0 && (
-          <TabButton active={tabMode === 'consumption'} onClick={() => setTabMode('consumption')}>
-            🍽️ مصرف ({toFa(consumptionCount)})
-          </TabButton>
-        )}
-      </div>
-
-      {/* ═══ فیلتر (فقط تب رویدادها) ═══ */}
-      {tabMode === 'events' && totalCount > 0 && (
-        <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, marginLeft: 4 }}>فیلتر:</span>
-          <Chip active={filter === 'all'} onClick={() => setFilter('all')}>همه</Chip>
-          {FILTER_TYPES.map(t => {
-            const n = typeCounts.get(t) || 0;
-            if (n === 0) return null;
-            return (
-              <Chip key={t} active={filter === t} onClick={() => setFilter(filter === t ? 'all' : t)}>
-                {TYPE_INFO[t].icon} {TYPE_INFO[t].label} ({toFa(n)})
-              </Chip>
-            );
-          })}
         </div>
       )}
 
@@ -579,9 +606,6 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
 
       {/* ═══ فوتر ═══ */}
       <BtnRow>
-        {!correctionOpen && (
-          <Btn variant="primary" onClick={() => setCorrectionOpen(true)}>✏️ ثبت اصلاح</Btn>
-        )}
         <Btn onClick={handleExport}>📥 CSV</Btn>
         <Btn onClick={onClose}>بستن</Btn>
       </BtnRow>
