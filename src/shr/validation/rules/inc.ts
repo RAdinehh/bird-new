@@ -6,7 +6,7 @@ import {
   optionalStr, optionalId, requiredId, requiredStr,
   floatNonNeg, floatPos, floatRange, intNonNeg, intPos, persianDateOpt,
 } from '../helpers';
-import { HATCH, EGG } from '../biological';
+import { HATCH, EGG } from '../biological-constants';
 import type { ValidationContext } from '../types';
 
 export const EggEntrySchema = z.object({

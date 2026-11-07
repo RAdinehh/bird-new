@@ -11,7 +11,7 @@ import {
   requiredStr, optionalStr, optionalId, requiredId,
   floatNonNeg, floatPos, floatRange, intNonNeg,
 } from '../helpers';
-import { RATION } from '../biological';
+import { RATION } from '../biological-constants';
 import type { ValidationContext } from '../types';
 
 const CATEGORIES = ['energy', 'protein', 'mineral', 'vitamin', 'amino', 'additive'] as const;

@@ -6,7 +6,7 @@ import {
   requiredStr, optionalStr, optionalId, requiredId,
   floatNonNeg, floatPos, floatRange, requiredFloatRange, optionalFloatRange, intPos, intNonNeg, intRange, persianDateOpt,
 } from '../helpers';
-import { HALL, TEMP, HUMIDITY } from '../biological';
+import { HALL, TEMP, HUMIDITY } from '../biological-constants';
 import type { ValidationContext } from '../types';
 
 export function createHallSchema(_ctx: ValidationContext = {}) {

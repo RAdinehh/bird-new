@@ -4,6 +4,8 @@
  * منابع:
  * - استانداردهای بین‌المللی پرورش طیور (Ross 308, Hy-Line, Lohmann)
  * - تجربه پرورش نژادهای بومی ایران (مرندی، گلپایگانی، گیلینی)
+  *
+ * (migrated from biological.ts — 5 orphan functions removed)
  */
 
 // ═══════════════════════════════════════════════
@@ -129,32 +131,3 @@ export const RATION = {
 // ═══════════════════════════════════════════════
 // توابع کمکی
 // ═══════════════════════════════════════════════
-
-/** میانگین وزن جوجه (گرم) از وزن تخم */
-export function chickWeightFromEgg(eggGram: number): number {
-  return Math.round(eggGram * 0.675); // ضریب صنعت
-}
-
-/** FCR = دان مصرفی (kg) / افزایش وزن یا تولید (kg) */
-export function fcr(feedKg: number, gainKg: number): number {
-  if (gainKg <= 0) return 0;
-  return Math.round((feedKg / gainKg) * 100) / 100;
-}
-
-/** Hen-Day % = تخم سالم / تعداد مرغ زنده × 100 */
-export function henDayPercent(eggs: number, liveBirds: number): number {
-  if (liveBirds <= 0) return 0;
-  return Math.round((eggs / liveBirds) * 1000) / 10;
-}
-
-/** میانگین وزن (گرم) از مجموع کیلوگرم / تعداد */
-export function avgEggGram(totalKg: number, count: number): number {
-  if (count <= 0) return 0;
-  return Math.round((totalKg * 1000 / count) * 10) / 10;
-}
-
-/** دان مصرفی به ازای هر پرنده (گرم/روز) */
-export function feedPerBirdGram(feedKg: number, birds: number, days = 1): number {
-  if (birds <= 0 || days <= 0) return 0;
-  return Math.round((feedKg * 1000) / (birds * days));
-}

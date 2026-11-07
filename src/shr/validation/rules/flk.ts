@@ -19,7 +19,7 @@ import {
   persianDatePast, persianDateOpt, requiredId, optionalId,
   requiredStr, optionalStr,
 } from '../helpers';
-import { EGG, GROWTH } from '../biological';
+import { EGG, GROWTH } from '../biological-constants';
 import type { ValidationContext } from '../types';
 import { MSG } from '../errorMessages';
 

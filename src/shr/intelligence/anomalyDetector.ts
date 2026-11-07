@@ -8,7 +8,7 @@ import type {
   FieldProfile, AnalysisContext, Warning, Signal, AlertLevel,
 } from './types';
 import { getProfile } from './fieldProfiles';
-import { getTempIdeal } from '../validation/biological';
+import { getTempIdeal } from '../validation/biological-constants';
 import { getHistory, HistoryOptions, getUserPattern } from './historyStore';
 
 // ══════════════════════════════════════════════════════════════════
