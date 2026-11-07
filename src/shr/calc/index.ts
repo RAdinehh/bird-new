@@ -1,10 +1,20 @@
 /**
  * index.ts — نقطه ورود موتور محاسباتی (shr/calc)
  *
- * فاز C1.1 — فقط type re-export.
- * فاز C1.2 توابع را اضافه می‌کند.
+ * C1.2 — همه توابع + typeها export می‌شوند.
  */
 
+// ═══ Formulas ═══
+export { calculateFCR } from './formulas/fcr';
+export { calculateMortality } from './formulas/mortality';
+export { calculateEggMetrics } from './formulas/egg';
+export { calculateWeightMetrics } from './formulas/weight';
+export { calculateFeedMetrics } from './formulas/feed';
+export { calculateWaterMetrics } from './formulas/water';
+export { calculateStockingDensity } from './formulas/stocking';
+export { calculateEPEF } from './formulas/epef';
+
+// ═══ Types ═══
 export type {
   Tone,
   FeedMethod,
