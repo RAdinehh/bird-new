@@ -41,3 +41,11 @@ export type {
 
 // ═══ Thresholds ═══
 export { getThresholds } from './thresholds';
+
+
+// ═══ Economics (C1.4) ═══
+export { calculateFeedCost } from './economics/feedCost';
+export { calculateVaccineCost } from './economics/vaccineCost';
+export { calculateMedicationCost } from './economics/medicationCost';
+export { calculateLitterCost } from './economics/litterCost';
+export { sumMovementsByCategory } from './economics/_shared';

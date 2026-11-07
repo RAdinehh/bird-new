@@ -226,3 +226,68 @@ export interface Thresholds {
   eggWeightG: number | null;
   densityBirdPerSqM: number | null;
 }
+
+
+// ═══════════════════════════════════════════════
+// Economics (C1.4) — typeهای لایه اقتصادی
+// ═══════════════════════════════════════════════
+
+export type ItemCategoryCalc =
+  | 'feed'
+  | 'medicine'
+  | 'vaccine'
+  | 'herbal'
+  | 'equipment'
+  | 'consumable'
+  | 'egg'
+  | 'manure'
+  | 'broken';
+
+export type MovementReasonCalc =
+  | 'purchase'
+  | 'consumption'
+  | 'sale'
+  | 'gift'
+  | 'loss'
+  | 'adjustment'
+  | 'return';
+
+export interface InputMovement {
+  itemId: string;
+  quantity: number;
+  unitPrice: number;
+  reason: MovementReasonCalc;
+  date: string;
+  flockId?: string;
+  sourceModule?: string;
+}
+
+export interface InputItem {
+  id: string;
+  name: string;
+  category: ItemCategoryCalc;
+  avgPrice?: number;
+  lastPrice: number;
+}
+
+export interface CostFilter {
+  flockId?: string;
+  category?: ItemCategoryCalc;
+  categories?: ItemCategoryCalc[];
+  reason?: MovementReasonCalc;
+  fromDate?: string;
+  toDate?: string;
+}
+
+export interface CostResult {
+  totalCost: number;
+  costPerBird: number;
+  count: number;
+  hasData: boolean;
+}
+
+export interface MedicationCostResult {
+  chemical: CostResult;
+  herbal: CostResult;
+  total: CostResult;
+}
