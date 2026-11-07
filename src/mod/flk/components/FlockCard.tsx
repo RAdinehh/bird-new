@@ -574,10 +574,10 @@ export default function FlockCard(props: FlockCardProps) {
         <>
           <CardActions actions={[
             { label: 'ویرایش', onClick: handleEditGuard, variant: 'outline' },
-            { label: '📋 تفکیک', onClick: () => setSexingOpen(true), variant: 'outline', hidden: f.type === 'broiler' },
-            { label: '📅 تفکیک‌ها', onClick: () => setSexingHistoryOpen(true), variant: 'outline', hidden: (f.sexingEvents?.length || 0) === 0 },
+            { label: '🧬 تفکیک جنسیت', onClick: () => setSexingOpen(true), variant: 'outline', hidden: f.type === 'broiler' },
+            { label: '📋 سابقه تفکیک', onClick: () => setSexingHistoryOpen(true), variant: 'outline', hidden: (f.sexingEvents?.length || 0) === 0 },
             { label: '🍽️ ثبت دان/آب', onClick: () => setConsumptionOpen(true), variant: 'outline' },
-            { label: '📜 رویدادها', onClick: () => setHistoryOpen(true), variant: 'outline' },
+            { label: '📅 همه رویدادها', onClick: () => setHistoryOpen(true), variant: 'outline' },
             { label: '📁 گروه‌ها', onClick: onOpenGroups, variant: 'outline' },
             { label: f.hidden ? '👁 نمایان' : '👁 پنهان', onClick: onToggleHidden, variant: 'outline' },
             { label: f.paused ? '▶️ فعال' : '⏸ غیرفعال', onClick: onTogglePaused, variant: 'outline' }
