@@ -24,6 +24,7 @@ import { HY_LINE_W36 } from './layers';
 import { IRAN_LAYER } from './layers';
 import { LOHMANN } from './layers';
 import { LEGHORN } from './layers';
+import { BOVANS_BROWN } from './layers';
 import { MARANDI } from './native';
 import { GOLPAYGANI } from './native';
 import { LARI } from './native';
@@ -52,6 +53,7 @@ export const NEW_BREEDS: Record<string, BirdStandard> = {
   'iran-layer': IRAN_LAYER,
   'lohmann': LOHMANN,
   'leghorn': LEGHORN,
+  'bovans-brown': BOVANS_BROWN,
   'marandi': MARANDI,
   'golpaygani': GOLPAYGANI,
   'lari': LARI,
