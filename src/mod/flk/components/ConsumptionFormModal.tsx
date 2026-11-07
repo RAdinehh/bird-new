@@ -1,9 +1,11 @@
 /**
  * ConsumptionFormModal.tsx — فرم ثبت دان/آب
  * فاز ۸b — write path برای ConsumptionEvent
+ * UI بهبود: دو ستونه، DatePicker، placeholders توصیفی، confidence پویا
  */
 import { useState } from 'react';
-import { Modal, Btn, BtnRow, Field, Select } from '../../../shr/components/ui';
+import { Modal, Btn, BtnRow, Field, Grid2, Select } from '../../../shr/components/ui';
+import DatePicker from '../../../shr/components/DatePicker';
 import { useFlk, type Flock } from '../store';
 import { todayJ } from '../api/flocksCalc';
 import { toastMsg } from '../../../cor/store/toast';
@@ -40,6 +42,9 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
   const num = parseFloat(toEn(amount).replace('٫', '.')) || 0;
   const unit = type === 'feed' ? 'kg' : 'L';
   const hasSplit = !!flock.genderSplitAt;
+  const showSex = type === 'feed' && hasSplit;
+  const amountPlaceholder = type === 'feed' ? 'مثلاً ۲۵' : 'مثلاً ۵۰';
+  const confidence: 'exact' | 'estimated' = source === 'sensor_level' ? 'estimated' : 'exact';
 
   const handleSave = () => {
     if (num <= 0) {
@@ -56,9 +61,9 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
       date,
       amount: num,
       unit,
-      sex: type === 'feed' && hasSplit ? sex : '',
+      sex: showSex ? sex : '',
       source,
-      confidence: 'exact',
+      confidence,
       notes: notes.trim(),
     });
     toastMsg.success(type === 'feed' ? 'دان ثبت شد' : 'آب ثبت شد');
@@ -69,36 +74,41 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
 
   return (
     <Modal open={open} onClose={onClose} title={'🍽️ ثبت دان/آب — ' + flock.name}>
-      <Field label="نوع" required>
-        <Select value={type} onChange={e => setType(e.target.value as 'feed' | 'water')}>
-          <option value="feed">🍽️ دان</option>
-          <option value="water">💧 آب</option>
-        </Select>
-      </Field>
+      <Grid2>
+        <Field label="نوع" required>
+          <Select value={type} onChange={e => setType(e.target.value as 'feed' | 'water')}>
+            <option value="feed">🍽️ دان</option>
+            <option value="water">💧 آب</option>
+          </Select>
+        </Field>
+        <Field label="تاریخ" required>
+          <DatePicker value={date} onChange={setDate} />
+        </Field>
+      </Grid2>
 
-      <Field label="تاریخ" required>
-        <input
-          type="text"
-          value={date}
-          onChange={e => setDate(e.target.value)}
-          placeholder="1405/08/10"
-          dir="ltr"
-          style={inputStyle}
-        />
-      </Field>
+      <Grid2>
+        <Field label={'مقدار (' + unit + ')'} required>
+          <input
+            type="text"
+            value={amount}
+            onChange={e => setAmount(e.target.value)}
+            placeholder={amountPlaceholder}
+            inputMode="decimal"
+            style={inputStyle}
+          />
+        </Field>
+        <Field label="روش ثبت">
+          <Select value={source} onChange={e => setSource(e.target.value as any)}>
+            <option value="bulk_manual">🍽️ پر کردن سطل</option>
+            <option value="daily_manual">📝 روزانه دستی</option>
+            <option value="sensor_scale">⚖️ سنسور وزن</option>
+            <option value="sensor_level">📊 سنسور سطح</option>
+            <option value="auto_feeder">🤖 اتومات هوشمند</option>
+          </Select>
+        </Field>
+      </Grid2>
 
-      <Field label={'مقدار (' + unit + ')'} required>
-        <input
-          type="text"
-          value={amount}
-          onChange={e => setAmount(e.target.value)}
-          placeholder="۰"
-          inputMode="decimal"
-          style={inputStyle}
-        />
-      </Field>
-
-      {hasSplit && type === 'feed' && (
+      {showSex && (
         <Field label="جنسیت">
           <Select value={sex} onChange={e => setSex(e.target.value as '' | 'male' | 'female' | 'mixed')}>
             <option value="">نامشخص (کل گله)</option>
@@ -109,16 +119,6 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
         </Field>
       )}
 
-      <Field label="روش ثبت">
-        <Select value={source} onChange={e => setSource(e.target.value as any)}>
-          <option value="bulk_manual">🍽️ پر کردن سطل</option>
-          <option value="daily_manual">📝 روزانه دستی</option>
-          <option value="sensor_scale">⚖️ سنسور وزن</option>
-          <option value="sensor_level">📊 سنسور سطح</option>
-          <option value="auto_feeder">🤖 اتومات هوشمند</option>
-        </Select>
-      </Field>
-
       <Field label="یادداشت (اختیاری)">
         <input
           type="text"
@@ -128,6 +128,19 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
           style={inputStyle}
         />
       </Field>
+
+      {confidence === 'estimated' && (
+        <div style={{
+          fontSize: 10,
+          color: 'var(--warn)',
+          padding: '4px 8px',
+          background: 'var(--warn-soft)',
+          borderRadius: 'var(--r-sm)',
+          marginTop: 4,
+        }}>
+          ⚠️ سنسور سطح — مقدار به‌عنوان «تخمینی» ثبت می‌شود
+        </div>
+      )}
 
       <BtnRow>
         <Btn variant="primary" onClick={handleSave}>ثبت</Btn>
