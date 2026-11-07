@@ -63,12 +63,21 @@ export default function SexingModal({ open, onClose, flock }: Props) {
   let femaleNum = femaleRaw;
   let unknownNum = unknownRaw;
 
+  let autoFillField: 'male' | 'female' | 'unknown' | null = null;
+  let autoFillValue = 0;
+
   if (isUnknownEmpty && remaining > 0) {
     unknownNum = remaining;
+    autoFillField = 'unknown';
+    autoFillValue = remaining;
   } else if (!isUnknownEmpty && isMaleEmpty && remaining > 0) {
     maleNum = remaining;
+    autoFillField = 'male';
+    autoFillValue = remaining;
   } else if (!isUnknownEmpty && !isMaleEmpty && isFemaleEmpty && remaining > 0) {
     femaleNum = remaining;
+    autoFillField = 'female';
+    autoFillValue = remaining;
   }
 
   const totalInput = maleNum + femaleNum + unknownNum;
@@ -168,7 +177,7 @@ export default function SexingModal({ open, onClose, flock }: Props) {
           <NumField
             value={maleStr}
             onChange={e => setMaleStr(e.target.value)}
-            placeholder={isMaleEmpty && !isUnknownEmpty && isFemaleEmpty && remaining > 0 ? String(remaining) : '۰'}
+            placeholder="۰"
             unit="پرنده"
           />
         </Field>
@@ -176,7 +185,7 @@ export default function SexingModal({ open, onClose, flock }: Props) {
           <NumField
             value={femaleStr}
             onChange={e => setFemaleStr(e.target.value)}
-            placeholder={isFemaleEmpty && !isUnknownEmpty && remaining > 0 ? String(remaining) : '۰'}
+            placeholder="۰"
             unit="پرنده"
           />
         </Field>
@@ -187,15 +196,15 @@ export default function SexingModal({ open, onClose, flock }: Props) {
           <NumField
             value={unknownStr}
             onChange={e => setUnknownStr(e.target.value)}
-            placeholder={remaining > 0 && maleNum + femaleNum > 0 ? String(remaining) : '۰'}
+            placeholder="۰"
             unit="پرنده"
           />
         </Field>
         <Field label="جمع کل">
           <div style={{
             padding: '10px 12px',
-            background: mismatch ? 'var(--danger-soft)' : 'var(--accent-soft)',
-            border: `1px solid ${mismatch ? 'var(--danger)' : 'var(--accent-border)'}`,
+            background: 'var(--card)',
+            border: `1px solid ${mismatch ? 'var(--danger)' : 'var(--accent)'}`,
             borderRadius: 'var(--r-md)',
             fontSize: 'var(--fs-sm)',
             fontWeight: 700,
@@ -209,24 +218,16 @@ export default function SexingModal({ open, onClose, flock }: Props) {
         </Field>
       </Grid2>
 
-      {/* 🆕 Smart Guide — یک خط، بدون کادر */}
+      {/* 🆕 Smart Guide — یک خط، گویا */}
       {noInput ? (
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', marginBottom: 8, lineHeight: 1.6 }}>
-          💡 تعداد نر یا ماده را وارد کنید — باقی‌مانده خودکار «نامشخص» می‌شود
+          💡 تعداد نر یا ماده را وارد کنید — سومین فیلد خودکار محاسبه می‌شود
         </div>
-      ) : isUnknownEmpty && remaining > 0 && maleNum > 0 && femaleNum > 0 ? (
+      ) : autoFillField ? (
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', marginBottom: 8, lineHeight: 1.6 }}>
-          ✓ {toFa(remaining)} نامشخص خودکار — {toFa(maleNum)} نر + {toFa(femaleNum)} ماده + {toFa(remaining)} نامشخص = {toFa(currentCount)}
+          ✓ {autoFillField === 'male' ? 'نر' : autoFillField === 'female' ? 'ماده' : 'نامشخص'} به‌طور خودکار <b>{toFa(autoFillValue)}</b> محاسبه شد
         </div>
-      ) : isUnknownEmpty && remaining > 0 && maleNum > 0 ? (
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--info)', marginBottom: 8, lineHeight: 1.6 }}>
-          ℹ️ فقط نر وارد شده — {toFa(remaining)} باقی‌مانده «نامشخص» (اگر ماده می‌دانید، وارد کنید)
-        </div>
-      ) : isUnknownEmpty && remaining > 0 && femaleNum > 0 ? (
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--info)', marginBottom: 8, lineHeight: 1.6 }}>
-          ℹ️ فقط ماده وارد شده — {toFa(remaining)} باقی‌مانده «نامشخص» (اگر نر می‌دانید، وارد کنید)
-        </div>
-      ) : !isUnknownEmpty && mismatch ? (
+      ) : mismatch ? (
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', marginBottom: 8, lineHeight: 1.6 }}>
           ⚠️ {toFa(Math.abs(diff))} پرنده {diff > 0 ? 'بیشتر' : 'کمتر'} — ثبت‌شده {toFa(totalInput)}، نیاز {toFa(currentCount)}
         </div>
