@@ -433,3 +433,63 @@ peak 95٪، eggsPerYear 400، eggWeight 63g
 5. تست = مشخصات مطلوب، باگ production در standards کشف شد
 
 آخرین تصمیم: 1405/11/08
+
+## جلسه 1405/11/08 (9 ادامه — C2 + D کامل)
+
+آخرین commit: d0f25873
+
+### C2 — اتصال calc به dlg
+
+تصمیم C2.1 — environment warnings در calc/environment.ts
+دلیل: tempWarning/humidityWarning از dlg/store.ts به calc منتقل شدند
+نتیجه: LogCard از calc استفاده می‌کند، دما/رطوبت استاندارد می‌شوند
+
+تصمیم C2.2 — حذف 6 تابع مرده از dlg/store.ts
+حذف شده: waterFeedRatio، mortalityRate، totalWater، lightWarning، tempWarning، humidityWarning
+جایگزین: calculateWaterMetrics، calculateMortality، calculateFeedMetrics، calculateEnvironmentWarnings
+دلیل: صفر مصرف‌کننده در UI، جایگزین در calc
+
+### D — Validation dlg
+
+تصمیم D1 — sumDeaths check مستقل از flockAlive
+دلیل: اگر flockAlive=0 (بدون context)، چک skipped می‌شد (باگ)
+باگ کشف شده توسط تست baseline
+
+تصمیم D2 — hen-day با femaleCount
+قبل: (eatingEggs+fertileEggs) / flockAlive * 100
+بعد: (eatingEggs+fertileEggs) / femaleForRate * 100
+که femaleForRate = femaleCount اگر >0، وگرنه flockAlive
+دلیل: گله sexed (500 نر + 500 ماده): 450 تخم = 90% hen-day واقعی، نه 45%
+
+تصمیم D3 — water balance soft warning (tolerance 20%)
+دلیل: کاربر می‌تواند waterAmount دستی وارد کند که با waterFillCount×waterFillVolume فرق دارد
+soft (fatal: false) → block نمی‌کند، فقط هشدار
+
+تصمیم D4 — feedRemaining soft warning
+آستانه: feedRemaining > feedAmount × 3 → warning
+دلیل: باقی‌مانده دیروز ممکن است بالاتر باشد
+
+### D4 — Intelligence standards-aware
+
+تصمیم D4a — species_temp با standards
+قبل: getTempIdeal (33°C ثابت برای همه)
+بعد: getThresholds(ctx) (Ross 308 روز 21: 21-25°C)
+کد تکراری حذف شد (دو بلوک species_temp یکسان)
+
+تصمیم D4b — species/species_curve با getSpeciesExpected
+فایل جدید: shr/calc/species-expected.ts (21 فیلد)
+منابع: getThresholds، getStandardFor، getEffectiveGrowth، findInRange
+دسته‌ها: FCR/ADG، humidity، feed nutrients، space، production، egg weight، weight curve
+
+تصمیم D4d — گسترش context در FeedSection + EggsWeightSection
+breedKey + ageDays + flockType در FieldHint
+دلیل: بدون breedKey، getSpeciesExpected null برمی‌گرداند
+
+### درس‌های session (27 commit، 185+ تست)
+1. heredoc __EOF__ در markdown شکسته می‌شود → PATCHEND
+2. Termux /tmp ندارد → ~/.bird_bak/
+3. anchor line-based مقاوم‌تر از text-replace
+4. 3 بار rollback در D3b/c به‌خاطر anchor طولانی
+5. تست baseline، باگ‌های 9 ماهه کشف می‌کند (production Hy-Line/Lohmann)
+
+آخرین تصمیم: 1405/11/08

@@ -1202,3 +1202,39 @@ PENDING — گام بعدی:
   - LogCard → metricها
 - جایگزین A: D (validation dlg)
 - جایگزین B: C3 (اتصال calc به dsh و flk)
+
+## جلسه 1405/11/08 (9 ادامه — C2 + D کامل)
+
+آخرین commit: d0f25873
+
+DONE:
+- C2 — اتصال calc به dlg (4 commits)
+- D — Validation dlg (4 commits)
+- D4 — Intelligence standards-aware (4 commits)
+
+28 commit این جلسه (C1 16 + C2 4 + D 4 + D4 4)
+17 فایل تست جدید
+~185 تست جدید
+
+آمار جلسه کامل:
+- commits: 28 (از 86feb29c به d0f25873)
+- تست calc: 140
+- تست validation dlg: 22
+- تست intelligence temp: 7
+- تست intelligence species: 13
+- صفر regression
+
+D4 کامل:
+- D4a: species_temp (5 فیلد دمای dlg) — bf07dee1
+- D4b: species/species_curve (21 فیلد) — 51303f5e
+- D4d: context در FeedSection + EggsWeightSection — d0f25873
+
+Intelligence قبل/بعد:
+- قبل: 36% شکسته (26 از 92 فیلد species* پیاده نشده بود)
+- بعد: standards-aware با getSpeciesExpected
+
+PENDING — گام بعدی:
+- D5: atomicSave + pre-flight در useDlgSave (نقشه B1)
+- C3: اتصال calc به dsh و flk (helpers-audit:246 فرمول غلط FCR)
+- بخش A/B dlg (تحلیل شده، پیاده نشده): مدل داده + زنجیره اتمیک
+- بخش E/F/G/H dlg (از تحلیل اولیه)
