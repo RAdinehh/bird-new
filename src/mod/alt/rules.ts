@@ -482,6 +482,87 @@ export function detectAllAlerts(): RuleAlert[] {
         date: log.date, notes: ''
       });
     }
+
+    // ═══ C3e — سرفه (بیماری تنفسی) ═══
+    if (log.sound === 'cough') {
+      alerts.push({
+        level: 'important',
+        category: 'behavior',
+        title: 'سرفه — بیماری تنفسی محتمل',
+        message: 'در ' + (flock?.name || 'گله') + ' — بررسی فوری — تاریخ ' + toFa(log.date),
+        source: 'dlg',
+        sourceId: log.id + ':sound-cough',
+        date: log.date, notes: ''
+      });
+    }
+
+    // ═══ C3e — عطسه (بیماری تنفسی) ═══
+    if (log.sound === 'sneeze') {
+      alerts.push({
+        level: 'important',
+        category: 'behavior',
+        title: 'عطسه — بیماری تنفسی محتمل',
+        message: 'در ' + (flock?.name || 'گله') + ' — تاریخ ' + toFa(log.date),
+        source: 'dlg',
+        sourceId: log.id + ':sound-sneeze',
+        date: log.date, notes: ''
+      });
+    }
+
+    // ═══ C3e — توزیع گوشه‌گیر ═══
+    if (log.distribution === 'cornered') {
+      alerts.push({
+        level: 'important',
+        category: 'behavior',
+        title: 'توزیع گوشه‌گیر',
+        message: 'در ' + (flock?.name || 'گله') + ' — احتمال سرما یا استرس — تاریخ ' + toFa(log.date),
+        source: 'dlg',
+        sourceId: log.id + ':distribution-cornered',
+        date: log.date, notes: ''
+      });
+    }
+
+    // ═══ C3e — نسبت آب/دان غیرعادی ═══
+    if (log.waterAmount && log.waterAmount > 0) {
+      const effectiveFeed = (log.feedConsumed && log.feedConsumed > 0) ? log.feedConsumed : (log.feedDelivered || 0);
+      if (effectiveFeed > 0) {
+        const ratio = log.waterAmount / effectiveFeed;
+        if (ratio > 2.5) {
+          alerts.push({
+            level: 'important',
+            category: 'water',
+            title: 'نسبت آب/دان بالا: ' + toFa(ratio.toFixed(2)),
+            message: 'در ' + (flock?.name || 'گله') + ' — احتمال بیماری یا گرما — تاریخ ' + toFa(log.date),
+            source: 'dlg',
+            sourceId: log.id + ':water-ratio-high',
+            date: log.date, notes: ''
+          });
+        } else if (ratio < 1.2) {
+          alerts.push({
+            level: 'info',
+            category: 'water',
+            title: 'نسبت آب/دان پایین: ' + toFa(ratio.toFixed(2)),
+            message: 'در ' + (flock?.name || 'گله') + ' — بررسی آبخوری — تاریخ ' + toFa(log.date),
+            source: 'dlg',
+            sourceId: log.id + ':water-ratio-low',
+            date: log.date, notes: ''
+          });
+        }
+      }
+    }
+
+    // ═══ C3e — دان داده شد ولی مصرف محاسبه نشد ═══
+    if ((!log.feedConsumed || log.feedConsumed === 0) && log.feedDelivered && log.feedDelivered > 0) {
+      alerts.push({
+        level: 'info',
+        category: 'feed',
+        title: 'دان مصرف محاسبه نشد',
+        message: 'در ' + (flock?.name || 'گله') + ' — ' + toFa(log.feedDelivered) + ' kg داده شد ولی مصرف صفر — تاریخ ' + toFa(log.date),
+        source: 'dlg',
+        sourceId: log.id + ':feed-no-consumed',
+        date: log.date, notes: ''
+      });
+    }
   });
 
   // ============ ۵. تخم‌گذاری ============

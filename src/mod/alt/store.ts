@@ -4,7 +4,7 @@ import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
 
 export type AlertLevel = 'critical' | 'important' | 'info';
-export type AlertCategory = 'stock' | 'vaccine' | 'payment' | 'temp' | 'humidity' | 'ventilation' | 'litter' | 'behavior' | 'mortality' | 'reproduction' | 'other';
+export type AlertCategory = 'stock' | 'vaccine' | 'payment' | 'temp' | 'humidity' | 'ventilation' | 'litter' | 'behavior' | 'water' | 'feed' | 'mortality' | 'reproduction' | 'other';
 export type AlertStatus = 'active' | 'dismissed' | 'snoozed';
 
 export interface Alert {
@@ -116,6 +116,8 @@ export const CATEGORY_LABEL: Record<AlertCategory, string> = {
   ventilation: 'تهویه',
   litter: 'بستر',
   behavior: 'رفتار پرنده',
+  water: 'آب',
+  feed: 'دان',
   mortality: 'تلفات',
   reproduction: 'تخم‌گذاری و جوجه‌کشی',
   other: 'سایر'
