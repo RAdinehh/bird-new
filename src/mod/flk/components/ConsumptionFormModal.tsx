@@ -9,6 +9,7 @@ import { useFlk, type Flock } from '../store';
 import { todayJ } from '../api/flocksCalc';
 import { toastMsg } from '../../../cor/store/toast';
 import { toEn } from '../../../shr/utils/fa';
+import { HELP } from '../../../shr/help/helpTexts';
 
 interface Props {
   open: boolean;
@@ -121,7 +122,7 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
       {/* ═══ جزئیات — تک ستونه ═══ */}
       <div style={GROUP_TITLE}>📝 جزئیات — اختیاری</div>
 
-      <Field label="روش توزیع">
+      <Field label="روش توزیع" help={HELP.flk.consumptionSource}>
         <Select value={source} onChange={e => setSource(e.target.value as any)}>
           <option value="bulk_manual">🍽️ پر کردن سطل</option>
           <option value="daily_manual">📝 روزانه دستی</option>
