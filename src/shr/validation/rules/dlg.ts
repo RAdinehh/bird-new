@@ -175,14 +175,30 @@ export function createDlgSchema(context: ValidationContext = {}) {
       }
     }
 
-    // آب: تعداد × حجم = مقدار
-    if (d.waterFillCount && d.waterFillVolume && d.waterAmount) {
-      const calc = d.waterFillCount * d.waterFillVolume;
-      // اگه مقدار آب دستی داده شده و با محاسبه فرق زیاد داره
-      if (Math.abs(calc - d.waterAmount) > calc * 0.1) {
-        // هشدار، نه خطا
+      // آب: تعداد × حجم = مقدار (soft warning)
+      if (d.waterFillCount && d.waterFillVolume && d.waterAmount) {
+        const calc = d.waterFillCount * d.waterFillVolume;
+        if (calc > 0 && Math.abs(calc - d.waterAmount) > calc * 0.2) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `مقدار آب (${d.waterAmount} L) با محاسبه (${calc} L) فرق دارد — بررسی کنید`,
+            path: ['waterAmount'],
+            fatal: false,
+          });
+        }
       }
-    }
+
+      // feedRemaining ≤ feedAmount × 3 (soft — باقی‌مانده دیروز ممکن است)
+      if (d.feedRemaining != null && d.feedAmount != null && d.feedAmount > 0) {
+        if (d.feedRemaining > d.feedAmount * 3) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `دان باقی‌مانده (${d.feedRemaining} kg) خیلی بیشتر از دان داده‌شده (${d.feedAmount} kg) است`,
+            path: ['feedRemaining'],
+            fatal: false,
+          });
+        }
+      }
 
     // واکسن‌های انتخاب‌شده از انبار → مقدار مصرفی اجباری
     for (let i = 0; i < (d.vaccines || []).length; i++) {
