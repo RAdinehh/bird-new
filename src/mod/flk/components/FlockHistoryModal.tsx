@@ -600,7 +600,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               <span style={{ textAlign: 'center' }}>اولیه</span>
               <span style={{ textAlign: 'center' }}>تلفات</span>
               <span style={{ textAlign: 'center' }}>فروش</span>
-              <span style={{ textAlign: 'center' }}>سایر</span>
+              <span style={{ textAlign: 'center', cursor: 'help' }} title="اصلاحات دستی، ادغام/انتقال یا خروج بدون سند">سایر</span>
               <span style={{ textAlign: 'center' }}>فعلی</span>
             </div>
 
@@ -646,8 +646,8 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
             }}>
               <span style={{ color: 'var(--accent)' }}>جمع</span>
               <span style={{ textAlign: 'center', fontFamily: 'monospace' }}>{toFa(sexAggregates.init.male + sexAggregates.init.female + sexAggregates.init.unknown)}</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: 'var(--danger)' }}>{(sexAggregates.deaths.male + sexAggregates.deaths.female + sexAggregates.deaths.unknown) > 0 ? `-${toFa(sexAggregates.deaths.male + sexAggregates.deaths.female + sexAggregates.deaths.unknown)}` : '۰'}</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: 'var(--purple)' }}>{(sexAggregates.sells.male + sexAggregates.sells.female + sexAggregates.sells.unknown) > 0 ? `-${toFa(sexAggregates.sells.male + sexAggregates.sells.female + sexAggregates.sells.unknown)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: (sexAggregates.deaths.male + sexAggregates.deaths.female + sexAggregates.deaths.unknown) > 0 ? 'var(--danger)' : 'var(--muted)' }}>{(sexAggregates.deaths.male + sexAggregates.deaths.female + sexAggregates.deaths.unknown) > 0 ? `-${toFa(sexAggregates.deaths.male + sexAggregates.deaths.female + sexAggregates.deaths.unknown)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: (sexAggregates.sells.male + sexAggregates.sells.female + sexAggregates.sells.unknown) > 0 ? 'var(--purple)' : 'var(--muted)' }}>{(sexAggregates.sells.male + sexAggregates.sells.female + sexAggregates.sells.unknown) > 0 ? `-${toFa(sexAggregates.sells.male + sexAggregates.sells.female + sexAggregates.sells.unknown)}` : '۰'}</span>
               <span style={{ textAlign: 'center', fontFamily: 'monospace', color: 'var(--warn)' }}>{(sexAggregates.others.male + sexAggregates.others.female + sexAggregates.others.unknown) !== 0 ? `${(sexAggregates.others.male + sexAggregates.others.female + sexAggregates.others.unknown) > 0 ? '+' : ''}${toFa(sexAggregates.others.male + sexAggregates.others.female + sexAggregates.others.unknown)}` : '۰'}</span>
               <span style={{ textAlign: 'center', fontFamily: 'monospace', color: 'var(--accent)' }}>{toFa(sexAggregates.current.male + sexAggregates.current.female + sexAggregates.current.unknown)}</span>
             </div>
