@@ -423,7 +423,11 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>دلیل</span>
-              <Select value={reasonCode} onChange={e => setReasonCode(e.target.value as FlockEventReasonCode)}>
+              <Select
+                value={reasonCode}
+                onChange={e => setReasonCode(e.target.value as FlockEventReasonCode)}
+                style={{ background: 'var(--card)', fontSize: 'var(--fs-sm)', height: 40, borderColor: 'var(--warn)' }}
+              >
                 {REASON_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
               </Select>
             </div>
