@@ -396,7 +396,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               size="sm"
               variant="outline"
               onClick={() => setCorrectionOpen(true)}
-              style={{ borderColor: 'var(--warn)', color: 'var(--warn)', borderWidth: 1.5, fontWeight: 700 }}
+              style={{ borderColor: 'var(--accent)', color: 'var(--accent)', borderWidth: 1.5, fontWeight: 700 }}
             >+ ثبت اصلاح</Btn>
           )}
         </div>
@@ -478,9 +478,9 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <button type="button" onClick={handleSaveCorrection} disabled={num === 0 || newCount < 0} style={{
               height: 40,
-              background: (num === 0 || newCount < 0) ? 'var(--input-bg)' : 'var(--warn)',
+              background: (num === 0 || newCount < 0) ? 'var(--input-bg)' : 'var(--accent)',
               color: (num === 0 || newCount < 0) ? 'var(--muted)' : 'white',
-              border: '1px solid ' + ((num === 0 || newCount < 0) ? 'var(--border)' : 'var(--warn)'),
+              border: '1px solid ' + ((num === 0 || newCount < 0) ? 'var(--border)' : 'var(--accent)'),
               borderRadius: 'var(--r-md)',
               fontFamily: 'inherit',
               fontSize: 'var(--fs-sm)',
