@@ -49,13 +49,27 @@ export default function SexingModal({ open, onClose, flock }: Props) {
   const [err, setErr] = useState('');
 
   const currentCount = flock?.currentCount ?? 0;
-  const maleNum = toEnNum(maleStr);
-  const femaleNum = toEnNum(femaleStr);
+  const maleRaw = toEnNum(maleStr);
+  const femaleRaw = toEnNum(femaleStr);
+  const unknownRaw = toEnNum(unknownStr);
 
-  // 🆕 Smart Total: اگر فیلد نامشخص خالی باشد، باقی‌مانده را خودکار محاسبه کن
-  const isUnknownAuto = unknownStr.trim() === '';
-  const remaining = Math.max(0, currentCount - maleNum - femaleNum);
-  const unknownNum = isUnknownAuto ? remaining : toEnNum(unknownStr);
+  const isMaleEmpty = maleStr.trim() === '';
+  const isFemaleEmpty = femaleStr.trim() === '';
+  const isUnknownEmpty = unknownStr.trim() === '';
+
+  // 🆕 Smart Total: سه‌فیلد هوشمند
+  const remaining = Math.max(0, currentCount - maleRaw - femaleRaw - unknownRaw);
+  let maleNum = maleRaw;
+  let femaleNum = femaleRaw;
+  let unknownNum = unknownRaw;
+
+  if (isUnknownEmpty && remaining > 0) {
+    unknownNum = remaining;
+  } else if (!isUnknownEmpty && isMaleEmpty && remaining > 0) {
+    maleNum = remaining;
+  } else if (!isUnknownEmpty && !isMaleEmpty && isFemaleEmpty && remaining > 0) {
+    femaleNum = remaining;
+  }
 
   const totalInput = maleNum + femaleNum + unknownNum;
   const diff = totalInput - currentCount;
@@ -154,7 +168,7 @@ export default function SexingModal({ open, onClose, flock }: Props) {
           <NumField
             value={maleStr}
             onChange={e => setMaleStr(e.target.value)}
-            placeholder="۰"
+            placeholder={isMaleEmpty && !isUnknownEmpty && isFemaleEmpty && remaining > 0 ? String(remaining) : '۰'}
             unit="پرنده"
           />
         </Field>
@@ -162,7 +176,7 @@ export default function SexingModal({ open, onClose, flock }: Props) {
           <NumField
             value={femaleStr}
             onChange={e => setFemaleStr(e.target.value)}
-            placeholder="۰"
+            placeholder={isFemaleEmpty && !isUnknownEmpty && remaining > 0 ? String(remaining) : '۰'}
             unit="پرنده"
           />
         </Field>
@@ -200,19 +214,19 @@ export default function SexingModal({ open, onClose, flock }: Props) {
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', marginBottom: 8, lineHeight: 1.6 }}>
           💡 تعداد نر یا ماده را وارد کنید — باقی‌مانده خودکار «نامشخص» می‌شود
         </div>
-      ) : isUnknownAuto && remaining > 0 && maleNum > 0 && femaleNum > 0 ? (
+      ) : isUnknownEmpty && remaining > 0 && maleNum > 0 && femaleNum > 0 ? (
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', marginBottom: 8, lineHeight: 1.6 }}>
           ✓ {toFa(remaining)} نامشخص خودکار — {toFa(maleNum)} نر + {toFa(femaleNum)} ماده + {toFa(remaining)} نامشخص = {toFa(currentCount)}
         </div>
-      ) : isUnknownAuto && remaining > 0 && maleNum > 0 ? (
+      ) : isUnknownEmpty && remaining > 0 && maleNum > 0 ? (
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--info)', marginBottom: 8, lineHeight: 1.6 }}>
           ℹ️ فقط نر وارد شده — {toFa(remaining)} باقی‌مانده «نامشخص» (اگر ماده می‌دانید، وارد کنید)
         </div>
-      ) : isUnknownAuto && remaining > 0 && femaleNum > 0 ? (
+      ) : isUnknownEmpty && remaining > 0 && femaleNum > 0 ? (
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--info)', marginBottom: 8, lineHeight: 1.6 }}>
           ℹ️ فقط ماده وارد شده — {toFa(remaining)} باقی‌مانده «نامشخص» (اگر نر می‌دانید، وارد کنید)
         </div>
-      ) : !isUnknownAuto && mismatch ? (
+      ) : !isUnknownEmpty && mismatch ? (
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', marginBottom: 8, lineHeight: 1.6 }}>
           ⚠️ {toFa(Math.abs(diff))} پرنده {diff > 0 ? 'بیشتر' : 'کمتر'} — ثبت‌شده {toFa(totalInput)}، نیاز {toFa(currentCount)}
         </div>
