@@ -754,7 +754,7 @@ function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        padding: '10px 0',
+        padding: '6px 0',
         borderBottom: '1px dashed var(--border)',
       }}>
         {/* برچسب جنسیت */}
@@ -790,16 +790,16 @@ function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
 
   return (
     <div style={{
-      padding: '10px 12px',
+      padding: '8px 10px',
       background: 'var(--input-bg)',
       borderRadius: 'var(--r-md)',
       border: '1px solid var(--border)',
       display: 'flex',
       flexDirection: 'column',
-      gap: 2,
+      gap: 0,
     }}>
       {/* هدر کارت */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: 8, marginBottom: 4 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: 6, marginBottom: 2 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ fontSize: 18 }}>{meta.icon}</span>
           <b style={{ color: meta.tone, fontSize: 'var(--fs-base)' }}>{meta.label}</b>
@@ -816,7 +816,7 @@ function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
 
       {/* توضیح */}
       {ev.note && (
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingTop: 8 }}>
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingTop: 6 }}>
           📝 {ev.note}
         </div>
       )}
