@@ -1,6 +1,6 @@
 /**
  * FlockHistoryModal.tsx — تاریخچه رویدادهای گله
- * تب‌بندی منطقی + فیلتر + گروه‌بندی تاریخ + صفحه‌بندی
+ * ۳ تب با سلسله‌مراتب منطقی + موجودی تفکیک‌شده
  */
 import { useEffect, useState, useMemo, type ReactNode } from 'react';
 import { Modal, Btn, BtnRow, Select } from '../../../shr/components/ui';
@@ -87,6 +87,40 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   const num = parseInt(toEn(delta).replace(/[^0-9-]/g, ''), 10) || 0;
   const newCount = current + num;
 
+  // 🆕 breakdown رویدادها برای موجودی
+  const eventBreakdown = useMemo(() => {
+    const b = { death: 0, sell: 0, cull: 0, add: 0, correctionNet: 0 };
+    for (const e of (flock.events || [])) {
+      if (e.revoked) continue;
+      switch (e.type) {
+        case 'death': b.death += e.count; break;
+        case 'sell': b.sell += e.count; break;
+        case 'cull': b.cull += e.count; break;
+        case 'add': b.add += e.count; break;
+        case 'transfer': b.add += e.count; break;
+        case 'correction': b.correctionNet += (e.direction === -1 ? -1 : 1) * e.count; break;
+      }
+    }
+    return b;
+  }, [flock.events]);
+
+  const hasBreakdown =
+    eventBreakdown.death > 0 ||
+    eventBreakdown.sell > 0 ||
+    eventBreakdown.cull > 0 ||
+    eventBreakdown.add > 0 ||
+    eventBreakdown.correctionNet !== 0;
+
+  // 🆕 نسبت جنسیتی
+  const sexRatios = useMemo(() => {
+    const m = flock.maleCount ?? 0;
+    const f = flock.femaleCount ?? 0;
+    const total = m + f;
+    if (total === 0) return null;
+    const mp = Math.round((m / total) * 100);
+    return { malePct: mp, femalePct: 100 - mp };
+  }, [flock.maleCount, flock.femaleCount]);
+
   const handleSaveCorrection = async () => {
     setValidationError('');
     if (num === 0) { setValidationError('عدد را وارد کنید'); return; }
@@ -161,7 +195,6 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   }, [flock.events, filter]);
 
   const visibleData = useMemo(() => {
-    // Events
     const egVisible = (() => {
       if (showAllEvents) return { items: groups, hidden: 0 };
       let total = 0;
@@ -175,11 +208,9 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
       const allTotal = groups.reduce((s, g) => s + g.events.length, 0);
       return { items: out, hidden: allTotal - visTotal };
     })();
-    // Audit
     const allAudit = (flock.sexBalanceEvents || []).slice().sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
     const auditVisible = showAllAudit ? allAudit : allAudit.slice(0, VISIBLE_LIMIT);
     const auditHidden = allAudit.length - auditVisible.length;
-    // Consumption
     const allCons = flockConsumption.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     const consVisible = showAllConsumption ? allCons : allCons.slice(0, VISIBLE_LIMIT);
     const consHidden = allCons.length - consVisible.length;
@@ -212,36 +243,65 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   return (
     <Modal open={open} onClose={onClose} title={'📜 رویدادها • ' + flock.name}>
 
-      {/* ═══ خط باریک موجودی ═══ */}
+      {/* ═══ موجودی با breakdown ═══ */}
       <div style={{
-        padding: '6px 10px',
+        padding: '8px 10px',
         background: 'var(--input-bg)',
         border: '1px solid var(--border)',
         borderRadius: 'var(--r-sm)',
         marginBottom: 10,
         display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: 8,
+        flexDirection: 'column',
+        gap: 6,
         fontSize: 12,
       }}>
-        <span>موجودی: <b>{toFa(current)}</b> از {toFa(initial)}</span>
-        {losses > 0 && (
-          <span style={{ color: lossesPct > 5 ? 'var(--danger)' : 'var(--warn)', fontWeight: 700 }}>
-            کاهش: {toFa(losses)} ({toFa(lossesPct.toFixed(1))}٪)
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+          <span>
+            🐔 <b>{toFa(current)}</b> زنده
+            <span style={{ color: 'var(--muted)', margin: '0 6px' }}>·</span>
+            <span style={{ color: 'var(--muted)' }}>اولیه {toFa(initial)}</span>
           </span>
-        )}
-        {flock.dealType && flock.dealType !== 'own' && (
-          <span style={{ fontSize: 10, color: 'var(--purple)', fontWeight: 600 }}>
-            {flock.dealType === 'partnership' && '🤝 شراکتی'}
-            {flock.dealType === 'consignment' && '📦 امانی'}
-            {flock.dealType === 'rent' && '📋 اجاره'}
-          </span>
+          {losses > 0 && (
+            <span style={{ color: lossesPct > 5 ? 'var(--danger)' : 'var(--warn)', fontWeight: 700 }}>
+              {toFa(losses)} کاهش ({toFa(lossesPct.toFixed(1))}٪)
+            </span>
+          )}
+          {flock.dealType && flock.dealType !== 'own' && (
+            <span style={{ fontSize: 10, color: 'var(--purple)', fontWeight: 600 }}>
+              {flock.dealType === 'partnership' && '🤝 شراکتی'}
+              {flock.dealType === 'consignment' && '📦 امانی'}
+              {flock.dealType === 'rent' && '📋 اجاره'}
+            </span>
+          )}
+        </div>
+
+        {hasBreakdown && (
+          <div style={{
+            display: 'flex', gap: 10, flexWrap: 'wrap',
+            fontSize: 11, color: 'var(--muted)',
+            paddingTop: 6,
+            borderTop: '1px dashed var(--border)',
+          }}>
+            {eventBreakdown.death > 0 && (
+              <span>💀 تلفات <b style={{ color: 'var(--danger)' }}>{toFa(eventBreakdown.death)}</b></span>
+            )}
+            {eventBreakdown.sell > 0 && (
+              <span>💰 فروش <b style={{ color: 'var(--purple)' }}>{toFa(eventBreakdown.sell)}</b></span>
+            )}
+            {eventBreakdown.cull > 0 && (
+              <span>🗑 حذف <b>{toFa(eventBreakdown.cull)}</b></span>
+            )}
+            {eventBreakdown.add > 0 && (
+              <span>➕ افزودن <b style={{ color: 'var(--accent)' }}>{toFa(eventBreakdown.add)}</b></span>
+            )}
+            {eventBreakdown.correctionNet !== 0 && (
+              <span>✏️ اصلاح <b style={{ color: 'var(--warn)' }}>{eventBreakdown.correctionNet > 0 ? '+' : ''}{toFa(eventBreakdown.correctionNet)}</b></span>
+            )}
+          </div>
         )}
       </div>
 
-      {/* ═══ فرم اصلاح (فقط وقتی باز) ═══ */}
+      {/* ═══ فرم اصلاح ═══ */}
       {correctionOpen && (
         <div style={{ marginBottom: 12, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px dashed var(--border)', paddingBottom: 8 }}>
@@ -295,8 +355,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
         </div>
       )}
 
-      {/* ═══ تب‌ها ═══ */}
-      {/* ═══ تب‌های اصلی — Segmented Control ═══ */}
+      {/* ═══ تب‌ها (Segmented Control) ═══ */}
       <div style={{
         display: 'flex',
         gap: 0,
@@ -321,7 +380,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
         )}
       </div>
 
-      {/* ═══ فیلتر نوع (فقط تب همه) ═══ */}
+      {/* ═══ فیلتر (فقط تب رویدادها) ═══ */}
       {tabMode === 'events' && totalCount > 0 && (
         <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap', alignItems: 'center' }}>
           <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, marginLeft: 4 }}>فیلتر:</span>
@@ -335,7 +394,6 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               </Chip>
             );
           })}
-
         </div>
       )}
 
@@ -343,34 +401,38 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
       {tabMode === 'consumption' ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {consumptionSummary.hasData && (
-            <div style={{ padding: '8px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 11 }}>
-              <div style={{ fontWeight: 700, marginBottom: 6, color: 'var(--muted)', fontSize: 10 }}>📊 خلاصه ۳۰ روز اخیر</div>
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                <span>🍽️ دان: <b>{toFa(consumptionSummary.totalFeedKg)} kg</b></span>
-                <span>💧 آب: <b>{toFa(consumptionSummary.totalWaterL)} L</b></span>
-                <span style={{ color: 'var(--muted)', fontSize: 10 }}>({toFa(consumptionSummary.eventCount)} رویداد)</span>
-              </div>
-              {(consumptionSummary.bySex.male > 0 || consumptionSummary.bySex.female > 0) && (
-                <div style={{ marginTop: 4, fontSize: 10, color: 'var(--muted)' }}>
-                  ♂ نر: {toFa(consumptionSummary.bySex.male)} kg · ♀ ماده: {toFa(consumptionSummary.bySex.female)} kg
+            <div>
+              <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>📊 خلاصه ۳۰ روز اخیر</div>
+              <div style={{ padding: '8px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 11 }}>
+                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                  <span>🍽️ دان: <b>{toFa(consumptionSummary.totalFeedKg)} kg</b></span>
+                  <span>💧 آب: <b>{toFa(consumptionSummary.totalWaterL)} L</b></span>
+                  <span style={{ color: 'var(--muted)', fontSize: 10 }}>({toFa(consumptionSummary.eventCount)} رویداد)</span>
                 </div>
-              )}
+                {(consumptionSummary.bySex.male > 0 || consumptionSummary.bySex.female > 0) && (
+                  <div style={{ marginTop: 4, fontSize: 10, color: 'var(--muted)' }}>
+                    ♂ نر: {toFa(consumptionSummary.bySex.male)} kg · ♀ ماده: {toFa(consumptionSummary.bySex.female)} kg
+                  </div>
+                )}
+              </div>
             </div>
           )}
           {fcrResult.fcr !== null && (
-            <div style={{ padding: '8px 10px', background: fcrResult.confidence === 'exact' ? 'var(--accent-soft)' : 'var(--warn-soft)', border: `1px solid ${fcrResult.confidence === 'exact' ? 'var(--accent-border)' : 'var(--warn)'}`, borderRadius: 'var(--r-md)', fontSize: 11 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                <span style={{ fontWeight: 700, color: 'var(--muted)', fontSize: 10 }}>📊 FCR</span>
-                <span style={{ fontSize: 9, padding: '1px 5px', borderRadius: 3, background: fcrResult.confidence === 'exact' ? 'var(--accent)' : 'var(--warn)', color: 'white', fontWeight: 700 }}>
-                  {fcrResult.confidence === 'exact' ? 'دقیق' : fcrResult.confidence === 'standard' ? 'استاندارد' : 'ناقص'}
-                </span>
-              </div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: fcrResult.confidence === 'exact' ? 'var(--accent)' : 'var(--warn)', marginBottom: 4 }}>
-                {toFa(fcrResult.fcr.toFixed(2))}
-              </div>
-              <div style={{ fontSize: 10, color: 'var(--muted)', lineHeight: 1.6 }}>
-                {fcrResult.note}<br />
-                دان/پرنده: {toFa(fcrResult.feedPerBird)} kg
+            <div>
+              <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>📈 FCR</div>
+              <div style={{ padding: '8px 10px', background: fcrResult.confidence === 'exact' ? 'var(--accent-soft)' : 'var(--warn-soft)', border: `1px solid ${fcrResult.confidence === 'exact' ? 'var(--accent-border)' : 'var(--warn)'}`, borderRadius: 'var(--r-md)', fontSize: 11 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: fcrResult.confidence === 'exact' ? 'var(--accent)' : 'var(--warn)' }}>
+                    {toFa(fcrResult.fcr.toFixed(2))}
+                  </span>
+                  <span style={{ fontSize: 9, padding: '1px 5px', borderRadius: 3, background: fcrResult.confidence === 'exact' ? 'var(--accent)' : 'var(--warn)', color: 'white', fontWeight: 700 }}>
+                    {fcrResult.confidence === 'exact' ? 'دقیق' : fcrResult.confidence === 'standard' ? 'استاندارد' : 'ناقص'}
+                  </span>
+                </div>
+                <div style={{ fontSize: 10, color: 'var(--muted)', lineHeight: 1.6 }}>
+                  {fcrResult.note}<br />
+                  دان/پرنده: {toFa(fcrResult.feedPerBird)} kg
+                </div>
               </div>
             </div>
           )}
@@ -381,10 +443,11 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
             </div>
           ) : (
             <>
+              <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>📋 رویدادهای مصرف</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {visibleData.consumption.items.map(ev => (
-                  <div key={ev.id} style={{ display: 'flex', gap: 8, padding: '6px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)', fontSize: 'var(--fs-xs)' }}>
-                    <span style={{ fontSize: 16, flexShrink: 0 }}>{ev.type === 'feed' ? '🍽️' : '💧'}</span>
+                  <div key={ev.id} style={{ display: 'flex', gap: 8, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)', fontSize: 'var(--fs-sm)' }}>
+                    <span style={{ fontSize: 18, flexShrink: 0 }}>{ev.type === 'feed' ? '🍽️' : '💧'}</span>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 6 }}>
                         <b dir="ltr">
@@ -410,15 +473,34 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
         </div>
       ) : tabMode === 'audit' ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {deathRate.hasData && (
-            <div style={{ padding: '8px 10px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 11 }}>
-              <div style={{ fontWeight: 700, marginBottom: 6, color: 'var(--muted)', fontSize: 10 }}>📊 نرخ تلفات به تفکیک جنسیت</div>
-              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                <span>♂ نر: <b dir="ltr" style={{ color: toneFromRate(deathRate.male.rate) }}>{toFa(deathRate.male.deaths)} / {toFa(deathRate.male.initial)} → {toFa(deathRate.male.rate.toFixed(1))}٪</b></span>
-                <span>♀ ماده: <b dir="ltr" style={{ color: toneFromRate(deathRate.female.rate) }}>{toFa(deathRate.female.deaths)} / {toFa(deathRate.female.initial)} → {toFa(deathRate.female.rate.toFixed(1))}٪</b></span>
-                {deathRate.unknown.deaths > 0 && (
-                  <span style={{ color: 'var(--muted)' }}>❓ نامشخص: <b>{toFa(deathRate.unknown.deaths)}</b></span>
+          {flock.genderSplitAt && (
+            <div>
+              <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>⚥ وضعیت جنسیتی فعلی</div>
+              <div style={{ padding: '8px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)' }}>
+                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                  <span>♂ نر: <b style={{ color: 'var(--info)' }}>{toFa(flock.maleCount ?? 0)}</b></span>
+                  <span>♀ ماده: <b style={{ color: 'var(--purple)' }}>{toFa(flock.femaleCount ?? 0)}</b></span>
+                  <span>❓ نامشخص: <b style={{ color: 'var(--muted)' }}>{toFa(flock.unknownCount ?? 0)}</b></span>
+                </div>
+                {sexRatios && (
+                  <div style={{ marginTop: 6, fontSize: 10, color: 'var(--muted)' }}>
+                    نسبت: {toFa(sexRatios.malePct)}٪ نر / {toFa(sexRatios.femalePct)}٪ ماده
+                  </div>
                 )}
+              </div>
+            </div>
+          )}
+          {deathRate.hasData && (
+            <div>
+              <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>💀 نرخ تلفات به تفکیک جنسیت</div>
+              <div style={{ padding: '8px 10px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 11 }}>
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                  <span>♂ نر: <b dir="ltr" style={{ color: toneFromRate(deathRate.male.rate) }}>{toFa(deathRate.male.deaths)} / {toFa(deathRate.male.initial)} → {toFa(deathRate.male.rate.toFixed(1))}٪</b></span>
+                  <span>♀ ماده: <b dir="ltr" style={{ color: toneFromRate(deathRate.female.rate) }}>{toFa(deathRate.female.deaths)} / {toFa(deathRate.female.initial)} → {toFa(deathRate.female.rate.toFixed(1))}٪</b></span>
+                  {deathRate.unknown.deaths > 0 && (
+                    <span style={{ color: 'var(--muted)' }}>❓ نامشخص: <b>{toFa(deathRate.unknown.deaths)}</b></span>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -429,6 +511,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
             </div>
           ) : (
             <>
+              <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>📋 تاریخچه تغییرات</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {visibleData.audit.items.map(ev => <AuditRow key={ev.id} ev={ev} />)}
               </div>
@@ -485,6 +568,31 @@ function ShowMoreButton({ count, onClick }: { count: number; onClick: () => void
   );
 }
 
+function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        flex: 1,
+        padding: '8px 10px',
+        fontSize: 'var(--fs-sm)',
+        fontWeight: 700,
+        borderRadius: 'calc(var(--r-md) - 3px)',
+        border: 'none',
+        background: active ? 'var(--card)' : 'transparent',
+        color: active ? 'var(--accent)' : 'var(--muted)',
+        cursor: 'pointer',
+        fontFamily: 'inherit',
+        boxShadow: active ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+        transition: 'all 0.15s',
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
 function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
   const meta = SEX_AUDIT_META[ev.type] || { icon: '•', label: ev.type, tone: 'var(--muted)' };
   const delta = formatSexDelta(ev.delta);
@@ -492,9 +600,7 @@ function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
     <div style={{ display: 'flex', gap: 8, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)', fontSize: 'var(--fs-sm)' }}>
       <span style={{ fontSize: 18, flexShrink: 0 }}>{meta.icon}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 6 }}>
-          <b style={{ color: meta.tone }}>{meta.label}</b>
-        </div>
+        <b style={{ color: meta.tone }}>{meta.label}</b>
         <div dir="ltr" style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 2, fontFamily: 'monospace', fontSize: 11 }}>
           <span>{toFa(ev.before.male)}/{toFa(ev.before.female)}/{toFa(ev.before.unknown)}</span>
           <span style={{ color: 'var(--muted)' }}>→</span>
@@ -518,17 +624,15 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
     <div style={{ display: 'flex', gap: 8, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)', fontSize: 'var(--fs-sm)' }}>
       <span style={{ fontSize: 18, flexShrink: 0 }}>{info.icon}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 6, alignItems: 'baseline' }}>
-          <div style={{ display: 'flex', gap: 6, alignItems: 'baseline', flexWrap: 'wrap' }}>
-            <b style={{ color: info.tone }}>{info.label}</b>
-            <span dir="ltr" style={{ fontFamily: 'monospace', fontWeight: 700, color: isRevoked ? 'var(--muted)' : (isPlus ? 'var(--accent)' : 'var(--danger)'), textDecoration: isRevoked ? 'line-through' : 'none' }}>
-              {isPlus ? '+' : '-'}{toFa(e.count)}
-            </span>
-          </div>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'baseline', flexWrap: 'wrap' }}>
+          <b style={{ color: info.tone }}>{info.label}</b>
+          <span dir="ltr" style={{ fontFamily: 'monospace', fontWeight: 700, color: isRevoked ? 'var(--muted)' : (isPlus ? 'var(--accent)' : 'var(--danger)'), textDecoration: isRevoked ? 'line-through' : 'none' }}>
+            {isPlus ? '+' : '-'}{toFa(e.count)}
+          </span>
         </div>
         {e.reason && <div style={{ color: 'var(--muted)', fontSize: 10, marginTop: 2 }}>{e.reason}</div>}
         {e.type === 'correction' && !e.linkedEventId && !e.revoked && (
-          <div style={{ color: 'var(--warn)', fontSize: 'var(--fs-xs)', marginTop: 4, padding: '4px 8px', background: 'var(--warn-soft)', borderRadius: 'var(--r-sm)', lineHeight: 1.5 }}>
+          <div style={{ color: 'var(--warn)', fontSize: 10, marginTop: 4, padding: '4px 8px', background: 'var(--warn-soft)', borderRadius: 'var(--r-sm)', lineHeight: 1.5 }}>
             ⚠️ این تغییر فقط روی موجودی گله اعمال شد، در «ثبت روزانه» سیستم ثبت نشده است.
           </div>
         )}
@@ -544,31 +648,5 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
 function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
   return (
     <button type="button" onClick={onClick} style={{ padding: '5px var(--sp-3)', fontSize: 12, fontWeight: 600, borderRadius: 'var(--r-sm)', border: '1px solid ' + (active ? 'var(--accent)' : 'var(--border)'), background: active ? 'var(--accent-soft)' : 'transparent', color: active ? 'var(--accent)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit' }}>{children}</button>
-  );
-}
-
-
-function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      style={{
-        flex: 1,
-        padding: '8px 10px',
-        fontSize: 'var(--fs-sm)',
-        fontWeight: 700,
-        borderRadius: 'calc(var(--r-md) - 3px)',
-        border: 'none',
-        background: active ? 'var(--card)' : 'transparent',
-        color: active ? 'var(--accent)' : 'var(--muted)',
-        cursor: 'pointer',
-        fontFamily: 'inherit',
-        boxShadow: active ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-        transition: 'all 0.15s',
-      }}
-    >
-      {children}
-    </button>
   );
 }
