@@ -186,26 +186,26 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
     const all = (flock.events || []).slice().sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
     const filtered = filter === 'all' ? all : all.filter(e => e.type === filter);
     const map = new Map<string, FlockEvent[]>();
-    const order: string[] = [];
     for (const e of filtered) {
-      const key = e.date === today ? 'امروز' : (e.date || 'نامشخص');
-      if (!map.has(key)) { map.set(key, []); order.push(key); }
+      const key = e.date || '';
+      if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(e);
     }
-    return order.map(k => ({ label: k, events: map.get(k)! }));
+    const sortedKeys = Array.from(map.keys()).sort((a, b) => b.localeCompare(a));
+    return sortedKeys.map(k => ({ label: k === today ? 'امروز' : (k || 'نامشخص'), events: map.get(k)! }));
   }, [flock.events, filter]);
 
   const auditGroups = useMemo(() => {
     const today = todayJ();
     const all = (flock.sexBalanceEvents || []).slice().sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
     const map = new Map<string, FlockSexBalanceEvent[]>();
-    const order: string[] = [];
     for (const e of all) {
-      const key = e.date === today ? 'امروز' : (e.date || 'نامشخص');
-      if (!map.has(key)) { map.set(key, []); order.push(key); }
+      const key = e.date || '';
+      if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(e);
     }
-    return order.map(k => ({ label: k, events: map.get(k)! }));
+    const sortedKeys = Array.from(map.keys()).sort((a, b) => b.localeCompare(a));
+    return sortedKeys.map(k => ({ label: k === today ? 'امروز' : (k || 'نامشخص'), events: map.get(k)! }));
   }, [flock.sexBalanceEvents]);
 
   const visibleData = useMemo(() => {
@@ -667,16 +667,22 @@ function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
         fontSize: 'var(--fs-sm)',
       }}>
         {/* برچسب جنسیت */}
-        <div style={{ width: 80, display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700, color: tone, flexShrink: 0 }}>
+        <div style={{ width: 70, display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700, color: tone, flexShrink: 0 }}>
           <span>{icon}</span>
           <span>{label}</span>
         </div>
 
-        {/* مقادیر قبل و بعد */}
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontFamily: 'monospace', direction: 'rtl' }}>
-          <span style={{ color: 'var(--muted)' }}>{toFa(before)}</span>
-          <span style={{ color: 'var(--dim)', fontSize: 12 }}>←</span>
-          <span style={{ fontWeight: 700, color: 'var(--text)' }}>{toFa(after)}</span>
+        {/* قبل و بعد */}
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 28 }}>
+            <span style={{ fontSize: 8, color: 'var(--muted)' }}>قبل</span>
+            <span style={{ color: 'var(--muted)', fontFamily: 'monospace' }}>{toFa(before)}</span>
+          </div>
+          <span style={{ color: 'var(--dim)', fontSize: 12, marginTop: 8 }}>←</span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 28 }}>
+            <span style={{ fontSize: 8, color: 'var(--muted)' }}>بعد</span>
+            <span style={{ fontWeight: 700, color: 'var(--text)', fontFamily: 'monospace' }}>{toFa(after)}</span>
+          </div>
         </div>
 
         {/* دلتا */}
