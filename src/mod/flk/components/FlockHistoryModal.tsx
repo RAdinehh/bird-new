@@ -577,14 +577,18 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
           padding: 10,
           marginBottom: 8,
         }}>
-          {/* Header */}
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, paddingBottom: 8, marginBottom: 6 }}>
-            <span style={{ fontSize: 18 }}>⚥</span>
+          {/* Header — وسط‌چین، دو خط، بالای جدول */}
+          <div style={{
+            textAlign: 'center',
+            paddingBottom: 8,
+            marginBottom: 8,
+            borderBottom: '1px dashed var(--accent-border)',
+          }}>
             <b style={{ fontSize: 'var(--fs-base)', color: 'var(--accent)' }}>وضعیت جنسیتی</b>
-            <span style={{ marginRight: 'auto', fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>از زمان تفکیک</span>
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>از زمان تفکیک</div>
           </div>
 
-          {/* Table — بدون inner card */}
+          {/* Table */}
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {/* Header row */}
             <div style={{
@@ -604,9 +608,9 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               <span style={{ textAlign: 'center' }}>فعلی</span>
             </div>
 
-            {/* نر */}
+            {/* نر — بدون ایموجی */}
             <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr 1fr 1fr 1fr 1fr', padding: '6px 0', borderBottom: '1px dashed var(--accent-border)', fontSize: 'var(--fs-sm)' }}>
-              <span style={{ color: 'var(--info)', fontWeight: 700 }}>♂ نر</span>
+              <span style={{ color: 'var(--info)', fontWeight: 700 }}>نر</span>
               <span style={{ textAlign: 'center', fontFamily: 'monospace' }}>{toFa(sexAggregates.init.male)}</span>
               <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.deaths.male > 0 ? 'var(--danger)' : 'var(--muted)' }}>{sexAggregates.deaths.male > 0 ? `-${toFa(sexAggregates.deaths.male)}` : '۰'}</span>
               <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.sells.male > 0 ? 'var(--purple)' : 'var(--muted)' }}>{sexAggregates.sells.male > 0 ? `-${toFa(sexAggregates.sells.male)}` : '۰'}</span>
@@ -614,9 +618,9 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               <span style={{ textAlign: 'center', fontFamily: 'monospace', fontWeight: 700, color: 'var(--text)' }}>{toFa(sexAggregates.current.male)}</span>
             </div>
 
-            {/* ماده */}
+            {/* ماده — بدون ایموجی */}
             <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr 1fr 1fr 1fr 1fr', padding: '6px 0', borderBottom: '1px dashed var(--accent-border)', fontSize: 'var(--fs-sm)' }}>
-              <span style={{ color: 'var(--purple)', fontWeight: 700 }}>♀ ماده</span>
+              <span style={{ color: 'var(--purple)', fontWeight: 700 }}>ماده</span>
               <span style={{ textAlign: 'center', fontFamily: 'monospace' }}>{toFa(sexAggregates.init.female)}</span>
               <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.deaths.female > 0 ? 'var(--danger)' : 'var(--muted)' }}>{sexAggregates.deaths.female > 0 ? `-${toFa(sexAggregates.deaths.female)}` : '۰'}</span>
               <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.sells.female > 0 ? 'var(--purple)' : 'var(--muted)' }}>{sexAggregates.sells.female > 0 ? `-${toFa(sexAggregates.sells.female)}` : '۰'}</span>
@@ -624,9 +628,9 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               <span style={{ textAlign: 'center', fontFamily: 'monospace', fontWeight: 700, color: 'var(--text)' }}>{toFa(sexAggregates.current.female)}</span>
             </div>
 
-            {/* نامشخص */}
+            {/* نامشخص — بدون ایموجی */}
             <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr 1fr 1fr 1fr 1fr', padding: '6px 0', fontSize: 'var(--fs-sm)' }}>
-              <span style={{ color: 'var(--muted)', fontWeight: 700 }}>? نامش</span>
+              <span style={{ color: 'var(--muted)', fontWeight: 700 }}>نامشخص</span>
               <span style={{ textAlign: 'center', fontFamily: 'monospace' }}>{toFa(sexAggregates.init.unknown)}</span>
               <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.deaths.unknown > 0 ? 'var(--danger)' : 'var(--muted)' }}>{sexAggregates.deaths.unknown > 0 ? `-${toFa(sexAggregates.deaths.unknown)}` : '۰'}</span>
               <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.sells.unknown > 0 ? 'var(--purple)' : 'var(--muted)' }}>{sexAggregates.sells.unknown > 0 ? `-${toFa(sexAggregates.sells.unknown)}` : '۰'}</span>
@@ -634,13 +638,13 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               <span style={{ textAlign: 'center', fontFamily: 'monospace', fontWeight: 700, color: 'var(--text)' }}>{toFa(sexAggregates.current.unknown)}</span>
             </div>
 
-            {/* جمع کل */}
+            {/* جمع — border نازک */}
             <div style={{
               display: 'grid',
               gridTemplateColumns: '60px 1fr 1fr 1fr 1fr 1fr',
               padding: '6px 0',
               marginTop: 2,
-              borderTop: '2px solid var(--accent)',
+              borderTop: '1px dashed var(--accent-border)',
               fontSize: 'var(--fs-sm)',
               fontWeight: 700,
             }}>
