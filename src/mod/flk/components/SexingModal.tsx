@@ -271,7 +271,7 @@ export default function SexingModal({ open, onClose, flock }: Props) {
           borderRadius: 'var(--r-sm)',
           fontSize: 'var(--fs-xs)', color: 'var(--danger)',
         }}>
-          ⚠️ {err}
+          {err}
         </div>
       )}
     </Modal>
