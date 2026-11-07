@@ -264,7 +264,17 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   };
 
   return (
-    <Modal open={open} onClose={onClose} title={'📜 رویدادها • ' + flock.name}>
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={'📜 رویدادها • ' + flock.name}
+      footer={
+        <BtnRow>
+          <Btn onClick={handleExport}>📥 CSV</Btn>
+          <Btn onClick={onClose}>بستن</Btn>
+        </BtnRow>
+      }
+    >
 
       {/* ═══ موجودی با breakdown ═══ */}
       <div style={{
@@ -354,7 +364,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
         <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
           {totalCount > 0 ? (
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-              <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, marginLeft: 4 }}>فیلتر:</span>
+              <span style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 600, marginLeft: 4 }}>فیلتر:</span>
               <Chip active={filter === 'all'} onClick={() => setFilter('all')}>همه</Chip>
               {FILTER_TYPES.map(t => {
                 const n = typeCounts.get(t) || 0;
@@ -594,11 +604,6 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
         )
       )}
 
-      {/* ═══ فوتر ═══ */}
-      <BtnRow>
-        <Btn onClick={handleExport}>📥 CSV</Btn>
-        <Btn onClick={onClose}>بستن</Btn>
-      </BtnRow>
     </Modal>
   );
 }
