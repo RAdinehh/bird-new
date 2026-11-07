@@ -54,6 +54,7 @@ export interface DailyLog {
   flockId: string;
   date: string;
   entryTime: string;
+  shift: 'morning' | 'noon' | 'evening';
 
   // محیط
   temperature: number | null;
@@ -92,15 +93,13 @@ export interface DailyLog {
   weightGender: '' | 'male' | 'female' | 'mixed';
 
   // تخم‌گذاری (اختصاصی layer/breeder)
-  eggsCount: number | null;
   brokenEggs: number | null;
-  dirtyEggs: number | null;
   // 🆕 تخم - تفکیک جدید
   eatingEggs?: number | null;
   fertileEggs?: number | null;
   otherEggs?: number | null;
-  brokenTarget?: 'consumption' | 'eating';
-  otherTarget?: 'consumption' | 'eating';
+  brokenTarget?: 'saleable' | 'lost';
+  otherTarget?: 'saleable' | 'lost';
 
   // تلفات
   deathsCount: number;
@@ -118,6 +117,7 @@ export interface DailyLog {
 
   // متادیتا
   status: LogStatus;
+  birdAgeDays: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -141,14 +141,14 @@ export const useDlg = create<State>()(
           id: uuid(),
           status: 'active',
           lightHours: (l as any).lightHours ?? null,
-          eggsCount: (l as any).eggsCount ?? null,
+          shift: (l as any).shift || 'morning',
+          birdAgeDays: (l as any).birdAgeDays ?? null,
           brokenEggs: (l as any).brokenEggs ?? null,
-          dirtyEggs: (l as any).dirtyEggs ?? null,
           eatingEggs: (l as any).eatingEggs ?? null,
           fertileEggs: (l as any).fertileEggs ?? null,
           otherEggs: (l as any).otherEggs ?? null,
-          brokenTarget: (l as any).brokenTarget || 'consumption',
-          otherTarget: (l as any).otherTarget || 'consumption',
+          brokenTarget: (l as any).brokenTarget || 'saleable',
+          otherTarget: (l as any).otherTarget || 'saleable',
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         } as DailyLog;
@@ -174,7 +174,7 @@ export const useDlg = create<State>()(
     }),
     {
       name: 'pm-dlg',
-      version: 7,
+      version: 10,
       migrate: (persisted: any, version: number) => {
         if (version < 2 && persisted?.logs) {
           persisted.logs = persisted.logs.map((l: any) => ({
@@ -208,16 +208,7 @@ export const useDlg = create<State>()(
             status: l.status || 'active',
           }));
         }
-        if (version < 7 && persisted?.logs) {
-          persisted.logs = persisted.logs.map((l: any) => ({
-            ...l,
-            eatingEggs: l.eatingEggs ?? l.eggsCount ?? null,
-            fertileEggs: l.fertileEggs ?? null,
-            otherEggs: l.otherEggs ?? l.dirtyEggs ?? null,
-            brokenTarget: l.brokenTarget || 'consumption',
-            otherTarget: l.otherTarget || 'consumption',
-          }));
-        }
+        // ═══ FIXED ORDER: v6 before v7 ═══
         if (version < 6 && persisted?.logs) {
           persisted.logs = persisted.logs.map((l: any) => ({
             ...l,
@@ -226,6 +217,37 @@ export const useDlg = create<State>()(
             brokenEggs: l.brokenEggs ?? null,
             dirtyEggs: l.dirtyEggs ?? null,
           }));
+        }
+        if (version < 7 && persisted?.logs) {
+          persisted.logs = persisted.logs.map((l: any) => ({
+            ...l,
+            eatingEggs: l.eatingEggs ?? l.eggsCount ?? null,
+            fertileEggs: l.fertileEggs ?? null,
+            otherEggs: l.otherEggs ?? l.dirtyEggs ?? null,
+            brokenTarget: l.brokenTarget === 'eating' ? 'lost' : 'saleable',
+            otherTarget: l.otherTarget === 'eating' ? 'lost' : 'saleable',
+          }));
+        }
+        // ═══ v10 — A1 (shift + birdAgeDays + target rename + legacy removal) ═══
+        if (version < 10 && persisted?.logs) {
+          persisted.logs = persisted.logs.map((l: any) => {
+            const { eggsCount, dirtyEggs, ...rest } = l;
+            // Map target: old ('consumption'/'eating') and new ('saleable'/'lost') both OK
+            const mapTarget = (v: any): 'saleable' | 'lost' => {
+              if (v === 'eating' || v === 'lost') return 'lost';
+              return 'saleable';
+            };
+            return {
+              ...rest,
+              shift: l.shift || 'morning',
+              birdAgeDays: l.birdAgeDays ?? null,
+              // Defensive: if v7 failed for any reason
+              eatingEggs: l.eatingEggs ?? eggsCount ?? null,
+              otherEggs: l.otherEggs ?? dirtyEggs ?? null,
+              brokenTarget: mapTarget(l.brokenTarget),
+              otherTarget: mapTarget(l.otherTarget),
+            };
+          });
         }
         return persisted;
       }

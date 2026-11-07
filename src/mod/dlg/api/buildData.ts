@@ -61,6 +61,8 @@ export function buildLogData(input: BuildDataInput): Omit<DailyLog, 'id' | 'stat
     flockId: form.flockId,
     date: form.date,
     entryTime: form.entryTime,
+    shift: form.shift || 'morning',
+    birdAgeDays: null,
     temperature: calcTemp,
     temperatureMin: tMin,
     temperatureMax: tMax,
@@ -89,10 +91,8 @@ export function buildLogData(input: BuildDataInput): Omit<DailyLog, 'id' | 'stat
     fertileEggs: int(form.fertileEggs),
     brokenEggs: int(form.brokenEggs),
     otherEggs: int(form.otherEggs),
-    brokenTarget: (form as any).brokenTarget || 'consumption',
-    otherTarget: (form as any).otherTarget || 'consumption',
-    eggsCount: int(form.eatingEggs),
-    dirtyEggs: int(form.otherEggs),
+    brokenTarget: (form as any).brokenTarget || 'saleable',
+    otherTarget: (form as any).otherTarget || 'saleable',
     weightSamples: form.weightSamples
       .map(w => ({ id: w.id, weight: num(w.weight) || 0 }))
       .filter(w => w.weight > 0),

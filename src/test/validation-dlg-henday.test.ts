@@ -6,7 +6,7 @@ const mkBase = (overrides: any = {}) => ({
   date: '1400/01/01',
   entryTime: '07:30',
   eatingEggs: 0, fertileEggs: 0, brokenEggs: 0, otherEggs: 0,
-  brokenTarget: 'consumption', otherTarget: 'consumption',
+  brokenTarget: 'saleable' as const, otherTarget: 'saleable' as const,
   deathsCount: 0, deaths: [], vaccines: [], medications: [],
   weightSamples: [], activities: [], notes: '',
   ...overrides,
