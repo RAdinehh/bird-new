@@ -653,32 +653,43 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
 
 function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
   const meta = SEX_AUDIT_META[ev.type] || { icon: '•', label: ev.type, tone: 'var(--muted)' };
-  const dM = ev.delta.male;
-  const dF = ev.delta.female;
-  const dU = ev.delta.unknown;
-  const hasDelta = dM !== 0 || dF !== 0 || dU !== 0;
 
-  const SexBadge = ({ icon, label, value, delta, color }: { icon: string; label: string; value: number; delta: number; color: string }) => (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: 2,
-      flex: 1,
-      padding: '6px 4px',
-      background: 'var(--card)',
-      borderRadius: 'var(--r-sm)',
-      border: '1px solid var(--border)',
-    }}>
-      <span style={{ fontSize: 11, color: 'var(--muted)' }}>{icon} {label}</span>
-      <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-base)', fontWeight: 700 }}>{toFa(value)}</span>
-      {delta !== 0 && (
-        <span style={{ fontSize: 10, fontWeight: 700, color }}>
-          {delta > 0 ? '+' : ''}{toFa(delta)}
-        </span>
-      )}
-    </div>
-  );
+  const renderRow = (label: string, icon: string, before: number, after: number, delta: number, tone: string) => {
+    const deltaColor = delta > 0 ? 'var(--accent)' : delta < 0 ? 'var(--danger)' : 'var(--muted)';
+    const isNoChange = delta === 0;
+
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        padding: '8px 0',
+        borderBottom: '1px dashed var(--border)',
+        fontSize: 'var(--fs-sm)',
+      }}>
+        {/* برچسب جنسیت */}
+        <div style={{ width: 80, display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700, color: tone, flexShrink: 0 }}>
+          <span>{icon}</span>
+          <span>{label}</span>
+        </div>
+
+        {/* مقادیر قبل و بعد */}
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontFamily: 'monospace', direction: 'rtl' }}>
+          <span style={{ color: 'var(--muted)' }}>{toFa(before)}</span>
+          <span style={{ color: 'var(--dim)', fontSize: 12 }}>←</span>
+          <span style={{ fontWeight: 700, color: 'var(--text)' }}>{toFa(after)}</span>
+        </div>
+
+        {/* دلتا */}
+        <div style={{ width: 60, textAlign: 'left', fontWeight: 700, color: deltaColor, fontFamily: 'monospace', flexShrink: 0 }}>
+          {isNoChange ? (
+            <span style={{ color: 'var(--muted)', fontSize: 10 }}>بدون تغییر</span>
+          ) : (
+            <span>{delta > 0 ? '+' : ''}{toFa(delta)}</span>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div style={{
@@ -688,36 +699,28 @@ function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
       border: '1px solid var(--border)',
       display: 'flex',
       flexDirection: 'column',
-      gap: 8,
+      gap: 2,
     }}>
-      {/* سطر ۱: عنوان + تاریخ */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6 }}>
+      {/* هدر کارت */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: 8, marginBottom: 4 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: 16 }}>{meta.icon}</span>
-          <b style={{ color: meta.tone, fontSize: 'var(--fs-sm)' }}>{meta.label}</b>
+          <span style={{ fontSize: 18 }}>{meta.icon}</span>
+          <b style={{ color: meta.tone, fontSize: 'var(--fs-base)' }}>{meta.label}</b>
         </div>
-        <span style={{ color: 'var(--muted)', fontSize: 10 }}>{toFa(ev.date)}</span>
+        <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>📅 {toFa(ev.date)}</span>
       </div>
 
-      {/* سطر ۲: قبل → بعد (۳ ستون) */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <div style={{ display: 'flex', gap: 4, flex: 1 }}>
-          <SexBadge icon="♂" label="نر" value={ev.before.male} delta={dM} color="var(--accent)" />
-          <SexBadge icon="♀" label="ماده" value={ev.before.female} delta={dF} color="var(--purple)" />
-          <SexBadge icon="?" label="نامشخص" value={ev.before.unknown} delta={dU} color="var(--muted)" />
-        </div>
-        <span style={{ fontSize: 16, color: 'var(--dim)', flexShrink: 0 }}>←</span>
-        <div style={{ display: 'flex', gap: 4, flex: 1 }}>
-          <SexBadge icon="♂" label="نر" value={ev.after.male} delta={0} color="var(--muted)" />
-          <SexBadge icon="♀" label="ماده" value={ev.after.female} delta={0} color="var(--muted)" />
-          <SexBadge icon="?" label="نامشخص" value={ev.after.unknown} delta={0} color="var(--muted)" />
-        </div>
+      {/* ردیف‌های داده */}
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        {renderRow('نر', '♂', ev.before.male, ev.after.male, ev.delta.male, 'var(--info)')}
+        {renderRow('ماده', '♀', ev.before.female, ev.after.female, ev.delta.female, 'var(--purple)')}
+        {renderRow('نامشخص', '?', ev.before.unknown, ev.after.unknown, ev.delta.unknown, 'var(--muted)')}
       </div>
 
-      {/* سطر ۳: توضیح */}
+      {/* توضیح */}
       {ev.note && (
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
-          {ev.note}
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingTop: 8 }}>
+          📝 {ev.note}
         </div>
       )}
     </div>
