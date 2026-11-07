@@ -152,18 +152,22 @@ export function createDlgSchema(context: ValidationContext = {}) {
       }
 
 
-      // Hen-Day بیولوژیکی — حداکثر ۱۰۲٪
-      const healthyEggs = (d.eatingEggs || 0) + (d.fertileEggs || 0);
-      if (flockAlive > 0 && healthyEggs > 0) {
-        const rate = (healthyEggs / flockAlive) * 100;
-        if (rate > 102) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `تخم سالم (${healthyEggs}) با تعداد گله (${flockAlive}) همخوانی ندارد (نرخ ${rate.toFixed(1)}٪)`,
-            path: ['eatingEggs'],
-          });
-        }
+    // Hen-Day بیولوژیکی — حداکثر ۱۰۲٪
+    // مخرج: femaleCount اگر sexed، وگرنه flockAlive
+    const healthyEggs = (d.eatingEggs || 0) + (d.fertileEggs || 0);
+    const femaleForRate = (context.flockFemaleCount ?? 0) > 0
+      ? (context.flockFemaleCount as number)
+      : flockAlive;
+    if (femaleForRate > 0 && healthyEggs > 0) {
+      const rate = (healthyEggs / femaleForRate) * 100;
+      if (rate > 102) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `تخم سالم (${healthyEggs}) با تعداد مرغ (${femaleForRate}) همخوانی ندارد (نرخ ${rate.toFixed(1)}٪)`,
+          path: ['eatingEggs'],
+        });
       }
+    }
 
       // مجموع تلفات + مجموع تخم مصرفی
       if (d.deathsCount > 0 && d.deathsCount > flockAlive) {

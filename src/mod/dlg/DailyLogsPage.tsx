@@ -94,6 +94,8 @@ export default function DailyLogsPage() {
     flockCount: selectedFlock?.initialCount || 0,
     flockCurrentCount: selectedFlock?.currentCount || flockAliveCount,
     flockType: selectedFlock?.type,
+    flockFemaleCount: selectedFlock?.femaleCount ?? undefined,
+    flockMaleCount: selectedFlock?.maleCount ?? undefined,
   };
   const { errors: vErrors } = useValidation(
     createDlgSchema(validationContext),
