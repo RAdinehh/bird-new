@@ -38,3 +38,6 @@ export type {
   EpefResult,
   Thresholds,
 } from './types';
+
+// ═══ Thresholds ═══
+export { getThresholds } from './thresholds';
