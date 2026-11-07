@@ -64,9 +64,9 @@ export function getDlgLogsConfig(ctx: {
         compare: (a: DailyLog, b: DailyLog) => (a.temperature || 0) - (b.temperature || 0),
       },
       {
-        key: 'feedAmount', label: 'دان مصرفی', icon: <IconChart size={18} />,
+        key: 'feedDelivered', label: 'دان مصرفی', icon: <IconChart size={18} />,
         hint: 'بر اساس مقدار دان',
-        compare: (a: DailyLog, b: DailyLog) => (a.feedAmount || 0) - (b.feedAmount || 0),
+        compare: (a: DailyLog, b: DailyLog) => (a.feedDelivered || 0) - (b.feedDelivered || 0),
       },
       {
         key: 'createdAt', label: 'جدیدترین ثبت', icon: <IconClock size={18} />,

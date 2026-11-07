@@ -25,7 +25,7 @@ const FIELD_LABELS: Record<string, string> = {
   'dlg.temperatureMin': 'حداقل دما',
   'dlg.temperatureMax': 'حداکثر دما',
   'dlg.humidity': 'رطوبت سالن',
-  'dlg.feedAmount': 'مقدار دان',
+  'dlg.feedDelivered': 'مقدار دان',
   'dlg.feedRemaining': 'دان باقی‌مانده',
   'dlg.waterAmount': 'مقدار آب',
   'dlg.waterFillVolume': 'حجم آب',

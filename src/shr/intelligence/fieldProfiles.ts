@@ -49,7 +49,7 @@ export const FIELD_PROFILES: Record<string, FieldProfile> = {
   }),
   'feed.bagWeight': P('feed.bagWeight', 'weight', 1, 100),
   'feed.bagCount': P('feed.bagCount', 'count', 1, 10_000),
-  'dlg.feedAmount': P('dlg.feedAmount', 'feed', 0.1, 100_000, {
+  'dlg.feedDelivered': P('dlg.feedDelivered', 'feed', 0.1, 100_000, {
     expectedFrom: 'cross_field', comparison: 'ratio', crossFieldRule: 'feed_vs_flock',
   }),
   'dlg.feedRemaining': P('dlg.feedRemaining', 'feed', 0, 50_000, {

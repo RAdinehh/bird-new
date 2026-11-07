@@ -53,7 +53,7 @@ function getCrossFieldExpected(
       if (ctx.flockSize) return ctx.flockSize * 0.5;
       return null;
     case 'remaining_vs_feed':
-      if (typeof ctx.feedAmount === 'number') return ctx.feedAmount * 0.5;
+      if (typeof ctx.feedDelivered === 'number') return ctx.feedDelivered * 0.5;
       return null;
     case 'lte_female':
       return ctx.femaleCount ?? ctx.flockSize ?? null;

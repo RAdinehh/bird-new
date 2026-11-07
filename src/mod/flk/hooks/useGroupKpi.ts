@@ -170,7 +170,7 @@ export function useGroupKpi(groupId: string): GroupKpi {
     let totalFeed = 0;
     for (const l of dlgLogs) {
       if (!flockIdSet.has(l.flockId)) continue;
-      const amt = l.feedAmount || 0;
+      const amt = l.feedDelivered || 0;
       if (amt > 0) {
         feedByFlock[l.flockId] = (feedByFlock[l.flockId] || 0) + amt;
         totalFeed += amt;
@@ -268,7 +268,7 @@ export function useMultiGroupKpi(groupIds: string[]): Record<string, GroupKpi> {
       let totalFeed = 0;
       for (const l of dlgLogs) {
         if (!flockIdSet.has(l.flockId)) continue;
-        const amt = l.feedAmount || 0;
+        const amt = l.feedDelivered || 0;
         if (amt > 0) {
           feedByFlock[l.flockId] = (feedByFlock[l.flockId] || 0) + amt;
           totalFeed += amt;

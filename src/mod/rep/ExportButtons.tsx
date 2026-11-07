@@ -123,7 +123,7 @@ export default function ExportButtons() {
       .map(l => {
         const f = flocks.find(x => x.id === l.flockId);
         const deaths = (l.deaths || []).reduce((a, x) => a + (x.count || 0), 0);
-        return [l.date, f?.name || '—', l.temperature || '', l.humidity || '', l.feedAmount || '', l.waterAmount || '', deaths];
+        return [l.date, f?.name || '—', l.temperature || '', l.humidity || '', l.feedDelivered || '', l.waterAmount || '', deaths];
       });
     exportTableToCSV('گزارش-ثبت-روزانه', headers, rows);
   };

@@ -11,7 +11,7 @@ export interface F {
   ventilation: string; litter: string;
   lightHours: string;
   behavior: string; distribution: string; appearance: string; sound: string;
-  feedType: string; feedAmount: string; feedRemaining: string;
+  feedType: string; feedDelivered: string; feedRemaining: string;
   feedSourceType: 'formula' | 'item' | ''; feedSourceId: string; feedMovementIds: string[];
   feedMethod: 'manual' | 'auto' | '';
   waterMethod: 'manual' | 'nipple' | 'trough' | 'tank' | '';

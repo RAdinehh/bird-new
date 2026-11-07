@@ -40,6 +40,26 @@ export interface UseDlgSaveParams {
 
 
 /** افزودن N روز به تاریخ شمسی YYYY/MM/DD */
+function findPreviousRemaining(
+  logs: DailyLog[],
+  form: { flockId: string; date: string; entryTime: string; id?: string },
+): number | null {
+  const candidates = logs.filter(
+    (l) =>
+      l.flockId === form.flockId &&
+      l.id !== form.id &&
+      (l.date < form.date ||
+        (l.date === form.date && l.entryTime < form.entryTime)),
+  );
+  if (candidates.length === 0) return null;
+  const latest = candidates.sort((a, b) => {
+    const d = b.date.localeCompare(a.date);
+    if (d !== 0) return d;
+    return b.entryTime.localeCompare(a.entryTime);
+  })[0];
+  return latest.feedRemaining;
+}
+
 function addJalaliDays(dateStr: string, days: number): string {
   if (!dateStr) return '';
   try {
@@ -71,7 +91,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
       medications: form.medications,
       feedSourceType: form.feedSourceType,
       feedSourceId: form.feedSourceId,
-      feedAmount: form.feedAmount,
+      feedDelivered: form.feedDelivered,
       whsItems,
     });
     if (shortages.length > 0) {
@@ -86,7 +106,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
 
     // ۲) اعتبارسنجی — به Zod منتقل شد (rules/dlg.ts)
 
-    const feedAmt = num(form.feedAmount);
+    const feedAmt = num(form.feedDelivered);
     const newMovementIds: string[] = [];
 
     // ۳) حذف movementهای قدیمی دان
@@ -99,7 +119,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
       const feedData = buildFeedMovements({
         feedSourceType: form.feedSourceType,
         feedSourceId: form.feedSourceId,
-        feedAmount: feedAmt,
+        feedDelivered: feedAmt,
         flockName: selectedFlock?.name || '',
         formulas,
         ingredients,
@@ -152,12 +172,15 @@ export function useDlgSave(params: UseDlgSaveParams) {
       ? getBirdAgeAt(selectedFlock, form.date)
       : null;
 
+    const previousRemainingKg = findPreviousRemaining(logs, form);
+
     const data = buildLogData({
       form,
       processedVaccines,
       processedMedications,
       feedMovementIds: newMovementIds,
       birdAgeDays,
+      previousRemainingKg,
     });
 
     // ۸) ذخیره
@@ -239,7 +262,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
       const recN = (p: string, v: number | null) => {
         if (v !== null && Number.isFinite(v) && v > 0) recordHistory(p, v, ctxIntel);
       };
-      recN('dlg.feedAmount', num(form.feedAmount));
+      recN('dlg.feedDelivered', num(form.feedDelivered));
       recN('dlg.feedRemaining', num(form.feedRemaining));
       recN('dlg.waterAmount', num(form.waterAmount));
       recN('dlg.waterFillCount', num(form.waterFillCount));

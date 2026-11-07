@@ -92,7 +92,7 @@ export default function LogCard(props: LogCardProps) {
       stats={<>
         {l.temperature !== null && <span>🌡 {toFa(l.temperature)}°</span>}
         {l.humidity !== null && <span>💧 {toFa(l.humidity)}٪</span>}
-        {l.feedAmount !== null && <span>🌾 {toFa(l.feedAmount)} kg</span>}
+        {l.feedDelivered !== null && <span>🌾 {toFa(l.feedDelivered)} kg</span>}
         {l.waterAmount !== null && <span>💧 {toFa(l.waterAmount)} L</span>}
       </>}
     >
@@ -130,17 +130,17 @@ export default function LogCard(props: LogCardProps) {
         {l.appearance && <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', lineHeight: 1.7 }}>{l.appearance}</div>}
       </Section>
 
-      {(l.feedAmount !== null || l.waterAmount !== null) && (
+      {(l.feedDelivered !== null || l.waterAmount !== null) && (
         <Section title="🌾 تغذیه و آب">
           {l.feedType && <Row l="جیره/دان" v={l.feedType} />}
-          {l.feedAmount !== null && <Row l="دان مصرفی" v={`${toFa(l.feedAmount)} kg`} />}
+          {l.feedDelivered !== null && <Row l="دان مصرفی" v={`${toFa(l.feedDelivered)} kg`} />}
           {l.feedRemaining !== null && <Row l="باقیمانده" v={`${toFa(l.feedRemaining)} kg`} />}
           {l.waterAmount !== null && <Row l="آب" v={`${toFa(l.waterAmount)} L`} />}
           {l.waterFillCount !== null && l.waterFillVolume !== null && (
             <Row l="روش آب" v={`${toFa(l.waterFillCount)} بار × ${toFa(l.waterFillVolume)} L`} />
           )}
-          {l.waterAmount && l.feedAmount && (
-            <Row l="نسبت آب/دان" v={toFa((l.waterAmount / l.feedAmount).toFixed(2))} />
+          {l.waterAmount && l.feedDelivered && (
+            <Row l="نسبت آب/دان" v={toFa((l.waterAmount / l.feedDelivered).toFixed(2))} />
           )}
         </Section>
       )}

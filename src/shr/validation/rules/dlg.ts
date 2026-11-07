@@ -41,7 +41,7 @@ export function createDlgSchema(context: ValidationContext = {}) {
     lightHours: floatRange('ساعت نوردهی', 0, 24).nullable().optional(),
 
     // تغذیه
-    feedAmount: floatRange('مقدار دان مصرفی', 0, MAX_FEED).nullable().optional(),
+    feedDelivered: floatRange('مقدار دان مصرفی', 0, MAX_FEED).nullable().optional(),
     feedRemaining: floatRange('دان باقیمانده', 0, MAX_FEED).nullable().optional(),
     feedSourceId: optionalId(),
 
@@ -188,12 +188,12 @@ export function createDlgSchema(context: ValidationContext = {}) {
         }
       }
 
-      // feedRemaining ≤ feedAmount × 3 (soft — باقی‌مانده دیروز ممکن است)
-      if (d.feedRemaining != null && d.feedAmount != null && d.feedAmount > 0) {
-        if (d.feedRemaining > d.feedAmount * 3) {
+      // feedRemaining ≤ feedDelivered × 3 (soft — باقی‌مانده دیروز ممکن است)
+      if (d.feedRemaining != null && d.feedDelivered != null && d.feedDelivered > 0) {
+        if (d.feedRemaining > d.feedDelivered * 3) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `دان باقی‌مانده (${d.feedRemaining} kg) خیلی بیشتر از دان داده‌شده (${d.feedAmount} kg) است`,
+            message: `دان باقی‌مانده (${d.feedRemaining} kg) خیلی بیشتر از دان داده‌شده (${d.feedDelivered} kg) است`,
             path: ['feedRemaining'],
             fatal: false,
           });

@@ -34,7 +34,7 @@ export default function FeedSection({ form, setForm, vErrors, showError, markTou
   const selectedFlock = flocks.find(f => f.id === form.flockId);
   const flockSize = selectedFlock?.currentCount || selectedFlock?.initialCount || 0;
   const flockAge = selectedFlock ? getAgeDays(selectedFlock) : null;
-  const feedAmtNum = parseNumericValue(form.feedAmount);
+  const feedAmtNum = parseNumericValue(form.feedDelivered);
 
   return (
     <>
@@ -82,7 +82,7 @@ export default function FeedSection({ form, setForm, vErrors, showError, markTou
       {form.feedSourceType === 'formula' && form.feedSourceId && (() => {
         const f = formulas.find(x => x.id === form.feedSourceId);
         if (!f) return null;
-        const used = num(form.feedAmount) || 0;
+        const used = num(form.feedDelivered) || 0;
         return (
           <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 4 }}>
             <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginBottom: 4 }}>مواد اولیه این جیره:</div>
@@ -111,7 +111,7 @@ export default function FeedSection({ form, setForm, vErrors, showError, markTou
       {form.feedSourceType === 'item' && form.feedSourceId && (() => {
         const it = feedItems.find(x => x.id === form.feedSourceId);
         if (!it) return null;
-        const used = num(form.feedAmount) || 0;
+        const used = num(form.feedDelivered) || 0;
         const after = it.currentStock - used;
         const warn = after < it.minStock;
         return (
@@ -126,15 +126,15 @@ export default function FeedSection({ form, setForm, vErrors, showError, markTou
       <Grid2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
           <Field label="مقدار دان مصرفی">
-            <NumField placeholder="۵۰" value={form.feedAmount} onChange={e => setForm({ ...form, feedAmount: e.target.value })} unit="kg" min={0} />
+            <NumField placeholder="۵۰" value={form.feedDelivered} onChange={e => setForm({ ...form, feedDelivered: e.target.value })} unit="kg" min={0} />
           </Field>
-          {!showError('feedAmount') && <FieldHint fieldPath="dlg.feedAmount" value={form.feedAmount} context={{ flockSize, breedKey: selectedFlock?.breedId, ageDays: flockAge ?? undefined, flockType: selectedFlock?.type }} />}
+          {!showError('feedDelivered') && <FieldHint fieldPath="dlg.feedDelivered" value={form.feedDelivered} context={{ flockSize, breedKey: selectedFlock?.breedId, ageDays: flockAge ?? undefined, flockType: selectedFlock?.type }} />}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
           <Field label="دان باقیمانده">
             <NumField placeholder="۰" value={form.feedRemaining} onChange={e => setForm({ ...form, feedRemaining: e.target.value })} unit="kg" min={0} />
           </Field>
-          {!showError('feedRemaining') && <FieldHint fieldPath="dlg.feedRemaining" value={form.feedRemaining} context={{ feedAmount: feedAmtNum ?? undefined, flockSize, breedKey: selectedFlock?.breedId, ageDays: flockAge ?? undefined, flockType: selectedFlock?.type }} />}
+          {!showError('feedRemaining') && <FieldHint fieldPath="dlg.feedRemaining" value={form.feedRemaining} context={{ feedDelivered: feedAmtNum ?? undefined, flockSize, breedKey: selectedFlock?.breedId, ageDays: flockAge ?? undefined, flockType: selectedFlock?.type }} />}
         </div>
       </Grid2>
 

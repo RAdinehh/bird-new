@@ -110,7 +110,7 @@ export default function DailyLogsPage() {
       humidityMin: num(form.humidityMin),
       humidityMax: num(form.humidityMax),
       lightHours: int(form.lightHours),
-      feedAmount: num(form.feedAmount),
+      feedDelivered: num(form.feedDelivered),
       feedRemaining: num(form.feedRemaining),
       feedSourceId: form.feedSourceId || '',
       waterAmount: num(form.waterAmount),

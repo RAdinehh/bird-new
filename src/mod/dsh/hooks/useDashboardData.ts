@@ -79,7 +79,7 @@ const [, _setTick] = useState(0);
 
   const todayLogs = useMemo(() => logs.filter(l => l.date === today), [logs, today]);
   const deathsToday = todayLogs.reduce((a, l) => a + (l.deaths || []).reduce((b, x) => b + (x.count || 0), 0), 0);
-  const feedToday = todayLogs.reduce((a, l) => a + (l.feedAmount || 0), 0);
+  const feedToday = todayLogs.reduce((a, l) => a + (l.feedDelivered || 0), 0);
   const waterToday = todayLogs.reduce((a, l) => a + (l.waterAmount || 0), 0);
   const tempToday = todayLogs.length > 0 ? (todayLogs[0].temperature || 0) : 0;
   const humidToday = todayLogs.length > 0 ? (todayLogs[0].humidity || 0) : 0;
@@ -178,7 +178,7 @@ const [, _setTick] = useState(0);
   const fcr = useMemo(() => {
     const monthLogs = logs.filter(l => monthKey(l.date) === thisMonth);
     const monthProd = productions.filter(p => monthKey(p.date) === thisMonth);
-    const feed = monthLogs.reduce((a, l) => a + (l.feedAmount || 0), 0);
+    const feed = monthLogs.reduce((a, l) => a + (l.feedDelivered || 0), 0);
     const eggsWeight = monthProd.reduce((a, p) => a + (p.totalCount || 0) * 0.06, 0);
     if (eggsWeight <= 0) return 0;
     return Math.round((feed / eggsWeight) * 100) / 100;
@@ -188,7 +188,7 @@ const [, _setTick] = useState(0);
   const waterFeedRatio = useMemo(() => {
     const last7 = logs.filter(l => dateDiffDays(l.date) <= 7);
     const water = last7.reduce((a, l) => a + (l.waterAmount || 0), 0);
-    const feed = last7.reduce((a, l) => a + (l.feedAmount || 0), 0);
+    const feed = last7.reduce((a, l) => a + (l.feedDelivered || 0), 0);
     if (feed === 0) return 0;
     return Math.round((water / feed) * 10) / 10;
   }, [logs]);
@@ -234,7 +234,7 @@ const [, _setTick] = useState(0);
     if (aliveCount === 0) return 0;
     const last7 = logs.filter(l => dateDiffDays(l.date) <= 7);
     if (last7.length === 0) return 0;
-    const totalFeed = last7.reduce((a, l) => a + (l.feedAmount || 0), 0);
+    const totalFeed = last7.reduce((a, l) => a + (l.feedDelivered || 0), 0);
     const days = 7;
     // totalFeed (kg) / aliveCount / days * 1000 (گرم)
     return Math.round((totalFeed / aliveCount / days) * 1000);
@@ -320,7 +320,7 @@ const [, _setTick] = useState(0);
     const flockLogs = logs.filter((l) => l.flockId === flock.id);
     const flockProd = productions.filter((p) => p.flockId === flock.id);
 
-    const totalFeed = flockLogs.reduce((a, l) => a + (l.feedAmount || 0), 0);
+    const totalFeed = flockLogs.reduce((a, l) => a + (l.feedDelivered || 0), 0);
     const totalEggs = flockProd.reduce((a, p) => a + (p.totalCount || 0), 0);
     const eggMass = totalEggs * 0.06; // kg (میانگین ۶۰ گرم)
 

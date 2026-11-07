@@ -75,7 +75,8 @@ export interface DailyLog {
 
   // تغذیه
   feedType: string;
-  feedAmount: number | null;    // kg
+  feedDelivered: number | null;    // kg (دان داده‌شده)
+  feedConsumed: number | null;     // kg (دان مصرف‌شده — مشتق)
   feedRemaining: number | null; // kg
   feedSourceType: 'formula' | 'item' | '';
   feedSourceId: string;
@@ -142,6 +143,7 @@ export const useDlg = create<State>()(
           status: 'active',
           lightHours: (l as any).lightHours ?? null,
           shift: (l as any).shift || 'morning',
+          feedConsumed: (l as any).feedConsumed ?? null,
           birdAgeDays: (l as any).birdAgeDays ?? null,
           brokenEggs: (l as any).brokenEggs ?? null,
           eatingEggs: (l as any).eatingEggs ?? null,
@@ -174,7 +176,7 @@ export const useDlg = create<State>()(
     }),
     {
       name: 'pm-dlg',
-      version: 10,
+      version: 11,
       migrate: (persisted: any, version: number) => {
         if (version < 2 && persisted?.logs) {
           persisted.logs = persisted.logs.map((l: any) => ({
@@ -246,6 +248,19 @@ export const useDlg = create<State>()(
               otherEggs: l.otherEggs ?? dirtyEggs ?? null,
               brokenTarget: mapTarget(l.brokenTarget),
               otherTarget: mapTarget(l.otherTarget),
+            };
+          });
+        }
+        // ═══ v11 — A2b (rename feedAmount → feedDelivered + feedConsumed) ═══
+        if (version < 11 && persisted?.logs) {
+          persisted.logs = persisted.logs.map((l: any) => {
+            const delivered = l.feedDelivered ?? l.feedAmount ?? null;
+            const consumed = l.feedConsumed ?? delivered;
+            const { feedAmount: _oldFeedAmount, ...rest } = l;
+            return {
+              ...rest,
+              feedDelivered: delivered,
+              feedConsumed: consumed,
             };
           });
         }

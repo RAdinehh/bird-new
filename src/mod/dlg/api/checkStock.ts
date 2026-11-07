@@ -26,12 +26,12 @@ interface CheckStockInput {
   medications: { itemId?: string; quantity?: number | null }[];
   feedSourceType: string;
   feedSourceId: string;
-  feedAmount: string | number | null;
+  feedDelivered: string | number | null;
   whsItems: Item[];
 }
 
 export function checkStock(params: CheckStockInput): StockShortage[] {
-  const { vaccines, medications, feedSourceType, feedSourceId, feedAmount, whsItems } = params;
+  const { vaccines, medications, feedSourceType, feedSourceId, feedDelivered, whsItems } = params;
   const list: StockShortage[] = [];
 
   const check = (itemId: string | undefined, qty: number | null | undefined) => {
@@ -52,7 +52,7 @@ export function checkStock(params: CheckStockInput): StockShortage[] {
   medications.forEach(m => check(m.itemId, m.quantity));
 
   if (feedSourceType === 'item' && feedSourceId) {
-    check(feedSourceId, parseNum(feedAmount));
+    check(feedSourceId, parseNum(feedDelivered));
   }
 
   return list;

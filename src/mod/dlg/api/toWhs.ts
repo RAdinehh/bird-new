@@ -28,16 +28,16 @@ interface IngredientLike {
 export function buildFeedMovements(params: {
   feedSourceType: 'formula' | 'item' | '';
   feedSourceId: string;
-  feedAmount: number | null;
+  feedDelivered: number | null;
   flockName: string;
   formulas: FormulaLike[];
   ingredients: IngredientLike[];
 }): NewMovementData[] {
   const {
-    feedSourceType, feedSourceId, feedAmount,
+    feedSourceType, feedSourceId, feedDelivered,
     flockName, formulas, ingredients,
   } = params;
-  if (!feedSourceId || !feedAmount || feedAmount <= 0) return [];
+  if (!feedSourceId || !feedDelivered || feedDelivered <= 0) return [];
 
   const result: NewMovementData[] = [];
 
@@ -47,7 +47,7 @@ export function buildFeedMovements(params: {
       formula.lines.forEach(line => {
         const ing = ingredients.find(i => i.id === line.ingredientId);
         if (!ing || !ing.stockItemId) return;
-        const qty = (line.percent / 100) * feedAmount;
+        const qty = (line.percent / 100) * feedDelivered;
         result.push({
           itemId: ing.stockItemId,
           quantity: Math.round(qty * 1000) / 1000,
@@ -58,7 +58,7 @@ export function buildFeedMovements(params: {
   } else if (feedSourceType === 'item') {
     result.push({
       itemId: feedSourceId,
-      quantity: feedAmount,
+      quantity: feedDelivered,
       notes: `ثبت روزانه — ${flockName}`,
     });
   }

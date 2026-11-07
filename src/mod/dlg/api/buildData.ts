@@ -5,6 +5,7 @@
  */
 import type { DailyLog, Vaccine, Medication } from '../store';
 import type { F } from '../types';
+import { calculateFeedMetrics } from '../../../shr/calc/formulas/feed';
 
 export interface BuildDataInput {
   form: F;
@@ -12,6 +13,7 @@ export interface BuildDataInput {
   processedMedications: Medication[];
   feedMovementIds: string[];
   birdAgeDays?: number | null;
+  previousRemainingKg?: number | null;
 }
 
 /** تبدیل رشته‌ی فارسی به عدد اعشاری */
@@ -35,9 +37,21 @@ function calcTotalWater(count: number | null, volume: number | null): number | n
 }
 
 export function buildLogData(input: BuildDataInput): Omit<DailyLog, 'id' | 'status' | 'createdAt' | 'updatedAt'> {
-  const { form, processedVaccines, processedMedications, feedMovementIds, birdAgeDays } = input;
+  const { form, processedVaccines, processedMedications, feedMovementIds, birdAgeDays, previousRemainingKg } = input;
 
-  const feedAmt = num(form.feedAmount);
+  const feedAmt = num(form.feedDelivered);
+
+  // محاسبه feedConsumed (simple یا precision بر اساس feedMethod)
+  const feedMethod = (form.feedMethod || 'scoop') as 'scoop' | 'bag' | 'semi_auto' | 'auto_sensor' | 'auto_chain';
+  const feedRemainingNum = num(form.feedRemaining);
+  const feedCalc = calculateFeedMetrics({
+    feedMethod,
+    feedDeliveredKg: feedAmt ?? 0,
+    feedRemainingKg: feedRemainingNum,
+    previousRemainingKg: previousRemainingKg ?? null,
+    aliveCount: 1,  // فقط برای feedPerBirdG — در DailyLog ذخیره نمی‌شود
+  });
+  const feedConsumed = feedCalc.feedConsumedKg > 0 ? feedCalc.feedConsumedKg : null;
 
   // آب: اگه manual و تعداد/حجم داریم، از اون حساب کن
   const calcWater = form.waterMethod === 'manual'
@@ -78,7 +92,8 @@ export function buildLogData(input: BuildDataInput): Omit<DailyLog, 'id' | 'stat
     appearance: form.appearance.trim(),
     sound: form.sound,
     feedType: form.feedType.trim(),
-    feedAmount: feedAmt,
+    feedDelivered: feedAmt,
+    feedConsumed,
     feedRemaining: num(form.feedRemaining),
     feedSourceType: form.feedSourceType,
     feedSourceId: form.feedSourceId,
