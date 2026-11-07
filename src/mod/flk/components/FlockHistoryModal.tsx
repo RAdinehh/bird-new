@@ -309,6 +309,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
       {/* ═══ فیلتر نوع (فقط تب همه) ═══ */}
       {tabMode === 'events' && totalCount > 0 && (
         <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
+          <Chip active={filter === 'all'} onClick={() => setFilter('all')}>همه</Chip>
           {FILTER_TYPES.map(t => {
             const n = typeCounts.get(t) || 0;
             if (n === 0) return null;
@@ -318,9 +319,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               </Chip>
             );
           })}
-          {filter !== 'all' && (
-            <button type="button" onClick={() => setFilter('all')} style={{ padding: '5px var(--sp-3)', fontSize: 12, fontWeight: 600, borderRadius: 'var(--r-sm)', border: '1px solid var(--border)', background: 'transparent', color: 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit' }}>✕ نمایش همه</button>
-          )}
+
         </div>
       )}
 
@@ -453,10 +452,10 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
       {/* ═══ فوتر ═══ */}
       <BtnRow>
         {!correctionOpen && (
-          <Btn onClick={() => setCorrectionOpen(true)}>✏️ ثبت اصلاح</Btn>
+          <Btn variant="primary" onClick={() => setCorrectionOpen(true)}>✏️ ثبت اصلاح</Btn>
         )}
         <Btn onClick={handleExport}>📥 CSV</Btn>
-        <Btn variant="primary" onClick={onClose}>بستن</Btn>
+        <Btn onClick={onClose}>بستن</Btn>
       </BtnRow>
     </Modal>
   );
@@ -479,7 +478,6 @@ function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 6 }}>
           <b style={{ color: meta.tone }}>{meta.label}</b>
-          <span style={{ color: 'var(--muted)', fontSize: 10 }}>{toFa(ev.date)}</span>
         </div>
         <div dir="ltr" style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 2, fontFamily: 'monospace', fontSize: 11 }}>
           <span>{toFa(ev.before.male)}/{toFa(ev.before.female)}/{toFa(ev.before.unknown)}</span>
@@ -511,7 +509,6 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
               {isPlus ? '+' : '-'}{toFa(e.count)}
             </span>
           </div>
-          <span style={{ color: 'var(--muted)', fontSize: 10 }}>{toFa(e.date)}</span>
         </div>
         {e.reason && <div style={{ color: 'var(--muted)', fontSize: 10, marginTop: 2 }}>{e.reason}</div>}
         {e.type === 'correction' && !e.linkedEventId && !e.revoked && (
