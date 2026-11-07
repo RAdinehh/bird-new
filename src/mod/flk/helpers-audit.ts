@@ -128,3 +128,102 @@ export function auditToCSV(events: FlockSexBalanceEvent[] | undefined): string {
   }
   return rows.map(r => r.map(csvCell).join(',')).join('\n');
 }
+
+// ═════════════════════════════════════════════════════════════
+// فاز ۷.۴ — وزن به تفکیک جنسیت
+// ═════════════════════════════════════════════════════════════
+export interface SexWeightStat {
+  avg: number;
+  count: number;
+  cv: number;
+  hasData: boolean;
+}
+
+export interface WeightBySex {
+  male: SexWeightStat;
+  female: SexWeightStat;
+  mixed: SexWeightStat;
+  delta: number | null;
+  hasData: boolean;
+}
+
+/**
+ * weightBySexFromLogs — جمع وزن‌سنجی‌های یک گله به تفکیک جنسیت
+ * منبع: dlg logs — هر log دارای weightSamples[] + weightGender
+ */
+export function weightBySexFromLogs(logs: any[], flockId: string): WeightBySex {
+  const male: number[] = [];
+  const female: number[] = [];
+  const mixed: number[] = [];
+
+  for (const log of logs || []) {
+    if (log.flockId !== flockId) continue;
+    if (!log.weightSamples || log.weightSamples.length === 0) continue;
+    const gender = log.weightGender || 'mixed';
+    const ws = (log.weightSamples as any[])
+      .map(s => Number(s.weight))
+      .filter(w => w > 0);
+    if (gender === 'male') male.push(...ws);
+    else if (gender === 'female') female.push(...ws);
+    else mixed.push(...ws);
+  }
+
+  const stat = (arr: number[]): SexWeightStat => {
+    if (arr.length === 0) return { avg: 0, count: 0, cv: 0, hasData: false };
+    const mean = arr.reduce((a, w) => a + w, 0) / arr.length;
+    const variance = arr.reduce((a, w) => a + Math.pow(w - mean, 2), 0) / arr.length;
+    const std = Math.sqrt(variance);
+    const cv = mean > 0 ? (std / mean) * 100 : 0;
+    return {
+      avg: Math.round(mean * 1000) / 1000,
+      count: arr.length,
+      cv: Math.round(cv * 10) / 10,
+      hasData: true,
+    };
+  };
+
+  const m = stat(male);
+  const f = stat(female);
+  const mx = stat(mixed);
+  const hasData = m.hasData || f.hasData || mx.hasData;
+  const delta = m.hasData && f.hasData
+    ? Math.round((m.avg - f.avg) * 1000) / 1000
+    : null;
+
+  return { male: m, female: f, mixed: mx, delta, hasData };
+}
+
+// ═════════════════════════════════════════════════════════════
+// فاز ۸c — CSV export برای ConsumptionEvent
+// ═════════════════════════════════════════════════════════════
+import type { ConsumptionEvent } from './types-store';
+
+const SOURCE_LABEL: Record<string, string> = {
+  daily_manual: 'روزانه دستی',
+  bulk_manual: 'پر کردن سطل',
+  sensor_scale: 'سنسور وزن',
+  sensor_level: 'سنسور سطح',
+  auto_feeder: 'اتومات',
+  inferred: 'استاندارد',
+};
+
+/**
+ * consumptionToCSV — CSV مصرف (دان + آب)
+ * header: تاریخ, نوع, مقدار, واحد, جنسیت, روش, یادداشت
+ */
+export function consumptionToCSV(events: ConsumptionEvent[] | undefined): string {
+  const header = ['تاریخ', 'نوع', 'مقدار', 'واحد', 'جنسیت', 'روش', 'یادداشت'];
+  const rows: string[][] = [header];
+  for (const e of events || []) {
+    rows.push([
+      e.date || '',
+      e.type === 'feed' ? 'دان' : 'آب',
+      String(e.amount),
+      e.unit,
+      e.sex === 'male' ? 'نر' : e.sex === 'female' ? 'ماده' : e.sex === 'mixed' ? 'مخلوط' : '',
+      SOURCE_LABEL[e.source] || e.source,
+      e.notes || '',
+    ]);
+  }
+  return rows.map(r => r.map(csvCell).join(',')).join('\n');
+}

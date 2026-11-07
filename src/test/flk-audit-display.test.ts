@@ -163,3 +163,100 @@ describe('auditToCSV', () => {
     expect(lines[1]).toContain('"فروش"');
   });
 });
+
+// ═════════════════════════════════════════════════════════════
+// فاز ۷.۴ — weightBySexFromLogs
+// ═════════════════════════════════════════════════════════════
+import { weightBySexFromLogs } from '../mod/flk/helpers-audit';
+
+const mkLog = (flockId: string, gender: string, weights: number[]) => ({
+  flockId,
+  weightGender: gender,
+  weightSamples: weights.map(w => ({ weight: w })),
+});
+
+describe('weightBySexFromLogs', () => {
+  it('بدون logs → hasData=false', () => {
+    const r = weightBySexFromLogs([], 'f1');
+    expect(r.hasData).toBe(false);
+    expect(r.delta).toBeNull();
+  });
+  it('یک log نر → male.hasData=true', () => {
+    const r = weightBySexFromLogs([mkLog('f1', 'male', [2.8, 2.9, 2.7])], 'f1');
+    expect(r.male.hasData).toBe(true);
+    expect(r.male.avg).toBeCloseTo(2.8, 2);
+    expect(r.male.count).toBe(3);
+    expect(r.female.hasData).toBe(false);
+  });
+  it('نر و ماده → delta درست', () => {
+    const r = weightBySexFromLogs([
+      mkLog('f1', 'male', [3.0]),
+      mkLog('f1', 'female', [2.4]),
+    ], 'f1');
+    expect(r.male.avg).toBeCloseTo(3.0, 2);
+    expect(r.female.avg).toBeCloseTo(2.4, 2);
+    expect(r.delta).toBeCloseTo(0.6, 2);
+  });
+  it('CV محاسبه می‌شود', () => {
+    const r = weightBySexFromLogs([mkLog('f1', 'male', [2, 4])], 'f1');
+    expect(r.male.cv).toBeCloseTo(33.3, 1);
+  });
+  it('mixed جدا ذخیره می‌شود (delta نمی‌گیرد)', () => {
+    const r = weightBySexFromLogs([mkLog('f1', 'mixed', [2.5])], 'f1');
+    expect(r.mixed.hasData).toBe(true);
+    expect(r.delta).toBeNull();
+  });
+  it('flockId متفاوت → ignore', () => {
+    const r = weightBySexFromLogs([mkLog('f2', 'male', [2.8])], 'f1');
+    expect(r.hasData).toBe(false);
+  });
+  it('چند log نر → جمع', () => {
+    const r = weightBySexFromLogs([
+      mkLog('f1', 'male', [2.8]),
+      mkLog('f1', 'male', [3.0]),
+    ], 'f1');
+    expect(r.male.count).toBe(2);
+    expect(r.male.avg).toBeCloseTo(2.9, 2);
+  });
+  it('وزن صفر → فیلتر', () => {
+    const r = weightBySexFromLogs([mkLog('f1', 'male', [0, 2.8])], 'f1');
+    expect(r.male.count).toBe(1);
+  });
+  it('weightGender خالی → mixed', () => {
+    const r = weightBySexFromLogs([mkLog('f1', '', [2.5])], 'f1');
+    expect(r.mixed.hasData).toBe(true);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════
+// فاز ۸c — consumptionToCSV
+// ═════════════════════════════════════════════════════════════
+import { consumptionToCSV } from '../mod/flk/helpers-audit';
+
+describe('consumptionToCSV', () => {
+  it('خالی → header فقط', () => {
+    const csv = consumptionToCSV([]);
+    expect(csv.split('\n').length).toBe(1);
+    expect(csv).toContain('تاریخ');
+    expect(csv).toContain('مقدار');
+  });
+  it('feed + water → ۲ ردیف', () => {
+    const csv = consumptionToCSV([
+      { id: '1', flockId: 'f1', type: 'feed', date: '1405/08/01', amount: 25, unit: 'kg', sex: 'male', source: 'bulk_manual', confidence: 'exact', createdAt: '', updatedAt: '' } as any,
+      { id: '2', flockId: 'f1', type: 'water', date: '1405/08/02', amount: 50, unit: 'L', sex: '', source: 'daily_manual', confidence: 'exact', createdAt: '', updatedAt: '' } as any,
+    ]);
+    const lines = csv.split('\n');
+    expect(lines.length).toBe(3);
+    expect(lines[1]).toContain('دان');
+    expect(lines[1]).toContain('25');
+    expect(lines[1]).toContain('نر');
+    expect(lines[2]).toContain('آب');
+    expect(lines[2]).toContain('50');
+  });
+  it('source label فارسی', () => {
+    const csv = consumptionToCSV([
+      { id: '1', flockId: 'f1', type: 'feed', date: '1405/08/01', amount: 25, unit: 'kg', sex: '', source: 'sensor_scale', confidence: 'exact', createdAt: '', updatedAt: '' } as any,
+    ]);
+    expect(csv).toContain('سنسور وزن');
+  });
+});

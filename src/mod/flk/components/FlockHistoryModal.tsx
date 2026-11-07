@@ -14,6 +14,8 @@ import { toastMsg } from '../../../cor/store/toast';
 import { downloadCSV } from '../../../shr/utils/export';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import type { DailyLog as DlgLog } from '../../dlg/store';
+import { consumptionToCSV } from '../helpers-audit';
+import { aggregateConsumptionEvents } from '../consumptionEventsCalc';
 
 const REASON_OPTIONS: { value: FlockEventReasonCode; label: string }[] = [
   { value: 'data_entry_error', label: 'خطای ثبت' },
@@ -40,7 +42,7 @@ interface Props {
 
 export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
-  const [showAudit, setShowAudit] = useState(false);
+  const [tabMode, setTabMode] = useState<'events' | 'audit' | 'consumption'>('events');
   const [dlgDeaths, setDlgDeaths] = useState<number>(0);
 
   useEffect(() => {
@@ -62,6 +64,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   const [validationError, setValidationError] = useState('');
   const addCorrection = useFlk(st => st.addCorrection);
   const revokeEvent = useFlk(st => st.revokeEvent);
+  const consumptionEvents = useFlk(st => st.consumptionEvents);
 
   const initial = flock.initialCount || 0;
   const current = flock.currentCount || 0;
@@ -106,6 +109,18 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   const lossesPct = initial > 0 ? (losses / initial) * 100 : 0;
   const totalCount = flock.events?.length || 0;
   const auditCount = flock.sexBalanceEvents?.length || 0;
+  const flockConsumption = (consumptionEvents || []).filter(e => e.flockId === flock.id);
+  const consumptionCount = flockConsumption.length;
+  const thirtyDaysAgo = (() => {
+    try {
+      const parts = todayJ().split('/').map(Number);
+      let [y, m, d] = parts;
+      d -= 30;
+      while (d < 1) { m -= 1; if (m < 1) { m = 12; y -= 1; } d += 30; }
+      return `${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}`;
+    } catch { return '1400/01/01'; }
+  })();
+  const consumptionSummary = aggregateConsumptionEvents(flockConsumption, thirtyDaysAgo, todayJ());
   const deathRate = aggregateDeathsBySex(flock.sexBalanceEvents, flock.initialMaleCount, flock.initialFemaleCount);
 
   const typeCounts = useMemo(() => {
@@ -133,9 +148,12 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   const handleExport = () => {
     try {
       const safeName = (flock.name || 'flock').replace(/[^\w\u0600-\u06FF-]+/g, '_');
-      if (showAudit) {
+      if (tabMode === 'audit') {
         const csv = auditToCSV(flock.sexBalanceEvents);
         downloadCSV(`flock-${safeName}-audit.csv`, '\uFEFF' + csv);
+      } else if (tabMode === 'consumption') {
+        const csv = consumptionToCSV(flockConsumption);
+        downloadCSV(`flock-${safeName}-consumption.csv`, '\uFEFF' + csv);
       } else {
         const csv = eventsToCSV(flock.events);
         downloadCSV(`flock-${safeName}-events.csv`, '\uFEFF' + csv);
@@ -261,15 +279,18 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
         </div>
       )}
 
-      {(totalCount > 0 || auditCount > 0) && (
-        <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
-          <Chip active={!showAudit} onClick={() => setShowAudit(false)}>📜 رویدادها ({toFa(totalCount)})</Chip>
+      {(totalCount > 0 || auditCount > 0 || consumptionCount > 0) && (
+        <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
+          <Chip active={tabMode === 'events'} onClick={() => setTabMode('events')}>📜 رویدادها ({toFa(totalCount)})</Chip>
           {auditCount > 0 && (
-            <Chip active={showAudit} onClick={() => setShowAudit(true)}>📊 تاریخچه جنسیت ({toFa(auditCount)})</Chip>
+            <Chip active={tabMode === 'audit'} onClick={() => setTabMode('audit')}>📊 تاریخچه جنسیت ({toFa(auditCount)})</Chip>
+          )}
+          {consumptionCount > 0 && (
+            <Chip active={tabMode === 'consumption'} onClick={() => setTabMode('consumption')}>🍽️ مصرف ({toFa(consumptionCount)})</Chip>
           )}
         </div>
       )}
-      {!showAudit && totalCount > 0 && (
+      {tabMode === 'events' && totalCount > 0 && (
         <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
           <Chip active={filter === 'all'} onClick={() => setFilter('all')}>همه ({toFa(totalCount)})</Chip>
           {(['death', 'sell', 'correction'] as FlockEventType[]).map(t => {
@@ -280,7 +301,53 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
         </div>
       )}
 
-      {showAudit ? (
+      {tabMode === 'consumption' ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {consumptionSummary.hasData && (
+            <div style={{ padding: '8px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 11 }}>
+              <div style={{ fontWeight: 700, marginBottom: 6, color: 'var(--muted)', fontSize: 10 }}>📊 خلاصه ۳۰ روز اخیر</div>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <span>🍽️ دان: <b>{toFa(consumptionSummary.totalFeedKg)} kg</b></span>
+                <span>💧 آب: <b>{toFa(consumptionSummary.totalWaterL)} L</b></span>
+                <span style={{ color: 'var(--muted)', fontSize: 10 }}>({toFa(consumptionSummary.eventCount)} رویداد)</span>
+              </div>
+              {(consumptionSummary.bySex.male > 0 || consumptionSummary.bySex.female > 0) && (
+                <div style={{ marginTop: 4, fontSize: 10, color: 'var(--muted)' }}>
+                  ♂ نر: {toFa(consumptionSummary.bySex.male)} kg · ♀ ماده: {toFa(consumptionSummary.bySex.female)} kg
+                </div>
+              )}
+            </div>
+          )}
+          {consumptionCount === 0 ? (
+            <div style={{ padding: 'var(--sp-8)', textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>
+              <div style={{ fontSize: 40, marginBottom: 8 }}>🍽️</div>
+              <div>هنوز مصرف ثبت نشده</div>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {flockConsumption.slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).map(ev => (
+                <div key={ev.id} style={{ display: 'flex', gap: 8, padding: '6px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)', fontSize: 'var(--fs-xs)' }}>
+                  <span style={{ fontSize: 16, flexShrink: 0 }}>{ev.type === 'feed' ? '🍽️' : '💧'}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 6 }}>
+                      <b dir="ltr">
+                        {toFa(ev.amount)} {ev.unit}
+                        {ev.sex === 'male' && <span style={{ color: 'var(--info)', marginRight: 4 }}>♂</span>}
+                        {ev.sex === 'female' && <span style={{ color: 'var(--purple)', marginRight: 4 }}>♀</span>}
+                      </b>
+                      <span style={{ color: 'var(--muted)', fontSize: 10 }}>{toFa(ev.date)}</span>
+                    </div>
+                    <div style={{ color: 'var(--muted)', fontSize: 10, marginTop: 2 }}>
+                      {ev.source === 'bulk_manual' ? 'پر کردن سطل' : ev.source === 'daily_manual' ? 'روزانه' : ev.source === 'sensor_scale' ? 'سنسور وزن' : ev.source === 'sensor_level' ? 'سنسور سطح' : ev.source === 'auto_feeder' ? 'اتومات' : 'استاندارد'}
+                      {ev.notes && ` — ${ev.notes}`}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : tabMode === 'audit' ? (
         auditCount === 0 ? (
           <div style={{ padding: 'var(--sp-8)', textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>
             <div style={{ fontSize: 40, marginBottom: 8 }}>📊</div>
