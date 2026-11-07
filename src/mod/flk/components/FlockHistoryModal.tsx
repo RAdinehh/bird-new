@@ -787,17 +787,13 @@ function EventRow({ e, onRevoke, runningTotals }: { e: FlockEvent; onRevoke: () 
         </div>
       )}
 
-      {/* ═══ سطر ۴ — هشدار (سطح ۳) ═══ */}
+      {/* ═══ سطر ۴ — هشدار (سطح ۳، ساده) ═══ */}
       {isManualCorrection && (
         <div style={{
           display: 'flex',
           alignItems: 'center',
           gap: 6,
-          padding: '6px 10px',
-          background: 'var(--warn-soft)',
-          borderRight: '3px solid var(--warn)',
-          borderRadius: 'var(--r-sm)',
-          fontSize: 'var(--fs-xs)',
+          fontSize: 'var(--fs-sm)',
           color: 'var(--warn)',
           lineHeight: 1.6,
         }}>
