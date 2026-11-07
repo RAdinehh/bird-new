@@ -296,19 +296,35 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
       )}
 
       {/* ═══ تب‌ها ═══ */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
-        <Chip active={tabMode === 'events'} onClick={() => setTabMode('events')}>📋 همه ({toFa(totalCount)})</Chip>
+      {/* ═══ تب‌های اصلی — Segmented Control ═══ */}
+      <div style={{
+        display: 'flex',
+        gap: 0,
+        marginBottom: 12,
+        background: 'var(--input-bg)',
+        borderRadius: 'var(--r-md)',
+        padding: 3,
+        border: '1px solid var(--border)',
+      }}>
+        <TabButton active={tabMode === 'events'} onClick={() => setTabMode('events')}>
+          📋 رویدادها ({toFa(totalCount)})
+        </TabButton>
         {auditCount > 0 && (
-          <Chip active={tabMode === 'audit'} onClick={() => setTabMode('audit')}>⚥ تغییرات جنسیتی ({toFa(auditCount)})</Chip>
+          <TabButton active={tabMode === 'audit'} onClick={() => setTabMode('audit')}>
+            ⚥ تغییرات ({toFa(auditCount)})
+          </TabButton>
         )}
         {consumptionCount > 0 && (
-          <Chip active={tabMode === 'consumption'} onClick={() => setTabMode('consumption')}>🍽️ مصرف ({toFa(consumptionCount)})</Chip>
+          <TabButton active={tabMode === 'consumption'} onClick={() => setTabMode('consumption')}>
+            🍽️ مصرف ({toFa(consumptionCount)})
+          </TabButton>
         )}
       </div>
 
       {/* ═══ فیلتر نوع (فقط تب همه) ═══ */}
       {tabMode === 'events' && totalCount > 0 && (
-        <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, marginLeft: 4 }}>فیلتر:</span>
           <Chip active={filter === 'all'} onClick={() => setFilter('all')}>همه</Chip>
           {FILTER_TYPES.map(t => {
             const n = typeCounts.get(t) || 0;
@@ -433,7 +449,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {visibleData.events.items.map(g => (
                 <div key={g.label}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', letterSpacing: '.5px', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>{g.label}</div>
+                  <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>📅 {toFa(g.label)}</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                     {g.events.map(e => <EventRow key={e.id} e={e} onRevoke={() => handleRevoke(e)} />)}
                   </div>
@@ -473,8 +489,8 @@ function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
   const meta = SEX_AUDIT_META[ev.type] || { icon: '•', label: ev.type, tone: 'var(--muted)' };
   const delta = formatSexDelta(ev.delta);
   return (
-    <div style={{ display: 'flex', gap: 8, padding: '6px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)', fontSize: 'var(--fs-xs)' }}>
-      <span style={{ fontSize: 16, flexShrink: 0 }}>{meta.icon}</span>
+    <div style={{ display: 'flex', gap: 8, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)', fontSize: 'var(--fs-sm)' }}>
+      <span style={{ fontSize: 18, flexShrink: 0 }}>{meta.icon}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 6 }}>
           <b style={{ color: meta.tone }}>{meta.label}</b>
@@ -499,8 +515,8 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
   const isPlus = e.type === 'add' || e.type === 'transfer' || (e.type === 'correction' && !isRevokeAction);
 
   return (
-    <div style={{ display: 'flex', gap: 8, padding: '6px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)', fontSize: 'var(--fs-xs)' }}>
-      <span style={{ fontSize: 16, flexShrink: 0 }}>{info.icon}</span>
+    <div style={{ display: 'flex', gap: 8, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)', fontSize: 'var(--fs-sm)' }}>
+      <span style={{ fontSize: 18, flexShrink: 0 }}>{info.icon}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 6, alignItems: 'baseline' }}>
           <div style={{ display: 'flex', gap: 6, alignItems: 'baseline', flexWrap: 'wrap' }}>
@@ -512,8 +528,8 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
         </div>
         {e.reason && <div style={{ color: 'var(--muted)', fontSize: 10, marginTop: 2 }}>{e.reason}</div>}
         {e.type === 'correction' && !e.linkedEventId && !e.revoked && (
-          <div style={{ color: 'var(--warn)', fontSize: 10, marginTop: 2 }}>
-            ⚠️ این اصلاح در ثبت روزانه (dlg) ثبت نشده — فقط موجودی گله تغییر کرده
+          <div style={{ color: 'var(--warn)', fontSize: 'var(--fs-xs)', marginTop: 4, padding: '4px 8px', background: 'var(--warn-soft)', borderRadius: 'var(--r-sm)', lineHeight: 1.5 }}>
+            ⚠️ این تغییر فقط روی موجودی گله اعمال شد، در «ثبت روزانه» سیستم ثبت نشده است.
           </div>
         )}
         {isRevoked && <div style={{ color: 'var(--danger)', fontSize: 10, marginTop: 2, fontWeight: 600 }}>لغو شده</div>}
@@ -528,5 +544,31 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
 function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
   return (
     <button type="button" onClick={onClick} style={{ padding: '5px var(--sp-3)', fontSize: 12, fontWeight: 600, borderRadius: 'var(--r-sm)', border: '1px solid ' + (active ? 'var(--accent)' : 'var(--border)'), background: active ? 'var(--accent-soft)' : 'transparent', color: active ? 'var(--accent)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit' }}>{children}</button>
+  );
+}
+
+
+function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        flex: 1,
+        padding: '8px 10px',
+        fontSize: 'var(--fs-sm)',
+        fontWeight: 700,
+        borderRadius: 'calc(var(--r-md) - 3px)',
+        border: 'none',
+        background: active ? 'var(--card)' : 'transparent',
+        color: active ? 'var(--accent)' : 'var(--muted)',
+        cursor: 'pointer',
+        fontFamily: 'inherit',
+        boxShadow: active ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+        transition: 'all 0.15s',
+      }}
+    >
+      {children}
+    </button>
   );
 }
