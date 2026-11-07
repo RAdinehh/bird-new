@@ -23,13 +23,6 @@ const SRC_LABEL: Record<string, { label: string; tone: Tone }> = {
   correction: { label: 'اصلاح', tone: 'blue' },
 };
 
-const TONE_VAR: Record<Tone, string> = {
-  green: 'var(--accent)',
-  amber: 'var(--warn)',
-  blue: 'var(--info)',
-  gray: 'var(--dim)',
-};
-
 const VISIBLE_LIMIT = 10;
 
 function fmt(n: number | undefined | null): string {
@@ -104,19 +97,26 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
           هنوز تفکیکی برای این گله ثبت نشده است.
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {visibleGroups.map(g => (
             <div key={g.label}>
               <div style={{
-                fontSize: 11,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '6px 10px',
+                marginBottom: 8,
+                background: 'var(--accent-soft)',
+                border: '1px solid var(--accent-border)',
+                borderRadius: 'var(--r-sm)',
+                fontSize: 'var(--fs-sm)',
                 fontWeight: 700,
-                color: 'var(--muted)',
-                letterSpacing: '.5px',
-                paddingBottom: 6,
-                marginBottom: 6,
-                borderBottom: '1px dashed var(--border)',
+                color: 'var(--accent)',
               }}>
-                {toFa(g.label)}
+                <span>📅 {toFa(g.label)}</span>
+                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 500 }}>
+                  · {toFa(g.items.length)} {g.items.length === 1 ? 'رویداد' : 'رویداد'}
+                </span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {g.items.map(({ ev, prev }) => {
@@ -125,14 +125,12 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
                   const dU = prev ? ev.unknown - prev.unknown : 0;
                   const hasDelta = prev && (dM !== 0 || dF !== 0 || dU !== 0);
                   const srcInfo = SRC_LABEL[ev.source] || { label: ev.source, tone: 'gray' as const };
-                  const toneVar = TONE_VAR[srcInfo.tone] || 'var(--border)';
                   return (
                     <div key={ev.id} style={{
                       padding: '8px 10px',
                       background: 'var(--input-bg)',
                       borderRadius: 'var(--r-sm)',
                       border: '1px solid var(--border)',
-                      borderRight: `3px solid ${toneVar}`,
                       display: 'flex',
                       flexDirection: 'column',
                       gap: 6,
