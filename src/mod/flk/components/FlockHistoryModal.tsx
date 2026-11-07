@@ -194,6 +194,19 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
     return order.map(k => ({ label: k, events: map.get(k)! }));
   }, [flock.events, filter]);
 
+  const auditGroups = useMemo(() => {
+    const today = todayJ();
+    const all = (flock.sexBalanceEvents || []).slice().sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+    const map = new Map<string, FlockSexBalanceEvent[]>();
+    const order: string[] = [];
+    for (const e of all) {
+      const key = e.date === today ? 'امروز' : (e.date || 'نامشخص');
+      if (!map.has(key)) { map.set(key, []); order.push(key); }
+      map.get(key)!.push(e);
+    }
+    return order.map(k => ({ label: k, events: map.get(k)! }));
+  }, [flock.sexBalanceEvents]);
+
   const visibleData = useMemo(() => {
     const egVisible = (() => {
       if (showAllEvents) return { items: groups, hidden: 0 };
@@ -208,9 +221,19 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
       const allTotal = groups.reduce((s, g) => s + g.events.length, 0);
       return { items: out, hidden: allTotal - visTotal };
     })();
-    const allAudit = (flock.sexBalanceEvents || []).slice().sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
-    const auditVisible = showAllAudit ? allAudit : allAudit.slice(0, VISIBLE_LIMIT);
-    const auditHidden = allAudit.length - auditVisible.length;
+    const auditVisible = showAllAudit ? auditGroups : (() => {
+      let total = 0;
+      const out: typeof auditGroups = [];
+      for (const g of auditGroups) {
+        if (total >= VISIBLE_LIMIT) break;
+        out.push(g);
+        total += g.events.length;
+      }
+      return out;
+    })();
+    const auditVisibleCount = auditVisible.reduce((s, g) => s + g.events.length, 0);
+    const auditAllCount = auditGroups.reduce((s, g) => s + g.events.length, 0);
+    const auditHidden = auditAllCount - auditVisibleCount;
     const allCons = flockConsumption.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     const consVisible = showAllConsumption ? allCons : allCons.slice(0, VISIBLE_LIMIT);
     const consHidden = allCons.length - consVisible.length;
@@ -219,7 +242,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
       audit: { items: auditVisible, hidden: auditHidden },
       consumption: { items: consVisible, hidden: consHidden },
     };
-  }, [groups, showAllEvents, showAllAudit, showAllConsumption, flock.sexBalanceEvents, flockConsumption]);
+  }, [groups, showAllEvents, showAllAudit, showAllConsumption, auditGroups, flockConsumption]);
 
   const handleExport = () => {
     try {
@@ -511,9 +534,15 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
             </div>
           ) : (
             <>
-              <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>📋 تاریخچه تغییرات</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {visibleData.audit.items.map(ev => <AuditRow key={ev.id} ev={ev} />)}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {visibleData.audit.items.map(g => (
+                  <div key={g.label}>
+                    <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>📅 {toFa(g.label)}</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {g.events.map(ev => <AuditRow key={ev.id} ev={ev} />)}
+                    </div>
+                  </div>
+                ))}
               </div>
               {visibleData.audit.hidden > 0 && (
                 <ShowMoreButton count={visibleData.audit.hidden} onClick={() => setShowAllAudit(true)} />
@@ -618,7 +647,8 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
   const isRevoked = e.revoked === true;
   const isRevokeAction = !!e.linkedEventId;
   const canRevoke = !isRevoked && !isRevokeAction && e.type !== 'add' && e.type !== 'correction';
-  const isPlus = e.type === 'add' || e.type === 'transfer' || (e.type === 'correction' && !isRevokeAction);
+  // 🆕 فیکس: اصلاح باید به direction احترام بگذارد (اگر -1 بود، منفی)
+  const isPlus = e.type === 'add' || e.type === 'transfer' || (e.type === 'correction' && !isRevokeAction && e.direction !== -1);
 
   return (
     <div style={{ display: 'flex', gap: 8, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)', fontSize: 'var(--fs-sm)' }}>
