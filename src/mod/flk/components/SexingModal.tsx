@@ -66,31 +66,28 @@ export default function SexingModal({ open, onClose, flock }: Props) {
   let autoFillField: 'male' | 'female' | 'unknown' | null = null;
   let autoFillValue = 0;
 
-  if (isUnknownEmpty && remaining > 0) {
-    unknownNum = remaining;
-    autoFillField = 'unknown';
-    autoFillValue = remaining;
-  } else if (!isUnknownEmpty && isMaleEmpty && remaining > 0) {
-    maleNum = remaining;
-    autoFillField = 'male';
-    autoFillValue = remaining;
-  } else if (!isUnknownEmpty && !isMaleEmpty && isFemaleEmpty && remaining > 0) {
-    femaleNum = remaining;
-    autoFillField = 'female';
-    autoFillValue = remaining;
+  const userFilledCountPre = (!isMaleEmpty ? 1 : 0) + (!isFemaleEmpty ? 1 : 0) + (!isUnknownEmpty ? 1 : 0);
+  if (userFilledCountPre === 2 && remaining > 0) {
+    if (isUnknownEmpty) {
+      unknownNum = remaining; autoFillField = 'unknown'; autoFillValue = remaining;
+    } else if (isMaleEmpty) {
+      maleNum = remaining; autoFillField = 'male'; autoFillValue = remaining;
+    } else if (isFemaleEmpty) {
+      femaleNum = remaining; autoFillField = 'female'; autoFillValue = remaining;
+    }
   }
 
   const totalInput = maleNum + femaleNum + unknownNum;
   const diff = totalInput - currentCount;
   const mismatch = diff !== 0;
   const userFilledCount = (!isMaleEmpty ? 1 : 0) + (!isFemaleEmpty ? 1 : 0) + (!isUnknownEmpty ? 1 : 0);
-  const isIncomplete = userFilledCount < 2;
+  const isIncomplete = userFilledCount < 3;
   const noInput = userFilledCount === 0;
 
   useEffect(() => {
     if (open && flock) {
-      setMaleStr(String(flock.maleCount ?? 0));
-      setFemaleStr(String(flock.femaleCount ?? 0));
+      setMaleStr(flock.maleCount ? String(flock.maleCount) : '');
+      setFemaleStr(flock.femaleCount ? String(flock.femaleCount) : '');
       setUnknownStr(flock.unknownCount ? String(flock.unknownCount) : '');
       setDate(todayJalali());
       setNote('');
@@ -101,11 +98,14 @@ export default function SexingModal({ open, onClose, flock }: Props) {
 
   const handleSave = async () => {
     if (!flock) return;
+    if (isIncomplete) {
+      setErr('هر سه فیلد نر، ماده و نامشخص باید پر باشند');
+      return;
+    }
     if (mismatch) {
       setErr(`جمع (${totalInput}) با تعداد زنده (${currentCount}) برابر نیست — اختلاف: ${diff}`);
       return;
     }
-    if (noInput) { setErr('حداقل یکی از نر یا ماده باید بیشتر از صفر باشد'); return; }
 
     // 🆕 کانفرم قبل از ثبت (فاز ۳ تکمیلی)
     const _isFirst = !flock.genderSplitAt;
@@ -222,22 +222,22 @@ export default function SexingModal({ open, onClose, flock }: Props) {
         </Field>
       </Grid2>
 
-      {/* 🆕 Smart Guide — اولویت‌بندی بر اساس completeness */}
-      {mismatch ? (
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', marginBottom: 8, lineHeight: 1.6 }}>
-          {toFa(Math.abs(diff))} پرنده {diff > 0 ? 'بیشتر' : 'کمتر'} — ثبت‌شده {toFa(totalInput)}، نیاز {toFa(currentCount)}
+      {/* 🆕 Smart Guide — یک خط، بدون تکرار */}
+      {isIncomplete && noInput ? (
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          تعداد نر یا ماده را وارد کنید
         </div>
-      ) : isIncomplete && noInput ? (
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 8, lineHeight: 1.6 }}>
-          تعداد نر یا ماده را وارد کنید — سومین فیلد خودکار محاسبه می‌شود
+      ) : isIncomplete && userFilledCount === 1 ? (
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          یک فیلد دیگر وارد کنید
         </div>
-      ) : isIncomplete ? (
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--info)', marginBottom: 8, lineHeight: 1.6 }}>
-          یک فیلد دیگر وارد کنید — سومین فیلد خودکار محاسبه می‌شود
+      ) : isIncomplete && autoFillField ? (
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--info)', marginBottom: 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {autoFillField === 'male' ? 'نر' : autoFillField === 'female' ? 'ماده' : 'نامشخص'} = {toFa(autoFillValue)} (خودکار — وارد کنید)
         </div>
-      ) : autoFillField ? (
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--info)', marginBottom: 8, lineHeight: 1.6 }}>
-          {autoFillField === 'male' ? 'نر' : autoFillField === 'female' ? 'ماده' : 'نامشخص'} = <b>{toFa(autoFillValue)}</b> (خودکار محاسبه شد)
+      ) : mismatch ? (
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', marginBottom: 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {toFa(Math.abs(diff))} پرنده {diff > 0 ? 'بیشتر' : 'کمتر'} از موجودی ({toFa(currentCount)})
         </div>
       ) : null}
 
@@ -257,10 +257,10 @@ export default function SexingModal({ open, onClose, flock }: Props) {
         color: 'var(--muted)',
       }}>
         {isFirst
-          ? 'ℹ️ این اولین تفکیک است. پس از ثبت، گله به‌عنوان «تفکیک‌شده» علامت می‌خورد.'
+          ? 'این اولین تفکیک است. پس از ثبت، گله به‌عنوان «تفکیک‌شده» علامت می‌خورد.'
           : isFinal && flock.unknownCount && flock.unknownCount > 0
-            ? 'ℹ️ تکمیل تفکیک — همه پرنده‌ها تعیین جنسیت می‌شوند.'
-            : 'ℹ️ تفکیک مجدد — تاریخچه قبلی حفظ می‌شود.'}
+            ? 'تکمیل تفکیک — همه پرنده‌ها تعیین جنسیت می‌شوند.'
+            : 'تفکیک مجدد — تاریخچه قبلی حفظ می‌شود.'}
       </div>
 
       {err && (
