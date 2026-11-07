@@ -760,51 +760,39 @@ function EventRow({ e, onRevoke, runningTotals }: { e: FlockEvent; onRevoke: () 
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 8,
-          padding: '8px 12px',
+          gap: 6,
+          alignSelf: 'flex-start',
+          padding: '4px 10px',
           background: 'var(--card)',
           borderRadius: 'var(--r-sm)',
           border: '1px solid var(--border)',
+          fontSize: 'var(--fs-sm)',
         }}>
-          <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>موجودی:</span>
-          <span dir="ltr" style={{ fontFamily: 'monospace', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--muted)' }}>
+          <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>موجودی:</span>
+          <span dir="ltr" style={{ fontFamily: 'monospace', fontWeight: 700, color: 'var(--muted)' }}>
             {toFa(runningTotals.before)}
           </span>
-          <span style={{ color: 'var(--dim)', fontSize: 'var(--fs-base)' }}>→</span>
-          <span dir="ltr" style={{ fontFamily: 'monospace', fontSize: 'var(--fs-base)', fontWeight: 700, color: isPlus ? 'var(--accent)' : 'var(--danger)' }}>
+          <span style={{ color: 'var(--dim)', fontSize: 12 }}>→</span>
+          <span dir="ltr" style={{ fontFamily: 'monospace', fontWeight: 700, color: isPlus ? 'var(--accent)' : 'var(--danger)' }}>
             {toFa(runningTotals.after)}
           </span>
         </div>
       )}
 
-      {/* ═══ سطر ۳ — دلیل ═══ */}
-      {e.reason && (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          fontSize: 'var(--fs-sm)',
-        }}>
-          <span style={{ color: 'var(--muted)' }}>دلیل:</span>
-          <b style={{ color: 'var(--text)' }}>{e.reason}</b>
-        </div>
-      )}
-
-      {/* ═══ سطر ۴ — هشدار ثبت دستی (واضح) ═══ */}
-      {isManualCorrection && (
-        <div style={{
-          padding: '8px 10px',
-          background: 'var(--warn-soft)',
-          border: '1px solid var(--warn)',
-          borderRadius: 'var(--r-sm)',
-          lineHeight: 1.6,
-        }}>
-          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--warn)' }}>
-            ⚠️ ثبت دستی
-          </div>
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', marginTop: 2 }}>
-            این عدد در «ثبت روزانه» سیستم ثبت نشده و فقط روی موجودی گله اعمال شده است
-          </div>
+      {/* ═══ سطر ۳ — دلیل + هشدار در یک خط ═══ */}
+      {(e.reason || isManualCorrection) && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 'var(--fs-sm)' }}>
+          {e.reason && (
+            <>
+              <span style={{ color: 'var(--muted)' }}>دلیل:</span>
+              <b style={{ color: 'var(--text)' }}>{e.reason}</b>
+            </>
+          )}
+          {isManualCorrection && (
+            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 600 }}>
+              ⚠️ ثبت دستی — بدون سند در «ثبت روزانه»
+            </span>
+          )}
         </div>
       )}
 
