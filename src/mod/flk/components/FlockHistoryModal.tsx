@@ -190,7 +190,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   };
 
   return (
-    <Modal open={open} onClose={onClose} title={'📜 تاریخچه • ' + flock.name}>
+    <Modal open={open} onClose={onClose} title={'📜 رویدادها • ' + flock.name}>
       <div style={{ padding: 'var(--sp-3) var(--sp-4)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, fontSize: 13 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           <span>موجودی: <b>{toFa(current)}</b> از {toFa(initial)}</span>
@@ -306,9 +306,9 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
 
       {(totalCount > 0 || auditCount > 0 || consumptionCount > 0) && (
         <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
-          <Chip active={tabMode === 'events'} onClick={() => setTabMode('events')}>📜 رویدادها ({toFa(totalCount)})</Chip>
+          <Chip active={tabMode === 'events'} onClick={() => setTabMode('events')}>📋 همه ({toFa(totalCount)})</Chip>
           {auditCount > 0 && (
-            <Chip active={tabMode === 'audit'} onClick={() => setTabMode('audit')}>📊 تاریخچه جنسیت ({toFa(auditCount)})</Chip>
+            <Chip active={tabMode === 'audit'} onClick={() => setTabMode('audit')}>⚥ تغییرات جنسیتی ({toFa(auditCount)})</Chip>
           )}
           {consumptionCount > 0 && (
             <Chip active={tabMode === 'consumption'} onClick={() => setTabMode('consumption')}>🍽️ مصرف ({toFa(consumptionCount)})</Chip>
