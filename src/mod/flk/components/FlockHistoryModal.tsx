@@ -574,70 +574,82 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
           background: 'var(--accent-soft)',
           border: '1px solid var(--accent-border)',
           borderRadius: 'var(--r-md)',
-          padding: '10px 12px',
+          padding: 10,
           marginBottom: 8,
         }}>
           {/* Header */}
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, paddingBottom: 8, marginBottom: 8, borderBottom: '1px dashed var(--accent-border)' }}>
-            <span style={{ fontSize: 16 }}>⚥</span>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, paddingBottom: 8, marginBottom: 6 }}>
+            <span style={{ fontSize: 18 }}>⚥</span>
             <b style={{ fontSize: 'var(--fs-base)', color: 'var(--accent)' }}>وضعیت جنسیتی</b>
             <span style={{ marginRight: 'auto', fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>از زمان تفکیک</span>
           </div>
 
-          {/* ۳ خط ساده — بدون جدول */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 'var(--fs-sm)' }}>
+          {/* Table — بدون inner card */}
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {/* Header row */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '60px 1fr 1fr 1fr 1fr 1fr',
+              padding: '4px 0',
+              borderBottom: '1px solid var(--accent-border)',
+              fontSize: 'var(--fs-xs)',
+              fontWeight: 700,
+              color: 'var(--muted)',
+            }}>
+              <span>جنسیت</span>
+              <span style={{ textAlign: 'center' }}>اولیه</span>
+              <span style={{ textAlign: 'center' }}>تلفات</span>
+              <span style={{ textAlign: 'center' }}>فروش</span>
+              <span style={{ textAlign: 'center' }}>سایر</span>
+              <span style={{ textAlign: 'center' }}>فعلی</span>
+            </div>
+
             {/* نر */}
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexWrap: 'wrap' }}>
-              <b style={{ color: 'var(--info)', width: 55 }}>♂ نر</b>
-              <span style={{ fontFamily: 'monospace' }}>
-                <b style={{ fontSize: 'var(--fs-base)', color: 'var(--text)' }}>{toFa(sexAggregates.current.male)}</b>
-                <span style={{ color: 'var(--muted)' }}> از {toFa(sexAggregates.init.male)}</span>
-              </span>
-              {sexAggregates.deaths.male > 0 && (
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>تلفات {toFa(sexAggregates.deaths.male)}</span>
-              )}
-              {sexAggregates.sells.male > 0 && (
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--purple)' }}>فروش {toFa(sexAggregates.sells.male)}</span>
-              )}
-              {sexAggregates.others.male !== 0 && (
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)' }}>سایر {sexAggregates.others.male > 0 ? '+' : ''}{toFa(sexAggregates.others.male)}</span>
-              )}
+            <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr 1fr 1fr 1fr 1fr', padding: '6px 0', borderBottom: '1px dashed var(--accent-border)', fontSize: 'var(--fs-sm)' }}>
+              <span style={{ color: 'var(--info)', fontWeight: 700 }}>♂ نر</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace' }}>{toFa(sexAggregates.init.male)}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.deaths.male > 0 ? 'var(--danger)' : 'var(--muted)' }}>{sexAggregates.deaths.male > 0 ? `-${toFa(sexAggregates.deaths.male)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.sells.male > 0 ? 'var(--purple)' : 'var(--muted)' }}>{sexAggregates.sells.male > 0 ? `-${toFa(sexAggregates.sells.male)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.others.male !== 0 ? 'var(--warn)' : 'var(--muted)' }}>{sexAggregates.others.male > 0 ? '+' : ''}{sexAggregates.others.male !== 0 ? toFa(sexAggregates.others.male) : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', fontWeight: 700, color: 'var(--text)' }}>{toFa(sexAggregates.current.male)}</span>
             </div>
 
             {/* ماده */}
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexWrap: 'wrap' }}>
-              <b style={{ color: 'var(--purple)', width: 55 }}>♀ ماده</b>
-              <span style={{ fontFamily: 'monospace' }}>
-                <b style={{ fontSize: 'var(--fs-base)', color: 'var(--text)' }}>{toFa(sexAggregates.current.female)}</b>
-                <span style={{ color: 'var(--muted)' }}> از {toFa(sexAggregates.init.female)}</span>
-              </span>
-              {sexAggregates.deaths.female > 0 && (
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>تلفات {toFa(sexAggregates.deaths.female)}</span>
-              )}
-              {sexAggregates.sells.female > 0 && (
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--purple)' }}>فروش {toFa(sexAggregates.sells.female)}</span>
-              )}
-              {sexAggregates.others.female !== 0 && (
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)' }}>سایر {sexAggregates.others.female > 0 ? '+' : ''}{toFa(sexAggregates.others.female)}</span>
-              )}
+            <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr 1fr 1fr 1fr 1fr', padding: '6px 0', borderBottom: '1px dashed var(--accent-border)', fontSize: 'var(--fs-sm)' }}>
+              <span style={{ color: 'var(--purple)', fontWeight: 700 }}>♀ ماده</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace' }}>{toFa(sexAggregates.init.female)}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.deaths.female > 0 ? 'var(--danger)' : 'var(--muted)' }}>{sexAggregates.deaths.female > 0 ? `-${toFa(sexAggregates.deaths.female)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.sells.female > 0 ? 'var(--purple)' : 'var(--muted)' }}>{sexAggregates.sells.female > 0 ? `-${toFa(sexAggregates.sells.female)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.others.female !== 0 ? 'var(--warn)' : 'var(--muted)' }}>{sexAggregates.others.female > 0 ? '+' : ''}{sexAggregates.others.female !== 0 ? toFa(sexAggregates.others.female) : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', fontWeight: 700, color: 'var(--text)' }}>{toFa(sexAggregates.current.female)}</span>
             </div>
 
             {/* نامشخص */}
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexWrap: 'wrap' }}>
-              <b style={{ color: 'var(--muted)', width: 55 }}>? نامشخص</b>
-              <span style={{ fontFamily: 'monospace' }}>
-                <b style={{ fontSize: 'var(--fs-base)', color: 'var(--text)' }}>{toFa(sexAggregates.current.unknown)}</b>
-                <span style={{ color: 'var(--muted)' }}> از {toFa(sexAggregates.init.unknown)}</span>
-              </span>
-              {sexAggregates.deaths.unknown > 0 && (
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>تلفات {toFa(sexAggregates.deaths.unknown)}</span>
-              )}
-              {sexAggregates.sells.unknown > 0 && (
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--purple)' }}>فروش {toFa(sexAggregates.sells.unknown)}</span>
-              )}
-              {sexAggregates.others.unknown !== 0 && (
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)' }}>سایر {sexAggregates.others.unknown > 0 ? '+' : ''}{toFa(sexAggregates.others.unknown)}</span>
-              )}
+            <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr 1fr 1fr 1fr 1fr', padding: '6px 0', fontSize: 'var(--fs-sm)' }}>
+              <span style={{ color: 'var(--muted)', fontWeight: 700 }}>? نامش</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace' }}>{toFa(sexAggregates.init.unknown)}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.deaths.unknown > 0 ? 'var(--danger)' : 'var(--muted)' }}>{sexAggregates.deaths.unknown > 0 ? `-${toFa(sexAggregates.deaths.unknown)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.sells.unknown > 0 ? 'var(--purple)' : 'var(--muted)' }}>{sexAggregates.sells.unknown > 0 ? `-${toFa(sexAggregates.sells.unknown)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.others.unknown !== 0 ? 'var(--warn)' : 'var(--muted)' }}>{sexAggregates.others.unknown > 0 ? '+' : ''}{sexAggregates.others.unknown !== 0 ? toFa(sexAggregates.others.unknown) : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', fontWeight: 700, color: 'var(--text)' }}>{toFa(sexAggregates.current.unknown)}</span>
+            </div>
+
+            {/* جمع کل */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '60px 1fr 1fr 1fr 1fr 1fr',
+              padding: '6px 0',
+              marginTop: 2,
+              borderTop: '2px solid var(--accent)',
+              fontSize: 'var(--fs-sm)',
+              fontWeight: 700,
+            }}>
+              <span style={{ color: 'var(--accent)' }}>جمع</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace' }}>{toFa(sexAggregates.init.male + sexAggregates.init.female + sexAggregates.init.unknown)}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: 'var(--danger)' }}>{(sexAggregates.deaths.male + sexAggregates.deaths.female + sexAggregates.deaths.unknown) > 0 ? `-${toFa(sexAggregates.deaths.male + sexAggregates.deaths.female + sexAggregates.deaths.unknown)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: 'var(--purple)' }}>{(sexAggregates.sells.male + sexAggregates.sells.female + sexAggregates.sells.unknown) > 0 ? `-${toFa(sexAggregates.sells.male + sexAggregates.sells.female + sexAggregates.sells.unknown)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: 'var(--warn)' }}>{(sexAggregates.others.male + sexAggregates.others.female + sexAggregates.others.unknown) !== 0 ? `${(sexAggregates.others.male + sexAggregates.others.female + sexAggregates.others.unknown) > 0 ? '+' : ''}${toFa(sexAggregates.others.male + sexAggregates.others.female + sexAggregates.others.unknown)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: 'var(--accent)' }}>{toFa(sexAggregates.current.male + sexAggregates.current.female + sexAggregates.current.unknown)}</span>
             </div>
           </div>
         </div>
