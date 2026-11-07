@@ -414,7 +414,17 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               <Select
                 value={reasonCode}
                 onChange={e => setReasonCode(e.target.value as FlockEventReasonCode)}
-                style={{ background: '#ffffff', fontSize: 'var(--fs-sm)', height: 40, borderColor: 'var(--warn)' }}
+                style={{
+                  background: '#ffffff',
+                  border: '1px solid var(--warn)',
+                  borderRadius: 'var(--r-md)',
+                  height: 40,
+                  padding: '0 var(--sp-3)',
+                  fontFamily: 'inherit',
+                  fontSize: 'var(--fs-sm)',
+                  color: 'var(--text)',
+                  width: '100%',
+                }}
               >
                 {REASON_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
               </Select>
