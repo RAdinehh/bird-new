@@ -1,7 +1,6 @@
 /**
  * ConsumptionFormModal.tsx — فرم ثبت دان/آب
- * فاز ۸b — write path برای ConsumptionEvent
- * UI بهبود: دو ستونه، DatePicker، placeholders توصیفی، confidence پویا
+ * فاز ۸b — سلسله مراتب منطقی: داده اصلی + جزئیات
  */
 import { useState } from 'react';
 import { Modal, Btn, BtnRow, Field, Grid2, Select } from '../../../shr/components/ui';
@@ -37,6 +36,25 @@ const SOURCE_LABEL: Record<string, string> = {
   sensor_level: '📊 سنسور سطح',
   auto_feeder: '🤖 اتومات هوشمند',
 };
+
+function SectionHeader({ icon, label, hint }: { icon: string; label: string; hint?: string }) {
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 6,
+      paddingBottom: 6,
+      marginBottom: 8,
+      marginTop: 4,
+      borderBottom: '1px dashed var(--border)',
+      fontSize: 'var(--fs-xs)',
+    }}>
+      <span style={{ fontSize: 14 }}>{icon}</span>
+      <b style={{ color: 'var(--text)' }}>{label}</b>
+      {hint && <span style={{ color: 'var(--muted)', fontSize: 10 }}>{hint}</span>}
+    </div>
+  );
+}
 
 export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
   const [type, setType] = useState<'feed' | 'water'>('feed');
@@ -82,6 +100,10 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
 
   return (
     <Modal open={open} onClose={onClose} title={'🍽️ ثبت دان/آب — ' + flock.name}>
+
+      {/* ═══ بخش ۱ — داده اصلی ═══ */}
+      <SectionHeader icon="📥" label="داده اصلی" hint="— الزامی" />
+
       <Grid2>
         <Field label="نوع" required>
           <Select value={type} onChange={e => setType(e.target.value as 'feed' | 'water')}>
@@ -94,104 +116,102 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
         </Field>
       </Grid2>
 
-      <Field label={'مقدار (' + unit + ')'} required>
-        <input
-          type="text"
-          value={amount}
-          onChange={e => setAmount(e.target.value)}
-          placeholder={amountPlaceholder}
-          inputMode="decimal"
-          style={inputStyle}
-        />
-      </Field>
-
-      {showSex && (
-        <Field label="جنسیت">
-          <Select value={sex} onChange={e => setSex(e.target.value as '' | 'male' | 'female' | 'mixed')}>
-            <option value="">نامشخص (کل گله)</option>
-            <option value="male">♂ نر</option>
-            <option value="female">♀ ماده</option>
-            <option value="mixed">مخلوط</option>
-          </Select>
+      <Grid2>
+        <Field label={'مقدار (' + unit + ')'} required>
+          <input
+            type="text"
+            value={amount}
+            onChange={e => setAmount(e.target.value)}
+            placeholder={amountPlaceholder}
+            inputMode="decimal"
+            style={inputStyle}
+          />
         </Field>
-      )}
+        {showSex ? (
+          <Field label="برای کدام جنس؟">
+            <Select value={sex} onChange={e => setSex(e.target.value as '' | 'male' | 'female' | 'mixed')}>
+              <option value="">کل گله (نامشخص)</option>
+              <option value="male">♂ نر</option>
+              <option value="female">♀ ماده</option>
+              <option value="mixed">مخلوط</option>
+            </Select>
+          </Field>
+        ) : (
+          <Field label=" ">
+            <div style={{
+              height: 38,
+              display: 'flex',
+              alignItems: 'center',
+              fontSize: 10,
+              color: 'var(--muted)',
+              padding: '0 var(--sp-3)',
+            }}>
+              {type === 'water' ? '💧 آب — بدون تفکیک جنسیت' : 'ℹ️ گله بدون تفکیک'}
+            </div>
+          </Field>
+        )}
+      </Grid2>
 
-            <details style={{ marginBottom: 8 }}>
-        <summary style={{
-          cursor: 'pointer',
-          padding: '8px 10px',
-          background: 'var(--input-bg)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--r-sm)',
-          fontSize: 'var(--fs-sm)',
-          color: 'var(--text)',
-          userSelect: 'none',
-          listStyle: 'none',
-        }}>
-          <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span>
-              <span style={{ color: 'var(--muted)', fontSize: 11, marginLeft: 4 }}>روش ثبت</span>
-              <b style={{ color: 'var(--accent)' }}>{SOURCE_LABEL[source]}</b>
+      {/* ═══ بخش ۲ — جزئیات اختیاری ═══ */}
+      <div style={{ marginTop: 12 }}>
+        <SectionHeader icon="📝" label="جزئیات" hint="— اختیاری" />
+
+        <Field label="یادداشت">
+          <input
+            type="text"
+            value={notes}
+            onChange={e => setNotes(e.target.value)}
+            placeholder="مثلاً پر کردن سطل ۱ و ۲"
+            style={inputStyle}
+          />
+        </Field>
+
+        <details style={{ marginTop: 8 }}>
+          <summary style={{
+            cursor: 'pointer',
+            padding: '8px 10px',
+            background: 'var(--input-bg)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--r-sm)',
+            fontSize: 'var(--fs-sm)',
+            color: 'var(--text)',
+            userSelect: 'none',
+            listStyle: 'none',
+          }}>
+            <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>
+                <span style={{ color: 'var(--muted)', fontSize: 11, marginLeft: 4 }}>روش ثبت</span>
+                <b style={{ color: 'var(--accent)' }}>{SOURCE_LABEL[source]}</b>
+              </span>
+              <span style={{ color: 'var(--muted)', fontSize: 10 }}>▾ تغییر</span>
             </span>
-            <span style={{ color: 'var(--muted)', fontSize: 10 }}>▾ تغییر</span>
-          </span>
-        </summary>
-        <div style={{ padding: '8px 4px 0' }}>
-          <Select value={source} onChange={e => setSource(e.target.value as any)}>
-            <option value="bulk_manual">🍽️ پر کردن سطل</option>
-            <option value="daily_manual">📝 روزانه دستی</option>
-            <option value="sensor_scale">⚖️ سنسور وزن</option>
-            <option value="sensor_level">📊 سنسور سطح</option>
-            <option value="auto_feeder">🤖 اتومات هوشمند</option>
-          </Select>
-          {source === 'sensor_level' && (
-            <div style={{
-              fontSize: 10,
-              color: 'var(--warn)',
-              padding: '4px 8px',
-              background: 'var(--warn-soft)',
-              borderRadius: 'var(--r-sm)',
-              marginTop: 6,
-            }}>
-              ⚠️ سنسور سطح — مقدار به‌عنوان «تخمینی» ثبت می‌شود
-            </div>
-          )}
-          {source === 'sensor_scale' && (
-            <div style={{
-              fontSize: 10,
-              color: 'var(--accent)',
-              padding: '4px 8px',
-              background: 'var(--accent-soft)',
-              borderRadius: 'var(--r-sm)',
-              marginTop: 6,
-            }}>
-              ✓ سنسور وزن — داده با دقت بالا ثبت می‌شود
-            </div>
-          )}
-          {source === 'auto_feeder' && (
-            <div style={{
-              fontSize: 10,
-              color: 'var(--info)',
-              padding: '4px 8px',
-              background: 'var(--info-soft)',
-              borderRadius: 'var(--r-sm)',
-              marginTop: 6,
-            }}>
-              ℹ️ اتومات هوشمند — ممکن است دو بار ثبت شود اگر سیستم هم داده بفرستد
-            </div>
-          )}
-        </div>
-      </details>
-
-      <Field label="یادداشت (اختیاری)">
-        <input
-          type="text"
-          value={notes}
-          onChange={e => setNotes(e.target.value)}
-          placeholder="مثلاً پر کردن سطل ۱ و ۲"
-          style={inputStyle}
-        />
-      </Field>
+          </summary>
+          <div style={{ padding: '8px 4px 0' }}>
+            <Select value={source} onChange={e => setSource(e.target.value as any)}>
+              <option value="bulk_manual">🍽️ پر کردن سطل</option>
+              <option value="daily_manual">📝 روزانه دستی</option>
+              <option value="sensor_scale">⚖️ سنسور وزن</option>
+              <option value="sensor_level">📊 سنسور سطح</option>
+              <option value="auto_feeder">🤖 اتومات هوشمند</option>
+            </Select>
+            {source === 'sensor_level' && (
+              <div style={{ fontSize: 10, color: 'var(--warn)', padding: '4px 8px', background: 'var(--warn-soft)', borderRadius: 'var(--r-sm)', marginTop: 6 }}>
+                ⚠️ سنسور سطح — مقدار «تخمینی» ثبت می‌شود
+              </div>
+            )}
+            {source === 'sensor_scale' && (
+              <div style={{ fontSize: 10, color: 'var(--accent)', padding: '4px 8px', background: 'var(--accent-soft)', borderRadius: 'var(--r-sm)', marginTop: 6 }}>
+                ✓ سنسور وزن — دقت بالا
+              </div>
+            )}
+            {source === 'auto_feeder' && (
+              <div style={{ fontSize: 10, color: 'var(--info)', padding: '4px 8px', background: 'var(--info-soft)', borderRadius: 'var(--r-sm)', marginTop: 6 }}>
+                ℹ️ اتومات — ممکن است با سیستم تلاقی کند
+              </div>
+            )}
+          </div>
+        </details>
+      </div>
 
       <BtnRow>
         <Btn variant="primary" onClick={handleSave}>ثبت</Btn>
