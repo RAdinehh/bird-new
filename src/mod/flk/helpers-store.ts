@@ -53,6 +53,14 @@ export function getAgeDays(f: Flock): number {
   return Math.max(0, differenceInDays(new Date(), d));
 }
 
+/** سن پرنده در تاریخ مشخص (برای snapshot در ثبت روزانه) */
+export function getBirdAgeAt(f: Flock, targetDate: string): number {
+  const start = jalaliToDate(getEffectiveStartDate(f));
+  const target = jalaliToDate(targetDate);
+  if (!start || !target) return 0;
+  return Math.max(0, differenceInDays(target, start));
+}
+
 export function matchesGroupRule(flock: Flock, rule: FlockGroupRule): boolean {
   if (rule.type && flock.type !== rule.type) return false;
   if (rule.status && flock.status !== rule.status) return false;

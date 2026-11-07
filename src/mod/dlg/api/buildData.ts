@@ -11,6 +11,7 @@ export interface BuildDataInput {
   processedVaccines: Vaccine[];
   processedMedications: Medication[];
   feedMovementIds: string[];
+  birdAgeDays?: number | null;
 }
 
 /** تبدیل رشته‌ی فارسی به عدد اعشاری */
@@ -34,7 +35,7 @@ function calcTotalWater(count: number | null, volume: number | null): number | n
 }
 
 export function buildLogData(input: BuildDataInput): Omit<DailyLog, 'id' | 'status' | 'createdAt' | 'updatedAt'> {
-  const { form, processedVaccines, processedMedications, feedMovementIds } = input;
+  const { form, processedVaccines, processedMedications, feedMovementIds, birdAgeDays } = input;
 
   const feedAmt = num(form.feedAmount);
 
@@ -62,7 +63,7 @@ export function buildLogData(input: BuildDataInput): Omit<DailyLog, 'id' | 'stat
     date: form.date,
     entryTime: form.entryTime,
     shift: form.shift || 'morning',
-    birdAgeDays: null,
+    birdAgeDays: birdAgeDays ?? null,
     temperature: calcTemp,
     temperatureMin: tMin,
     temperatureMax: tMax,

@@ -21,6 +21,7 @@ import type { DailyLog } from '../store';
 import { format as formatJ, addDays, parse as parseJ } from 'date-fns-jalali';
 import type { Flock } from '../../flk/store';
 import { useFlk } from '../../flk/store';
+import { getBirdAgeAt } from '../../flk/helpers-store';
 import type { Dispatch, SetStateAction } from 'react';
 
 export interface UseDlgSaveParams {
@@ -147,11 +148,16 @@ export function useDlgSave(params: UseDlgSaveParams) {
     });
 
     // ۷) ساخت داده نهایی
+    const birdAgeDays = selectedFlock
+      ? getBirdAgeAt(selectedFlock, form.date)
+      : null;
+
     const data = buildLogData({
       form,
       processedVaccines,
       processedMedications,
       feedMovementIds: newMovementIds,
+      birdAgeDays,
     });
 
     // ۸) ذخیره
