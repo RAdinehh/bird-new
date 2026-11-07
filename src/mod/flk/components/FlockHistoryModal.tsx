@@ -350,47 +350,29 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
       </div>
 
       {/* ═══ فیلتر (فقط تب رویدادها) ═══ */}
-      {tabMode === 'events' && totalCount > 0 && (
-        <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, marginLeft: 4 }}>فیلتر:</span>
-          <Chip active={filter === 'all'} onClick={() => setFilter('all')}>همه</Chip>
-          {FILTER_TYPES.map(t => {
-            const n = typeCounts.get(t) || 0;
-            if (n === 0) return null;
-            return (
-              <Chip key={t} active={filter === t} onClick={() => setFilter(filter === t ? 'all' : t)}>
-                {TYPE_INFO[t].icon} {TYPE_INFO[t].label} ({toFa(n)})
-              </Chip>
-            );
-          })}
+      {tabMode === 'events' && (
+        <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
+          {totalCount > 0 ? (
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+              <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, marginLeft: 4 }}>فیلتر:</span>
+              <Chip active={filter === 'all'} onClick={() => setFilter('all')}>همه</Chip>
+              {FILTER_TYPES.map(t => {
+                const n = typeCounts.get(t) || 0;
+                if (n === 0) return null;
+                return (
+                  <Chip key={t} active={filter === t} onClick={() => setFilter(filter === t ? 'all' : t)}>
+                    {TYPE_INFO[t].icon} {TYPE_INFO[t].label} ({toFa(n)})
+                  </Chip>
+                );
+              })}
+            </div>
+          ) : (
+            <div />
+          )}
+          {!correctionOpen && (
+            <Btn size="sm" onClick={() => setCorrectionOpen(true)}>+ ثبت اصلاح</Btn>
+          )}
         </div>
-      )}
-
-      {/* ═══ دکمه ثبت اصلاح — فقط در تب رویدادها ═══ */}
-      {tabMode === 'events' && !correctionOpen && (
-        <button
-          type="button"
-          onClick={() => setCorrectionOpen(true)}
-          style={{
-            width: '100%',
-            padding: '10px',
-            background: 'var(--warn-soft)',
-            border: '1px dashed var(--warn)',
-            borderRadius: 'var(--r-sm)',
-            color: 'var(--warn)',
-            fontWeight: 600,
-            fontSize: 'var(--fs-sm)',
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-            marginBottom: 10,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 6,
-          }}
-        >
-          ✏️ ثبت اصلاح موجودی
-        </button>
       )}
 
       {/* ═══ فرم اصلاح — فقط در تب رویدادها ═══ */}
@@ -683,13 +665,25 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
           <span dir="ltr" style={{ fontFamily: 'monospace', fontWeight: 700, color: isRevoked ? 'var(--muted)' : (isPlus ? 'var(--accent)' : 'var(--danger)'), textDecoration: isRevoked ? 'line-through' : 'none' }}>
             {isPlus ? '+' : '-'}{toFa(e.count)}
           </span>
+          {e.type === 'correction' && !e.linkedEventId && !e.revoked && (
+            <span
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                padding: '1px 5px',
+                background: 'var(--warn-soft)',
+                color: 'var(--warn)',
+                borderRadius: 3,
+                border: '1px solid var(--warn)',
+                cursor: 'help',
+              }}
+              title="این تغییر فقط روی موجودی گله اعمال شد، در «ثبت روزانه» سیستم ثبت نشده است."
+            >
+              ⚠️ در dlg نیست
+            </span>
+          )}
         </div>
         {e.reason && <div style={{ color: 'var(--muted)', fontSize: 10, marginTop: 2 }}>{e.reason}</div>}
-        {e.type === 'correction' && !e.linkedEventId && !e.revoked && (
-          <div style={{ color: 'var(--warn)', fontSize: 10, marginTop: 4, padding: '4px 8px', background: 'var(--warn-soft)', borderRadius: 'var(--r-sm)', lineHeight: 1.5 }}>
-            ⚠️ این تغییر فقط روی موجودی گله اعمال شد، در «ثبت روزانه» سیستم ثبت نشده است.
-          </div>
-        )}
         {isRevoked && <div style={{ color: 'var(--danger)', fontSize: 10, marginTop: 2, fontWeight: 600 }}>لغو شده</div>}
         {canRevoke && (
           <button type="button" onClick={onRevoke} style={{ padding: 0, marginTop: 4, background: 'none', border: 'none', fontSize: 10, fontWeight: 600, color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit' }}>↩️ لغو</button>
