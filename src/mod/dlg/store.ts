@@ -80,7 +80,7 @@ export interface DailyLog {
   feedRemaining: number | null; // kg
   feedSourceType: 'formula' | 'item' | '';
   feedSourceId: string;
-  feedMethod: 'manual' | 'auto' | '';
+  feedMethod: 'scoop' | 'bag' | 'semi_auto' | 'auto_sensor' | 'auto_chain' | '';
   feedMovementIds: string[];
 
   // آب
@@ -176,7 +176,7 @@ export const useDlg = create<State>()(
     }),
     {
       name: 'pm-dlg',
-      version: 11,
+      version: 12,
       migrate: (persisted: any, version: number) => {
         if (version < 2 && persisted?.logs) {
           persisted.logs = persisted.logs.map((l: any) => ({
@@ -261,6 +261,22 @@ export const useDlg = create<State>()(
               ...rest,
               feedDelivered: delivered,
               feedConsumed: consumed,
+            };
+          });
+        }
+        // ═══ v12 — A2d (feedMethod: 'manual'|'auto' → 5 مقدار calc) ═══
+        if (version < 12 && persisted?.logs) {
+          persisted.logs = persisted.logs.map((l: any) => {
+            const mapMethod = (m: any): string => {
+              if (m === 'manual' || m === '' || m == null) return 'scoop';
+              if (m === 'auto') return 'auto_chain';
+              // از قبل 5 مقدار
+              if (['scoop', 'bag', 'semi_auto', 'auto_sensor', 'auto_chain'].includes(m)) return m;
+              return 'scoop';
+            };
+            return {
+              ...l,
+              feedMethod: mapMethod(l.feedMethod),
             };
           });
         }

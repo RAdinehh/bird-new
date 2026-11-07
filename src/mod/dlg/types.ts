@@ -13,7 +13,7 @@ export interface F {
   behavior: string; distribution: string; appearance: string; sound: string;
   feedType: string; feedDelivered: string; feedRemaining: string;
   feedSourceType: 'formula' | 'item' | ''; feedSourceId: string; feedMovementIds: string[];
-  feedMethod: 'manual' | 'auto' | '';
+  feedMethod: 'scoop' | 'bag' | 'semi_auto' | 'auto_sensor' | 'auto_chain' | '';
   waterMethod: 'manual' | 'nipple' | 'trough' | 'tank' | '';
   waterAmount: string; waterFillCount: string; waterFillVolume: string;
   weightSamples: { id: string; weight: string }[];

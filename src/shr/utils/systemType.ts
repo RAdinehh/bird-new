@@ -5,25 +5,23 @@
  * هر وقت سیستم جدیدی اضافه شد، فقط این فایل عوض می‌شود.
  */
 
-// === سیستم دان ===
-export type FeedSystem = 'manual' | 'auto';
+// === سیستم دان (5 مقدار مطابق calc) ===
+export type FeedSystem = 'scoop' | 'bag' | 'semi_auto' | 'auto_sensor' | 'auto_chain';
 
 export function feedSystemFromHall(feederType: string): FeedSystem {
-  // دستی → manual
-  if (!feederType || feederType === 'manual' || feederType === 'none' || feederType === '') {
-    return 'manual';
-  }
-  // زنجیری، بشقابی، لوله‌ای → اتوماتیک
-  if (feederType === 'chain' || feederType === 'pan' || feederType === 'tube') {
-    return 'auto';
-  }
-  // پیش‌فرض امن
-  return 'manual';
+  if (!feederType || feederType === 'manual' || feederType === 'none') return 'scoop';
+  if (feederType === 'chain') return 'auto_chain';
+  if (feederType === 'pan') return 'auto_sensor';
+  if (feederType === 'tube') return 'scoop';
+  return 'scoop';
 }
 
 export const FEED_SYSTEM_LABEL: Record<FeedSystem, string> = {
-  manual: 'دستی',
-  auto: 'اتوماتیک'
+  scoop: 'دستی (سطل)',
+  bag: 'کیسه‌ای',
+  semi_auto: 'نیمه‌اتومات',
+  auto_sensor: 'اتومات (سنسور)',
+  auto_chain: 'اتومات (زنجیری)',
 };
 
 // === سیستم آب ===
@@ -57,5 +55,6 @@ export function isWaterSystemImplemented(sys: WaterSystem): boolean {
 }
 
 export function isFeedSystemImplemented(sys: FeedSystem): boolean {
-  return sys === 'manual' || sys === 'auto';
+  // همه 5 مقدار در calc پیاده شده‌اند
+  return true;
 }

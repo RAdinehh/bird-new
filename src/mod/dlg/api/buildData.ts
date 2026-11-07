@@ -42,7 +42,8 @@ export function buildLogData(input: BuildDataInput): Omit<DailyLog, 'id' | 'stat
   const feedAmt = num(form.feedDelivered);
 
   // محاسبه feedConsumed (simple یا precision بر اساس feedMethod)
-  const feedMethod = (form.feedMethod || 'scoop') as 'scoop' | 'bag' | 'semi_auto' | 'auto_sensor' | 'auto_chain';
+  // form.feedMethod حالا 5 مقدار calc است — نیازی به cast نیست
+  const feedMethod = form.feedMethod || 'scoop';
   const feedRemainingNum = num(form.feedRemaining);
   const feedCalc = calculateFeedMetrics({
     feedMethod,
