@@ -180,6 +180,24 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
     return m;
   }, [flock.events]);
 
+  const eventRunningTotals = useMemo(() => {
+    const map = new Map<string, { before: number; after: number }>();
+    const sorted = [...(flock.events || [])]
+      .filter(e => !e.revoked)
+      .sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
+    let running = initial;
+    for (const e of sorted) {
+      const before = running;
+      let d = 0;
+      if (e.type === 'death' || e.type === 'sell' || e.type === 'cull') d = -e.count;
+      else if (e.type === 'add' || e.type === 'transfer') d = +e.count;
+      else if (e.type === 'correction') d = (e.direction === -1 ? -1 : 1) * e.count;
+      running += d;
+      map.set(e.id, { before, after: running });
+    }
+    return map;
+  }, [flock.events, initial]);
+
   const groups = useMemo(() => {
     const today = todayJ();
     const all = (flock.events || []).slice().sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
@@ -603,7 +621,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
                 <div key={g.label}>
                   <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>📅 {toFa(g.label)}</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {g.events.map(e => <EventRow key={e.id} e={e} onRevoke={() => handleRevoke(e)} />)}
+                    {g.events.map(e => <EventRow key={e.id} e={e} onRevoke={() => handleRevoke(e)} runningTotals={eventRunningTotals.get(e.id)} />)}
                   </div>
                 </div>
               ))}
@@ -674,87 +692,128 @@ function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
   );
 }
 
-function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
+function EventRow({ e, onRevoke, runningTotals }: { e: FlockEvent; onRevoke: () => void; runningTotals?: { before: number; after: number } }) {
   const info = TYPE_INFO[e.type] || { icon: '•', label: e.type, tone: 'var(--muted)' };
   const isRevoked = e.revoked === true;
   const isRevokeAction = !!e.linkedEventId;
   const canRevoke = !isRevoked && !isRevokeAction && e.type !== 'add' && e.type !== 'correction';
   const isPlus = e.type === 'add' || e.type === 'transfer' || (e.type === 'correction' && !isRevokeAction && e.direction !== -1);
+  const isManualCorrection = e.type === 'correction' && !e.linkedEventId && !isRevoked;
 
   return (
     <div style={{
-      display: 'flex',
-      gap: 8,
-      padding: '8px 10px',
+      padding: '10px 12px',
       background: 'var(--input-bg)',
-      borderRadius: 'var(--r-sm)',
+      borderRadius: 'var(--r-md)',
       border: '1px solid var(--border)',
       opacity: isRevoked ? 0.7 : 1,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 8,
     }}>
-      <span style={{ fontSize: 18, flexShrink: 0 }}>{info.icon}</span>
-      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-        {/* سطر ۱: عنوان + مقدار */}
-        <div style={{ display: 'flex', gap: 8, alignItems: 'baseline', flexWrap: 'wrap' }}>
-          <b style={{ color: info.tone, fontSize: 'var(--fs-sm)', fontWeight: 700 }}>{info.label}</b>
-          <span dir="ltr" style={{
+
+      {/* ═══ سطر ۱ — عنوان + دلتا (برجسته) ═══ */}
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+        <span style={{ fontSize: 22, flexShrink: 0 }}>{info.icon}</span>
+        <b style={{ color: info.tone, fontSize: 'var(--fs-base)', fontWeight: 700 }}>{info.label}</b>
+        <span
+          dir="ltr"
+          style={{
             fontFamily: 'monospace',
-            fontSize: 'var(--fs-base)',
-            fontWeight: 700,
+            fontSize: 'var(--fs-lg)',
+            fontWeight: 800,
             color: isRevoked ? 'var(--muted)' : (isPlus ? 'var(--accent)' : 'var(--danger)'),
             textDecoration: isRevoked ? 'line-through' : 'none',
-          }}>
-            {isPlus ? '+' : '-'}{toFa(e.count)}
-          </span>
-          {e.type === 'correction' && !e.linkedEventId && !e.revoked && (
-            <span
-              style={{
-                fontSize: 'var(--fs-xs)',
-                fontWeight: 600,
-                padding: '0 4px',
-                background: 'transparent',
-                color: 'var(--muted)',
-                borderRadius: 3,
-                border: '1px solid var(--border)',
-                cursor: 'help',
-              }}
-              title="این عدد دستی وارد شد — در فرم «ثبت روزانه» ثبت نشده"
-            >
-              ✋ دستی
-            </span>
-          )}
-          {isRevoked && (
-            <span style={{ fontSize: 10, fontWeight: 700, padding: '1px 6px', background: 'var(--danger-soft)', color: 'var(--danger)', borderRadius: 3 }}>
-              لغو شده
-            </span>
-          )}
-        </div>
-
-        {/* سطر ۲: دلیل (Tag) + توضیح (muted) */}
-        {(e.reason || e.notes) && (
-          <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', fontSize: 'var(--fs-xs)' }}>
-            {e.reason && (
-              <span style={{
-                padding: '1px 6px',
-                background: 'var(--input-bg)',
-                border: '1px solid var(--border)',
-                borderRadius: 3,
-                color: 'var(--muted)',
-                fontSize: 10,
-              }}>
-                {e.reason}
-              </span>
-            )}
-            {e.notes && <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>{e.notes}</span>}
-          </div>
+          }}
+        >
+          {isPlus ? '+' : '-'}{toFa(e.count)}
+        </span>
+        <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>پرنده</span>
+        {isRevoked && (
+          <span style={{
+            fontSize: 'var(--fs-xs)',
+            fontWeight: 700,
+            padding: '2px 8px',
+            background: 'var(--danger-soft)',
+            color: 'var(--danger)',
+            borderRadius: 4,
+          }}>لغو شده</span>
         )}
-
-        {/* سطر ۳: دکمه لغو */}
+        <div style={{ flex: 1 }} />
         {canRevoke && (
-          <button type="button" onClick={onRevoke} style={{ alignSelf: 'flex-start', padding: 0, background: 'none', border: 'none', fontSize: 'var(--fs-xs)', fontWeight: 600, color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit' }}>
-            ↩️ لغو این رویداد
-          </button>
+          <button type="button" onClick={onRevoke} style={{
+            padding: '4px 10px',
+            background: 'transparent',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--r-sm)',
+            fontSize: 'var(--fs-xs)',
+            fontWeight: 600,
+            color: 'var(--muted)',
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+          }}>↩️ لغو</button>
         )}
       </div>
+
+      {/* ═══ سطر ۲ — قبل → بعد ═══ */}
+      {runningTotals && !isRevoked && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          padding: '8px 12px',
+          background: 'var(--card)',
+          borderRadius: 'var(--r-sm)',
+          border: '1px solid var(--border)',
+        }}>
+          <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>موجودی:</span>
+          <span dir="ltr" style={{ fontFamily: 'monospace', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--muted)' }}>
+            {toFa(runningTotals.before)}
+          </span>
+          <span style={{ color: 'var(--dim)', fontSize: 'var(--fs-base)' }}>→</span>
+          <span dir="ltr" style={{ fontFamily: 'monospace', fontSize: 'var(--fs-base)', fontWeight: 700, color: isPlus ? 'var(--accent)' : 'var(--danger)' }}>
+            {toFa(runningTotals.after)}
+          </span>
+        </div>
+      )}
+
+      {/* ═══ سطر ۳ — دلیل ═══ */}
+      {e.reason && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          fontSize: 'var(--fs-sm)',
+        }}>
+          <span style={{ color: 'var(--muted)' }}>دلیل:</span>
+          <b style={{ color: 'var(--text)' }}>{e.reason}</b>
+        </div>
+      )}
+
+      {/* ═══ سطر ۴ — هشدار ثبت دستی (واضح) ═══ */}
+      {isManualCorrection && (
+        <div style={{
+          padding: '8px 10px',
+          background: 'var(--warn-soft)',
+          border: '1px solid var(--warn)',
+          borderRadius: 'var(--r-sm)',
+          lineHeight: 1.6,
+        }}>
+          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--warn)' }}>
+            ⚠️ ثبت دستی
+          </div>
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', marginTop: 2 }}>
+            این عدد در «ثبت روزانه» سیستم ثبت نشده و فقط روی موجودی گله اعمال شده است
+          </div>
+        </div>
+      )}
+
+      {/* ═══ سطر ۵ — یادداشت ═══ */}
+      {e.notes && (
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+          📝 {e.notes}
+        </div>
+      )}
     </div>
   );
 }
