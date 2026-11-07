@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
-  useDlg, waterFeedRatio, tempWarning, humidityWarning,
-  mortalityRate, avgWeight, sumWeight, cvWeight, totalWater, lightWarning,
+  useDlg, tempWarning, humidityWarning,
+  avgWeight, sumWeight, cvWeight,
 } from '../mod/dlg/store';
 
 const makeLog = () => ({
@@ -94,20 +94,6 @@ describe('useDlg — store', () => {
   });
 });
 
-describe('waterFeedRatio', () => {
-  it('محاسبه درست', () => {
-    expect(waterFeedRatio(200, 100)).toBe(2);
-  });
-  it('null ها → 0', () => {
-    expect(waterFeedRatio(null, 100)).toBe(0);
-    expect(waterFeedRatio(200, null)).toBe(0);
-    expect(waterFeedRatio(null, null)).toBe(0);
-  });
-  it('feed=0 → 0 (نه Infinity)', () => {
-    expect(waterFeedRatio(200, 0)).toBe(0);
-  });
-});
-
 describe('tempWarning', () => {
   it('null → ok', () => {
     expect(tempWarning(null)).toBe('ok');
@@ -138,16 +124,6 @@ describe('humidityWarning', () => {
   it('<30 یا >80 → danger', () => {
     expect(humidityWarning(20)).toBe('danger');
     expect(humidityWarning(90)).toBe('danger');
-  });
-});
-
-describe('mortalityRate', () => {
-  it('محاسبه درست (در هزار)', () => {
-    expect(mortalityRate(5, 1000)).toBe(5);
-  });
-  it('بدون داده → 0', () => {
-    expect(mortalityRate(0, 1000)).toBe(0);
-    expect(mortalityRate(5, null)).toBe(0);
   });
 });
 
@@ -192,33 +168,3 @@ describe('cvWeight', () => {
   });
 });
 
-describe('totalWater', () => {
-  it('محاسبه', () => {
-    expect(totalWater(5, 4)).toBe(20);
-  });
-  it('null → null', () => {
-    expect(totalWater(null, 4)).toBeNull();
-    expect(totalWater(5, null)).toBeNull();
-  });
-});
-
-describe('lightWarning', () => {
-  it('null → ok', () => {
-    expect(lightWarning(null, 'layer')).toBe('ok');
-  });
-  it('layer: 14-17 → ok', () => {
-    expect(lightWarning(16, 'layer')).toBe('ok');
-  });
-  it('layer: 12-14 → warn', () => {
-    expect(lightWarning(13, 'layer')).toBe('warn');
-  });
-  it('layer: <12 → danger', () => {
-    expect(lightWarning(8, 'layer')).toBe('danger');
-  });
-  it('broiler: 18-24 → ok', () => {
-    expect(lightWarning(20, 'broiler')).toBe('ok');
-  });
-  it('broiler: <18 → danger', () => {
-    expect(lightWarning(15, 'broiler')).toBe('danger');
-  });
-});

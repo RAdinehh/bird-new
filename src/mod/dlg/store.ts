@@ -249,12 +249,6 @@ export const SOUND_LABEL: Record<string, string> = {
   normal: 'طبیعی', cough: 'سرفه', sneeze: 'عطسه'
 };
 
-/** محاسبه‌ی نسبت آب به دان */
-export function waterFeedRatio(water: number | null, feed: number | null): number {
-  if (!water || !feed) return 0;
-  return water / feed;
-}
-
 /** تشخیص هشدار دما (مرغ تخم‌گذار: ۱۸-۲۴) */
 /**
  * هشدار دما — بر اساس محدوده استاندارد (اگه داده شده) یا fallback
@@ -313,12 +307,6 @@ export function humidityWarning(
   return 'ok';
 }
 
-/** نرخ تلفات (در هزار) */
-export function mortalityRate(deaths: number, aliveCount: number | null): number {
-  if (!aliveCount || !deaths) return 0;
-  return (deaths / aliveCount) * 1000;
-}
-
 /** دلایل رایج تلفات */
 export const DEATH_CAUSES: [string, string][] = [
   ['', '— نامشخص —'],
@@ -366,26 +354,3 @@ export function cvWeight(samples: WeightSample[]): number {
   return Math.round((std / mean) * 10000) / 100;
 }
 
-/** حجم کل آب مصرفی از فیلدهای دستی */
-export function totalWater(count: number | null, volume: number | null): number | null {
-  if (count === null || volume === null) return null;
-  return Math.round(count * volume * 100) / 100;
-}
-
-
-/** تشخیص هشدار روشنایی (طبق استاندارد Hy-Line) */
-export function lightWarning(hours: number | null, flockType: string): 'ok' | 'warn' | 'danger' {
-  if (hours === null || hours === undefined || hours === 0) return 'ok';
-  // تخم‌گذار: ۱۴-۱۷ ساعت
-  if (flockType === 'layer' || flockType === 'breeder') {
-    if (hours < 12 || hours > 18) return 'danger';
-    if (hours < 14 || hours > 17) return 'warn';
-    return 'ok';
-  }
-  // گوشتی: ۱۸-۲۳ ساعت
-  if (flockType === 'broiler') {
-    if (hours < 18 || hours > 24) return 'danger';
-    return 'ok';
-  }
-  return 'ok';
-}
