@@ -86,7 +86,7 @@ export default function LogCard(props: LogCardProps) {
       id={l.id} ms={ms} accent={accent}
       index={toFa(i + 1)} iconEmoji="📋"
       title={flock?.name || '—'}
-      subtitle={`${toFa(l.date)}${l.entryTime ? ` • ${toFa(l.entryTime)}` : ''}${birdName ? ` • ${birdName}` : ''}`}
+      subtitle={`${toFa(l.date)}${l.entryTime ? ` • ${toFa(l.entryTime)}` : ''}${l.birdAgeDays !== null && l.birdAgeDays > 0 ? ` • ${toFa(l.birdAgeDays)} روز` : ''}${birdName ? ` • ${birdName}` : ''}`}
       isOpen={isOpen} onToggle={onToggle}
       badge={l.deathsCount > 0 ? <Tag tone="amber">{toFa(l.deathsCount)} تلفات</Tag> : undefined}
       stats={<>
