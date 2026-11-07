@@ -283,7 +283,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
         background: 'var(--input-bg)',
         border: '1px solid var(--border)',
         borderRadius: 'var(--r-sm)',
-        marginBottom: 10,
+        marginBottom: 6,
         display: 'flex',
         flexDirection: 'column',
         gap: 6,
@@ -314,7 +314,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
       <div style={{
         display: 'flex',
         gap: 0,
-        marginBottom: 12,
+        marginBottom: 8,
         background: 'var(--input-bg)',
         borderRadius: 'var(--r-md)',
         padding: 3,
