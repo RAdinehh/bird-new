@@ -666,7 +666,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 {visibleData.audit.items.map(g => (
                   <div key={g.label}>
-                    <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>📅 {toFa(g.label)}</div>
+                    <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6 }}>📅 {toFa(g.label)}</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {g.events.map(ev => <AuditRow key={ev.id} ev={ev} />)}
                     </div>
@@ -690,7 +690,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {visibleData.events.items.map(g => (
                 <div key={g.label}>
-                  <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>📅 {toFa(g.label)}</div>
+                  <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6 }}>📅 {toFa(g.label)}</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                     {g.events.map(e => <EventRow key={e.id} e={e} onRevoke={() => handleRevoke(e)} />)}
                   </div>
@@ -746,7 +746,7 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
 function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
   const meta = SEX_AUDIT_META[ev.type] || { icon: '•', label: ev.type, tone: 'var(--muted)' };
 
-  const renderRow = (label: string, icon: string, before: number, after: number, delta: number, tone: string) => {
+  const renderRow = (label: string, icon: string, before: number, after: number, delta: number, tone: string, isLast = false) => {
     const deltaColor = delta > 0 ? 'var(--accent)' : delta < 0 ? 'var(--danger)' : 'var(--muted)';
     const isNoChange = delta === 0;
 
@@ -811,7 +811,7 @@ function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {renderRow('نر', '♂', ev.before.male, ev.after.male, ev.delta.male, 'var(--info)')}
         {renderRow('ماده', '♀', ev.before.female, ev.after.female, ev.delta.female, 'var(--purple)')}
-        {renderRow('نامشخص', '?', ev.before.unknown, ev.after.unknown, ev.delta.unknown, 'var(--muted)')}
+        {renderRow('نامشخص', '?', ev.before.unknown, ev.after.unknown, ev.delta.unknown, 'var(--muted)', true)}
       </div>
 
       {/* توضیح */}
