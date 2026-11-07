@@ -132,15 +132,6 @@ export function createDlgSchema(context: ValidationContext = {}) {
     }
 
     // تلفات ≤ تعداد زنده
-    if (flockAlive > 0) {
-      if (d.deathsCount > flockAlive) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `تلفات (${d.deathsCount.toLocaleString('fa-IR')}) نمی‌تواند از تعداد زنده گله (${flockAlive.toLocaleString('fa-IR')}) بیشتر باشد`,
-          path: ['deathsCount'],
-        });
-      }
-
       // مجموع تلفات رکوردها = deathsCount
       const sumDeaths = (d.deaths || []).reduce((a: number, x: any) => a + (x.count || 0), 0);
       if (sumDeaths > 0 && sumDeaths !== d.deathsCount) {
@@ -150,6 +141,16 @@ export function createDlgSchema(context: ValidationContext = {}) {
           path: ['deaths'],
         });
       }
+
+    if (flockAlive > 0) {
+      if (d.deathsCount > flockAlive) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `تلفات (${d.deathsCount.toLocaleString('fa-IR')}) نمی‌تواند از تعداد زنده گله (${flockAlive.toLocaleString('fa-IR')}) بیشتر باشد`,
+          path: ['deathsCount'],
+        });
+      }
+
 
       // Hen-Day بیولوژیکی — حداکثر ۱۰۲٪
       const healthyEggs = (d.eatingEggs || 0) + (d.fertileEggs || 0);
