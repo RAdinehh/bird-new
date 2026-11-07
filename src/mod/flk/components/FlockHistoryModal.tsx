@@ -779,7 +779,7 @@ function EventRow({ e, onRevoke, runningTotals }: { e: FlockEvent; onRevoke: () 
         </div>
       )}
 
-      {/* ═══ سطر ۳ — دلیل ═══ */}
+      {/* ═══ سطر ۳ — دلیل (سطح ۲) ═══ */}
       {e.reason && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-sm)' }}>
           <span style={{ color: 'var(--muted)' }}>دلیل:</span>
@@ -787,15 +787,19 @@ function EventRow({ e, onRevoke, runningTotals }: { e: FlockEvent; onRevoke: () 
         </div>
       )}
 
-      {/* ═══ سطر ۴ — هشدار «ثبت نشده» (زیر دلیل) ═══ */}
+      {/* ═══ سطر ۴ — هشدار (سطح ۳) ═══ */}
       {isManualCorrection && (
         <div style={{
           display: 'flex',
           alignItems: 'center',
           gap: 6,
-          fontSize: 'var(--fs-sm)',
+          padding: '6px 10px',
+          background: 'var(--warn-soft)',
+          borderRight: '3px solid var(--warn)',
+          borderRadius: 'var(--r-sm)',
+          fontSize: 'var(--fs-xs)',
           color: 'var(--warn)',
-          fontWeight: 500,
+          lineHeight: 1.6,
         }}>
           <span>⚠️</span>
           <span>این تغییر در «ثبت روزانه» سیستم ثبت نشده است.</span>
