@@ -243,7 +243,13 @@ export function useMultiGroupKpi(groupIds: string[]): Record<string, GroupKpi> {
       const live = byFlock.filter(f => f.status === 'active');
       const totalInitial = live.reduce((s, f) => s + f.initialCount, 0);
       const totalCurrent = live.reduce((s, f) => s + f.currentCount, 0);
-      const totalDeaths = Math.max(0, totalInitial - totalCurrent);
+      const totalDeaths = live.reduce((sum, row) => {
+        const flock = flocks.find(f => f.id === row.id);
+        if (!flock) return sum;
+        return sum + (flock.events || [])
+          .filter(e => e.type === 'death' || e.type === 'cull')
+          .reduce((s, e) => s + e.count, 0);
+      }, 0);
       const mortalityRate = totalInitial > 0 ? (totalDeaths / totalInitial) * 100 : 0;
       const totalCost = byFlock.reduce((s, f) => s + f.cost, 0);
       const totalRevenue = byFlock.reduce((s, f) => s + f.revenue, 0);
