@@ -410,6 +410,78 @@ export function detectAllAlerts(): RuleAlert[] {
       }
       // داخل محدوده استاندارد → OK (هیچ هشداری)
     }
+
+    // ═══ C3d — رطوبت غیرعادی ═══
+    if (log.humidity !== null && log.humidity !== undefined) {
+      const bird = birds.find(b => b.id === flock?.birdId);
+      const customStandards = _s.customStandards || {};
+      const flockAge = flock ? getAgeDays(flock) : 0;
+      try {
+        const stdEnv = getEffectiveEnv(bird?.name, flockAge, null, { customStandards });
+        const humMin = stdEnv?.humidity?.min ?? 40;
+        const humMax = stdEnv?.humidity?.max ?? 70;
+        if (log.humidity < humMin || log.humidity > humMax) {
+          alerts.push({
+            level: 'important',
+            category: 'humidity',
+            title: 'رطوبت خارج بازه: ' + toFa(log.humidity) + '٪',
+            message: 'در ' + (flock?.name || 'گله') + ' — محدوده: ' + toFa(humMin) + '-' + toFa(humMax) + '٪ — تاریخ ' + toFa(log.date),
+            source: 'dlg',
+            sourceId: log.id + ':humidity',
+            date: log.date, notes: ''
+          });
+        }
+      } catch { /* silent */ }
+    }
+
+    // ═══ C3d — تهویه ضعیف ═══
+    if (log.ventilation === 'low') {
+      alerts.push({
+        level: 'important',
+        category: 'ventilation',
+        title: 'تهویه ضعیف',
+        message: 'در ' + (flock?.name || 'گله') + ' — بررسی فن‌ها و دریچه‌ها — تاریخ ' + toFa(log.date),
+        source: 'dlg',
+        sourceId: log.id + ':ventilation-low',
+        date: log.date, notes: ''
+      });
+    }
+
+    // ═══ C3d — بستر ═══
+    if (log.litter === 'wet') {
+      alerts.push({
+        level: 'important',
+        category: 'litter',
+        title: 'بستر مرطوب',
+        message: 'در ' + (flock?.name || 'گله') + ' — خطر آمونیاک و بیماری — تاریخ ' + toFa(log.date),
+        source: 'dlg',
+        sourceId: log.id + ':litter-wet',
+        date: log.date, notes: ''
+      });
+    } else if (log.litter === 'clumped') {
+      alerts.push({
+        level: 'info',
+        category: 'litter',
+        title: 'بستر کلوخه',
+        message: 'در ' + (flock?.name || 'گله') + ' — نیاز به زیر و رو کردن — تاریخ ' + toFa(log.date),
+        source: 'dlg',
+        sourceId: log.id + ':litter-clumped',
+        date: log.date, notes: ''
+      });
+    }
+
+    // ═══ C3d — رفتار غیرعادی ═══
+    if (log.behavior === 'lethargic') {
+      alerts.push({
+        level: 'important',
+        category: 'behavior',
+        title: 'پرنده‌های بی‌حال',
+        message: 'در ' + (flock?.name || 'گله') + ' — احتمال بیماری — تاریخ ' + toFa(log.date),
+        source: 'dlg',
+        sourceId: log.id + ':behavior-lethargic',
+        date: log.date, notes: ''
+      });
+    }
   });
 
   // ============ ۵. تخم‌گذاری ============
