@@ -83,7 +83,9 @@ export default function SexingModal({ open, onClose, flock }: Props) {
   const totalInput = maleNum + femaleNum + unknownNum;
   const diff = totalInput - currentCount;
   const mismatch = diff !== 0;
-  const noInput = maleNum + femaleNum === 0;
+  const userFilledCount = (!isMaleEmpty ? 1 : 0) + (!isFemaleEmpty ? 1 : 0) + (!isUnknownEmpty ? 1 : 0);
+  const isIncomplete = userFilledCount < 2;
+  const noInput = userFilledCount === 0;
 
   useEffect(() => {
     if (open && flock) {
@@ -148,7 +150,7 @@ export default function SexingModal({ open, onClose, flock }: Props) {
       size="md"
       footer={
         <BtnRow>
-          <Btn variant="primary" onClick={handleSave} disabled={mismatch || noInput}>
+          <Btn variant="primary" onClick={handleSave} disabled={mismatch || isIncomplete}>
             ✓ ثبت تفکیک
           </Btn>
           <Btn onClick={onClose}>انصراف</Btn>
@@ -204,15 +206,15 @@ export default function SexingModal({ open, onClose, flock }: Props) {
           <div style={{
             padding: '10px 12px',
             background: 'var(--card)',
-            border: `1px solid ${noInput ? 'var(--border)' : mismatch ? 'var(--danger)' : 'var(--accent)'}`,
+            border: `1px solid ${isIncomplete ? 'var(--border)' : mismatch ? 'var(--danger)' : 'var(--accent)'}`,
             borderRadius: 'var(--r-md)',
             fontSize: 'var(--fs-sm)',
             fontWeight: 700,
-            color: noInput ? 'var(--muted)' : mismatch ? 'var(--danger)' : 'var(--accent)',
+            color: isIncomplete ? 'var(--muted)' : mismatch ? 'var(--danger)' : 'var(--accent)',
             textAlign: 'center',
           }}>
-            {noInput
-              ? `${toFa(currentCount.toLocaleString('fa-IR'))} = ${toFa(currentCount.toLocaleString('fa-IR'))}`
+            {isIncomplete
+              ? `— / ${toFa(currentCount.toLocaleString('fa-IR'))}`
               : mismatch
                 ? `✗ ${toFa(totalInput.toLocaleString('fa-IR'))} / ${toFa(currentCount.toLocaleString('fa-IR'))}`
                 : `✓ ${toFa(totalInput.toLocaleString('fa-IR'))} = ${toFa(currentCount.toLocaleString('fa-IR'))}`}
@@ -220,18 +222,22 @@ export default function SexingModal({ open, onClose, flock }: Props) {
         </Field>
       </Grid2>
 
-      {/* 🆕 Smart Guide — فقط وقتی اطلاعات جدید دارد */}
+      {/* 🆕 Smart Guide — اولویت‌بندی بر اساس completeness */}
       {mismatch ? (
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', marginBottom: 8, lineHeight: 1.6 }}>
           ⚠️ {toFa(Math.abs(diff))} پرنده {diff > 0 ? 'بیشتر' : 'کمتر'} — ثبت‌شده {toFa(totalInput)}، نیاز {toFa(currentCount)}
         </div>
+      ) : isIncomplete && noInput ? (
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 8, lineHeight: 1.6 }}>
+          💡 تعداد نر یا ماده را وارد کنید — سومین فیلد خودکار محاسبه می‌شود
+        </div>
+      ) : isIncomplete ? (
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--info)', marginBottom: 8, lineHeight: 1.6 }}>
+          💡 یک فیلد دیگر وارد کنید — سومین فیلد خودکار محاسبه می‌شود
+        </div>
       ) : autoFillField ? (
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--info)', marginBottom: 8, lineHeight: 1.6 }}>
           💡 {autoFillField === 'male' ? 'نر' : autoFillField === 'female' ? 'ماده' : 'نامشخص'} = <b>{toFa(autoFillValue)}</b> (خودکار محاسبه شد)
-        </div>
-      ) : noInput ? (
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 8, lineHeight: 1.6 }}>
-          💡 تعداد نر یا ماده را وارد کنید — سومین فیلد خودکار محاسبه می‌شود
         </div>
       ) : null}
 
