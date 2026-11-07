@@ -214,8 +214,8 @@ export default function DialogHost() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          padding: '20px 20px 16px',
-          gap: 12,
+          padding: '20px',
+          gap: 10,
           animation: noAnim
             ? 'none'
             : 'pmScaleIn var(--dur-enter) var(--ease-out)',
@@ -225,16 +225,16 @@ export default function DialogHost() {
         <div
           aria-hidden="true"
           style={{
-            width: 48,
-            height: 48,
+            width: 36,
+            height: 36,
             borderRadius: '50%',
             background: soft,
             color: color,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 24,
-            fontWeight: 700,
+            fontSize: 18,
+            fontWeight: 600,
             flexShrink: 0,
           }}
         >
@@ -246,10 +246,10 @@ export default function DialogHost() {
             id={titleId.current}
             style={{
               fontSize: 'var(--fs-md)',
-              fontWeight: 700,
+              fontWeight: 600,
               textAlign: 'center',
               color: 'var(--text)',
-              lineHeight: 1.5,
+              lineHeight: 1.4,
             }}
           >
             {config.title}
@@ -263,7 +263,7 @@ export default function DialogHost() {
               fontSize: 'var(--fs-sm)',
               color: 'var(--muted)',
               textAlign: 'center',
-              lineHeight: 1.8,
+              lineHeight: 1.5,
               whiteSpace: 'pre-wrap',
             }}
           >
@@ -327,12 +327,12 @@ export default function DialogHost() {
             variant={type === 'danger' ? 'danger' : 'primary'}
             onClick={handleConfirm}
             disabled={!!(config.input?.required && !inputValue.trim())}
-            style={{ flex: 1, minHeight: 46 }}
+            style={{ flex: 1, minHeight: 44 }}
           >
             {config.confirmText || 'تأیید'}
           </Btn>
           {isConfirm && (
-            <Btn onClick={handleCancel} style={{ flex: 1, minHeight: 46 }}>
+            <Btn onClick={handleCancel} style={{ flex: 1, minHeight: 44 }}>
               {config.cancelText || 'لغو'}
             </Btn>
           )}
