@@ -793,9 +793,9 @@ function EventRow({ e, onRevoke, runningTotals }: { e: FlockEvent; onRevoke: () 
           display: 'flex',
           alignItems: 'center',
           gap: 6,
-          fontSize: 'var(--fs-sm)',
+          fontSize: 'var(--fs-xs)',
           color: 'var(--warn)',
-          lineHeight: 1.6,
+          lineHeight: 1.5,
         }}>
           <span>⚠️</span>
           <span>این تغییر در «ثبت روزانه» سیستم ثبت نشده است.</span>
