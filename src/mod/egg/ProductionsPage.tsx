@@ -3,6 +3,8 @@
  */
 import { useState, useMemo, useEffect } from 'react';
 import ProductionFormModal from './components/ProductionFormModal';
+import DiscardFormModal from './components/DiscardFormModal';
+import { format as formatJ } from 'date-fns-jalali';
 import { useFab } from '../../shr/hooks/useFab';
 import { useEgg, healthyCount, henDayRate, brokenRate, type EggProduction } from './store';
 import { useFlk, getAgeDays } from '../flk/store';
@@ -45,7 +47,7 @@ const empty = (): F => ({
 });
 
 export default function ProductionsPage({ active = true }: { active?: boolean } = {}) {
-  const { productions, addProduction, updateProduction, deleteProduction } = useEgg();
+  const { productions, addProduction, updateProduction, deleteProduction, addDiscard } = useEgg();
   const { flocks } = useFlk();
   const { birds } = useBrd();
 
@@ -56,6 +58,9 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [openDiscard, setOpenDiscard] = useState(false);
+  const [discardForm, setDiscardForm] = useState<{ date: string; type: 'broken' | 'soft' | 'dirty'; count: string; reason: 'rotten' | 'broken_handling' | 'expired' | 'contaminated' | 'other'; notes: string }>({ date: '', type: 'broken', count: '', reason: 'rotten', notes: '' });
+  const [discardErr, setDiscardErr] = useState('');
 
   // فیلتر/مرتب
   const config = useMemo(
@@ -118,6 +123,22 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
     setForm({ ...empty(), flockId: activeFlocks[0].id });
     setErr(''); setOpen(true);
   };
+  const openDiscardNew = () => {
+    const today = formatJ(new Date(), 'yyyy/MM/dd');
+    setDiscardForm({ date: today, type: 'broken', count: '', reason: 'rotten', notes: '' });
+    setDiscardErr('');
+    setOpenDiscard(true);
+  };
+
+  const handleSaveDiscard = () => {
+    const count = parseInt(discardForm.count) || 0;
+    if (count <= 0) { setDiscardErr('تعداد باید بیشتر از ۰ باشد'); return; }
+    if (!discardForm.date) { setDiscardErr('تاریخ را انتخاب کنید'); return; }
+    addDiscard({ date: discardForm.date, type: discardForm.type, count, reason: discardForm.reason, notes: discardForm.notes });
+    toastMsg.saved('دور ریخت تخم');
+    setOpenDiscard(false);
+  };
+
   useFab(active ? { label: 'ثبت تخم‌گذاری', onClick: openNew } : null);
 
   const openEdit = (p: EggProduction) => {
@@ -248,6 +269,9 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
         description="هر روز تعداد تخم‌ها را بین خوراکی، نطفه‌دار و مصرفی تقسیم کنید."
         tone="info"
       />
+      <div style={{ display: 'flex', gap: 6, padding: '0 8px 8px' }}>
+        <Btn size="sm" onClick={openDiscardNew}>🗑 ثبت دور ریخت</Btn>
+      </div>
       <FilterBar
         filterDefs={config.filterDefs}
         sortDefs={config.sortDefs}
@@ -386,6 +410,15 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
         activeFlocks={activeFlocks}
         flockCount={flockCount}
         onSave={save}
+      />
+
+      <DiscardFormModal
+        open={openDiscard}
+        setOpen={setOpenDiscard}
+        form={discardForm}
+        setForm={setDiscardForm}
+        err={discardErr}
+        onSave={handleSaveDiscard}
       />
 
     </PageContainer>

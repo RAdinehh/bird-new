@@ -28,6 +28,19 @@ export interface EggProduction {
   createdAt: string;
 }
 
+export type EggDiscardType = 'broken' | 'soft' | 'dirty';
+export type EggDiscardReason = 'rotten' | 'broken_handling' | 'expired' | 'contaminated' | 'other';
+
+export interface EggDiscard {
+  id: string;
+  date: string;
+  type: EggDiscardType;
+  count: number;
+  reason: EggDiscardReason;
+  notes: string;
+  createdAt: string;
+}
+
 export interface EggStock {
   eating: number;
   fertile: number;
@@ -53,6 +66,7 @@ export interface EggSale {
 interface State {
   productions: EggProduction[];
   sales: EggSale[];
+  discards: EggDiscard[];
   packShikan: number;
   packBox: number;
   packCarton: number;
@@ -62,6 +76,8 @@ interface State {
   deleteProduction: (id: string) => void;
   addSale: (s: Omit<EggSale, 'id' | 'createdAt'>) => void;
   deleteSale: (id: string) => void;
+  addDiscard: (d: Omit<EggDiscard, 'id' | 'createdAt'>) => string;
+  deleteDiscard: (id: string) => void;
 }
 
 
@@ -72,6 +88,7 @@ export const useEgg = create<State>()(
     (set, get) => ({
       productions: [],
       sales: [],
+      discards: [],
       packShikan: 0,
       packBox: 0,
       packCarton: 0,
@@ -100,17 +117,26 @@ export const useEgg = create<State>()(
       },
 
       addSale: (s) => set({ sales: [...get().sales, { ...s, id: uuid(), createdAt: now() }] }),
-      deleteSale: (id) => set({ sales: get().sales.filter(x => x.id !== id) })
+      deleteSale: (id) => set({ sales: get().sales.filter(x => x.id !== id) }),
+      addDiscard: (d) => {
+        const id = uuid();
+        set({ discards: [...get().discards, { ...d, id, createdAt: now() }] });
+        return id;
+      },
+      deleteDiscard: (id) => set({ discards: get().discards.filter(x => x.id !== id) })
     }),
     {
       name: 'pm-egg',
-      version: 2,
+      version: 3,
       migrate: (persisted: any, version: number) => {
         if (version < 2 && persisted?.productions) {
           persisted.productions = persisted.productions.map((p: any) => ({
             ...p,
             sourceType: p.sourceType ?? (p.sourceLogId ? 'dlg' : 'unknown'),
           }));
+        }
+        if (version < 3 && persisted) {
+          persisted.discards = persisted.discards ?? [];
         }
         return persisted;
       },
@@ -157,7 +183,7 @@ export function brokenRate(p: EggProduction): number {
 }
 
 /** محاسبه‌ی موجودی انبار */
-export function calcStock(productions: EggProduction[], sales: EggSale[]): EggStock {
+export function calcStock(productions: EggProduction[], sales: EggSale[], discards: EggDiscard[] = []): EggStock {
   let eating = 0, fertile = 0, broken = 0;
 
   // اضافه‌ی تخم‌گذاری
@@ -172,6 +198,11 @@ export function calcStock(productions: EggProduction[], sales: EggSale[]): EggSt
     if (s.type === 'eating') eating -= pieces;
     else if (s.type === 'fertile') fertile -= pieces;
     else if (s.type === 'broken') broken -= pieces;
+  });
+
+  // کم کردن دور ریخت
+  discards.forEach(d => {
+    if (d.type === 'broken' || d.type === 'soft' || d.type === 'dirty') broken -= d.count;
   });
 
   return {
