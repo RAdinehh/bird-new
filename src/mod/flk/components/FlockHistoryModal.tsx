@@ -666,7 +666,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 {visibleData.audit.items.map(g => (
                   <div key={g.label}>
-                    <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>📅 {toFa(g.label)}</div>
+                    <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>📅 {toFa(g.label)}</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {g.events.map(ev => <AuditRow key={ev.id} ev={ev} />)}
                     </div>
@@ -754,7 +754,7 @@ function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        padding: '6px 0',
+        padding: '4px 0',
         borderBottom: '1px dashed var(--border)',
       }}>
         {/* برچسب جنسیت */}
@@ -790,7 +790,7 @@ function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
 
   return (
     <div style={{
-      padding: '8px 10px',
+      padding: '6px 8px',
       background: 'var(--input-bg)',
       borderRadius: 'var(--r-md)',
       border: '1px solid var(--border)',
@@ -799,7 +799,7 @@ function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
       gap: 0,
     }}>
       {/* هدر کارت */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: 6, marginBottom: 2 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: 4, marginBottom: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ fontSize: 18 }}>{meta.icon}</span>
           <b style={{ color: meta.tone, fontSize: 'var(--fs-base)' }}>{meta.label}</b>
