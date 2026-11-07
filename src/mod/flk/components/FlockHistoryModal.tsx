@@ -180,23 +180,6 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
     return m;
   }, [flock.events]);
 
-  const eventRunningTotals = useMemo(() => {
-    const map = new Map<string, { before: number; after: number }>();
-    const sorted = [...(flock.events || [])]
-      .filter(e => !e.revoked)
-      .sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
-    let running = initial;
-    for (const e of sorted) {
-      const before = running;
-      let d = 0;
-      if (e.type === 'death' || e.type === 'sell' || e.type === 'cull') d = -e.count;
-      else if (e.type === 'add' || e.type === 'transfer') d = +e.count;
-      else if (e.type === 'correction') d = (e.direction === -1 ? -1 : 1) * e.count;
-      running += d;
-      map.set(e.id, { before, after: running });
-    }
-    return map;
-  }, [flock.events, initial]);
 
   const groups = useMemo(() => {
     const today = todayJ();
@@ -426,14 +409,14 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               <Select
                 value={reasonCode}
                 onChange={e => setReasonCode(e.target.value as FlockEventReasonCode)}
-                style={{ background: 'var(--card)', fontSize: 'var(--fs-sm)', height: 40, borderColor: 'var(--warn)' }}
+                style={{ background: '#ffffff', fontSize: 'var(--fs-sm)', height: 40, borderColor: 'var(--warn)' }}
               >
                 {REASON_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
               </Select>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>توضیح (اختیاری)</span>
-              <input type="text" value={notes} onChange={e => setNotes(e.target.value)} placeholder="مثلاً شمارش اشتباه" style={{ background: 'var(--card)', border: '1px solid var(--warn)', borderRadius: 'var(--r-md)', height: 40, padding: '0 var(--sp-3)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', color: 'var(--text)', outline: 'none', width: '100%' }} />
+              <input type="text" value={notes} onChange={e => setNotes(e.target.value)} placeholder="مثلاً شمارش اشتباه" style={{ background: '#ffffff', border: '1px solid var(--warn)', borderRadius: 'var(--r-md)', height: 40, padding: '0 var(--sp-3)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', color: 'var(--text)', outline: 'none', width: '100%' }} />
             </div>
           </div>
 
@@ -602,7 +585,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
                 <div key={g.label}>
                   <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>📅 {toFa(g.label)}</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {g.events.map(e => <EventRow key={e.id} e={e} onRevoke={() => handleRevoke(e)} runningTotals={eventRunningTotals.get(e.id)} />)}
+                    {g.events.map(e => <EventRow key={e.id} e={e} onRevoke={() => handleRevoke(e)} />)}
                   </div>
                 </div>
               ))}
@@ -673,7 +656,7 @@ function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
   );
 }
 
-function EventRow({ e, onRevoke, runningTotals }: { e: FlockEvent; onRevoke: () => void; runningTotals?: { before: number; after: number } }) {
+function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
   const info = TYPE_INFO[e.type] || { icon: '•', label: e.type, tone: 'var(--muted)' };
   const isRevoked = e.revoked === true;
   const isRevokeAction = !!e.linkedEventId;
@@ -736,28 +719,6 @@ function EventRow({ e, onRevoke, runningTotals }: { e: FlockEvent; onRevoke: () 
       </div>
 
       {/* ═══ سطر ۲ — قبل → بعد ═══ */}
-      {runningTotals && !isRevoked && (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          alignSelf: 'flex-start',
-          padding: '4px 10px',
-          background: 'var(--card)',
-          borderRadius: 'var(--r-sm)',
-          border: '1px solid var(--border)',
-          fontSize: 'var(--fs-sm)',
-        }}>
-          <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>موجودی:</span>
-          <span dir="ltr" style={{ fontFamily: 'monospace', fontWeight: 700, color: 'var(--muted)' }}>
-            {toFa(runningTotals.before)}
-          </span>
-          <span style={{ color: 'var(--dim)', fontSize: 12 }}>→</span>
-          <span dir="ltr" style={{ fontFamily: 'monospace', fontWeight: 700, color: isPlus ? 'var(--accent)' : 'var(--danger)' }}>
-            {toFa(runningTotals.after)}
-          </span>
-        </div>
-      )}
 
       {/* ═══ سطر ۳ — دلیل (سطح ۲) ═══ */}
       {e.reason && (
@@ -773,7 +734,7 @@ function EventRow({ e, onRevoke, runningTotals }: { e: FlockEvent; onRevoke: () 
           display: 'flex',
           alignItems: 'center',
           gap: 6,
-          fontSize: 'var(--fs-xs)',
+          fontSize: 11,
           color: 'var(--warn)',
           lineHeight: 1.5,
         }}>
