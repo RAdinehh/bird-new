@@ -28,7 +28,7 @@ const TYPE_INFO: Record<FlockEventType, { icon: string; label: string; tone: str
   sell:       { icon: '💰', label: 'فروش',    tone: 'var(--purple)' },
   death:      { icon: '💀', label: 'تلفات',   tone: 'var(--danger)' },
   transfer:   { icon: '🔄', label: 'انتقال',  tone: 'var(--info)' },
-  correction: { icon: '✏️', label: 'اصلاح',   tone: 'var(--warn)' },
+  correction: { icon: '',   label: 'اصلاح',   tone: 'var(--warn)' },
   cull:       { icon: '🗑',  label: 'حذف',    tone: 'var(--warn)' },
 };
 
@@ -346,7 +346,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               <span>➕ افزودن <b style={{ color: 'var(--accent)' }}>{toFa(eventBreakdown.add)}</b></span>
             )}
             {eventBreakdown.correctionNet !== 0 && (
-              <span>✏️ اصلاح <b style={{ color: 'var(--warn)' }}>{eventBreakdown.correctionNet > 0 ? '+' : ''}{toFa(eventBreakdown.correctionNet)}</b></span>
+              <span>اصلاح <b style={{ color: 'var(--warn)' }}>{eventBreakdown.correctionNet > 0 ? '+' : ''}{toFa(eventBreakdown.correctionNet)}</b></span>
             )}
           </div>
         )}
@@ -407,7 +407,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
       {tabMode === 'events' && correctionOpen && (
         <div style={{ marginBottom: 12, marginTop: 4, background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-md)', padding: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px dashed var(--warn)', paddingBottom: 8 }}>
-            <span style={{ fontWeight: 700, color: 'var(--warn)', fontSize: 'var(--fs-base)' }}>✏️ ثبت اصلاح موجودی</span>
+            <span style={{ fontWeight: 700, color: 'var(--warn)', fontSize: 'var(--fs-base)' }}>ثبت اصلاح موجودی</span>
             <button type="button" onClick={() => { setCorrectionOpen(false); setDelta(''); setNotes(''); setValidationError(''); }} style={{ background: 'none', border: 'none', color: 'var(--muted)', fontSize: 18, cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>✕</button>
           </div>
 
@@ -714,7 +714,7 @@ function EventRow({ e, onRevoke, runningTotals }: { e: FlockEvent; onRevoke: () 
 
       {/* ═══ سطر ۱ — عنوان + دلتا (برجسته) ═══ */}
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-        <span style={{ fontSize: 22, flexShrink: 0 }}>{info.icon}</span>
+        {info.icon && <span style={{ fontSize: 22, flexShrink: 0 }}>{info.icon}</span>}
         <b style={{ color: info.tone, fontSize: 'var(--fs-base)', fontWeight: 700 }}>{info.label}</b>
         <span
           dir="ltr"
