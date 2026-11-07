@@ -113,7 +113,7 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
               </div>
 
               {/* wrapper کل گروه */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
                 {g.items.map(({ ev, prev }) => {
                   const dM = prev ? ev.male - prev.male : 0;
                   const dF = prev ? ev.female - prev.female : 0;
