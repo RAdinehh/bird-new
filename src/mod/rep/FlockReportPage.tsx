@@ -33,7 +33,7 @@ export default function FlockReportPage() {
     const flockCount = f.currentCount || f.initialCount || 0;
     const totalEggs = myProductions.reduce((a, p) => a + healthyCount(p), 0);
     const totalDeaths = myLogs.reduce((a, l) => a + (l.deaths || []).reduce((b, x) => b + (x.count || 0), 0), 0);
-    const totalFeed = myLogs.reduce((a, l) => a + (l.feedDelivered || 0), 0);
+    const totalFeed = myLogs.reduce((a, l) => a + (l.feedConsumed || l.feedDelivered || 0), 0);
     const initialCount = f.initialCount || 0;
     const mortality = initialCount > 0 ? (totalDeaths / initialCount) * 100 : 0;
     const avgHenDay = myProductions.length > 0

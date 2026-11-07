@@ -10,7 +10,7 @@ export default function BenchmarkCard() {
   const rows = useMemo(() => {
     return flocks.map(f => {
       const fLogs = logs.filter(l => l.flockId === f.id);
-      const totalFeed = fLogs.reduce((a, l) => a + (l.feedDelivered || 0), 0);
+      const totalFeed = fLogs.reduce((a, l) => a + (l.feedConsumed || l.feedDelivered || 0), 0);
       const totalDeaths = fLogs.reduce((a, l) => a + (l.deathsCount || 0), 0);
       const initial = f.initialCount || 0;
       const alive = f.currentCount || initial;

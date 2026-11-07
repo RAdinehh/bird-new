@@ -97,7 +97,7 @@ export function eggsInMonth(productions: any[], month: string): { healthy: numbe
 export function feedInMonth(logs: any[], month: string): number {
   return logs
     .filter(l => monthKey(l.date) === month)
-    .reduce((a, l) => a + (l.feedDelivered || 0), 0);
+    .reduce((a, l) => a + (l.feedConsumed || l.feedDelivered || 0), 0);
 }
 
 /** تلفات در یک ماه */

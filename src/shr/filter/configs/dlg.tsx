@@ -66,7 +66,7 @@ export function getDlgLogsConfig(ctx: {
       {
         key: 'feedDelivered', label: 'دان مصرفی', icon: <IconChart size={18} />,
         hint: 'بر اساس مقدار دان',
-        compare: (a: DailyLog, b: DailyLog) => (a.feedDelivered || 0) - (b.feedDelivered || 0),
+        compare: (a: DailyLog, b: DailyLog) => (a.feedConsumed ?? a.feedDelivered ?? 0) - (b.feedConsumed ?? b.feedDelivered ?? 0),
       },
       {
         key: 'createdAt', label: 'جدیدترین ثبت', icon: <IconClock size={18} />,
