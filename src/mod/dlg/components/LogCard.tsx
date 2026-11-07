@@ -133,15 +133,20 @@ export default function LogCard(props: LogCardProps) {
       {(l.feedDelivered !== null || l.waterAmount !== null) && (
         <Section title="🌾 تغذیه و آب">
           {l.feedType && <Row l="جیره/دان" v={l.feedType} />}
-          {l.feedDelivered !== null && <Row l="دان مصرفی" v={`${toFa(l.feedDelivered)} kg`} />}
+          {l.feedDelivered !== null && <Row l="دان داده‌شده" v={`${toFa(l.feedDelivered)} kg`} />}
+          {l.feedConsumed !== null && l.feedConsumed !== undefined && l.feedConsumed !== l.feedDelivered && (
+            <Row l="دان مصرف‌شده" v={`${toFa(l.feedConsumed)} kg`} />
+          )}
           {l.feedRemaining !== null && <Row l="باقیمانده" v={`${toFa(l.feedRemaining)} kg`} />}
           {l.waterAmount !== null && <Row l="آب" v={`${toFa(l.waterAmount)} L`} />}
           {l.waterFillCount !== null && l.waterFillVolume !== null && (
             <Row l="روش آب" v={`${toFa(l.waterFillCount)} بار × ${toFa(l.waterFillVolume)} L`} />
           )}
-          {l.waterAmount && l.feedDelivered && (
-            <Row l="نسبت آب/دان" v={toFa((l.waterAmount / l.feedDelivered).toFixed(2))} />
-          )}
+          {(() => {
+            const effectiveFeed = (l.feedConsumed && l.feedConsumed > 0) ? l.feedConsumed : l.feedDelivered;
+            if (!l.waterAmount || !effectiveFeed || effectiveFeed <= 0) return null;
+            return <Row l="نسبت آب/دان" v={toFa((l.waterAmount / effectiveFeed).toFixed(2))} />;
+          })()}
         </Section>
       )}
 

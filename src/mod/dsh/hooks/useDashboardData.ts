@@ -189,7 +189,7 @@ const [, _setTick] = useState(0);
   const fcr = useMemo(() => {
     const monthLogs = logs.filter(l => monthKey(l.date) === thisMonth);
     const monthProd = productions.filter(p => monthKey(p.date) === thisMonth);
-    const feed = monthLogs.reduce((a, l) => a + (l.feedDelivered || 0), 0);
+    const feed = monthLogs.reduce((a, l) => a + (l.feedConsumed || l.feedDelivered || 0), 0);
     const eggsWeight = monthProd.reduce((a, p) => a + (p.totalCount || 0) * 0.06, 0);
     if (eggsWeight <= 0) return 0;
     return Math.round((feed / eggsWeight) * 100) / 100;
@@ -199,7 +199,7 @@ const [, _setTick] = useState(0);
   const waterFeedRatio = useMemo(() => {
     const last7 = logs.filter(l => dateDiffDays(l.date) <= 7);
     const water = last7.reduce((a, l) => a + (l.waterAmount || 0), 0);
-    const feed = last7.reduce((a, l) => a + (l.feedDelivered || 0), 0);
+    const feed = last7.reduce((a, l) => a + (l.feedConsumed || l.feedDelivered || 0), 0);
     if (feed === 0) return 0;
     return Math.round((water / feed) * 10) / 10;
   }, [logs]);
