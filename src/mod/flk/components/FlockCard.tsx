@@ -34,6 +34,7 @@ import UnmergeFlocksModal from './UnmergeFlocksModal';
 import MergedEditBlockModal from './MergedEditBlockModal';
 import SexingModal from './SexingModal';
 import SexingHistoryModal from './SexingHistoryModal';
+import ConsumptionFormModal from './ConsumptionFormModal';
 import { useBreedStandard } from '../../../shr/hooks/useBreedStandard';
 
 type Fmt = ReturnType<typeof useFormat>;
@@ -96,6 +97,7 @@ export default function FlockCard(props: FlockCardProps) {
   const [unmergeOpen, setUnmergeOpen] = useState(false);
   const [sexingOpen, setSexingOpen] = useState(false);
   const [sexingHistoryOpen, setSexingHistoryOpen] = useState(false);
+  const [consumptionOpen, setConsumptionOpen] = useState(false);
   const [editBlockOpen, setEditBlockOpen] = useState(false);
 
   const isMerged = f.status === 'merged' || (f.mergedInfo?.sources?.length || 0) >= 2;
@@ -574,6 +576,7 @@ export default function FlockCard(props: FlockCardProps) {
             { label: 'ویرایش', onClick: handleEditGuard, variant: 'outline' },
             { label: '📋 تفکیک', onClick: () => setSexingOpen(true), variant: 'outline', hidden: f.type === 'broiler' },
             { label: '📅 تفکیک‌ها', onClick: () => setSexingHistoryOpen(true), variant: 'outline', hidden: (f.sexingEvents?.length || 0) === 0 },
+            { label: '🍽️ ثبت دان/آب', onClick: () => setConsumptionOpen(true), variant: 'outline' },
             { label: '📜 رویدادها', onClick: () => setHistoryOpen(true), variant: 'outline' },
             { label: '📁 گروه‌ها', onClick: onOpenGroups, variant: 'outline' },
             { label: f.hidden ? '👁 نمایان' : '👁 پنهان', onClick: onToggleHidden, variant: 'outline' },
@@ -590,6 +593,7 @@ export default function FlockCard(props: FlockCardProps) {
           <UnmergeFlocksModal open={unmergeOpen} onClose={() => setUnmergeOpen(false)} targetFlockId={f.id} />
       <SexingModal open={sexingOpen} onClose={() => setSexingOpen(false)} flock={f} />
       <SexingHistoryModal open={sexingHistoryOpen} onClose={() => setSexingHistoryOpen(false)} flock={f} />
+      <ConsumptionFormModal open={consumptionOpen} onClose={() => setConsumptionOpen(false)} flock={f} />
       <MergedEditBlockModal open={editBlockOpen} onClose={() => setEditBlockOpen(false)} onUnmerge={() => setUnmergeOpen(true)} flockName={f.name} />
     </ExpandableCard>
     
