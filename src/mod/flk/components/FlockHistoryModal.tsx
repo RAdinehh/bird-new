@@ -393,30 +393,33 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
             <button type="button" onClick={() => { setCorrectionOpen(false); setDelta(''); setNotes(''); setValidationError(''); }} style={{ background: 'none', border: 'none', color: 'var(--muted)', fontSize: 18, cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>✕</button>
           </div>
 
-          {/* فیلد ۱ — مقدار تغییر */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>مقدار تغییر</span>
-            <div style={{ display: 'flex', alignItems: 'center', background: 'var(--card)', border: '1px solid ' + (validationError ? 'var(--danger)' : 'var(--warn)'), borderRadius: 'var(--r-md)', height: 40, overflow: 'hidden' }}>
-              <button type="button" onClick={() => { const n = parseInt(toEn(delta), 10) || 0; setDelta(toFa(String(n + 1))); }} style={{ width: 36, height: '100%', border: 'none', background: 'transparent', fontSize: 20, fontWeight: num > 0 ? 700 : 400, color: num > 0 ? 'var(--accent)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderLeft: '1px solid var(--border)', flexShrink: 0 }}>+</button>
-              <input type="text" value={delta} onChange={e => {
-                const raw = toEn(e.target.value);
-                const isNegative = raw.startsWith('-') || raw.startsWith('−');
-                const digits = raw.replace(/[^0-9]/g, '');
-                if (digits) { setDelta(toFa(isNegative ? '-' + digits : digits)); } else { setDelta(isNegative ? '−' : ''); }
-                setValidationError('');
-              }} placeholder="۰" inputMode="text" style={{ flex: 1, minWidth: 0, background: 'none', border: 'none', outline: 'none', fontFamily: 'monospace', fontSize: 'var(--fs-base)', fontWeight: 700, color: num > 0 ? 'var(--accent)' : num < 0 ? 'var(--danger)' : 'var(--text)', textAlign: 'center', padding: '0 var(--sp-1)', direction: 'ltr' }} />
-              <button type="button" onClick={() => { const n = parseInt(toEn(delta), 10) || 0; setDelta(toFa(String(n - 1))); }} style={{ width: 36, height: '100%', border: 'none', background: 'transparent', fontSize: 20, fontWeight: num < 0 ? 700 : 400, color: num < 0 ? 'var(--danger)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderRight: '1px solid var(--border)', flexShrink: 0 }}>−</button>
+          {/* ردیف اول: مقدار + موجودی بعد از ثبت (دو ستونه) */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8 }}>
+            {/* فیلد ۱ — مقدار تغییر */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+              <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>مقدار تغییر</span>
+              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--card)', border: '1px solid ' + (validationError ? 'var(--danger)' : 'var(--warn)'), borderRadius: 'var(--r-md)', height: 40, overflow: 'hidden', minWidth: 0 }}>
+                <button type="button" onClick={() => { const n = parseInt(toEn(delta), 10) || 0; setDelta(toFa(String(n + 1))); }} style={{ width: 32, height: '100%', border: 'none', background: 'transparent', fontSize: 18, fontWeight: num > 0 ? 700 : 400, color: num > 0 ? 'var(--accent)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderLeft: '1px solid var(--border)', flexShrink: 0, padding: 0 }}>+</button>
+                <input type="text" value={delta} onChange={e => {
+                  const raw = toEn(e.target.value);
+                  const isNegative = raw.startsWith('-') || raw.startsWith('−');
+                  const digits = raw.replace(/[^0-9]/g, '');
+                  if (digits) { setDelta(toFa(isNegative ? '-' + digits : digits)); } else { setDelta(isNegative ? '−' : ''); }
+                  setValidationError('');
+                }} placeholder="۰" inputMode="text" style={{ flex: 1, minWidth: 0, width: '100%', background: 'none', border: 'none', outline: 'none', fontFamily: 'monospace', fontSize: 'var(--fs-base)', fontWeight: 700, color: num > 0 ? 'var(--accent)' : num < 0 ? 'var(--danger)' : 'var(--text)', textAlign: 'center', padding: '0 4px', direction: 'ltr' }} />
+                <button type="button" onClick={() => { const n = parseInt(toEn(delta), 10) || 0; setDelta(toFa(String(n - 1))); }} style={{ width: 32, height: '100%', border: 'none', background: 'transparent', fontSize: 18, fontWeight: num < 0 ? 700 : 400, color: num < 0 ? 'var(--danger)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderRight: '1px solid var(--border)', flexShrink: 0, padding: 0 }}>−</button>
+              </div>
             </div>
-          </div>
 
-          {/* فیلد ۲ — موجودی بعد از ثبت (زیر آن) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>موجودی بعد از ثبت</span>
-            <div style={{ background: 'var(--card)', border: '1px solid ' + (num !== 0 ? (newCount < 0 ? 'var(--danger)' : (newCount < initial * 0.1 ? 'var(--warn)' : 'var(--accent)')) : 'var(--warn)'), borderRadius: 'var(--r-md)', height: 40, padding: '0 var(--sp-2)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <div dir="ltr" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 600, color: 'var(--muted)' }}>{toFa(current)}</span>
-                <span style={{ color: 'var(--dim)', fontSize: 12 }}>→</span>
-                {num === 0 ? <span style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 400, color: 'var(--dim)' }}>؟</span> : newCount < 0 ? <span style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'var(--danger)' }}>منفی</span> : num > 0 ? <span style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'var(--accent)' }}>{toFa(newCount)}</span> : <span style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'var(--danger)' }}>{toFa(newCount)}</span>}
+            {/* فیلد ۲ — موجودی بعد از ثبت */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+              <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>موجودی بعد از ثبت</span>
+              <div style={{ background: 'var(--card)', border: '1px solid ' + (num !== 0 ? (newCount < 0 ? 'var(--danger)' : (newCount < initial * 0.1 ? 'var(--warn)' : 'var(--accent)')) : 'var(--warn)'), borderRadius: 'var(--r-md)', height: 40, padding: '0 4px', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden', minWidth: 0 }}>
+                <div dir="ltr" style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13 }}>
+                  <span style={{ fontFamily: 'monospace', fontWeight: 600, color: 'var(--muted)' }}>{toFa(current)}</span>
+                  <span style={{ color: 'var(--dim)', fontSize: 11 }}>→</span>
+                  {num === 0 ? <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 400, color: 'var(--dim)' }}>؟</span> : newCount < 0 ? <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, color: 'var(--danger)' }}>منفی</span> : num > 0 ? <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'var(--accent)' }}>{toFa(newCount)}</span> : <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'var(--danger)' }}>{toFa(newCount)}</span>}
+                </div>
               </div>
             </div>
           </div>
@@ -440,7 +443,18 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
           )}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            <button type="button" onClick={handleSaveCorrection} disabled={num === 0 || newCount < 0} style={{ height: 40, background: (num === 0 || newCount < 0) ? 'var(--dim)' : 'var(--accent)', color: 'white', border: 'none', borderRadius: 'var(--r-md)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: (num === 0 || newCount < 0) ? 'not-allowed' : 'pointer', opacity: (num === 0 || newCount < 0) ? 0.7 : 1, transition: 'all 0.2s' }}>{(num === 0) ? 'مقدار را وارد کنید' : (newCount < 0 ? 'موجودی کافی نیست' : '✓ ثبت اصلاح')}</button>
+            <button type="button" onClick={handleSaveCorrection} disabled={num === 0 || newCount < 0} style={{
+              height: 40,
+              background: (num === 0 || newCount < 0) ? 'var(--input-bg)' : 'var(--accent)',
+              color: (num === 0 || newCount < 0) ? 'var(--muted)' : 'white',
+              border: '1px solid ' + ((num === 0 || newCount < 0) ? 'var(--border)' : 'var(--accent)'),
+              borderRadius: 'var(--r-md)',
+              fontFamily: 'inherit',
+              fontSize: 'var(--fs-sm)',
+              fontWeight: 700,
+              cursor: (num === 0 || newCount < 0) ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s'
+            }}>{(num === 0) ? 'مقدار را وارد کنید' : (newCount < 0 ? 'موجودی کافی نیست' : '✓ ثبت اصلاح')}</button>
             <button type="button" onClick={() => { setCorrectionOpen(false); setDelta(''); setNotes(''); setValidationError(''); }} style={{ height: 40, background: 'var(--card)', color: 'var(--muted)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer' }}>لغو</button>
           </div>
         </div>
