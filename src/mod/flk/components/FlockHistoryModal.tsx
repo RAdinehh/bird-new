@@ -174,6 +174,42 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   const fcrResult = calculateFCR(consumptionSummary, weightBySex, flock, stdFCR);
   const deathRate = aggregateDeathsBySex(flock.sexBalanceEvents, flock.initialMaleCount, flock.initialFemaleCount);
 
+  const sexAggregates = (() => {
+    const isSexed = !!flock.genderSplitAt;
+    const initM = isSexed ? (flock.initialMaleCount ?? 0) : 0;
+    const initF = isSexed ? (flock.initialFemaleCount ?? 0) : 0;
+    const initU = isSexed
+      ? Math.max(0, (flock.initialCount ?? 0) - initM - initF)
+      : (flock.initialCount ?? 0);
+
+    let sellsM = 0, sellsF = 0, sellsU = 0;
+    for (const ev of flock.sexBalanceEvents || []) {
+      if (ev.type === 'sale') {
+        sellsM += Math.abs(Math.min(0, ev.delta.male));
+        sellsF += Math.abs(Math.min(0, ev.delta.female));
+        sellsU += Math.abs(Math.min(0, ev.delta.unknown));
+      }
+    }
+
+    const curM = flock.maleCount ?? 0;
+    const curF = flock.femaleCount ?? 0;
+    const curU = flock.unknownCount ?? 0;
+
+    return {
+      init: { male: initM, female: initF, unknown: initU },
+      deaths: { male: deathRate.male.deaths, female: deathRate.female.deaths, unknown: deathRate.unknown.deaths },
+      sells: { male: sellsM, female: sellsF, unknown: sellsU },
+      others: {
+        male: curM - initM + deathRate.male.deaths + sellsM,
+        female: curF - initF + deathRate.female.deaths + sellsF,
+        unknown: curU - initU + deathRate.unknown.deaths + sellsU,
+      },
+      current: { male: curM, female: curF, unknown: curU },
+    };
+  })();
+
+
+
   const typeCounts = useMemo(() => {
     const m = new Map<FlockEventType, number>();
     (flock.events || []).forEach(e => m.set(e.type, (m.get(e.type) || 0) + 1));
@@ -533,38 +569,50 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
         </div>
       ) : tabMode === 'audit' ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {flock.genderSplitAt && (
-            <div>
-              <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>⚥ وضعیت جنسیتی فعلی</div>
-              <div style={{ padding: '8px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)' }}>
-                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                  <span>♂ نر: <b style={{ color: 'var(--info)' }}>{toFa(flock.maleCount ?? 0)}</b></span>
-                  <span>♀ ماده: <b style={{ color: 'var(--purple)' }}>{toFa(flock.femaleCount ?? 0)}</b></span>
-                  <span>❓ نامشخص: <b style={{ color: 'var(--muted)' }}>{toFa(flock.unknownCount ?? 0)}</b></span>
-                </div>
-                {sexRatios && (
-                  <div style={{ marginTop: 6, fontSize: 10, color: 'var(--muted)' }}>
-                    نسبت: {toFa(sexRatios.malePct)}٪ نر / {toFa(sexRatios.femalePct)}٪ ماده
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
           {deathRate.hasData && (
-            <div>
-              <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>💀 نرخ تلفات به تفکیک جنسیت</div>
-              <div style={{ padding: '8px 10px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 11 }}>
-                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                  <span>♂ نر: <b dir="ltr" style={{ color: toneFromRate(deathRate.male.rate) }}>{toFa(deathRate.male.deaths)} / {toFa(deathRate.male.initial)} → {toFa(deathRate.male.rate.toFixed(1))}٪</b></span>
-                  <span>♀ ماده: <b dir="ltr" style={{ color: toneFromRate(deathRate.female.rate) }}>{toFa(deathRate.female.deaths)} / {toFa(deathRate.female.initial)} → {toFa(deathRate.female.rate.toFixed(1))}٪</b></span>
-                  {deathRate.unknown.deaths > 0 && (
-                    <span style={{ color: 'var(--muted)' }}>❓ نامشخص: <b>{toFa(deathRate.unknown.deaths)}</b></span>
-                  )}
-                </div>
-              </div>
+        <div>
+          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>⚥ جدول جنسیتی</div>
+          <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', overflow: 'hidden' }}>
+            {/* Header */}
+            <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr 1fr 1fr 1fr 1fr', padding: '6px 8px', background: 'var(--input-bg)', borderBottom: '1px solid var(--border)', fontSize: 'var(--fs-xs)', fontWeight: 700, color: 'var(--muted)' }}>
+              <span>جنسیت</span>
+              <span style={{ textAlign: 'center' }}>اولیه</span>
+              <span style={{ textAlign: 'center' }}>تلفات</span>
+              <span style={{ textAlign: 'center' }}>فروش</span>
+              <span style={{ textAlign: 'center' }}>سایر</span>
+              <span style={{ textAlign: 'center' }}>فعلی</span>
             </div>
-          )}
-          {auditCount === 0 ? (
+            {/* Male */}
+            <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr 1fr 1fr 1fr 1fr', padding: '8px', borderBottom: '1px dashed var(--border)', fontSize: 'var(--fs-sm)' }}>
+              <span style={{ color: 'var(--info)', fontWeight: 700 }}>♂ نر</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace' }}>{toFa(sexAggregates.init.male)}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.deaths.male > 0 ? 'var(--danger)' : 'var(--muted)' }}>{sexAggregates.deaths.male > 0 ? `-${toFa(sexAggregates.deaths.male)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.sells.male > 0 ? 'var(--purple)' : 'var(--muted)' }}>{sexAggregates.sells.male > 0 ? `-${toFa(sexAggregates.sells.male)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.others.male !== 0 ? 'var(--warn)' : 'var(--muted)' }}>{sexAggregates.others.male > 0 ? '+' : ''}{sexAggregates.others.male !== 0 ? toFa(sexAggregates.others.male) : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', fontWeight: 700 }}>{toFa(sexAggregates.current.male)}</span>
+            </div>
+            {/* Female */}
+            <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr 1fr 1fr 1fr 1fr', padding: '8px', borderBottom: '1px dashed var(--border)', fontSize: 'var(--fs-sm)' }}>
+              <span style={{ color: 'var(--purple)', fontWeight: 700 }}>♀ ماده</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace' }}>{toFa(sexAggregates.init.female)}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.deaths.female > 0 ? 'var(--danger)' : 'var(--muted)' }}>{sexAggregates.deaths.female > 0 ? `-${toFa(sexAggregates.deaths.female)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.sells.female > 0 ? 'var(--purple)' : 'var(--muted)' }}>{sexAggregates.sells.female > 0 ? `-${toFa(sexAggregates.sells.female)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.others.female !== 0 ? 'var(--warn)' : 'var(--muted)' }}>{sexAggregates.others.female > 0 ? '+' : ''}{sexAggregates.others.female !== 0 ? toFa(sexAggregates.others.female) : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', fontWeight: 700 }}>{toFa(sexAggregates.current.female)}</span>
+            </div>
+            {/* Unknown */}
+            <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr 1fr 1fr 1fr 1fr', padding: '8px', fontSize: 'var(--fs-sm)' }}>
+              <span style={{ color: 'var(--muted)', fontWeight: 700 }}>? نامشخص</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace' }}>{toFa(sexAggregates.init.unknown)}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.deaths.unknown > 0 ? 'var(--danger)' : 'var(--muted)' }}>{sexAggregates.deaths.unknown > 0 ? `-${toFa(sexAggregates.deaths.unknown)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.sells.unknown > 0 ? 'var(--purple)' : 'var(--muted)' }}>{sexAggregates.sells.unknown > 0 ? `-${toFa(sexAggregates.sells.unknown)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.others.unknown !== 0 ? 'var(--warn)' : 'var(--muted)' }}>{sexAggregates.others.unknown > 0 ? '+' : ''}{sexAggregates.others.unknown !== 0 ? toFa(sexAggregates.others.unknown) : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', fontWeight: 700 }}>{toFa(sexAggregates.current.unknown)}</span>
+            </div>
+          </div>
+        </div>
+      )}
+      {auditCount === 0 ? (
             <div style={{ padding: 'var(--sp-8)', textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>
               <div style={{ fontSize: 40, marginBottom: 8 }}>📊</div>
               <div>هنوز تغییر جنسیتی ثبت نشده</div>
