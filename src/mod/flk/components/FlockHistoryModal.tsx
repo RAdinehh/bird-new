@@ -728,7 +728,6 @@ function EventRow({ e, onRevoke, runningTotals }: { e: FlockEvent; onRevoke: () 
         >
           {isPlus ? '+' : '-'}{toFa(e.count)}
         </span>
-        <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>پرنده</span>
         {isRevoked && (
           <span style={{
             fontSize: 'var(--fs-xs)',
