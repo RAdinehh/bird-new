@@ -62,7 +62,7 @@ export default function ToastHost() {
               border: isSuccess ? 'none' : '1px solid ' + color,
               borderRadius: 12,
               padding: '8px 12px',
-              maxWidth: 200,
+              maxWidth: 340,
               width: '100%',
               boxShadow: isSuccess
                 ? '0 4px 12px rgba(0,0,0,.18), 0 2px 4px rgba(0,0,0,.10)'
