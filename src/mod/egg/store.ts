@@ -20,6 +20,7 @@ export interface EggProduction {
   dirtyCount: number;
   avgWeight: number | null;
   notes: string;
+  sourceType?: 'dlg' | 'manual' | 'inc' | 'unknown';
   sourceLogId?: string;
   eatingMovementId?: string;
   fertileMovementId?: string;
@@ -101,7 +102,19 @@ export const useEgg = create<State>()(
       addSale: (s) => set({ sales: [...get().sales, { ...s, id: uuid(), createdAt: now() }] }),
       deleteSale: (id) => set({ sales: get().sales.filter(x => x.id !== id) })
     }),
-    { name: 'pm-egg' }
+    {
+      name: 'pm-egg',
+      version: 2,
+      migrate: (persisted: any, version: number) => {
+        if (version < 2 && persisted?.productions) {
+          persisted.productions = persisted.productions.map((p: any) => ({
+            ...p,
+            sourceType: p.sourceType ?? (p.sourceLogId ? 'dlg' : 'unknown'),
+          }));
+        }
+        return persisted;
+      },
+    }
   )
 );
 

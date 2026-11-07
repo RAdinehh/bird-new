@@ -29,8 +29,6 @@ export interface UseEggEntriesFormParams {
   deleteEntry: (id: string) => void;
   addInvoice: (inv: any) => string | undefined;
   deleteInvoice: (id: string) => void;
-  addProduction: (p: any) => string | undefined;
-  deleteProduction: (id: string) => void;
   onGoTo?: (t: any, payload?: { entry?: string }) => void;
 }
 
@@ -38,7 +36,7 @@ export function useEggEntriesForm(params: UseEggEntriesFormParams) {
   const {
     devices, birds, eggEntries, flocks, initialDevice,
     addEntry, updateEntry, deleteEntry,
-    addInvoice, deleteInvoice, addProduction, deleteProduction,
+    addInvoice, deleteInvoice,
     onGoTo,
   } = params;
 
@@ -277,13 +275,6 @@ export function useEggEntriesForm(params: UseEggEntriesFormParams) {
               } as any);
               refIds.generatedInvoiceId = invId || '';
             }
-          } else if (row.dealType === 'own' && row.flockId) {
-            const prodId = addProduction({
-              flockId: row.flockId, date: row.entryDate, totalCount: count || 0,
-              brokenCount: 0, softCount: 0, dirtyCount: 0, avgWeight: null,
-              notes: 'ورودی به جوجه‌کشی — ' + (device.name || ''),
-            } as any);
-            refIds.generatedProductionId = prodId || '';
           } else if (row.dealType === 'rent' && row.dealData.lessorId && row.dealData.rentAmount) {
             const rentAmount = parseFloat(toEn(row.dealData.rentAmount).replace('٫', '.')) || 0;
             if (rentAmount > 0) {
@@ -297,7 +288,7 @@ export function useEggEntriesForm(params: UseEggEntriesFormParams) {
             }
           }
         } catch {}
-        if (newId && (refIds.generatedInvoiceId || refIds.generatedProductionId)) {
+        if (newId && refIds.generatedInvoiceId) {
           updateEntry(newId, refIds);
         }
         savedCount++;
@@ -344,15 +335,11 @@ export function useEggEntriesForm(params: UseEggEntriesFormParams) {
   const deleteEntryWithCascade = async (id: string) => {
     const entry = eggEntries.find(e => e.id === id) as any;
     if (!entry) return;
-    let delInv = false, delProd = false;
+    let delInv = false;
     if (entry.generatedInvoiceId) {
       delInv = await showConfirmAsync('تأیید', 'این ورودی یک فاکتور در معاملات ساخته.\nتایید — فاکتور هم حذف شود\nلغو — فقط ورودی حذف شود', { danger: true });
     }
-    if (entry.generatedProductionId) {
-      delProd = await showConfirmAsync('تأیید', 'این ورودی یک رکورد تولید تخم ساخته.\nتایید — آن هم حذف شود\nلغو — فقط ورودی حذف شود', { danger: true });
-    }
     if (delInv && entry.generatedInvoiceId) { try { deleteInvoice(entry.generatedInvoiceId); } catch {} }
-    if (delProd && entry.generatedProductionId) { try { deleteProduction(entry.generatedProductionId); } catch {} }
     deleteEntry(id);
   };
 

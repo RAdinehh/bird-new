@@ -110,7 +110,8 @@ export interface EggEntry {
   shippingCost: number | null;
   status: EntryStatus;
   generatedInvoiceId: string;
-  generatedProductionId: string;
+  /** @deprecated — inc دیگر production نمی‌سازد (A3). برای backward compat نگه‌داری می‌شود. */
+  generatedProductionId?: string;
   notes: string;
   /** 🆕 وزن نمونه اولیه تخم (گرم) — برای محاسبه کاهش وزن */
   sampleWeightInitial?: number | null;

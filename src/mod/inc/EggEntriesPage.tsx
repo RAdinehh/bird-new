@@ -11,7 +11,6 @@ import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { useFlk } from '../flk/store';
 import { useCtc } from '../ctc/store';
 import { useTra } from '../tra/store';
-import { useEgg } from '../egg/store';
 import { Btn, Empty, PageContainer } from '../../shr/components/ui';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showConfirmAsync } from '../../cor/store/dialog';
@@ -32,7 +31,6 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
   const { flocks } = useFlk();
   const { contacts } = useCtc();
   const { addInvoice, deleteInvoice } = useTra();
-  const { addProduction, deleteProduction } = useEgg();
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -76,7 +74,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
   } = useEggEntriesForm({
     devices, birds, eggEntries, flocks, initialDevice,
     addEntry, updateEntry, deleteEntry,
-    addInvoice, deleteInvoice, addProduction, deleteProduction,
+    addInvoice, deleteInvoice,
     onGoTo,
   });
 

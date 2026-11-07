@@ -178,6 +178,19 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
       setErr('تخم سالم (' + toFa(eating + fertile) + ') نمی‌تواند از تعداد گله (' + toFa(flockCount) + ') بیشتر باشد');
       return;
     }
+    // Duplicate check (فقط برای ثبت جدید — نه ویرایش)
+    if (form.id === undefined) {
+      const dup = productions.find(
+        (p) => p.flockId === form.flockId &&
+               p.date === form.date.trim() &&
+               (p.sourceType === 'manual' || (!p.sourceType && !p.sourceLogId)),
+      );
+      if (dup) {
+        setErr('برای این گله و تاریخ قبلاً ثبت دستی شده. از ویرایش استفاده کنید.');
+        return;
+      }
+    }
+
     const data = {
       flockId: form.flockId,
       date: form.date.trim(),
@@ -189,6 +202,7 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
       dirtyCount: dirty,
       avgWeight: form.avgWeight ? num(form.avgWeight) : null,
       notes: form.notes.trim(),
+      sourceType: 'manual' as const,
     };
     if (form.id === undefined) { addProduction(data); }
     else { updateProduction(form.id, data); }

@@ -28,6 +28,7 @@ export interface EggSyncData {
   avgWeight: number | null;
   notes: string;
   sourceLogId: string;
+  sourceType: 'dlg' | 'manual' | 'inc' | 'unknown';
 }
 
 /** آیا این log نیاز به egg.production داره؟ */
@@ -52,6 +53,7 @@ export function buildEggProductionData(input: EggSyncInput): EggSyncData {
     avgWeight: null,
     notes: '',
     sourceLogId: logId,
+    sourceType: 'dlg',
   };
 }
 
