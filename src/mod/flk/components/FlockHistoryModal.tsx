@@ -6,7 +6,7 @@
 import { useEffect, useState, useMemo, type ReactNode } from 'react';
 import { Modal, Btn, BtnRow, Field, Grid2, Select } from '../../../shr/components/ui';
 import type { Flock, FlockEvent, FlockEventType, FlockEventReasonCode, FlockSexBalanceEvent } from '../store';
-import { SEX_AUDIT_META, formatSexDelta, aggregateDeathsBySex, toneFromRate, eventsToCSV, auditToCSV } from '../helpers-audit';
+import { SEX_AUDIT_META, formatSexDelta, aggregateDeathsBySex, toneFromRate, eventsToCSV, auditToCSV , calculateFCR, weightBySexFromLogs } from '../helpers-audit';
 import { useFlk } from '../store';
 import { todayJ } from '../api/flocksCalc';
 import { showConfirmAsync } from '../../../cor/store/dialog';
@@ -16,6 +16,8 @@ import { toFa, toEn } from '../../../shr/utils/fa';
 import type { DailyLog as DlgLog } from '../../dlg/store';
 import { consumptionToCSV } from '../helpers-audit';
 import { aggregateConsumptionEvents } from '../consumptionEventsCalc';
+import { useBrd } from '../../brd/store';
+import { getStandardFor } from '../../set/standards/resolve';
 
 const REASON_OPTIONS: { value: FlockEventReasonCode; label: string }[] = [
   { value: 'data_entry_error', label: 'خطای ثبت' },
@@ -44,6 +46,19 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
   const [tabMode, setTabMode] = useState<'events' | 'audit' | 'consumption'>('events');
   const [dlgDeaths, setDlgDeaths] = useState<number>(0);
+  const [weightBySex, setWeightBySex] = useState<{
+    male: { avg: number; count: number; cv: number; hasData: boolean };
+    female: { avg: number; count: number; cv: number; hasData: boolean };
+    mixed: { avg: number; count: number; cv: number; hasData: boolean };
+    delta: number | null;
+    hasData: boolean;
+  }>({
+    male: { avg: 0, count: 0, cv: 0, hasData: false },
+    female: { avg: 0, count: 0, cv: 0, hasData: false },
+    mixed: { avg: 0, count: 0, cv: 0, hasData: false },
+    delta: null,
+    hasData: false,
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -54,6 +69,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
         .filter((l: DlgLog) => l.flockId === flock.id)
         .reduce((sum: number, l: DlgLog) => sum + (l.deathsCount || 0), 0);
       setDlgDeaths(total);
+      setWeightBySex(weightBySexFromLogs(logs, flock.id));
     }).catch(() => {});
     return () => { cancelled = true; };
   }, [flock.id, flock.events]);
@@ -65,6 +81,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   const addCorrection = useFlk(st => st.addCorrection);
   const revokeEvent = useFlk(st => st.revokeEvent);
   const consumptionEvents = useFlk(st => st.consumptionEvents);
+  const brd = useBrd();
 
   const initial = flock.initialCount || 0;
   const current = flock.currentCount || 0;
@@ -121,6 +138,14 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
     } catch { return '1400/01/01'; }
   })();
   const consumptionSummary = aggregateConsumptionEvents(flockConsumption, thirtyDaysAgo, todayJ());
+  const breedObj = (brd.breeds || []).find((b: any) => b.id === flock.breedId);
+  const stdFCR = (() => {
+    try {
+      const std = getStandardFor(breedObj?.name || '', {}) as any;
+      return std?.targetFCR ?? std?.fcr ?? null;
+    } catch { return null; }
+  })();
+  const fcrResult = calculateFCR(consumptionSummary, weightBySex, flock, stdFCR);
   const deathRate = aggregateDeathsBySex(flock.sexBalanceEvents, flock.initialMaleCount, flock.initialFemaleCount);
 
   const typeCounts = useMemo(() => {
@@ -316,6 +341,37 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
                   ♂ نر: {toFa(consumptionSummary.bySex.male)} kg · ♀ ماده: {toFa(consumptionSummary.bySex.female)} kg
                 </div>
               )}
+            </div>
+          )}
+          {fcrResult.fcr !== null && (
+            <div style={{
+              padding: '8px 10px',
+              background: fcrResult.confidence === 'exact' ? 'var(--accent-soft)' : 'var(--warn-soft)',
+              border: `1px solid ${fcrResult.confidence === 'exact' ? 'var(--accent-border)' : 'var(--warn)'}`,
+              borderRadius: 'var(--r-md)',
+              fontSize: 11,
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                <span style={{ fontWeight: 700, color: 'var(--muted)', fontSize: 10 }}>📊 FCR</span>
+                <span style={{
+                  fontSize: 9,
+                  padding: '1px 5px',
+                  borderRadius: 3,
+                  background: fcrResult.confidence === 'exact' ? 'var(--accent)' : 'var(--warn)',
+                  color: 'white',
+                  fontWeight: 700,
+                }}>
+                  {fcrResult.confidence === 'exact' ? 'دقیق' : fcrResult.confidence === 'standard' ? 'استاندارد' : 'ناقص'}
+                </span>
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: fcrResult.confidence === 'exact' ? 'var(--accent)' : 'var(--warn)', marginBottom: 4 }}>
+                {toFa(fcrResult.fcr.toFixed(2))}
+              </div>
+              <div style={{ fontSize: 10, color: 'var(--muted)', lineHeight: 1.6 }}>
+                {fcrResult.note}
+                <br />
+                دان/پرنده: {toFa(fcrResult.feedPerBird)} kg
+              </div>
             </div>
           )}
           {consumptionCount === 0 ? (

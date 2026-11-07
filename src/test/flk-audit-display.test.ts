@@ -260,3 +260,66 @@ describe('consumptionToCSV', () => {
     expect(csv).toContain('سنسور وزن');
   });
 });
+
+// ═════════════════════════════════════════════════════════════
+// فاز ۸d — calculateFCR
+// ═════════════════════════════════════════════════════════════
+import { calculateFCR } from '../mod/flk/helpers-audit';
+
+const agg = (feedKg: number) => ({
+  totalFeedKg: feedKg, totalWaterL: 0,
+  byType: { feed: feedKg, water: 0 },
+  bySource: {}, bySex: { male: 0, female: 0, mixed: 0, unknown: 0 },
+  confidence: 'exact' as const, eventCount: 1, hasData: feedKg > 0,
+});
+
+const wEmpty = { male: { avg: 0, count: 0, cv: 0, hasData: false }, female: { avg: 0, count: 0, cv: 0, hasData: false }, mixed: { avg: 0, count: 0, cv: 0, hasData: false }, delta: null, hasData: false };
+
+describe('calculateFCR — insufficient', () => {
+  it('بدون دان → fcr=null، confidence=insufficient', () => {
+    const r = calculateFCR(agg(0), wEmpty, { currentCount: 100 }, 2.5);
+    expect(r.fcr).toBeNull();
+    expect(r.confidence).toBe('insufficient');
+  });
+});
+
+describe('calculateFCR — exact', () => {
+  it('دان ۵۰۰ + وزن کامل (male+female) → FCR=۲.۵', () => {
+    const w = { ...wEmpty,
+      male: { avg: 2.0, count: 10, cv: 5, hasData: true },
+      female: { avg: 1.5, count: 100, cv: 5, hasData: true },
+      hasData: true,
+    };
+    // live weight = 2.0*10 + 1.5*100 = 20 + 150 = 170
+    // FCR = 500 / 170 = 2.94
+    const r = calculateFCR(agg(500), w, { currentCount: 110, maleCount: 10, femaleCount: 100, unknownCount: 0 });
+    expect(r.confidence).toBe('exact');
+    expect(r.fcr).toBeCloseTo(2.94, 1);
+    expect(r.totalLiveWeightKg).toBe(170);
+  });
+  it('unsplit (فقط mixed) → exact', () => {
+    const w = { ...wEmpty, mixed: { avg: 1.8, count: 50, cv: 5, hasData: true }, hasData: true };
+    const r = calculateFCR(agg(360), w, { currentCount: 100, maleCount: 0, femaleCount: 0, unknownCount: 100 });
+    expect(r.confidence).toBe('exact');
+    expect(r.fcr).toBeCloseTo(2, 1);  // 360 / 180
+  });
+});
+
+describe('calculateFCR — standard fallback', () => {
+  it('بدون وزن، با standard → FCR از استاندارد', () => {
+    const r = calculateFCR(agg(500), wEmpty, { currentCount: 100 }, 2.3);
+    expect(r.confidence).toBe('standard');
+    expect(r.fcr).toBe(2.3);
+    expect(r.totalLiveWeightKg).toBeNull();
+  });
+  it('بدون وزن، بدون standard → fcr=null', () => {
+    const r = calculateFCR(agg(500), wEmpty, { currentCount: 100 }, null);
+    expect(r.fcr).toBeNull();
+    expect(r.confidence).toBe('insufficient');
+  });
+  it('وزن ناقص (male هست، female نیست ولی گله female دارد) → fallback استاندارد', () => {
+    const w = { ...wEmpty, male: { avg: 2, count: 10, cv: 5, hasData: true }, hasData: true };
+    const r = calculateFCR(agg(500), w, { currentCount: 110, maleCount: 10, femaleCount: 100, unknownCount: 0 }, 2.5);
+    expect(r.confidence).toBe('standard');
+  });
+});

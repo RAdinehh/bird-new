@@ -227,3 +227,92 @@ export function consumptionToCSV(events: ConsumptionEvent[] | undefined): string
   }
   return rows.map(r => r.map(csvCell).join(',')).join('\n');
 }
+
+// ═════════════════════════════════════════════════════════════
+// فاز ۸d — FCR engine
+// ═════════════════════════════════════════════════════════════
+import type { ConsumptionAggregate } from './consumptionEventsCalc';
+
+export interface FCRResult {
+  fcr: number | null;
+  confidence: 'exact' | 'standard' | 'insufficient';
+  totalFeedKg: number;
+  feedPerBird: number;
+  totalLiveWeightKg: number | null;
+  source: string;
+  note: string;
+}
+
+export function calculateFCR(
+  consumption: ConsumptionAggregate,
+  weightBySex: WeightBySex | null,
+  flock: {
+    currentCount?: number | null;
+    maleCount?: number | null;
+    femaleCount?: number | null;
+    unknownCount?: number | null;
+  },
+  standardFCR?: number | null,
+): FCRResult {
+  const totalFeedKg = consumption.totalFeedKg || 0;
+  const currentCount = flock.currentCount || 0;
+  const feedPerBird = currentCount > 0 ? totalFeedKg / currentCount : 0;
+  const r2 = (n: number) => Math.round(n * 100) / 100;
+
+  if (totalFeedKg <= 0) {
+    return {
+      fcr: null, confidence: 'insufficient', totalFeedKg: 0,
+      feedPerBird: 0, totalLiveWeightKg: null,
+      source: 'بدون ثبت دان', note: '',
+    };
+  }
+
+  // try exact from weight
+  let totalLiveWeight = 0;
+  let weightComplete = false;
+  if (weightBySex && weightBySex.hasData) {
+    const m = flock.maleCount ?? 0;
+    const f = flock.femaleCount ?? 0;
+    const u = flock.unknownCount ?? 0;
+    if (weightBySex.male.hasData && m > 0) totalLiveWeight += weightBySex.male.avg * m;
+    if (weightBySex.female.hasData && f > 0) totalLiveWeight += weightBySex.female.avg * f;
+    if (weightBySex.mixed.hasData && u > 0) totalLiveWeight += weightBySex.mixed.avg * u;
+    const okM = m === 0 || weightBySex.male.hasData;
+    const okF = f === 0 || weightBySex.female.hasData;
+    const okU = u === 0 || weightBySex.mixed.hasData;
+    weightComplete = okM && okF && okU && totalLiveWeight > 0;
+  }
+
+  if (weightComplete) {
+    return {
+      fcr: r2(totalFeedKg / totalLiveWeight),
+      confidence: 'exact',
+      totalFeedKg: r2(totalFeedKg),
+      feedPerBird: r2(feedPerBird),
+      totalLiveWeightKg: r2(totalLiveWeight),
+      source: 'دان + وزن واقعی',
+      note: `FCR = ${r2(totalFeedKg)}kg دان ÷ ${Math.round(totalLiveWeight)}kg وزن زنده`,
+    };
+  }
+
+  if (standardFCR && standardFCR > 0) {
+    return {
+      fcr: r2(standardFCR),
+      confidence: 'standard',
+      totalFeedKg: r2(totalFeedKg),
+      feedPerBird: r2(feedPerBird),
+      totalLiveWeightKg: null,
+      source: 'استاندارد نژاد',
+      note: 'وزن واقعی موجود نیست — FCR استاندارد نمایش داده می‌شود',
+    };
+  }
+
+  return {
+    fcr: null, confidence: 'insufficient',
+    totalFeedKg: r2(totalFeedKg),
+    feedPerBird: r2(feedPerBird),
+    totalLiveWeightKg: null,
+    source: 'دان فقط',
+    note: 'وزن و استاندارد هر دو غایب',
+  };
+}
