@@ -1166,3 +1166,39 @@ Deals (معاملات خاص) — چرخه کامل: Deal → Settlement → Inv
 - C5: auto-cancel (remaining=0 → nextReminderAt=undefined)
 - C6 (اختیاری): Statement log
 
+
+## جلسه 1405/11/08 (شماره 9 — C1 موتور محاسباتی)
+
+آخرین commit: 6d5395b1
+
+DONE — C1 کامل شد (16 commit):
+- C1.1: اسکلت shr/calc/ (types only) — 5d8322a9
+- C1.2a: FCR + Mortality + Egg + Weight — 4 commits
+- C1.2b: Feed + Water + Stocking + EPEF — 4 commits
+- C1.3: getThresholds + fix standards — 2 commits
+- C1.4a: 4 هزینه پایه — eee5c18c
+- C1.4b: totalCost + perKg + perEgg + revenue + profit — 879a2c9a
+- C1.4c: averages — 4a90c09c
+- C1.5a: Bovans Brown — 4f4b1b50
+- C1.5b: biological → biological-constants — 6d5395b1
+
+آمار:
+- commits: 16
+- تست‌های calc: 129 (12 فایل)
+- فایل‌های calc: 22
+- خطوط calc: ~1500
+- خطوط تست: 1800
+- صفر regression
+
+کشف‌ها:
+- biological.ts یتیم نبود (grep قبلی ناقص بود)
+- standards/layers.ts production نداشت (باگ 9 ماهه)
+- calculateFCR در helpers-audit.ts فرمول غلط دارد
+
+PENDING — گام بعدی:
+- C2 (پیشنهاد): اتصال calc به dlg
+  - useDlgSave → calculateFCR، calculateFeedMetrics، calculateAverages
+  - DailyLogsPage → metricهای محاسبه‌شده
+  - LogCard → metricها
+- جایگزین A: D (validation dlg)
+- جایگزین B: C3 (اتصال calc به dsh و flk)

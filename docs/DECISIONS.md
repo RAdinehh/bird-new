@@ -381,3 +381,55 @@
 **درس:** «کد = حقیقت»، سند فقط فرضیه. verify قبل از هر patch.
 
 **باز:** فاز ۴b — سه باگ B1/B2/B3 در `applyInvoiceFlocks` + revoke logic در `updateInvoice`.
+
+## جلسه 1405/11/08 (9 — C1 موتور محاسباتی)
+
+آخرین commit: 6d5395b1
+
+تصمیم 1 — موتور محاسباتی متمرکز در src/shr/calc/
+دلیل: 3 نسخه FCR، 3 henDay، 2 mortality پراکنده → یک منبع حقیقت
+
+تصمیم 2 — FCR استاندارد Aviagen
+فرمول: feedConsumedKg / ((finalWeightKg - initialWeightKg) × aliveCount)
+جایگزین فرمول قدیم helpers-audit.ts:246 که غلط بود
+
+تصمیم 3 — Mortality مخرج اصلاح شد
+قبل: deaths / aliveToday
+بعد: deaths / (aliveToday + deathsToday)
+
+تصمیم 4 — hen-housed اضافه شد (کنار hen-day)
+
+تصمیم 5 — Uniformity = درصد در بازه ±10٪ میانگین
+
+تصمیم 6 — Feed mode بر اساس سالن
+scoop/bag/semi_auto: precision اگر remaining موجود
+auto_sensor: همیشه precision
+auto_chain: همیشه simple
+
+تصمیم 7 — getThresholds از standards
+hardcode فقط: cvPct=12، uniformityPct=70، waterFeedRatio={min:1.5,max:2.5}
+weeklyPct تخمین: dailyPct × 5
+
+تصمیم 8 — Economics با InputMovement محلی (L9)
+
+تصمیم 9 — Revenue hybrid: invoices اولویت، prices fallback
+
+تصمیم 10 — biological.ts بازنشسته، 5 تابع یتیم حذف
+
+تصمیم 11 — Hy-Line/Lohmann production اضافه شد
+Hy-Line W36: peak 97٪، eggsPerYear 420، eggWeight 63.3g
+Lohmann Brown: peak 96٪، eggsPerYear 405، eggWeight 64.2g
+منبع: Hy-Line 2023، Lohmann 2024
+
+تصمیم 12 — Bovans Brown اضافه شد
+peak 95٪، eggsPerYear 400، eggWeight 63g
+منبع: Hendrix Genetics 2024
+
+درس‌های این جلسه:
+1. Heredoc __EOF__ در markdown شکسته می‌شود → PATCHEND
+2. Termux /tmp ندارد → ~/.bird_bak/
+3. Anchor باید یکتا باشد → content.count(anchor) == 1
+4. grep pattern ناقص = نتیجه اشتباه
+5. تست = مشخصات مطلوب، باگ production در standards کشف شد
+
+آخرین تصمیم: 1405/11/08
