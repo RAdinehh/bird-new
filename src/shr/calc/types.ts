@@ -389,3 +389,42 @@ export interface ProfitResult {
   marginPct: number;
   hasData: boolean;
 }
+
+
+// ═══════════════════════════════════════════════
+// Economics — C1.4c (averages)
+// ═══════════════════════════════════════════════
+
+export interface InputLog {
+  date: string;
+  feedConsumedKg: number;
+  waterAmountL: number;
+}
+
+export interface AveragesParams {
+  logs: InputLog[];
+  movements: InputMovement[];
+  items: InputItem[];
+  flockId?: string;
+  aliveCount: number;
+  fromDate?: string;
+  toDate?: string;
+}
+
+export interface AveragesResult {
+  avgFeedPerDayKg: number;
+  avgWaterPerDayL: number;
+
+  totalVaccines: number;
+  totalMedications: number;
+  totalHerbal: number;
+  totalLitterKg: number;
+
+  avgVaccinesPerBird: number;
+  avgMedicationsPerBird: number;
+  avgHerbalPerBird: number;
+  avgLitterPerBirdKg: number;
+
+  daysCount: number;
+  hasData: boolean;
+}

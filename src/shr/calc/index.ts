@@ -57,3 +57,7 @@ export { calculatePerKgCost } from './economics/perKgCost';
 export { calculatePerEggCost } from './economics/perEggCost';
 export { calculateRevenueFromInvoices, calculateRevenueFromPrices, calculateRevenue } from './economics/revenue';
 export { calculateProfit } from './economics/profit';
+
+
+// ═══ Economics — C1.4c ═══
+export { calculateAverages } from './economics/averages';
