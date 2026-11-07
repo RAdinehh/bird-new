@@ -204,32 +204,34 @@ export default function SexingModal({ open, onClose, flock }: Props) {
           <div style={{
             padding: '10px 12px',
             background: 'var(--card)',
-            border: `1px solid ${mismatch ? 'var(--danger)' : 'var(--accent)'}`,
+            border: `1px solid ${noInput ? 'var(--border)' : mismatch ? 'var(--danger)' : 'var(--accent)'}`,
             borderRadius: 'var(--r-md)',
             fontSize: 'var(--fs-sm)',
             fontWeight: 700,
-            color: mismatch ? 'var(--danger)' : 'var(--accent)',
+            color: noInput ? 'var(--muted)' : mismatch ? 'var(--danger)' : 'var(--accent)',
             textAlign: 'center',
           }}>
-            {mismatch
-              ? `✗ ${toFa(totalInput.toLocaleString('fa-IR'))} / ${toFa(currentCount.toLocaleString('fa-IR'))}`
-              : `✓ ${toFa(totalInput.toLocaleString('fa-IR'))} = ${toFa(currentCount.toLocaleString('fa-IR'))}`}
+            {noInput
+              ? `${toFa(currentCount.toLocaleString('fa-IR'))} = ${toFa(currentCount.toLocaleString('fa-IR'))}`
+              : mismatch
+                ? `✗ ${toFa(totalInput.toLocaleString('fa-IR'))} / ${toFa(currentCount.toLocaleString('fa-IR'))}`
+                : `✓ ${toFa(totalInput.toLocaleString('fa-IR'))} = ${toFa(currentCount.toLocaleString('fa-IR'))}`}
           </div>
         </Field>
       </Grid2>
 
-      {/* 🆕 Smart Guide — یک خط، گویا */}
-      {noInput ? (
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', marginBottom: 8, lineHeight: 1.6 }}>
-          💡 تعداد نر یا ماده را وارد کنید — سومین فیلد خودکار محاسبه می‌شود
-        </div>
-      ) : autoFillField ? (
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', marginBottom: 8, lineHeight: 1.6 }}>
-          ✓ {autoFillField === 'male' ? 'نر' : autoFillField === 'female' ? 'ماده' : 'نامشخص'} به‌طور خودکار <b>{toFa(autoFillValue)}</b> محاسبه شد
-        </div>
-      ) : mismatch ? (
+      {/* 🆕 Smart Guide — فقط وقتی اطلاعات جدید دارد */}
+      {mismatch ? (
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', marginBottom: 8, lineHeight: 1.6 }}>
           ⚠️ {toFa(Math.abs(diff))} پرنده {diff > 0 ? 'بیشتر' : 'کمتر'} — ثبت‌شده {toFa(totalInput)}، نیاز {toFa(currentCount)}
+        </div>
+      ) : autoFillField ? (
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--info)', marginBottom: 8, lineHeight: 1.6 }}>
+          💡 {autoFillField === 'male' ? 'نر' : autoFillField === 'female' ? 'ماده' : 'نامشخص'} = <b>{toFa(autoFillValue)}</b> (خودکار محاسبه شد)
+        </div>
+      ) : noInput ? (
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 8, lineHeight: 1.6 }}>
+          💡 تعداد نر یا ماده را وارد کنید — سومین فیلد خودکار محاسبه می‌شود
         </div>
       ) : null}
 
