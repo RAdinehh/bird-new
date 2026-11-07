@@ -178,36 +178,135 @@ export default function SexingModal({ open, onClose, flock }: Props) {
           />
         </Field>
         <Field label="جمع کل">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {/* کادر جمع — فقط عدد */}
-            <div style={{
-              padding: '10px 12px',
-              background: mismatch ? 'var(--danger-soft)' : 'var(--accent-soft)',
-              border: `1px solid ${mismatch ? 'var(--danger)' : 'var(--accent-border)'}`,
-              borderRadius: 'var(--r-md)',
-              fontSize: 'var(--fs-sm)',
-              fontWeight: 700,
-              color: mismatch ? 'var(--danger)' : 'var(--accent)',
-              textAlign: 'center',
-            }}>
-              {mismatch
-                ? `✗ ${toFa(totalInput.toLocaleString('fa-IR'))} / ${toFa(currentCount.toLocaleString('fa-IR'))}`
-                : `✓ ${toFa(totalInput.toLocaleString('fa-IR'))} = ${toFa(currentCount.toLocaleString('fa-IR'))}`}
-            </div>
-            {/* hint زیر کادر */}
-            {isUnknownAuto && maleNum + femaleNum > 0 && remaining > 0 && (
-              <div style={{ fontSize: 10, fontWeight: 400, color: 'var(--muted)', textAlign: 'center' }}>
-                شامل {toFa(remaining)} نامشخص (خودکار)
-              </div>
-            )}
-            {!isUnknownAuto && mismatch && (
-              <div style={{ fontSize: 10, fontWeight: 400, color: mismatch ? 'var(--danger)' : 'var(--muted)', textAlign: 'center' }}>
-                {diff > 0 ? `${toFa(diff)} بیشتر` : `${toFa(-diff)} کمتر`}
-              </div>
-            )}
+          <div style={{
+            padding: '10px 12px',
+            background: mismatch ? 'var(--danger-soft)' : 'var(--accent-soft)',
+            border: `1px solid ${mismatch ? 'var(--danger)' : 'var(--accent-border)'}`,
+            borderRadius: 'var(--r-md)',
+            fontSize: 'var(--fs-sm)',
+            fontWeight: 700,
+            color: mismatch ? 'var(--danger)' : 'var(--accent)',
+            textAlign: 'center',
+          }}>
+            {mismatch
+              ? `✗ ${toFa(totalInput.toLocaleString('fa-IR'))} / ${toFa(currentCount.toLocaleString('fa-IR'))}`
+              : `✓ ${toFa(totalInput.toLocaleString('fa-IR'))} = ${toFa(currentCount.toLocaleString('fa-IR'))}`}
           </div>
         </Field>
       </Grid2>
+
+      {/* 🆕 Smart Guide — full width، context-aware */}
+      {noInput ? (
+        <div style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: 8,
+          padding: '10px 12px',
+          background: 'var(--warn-soft)',
+          border: '1px solid var(--warn)',
+          borderRadius: 'var(--r-md)',
+          marginBottom: 8,
+          fontSize: 'var(--fs-sm)',
+          color: 'var(--warn)',
+          lineHeight: 1.7,
+        }}>
+          <span style={{ fontSize: 18, flexShrink: 0 }}>💡</span>
+          <div style={{ flex: 1 }}>
+            <b>برای شروع، تعداد نر یا ماده را وارد کنید.</b>
+            <div style={{ fontSize: 'var(--fs-xs)', marginTop: 2, opacity: 0.85 }}>
+              باقی‌مانده به‌طور خودکار در «نامشخص» قرار می‌گیرد.
+            </div>
+          </div>
+        </div>
+      ) : isUnknownAuto && remaining > 0 && maleNum > 0 && femaleNum > 0 ? (
+        <div style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: 8,
+          padding: '10px 12px',
+          background: 'var(--accent-soft)',
+          border: '1px solid var(--accent-border)',
+          borderRadius: 'var(--r-md)',
+          marginBottom: 8,
+          fontSize: 'var(--fs-sm)',
+          color: 'var(--accent)',
+          lineHeight: 1.7,
+        }}>
+          <span style={{ fontSize: 18, flexShrink: 0 }}>✓</span>
+          <div style={{ flex: 1 }}>
+            <b>{toFa(remaining)} پرنده نامشخص</b> به‌طور خودکار محاسبه شد.
+            <div style={{ fontSize: 'var(--fs-xs)', marginTop: 2, opacity: 0.85 }}>
+              {toFa(maleNum)} نر + {toFa(femaleNum)} ماده + {toFa(remaining)} نامشخص = {toFa(currentCount)}
+            </div>
+          </div>
+        </div>
+      ) : isUnknownAuto && remaining > 0 && maleNum > 0 ? (
+        <div style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: 8,
+          padding: '10px 12px',
+          background: 'var(--info-soft)',
+          border: '1px solid var(--info)',
+          borderRadius: 'var(--r-md)',
+          marginBottom: 8,
+          fontSize: 'var(--fs-sm)',
+          color: 'var(--info)',
+          lineHeight: 1.7,
+        }}>
+          <span style={{ fontSize: 18, flexShrink: 0 }}>ℹ️</span>
+          <div style={{ flex: 1 }}>
+            <b>فقط نر وارد کرده‌اید.</b> {toFa(remaining)} باقی‌مانده در «نامشخص» قرار گرفت.
+            <div style={{ fontSize: 'var(--fs-xs)', marginTop: 2, opacity: 0.85 }}>
+              اگر تعداد ماده را می‌دانید، وارد کنید.
+            </div>
+          </div>
+        </div>
+      ) : isUnknownAuto && remaining > 0 && femaleNum > 0 ? (
+        <div style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: 8,
+          padding: '10px 12px',
+          background: 'var(--info-soft)',
+          border: '1px solid var(--info)',
+          borderRadius: 'var(--r-md)',
+          marginBottom: 8,
+          fontSize: 'var(--fs-sm)',
+          color: 'var(--info)',
+          lineHeight: 1.7,
+        }}>
+          <span style={{ fontSize: 18, flexShrink: 0 }}>ℹ️</span>
+          <div style={{ flex: 1 }}>
+            <b>فقط ماده وارد کرده‌اید.</b> {toFa(remaining)} باقی‌مانده در «نامشخص» قرار گرفت.
+            <div style={{ fontSize: 'var(--fs-xs)', marginTop: 2, opacity: 0.85 }}>
+              اگر تعداد نر را می‌دانید، وارد کنید.
+            </div>
+          </div>
+        </div>
+      ) : !isUnknownAuto && mismatch ? (
+        <div style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: 8,
+          padding: '10px 12px',
+          background: 'var(--danger-soft)',
+          border: '1px solid var(--danger)',
+          borderRadius: 'var(--r-md)',
+          marginBottom: 8,
+          fontSize: 'var(--fs-sm)',
+          color: 'var(--danger)',
+          lineHeight: 1.7,
+        }}>
+          <span style={{ fontSize: 18, flexShrink: 0 }}>⚠️</span>
+          <div style={{ flex: 1 }}>
+            <b>{toFa(Math.abs(diff))} پرنده {diff > 0 ? 'بیشتر' : 'کمتر'}</b> از تعداد زنده ثبت شده است.
+            <div style={{ fontSize: 'var(--fs-xs)', marginTop: 2, opacity: 0.85 }}>
+              ثبت شده: {toFa(totalInput)} · مورد نیاز: {toFa(currentCount)}
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <Field label="تاریخ تفکیک">
         <DatePicker value={date} onChange={setDate} />
