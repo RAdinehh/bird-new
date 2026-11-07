@@ -125,6 +125,17 @@ const [, _setTick] = useState(0);
     [activeFlocks]
   );
 
+  // 🆕 C3a — laying count: فقط layer/breeder + femaleCount برای گله sexed
+  const layingAliveCount = useMemo(() =>
+    activeFlocks
+      .filter(f => f.type === 'layer' || f.type === 'breeder')
+      .reduce((a, f) => {
+        if (f.femaleCount && f.femaleCount > 0) return a + f.femaleCount;
+        return a + (f.currentCount || f.initialCount || 0);
+      }, 0),
+    [activeFlocks]
+  );
+
   const totalInitial = useMemo(() =>
     activeFlocks.reduce((a, f) => a + (f.initialCount || 0), 0),
     [activeFlocks]
@@ -143,12 +154,12 @@ const [, _setTick] = useState(0);
       const prods = productions.filter(p => p.date === key);
       prods.forEach(p => last7.push(p));
     }
-    if (last7.length === 0 || aliveCount === 0) return 0;
+    if (last7.length === 0 || layingAliveCount === 0) return 0;
     const totalHealthy = last7.reduce((a, p) => a + healthyCount(p), 0);
     const days = new Set(last7.map(p => p.date)).size;
     if (days === 0) return 0;
-    return (totalHealthy / (aliveCount * days)) * 100;
-  }, [productions, aliveCount]);
+    return (totalHealthy / (layingAliveCount * days)) * 100;
+  }, [productions, layingAliveCount]);
 
   // تخم شکسته درصد — ۷ روز
   const brokenRate7 = useMemo(() => {
