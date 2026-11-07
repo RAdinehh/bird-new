@@ -9,6 +9,8 @@ import type {
 } from './types';
 import { getProfile } from './fieldProfiles';
 import { getTempIdeal } from '../validation/biological-constants';
+import { getThresholds } from '../calc/thresholds';
+import type { CalcContext } from '../calc/types';
 import { getHistory, HistoryOptions, getUserPattern } from './historyStore';
 
 // ══════════════════════════════════════════════════════════════════
@@ -178,11 +180,40 @@ export function analyzeAnomaly(
   if (typeof context.expected === 'number' && Number.isFinite(context.expected)) {
     expected = context.expected;
   }
+  let _rangeMin: number | null = null;
+  let _rangeMax: number | null = null;
+
   if (expected === null && profile.expectedFrom === 'species_temp') {
-    expected = getTempIdeal(context.species, profile.fieldPath);
-  }
-  if (expected === null && profile.expectedFrom === 'species_temp') {
-    expected = getTempIdeal(context.species, profile.fieldPath);
+    if (context.breedKey && context.ageDays != null) {
+      try {
+        const calcCtx: CalcContext = {
+          breedId: context.breedKey,
+          flockType: ((context as any).flockType as 'broiler' | 'layer' | 'breeder' | 'ornamental') ?? 'broiler',
+          ageDays: context.ageDays,
+          aliveCount: context.flockSize ?? context.currentCount ?? 0,
+          initialCount: context.flockSize ?? 0,
+        };
+        const th = getThresholds(calcCtx);
+        if (profile.kind === 'temperature' && th.temp) {
+          const suffix = profile.fieldPath.slice(-3);
+          expected = suffix === 'Min' ? th.temp.min
+                   : suffix === 'Max' ? th.temp.max
+                   : th.temp.target;
+          _rangeMin = th.temp.min;
+          _rangeMax = th.temp.max;
+        } else if (profile.kind === 'humidity' && th.humidity) {
+          const suffix = profile.fieldPath.slice(-3);
+          expected = suffix === 'Min' ? th.humidity.min
+                   : suffix === 'Max' ? th.humidity.max
+                   : th.humidity.target;
+          _rangeMin = th.humidity.min;
+          _rangeMax = th.humidity.max;
+        }
+      } catch { /* silent — fallback to biological */ }
+    }
+    if (expected === null) {
+      expected = getTempIdeal(context.species, profile.fieldPath);
+    }
   }
   if (expected === null && profile.expectedFrom === 'cross_field' && profile.crossFieldRule) {
     expected = getCrossFieldExpected(profile.crossFieldRule, context);
@@ -204,23 +235,39 @@ export function analyzeAnomaly(
   if (profile.comparison !== 'absolute' && expected !== null && expected > 0) {
     const isMin = profile.fieldPath.endsWith('Min');
     const isMax = profile.fieldPath.endsWith('Max');
-    const targetVal = context.expected;
+    const targetVal = context.expected ?? expected;
 
     // ─── دما: آستانه بر اساس اختلاف مطلق از target (برای کاربر تازه هم حساس) ───
-    if (profile.kind === 'temperature' && typeof targetVal === 'number' && (isMin || isMax)) {
-      const diff = isMin
-        ? Math.max(0, targetVal - value)
-        : Math.max(0, value - targetVal);
+    if (profile.kind === 'temperature' && typeof targetVal === 'number') {
+      let diff = 0;
+      if (_rangeMin != null && _rangeMax != null && !isMin && !isMax) {
+        if (value < _rangeMin) diff = _rangeMin - value;
+        else if (value > _rangeMax) diff = value - _rangeMax;
+      } else if (isMin) {
+        diff = Math.max(0, targetVal - value);
+      } else if (isMax) {
+        diff = Math.max(0, value - targetVal);
+      } else {
+        diff = Math.abs(value - targetVal);
+      }
       if (diff > 12) signals.push({ type: 'ratio', weight: 5, detail: `${diff.toFixed(1)}°C خارج از هدف` });
       else if (diff > 8) signals.push({ type: 'ratio', weight: 4, detail: `${diff.toFixed(1)}°C خارج از هدف` });
       else if (diff > 5) signals.push({ type: 'ratio', weight: 3, detail: `${diff.toFixed(1)}°C خارج از هدف` });
       else if (diff > 3) signals.push({ type: 'ratio', weight: 2, detail: `${diff.toFixed(1)}°C خارج از هدف` });
     }
     // ─── رطوبت: آستانه اختصاصی (٪) ───
-    else if (profile.kind === 'humidity' && typeof targetVal === 'number' && (isMin || isMax)) {
-      const diff = isMin
-        ? Math.max(0, targetVal - value)
-        : Math.max(0, value - targetVal);
+    else if (profile.kind === 'humidity' && typeof targetVal === 'number') {
+      let diff = 0;
+      if (_rangeMin != null && _rangeMax != null && !isMin && !isMax) {
+        if (value < _rangeMin) diff = _rangeMin - value;
+        else if (value > _rangeMax) diff = value - _rangeMax;
+      } else if (isMin) {
+        diff = Math.max(0, targetVal - value);
+      } else if (isMax) {
+        diff = Math.max(0, value - targetVal);
+      } else {
+        diff = Math.abs(value - targetVal);
+      }
       if (diff > 30) signals.push({ type: 'ratio', weight: 5, detail: `${diff.toFixed(0)}٪ خارج از هدف` });
       else if (diff > 20) signals.push({ type: 'ratio', weight: 4, detail: `${diff.toFixed(0)}٪ خارج از هدف` });
       else if (diff > 12) signals.push({ type: 'ratio', weight: 3, detail: `${diff.toFixed(0)}٪ خارج از هدف` });

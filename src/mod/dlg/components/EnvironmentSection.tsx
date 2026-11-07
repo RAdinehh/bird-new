@@ -36,13 +36,13 @@ export default function EnvironmentSection({ form, setForm, vErrors, showError, 
           <Field label="حداقل دما" hint="۱۵-۳۰ درجه" error={showError('temperatureMin')}>
             <NumField placeholder="۲۰" value={form.temperatureMin} onChange={e => setForm({ ...form, temperatureMin: e.target.value })} unit="°C" min={-10} max={50} />
           </Field>
-          {!showError('temperatureMin') && <FieldHint fieldPath="dlg.temperatureMin" value={form.temperatureMin} context={targetTemp !== null ? { expected: targetTemp } : {}} />}
+          {!showError('temperatureMin') && <FieldHint fieldPath="dlg.temperatureMin" value={form.temperatureMin} context={{ expected: targetTemp ?? undefined, breedKey: flock?.breedId, ageDays: flockAge ?? undefined }} />}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
           <Field label="حداکثر دما" hint="۱۵-۳۰ درجه" error={showError('temperatureMax')}>
             <NumField placeholder="۲۵" value={form.temperatureMax} onChange={e => setForm({ ...form, temperatureMax: e.target.value })} unit="°C" min={-10} max={50} />
           </Field>
-          {!showError('temperatureMax') && <FieldHint fieldPath="dlg.temperatureMax" value={form.temperatureMax} context={targetTemp !== null ? { expected: targetTemp } : {}} />}
+          {!showError('temperatureMax') && <FieldHint fieldPath="dlg.temperatureMax" value={form.temperatureMax} context={{ expected: targetTemp ?? undefined, breedKey: flock?.breedId, ageDays: flockAge ?? undefined }} />}
         </div>
       </Grid2>
 
@@ -51,13 +51,13 @@ export default function EnvironmentSection({ form, setForm, vErrors, showError, 
           <Field label="حداقل رطوبت" hint="۴۰-۷۰٪" error={showError('humidityMin')}>
             <PercentField placeholder="۵۰" value={form.humidityMin} onChange={e => setForm({ ...form, humidityMin: e.target.value })} />
           </Field>
-          {!showError('humidityMin') && <FieldHint fieldPath="dlg.humidityMin" value={form.humidityMin} context={targetHumidity !== null ? { expected: targetHumidity } : {}} />}
+          {!showError('humidityMin') && <FieldHint fieldPath="dlg.humidityMin" value={form.humidityMin} context={{ expected: targetHumidity ?? undefined, breedKey: flock?.breedId, ageDays: flockAge ?? undefined }} />}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
           <Field label="حداکثر رطوبت" hint="۴۰-۷۰٪" error={showError('humidityMax')}>
             <PercentField placeholder="۷۰" value={form.humidityMax} onChange={e => setForm({ ...form, humidityMax: e.target.value })} />
           </Field>
-          {!showError('humidityMax') && <FieldHint fieldPath="dlg.humidityMax" value={form.humidityMax} context={targetHumidity !== null ? { expected: targetHumidity } : {}} />}
+          {!showError('humidityMax') && <FieldHint fieldPath="dlg.humidityMax" value={form.humidityMax} context={{ expected: targetHumidity ?? undefined, breedKey: flock?.breedId, ageDays: flockAge ?? undefined }} />}
         </div>
       </Grid2>
 
