@@ -98,8 +98,6 @@ export interface DailyLog {
   eatingEggs?: number | null;
   fertileEggs?: number | null;
   otherEggs?: number | null;
-  brokenTarget?: 'saleable' | 'lost';
-  otherTarget?: 'saleable' | 'lost';
 
   // تلفات
   deathsCount: number;
@@ -147,8 +145,6 @@ export const useDlg = create<State>()(
           eatingEggs: (l as any).eatingEggs ?? null,
           fertileEggs: (l as any).fertileEggs ?? null,
           otherEggs: (l as any).otherEggs ?? null,
-          brokenTarget: (l as any).brokenTarget || 'saleable',
-          otherTarget: (l as any).otherTarget || 'saleable',
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         } as DailyLog;

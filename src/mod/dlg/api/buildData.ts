@@ -107,8 +107,6 @@ export function buildLogData(input: BuildDataInput): Omit<DailyLog, 'id' | 'stat
     fertileEggs: int(form.fertileEggs),
     brokenEggs: int(form.brokenEggs),
     otherEggs: int(form.otherEggs),
-    brokenTarget: (form as any).brokenTarget || 'saleable',
-    otherTarget: (form as any).otherTarget || 'saleable',
     weightSamples: form.weightSamples
       .map(w => ({ id: w.id, weight: num(w.weight) || 0 }))
       .filter(w => w.weight > 0),

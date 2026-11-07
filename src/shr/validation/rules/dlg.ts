@@ -55,8 +55,6 @@ export function createDlgSchema(context: ValidationContext = {}) {
     fertileEggs: intRange('تخم نطفه‌دار', 0, 100000),
     brokenEggs: intRange('تخم شکسته', 0, 100000),
     otherEggs: intRange('تخم سایر', 0, 100000),
-    brokenTarget: z.enum(['saleable', 'lost']).default('saleable'),
-    otherTarget: z.enum(['saleable', 'lost']).default('saleable'),
 
     // تلفات
     deathsCount: intRange('تلفات', 0, 100000),

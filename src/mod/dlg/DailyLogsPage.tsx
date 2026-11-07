@@ -120,8 +120,6 @@ export default function DailyLogsPage() {
       fertileEggs: int(form.fertileEggs) ?? 0,
       brokenEggs: int(form.brokenEggs) ?? 0,
       otherEggs: int(form.otherEggs) ?? 0,
-      brokenTarget: form.brokenTarget || 'saleable',
-      otherTarget: form.otherTarget || 'saleable',
       deathsCount: form.deaths.reduce((a, x) => a + (x.count || 0), 0),
       deaths: form.deaths,
       vaccines: form.vaccines,

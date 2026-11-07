@@ -48,9 +48,6 @@ describe('migration — v5 → v10', () => {
   });
 });
 
-describe('migration — v7 → v10', () => {
-  
-  });
 
 
 describe('migration — defensive v10 (v7 failed case)', () => {

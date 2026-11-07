@@ -9,8 +9,6 @@ const mkBase = (overrides: any = {}) => ({
   fertileEggs: 0,
   brokenEggs: 0,
   otherEggs: 0,
-  brokenTarget: 'saleable' as const,
-  otherTarget: 'saleable' as const,
   deathsCount: 0,
   deaths: [],
   vaccines: [],
