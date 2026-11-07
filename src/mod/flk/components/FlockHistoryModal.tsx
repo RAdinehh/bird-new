@@ -662,33 +662,32 @@ function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        padding: '8px 0',
+        padding: '10px 0',
         borderBottom: '1px dashed var(--border)',
-        fontSize: 'var(--fs-sm)',
       }}>
         {/* برچسب جنسیت */}
-        <div style={{ width: 70, display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700, color: tone, flexShrink: 0 }}>
+        <div style={{ width: 70, display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700, color: tone, flexShrink: 0, fontSize: 'var(--fs-sm)' }}>
           <span>{icon}</span>
           <span>{label}</span>
         </div>
 
         {/* قبل و بعد */}
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 28 }}>
-            <span style={{ fontSize: 8, color: 'var(--muted)' }}>قبل</span>
-            <span style={{ color: 'var(--muted)', fontFamily: 'monospace' }}>{toFa(before)}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 40 }}>
+            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 2 }}>قبل</span>
+            <span style={{ color: 'var(--muted)', fontFamily: 'monospace', fontSize: 'var(--fs-base)', fontWeight: 600 }}>{toFa(before)}</span>
           </div>
-          <span style={{ color: 'var(--dim)', fontSize: 12, marginTop: 8 }}>←</span>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 28 }}>
-            <span style={{ fontSize: 8, color: 'var(--muted)' }}>بعد</span>
-            <span style={{ fontWeight: 700, color: 'var(--text)', fontFamily: 'monospace' }}>{toFa(after)}</span>
+          <span style={{ color: 'var(--dim)', fontSize: 14, marginTop: 14 }}>←</span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 40 }}>
+            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 2 }}>بعد</span>
+            <span style={{ fontWeight: 700, color: 'var(--text)', fontFamily: 'monospace', fontSize: 'var(--fs-base)' }}>{toFa(after)}</span>
           </div>
         </div>
 
         {/* دلتا */}
-        <div style={{ width: 60, textAlign: 'left', fontWeight: 700, color: deltaColor, fontFamily: 'monospace', flexShrink: 0 }}>
+        <div style={{ width: 60, textAlign: 'left', fontWeight: 700, color: deltaColor, fontFamily: 'monospace', flexShrink: 0, fontSize: 'var(--fs-sm)' }}>
           {isNoChange ? (
-            <span style={{ color: 'var(--muted)', fontSize: 10 }}>بدون تغییر</span>
+            <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>بدون تغییر</span>
           ) : (
             <span>{delta > 0 ? '+' : ''}{toFa(delta)}</span>
           )}
