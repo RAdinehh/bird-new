@@ -779,20 +779,26 @@ function EventRow({ e, onRevoke, runningTotals }: { e: FlockEvent; onRevoke: () 
         </div>
       )}
 
-      {/* ═══ سطر ۳ — دلیل + هشدار در یک خط ═══ */}
-      {(e.reason || isManualCorrection) && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 'var(--fs-sm)' }}>
-          {e.reason && (
-            <>
-              <span style={{ color: 'var(--muted)' }}>دلیل:</span>
-              <b style={{ color: 'var(--text)' }}>{e.reason}</b>
-            </>
-          )}
-          {isManualCorrection && (
-            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 600 }}>
-              ⚠️ ثبت دستی — بدون سند در «ثبت روزانه»
-            </span>
-          )}
+      {/* ═══ سطر ۳ — دلیل ═══ */}
+      {e.reason && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-sm)' }}>
+          <span style={{ color: 'var(--muted)' }}>دلیل:</span>
+          <b style={{ color: 'var(--text)' }}>{e.reason}</b>
+        </div>
+      )}
+
+      {/* ═══ سطر ۴ — هشدار «ثبت نشده» (زیر دلیل) ═══ */}
+      {isManualCorrection && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          fontSize: 'var(--fs-sm)',
+          color: 'var(--warn)',
+          fontWeight: 500,
+        }}>
+          <span>⚠️</span>
+          <span>این تغییر در «ثبت روزانه» سیستم ثبت نشده است.</span>
         </div>
       )}
 
