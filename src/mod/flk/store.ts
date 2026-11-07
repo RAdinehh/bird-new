@@ -6,7 +6,7 @@ import { todayJ } from './api/flocksCalc';
 import { showToast } from '../../cor/store/toast';
 import { matchesGroupRule, EVENT_LABEL } from './helpers-store';
 import { flkMigrate } from './migrations';
-import type { FlockType, FlockStatus, FlockEvent, FlockEventReasonCode, FlockEventSex, FlockMergeSource, FlockMergeInfo, FlockDealType, FlockDealData, FlockGroupType, FlockGroupRule, FlockGroup, FlockGroupMember } from './types-store';
+import type { FlockType, FlockStatus, FlockEvent, FlockEventReasonCode, FlockEventSex, FlockMergeSource, FlockMergeInfo, FlockDealType, FlockDealData, FlockGroupType, FlockGroupRule, FlockGroup, FlockGroupMember, ConsumptionEvent } from './types-store';
 export * from './types-store';
 export * from './helpers-store';
 
@@ -114,7 +114,13 @@ export interface State {
   flocks: Flock[];
   groups: FlockGroup[];
   groupMembers: FlockGroupMember[];
+  consumptionEvents: ConsumptionEvent[];
   addEvent: (flockId: string, ev: Omit<FlockEvent, 'id'|'flockId'|'createdAt'>) => void;
+  // 🆕 فاز ۸a — ConsumptionEvent
+  addConsumptionEvent: (ev: Omit<ConsumptionEvent, 'id' | 'createdAt' | 'updatedAt'>) => string;
+  updateConsumptionEvent: (id: string, patch: Partial<ConsumptionEvent>) => void;
+  removeConsumptionEvent: (id: string) => void;
+  listConsumptionEvents: (flockId: string) => ConsumptionEvent[];
   /** 🆕 ثبت تفکیک جنسیت (تعادل پیوسته) */
   recordSexing: (flockId: string, params: {
     male: number;
@@ -160,6 +166,7 @@ export const useFlk = create<State>()(
       flocks: [],
       groups: [],
       groupMembers: [],
+      consumptionEvents: [],
       add: (f) => {
         const id = uuid();
         // 🆕 فیکس: auto genderSplitAt
@@ -502,6 +509,32 @@ export const useFlk = create<State>()(
     return { ...f, ...patch, events: [...(f.events || []), newEvent], sexBalanceEvents: _newBalanceEvents, updatedAt: now() };
         })
       }),
+      // 🆕 فاز ۸a — ConsumptionEvent
+      addConsumptionEvent: (ev) => {
+        const id = uuid();
+        const nowTs = now();
+        const newEv: ConsumptionEvent = {
+          ...ev,
+          id,
+          createdAt: nowTs,
+          updatedAt: nowTs,
+        };
+        set({ consumptionEvents: [...get().consumptionEvents, newEv] });
+        return id;
+      },
+      updateConsumptionEvent: (id, patch) => set({
+        consumptionEvents: get().consumptionEvents.map(e =>
+          e.id === id ? { ...e, ...patch, updatedAt: now() } : e
+        ),
+      }),
+      removeConsumptionEvent: (id) => set({
+        consumptionEvents: get().consumptionEvents.filter(e => e.id !== id),
+      }),
+      listConsumptionEvents: (flockId) => {
+        return get().consumptionEvents
+          .filter(e => e.flockId === flockId)
+          .sort((a, b) => b.date.localeCompare(a.date));
+      },
       addCorrection: (flockId, delta, reasonCode, reasonLabel, notes) => set({
         flocks: get().flocks.map(f => {
           if (f.id !== flockId) return f;

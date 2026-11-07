@@ -127,3 +127,36 @@ export interface FlockGroupMember {
   weight?: number;
   notes?: string;
 }
+
+// ═════════════════════════════════════════════════════════════
+// ConsumptionEvent — مدل universal ثبت دان/آب
+// فاز ۸a — از Equipment موجود استفاده می‌کند (category='feeding'|'drinking')
+// ═════════════════════════════════════════════════════════════
+export type ConsumptionType = 'feed' | 'water';
+
+export type ConsumptionSource =
+  | 'daily_manual'      // ثبت روزانه دستی
+  | 'bulk_manual'       // پر کردن سطل/دانخوری
+  | 'sensor_scale'      // سنسور وزن روی سیلو
+  | 'sensor_level'      // سنسور سطح
+  | 'auto_feeder'       // دانخوری/آبخوری هوشمند
+  | 'inferred';         // محاسبه‌شده از اختلاف
+
+export type ConsumptionConfidence = 'exact' | 'estimated' | 'standard';
+
+export interface ConsumptionEvent {
+  id: string;
+  flockId: string;
+  type: ConsumptionType;       // 'feed' | 'water'
+  date: string;
+  endDate?: string;
+  amount: number;              // عدد (kg یا L)
+  unit: 'kg' | 'L';
+  sex: '' | 'male' | 'female' | 'mixed';
+  source: ConsumptionSource;
+  confidence: ConsumptionConfidence;
+  equipmentId?: string;        // FK → Equipment (category='feeding'|'drinking')
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
