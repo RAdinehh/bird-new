@@ -427,9 +427,9 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <button type="button" onClick={handleSaveCorrection} disabled={num === 0 || newCount < 0} style={{
               height: 40,
-              background: (num === 0 || newCount < 0) ? 'var(--input-bg)' : 'var(--accent)',
+              background: (num === 0 || newCount < 0) ? 'var(--input-bg)' : 'var(--warn)',
               color: (num === 0 || newCount < 0) ? 'var(--muted)' : 'white',
-              border: '1px solid ' + ((num === 0 || newCount < 0) ? 'var(--border)' : 'var(--accent)'),
+              border: '1px solid ' + ((num === 0 || newCount < 0) ? 'var(--border)' : 'var(--warn)'),
               borderRadius: 'var(--r-md)',
               fontFamily: 'inherit',
               fontSize: 'var(--fs-sm)',
@@ -728,7 +728,15 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
         </div>
       )}
 
-      {/* ═══ سطر ۴ — هشدار (سطح ۳، ساده) ═══ */}
+      {/* ═══ سطر ۴ — یادداشت (حرف کاربر) ═══ */}
+      {e.notes && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-sm)' }}>
+          <span style={{ color: 'var(--muted)' }}>یادداشت:</span>
+          <span style={{ color: 'var(--text)' }}>{e.notes}</span>
+        </div>
+      )}
+
+      {/* ═══ سطر ۵ — هشدار سیستم ═══ */}
       {isManualCorrection && (
         <div style={{
           display: 'flex',
@@ -740,13 +748,6 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
         }}>
           <span>⚠️</span>
           <span>این تغییر در «ثبت روزانه» سیستم ثبت نشده است.</span>
-        </div>
-      )}
-
-      {/* ═══ سطر ۵ — یادداشت ═══ */}
-      {e.notes && (
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-          📝 {e.notes}
         </div>
       )}
     </div>
