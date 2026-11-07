@@ -10,6 +10,7 @@ import DatePicker from '../../../shr/components/DatePicker';
 import { HELP } from '../../../shr/help/helpTexts';
 import { useFlk, type Flock } from '../store';
 import { toastMsg } from '../../../cor/store/toast';
+import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toFa } from '../../../shr/utils/fa';
 
 interface Props {
@@ -68,13 +69,29 @@ export default function SexingModal({ open, onClose, flock }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, flock?.id]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!flock) return;
     if (mismatch) {
       setErr(`جمع (${totalInput}) با تعداد زنده (${currentCount}) برابر نیست — اختلاف: ${diff}`);
       return;
     }
     if (noInput) { setErr('حداقل یکی از نر یا ماده باید بیشتر از صفر باشد'); return; }
+
+    // 🆕 کانفرم قبل از ثبت (فاز ۳ تکمیلی)
+    const _isFirst = !flock.genderSplitAt;
+    const _before = {
+      m: flock.maleCount ?? 0,
+      f: flock.femaleCount ?? 0,
+      u: flock.unknownCount ?? 0,
+    };
+    const _msg = _isFirst
+      ? `تفکیک اولیه گله «${flock.name}»:\n♂ ${maleNum} · ♀ ${femaleNum} · ? ${unknownNum}\nجمع: ${totalInput} = زنده: ${currentCount}`
+      : `تغییر تفکیک گله «${flock.name}»:\nاز: ♂ ${_before.m} · ♀ ${_before.f} · ? ${_before.u}\nبه: ♂ ${maleNum} · ♀ ${femaleNum} · ? ${unknownNum}\n\nتاریخچه قبلی حفظ می‌شود.`;
+    const _ok = await showConfirmAsync('تأیید تفکیک جنسیت', _msg, {
+      confirmText: _isFirst ? 'ثبت تفکیک' : 'اعمال تغییر',
+    });
+    if (!_ok) return;
+
     try {
       recordSexing(flock.id, {
         male: maleNum,
