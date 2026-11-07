@@ -97,7 +97,7 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
           هنوز تفکیکی برای این گله ثبت نشده است.
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {visibleGroups.map(g => (
             <div key={g.label}>
               {/* تاریخ سمت راست، بدون کادر */}
@@ -113,7 +113,7 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
               </div>
 
               {/* wrapper کل گروه */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {g.items.map(({ ev, prev }) => {
                   const dM = prev ? ev.male - prev.male : 0;
                   const dF = prev ? ev.female - prev.female : 0;
@@ -123,7 +123,7 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
                     <div
                       key={ev.id}
                       style={{
-                        padding: '8px 10px',
+                        padding: '6px 8px',
                         background: 'var(--input-bg)',
                         borderRadius: 'var(--r-sm)',
                         border: '1px solid var(--border)',
@@ -133,8 +133,8 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
                         display: 'flex',
                         alignItems: 'center',
                         gap: 8,
-                        paddingBottom: 6,
-                        marginBottom: 6,
+                        paddingBottom: 4,
+                        marginBottom: 4,
                         borderBottom: '1px dashed var(--border)',
                       }}>
                         <Tag tone={srcInfo.tone}>{srcInfo.label}</Tag>
@@ -143,11 +143,11 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
                       <div style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(3, 1fr)',
-                        gap: 8,
+                        gap: 6,
                         textAlign: 'center',
                       }}>
                         <div>
-                          <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', marginBottom: 2 }}>نر</div>
+                          <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', marginBottom: 1 }}>نر</div>
                           <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: deltaTone(dM) }}>
                             {fmt(ev.male)}
                             {dM !== 0 && (
@@ -158,7 +158,7 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
                           </div>
                         </div>
                         <div>
-                          <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', marginBottom: 2 }}>ماده</div>
+                          <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', marginBottom: 1 }}>ماده</div>
                           <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: deltaTone(dF) }}>
                             {fmt(ev.female)}
                             {dF !== 0 && (
@@ -169,7 +169,7 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
                           </div>
                         </div>
                         <div>
-                          <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', marginBottom: 2 }}>نامشخص</div>
+                          <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', marginBottom: 1 }}>نامشخص</div>
                           <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: deltaTone(dU) }}>
                             {fmt(ev.unknown)}
                             {dU !== 0 && (
@@ -182,7 +182,7 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
                       </div>
 
                       {ev.note && (
-                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 6, paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
+                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 4, paddingTop: 3, borderTop: '1px dashed var(--border)' }}>
                           📝 {ev.note}
                         </div>
                       )}
