@@ -291,3 +291,101 @@ export interface MedicationCostResult {
   herbal: CostResult;
   total: CostResult;
 }
+
+
+// ═══════════════════════════════════════════════
+// Economics — C1.4b (totalCost, perKg, perEgg, revenue, profit)
+// ═══════════════════════════════════════════════
+
+export interface TotalCostParams {
+  feedTotal: number;
+  vaccineTotal: number;
+  medicationTotal: number;
+  litterTotal: number;
+  utilitiesTotal?: number;
+  laborTotal?: number;
+  aliveCount: number;
+}
+
+export interface TotalCostResult {
+  totalCost: number;
+  costPerBird: number;
+  breakdown: {
+    feed: number;
+    vaccine: number;
+    medication: number;
+    litter: number;
+    utilities: number;
+    labor: number;
+  };
+}
+
+export interface PerKgCostParams {
+  totalCost: number;
+  totalLiveWeightKg: number;
+  totalGainKg: number;
+}
+
+export interface PerKgCostResult {
+  costPerLiveKg: number | null;
+  costPerGainKg: number | null;
+}
+
+export interface PerEggCostParams {
+  totalCost: number;
+  totalEggs: number;
+}
+
+export interface PerEggCostResult {
+  costPerEgg: number | null;
+}
+
+export type InvoiceTypeCalc = 'purchase' | 'sale';
+export type WorkflowStatusCalc = 'draft' | 'confirmed' | 'received' | 'paid';
+
+export interface InputInvoice {
+  id: string;
+  type: InvoiceTypeCalc;
+  total: number;
+  relatedFlockId: string;
+  workflowStatus?: WorkflowStatusCalc;
+}
+
+export interface RevenueFromInvoicesParams {
+  invoices: InputInvoice[];
+  flockId: string;
+  includeDraft?: boolean;
+}
+
+export interface RevenueFromPricesParams {
+  liveWeightKg?: number;
+  pricePerKg?: number;
+  eggsCount?: number;
+  pricePerEgg?: number;
+  culledCount?: number;
+  culledPrice?: number;
+}
+
+export type RevenueSource = 'invoices' | 'prices' | 'none';
+
+export interface RevenueResult {
+  totalRevenue: number;
+  revenuePerBird: number;
+  source: RevenueSource;
+  count: number;
+  hasData: boolean;
+}
+
+export interface ProfitParams {
+  revenue: number;
+  totalCost: number;
+  aliveCount: number;
+}
+
+export interface ProfitResult {
+  profit: number;
+  profitPerBird: number;
+  revenueToCostRatio: number;
+  marginPct: number;
+  hasData: boolean;
+}

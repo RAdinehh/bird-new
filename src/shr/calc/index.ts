@@ -49,3 +49,11 @@ export { calculateVaccineCost } from './economics/vaccineCost';
 export { calculateMedicationCost } from './economics/medicationCost';
 export { calculateLitterCost } from './economics/litterCost';
 export { sumMovementsByCategory } from './economics/_shared';
+
+
+// ═══ Economics — C1.4b ═══
+export { calculateTotalCost } from './economics/totalCost';
+export { calculatePerKgCost } from './economics/perKgCost';
+export { calculatePerEggCost } from './economics/perEggCost';
+export { calculateRevenueFromInvoices, calculateRevenueFromPrices, calculateRevenue } from './economics/revenue';
+export { calculateProfit } from './economics/profit';
