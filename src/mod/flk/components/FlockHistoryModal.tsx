@@ -356,7 +356,12 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
             <div />
           )}
           {!correctionOpen && (
-            <Btn size="sm" variant="outline" onClick={() => setCorrectionOpen(true)} style={{ borderColor: 'var(--warn)', color: 'var(--warn)' }}>+ ثبت اصلاح</Btn>
+            <Btn
+              size="sm"
+              variant="outline"
+              onClick={() => setCorrectionOpen(true)}
+              style={{ borderColor: 'var(--warn)', color: 'var(--warn)', borderWidth: 1.5, fontWeight: 700 }}
+            >+ ثبت اصلاح</Btn>
           )}
         </div>
       )}
@@ -731,7 +736,7 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
       {/* ═══ سطر ۴ — یادداشت (حرف کاربر) ═══ */}
       {e.notes && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-sm)' }}>
-          <span style={{ color: 'var(--muted)' }}>یادداشت:</span>
+          <span style={{ color: 'var(--muted)' }}>توضیح:</span>
           <span style={{ color: 'var(--text)' }}>{e.notes}</span>
         </div>
       )}
