@@ -54,7 +54,6 @@ export interface DailyLog {
   flockId: string;
   date: string;
   entryTime: string;
-  shift: 'morning' | 'noon' | 'evening';
 
   // محیط
   temperature: number | null;
@@ -142,7 +141,6 @@ export const useDlg = create<State>()(
           id: uuid(),
           status: 'active',
           lightHours: (l as any).lightHours ?? null,
-          shift: (l as any).shift || 'morning',
           feedConsumed: (l as any).feedConsumed ?? null,
           birdAgeDays: (l as any).birdAgeDays ?? null,
           brokenEggs: (l as any).brokenEggs ?? null,
@@ -176,7 +174,7 @@ export const useDlg = create<State>()(
     }),
     {
       name: 'pm-dlg',
-      version: 12,
+      version: 13,
       migrate: (persisted: any, version: number) => {
         if (version < 2 && persisted?.logs) {
           persisted.logs = persisted.logs.map((l: any) => ({
@@ -278,6 +276,13 @@ export const useDlg = create<State>()(
               ...l,
               feedMethod: mapMethod(l.feedMethod),
             };
+          });
+        }
+        // ═══ v13 — حذف shift + brokenTarget/otherTarget ═══
+        if (version < 13 && persisted?.logs) {
+          persisted.logs = persisted.logs.map((l: any) => {
+            const { shift: _s, brokenTarget: _bt, otherTarget: _ot, ...rest } = l;
+            return rest;
           });
         }
         return persisted;

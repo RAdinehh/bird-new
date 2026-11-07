@@ -15,7 +15,7 @@ import { showToast } from '../../../cor/store/toast';
 
 export function newLog(flockId = ''): F {
   return {
-    flockId, date: '', entryTime: '', shift: 'morning',
+    flockId, date: '', entryTime: '',
     temperature: '', temperatureMin: '', temperatureMax: '',
     humidity: '', humidityMin: '', humidityMax: '',
     ventilation: 'ok', litter: 'dry', lightHours: '',
@@ -76,7 +76,7 @@ export function useDlgForm({ activeFlocks, halls, todayStr }: UseDlgFormParams) 
 
   const openEdit = (l: DailyLog) => {
     setForm({
-      id: l.id, flockId: l.flockId, date: l.date, entryTime: l.entryTime, shift: l.shift || 'morning',
+      id: l.id, flockId: l.flockId, date: l.date, entryTime: l.entryTime,
       temperature: l.temperature ? toFa(l.temperature) : '',
       temperatureMin: l.temperatureMin ? toFa(l.temperatureMin) : '',
       temperatureMax: l.temperatureMax ? toFa(l.temperatureMax) : '',

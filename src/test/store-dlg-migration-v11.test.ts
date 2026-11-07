@@ -81,7 +81,6 @@ describe('migration — v5 → v11 (زنجیره‌ای)', () => {
     // v10 (A1)
     expect(result.logs[0].eatingEggs).toBe(350);
     expect(result.logs[0].otherEggs).toBe(25);
-    expect(result.logs[0].shift).toBe('morning');
 
     // v11 (A2)
     expect(result.logs[0].feedDelivered).toBe(50);

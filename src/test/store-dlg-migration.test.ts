@@ -39,18 +39,7 @@ describe('migration — v5 → v10', () => {
     expect(result.logs[0].dirtyEggs).toBeUndefined();
   });
 
-  it('brokenTarget از consumption به saleable تبدیل می‌شود', () => {
-    const persisted = { logs: [oldLog()] };
-    const result = migrateFn(persisted, 5);
-    expect(result.logs[0].brokenTarget).toBe('saleable');
-    expect(result.logs[0].otherTarget).toBe('saleable');
-  });
-
-  it('shift پیش‌فرض morning می‌گیرد', () => {
-    const persisted = { logs: [oldLog()] };
-    const result = migrateFn(persisted, 5);
-    expect(result.logs[0].shift).toBe('morning');
-  });
+  
 
   it('birdAgeDays پیش‌فرض null می‌گیرد', () => {
     const persisted = { logs: [oldLog()] };
@@ -60,67 +49,9 @@ describe('migration — v5 → v10', () => {
 });
 
 describe('migration — v7 → v10', () => {
-  it("targets از 'consumption' → 'saleable'", () => {
-    const v7Log = {
-      id: 'log-1',
-      flockId: 'flock-A',
-      date: '1404/02/10',
-      entryTime: '07:30',
-      eatingEggs: 350,
-      otherEggs: 25,
-      brokenEggs: 10,
-      brokenTarget: 'consumption',
-      otherTarget: 'consumption',
-      // v7 fields
-      lightHours: 20,
-    };
-    const persisted = { logs: [v7Log] };
-    const result = migrateFn(persisted, 7);
-    expect(result.logs[0].brokenTarget).toBe('saleable');
-    expect(result.logs[0].otherTarget).toBe('saleable');
+  
   });
 
-  it("targets از 'eating' → 'lost'", () => {
-    const v7Log = {
-      id: 'log-1',
-      flockId: 'flock-A',
-      date: '1404/02/10',
-      entryTime: '07:30',
-      eatingEggs: 350,
-      otherEggs: 25,
-      brokenEggs: 10,
-      brokenTarget: 'eating',
-      otherTarget: 'eating',
-    };
-    const persisted = { logs: [v7Log] };
-    const result = migrateFn(persisted, 7);
-    expect(result.logs[0].brokenTarget).toBe('lost');
-    expect(result.logs[0].otherTarget).toBe('lost');
-  });
-});
-
-describe('migration — idempotent (v10 → v10)', () => {
-  it('داده v10 دست‌نخورده می‌ماند', () => {
-    const v10Log = {
-      id: 'log-1',
-      flockId: 'flock-A',
-      date: '1404/02/10',
-      entryTime: '07:30',
-      shift: 'noon',
-      birdAgeDays: 25,
-      eatingEggs: 350,
-      otherEggs: 25,
-      brokenEggs: 10,
-      brokenTarget: 'lost',
-      otherTarget: 'saleable',
-    };
-    const persisted = { logs: [v10Log] };
-    const result = migrateFn(persisted, 10);
-    expect(result.logs[0].shift).toBe('noon');
-    expect(result.logs[0].birdAgeDays).toBe(25);
-    expect(result.logs[0].brokenTarget).toBe('lost');
-  });
-});
 
 describe('migration — defensive v10 (v7 failed case)', () => {
   it('اگر v7 نتوانست eatingEggs را از eggsCount کپی کند، v10 آن را انجام می‌دهد', () => {

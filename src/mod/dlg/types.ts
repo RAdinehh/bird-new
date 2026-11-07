@@ -5,7 +5,7 @@ import type { Death, Vaccine, Medication, Activity } from './store';
 
 export interface F {
   id?: string;
-  flockId: string; date: string; entryTime: string; shift: 'morning' | 'noon' | 'evening';
+  flockId: string; date: string; entryTime: string;
   temperature: string; temperatureMin: string; temperatureMax: string;
   humidity: string; humidityMin: string; humidityMax: string;
   ventilation: string; litter: string;

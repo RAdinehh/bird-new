@@ -65,32 +65,6 @@ export default function FormModal(props: FormModalProps) {
         </Field>
       </Grid2>
 
-      <Field label="شیفت">
-        <div style={{ display: 'flex', gap: 6 }}>
-          {(['morning', 'noon', 'evening'] as const).map(s => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => setForm({ ...form, shift: s })}
-              style={{
-                flex: 1,
-                padding: '10px 8px',
-                border: form.shift === s ? '2px solid var(--accent)' : '1px solid var(--border)',
-                background: form.shift === s ? 'var(--accent-soft)' : 'var(--input-bg)',
-                color: form.shift === s ? 'var(--accent)' : 'var(--text)',
-                borderRadius: 'var(--r-md)',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                fontWeight: 600,
-                fontSize: 'var(--fs-sm)',
-              }}
-            >
-              {s === 'morning' ? 'صبح' : s === 'noon' ? 'ظهر' : 'شب'}
-            </button>
-          ))}
-        </div>
-      </Field>
-
       <Field label="گله" required error={showError('flockId')} onTouch={() => markTouched('flockId')}>
         <SmartSelect
           value={form.flockId}

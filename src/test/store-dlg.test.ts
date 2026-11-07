@@ -8,7 +8,6 @@ const makeLog = () => ({
   flockId: 'flock-1',
   date: '1405/07/09',
   entryTime: '08:00',
-    shift: 'morning' as const,
   temperature: 22, temperatureMin: 20, temperatureMax: 25,
   humidity: 55, humidityMin: 50, humidityMax: 60,
   ventilation: 'ok', litter: 'dry', lightHours: 16,

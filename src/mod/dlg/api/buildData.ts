@@ -77,7 +77,6 @@ export function buildLogData(input: BuildDataInput): Omit<DailyLog, 'id' | 'stat
     flockId: form.flockId,
     date: form.date,
     entryTime: form.entryTime,
-    shift: form.shift || 'morning',
     birdAgeDays: birdAgeDays ?? null,
     temperature: calcTemp,
     temperatureMin: tMin,
