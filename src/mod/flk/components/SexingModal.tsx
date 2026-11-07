@@ -195,116 +195,26 @@ export default function SexingModal({ open, onClose, flock }: Props) {
         </Field>
       </Grid2>
 
-      {/* 🆕 Smart Guide — full width، context-aware */}
+      {/* 🆕 Smart Guide — یک خط، بدون کادر */}
       {noInput ? (
-        <div style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: 8,
-          padding: '10px 12px',
-          background: 'var(--warn-soft)',
-          border: '1px solid var(--warn)',
-          borderRadius: 'var(--r-md)',
-          marginBottom: 8,
-          fontSize: 'var(--fs-sm)',
-          color: 'var(--warn)',
-          lineHeight: 1.7,
-        }}>
-          <span style={{ fontSize: 18, flexShrink: 0 }}>💡</span>
-          <div style={{ flex: 1 }}>
-            <b>برای شروع، تعداد نر یا ماده را وارد کنید.</b>
-            <div style={{ fontSize: 'var(--fs-xs)', marginTop: 2, opacity: 0.85 }}>
-              باقی‌مانده به‌طور خودکار در «نامشخص» قرار می‌گیرد.
-            </div>
-          </div>
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', marginBottom: 8, lineHeight: 1.6 }}>
+          💡 تعداد نر یا ماده را وارد کنید — باقی‌مانده خودکار «نامشخص» می‌شود
         </div>
       ) : isUnknownAuto && remaining > 0 && maleNum > 0 && femaleNum > 0 ? (
-        <div style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: 8,
-          padding: '10px 12px',
-          background: 'var(--accent-soft)',
-          border: '1px solid var(--accent-border)',
-          borderRadius: 'var(--r-md)',
-          marginBottom: 8,
-          fontSize: 'var(--fs-sm)',
-          color: 'var(--accent)',
-          lineHeight: 1.7,
-        }}>
-          <span style={{ fontSize: 18, flexShrink: 0 }}>✓</span>
-          <div style={{ flex: 1 }}>
-            <b>{toFa(remaining)} پرنده نامشخص</b> به‌طور خودکار محاسبه شد.
-            <div style={{ fontSize: 'var(--fs-xs)', marginTop: 2, opacity: 0.85 }}>
-              {toFa(maleNum)} نر + {toFa(femaleNum)} ماده + {toFa(remaining)} نامشخص = {toFa(currentCount)}
-            </div>
-          </div>
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', marginBottom: 8, lineHeight: 1.6 }}>
+          ✓ {toFa(remaining)} نامشخص خودکار — {toFa(maleNum)} نر + {toFa(femaleNum)} ماده + {toFa(remaining)} نامشخص = {toFa(currentCount)}
         </div>
       ) : isUnknownAuto && remaining > 0 && maleNum > 0 ? (
-        <div style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: 8,
-          padding: '10px 12px',
-          background: 'var(--info-soft)',
-          border: '1px solid var(--info)',
-          borderRadius: 'var(--r-md)',
-          marginBottom: 8,
-          fontSize: 'var(--fs-sm)',
-          color: 'var(--info)',
-          lineHeight: 1.7,
-        }}>
-          <span style={{ fontSize: 18, flexShrink: 0 }}>ℹ️</span>
-          <div style={{ flex: 1 }}>
-            <b>فقط نر وارد کرده‌اید.</b> {toFa(remaining)} باقی‌مانده در «نامشخص» قرار گرفت.
-            <div style={{ fontSize: 'var(--fs-xs)', marginTop: 2, opacity: 0.85 }}>
-              اگر تعداد ماده را می‌دانید، وارد کنید.
-            </div>
-          </div>
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--info)', marginBottom: 8, lineHeight: 1.6 }}>
+          ℹ️ فقط نر وارد شده — {toFa(remaining)} باقی‌مانده «نامشخص» (اگر ماده می‌دانید، وارد کنید)
         </div>
       ) : isUnknownAuto && remaining > 0 && femaleNum > 0 ? (
-        <div style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: 8,
-          padding: '10px 12px',
-          background: 'var(--info-soft)',
-          border: '1px solid var(--info)',
-          borderRadius: 'var(--r-md)',
-          marginBottom: 8,
-          fontSize: 'var(--fs-sm)',
-          color: 'var(--info)',
-          lineHeight: 1.7,
-        }}>
-          <span style={{ fontSize: 18, flexShrink: 0 }}>ℹ️</span>
-          <div style={{ flex: 1 }}>
-            <b>فقط ماده وارد کرده‌اید.</b> {toFa(remaining)} باقی‌مانده در «نامشخص» قرار گرفت.
-            <div style={{ fontSize: 'var(--fs-xs)', marginTop: 2, opacity: 0.85 }}>
-              اگر تعداد نر را می‌دانید، وارد کنید.
-            </div>
-          </div>
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--info)', marginBottom: 8, lineHeight: 1.6 }}>
+          ℹ️ فقط ماده وارد شده — {toFa(remaining)} باقی‌مانده «نامشخص» (اگر نر می‌دانید، وارد کنید)
         </div>
       ) : !isUnknownAuto && mismatch ? (
-        <div style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: 8,
-          padding: '10px 12px',
-          background: 'var(--danger-soft)',
-          border: '1px solid var(--danger)',
-          borderRadius: 'var(--r-md)',
-          marginBottom: 8,
-          fontSize: 'var(--fs-sm)',
-          color: 'var(--danger)',
-          lineHeight: 1.7,
-        }}>
-          <span style={{ fontSize: 18, flexShrink: 0 }}>⚠️</span>
-          <div style={{ flex: 1 }}>
-            <b>{toFa(Math.abs(diff))} پرنده {diff > 0 ? 'بیشتر' : 'کمتر'}</b> از تعداد زنده ثبت شده است.
-            <div style={{ fontSize: 'var(--fs-xs)', marginTop: 2, opacity: 0.85 }}>
-              ثبت شده: {toFa(totalInput)} · مورد نیاز: {toFa(currentCount)}
-            </div>
-          </div>
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', marginBottom: 8, lineHeight: 1.6 }}>
+          ⚠️ {toFa(Math.abs(diff))} پرنده {diff > 0 ? 'بیشتر' : 'کمتر'} — ثبت‌شده {toFa(totalInput)}، نیاز {toFa(currentCount)}
         </div>
       ) : null}
 
