@@ -1,6 +1,6 @@
 /**
  * SexingHistoryModal — تاریخچه تفکیک جنسیت گله
- * گروه‌بندی تاریخ + کارت متعادل + نمایش ۱۰ تای آخر
+ * یک wrapper برای هر گروه + جداکننده بین eventها
  */
 import { useMemo, useState } from 'react';
 import { Modal, Btn, BtnRow, Tag } from '../../../shr/components/ui';
@@ -100,55 +100,58 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
               }}>
                 {g.label}
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {g.items.map(({ ev, prev }) => {
+
+              {/* یک wrapper برای کل گروه با یک border */}
+              <div style={{
+                background: 'var(--input-bg)',
+                borderRadius: 'var(--r-md)',
+                border: '1px solid var(--border)',
+                overflow: 'hidden',
+              }}>
+                {g.items.map(({ ev, prev }, idx) => {
                   const dM = prev ? ev.male - prev.male : 0;
                   const dF = prev ? ev.female - prev.female : 0;
                   const dU = prev ? ev.unknown - prev.unknown : 0;
                   const hasDelta = prev && (dM !== 0 || dF !== 0 || dU !== 0);
                   const srcInfo = SRC_LABEL[ev.source] || { label: ev.source, tone: 'gray' as const };
                   return (
-                    <div key={ev.id} style={{
-                      padding: '10px 12px',
-                      background: 'var(--input-bg)',
-                      borderRadius: 'var(--r-md)',
-                      border: '1px solid var(--border)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 8,
-                    }}>
-                      {/* ردیف Tag */}
-                      <div>
+                    <div
+                      key={ev.id}
+                      style={{
+                        padding: '8px 10px',
+                        borderTop: idx > 0 ? '1px dashed var(--border)' : 'none',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                         <Tag tone={srcInfo.tone}>{srcInfo.label}</Tag>
                       </div>
 
-                      {/* ۳ ستون اعداد با label بالا */}
                       <div style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(3, 1fr)',
-                        gap: 12,
+                        gap: 8,
                         textAlign: 'center',
                       }}>
                         <div>
                           <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', marginBottom: 2 }}>نر</div>
-                          <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)' }}>{fmt(ev.male)}</div>
+                          <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{fmt(ev.male)}</div>
                         </div>
                         <div>
                           <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', marginBottom: 2 }}>ماده</div>
-                          <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)' }}>{fmt(ev.female)}</div>
+                          <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{fmt(ev.female)}</div>
                         </div>
                         <div>
                           <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', marginBottom: 2 }}>نامشخص</div>
-                          <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)' }}>{fmt(ev.unknown)}</div>
+                          <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{fmt(ev.unknown)}</div>
                         </div>
                       </div>
 
-                      {/* Delta */}
                       {hasDelta && (
                         <div style={{
                           fontSize: 'var(--fs-xs)',
                           color: 'var(--info, #0284c7)',
-                          paddingTop: 6,
+                          paddingTop: 4,
+                          marginTop: 6,
                           borderTop: '1px dashed var(--border)',
                         }}>
                           ⚠️ تفاوت با قبلی:
@@ -159,7 +162,7 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
                       )}
 
                       {ev.note && (
-                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 4 }}>
                           📝 {ev.note}
                         </div>
                       )}
