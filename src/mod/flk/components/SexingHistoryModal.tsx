@@ -113,13 +113,8 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
               </div>
 
               {/* wrapper کل گروه */}
-              <div style={{
-                background: 'var(--input-bg)',
-                borderRadius: 'var(--r-md)',
-                border: '1px solid var(--border)',
-                overflow: 'hidden',
-              }}>
-                {g.items.map(({ ev, prev }, idx) => {
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {g.items.map(({ ev, prev }) => {
                   const dM = prev ? ev.male - prev.male : 0;
                   const dF = prev ? ev.female - prev.female : 0;
                   const dU = prev ? ev.unknown - prev.unknown : 0;
@@ -129,7 +124,9 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
                       key={ev.id}
                       style={{
                         padding: '8px 10px',
-                        borderTop: idx > 0 ? '1px dashed var(--border)' : 'none',
+                        background: 'var(--input-bg)',
+                        borderRadius: 'var(--r-sm)',
+                        border: '1px solid var(--border)',
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
