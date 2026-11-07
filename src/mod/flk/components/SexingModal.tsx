@@ -178,34 +178,32 @@ export default function SexingModal({ open, onClose, flock }: Props) {
           />
         </Field>
         <Field label="جمع کل">
-          <div style={{
-            padding: '10px 12px',
-            background: mismatch ? 'var(--danger-soft)' : 'var(--accent-soft)',
-            border: `1px solid ${mismatch ? 'var(--danger)' : 'var(--accent-border)'}`,
-            borderRadius: 'var(--r-md)',
-            fontSize: 'var(--fs-sm)',
-            fontWeight: 700,
-            color: mismatch ? 'var(--danger)' : 'var(--accent)',
-            textAlign: 'center',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            gap: 2,
-          }}>
-            <span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {/* کادر جمع — فقط عدد */}
+            <div style={{
+              padding: '10px 12px',
+              background: mismatch ? 'var(--danger-soft)' : 'var(--accent-soft)',
+              border: `1px solid ${mismatch ? 'var(--danger)' : 'var(--accent-border)'}`,
+              borderRadius: 'var(--r-md)',
+              fontSize: 'var(--fs-sm)',
+              fontWeight: 700,
+              color: mismatch ? 'var(--danger)' : 'var(--accent)',
+              textAlign: 'center',
+            }}>
               {mismatch
                 ? `✗ ${toFa(totalInput.toLocaleString('fa-IR'))} / ${toFa(currentCount.toLocaleString('fa-IR'))}`
                 : `✓ ${toFa(totalInput.toLocaleString('fa-IR'))} = ${toFa(currentCount.toLocaleString('fa-IR'))}`}
-            </span>
+            </div>
+            {/* hint زیر کادر */}
             {isUnknownAuto && maleNum + femaleNum > 0 && remaining > 0 && (
-              <span style={{ fontSize: 10, fontWeight: 400, color: 'var(--muted)' }}>
+              <div style={{ fontSize: 10, fontWeight: 400, color: 'var(--muted)', textAlign: 'center' }}>
                 شامل {toFa(remaining)} نامشخص (خودکار)
-              </span>
+              </div>
             )}
             {!isUnknownAuto && mismatch && (
-              <span style={{ fontSize: 10, fontWeight: 400 }}>
+              <div style={{ fontSize: 10, fontWeight: 400, color: mismatch ? 'var(--danger)' : 'var(--muted)', textAlign: 'center' }}>
                 {diff > 0 ? `${toFa(diff)} بیشتر` : `${toFa(-diff)} کمتر`}
-              </span>
+              </div>
             )}
           </div>
         </Field>
