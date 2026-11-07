@@ -1,9 +1,9 @@
 /**
  * ConsumptionFormModal.tsx — فرم ثبت دان/آب
- * فاز ۸b — سلسله مراتب منطقی: داده اصلی + جزئیات
+ * فاز ۸b — نسخه نهایی با match کامل به الگوهای موجود
  */
 import { useState } from 'react';
-import { Modal, Btn, BtnRow, Field, Grid2, Select } from '../../../shr/components/ui';
+import { Modal, Btn, BtnRow, Field, Grid2, Select, NumField, Textarea } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 import { useFlk, type Flock } from '../store';
 import { todayJ } from '../api/flocksCalc';
@@ -15,27 +15,6 @@ interface Props {
   onClose: () => void;
   flock: Flock;
 }
-
-const inputStyle = {
-  background: 'var(--input-bg)',
-  border: '1px solid var(--border)',
-  borderRadius: 'var(--r-md)',
-  height: 38,
-  padding: '0 var(--sp-3)',
-  fontFamily: 'inherit',
-  fontSize: 'var(--fs-sm)',
-  color: 'var(--text)',
-  outline: 'none',
-  width: '100%',
-};
-
-const SOURCE_LABEL: Record<string, string> = {
-  bulk_manual: '🍽️ پر کردن سطل',
-  daily_manual: '📝 روزانه دستی',
-  sensor_scale: '⚖️ سنسور وزن',
-  sensor_level: '📊 سنسور سطح',
-  auto_feeder: '🤖 اتومات هوشمند',
-};
 
 function SectionHeader({ icon, label, hint }: { icon: string; label: string; hint?: string }) {
   return (
@@ -101,7 +80,7 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
   return (
     <Modal open={open} onClose={onClose} title={'🍽️ ثبت دان/آب — ' + flock.name}>
 
-      {/* ═══ بخش ۱ — داده اصلی ═══ */}
+      {/* ═══ داده اصلی ═══ */}
       <SectionHeader icon="📥" label="داده اصلی" hint="— الزامی" />
 
       <Grid2>
@@ -118,17 +97,16 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
 
       <Grid2>
         <Field label={'مقدار (' + unit + ')'} required>
-          <input
-            type="text"
+          <NumField
             value={amount}
             onChange={e => setAmount(e.target.value)}
             placeholder={amountPlaceholder}
-            inputMode="decimal"
-            style={inputStyle}
+            unit={unit}
           />
         </Field>
+
         {showSex ? (
-          <Field label="برای کدام جنس؟">
+          <Field label="جنسیت">
             <Select value={sex} onChange={e => setSex(e.target.value as '' | 'male' | 'female' | 'mixed')}>
               <option value="">کل گله (نامشخص)</option>
               <option value="male">♂ نر</option>
@@ -136,57 +114,27 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
               <option value="mixed">مخلوط</option>
             </Select>
           </Field>
+        ) : type === 'water' ? (
+          <Field label="جنسیت" hint="آب بین همه پرنده‌ها مشترک است">
+            <Select value="" disabled>
+              <option value="">— آب بدون تفکیک —</option>
+            </Select>
+          </Field>
         ) : (
-          <Field label=" ">
-            <div style={{
-              height: 38,
-              display: 'flex',
-              alignItems: 'center',
-              fontSize: 10,
-              color: 'var(--muted)',
-              padding: '0 var(--sp-3)',
-            }}>
-              {type === 'water' ? '💧 آب — بدون تفکیک جنسیت' : 'ℹ️ گله بدون تفکیک'}
-            </div>
+          <Field label="جنسیت" hint={`گله «${flock.name}» هنوز تفکیک نشده`}>
+            <Select value="" disabled>
+              <option value="">— ابتدا از گله تفکیک کنید —</option>
+            </Select>
           </Field>
         )}
       </Grid2>
 
-      {/* ═══ بخش ۲ — جزئیات اختیاری ═══ */}
+      {/* ═══ جزئیات ═══ */}
       <div style={{ marginTop: 12 }}>
         <SectionHeader icon="📝" label="جزئیات" hint="— اختیاری" />
 
-        <Field label="یادداشت">
-          <input
-            type="text"
-            value={notes}
-            onChange={e => setNotes(e.target.value)}
-            placeholder="مثلاً پر کردن سطل ۱ و ۲"
-            style={inputStyle}
-          />
-        </Field>
-
-        <details style={{ marginTop: 8 }}>
-          <summary style={{
-            cursor: 'pointer',
-            padding: '8px 10px',
-            background: 'var(--input-bg)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--r-sm)',
-            fontSize: 'var(--fs-sm)',
-            color: 'var(--text)',
-            userSelect: 'none',
-            listStyle: 'none',
-          }}>
-            <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>
-                <span style={{ color: 'var(--muted)', fontSize: 11, marginLeft: 4 }}>روش ثبت</span>
-                <b style={{ color: 'var(--accent)' }}>{SOURCE_LABEL[source]}</b>
-              </span>
-              <span style={{ color: 'var(--muted)', fontSize: 10 }}>▾ تغییر</span>
-            </span>
-          </summary>
-          <div style={{ padding: '8px 4px 0' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 8 }}>
+          <Field label="روش ثبت">
             <Select value={source} onChange={e => setSource(e.target.value as any)}>
               <option value="bulk_manual">🍽️ پر کردن سطل</option>
               <option value="daily_manual">📝 روزانه دستی</option>
@@ -194,23 +142,22 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
               <option value="sensor_level">📊 سنسور سطح</option>
               <option value="auto_feeder">🤖 اتومات هوشمند</option>
             </Select>
-            {source === 'sensor_level' && (
-              <div style={{ fontSize: 10, color: 'var(--warn)', padding: '4px 8px', background: 'var(--warn-soft)', borderRadius: 'var(--r-sm)', marginTop: 6 }}>
-                ⚠️ سنسور سطح — مقدار «تخمینی» ثبت می‌شود
-              </div>
-            )}
-            {source === 'sensor_scale' && (
-              <div style={{ fontSize: 10, color: 'var(--accent)', padding: '4px 8px', background: 'var(--accent-soft)', borderRadius: 'var(--r-sm)', marginTop: 6 }}>
-                ✓ سنسور وزن — دقت بالا
-              </div>
-            )}
-            {source === 'auto_feeder' && (
-              <div style={{ fontSize: 10, color: 'var(--info)', padding: '4px 8px', background: 'var(--info-soft)', borderRadius: 'var(--r-sm)', marginTop: 6 }}>
-                ℹ️ اتومات — ممکن است با سیستم تلاقی کند
-              </div>
-            )}
+          </Field>
+          <Field label="یادداشت">
+            <Textarea
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              placeholder="مثلاً پر کردن سطل ۱ و ۲ — یا هر توضیح دیگر"
+              rows={2}
+            />
+          </Field>
+        </div>
+
+        {source === 'sensor_level' && (
+          <div style={{ fontSize: 10, color: 'var(--warn)', padding: '6px 10px', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', marginTop: 6 }}>
+            ⚠️ سنسور سطح — مقدار به‌عنوان «تخمینی» ثبت می‌شود
           </div>
-        </details>
+        )}
       </div>
 
       <BtnRow>
