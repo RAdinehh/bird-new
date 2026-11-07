@@ -69,7 +69,7 @@ export default function ToastHost() {
                 ? '0 4px 12px rgba(0,0,0,.18), 0 2px 4px rgba(0,0,0,.10)'
                 : '0 4px 12px rgba(0,0,0,.12), 0 2px 4px rgba(0,0,0,.06)',
               display: 'flex',
-              alignItems: 'flex-start',
+              alignItems: 'center',
               gap: 8,
               fontSize: 'var(--fs-sm)',
               fontWeight: 600,
@@ -88,10 +88,10 @@ export default function ToastHost() {
                 background: isSuccess ? 'rgba(255,255,255,0.22)' : 'var(--card-solid)',
                 color: isSuccess ? 'var(--avatar-text, #fff)' : color,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 12, flexShrink: 0, marginTop: 2,
+                fontSize: 12, flexShrink: 0,
               }}
             >{TYPE_ICON[t.type]}</span>
-            <span style={{ flex: 1, lineHeight: 1.6, wordBreak: 'break-word' }}>{t.message}</span>
+            <span style={{ flex: 1, lineHeight: 1.5, wordBreak: 'break-word' }}>{t.message}</span>
           </div>
         );
       })}
