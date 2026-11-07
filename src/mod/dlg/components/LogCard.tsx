@@ -8,8 +8,9 @@ import type { Flock } from '../../flk/store';
 import {
   VENTILATION_LABEL, LITTER_LABEL, BEHAVIOR_LABEL,
   DISTRIBUTION_LABEL, SOUND_LABEL, causeLabel,
-  tempWarning, humidityWarning, avgWeight, sumWeight, cvWeight,
+  avgWeight, sumWeight, cvWeight,
 } from '../store';
+import { calculateEnvironmentWarnings } from '../../../shr/calc';
 import { toFa } from '../../../shr/utils/fa';
 import { getEffectiveEnv } from '../../set/standards/resolve';
 import { useSet } from '../../set/store';
@@ -64,9 +65,20 @@ export default function LogCard(props: LogCardProps) {
     } catch { /* silent */ }
   }
 
-  const tWarn = tempWarning(l.temperature, stdTempMin, stdTempMax, stdTempTarget);
-  const hWarn = humidityWarning(l.humidity, stdHumMin, stdHumMax);
-  const hasProblem = tWarn !== 'ok' || hWarn !== 'ok' || l.deathsCount > 0;
+  const envWarn = calculateEnvironmentWarnings({
+    tempC: l.temperature,
+    tempMin: stdTempMin,
+    tempMax: stdTempMax,
+    tempTarget: stdTempTarget,
+    humidityPct: l.humidity,
+    humidityMin: stdHumMin,
+    humidityMax: stdHumMax,
+  });
+  const tWarn = envWarn.tempTone;
+  const hWarn = envWarn.humidityTone;
+  const tIsBad = tWarn === 'warn' || tWarn === 'danger';
+  const hIsBad = hWarn === 'warn' || hWarn === 'danger';
+  const hasProblem = tIsBad || hIsBad || l.deathsCount > 0;
   const accent: any = hasProblem ? 'warn' : 'accent';
 
   return (
@@ -84,18 +96,18 @@ export default function LogCard(props: LogCardProps) {
         {l.waterAmount !== null && <span>💧 {toFa(l.waterAmount)} L</span>}
       </>}
     >
-      {(tWarn !== 'ok' || hWarn !== 'ok') && (
+      {(tIsBad || hIsBad) && (
         <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>
-          ⚠ {tWarn !== 'ok' ? `دما ${tWarn === 'danger' ? 'خطرناک' : 'نامناسب'}` : ''}
-          {tWarn !== 'ok' && hWarn !== 'ok' ? ' • ' : ''}
-          {hWarn !== 'ok' ? `رطوبت ${hWarn === 'danger' ? 'خطرناک' : 'نامناسب'}` : ''}
+          ⚠ {tIsBad ? `دما ${tWarn === 'danger' ? 'خطرناک' : 'نامناسب'}` : ''}
+          {tIsBad && hIsBad ? ' • ' : ''}
+          {hIsBad ? `رطوبت ${hWarn === 'danger' ? 'خطرناک' : 'نامناسب'}` : ''}
         </div>
       )}
 
       <Section title="🌡 محیط">
         <Grid2>
-          {l.temperature !== null && <Row l="دما" v={`${toFa(l.temperature)} °C`} warn={tWarn !== 'ok'} />}
-          {l.humidity !== null && <Row l="رطوبت" v={`${toFa(l.humidity)} ٪`} warn={hWarn !== 'ok'} />}
+          {l.temperature !== null && <Row l="دما" v={`${toFa(l.temperature)} °C`} warn={tIsBad} />}
+          {l.humidity !== null && <Row l="رطوبت" v={`${toFa(l.humidity)} ٪`} warn={hIsBad} />}
         </Grid2>
         {(l.temperatureMin !== null || l.temperatureMax !== null) && (
           <Row l="بازه دما" v={`${l.temperatureMin !== null ? toFa(l.temperatureMin) : '—'} تا ${l.temperatureMax !== null ? toFa(l.temperatureMax) : '—'} °C`} />
