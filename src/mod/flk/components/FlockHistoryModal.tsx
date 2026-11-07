@@ -387,37 +387,36 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
 
       {/* ═══ فرم اصلاح — فقط در تب رویدادها ═══ */}
       {tabMode === 'events' && correctionOpen && (
-        <div style={{ marginBottom: 12, background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-md)', padding: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ marginBottom: 12, marginTop: 4, background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-md)', padding: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px dashed var(--warn)', paddingBottom: 8 }}>
             <span style={{ fontWeight: 700, color: 'var(--warn)', fontSize: 'var(--fs-base)' }}>✏️ ثبت اصلاح موجودی</span>
             <button type="button" onClick={() => { setCorrectionOpen(false); setDelta(''); setNotes(''); setValidationError(''); }} style={{ background: 'none', border: 'none', color: 'var(--muted)', fontSize: 18, cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>✕</button>
           </div>
 
-          {/* فیلد ۱ — مقدار تغییر + نتیجه */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>مقدار تغییر</span>
-              <div style={{ display: 'flex', alignItems: 'center', background: 'var(--card)', border: '1px solid ' + (validationError ? 'var(--danger)' : 'var(--warn)'), borderRadius: 'var(--r-md)', height: 40, overflow: 'hidden' }}>
-                <button type="button" onClick={() => { const n = parseInt(toEn(delta), 10) || 0; setDelta(toFa(String(n + 1))); }} style={{ width: 36, height: '100%', border: 'none', background: 'transparent', fontSize: 20, fontWeight: num > 0 ? 700 : 400, color: num > 0 ? 'var(--accent)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderLeft: '1px solid var(--border)', flexShrink: 0 }}>+</button>
-                <input type="text" value={delta} onChange={e => {
-                  const raw = toEn(e.target.value);
-                  const isNegative = raw.startsWith('-') || raw.startsWith('−');
-                  const digits = raw.replace(/[^0-9]/g, '');
-                  if (digits) { setDelta(toFa(isNegative ? '-' + digits : digits)); } else { setDelta(isNegative ? '−' : ''); }
-                  setValidationError('');
-                }} placeholder="۰" inputMode="text" style={{ flex: 1, minWidth: 0, background: 'none', border: 'none', outline: 'none', fontFamily: 'monospace', fontSize: 'var(--fs-base)', fontWeight: 700, color: num > 0 ? 'var(--accent)' : num < 0 ? 'var(--danger)' : 'var(--text)', textAlign: 'center', padding: '0 var(--sp-1)', direction: 'ltr' }} />
-                <button type="button" onClick={() => { const n = parseInt(toEn(delta), 10) || 0; setDelta(toFa(String(n - 1))); }} style={{ width: 36, height: '100%', border: 'none', background: 'transparent', fontSize: 20, fontWeight: num < 0 ? 700 : 400, color: num < 0 ? 'var(--danger)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderRight: '1px solid var(--border)', flexShrink: 0 }}>−</button>
-              </div>
+          {/* فیلد ۱ — مقدار تغییر */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>مقدار تغییر</span>
+            <div style={{ display: 'flex', alignItems: 'center', background: 'var(--card)', border: '1px solid ' + (validationError ? 'var(--danger)' : 'var(--warn)'), borderRadius: 'var(--r-md)', height: 40, overflow: 'hidden' }}>
+              <button type="button" onClick={() => { const n = parseInt(toEn(delta), 10) || 0; setDelta(toFa(String(n + 1))); }} style={{ width: 36, height: '100%', border: 'none', background: 'transparent', fontSize: 20, fontWeight: num > 0 ? 700 : 400, color: num > 0 ? 'var(--accent)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderLeft: '1px solid var(--border)', flexShrink: 0 }}>+</button>
+              <input type="text" value={delta} onChange={e => {
+                const raw = toEn(e.target.value);
+                const isNegative = raw.startsWith('-') || raw.startsWith('−');
+                const digits = raw.replace(/[^0-9]/g, '');
+                if (digits) { setDelta(toFa(isNegative ? '-' + digits : digits)); } else { setDelta(isNegative ? '−' : ''); }
+                setValidationError('');
+              }} placeholder="۰" inputMode="text" style={{ flex: 1, minWidth: 0, background: 'none', border: 'none', outline: 'none', fontFamily: 'monospace', fontSize: 'var(--fs-base)', fontWeight: 700, color: num > 0 ? 'var(--accent)' : num < 0 ? 'var(--danger)' : 'var(--text)', textAlign: 'center', padding: '0 var(--sp-1)', direction: 'ltr' }} />
+              <button type="button" onClick={() => { const n = parseInt(toEn(delta), 10) || 0; setDelta(toFa(String(n - 1))); }} style={{ width: 36, height: '100%', border: 'none', background: 'transparent', fontSize: 20, fontWeight: num < 0 ? 700 : 400, color: num < 0 ? 'var(--danger)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderRight: '1px solid var(--border)', flexShrink: 0 }}>−</button>
             </div>
+          </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>موجودی بعد از ثبت</span>
-              <div style={{ background: 'var(--card)', border: '1px solid ' + (num !== 0 ? (newCount < 0 ? 'var(--danger)' : (newCount < initial * 0.1 ? 'var(--warn)' : 'var(--accent)')) : 'var(--warn)'), borderRadius: 'var(--r-md)', height: 40, padding: '0 var(--sp-2)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <div dir="ltr" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ fontFamily: 'monospace', fontSize: 13, fontWeight: 600, color: 'var(--muted)' }}>{toFa(current)}</span>
-                  <span style={{ color: 'var(--dim)', fontSize: 12 }}>→</span>
-                  {num === 0 ? <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 400, color: 'var(--dim)' }}>؟</span> : newCount < 0 ? <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'var(--danger)' }}>منفی</span> : num > 0 ? <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'var(--accent)' }}>{toFa(newCount)}</span> : <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'var(--danger)' }}>{toFa(newCount)}</span>}
-                </div>
+          {/* فیلد ۲ — موجودی بعد از ثبت (زیر آن) */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>موجودی بعد از ثبت</span>
+            <div style={{ background: 'var(--card)', border: '1px solid ' + (num !== 0 ? (newCount < 0 ? 'var(--danger)' : (newCount < initial * 0.1 ? 'var(--warn)' : 'var(--accent)')) : 'var(--warn)'), borderRadius: 'var(--r-md)', height: 40, padding: '0 var(--sp-2)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <div dir="ltr" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 600, color: 'var(--muted)' }}>{toFa(current)}</span>
+                <span style={{ color: 'var(--dim)', fontSize: 12 }}>→</span>
+                {num === 0 ? <span style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 400, color: 'var(--dim)' }}>؟</span> : newCount < 0 ? <span style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'var(--danger)' }}>منفی</span> : num > 0 ? <span style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'var(--accent)' }}>{toFa(newCount)}</span> : <span style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'var(--danger)' }}>{toFa(newCount)}</span>}
               </div>
             </div>
           </div>
@@ -441,7 +440,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
           )}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            <button type="button" onClick={handleSaveCorrection} disabled={num === 0 || newCount < 0} style={{ height: 40, background: (num === 0 || newCount < 0) ? 'var(--dim)' : 'var(--accent)', color: 'white', border: 'none', borderRadius: 'var(--r-md)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: (num === 0 || newCount < 0) ? 'not-allowed' : 'pointer' }}>✓ ثبت اصلاح</button>
+            <button type="button" onClick={handleSaveCorrection} disabled={num === 0 || newCount < 0} style={{ height: 40, background: (num === 0 || newCount < 0) ? 'var(--dim)' : 'var(--accent)', color: 'white', border: 'none', borderRadius: 'var(--r-md)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: (num === 0 || newCount < 0) ? 'not-allowed' : 'pointer', opacity: (num === 0 || newCount < 0) ? 0.7 : 1, transition: 'all 0.2s' }}>{(num === 0) ? 'مقدار را وارد کنید' : (newCount < 0 ? 'موجودی کافی نیست' : '✓ ثبت اصلاح')}</button>
             <button type="button" onClick={() => { setCorrectionOpen(false); setDelta(''); setNotes(''); setValidationError(''); }} style={{ height: 40, background: 'var(--card)', color: 'var(--muted)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer' }}>لغو</button>
           </div>
         </div>
@@ -706,7 +705,7 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
               }}
               title="این عدد دستی وارد شد — در فرم «ثبت روزانه» ثبت نشده"
             >
-              ✋ دستی
+              ✋ ثبت دستی
             </span>
           )}
           {isRevoked && (
