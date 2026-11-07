@@ -129,7 +129,14 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
                         border: '1px solid var(--border)',
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        paddingBottom: 6,
+                        marginBottom: 6,
+                        borderBottom: '1px dashed var(--border)',
+                      }}>
                         <Tag tone={srcInfo.tone}>{srcInfo.label}</Tag>
                       </div>
 
