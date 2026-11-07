@@ -570,24 +570,21 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
       ) : tabMode === 'audit' ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {deathRate.hasData && (
-        <div style={{
-          background: 'var(--accent-soft)',
-          border: '1px solid var(--accent-border)',
-          borderRadius: 'var(--r-md)',
-          padding: 10,
-          marginBottom: 8,
-        }}>
-          {/* Header — وسط‌چین، دو خط، بالای جدول */}
-          <div style={{
-            textAlign: 'center',
-            paddingBottom: 8,
-            marginBottom: 8,
-            borderBottom: '1px dashed var(--accent-border)',
-          }}>
+        <div>
+          {/* Header — خارج از کادر، راست/چپ */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '0 4px', marginBottom: 6 }}>
             <b style={{ fontSize: 'var(--fs-base)', color: 'var(--accent)' }}>وضعیت جنسیتی</b>
-            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>از زمان تفکیک</div>
+            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>از زمان تفکیک</span>
           </div>
 
+          {/* کادر سبز — فقط table */}
+          <div style={{
+            background: 'var(--accent-soft)',
+            border: '1px solid var(--accent-border)',
+            borderRadius: 'var(--r-md)',
+            padding: 10,
+            marginBottom: 8,
+          }}>
           {/* Table */}
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {/* Header row */}
@@ -655,6 +652,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               <span style={{ textAlign: 'center', fontFamily: 'monospace', color: 'var(--warn)' }}>{(sexAggregates.others.male + sexAggregates.others.female + sexAggregates.others.unknown) !== 0 ? `${(sexAggregates.others.male + sexAggregates.others.female + sexAggregates.others.unknown) > 0 ? '+' : ''}${toFa(sexAggregates.others.male + sexAggregates.others.female + sexAggregates.others.unknown)}` : '۰'}</span>
               <span style={{ textAlign: 'center', fontFamily: 'monospace', color: 'var(--accent)' }}>{toFa(sexAggregates.current.male + sexAggregates.current.female + sexAggregates.current.unknown)}</span>
             </div>
+          </div>
           </div>
         </div>
       )}
@@ -806,7 +804,7 @@ function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
           <span style={{ fontSize: 18 }}>{meta.icon}</span>
           <b style={{ color: meta.tone, fontSize: 'var(--fs-base)' }}>{meta.label}</b>
         </div>
-        <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>📅 {toFa(ev.date)}</span>
+
       </div>
 
       {/* ردیف‌های داده */}
