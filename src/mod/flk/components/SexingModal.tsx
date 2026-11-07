@@ -51,7 +51,12 @@ export default function SexingModal({ open, onClose, flock }: Props) {
   const currentCount = flock?.currentCount ?? 0;
   const maleNum = toEnNum(maleStr);
   const femaleNum = toEnNum(femaleStr);
-  const unknownNum = toEnNum(unknownStr);
+
+  // 🆕 Smart Total: اگر فیلد نامشخص خالی باشد، باقی‌مانده را خودکار محاسبه کن
+  const isUnknownAuto = unknownStr.trim() === '';
+  const remaining = Math.max(0, currentCount - maleNum - femaleNum);
+  const unknownNum = isUnknownAuto ? remaining : toEnNum(unknownStr);
+
   const totalInput = maleNum + femaleNum + unknownNum;
   const diff = totalInput - currentCount;
   const mismatch = diff !== 0;
@@ -61,7 +66,7 @@ export default function SexingModal({ open, onClose, flock }: Props) {
     if (open && flock) {
       setMaleStr(String(flock.maleCount ?? 0));
       setFemaleStr(String(flock.femaleCount ?? 0));
-      setUnknownStr(String(flock.unknownCount ?? 0));
+      setUnknownStr(flock.unknownCount ? String(flock.unknownCount) : '');
       setDate(todayJalali());
       setNote('');
       setErr('');
@@ -168,7 +173,7 @@ export default function SexingModal({ open, onClose, flock }: Props) {
           <NumField
             value={unknownStr}
             onChange={e => setUnknownStr(e.target.value)}
-            placeholder="۰"
+            placeholder={remaining > 0 && maleNum + femaleNum > 0 ? String(remaining) : '۰'}
             unit="پرنده"
           />
         </Field>
@@ -182,10 +187,26 @@ export default function SexingModal({ open, onClose, flock }: Props) {
             fontWeight: 700,
             color: mismatch ? 'var(--danger)' : 'var(--accent)',
             textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            gap: 2,
           }}>
-            {mismatch
-              ? `${toFa(totalInput.toLocaleString('fa-IR'))} / ${toFa(currentCount.toLocaleString('fa-IR'))}`
-              : `✓ ${toFa(totalInput.toLocaleString('fa-IR'))} = ${toFa(currentCount.toLocaleString('fa-IR'))}`}
+            <span>
+              {mismatch
+                ? `✗ ${toFa(totalInput.toLocaleString('fa-IR'))} / ${toFa(currentCount.toLocaleString('fa-IR'))}`
+                : `✓ ${toFa(totalInput.toLocaleString('fa-IR'))} = ${toFa(currentCount.toLocaleString('fa-IR'))}`}
+            </span>
+            {isUnknownAuto && maleNum + femaleNum > 0 && remaining > 0 && (
+              <span style={{ fontSize: 10, fontWeight: 400, color: 'var(--muted)' }}>
+                شامل {toFa(remaining)} نامشخص (خودکار)
+              </span>
+            )}
+            {!isUnknownAuto && mismatch && (
+              <span style={{ fontSize: 10, fontWeight: 400 }}>
+                {diff > 0 ? `${toFa(diff)} بیشتر` : `${toFa(-diff)} کمتر`}
+              </span>
+            )}
           </div>
         </Field>
       </Grid2>
