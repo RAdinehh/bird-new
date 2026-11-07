@@ -30,6 +30,14 @@ const inputStyle = {
   width: '100%',
 };
 
+const SOURCE_LABEL: Record<string, string> = {
+  bulk_manual: '🍽️ پر کردن سطل',
+  daily_manual: '📝 روزانه دستی',
+  sensor_scale: '⚖️ سنسور وزن',
+  sensor_level: '📊 سنسور سطح',
+  auto_feeder: '🤖 اتومات هوشمند',
+};
+
 export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
   const [type, setType] = useState<'feed' | 'water'>('feed');
   const [date, setDate] = useState(todayJ());
@@ -86,27 +94,16 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
         </Field>
       </Grid2>
 
-      <Grid2>
-        <Field label={'مقدار (' + unit + ')'} required>
-          <input
-            type="text"
-            value={amount}
-            onChange={e => setAmount(e.target.value)}
-            placeholder={amountPlaceholder}
-            inputMode="decimal"
-            style={inputStyle}
-          />
-        </Field>
-        <Field label="روش ثبت">
-          <Select value={source} onChange={e => setSource(e.target.value as any)}>
-            <option value="bulk_manual">🍽️ پر کردن سطل</option>
-            <option value="daily_manual">📝 روزانه دستی</option>
-            <option value="sensor_scale">⚖️ سنسور وزن</option>
-            <option value="sensor_level">📊 سنسور سطح</option>
-            <option value="auto_feeder">🤖 اتومات هوشمند</option>
-          </Select>
-        </Field>
-      </Grid2>
+      <Field label={'مقدار (' + unit + ')'} required>
+        <input
+          type="text"
+          value={amount}
+          onChange={e => setAmount(e.target.value)}
+          placeholder={amountPlaceholder}
+          inputMode="decimal"
+          style={inputStyle}
+        />
+      </Field>
 
       {showSex && (
         <Field label="جنسیت">
@@ -119,6 +116,73 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
         </Field>
       )}
 
+            <details style={{ marginBottom: 8 }}>
+        <summary style={{
+          cursor: 'pointer',
+          padding: '8px 10px',
+          background: 'var(--input-bg)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--r-sm)',
+          fontSize: 'var(--fs-sm)',
+          color: 'var(--text)',
+          userSelect: 'none',
+          listStyle: 'none',
+        }}>
+          <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>
+              <span style={{ color: 'var(--muted)', fontSize: 11, marginLeft: 4 }}>روش ثبت</span>
+              <b style={{ color: 'var(--accent)' }}>{SOURCE_LABEL[source]}</b>
+            </span>
+            <span style={{ color: 'var(--muted)', fontSize: 10 }}>▾ تغییر</span>
+          </span>
+        </summary>
+        <div style={{ padding: '8px 4px 0' }}>
+          <Select value={source} onChange={e => setSource(e.target.value as any)}>
+            <option value="bulk_manual">🍽️ پر کردن سطل</option>
+            <option value="daily_manual">📝 روزانه دستی</option>
+            <option value="sensor_scale">⚖️ سنسور وزن</option>
+            <option value="sensor_level">📊 سنسور سطح</option>
+            <option value="auto_feeder">🤖 اتومات هوشمند</option>
+          </Select>
+          {source === 'sensor_level' && (
+            <div style={{
+              fontSize: 10,
+              color: 'var(--warn)',
+              padding: '4px 8px',
+              background: 'var(--warn-soft)',
+              borderRadius: 'var(--r-sm)',
+              marginTop: 6,
+            }}>
+              ⚠️ سنسور سطح — مقدار به‌عنوان «تخمینی» ثبت می‌شود
+            </div>
+          )}
+          {source === 'sensor_scale' && (
+            <div style={{
+              fontSize: 10,
+              color: 'var(--accent)',
+              padding: '4px 8px',
+              background: 'var(--accent-soft)',
+              borderRadius: 'var(--r-sm)',
+              marginTop: 6,
+            }}>
+              ✓ سنسور وزن — داده با دقت بالا ثبت می‌شود
+            </div>
+          )}
+          {source === 'auto_feeder' && (
+            <div style={{
+              fontSize: 10,
+              color: 'var(--info)',
+              padding: '4px 8px',
+              background: 'var(--info-soft)',
+              borderRadius: 'var(--r-sm)',
+              marginTop: 6,
+            }}>
+              ℹ️ اتومات هوشمند — ممکن است دو بار ثبت شود اگر سیستم هم داده بفرستد
+            </div>
+          )}
+        </div>
+      </details>
+
       <Field label="یادداشت (اختیاری)">
         <input
           type="text"
@@ -128,19 +192,6 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
           style={inputStyle}
         />
       </Field>
-
-      {confidence === 'estimated' && (
-        <div style={{
-          fontSize: 10,
-          color: 'var(--warn)',
-          padding: '4px 8px',
-          background: 'var(--warn-soft)',
-          borderRadius: 'var(--r-sm)',
-          marginTop: 4,
-        }}>
-          ⚠️ سنسور سطح — مقدار به‌عنوان «تخمینی» ثبت می‌شود
-        </div>
-      )}
 
       <BtnRow>
         <Btn variant="primary" onClick={handleSave}>ثبت</Btn>
