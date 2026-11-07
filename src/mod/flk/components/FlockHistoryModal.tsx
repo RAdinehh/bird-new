@@ -325,7 +325,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
         </TabButton>
         {auditCount > 0 && (
           <TabButton active={tabMode === 'audit'} onClick={() => setTabMode('audit')}>
-            ⚥ تغییرات ({toFa(auditCount)})
+            ⚥ تعادل جنسیتی ({toFa(auditCount)})
           </TabButton>
         )}
         {consumptionCount > 0 && (
@@ -653,20 +653,73 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
 
 function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
   const meta = SEX_AUDIT_META[ev.type] || { icon: '•', label: ev.type, tone: 'var(--muted)' };
-  const delta = formatSexDelta(ev.delta);
+  const dM = ev.delta.male;
+  const dF = ev.delta.female;
+  const dU = ev.delta.unknown;
+  const hasDelta = dM !== 0 || dF !== 0 || dU !== 0;
+
+  const SexBadge = ({ icon, label, value, delta, color }: { icon: string; label: string; value: number; delta: number; color: string }) => (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: 2,
+      flex: 1,
+      padding: '6px 4px',
+      background: 'var(--card)',
+      borderRadius: 'var(--r-sm)',
+      border: '1px solid var(--border)',
+    }}>
+      <span style={{ fontSize: 11, color: 'var(--muted)' }}>{icon} {label}</span>
+      <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-base)', fontWeight: 700 }}>{toFa(value)}</span>
+      {delta !== 0 && (
+        <span style={{ fontSize: 10, fontWeight: 700, color }}>
+          {delta > 0 ? '+' : ''}{toFa(delta)}
+        </span>
+      )}
+    </div>
+  );
+
   return (
-    <div style={{ display: 'flex', gap: 8, padding: '8px 10px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)', fontSize: 'var(--fs-sm)' }}>
-      <span style={{ fontSize: 18, flexShrink: 0 }}>{meta.icon}</span>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <b style={{ color: meta.tone }}>{meta.label}</b>
-        <div dir="ltr" style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 2, fontFamily: 'monospace', fontSize: 11 }}>
-          <span>{toFa(ev.before.male)}/{toFa(ev.before.female)}/{toFa(ev.before.unknown)}</span>
-          <span style={{ color: 'var(--muted)' }}>→</span>
-          <span>{toFa(ev.after.male)}/{toFa(ev.after.female)}/{toFa(ev.after.unknown)}</span>
-          {delta && <span style={{ color: meta.tone, fontWeight: 600 }}>({delta})</span>}
+    <div style={{
+      padding: '10px 12px',
+      background: 'var(--input-bg)',
+      borderRadius: 'var(--r-md)',
+      border: '1px solid var(--border)',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 8,
+    }}>
+      {/* سطر ۱: عنوان + تاریخ */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{ fontSize: 16 }}>{meta.icon}</span>
+          <b style={{ color: meta.tone, fontSize: 'var(--fs-sm)' }}>{meta.label}</b>
         </div>
-        {ev.note && <div style={{ color: 'var(--muted)', fontSize: 10, marginTop: 2 }}>{ev.note}</div>}
+        <span style={{ color: 'var(--muted)', fontSize: 10 }}>{toFa(ev.date)}</span>
       </div>
+
+      {/* سطر ۲: قبل → بعد (۳ ستون) */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ display: 'flex', gap: 4, flex: 1 }}>
+          <SexBadge icon="♂" label="نر" value={ev.before.male} delta={dM} color="var(--accent)" />
+          <SexBadge icon="♀" label="ماده" value={ev.before.female} delta={dF} color="var(--purple)" />
+          <SexBadge icon="?" label="نامشخص" value={ev.before.unknown} delta={dU} color="var(--muted)" />
+        </div>
+        <span style={{ fontSize: 16, color: 'var(--dim)', flexShrink: 0 }}>←</span>
+        <div style={{ display: 'flex', gap: 4, flex: 1 }}>
+          <SexBadge icon="♂" label="نر" value={ev.after.male} delta={0} color="var(--muted)" />
+          <SexBadge icon="♀" label="ماده" value={ev.after.female} delta={0} color="var(--muted)" />
+          <SexBadge icon="?" label="نامشخص" value={ev.after.unknown} delta={0} color="var(--muted)" />
+        </div>
+      </div>
+
+      {/* سطر ۳: توضیح */}
+      {ev.note && (
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
+          {ev.note}
+        </div>
+      )}
     </div>
   );
 }
