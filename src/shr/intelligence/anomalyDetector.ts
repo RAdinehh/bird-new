@@ -10,6 +10,7 @@ import type {
 import { getProfile } from './fieldProfiles';
 import { getTempIdeal } from '../validation/biological-constants';
 import { getThresholds } from '../calc/thresholds';
+import { getSpeciesExpected } from '../calc/species-expected';
 import type { CalcContext } from '../calc/types';
 import { getHistory, HistoryOptions, getUserPattern } from './historyStore';
 
@@ -215,6 +216,31 @@ export function analyzeAnomaly(
       expected = getTempIdeal(context.species, profile.fieldPath);
     }
   }
+
+  // ═══ species / species_curve — dynamic standards-aware ═══
+  if (expected === null && (profile.expectedFrom === 'species' || profile.expectedFrom === 'species_curve')) {
+    if (context.breedKey && context.ageDays != null) {
+      try {
+        const calcCtx: CalcContext = {
+          breedId: context.breedKey,
+          flockType: (context.flockType as 'broiler' | 'layer' | 'breeder' | 'ornamental') ?? 'broiler',
+          ageDays: context.ageDays,
+          aliveCount: context.flockSize ?? context.currentCount ?? 0,
+          initialCount: context.flockSize ?? 0,
+        };
+        const sp = getSpeciesExpected(profile.fieldPath, calcCtx);
+        if (sp && sp.target != null) {
+          expected = sp.target;
+          _rangeMin = sp.min;
+          _rangeMax = sp.max;
+          if (!context.expectedLabel) {
+            (context as any).expectedLabel = 'استاندارد ' + sp.source;
+          }
+        }
+      } catch { /* silent */ }
+    }
+  }
+
   if (expected === null && profile.expectedFrom === 'cross_field' && profile.crossFieldRule) {
     expected = getCrossFieldExpected(profile.crossFieldRule, context);
   }
@@ -272,6 +298,19 @@ export function analyzeAnomaly(
       else if (diff > 20) signals.push({ type: 'ratio', weight: 4, detail: `${diff.toFixed(0)}٪ خارج از هدف` });
       else if (diff > 12) signals.push({ type: 'ratio', weight: 3, detail: `${diff.toFixed(0)}٪ خارج از هدف` });
       else if (diff > 8) signals.push({ type: 'ratio', weight: 2, detail: `${diff.toFixed(0)}٪ خارج از هدف` });
+    }
+    // ─── Range check (species-aware) ───
+    else if (_rangeMin != null && _rangeMax != null && typeof value === 'number') {
+      const below = value < _rangeMin ? (_rangeMin - value) / Math.max(Math.abs(_rangeMin), 1) : 0;
+      const above = value > _rangeMax ? (value - _rangeMax) / Math.max(Math.abs(_rangeMax), 1) : 0;
+      const relOut = Math.max(below, above);
+      if (relOut > 0.5) {
+        signals.push({ type: 'range', weight: 5, detail: `${Math.round(relOut * 100)}% خارج از محدوده` });
+      } else if (relOut > 0.2) {
+        signals.push({ type: 'range', weight: 3, detail: `${Math.round(relOut * 100)}% خارج از محدوده` });
+      } else if (relOut > 0.1) {
+        signals.push({ type: 'range', weight: 2, detail: `${Math.round(relOut * 100)}% خارج از محدوده` });
+      }
     }
     // ─── بقیه (price, count, weight, ...): آستانه‌های ratio فعلی ───
     else {

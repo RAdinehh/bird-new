@@ -68,6 +68,7 @@ export interface AnalysisContext {
   species?: string;
   breedKey?: string;
   ageDays?: number;
+  flockType?: 'broiler' | 'layer' | 'breeder' | 'ornamental';
   flockSize?: number;
   femaleCount?: number;
   currentCount?: number;
