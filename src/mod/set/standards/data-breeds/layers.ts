@@ -91,6 +91,13 @@ export const HY_LINE_W36: BirdStandard = {
     { dayFrom: 281, dayTo: 500, maxPct: 2.5 },
   ],
   mortalityTotalPct: 4.5,
+  production: {
+    layingStartDay: 143,
+    peakLayingPct: 97,
+    eggsPerYear: 420,
+    eggWeightG: 63.3,
+    cycleDays: 700,
+  },
   notes: 'های‌لاین W36',
 };
 
@@ -264,6 +271,13 @@ export const LOHMANN: BirdStandard = {
     { dayFrom: 281, dayTo: 500, maxPct: 2.5 },
   ],
   mortalityTotalPct: 4.5,
+  production: {
+    layingStartDay: 142,
+    peakLayingPct: 96,
+    eggsPerYear: 405,
+    eggWeightG: 64.2,
+    cycleDays: 630,
+  },
   notes: 'لوهمن',
 };
 
