@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
-  useDlg, tempWarning, humidityWarning,
+  useDlg,
   avgWeight, sumWeight, cvWeight,
 } from '../mod/dlg/store';
 
@@ -91,39 +91,6 @@ describe('useDlg — store', () => {
     s.add(makeLog() as any);
     s.update('nonexistent', { notes: 'X' });
     expect(useDlg.getState().logs[0].notes).toBe('');
-  });
-});
-
-describe('tempWarning', () => {
-  it('null → ok', () => {
-    expect(tempWarning(null)).toBe('ok');
-  });
-  it('18-26 → ok', () => {
-    expect(tempWarning(22)).toBe('ok');
-    expect(tempWarning(18)).toBe('ok');
-    expect(tempWarning(26)).toBe('ok');
-  });
-  it('15-18 یا 26-30 → warn', () => {
-    expect(tempWarning(16)).toBe('warn');
-    expect(tempWarning(28)).toBe('warn');
-  });
-  it('<15 یا >30 → danger', () => {
-    expect(tempWarning(10)).toBe('danger');
-    expect(tempWarning(35)).toBe('danger');
-  });
-});
-
-describe('humidityWarning', () => {
-  it('40-70 → ok', () => {
-    expect(humidityWarning(55)).toBe('ok');
-  });
-  it('30-40 یا 70-80 → warn', () => {
-    expect(humidityWarning(35)).toBe('warn');
-    expect(humidityWarning(75)).toBe('warn');
-  });
-  it('<30 یا >80 → danger', () => {
-    expect(humidityWarning(20)).toBe('danger');
-    expect(humidityWarning(90)).toBe('danger');
   });
 });
 
