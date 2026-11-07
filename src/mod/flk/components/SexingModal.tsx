@@ -225,19 +225,19 @@ export default function SexingModal({ open, onClose, flock }: Props) {
       {/* 🆕 Smart Guide — اولویت‌بندی بر اساس completeness */}
       {mismatch ? (
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', marginBottom: 8, lineHeight: 1.6 }}>
-          ⚠️ {toFa(Math.abs(diff))} پرنده {diff > 0 ? 'بیشتر' : 'کمتر'} — ثبت‌شده {toFa(totalInput)}، نیاز {toFa(currentCount)}
+          {toFa(Math.abs(diff))} پرنده {diff > 0 ? 'بیشتر' : 'کمتر'} — ثبت‌شده {toFa(totalInput)}، نیاز {toFa(currentCount)}
         </div>
       ) : isIncomplete && noInput ? (
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 8, lineHeight: 1.6 }}>
-          💡 تعداد نر یا ماده را وارد کنید — سومین فیلد خودکار محاسبه می‌شود
+          تعداد نر یا ماده را وارد کنید — سومین فیلد خودکار محاسبه می‌شود
         </div>
       ) : isIncomplete ? (
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--info)', marginBottom: 8, lineHeight: 1.6 }}>
-          💡 یک فیلد دیگر وارد کنید — سومین فیلد خودکار محاسبه می‌شود
+          یک فیلد دیگر وارد کنید — سومین فیلد خودکار محاسبه می‌شود
         </div>
       ) : autoFillField ? (
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--info)', marginBottom: 8, lineHeight: 1.6 }}>
-          💡 {autoFillField === 'male' ? 'نر' : autoFillField === 'female' ? 'ماده' : 'نامشخص'} = <b>{toFa(autoFillValue)}</b> (خودکار محاسبه شد)
+          {autoFillField === 'male' ? 'نر' : autoFillField === 'female' ? 'ماده' : 'نامشخص'} = <b>{toFa(autoFillValue)}</b> (خودکار محاسبه شد)
         </div>
       ) : null}
 
