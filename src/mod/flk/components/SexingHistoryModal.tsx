@@ -1,8 +1,8 @@
 /**
  * SexingHistoryModal — تاریخچه تفکیک جنسیت گله
- * گروه‌بندی بر اساس تاریخ (match FlockHistoryModal)
+ * گروه‌بندی بر اساس تاریخ + کارت متوسط + نمایش ۱۰ تای آخر
  */
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Modal, Btn, BtnRow, Tag } from '../../../shr/components/ui';
 import { useFlk, type Flock } from '../store';
 import { toFa, formatNumWhileTyping } from '../../../shr/utils/fa';
@@ -21,11 +21,15 @@ const SRC_LABEL: Record<string, { label: string; tone: 'green' | 'amber' | 'blue
   correction: { label: 'اصلاح', tone: 'blue' },
 };
 
+const VISIBLE_LIMIT = 10;
+
 function fmt(n: number | undefined | null): string {
   return formatNumWhileTyping(String(n || 0)) || '۰';
 }
 
 export default function SexingHistoryModal({ open, onClose, flock }: Props) {
+  const [showAll, setShowAll] = useState(false);
+
   const events = useMemo(() => {
     if (!flock) return [];
     return [...(flock.sexingEvents || [])].sort((a, b) => {
@@ -53,6 +57,20 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
     return order.map(k => ({ label: k, items: map.get(k)! }));
   }, [eventsWithMeta]);
 
+  const { visibleGroups, hiddenCount } = useMemo(() => {
+    if (showAll) return { visibleGroups: groups, hiddenCount: 0 };
+    let total = 0;
+    const out: typeof groups = [];
+    for (const g of groups) {
+      if (total >= VISIBLE_LIMIT) break;
+      out.push(g);
+      total += g.items.length;
+    }
+    const visibleCount = out.reduce((s, g) => s + g.items.length, 0);
+    const totalCount = groups.reduce((s, g) => s + g.items.length, 0);
+    return { visibleGroups: out, hiddenCount: totalCount - visibleCount };
+  }, [groups, showAll]);
+
   if (!flock) return null;
 
   return (
@@ -68,8 +86,8 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
           هنوز تفکیکی برای این گله ثبت نشده است.
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {groups.map(g => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {visibleGroups.map(g => (
             <div key={g.label}>
               <div style={{
                 fontSize: 11,
@@ -82,7 +100,7 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
               }}>
                 {g.label}
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {g.items.map(({ ev, prev }) => {
                   const dM = prev ? ev.male - prev.male : 0;
                   const dF = prev ? ev.female - prev.female : 0;
@@ -91,46 +109,40 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
                   const srcInfo = SRC_LABEL[ev.source] || { label: ev.source, tone: 'gray' as const };
                   return (
                     <div key={ev.id} style={{
-                      padding: 'var(--pad-normal)',
+                      padding: '8px 10px',
                       background: 'var(--input-bg)',
-                      borderRadius: 'var(--r-md)',
+                      borderRadius: 'var(--r-sm)',
                       border: '1px solid var(--border)',
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: 6,
+                      gap: 4,
                     }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>
-                          📅 {toFa(ev.date)}
-                        </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                         <Tag tone={srcInfo.tone}>{srcInfo.label}</Tag>
-                      </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 'var(--sp-1)' }}>
-                        <div style={{ padding: 'var(--pad-tight)', background: 'var(--bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)' }}>
-                          <div style={{ color: 'var(--muted)' }}>نر</div>
-                          <div style={{ fontWeight: 700 }}>{fmt(ev.male)}</div>
-                        </div>
-                        <div style={{ padding: 'var(--pad-tight)', background: 'var(--bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)' }}>
-                          <div style={{ color: 'var(--muted)' }}>ماده</div>
-                          <div style={{ fontWeight: 700 }}>{fmt(ev.female)}</div>
-                        </div>
-                        <div style={{ padding: 'var(--pad-tight)', background: 'var(--bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)' }}>
-                          <div style={{ color: 'var(--muted)' }}>نامشخص</div>
-                          <div style={{ fontWeight: 700 }}>{fmt(ev.unknown)}</div>
-                        </div>
+                        <span style={{ fontSize: 'var(--fs-sm)' }}>
+                          <span style={{ color: 'var(--muted)' }}>♂ نر</span>{' '}
+                          <b>{fmt(ev.male)}</b>
+                        </span>
+                        <span style={{ fontSize: 'var(--fs-sm)' }}>
+                          <span style={{ color: 'var(--muted)' }}>♀ ماده</span>{' '}
+                          <b>{fmt(ev.female)}</b>
+                        </span>
+                        <span style={{ fontSize: 'var(--fs-sm)' }}>
+                          <span style={{ color: 'var(--muted)' }}>? نامشخص</span>{' '}
+                          <b>{fmt(ev.unknown)}</b>
+                        </span>
                       </div>
                       {hasDelta && (
                         <div style={{
                           fontSize: 'var(--fs-xs)',
                           color: 'var(--info, #0284c7)',
-                          padding: 'var(--pad-tight)',
-                          background: 'var(--info-soft, rgba(2,132,199,.08))',
-                          borderRadius: 'var(--r-sm)',
+                          paddingTop: 4,
+                          borderTop: '1px dashed var(--border)',
                         }}>
                           ⚠️ تفاوت با قبلی:
                           {dM !== 0 && ` نر ${dM > 0 ? '+' : ''}${toFa(dM)}`}
-                          {dF !== 0 && ` • ماده ${dF > 0 ? '+' : ''}${toFa(dF)}`}
-                          {dU !== 0 && ` • نامشخص ${dU > 0 ? '+' : ''}${toFa(dU)}`}
+                          {dF !== 0 && ` · ماده ${dF > 0 ? '+' : ''}${toFa(dF)}`}
+                          {dU !== 0 && ` · نامشخص ${dU > 0 ? '+' : ''}${toFa(dU)}`}
                         </div>
                       )}
                       {ev.note && (
@@ -144,6 +156,25 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
               </div>
             </div>
           ))}
+          {hiddenCount > 0 && (
+            <button
+              type="button"
+              onClick={() => setShowAll(true)}
+              style={{
+                padding: '10px',
+                background: 'var(--input-bg)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--r-sm)',
+                fontSize: 'var(--fs-sm)',
+                color: 'var(--accent)',
+                fontWeight: 600,
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+              }}
+            >
+              📜 نمایش {toFa(hiddenCount)} رویداد بیشتر
+            </button>
+          )}
         </div>
       )}
     </Modal>
