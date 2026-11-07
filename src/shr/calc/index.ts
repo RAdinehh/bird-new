@@ -61,3 +61,6 @@ export { calculateProfit } from './economics/profit';
 
 // ═══ Economics — C1.4c ═══
 export { calculateAverages } from './economics/averages';
+
+// ═══ C2 — Environment warnings ═══
+export { calculateEnvironmentWarnings } from './formulas/environment';
