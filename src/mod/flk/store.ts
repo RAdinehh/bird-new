@@ -175,6 +175,11 @@ export const useFlk = create<State>()(
         if (hasSplit && !patch.genderSplitAt) {
           patch.genderSplitAt = now();
         }
+        // 🆕 فیکس: اگر split ولی initialMaleCount ست نشده (فاکتور خرید / ساخت دستی)
+        if (patch.genderSplitAt && patch.initialMaleCount === undefined) {
+          patch.initialMaleCount = patch.maleCount ?? 0;
+          patch.initialFemaleCount = patch.femaleCount ?? 0;
+        }
         set({ flocks: [...get().flocks, { ...patch, id, createdAt: now(), updatedAt: now() }] });
         return id;
       },
@@ -786,7 +791,7 @@ export const useFlk = create<State>()(
     }),
     {
       name: 'pm-flk',
-      version: 12,
+      version: 13,
       migrate: flkMigrate,
     }
   )

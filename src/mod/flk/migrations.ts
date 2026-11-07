@@ -45,6 +45,30 @@ type PersistedFlk = {
 };
 
 export function flkMigrate(persistedInput: unknown, version: number): State {
+
+  // 🆕 v13 — fix missing initialMaleCount/initialFemaleCount for split flocks
+  // علت: applyInvoiceFlocks و FlockCreateStandalone این فیلدها را ست نمی‌کردند
+  if (version < 13) {
+    const p = persistedInput as any;
+    if (p && Array.isArray(p.flocks)) {
+      for (const f of p.flocks) {
+        if (f.genderSplitAt && f.initialMaleCount === undefined) {
+          const sortedEvents = (f.sexBalanceEvents || []).slice().sort((a: any, b: any) =>
+            (a.createdAt || '').localeCompare(b.createdAt || '')
+          );
+          const firstEv = sortedEvents[0];
+          if (firstEv && firstEv.before) {
+            f.initialMaleCount = firstEv.before.male ?? 0;
+            f.initialFemaleCount = firstEv.before.female ?? 0;
+          } else {
+            f.initialMaleCount = f.maleCount ?? 0;
+            f.initialFemaleCount = f.femaleCount ?? 0;
+          }
+        }
+      }
+    }
+  }
+
   const persisted = persistedInput as PersistedFlk;
   const state: { flocks?: LegacyFlock[] } = (persisted && persisted.state ? persisted.state : persisted) as { flocks?: LegacyFlock[] };
   if (!state || !state.flocks) return persistedInput as State;
