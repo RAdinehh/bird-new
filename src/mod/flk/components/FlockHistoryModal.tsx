@@ -283,7 +283,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
         background: 'var(--input-bg)',
         border: '1px solid var(--border)',
         borderRadius: 'var(--r-sm)',
-        marginBottom: 6,
+        marginBottom: 2,
         display: 'flex',
         flexDirection: 'column',
         gap: 6,
@@ -739,7 +739,7 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
       {e.reason && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-sm)' }}>
           <span style={{ color: 'var(--muted)' }}>دلیل:</span>
-          <b style={{ color: 'var(--text)' }}>{e.reason}</b>
+          <span style={{ color: 'var(--text)' }}>{e.reason}</span>
         </div>
       )}
 
