@@ -325,31 +325,6 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
             </span>
           )}
         </div>
-
-        {hasBreakdown && (
-          <div style={{
-            display: 'flex', gap: 10, flexWrap: 'wrap',
-            fontSize: 11, color: 'var(--muted)',
-            paddingTop: 6,
-            borderTop: '1px dashed var(--border)',
-          }}>
-            {eventBreakdown.death > 0 && (
-              <span>💀 تلفات <b style={{ color: 'var(--danger)' }}>{toFa(eventBreakdown.death)}</b></span>
-            )}
-            {eventBreakdown.sell > 0 && (
-              <span>💰 فروش <b style={{ color: 'var(--purple)' }}>{toFa(eventBreakdown.sell)}</b></span>
-            )}
-            {eventBreakdown.cull > 0 && (
-              <span>🗑 حذف <b>{toFa(eventBreakdown.cull)}</b></span>
-            )}
-            {eventBreakdown.add > 0 && (
-              <span>➕ افزودن <b style={{ color: 'var(--accent)' }}>{toFa(eventBreakdown.add)}</b></span>
-            )}
-            {eventBreakdown.correctionNet !== 0 && (
-              <span>اصلاح <b style={{ color: 'var(--warn)' }}>{eventBreakdown.correctionNet > 0 ? '+' : ''}{toFa(eventBreakdown.correctionNet)}</b></span>
-            )}
-          </div>
-        )}
       </div>
 
       {/* ═══ تب‌ها (Segmented Control) ═══ */}
@@ -424,7 +399,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
                   const digits = raw.replace(/[^0-9]/g, '');
                   if (digits) { setDelta(toFa(isNegative ? '-' + digits : digits)); } else { setDelta(isNegative ? '−' : ''); }
                   setValidationError('');
-                }} placeholder="۰" inputMode="text" style={{ flex: 1, minWidth: 0, width: '100%', background: 'none', border: 'none', outline: 'none', fontFamily: 'monospace', fontSize: 'var(--fs-base)', fontWeight: 700, color: num > 0 ? 'var(--accent)' : num < 0 ? 'var(--danger)' : 'var(--text)', textAlign: 'center', padding: '0 4px', direction: 'ltr' }} />
+                }} inputMode="text" style={{ flex: 1, minWidth: 0, width: '100%', background: 'none', border: 'none', outline: 'none', fontFamily: 'monospace', fontSize: 'var(--fs-base)', fontWeight: 700, color: num > 0 ? 'var(--accent)' : num < 0 ? 'var(--danger)' : 'var(--text)', textAlign: 'center', padding: '0 4px', direction: 'ltr' }} />
                 <button type="button" onClick={() => { const n = parseInt(toEn(delta), 10) || 0; setDelta(toFa(String(n - 1))); }} style={{ width: 32, height: '100%', border: 'none', background: 'transparent', fontSize: 18, fontWeight: num < 0 ? 700 : 400, color: num < 0 ? 'var(--danger)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderRight: '1px solid var(--border)', flexShrink: 0, padding: 0 }}>−</button>
               </div>
             </div>
@@ -433,9 +408,11 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
               <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>موجودی بعد از ثبت</span>
               <div style={{ background: 'var(--card)', border: '1px solid ' + (num !== 0 ? (newCount < 0 ? 'var(--danger)' : (newCount < initial * 0.1 ? 'var(--warn)' : 'var(--accent)')) : 'var(--warn)'), borderRadius: 'var(--r-md)', height: 40, padding: '0 4px', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden', minWidth: 0 }}>
-                <div dir="ltr" style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13 }}>
-                  <span style={{ fontFamily: 'monospace', fontWeight: 600, color: 'var(--muted)' }}>{toFa(current)}</span>
-                  <span style={{ color: 'var(--dim)', fontSize: 11 }}>→</span>
+                <div dir="rtl" style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13 }}>
+                  <span style={{ fontSize: 10, color: 'var(--muted)' }}>فعلی</span>
+                  <span style={{ fontFamily: 'monospace', fontWeight: 700, color: 'var(--text)' }}>{toFa(current)}</span>
+                  <span style={{ color: 'var(--dim)', fontSize: 12 }}>←</span>
+                  <span style={{ fontSize: 10, color: 'var(--muted)' }}>بعدی</span>
                   {num === 0 ? <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 400, color: 'var(--dim)' }}>؟</span> : newCount < 0 ? <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, color: 'var(--danger)' }}>منفی</span> : num > 0 ? <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'var(--accent)' }}>{toFa(newCount)}</span> : <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'var(--danger)' }}>{toFa(newCount)}</span>}
                 </div>
               </div>
