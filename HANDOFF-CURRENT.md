@@ -67,6 +67,10 @@
 - **Egg سایر** — برچسب ساده + HelpIcon «نرم، کثیف، ترک‌خورده...» ✅
 - **Mortality calc** — متصل در FlockHistoryModal (نرخ تلفات تجمعی + ۱۱ تست) ✅
 - **Weight calc** — متصل در EggsWeightSection (≥3 نمونه، fallback legacy برای ۲) + uniformity ✅
+- **Stocking calc** — متصل در FlockHistoryModal (چگالی گله) ✅
+- **Water calc** — متصل در dsh (calculateWaterMetrics جایگزین inline) ✅
+
+**🏆 ۷/۷ calc orphan همه متصل: FCR، EPEF، Egg، Mortality، Weight، Stocking، Water**
 
 ### 🚧 In progress — Stocking + Water
 
@@ -83,18 +87,22 @@
 
 ### ⏳ بعدی — به ترتیب پیشنهادی
 
-1. **Stocking** orphan — چگالی گله در سالن
-2. **Water** orphan — نسبت آب/دان
-3. **`entryTime` Zod mismatch**
-4. **`dsh` استفاده از `aggregateEggMetrics`** (helper آماده)
-5. بعد: G (Draft), H (CSV), C8 (EggSale.quality)
-6. D5.4 (`_v`/`_txid`) — همراه server
+1. **`entryTime` Zod mismatch** — type اجباری، validation اختیاری
+2. **`dsh` استفاده از `aggregateEggMetrics`** — helper آماده
+3. **۳ نسخهٔ موازی avgWeight** — یکسان‌سازی
+4. بعد: G (Draft Mode), H (CSV), C8 (EggSale.quality)
+5. D5.4 (`_v`/`_txid`) — همراه server
 
 ## 🐛 شکاف‌های باز (از DLG-AUDIT، به‌روز شده)
 
-- **۲ calc orphan باقی‌مانده** — Stocking, Water (۵ از ۷ انجام: FCR، EPEF، Egg، Mortality، Weight)
-- **`entryTime` Zod mismatch**
-- **۳ نسخهٔ موازی avgWeight**
+- **`entryTime` Zod mismatch** — type اجباری، validation اختیاری
+- **۳ نسخهٔ موازی avgWeight** (dlg/store، calc/weight، dsh inline)
+- **`dsh` aggregateEggMetrics** — helper آماده، متصل نشده
+
+**حل‌شده در این جلسه:**
+- ۷/۷ calc orphan متصل
+- `softCount: 0` → تصمیم UX (DECISIONS)
+- `calculateFCR` helpers-audit:246 → fix در `7afd3aa5`
 
 **حل‌شده (نه باگ):**
 - `softCount: 0` → تصمیم UX (DECISIONS 1405/11/08)

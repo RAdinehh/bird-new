@@ -782,3 +782,29 @@ Zustand `set()` = atomic (single shallow merge). هر action یک `set()` دار
 **پیامد:**
 - از ۷ calc orphan: FCR، EPEF، Egg، Mortality، Weight — **۵/۷**
 - باقی: Stocking، Water
+
+---
+
+## Stocking + Water calc orphan (1405/11/08)
+
+**Stocking:** متصل در `FlockHistoryModal` (commit `95c52d2c`).
+- `densityBirdPerSqM` از `flock.currentCount / (hall.length * hall.width)`
+- `standardDensityMax: null` (استاندارد نژاد در future)
+- UI: کارت `📐 چگالی`
+
+**Water:** متصل در `dsh/useDashboardData` (commit `68b8dcb7`).
+- `calculateWaterMetrics` جایگزین inline `water/feed`
+- `waterFeedTone` + `waterFeedWarning` به return اضافه
+- AnalyticsCards color logic **دست نخورد** (صفر تغییر بصری)
+
+**🏆 نتیجه: ۷/۷ calc orphan متصل.**
+
+| # | تابع | commit |
+|---|---|---|
+| ۱ | FCR | `7afd3aa5` |
+| ۲ | EPEF | `9ebde4cb` |
+| ۳ | Egg | `5b581c3f` |
+| ۴ | Mortality | `fd3fca23` |
+| ۵ | Weight | `65c82b57` |
+| ۶ | Stocking | `95c52d2c` |
+| ۷ | Water | `68b8dcb7` |
