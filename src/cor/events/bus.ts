@@ -26,6 +26,43 @@ export class EventBus {
   setDevMode(on: boolean) { this.devMode = on; }
   isDevMode() { return this.devMode; }
 
+  /**
+   * emitSync — نسخه sync از emit، برای سناریوهای atomic
+   *
+   * - فقط handlerهای sync را صدا می‌زند
+   * - handlerهای async (که Promise برمی‌گردانند) fire-and-forget
+   * - اگر handler sync throw کند، بعد از اجرای همه، اولین خطا re-throw می‌شود
+   *
+   * استفاده: egg.store برای rollback atomic
+   */
+  emitSync<K extends AppEventName>(
+    event: K,
+    data: AppEventData<K>,
+    meta?: Partial<EventMeta> & { source?: string },
+  ): void {
+    const traceId = meta?.traceId || `t_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+    const source = meta?.source || 'unknown';
+    const entries = (this.listeners.get(event) || []).slice();
+    const errors: any[] = [];
+    const fullMeta: any = { ...(meta || {}), traceId, source };
+
+    for (const entry of entries) {
+      try {
+        const result = entry.handler(data, fullMeta);
+        if (result instanceof Promise) {
+          result.catch(() => { /* fire-and-forget */ });
+        }
+      } catch (e) {
+        errors.push(e);
+      }
+      if (entry.once) this.off(event, entry.handler as any);
+    }
+
+    if (errors.length > 0) {
+      throw errors[0];
+    }
+  }
+
   on<K extends AppEventName>(
     event: K,
     handler: (data: AppEventData<K>, meta: EventMeta) => void | Promise<void>,
