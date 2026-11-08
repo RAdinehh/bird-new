@@ -9,6 +9,7 @@ import { useEgg } from '../egg/store';
 import { verifyInvariantsIfDev } from '../../shr/dev/invariants';
 import { useWhs } from '../whs/store';
 import { useHal } from '../hal/store';
+import type { EquipmentCategory, EquipmentUnit } from '../hal/store';
 import { bus } from '../../cor/events';
 
 import type { Invoice, InvoiceItem, State, DeletedInvoiceSnapshot, DeletedDealSnapshot, Deal, Settlement } from './types';
@@ -475,7 +476,7 @@ export const useTra = create<State>()(
           const flkState = useFlk.getState();
           const linked = flkState.flocks.filter((f: any) => f.sourceInvoiceId === id);
           linked.forEach((f: any) => {
-            try { flkState.update(f.id, { sourceInvoiceId: '', sourceCategory: '' } as any); } catch (e) { console.error('[tra delete] flock unlink failed:', e); }
+            try { flkState.update(f.id, { sourceInvoiceId: '', sourceCategory: '' }); } catch (e) { console.error('[tra delete] flock unlink failed:', e); }
           });
           if (linked.length > 0) {
             // Merge info — no separate toast (single notification policy)
@@ -548,7 +549,7 @@ export const useTra = create<State>()(
                   }
                   return f;
                 }),
-              } as any);
+              });
             }
           } catch (e) { console.error('[deleteInvoice] post-loop fix failed:', e); }
 
@@ -597,18 +598,18 @@ export const useTra = create<State>()(
           const eq = halState.equipment.find((e: any) => e.id === eqId);
           if (eq) {
             // تجهیز هنوز هست → تعداد رو برگردون
-            try { halState.updateEquip(eqId, { count: (eq.count || 0) + qty } as any); } catch (e) { console.error('[tra delete] hal.updateEquip failed:', e); }
+            try { halState.updateEquip(eqId, { count: (eq.count || 0) + qty }); } catch (e) { console.error('[tra delete] hal.updateEquip failed:', e); }
           } else {
             // تجهیز حذف شده بود → بازسازی
             try {
               halState.addEquip({
                 hallId: it.hallId || '',
                 zoneId: it.zoneId || '',
-                category: it.equipmentCategory || 'other',
+                category: (it.equipmentCategory || 'other') as EquipmentCategory,
                 type: it.equipmentType || 'other',
                 name: it.description || 'تجهیز',
                 count: qty,
-                unit: it.unit || 'pcs',
+                unit: (it.unit || 'pcs') as EquipmentUnit,
                 unitPrice: it.unitPrice || null,
                 purchasedAt: '',
                 warranty: null,
@@ -618,7 +619,7 @@ export const useTra = create<State>()(
                 sourceInvoiceId: '',
                 model: it.model || '',
                 status: 'active',
-              } as any);
+              });
             } catch (e) { console.error('[tra delete] equip restore:', e); }
           }
         }
