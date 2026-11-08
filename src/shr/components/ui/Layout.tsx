@@ -33,8 +33,8 @@ export function SectionTitle({ children }: { children: React.ReactNode }) {
       marginTop: 4,
       borderTop: '1px dashed var(--border)',
       fontSize: 'var(--fs-base)',
-      fontWeight: 700,
-      color: 'var(--text)',
+      fontWeight: 600,
+      color: 'var(--muted)',
       letterSpacing: '.3px',
     }}>{children}</div>
   );
