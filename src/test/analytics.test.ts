@@ -18,7 +18,7 @@ const makeProd = (o: any = {}) => ({
 });
 
 const makeLog = (o: any = {}) => ({
-  id: 'l1', date: '1405/07/09', feedAmount: 50, deaths: [],
+  id: 'l1', date: '1405/07/09', feedDelivered: 50, deaths: [],
   ...o,
 });
 
@@ -218,10 +218,10 @@ describe('eggsInMonth', () => {
 // feedInMonth
 // ═══════════════════════════════════════════════
 describe('feedInMonth', () => {
-  it('جمع feedAmount در ماه', () => {
+  it('جمع feedDelivered در ماه', () => {
     const logs = [
-      makeLog({ feedAmount: 50 }),
-      makeLog({ feedAmount: 30 }),
+      makeLog({ feedDelivered: 50 }),
+      makeLog({ feedDelivered: 30 }),
     ];
     expect(feedInMonth(logs, '1405/07')).toBe(80);
   });
@@ -257,7 +257,7 @@ describe('deathsInMonth', () => {
 // ═══════════════════════════════════════════════
 describe('fcrMonth — ضریب تبدیل غذایی', () => {
   it('feed=100, birds=1000, gain=1.8kg → FCR=55.56', () => {
-    const logs = [makeLog({ feedAmount: 100 })];
+    const logs = [makeLog({ feedDelivered: 100 })];
     // gain = 1000 * 1.8 / 1000 = 1.8 کیلو
     // FCR = 100 / 1.8 = 55.55...
     expect(fcrMonth(logs, '1405/07', 1000, 1.8)).toBe(55.56);
@@ -268,19 +268,19 @@ describe('fcrMonth — ضریب تبدیل غذایی', () => {
   });
 
   it('birds=0 → 0 (بدون تقسیم بر صفر)', () => {
-    const logs = [makeLog({ feedAmount: 100 })];
+    const logs = [makeLog({ feedDelivered: 100 })];
     expect(fcrMonth(logs, '1405/07', 0, 1.8)).toBe(0);
   });
 
   it('avgWeightGain=0 → 0', () => {
-    const logs = [makeLog({ feedAmount: 100 })];
+    const logs = [makeLog({ feedDelivered: 100 })];
     expect(fcrMonth(logs, '1405/07', 1000, 0)).toBe(0);
   });
 
   it('مقدار معقول (FCR 1.5-2.0 برای مرغ)', () => {
     // اگه 1.5 باشه: feed = 1.8 * 1.5 = 2.7 کیلو برای 1000 پرنده
     // یعنی 2700 گرم دان / 1800 گرم وزن = 1.5
-    const logs = [makeLog({ feedAmount: 2.7 })];
+    const logs = [makeLog({ feedDelivered: 2.7 })];
     expect(fcrMonth(logs, '1405/07', 1000, 1.8)).toBe(1.5);
   });
 });

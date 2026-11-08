@@ -10,7 +10,7 @@ const evtWithNote = (note: string): ConsumptionEvent => ({
 });
 
 const log = (o: any = {}) => ({
-  id: 'l1', flockId: 'f1', date: '1405/08/01', feedAmount: 25, ...o,
+  id: 'l1', flockId: 'f1', date: '1405/08/01', feedDelivered: 25, ...o,
 });
 
 describe('runFeedMigrationIfNeeded', () => {

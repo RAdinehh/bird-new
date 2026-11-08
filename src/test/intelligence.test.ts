@@ -185,7 +185,7 @@ describe('Cross-field', () => {
   });
   it('دان مصرفی نسبت به گله', () => {
     // گله ۱۰۰۰، perBird=120g → expected = 120kg
-    const w = analyzeAnomaly('dlg.feedAmount', 1200, {
+    const w = analyzeAnomaly('dlg.feedDelivered', 1200, {
       flockSize: 1000, perBirdGramsPerDay: 120,
     }, STORE);
     // 1200 / 120 = 10x → تک سیگنال قوی → حداقل yellow
@@ -225,7 +225,7 @@ describe('User Pattern — درصد', () => {
 describe('Anti-False-Positive', () => {
   it('تک سیگنال قوی (ratio 10x) → حداقل yellow', () => {
     // بدون تاریخچه، فقط cross-field → ratio 10x → weight 3 → yellow
-    const w = analyzeAnomaly('dlg.feedAmount', 1200, {
+    const w = analyzeAnomaly('dlg.feedDelivered', 1200, {
       flockSize: 1000, perBirdGramsPerDay: 120,
     }, STORE);
     expect(w).not.toBeNull();

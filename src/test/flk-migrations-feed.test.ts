@@ -6,7 +6,7 @@ const log = (o: any = {}) => ({
   id: 'l-' + Math.random().toString(36).slice(2, 7),
   flockId: 'f1',
   date: '1405/08/01',
-  feedAmount: 25,
+  feedDelivered: 25,
   ...o,
 });
 
@@ -18,8 +18,8 @@ const evtWithNote = (note: string): ConsumptionEvent => ({
 });
 
 describe('migrateFeedLogsToConsumption', () => {
-  it('یک log با feedAmount → یک candidate', () => {
-    const out = migrateFeedLogsToConsumption([log({ feedAmount: 25 })], new Set());
+  it('یک log با feedDelivered → یک candidate', () => {
+    const out = migrateFeedLogsToConsumption([log({ feedDelivered: 25 })], new Set());
     expect(out).toHaveLength(1);
     expect(out[0].amount).toBe(25);
     expect(out[0].type).toBe('feed');
@@ -30,13 +30,13 @@ describe('migrateFeedLogsToConsumption', () => {
     expect(out[0].date).toBe('1405/08/01');
   });
 
-  it('feedAmount=0 → skip', () => {
-    const out = migrateFeedLogsToConsumption([log({ feedAmount: 0 })], new Set());
+  it('feedDelivered=0 → skip', () => {
+    const out = migrateFeedLogsToConsumption([log({ feedDelivered: 0 })], new Set());
     expect(out).toHaveLength(0);
   });
 
-  it('feedAmount=null → skip', () => {
-    const out = migrateFeedLogsToConsumption([log({ feedAmount: null })], new Set());
+  it('feedDelivered=null → skip', () => {
+    const out = migrateFeedLogsToConsumption([log({ feedDelivered: null })], new Set());
     expect(out).toHaveLength(0);
   });
 
@@ -51,7 +51,7 @@ describe('migrateFeedLogsToConsumption', () => {
   });
 
   it('existingNotes حاوی marker → skip', () => {
-    const l = log({ id: 'l-fixed', feedAmount: 25 });
+    const l = log({ id: 'l-fixed', feedDelivered: 25 });
     const existing = new Set([`${MIGRATED_NOTES_PREFIX}l-fixed]`]);
     const out = migrateFeedLogsToConsumption([l], existing);
     expect(out).toHaveLength(0);
@@ -59,9 +59,9 @@ describe('migrateFeedLogsToConsumption', () => {
 
   it('چند log → چند candidate، amount گرد شده', () => {
     const out = migrateFeedLogsToConsumption([
-      log({ id: 'a', feedAmount: 25.567 }),
-      log({ id: 'b', feedAmount: 10 }),
-      log({ id: 'c', feedAmount: 0 }),
+      log({ id: 'a', feedDelivered: 25.567 }),
+      log({ id: 'b', feedDelivered: 10 }),
+      log({ id: 'c', feedDelivered: 0 }),
     ], new Set());
     expect(out).toHaveLength(2);
     expect(out[0].amount).toBe(25.57);

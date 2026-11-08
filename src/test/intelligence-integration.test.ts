@@ -39,12 +39,12 @@ describe('Integration — end-to-end', () => {
     expect(msg).toMatch(/[ا-ی]/);
   });
 
-  it('feedAmount: cascade fallback از cross_field به history', () => {
+  it('feedDelivered: cascade fallback از cross_field به history', () => {
     // بدون perBirdGramsPerDay → cross_field null → fallback history
     for (let i = 0; i < 5; i++) {
-      recordHistory('dlg.feedAmount', 120, { flockSize: 1000 }, { ...STORE, today: `2026-10-${15 + i}` });
+      recordHistory('dlg.feedDelivered', 120, { flockSize: 1000 }, { ...STORE, today: `2026-10-${15 + i}` });
     }
-    const w = analyzeAnomaly('dlg.feedAmount', 720, { flockSize: 1000 }, { ...STORE, today: '2026-10-20' });
+    const w = analyzeAnomaly('dlg.feedDelivered', 720, { flockSize: 1000 }, { ...STORE, today: '2026-10-20' });
     expect(w).not.toBeNull();
     expect(w!.level).toMatch(/orange|red/);
   });
