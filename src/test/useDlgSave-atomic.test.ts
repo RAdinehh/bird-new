@@ -9,9 +9,9 @@
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useDlgSave } from '../mod/dlg/hooks/useDlgSave';
-import { useDlg } from '../mod/dlg/store';
-import { useWhs } from '../mod/whs/store';
+import { useDlgSave, type UseDlgSaveParams } from '../mod/dlg/hooks/useDlgSave';
+import { useDlg, type DailyLog } from '../mod/dlg/store';
+import { useWhs, type Item } from '../mod/whs/store';
 import { useEgg } from '../mod/egg/store';
 import { useFlk } from '../mod/flk/store';
 import type { F } from '../mod/dlg/types';
@@ -69,7 +69,7 @@ const emptyForm = (): F => ({
   deaths: [], vaccines: [], medications: [], activities: [], notes: '',
 });
 
-const makeLogRecord = (overrides: any = {}) => ({
+const makeLogRecord = (overrides: Partial<Omit<DailyLog, 'id' | 'status' | 'createdAt' | 'updatedAt'>> = {}): Omit<DailyLog, 'id' | 'status' | 'createdAt' | 'updatedAt'> => ({
   flockId: 'flock-1',
   date: '1405/08/08',
   entryTime: '08:00',
@@ -87,7 +87,7 @@ const makeLogRecord = (overrides: any = {}) => ({
   ...overrides,
 });
 
-const makeParams = (overrides: Partial<any> = {}) => ({
+const makeParams = (overrides: Partial<UseDlgSaveParams> = {}): UseDlgSaveParams => ({
   form: emptyForm(),
   setForm: vi.fn(),
   saving: false,
@@ -103,8 +103,10 @@ const makeParams = (overrides: Partial<any> = {}) => ({
 });
 
 // ═══ setup ═══
-let origAddMovement: any;
-let origRemove: any;
+type WhsState = ReturnType<typeof useWhs.getState>;
+type DlgState = ReturnType<typeof useDlg.getState>;
+let origAddMovement: WhsState['addMovement'] | undefined;
+let origRemove: DlgState['remove'] | undefined;
 
 beforeEach(() => {
   if (!origAddMovement) origAddMovement = useWhs.getState().addMovement;
@@ -135,11 +137,11 @@ describe('useDlgSave — B4 atomic', () => {
 
   it('2) save shortage + reject → false، صفر mutation', async () => {
     const { checkStock } = await import('../mod/dlg/api/checkStock');
-    (checkStock as any).mockReturnValueOnce([
+    vi.mocked(checkStock).mockReturnValueOnce([
       { name: 'test-item', need: 10, have: 5, unit: 'kg' },
     ]);
     const { showConfirmAsync } = await import('../cor/store/dialog');
-    (showConfirmAsync as any).mockResolvedValueOnce(false);
+    vi.mocked(showConfirmAsync).mockResolvedValueOnce(false);
 
     const params = makeParams();
     const { result } = renderHook(() => useDlgSave(params));
@@ -154,15 +156,16 @@ describe('useDlgSave — B4 atomic', () => {
 
   it('3) save fail در cascade → rollback کامل', async () => {
     // mock addMovement → '' → atomic throw
-    useWhs.setState({ addMovement: (() => '') as any });
+    useWhs.setState({ addMovement: () => '' });
     useWhs.setState({
       items: [{
         id: 'item-1', name: 'feed', category: 'feed',
         currentStock: 100, lastPrice: 1000, unit: 'kg',
         initialStock: 100, minStock: 0, supplierId: '',
         expireDate: '', storage: 'room', notes: '',
+        withdrawalDays: null,
         createdAt: '', updatedAt: '',
-      } as any],
+      } as Item],
     });
 
     const params = makeParams({
@@ -184,11 +187,11 @@ describe('useDlgSave — B4 atomic', () => {
     // rollback: whs movements still empty
     expect(useWhs.getState().movements).toHaveLength(0);
     // restore
-    useWhs.setState({ addMovement: origAddMovement });
+    if (origAddMovement) useWhs.setState({ addMovement: origAddMovement });
   });
 
   it('4) deleteLog موفق → log حذف شد', async () => {
-    const logId = useDlg.getState().add(makeLogRecord() as any);
+    const logId = useDlg.getState().add(makeLogRecord());
     const log = useDlg.getState().logs.find(l => l.id === logId)!;
     expect(log).toBeTruthy();
 
@@ -207,12 +210,12 @@ describe('useDlgSave — B4 atomic', () => {
     const { showConfirmAsync } = await import('../cor/store/dialog');
 
     // 2 logs
-    useDlg.getState().add(makeLogRecord({ entryTime: '08:00' }) as any);
-    useDlg.getState().add(makeLogRecord({ entryTime: '12:00' }) as any);
+    useDlg.getState().add(makeLogRecord({ entryTime: '08:00' }));
+    useDlg.getState().add(makeLogRecord({ entryTime: '12:00' }));
     const logs = [...useDlg.getState().logs];
     expect(logs).toHaveLength(2);
 
-    (showConfirmAsync as any).mockClear();
+    vi.mocked(showConfirmAsync).mockClear();
 
     const params = makeParams();
     const { result } = renderHook(() => useDlgSave(params));
