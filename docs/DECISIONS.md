@@ -662,3 +662,28 @@ atomicTransaction + outbox + حذف catch {} خالی (L6) + throw در silent f
 **تست:** `src/test/flk-merge-atomic.test.ts` (5 test) — verify functional + structural.
 
 **پیامد برای AI جدید:** نیازی به wrap این action ها با `atomicTransactionSync` نیست — theater می‌شود. اگر نیاز به atomic cross-store آینده شد (مثلاً merge + flk history)، از `atomicTransactionSync([flkStore, ...])` استفاده کن.
+
+
+---
+
+## D10 (1405/11/08) — whs atomic by design
+
+**نتیجه verify:**
+- `addItem`, `updateItem`, `deleteItem`, `addMovement`, `deleteMovement` — هر کدام **single set()**
+- صفر cross-store cascade داخل whs
+- `assertMovement` (Zod) preflight throw → صفر mutation
+  - `reason: 'purchase'` نیاز به `partyId` دارد؛ `consumption` نیاز ندارد
+- `deleteMovement` از تاریخچه بازمحاسبه می‌کند (`recalcStockByLocation`): `initialStock + sum(remaining)`
+  - **نکته مهم:** `initialStock` باید در item تعریف شده باشد
+- subscriber `whs:movement:created` → outbox → bus (async، atomic را نمی‌شکند)
+
+**چرا atomic است:**
+Zustand `set()` = atomic (single shallow merge). هر action یک `set()` دارد.
+
+**D.6 (deleteInvoice) چطور با whs کار می‌کند:**
+`deleteInvoice` یک loop روی `log.feedMovementIds` می‌زند و `deleteMovement` را صدا می‌زند. اگر یکی fail شود، snapshot D.4-B در tra همه را rollback می‌کند. whs مسئول loop نیست — فقط تک movement.
+
+**پیامد برای AI جدید:**
+- نیازی به wrap whs action ها با `atomicTransactionSync` نیست — theater می‌شود
+- اگر `batchMovements`/`transferStock` آینده اضافه شد، snapshot/rollback در همان action لازم است (الگوی D.7)
+- تست fake items باید `initialStock` داشته باشند (کشف D10)
