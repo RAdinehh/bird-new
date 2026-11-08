@@ -155,7 +155,7 @@ export default function LogCard(props: LogCardProps) {
         </LogSection>
       )}
 
-      {((l.eatingEggs || 0) + (l.fertileEggs || 0) + (l.brokenEggs || 0) + (l.softEggs || 0) + (l.dirtyEggs || 0)) > 0 && (
+      {((l.eatingEggs || 0) + (l.fertileEggs || 0) + (l.brokenEggs || 0) + (l.otherEggs || 0)) > 0 && (
         <LogSection title="🥚 تخم">
           <Grid2>
             {l.eatingEggs ? <Row l="خوراکی" v={toFa(l.eatingEggs)} /> : null}
@@ -163,10 +163,9 @@ export default function LogCard(props: LogCardProps) {
           </Grid2>
           <Grid2>
             {l.brokenEggs ? <Row l="شکسته" v={toFa(l.brokenEggs)} /> : null}
-            {l.softEggs ? <Row l="نرم" v={toFa(l.softEggs)} /> : null}
-            {l.dirtyEggs ? <Row l="کثیف" v={toFa(l.dirtyEggs)} /> : null}
+            {l.otherEggs ? <Row l="سایر" v={toFa(l.otherEggs)} /> : null}
           </Grid2>
-          <Row l="مجموع" v={toFa((l.eatingEggs||0)+(l.fertileEggs||0)+(l.brokenEggs||0)+(l.softEggs||0)+(l.dirtyEggs||0))} />
+          <Row l="مجموع" v={toFa((l.eatingEggs||0)+(l.fertileEggs||0)+(l.brokenEggs||0)+(l.otherEggs||0))} />
         </LogSection>
       )}
 

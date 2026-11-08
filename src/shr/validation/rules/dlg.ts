@@ -53,8 +53,7 @@ export function createDlgSchema(context: ValidationContext = {}) {
     eatingEggs: intRange('تخم خوراکی', 0, 100000),
     fertileEggs: intRange('تخم نطفه‌دار', 0, 100000),
     brokenEggs: intRange('تخم شکسته', 0, 100000),
-    softEggs: intRange('تخم نرم', 0, 100000),
-    dirtyEggs: intRange('تخم کثیف', 0, 100000),
+    otherEggs: intRange('تخم سایر', 0, 100000),
 
     // تلفات
     deathsCount: intRange('تلفات', 0, 100000),

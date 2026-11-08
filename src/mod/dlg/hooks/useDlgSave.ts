@@ -297,8 +297,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
             eatingEggs: int(form.eatingEggs) || 0,
             fertileEggs: int(form.fertileEggs) || 0,
             brokenEggs: int(form.brokenEggs) || 0,
-            softEggs: int(form.softEggs) || 0,
-            dirtyEggs: int(form.dirtyEggs) || 0,
+            otherEggs: int(form.otherEggs) || 0,
           },
           existing: findByLogId(logId),
         });
@@ -334,7 +333,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
             });
           }
 
-          const __eggTotal = (finalData.eatingEggs || 0) + (finalData.fertileEggs || 0) + (finalData.brokenEggs || 0) + (finalData.softEggs || 0) + (finalData.dirtyEggs || 0);
+          const __eggTotal = (finalData.eatingEggs || 0) + (finalData.fertileEggs || 0) + (finalData.brokenEggs || 0) + (finalData.otherEggs || 0);
           if (__eggTotal > 0) {
             void outbox.publish('dlg:egg:recorded', {
               logId,
@@ -343,7 +342,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
               eating: finalData.eatingEggs || 0,
               fertile: finalData.fertileEggs || 0,
               broken: finalData.brokenEggs || 0,
-              other: (finalData.softEggs || 0) + (finalData.dirtyEggs || 0),
+              other: finalData.otherEggs || 0,
             });
           }
 
@@ -396,8 +395,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
           recN('dlg.eatingEggs', int(form.eatingEggs));
           recN('dlg.fertileEggs', int(form.fertileEggs));
           recN('dlg.brokenEggs', int(form.brokenEggs));
-          recN('dlg.softEggs', int(form.softEggs));
-          recN('dlg.dirtyEggs', int(form.dirtyEggs));
+          recN('dlg.otherEggs', int(form.otherEggs));
           recN('egg.eatingCount', int(form.eatingEggs));
           recN('egg.fertileCount', int(form.fertileEggs));
           recN('egg.brokenCount', int(form.brokenEggs));
