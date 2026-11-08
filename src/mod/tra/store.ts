@@ -571,7 +571,7 @@ export const useTra = create<State>()(
                 ),
               };
             }),
-          } as any);
+          });
         }
       } catch (e) { console.error('[deleteInvoice] sell events revoke failed:', e); }
           // 🎯 rollback حرکات انبار از طریق Event Bus
