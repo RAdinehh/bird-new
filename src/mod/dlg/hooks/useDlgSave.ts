@@ -96,6 +96,7 @@ function recomputeActiveWithdrawal(
   const flock = flk.flocks.find(f => f.id === flockId);
   if (!flock) return;
 
+  const whsItems = useWhs.getState().items;
   const flockLogs = logs.filter(l => l.flockId === flockId);
 
   let maxUntil = '';
@@ -108,6 +109,11 @@ function recomputeActiveWithdrawal(
     for (const med of log.medications || []) {
       const days = med.withdrawalDays || 0;
       if (days <= 0) continue;
+      // 🆕 herbal safety: گیاهی پرهیز ندارد (اگرچه فیلد مخفی است، ولی داده قدیمی ممکن است)
+      if (med.itemId) {
+        const __medItem = whsItems.find(x => x.id === med.itemId);
+        if (__medItem?.category === 'herbal') continue;
+      }
       const until = addJalaliDays(log.date, days);
       if (!until) continue;
       if (until > maxUntil) {

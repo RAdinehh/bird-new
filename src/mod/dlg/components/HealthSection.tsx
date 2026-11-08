@@ -144,22 +144,24 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
               <Input placeholder="دوز" value={m.dose} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, dose: e.target.value } : x) }))} />
             </Grid2>
 
-            <Field label="دوره پرهیز (روز)" hint="چند روز بعد از مصرف، گوشت و تخم قابل فروش نیست">
+            {!(() => { const __sel = medicineItems.find(y => y.id === m.itemId); return __sel?.category === 'herbal'; })() && (<Field label="دوره پرهیز (روز)" hint="چند روز بعد از مصرف، گوشت و تخم قابل فروش نیست">
               <NumField
                 placeholder="مثلاً ۷"
                 value={m.withdrawalDays !== null && m.withdrawalDays !== undefined ? String(m.withdrawalDays) : ''}
                 onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, withdrawalDays: e.target.value === '' ? null : (parseInt(toEn(e.target.value)) || null) } : x) }))}
                 unit="روز" min={0}
               />
-            </Field>
+            </Field>)}
             {medicineItems.length > 0 && (
               <Grid2>
                 <Field label="از انبار" autoFrom="انبار (مصرف کسر می‌شه)" hint="اگه انتخاب کنی، به‌طور خودکار از موجودی انبار کم می‌شه">
                   <SmartSelect
                     value={m.itemId || ''}
                     onChange={id => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null } : x) }))}
-                    options={medicineItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}` }))}
-                    placeholder="— متصل نکن —"
+                    options={medicineItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}`, group: w.category === 'herbal' ? 'herbal' : 'chemical' }))}
+groupLabels={{ chemical: '💊 شیمیایی', herbal: '🌿 گیاهی' }}
+                    groupIcons={{ chemical: '💊', herbal: '🌿' }}
+                                        placeholder="— متصل نکن —"
                     modalTitle="انتخاب از انبار"
                     autoThreshold={6}
                   />
