@@ -16,7 +16,7 @@
 |---|---|---|
 | HEAD (ادعای v11) | `bc503023` | **الان: `docs/STATUS.md` را ببین** |
 | tsc | پاس | **۰** ✅ (D.3a-fix ✅) |
-| D.3b as any | ۵ عدد | **۱ عدد** (خط `:573`) |
+| D.3b as any | ۵ عدد | **۰ عدد** ✅ (D.3b کامل) |
 | D6 برآورد | ۳۰ دقیقه | **۳-۴ جلسه** (v11 خودش: ۱۲-۱۴ ساعت) |
 
 **درس:** قبل از اعتماد به HANDOFF، `git log`, `npx tsc --noEmit` را خودت اجرا کن.
@@ -46,8 +46,6 @@
 | فاز | کار | برآورد | وضعیت |
 |---|---|---|---|
 | ~~D.3a-fix~~ | ~~fix ۲ خطای tsc~~ | ✅ انجام شد | ✅ |
-| ~~E.1a~~ | ~~handleSave block~~ | ✅ | ✅ |
-| ~~E.1b~~ | ~~LogCard تخم~~ | ✅ | ✅ |
 | E | `updateInvoice` atomic | **۵ ساعت PR-risk** | ⏳ |
 | F | `add` atomic | ۳ ساعت | ⏳ |
 | G | tests | ۲ ساعت | ⏳ |
@@ -66,7 +64,6 @@
 
 - **۷ تابع calc orphan** — FCR, Mortality, Egg, Weight, Stocking, EPEF, Water
 - **`softCount: 0` هاردکد** در `toEgg.ts:52`
-- **`checkStock` formula ناقص** در `checkStock.ts:55`
 - **`calculateFCR` helpers-audit:246 فرمول غلط** — FlockHistoryModal
 - **`entryTime` Zod mismatch**
 - **۳ نسخهٔ موازی avgWeight**
