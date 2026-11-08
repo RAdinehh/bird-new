@@ -898,3 +898,46 @@ Zustand `set()` = atomic (single shallow merge). هر action یک `set()` دار
 **اگر روزی fix خواست:** type را `entryTime: string | null` کنید + Zod را `optionalStr` حفظ + `buildData` fallback.
 
 **نتیجه DLG-AUDIT:** تمام شکاف‌های واقعی حل شدند (۷ orphan + ۴ باگ). این یکی «تصمیم آگاهانه بماند» است، نه شکاف.
+
+---
+
+## Corrections (C1 + C2) — Data + Actions (1405/11/09)
+
+**زمینه:** سناریوی چندبار در روز (صبح، ظهر، شب) + تصحیح اشتباهات — الگوی `flk` (Event + Correction + Revoke) در `dlg` پیاده می‌شود.
+
+**تصمیمات تأییدشده:**
+- 🅰️ اصلاح در سطح فیلد (`changes: Partial<DailyLog>`)
+- 🅰️ اصلاح قابل لغو (`correction.revoked`)
+- 🅰️ فقط آخرین اصلاح اعمال می‌شود (ترتیب: قدیمی → جدید)
+
+**C1 — Data Layer (`35324f6e`):**
+- `DailyLogCorrection` interface: `{ id, timestamp, reason, changes, notes?, revoked?, createdAt }`
+- `DailyLog.corrections?: DailyLogCorrection[]`
+- Migration v14 → v15 (`corrections: []` برای داده قدیمی)
+- `add()` → `corrections: []`
+- `api/applyCorrections.ts`: تابع pure — `applyCorrections(log)` → مقدار effective
+  - `revoked` نادیده گرفته می‌شود
+  - آخرین برنده (ترتیب)
+  - لاگ اصلی دست‌نخورده (immutable)
+- ۴ تست (`dlg-corrections.test.ts`)
+
+**C2 — Store Actions (`e08be058`):**
+- `addCorrection(logId, changes, reason, notes?)` → `correctionId | null`
+  - timestamp خودکار (HH:MM)
+  - `revoked: false` پیش‌فرض
+- `revokeCorrection(logId, correctionId)` → `boolean` (idempotent — دوباره false)
+- ۵ تست (`dlg-store-corrections.test.ts`)
+
+**باقی‌مانده:**
+- **C3** — `LogCard` + فرم اصلاح inline (الگوی `flk`)
+- **C4** — ۳ تب در `DailyLogsPage` (امروز / Timeline / تجمیع)
+
+**UI کاربر: صفر تغییر در C1+C2** — فقط data + actions.
+
+**الگوی یکسان با `flk`:**
+- `+ ثبت اصلاح` (accent، 1.5px border)
+- فرم inline `warn-soft` + `warn border`
+- Badge «اصلاح‌شده» / «لغو شده»
+- دکمه `↩️ لغو`
+- Strikethrough برای revoked
+- Divider = `1px dashed var(--border)` (از `SectionTitle`)

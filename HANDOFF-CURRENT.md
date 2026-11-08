@@ -90,10 +90,11 @@
 
 ### ⏳ بعدی — به ترتیب پیشنهادی
 
-1. **`entryTime` Zod mismatch** — تنها شکاف DLG-AUDIT
-2. بعد: G (Draft Mode)
-3. C8 (EggSale.quality)
-4. D5.4 (`_v`/`_txid`) — همراه server
+1. **Corrections (C3)** — UI فرم اصلاح در `LogCard` (مرحله ۳)
+2. **Corrections (C4)** — ۳ تب (امروز/Timeline/تجمیع) در `DailyLogsPage` (مرحله ۴)
+3. **`entryTime` Zod mismatch** — تصمیم «بماند» (DECISIONS)
+4. بعد: G (Draft Mode) — تصمیم «نه» (DECISIONS)
+5. C8 (EggSale.quality) — تصمیم «نه» (DECISIONS)
 
 ## 🐛 شکاف‌های باز (از DLG-AUDIT، به‌روز شده)
 
