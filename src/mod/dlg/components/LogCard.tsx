@@ -150,6 +150,20 @@ export default function LogCard(props: LogCardProps) {
         </Section>
       )}
 
+      {((l.eatingEggs || 0) + (l.fertileEggs || 0) + (l.brokenEggs || 0) + (l.otherEggs || 0)) > 0 && (
+        <Section title="🥚 تخم">
+          <Grid2>
+            {l.eatingEggs ? <Row l="خوراکی" v={toFa(l.eatingEggs)} /> : null}
+            {l.fertileEggs ? <Row l="نطفه‌دار" v={toFa(l.fertileEggs)} /> : null}
+          </Grid2>
+          <Grid2>
+            {l.brokenEggs ? <Row l="شکسته" v={toFa(l.brokenEggs)} /> : null}
+            {l.otherEggs ? <Row l="سایر" v={toFa(l.otherEggs)} /> : null}
+          </Grid2>
+          <Row l="مجموع" v={toFa((l.eatingEggs||0)+(l.fertileEggs||0)+(l.brokenEggs||0)+(l.otherEggs||0))} />
+        </Section>
+      )}
+
       {l.weightSamples && l.weightSamples.length > 0 && (
         <Section title="⚖️ وزن‌کشی">
           <Grid2>
