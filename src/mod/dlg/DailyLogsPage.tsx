@@ -65,8 +65,13 @@ export default function DailyLogsPage() {
     l: DailyLog,
     opts?: { skipConfirm?: boolean },
   ): Promise<DailyLog | null> => {
-    const { ok, undoData: log } = await deleteLog(l, opts);
-    if (!ok || !log) return null;
+    const { ok, undoData: log, hadCascades } = await deleteLog(l, opts);
+    if (!ok) return null;
+    if (hadCascades) {
+      toastMsg.info('ثبت حذف شد — حرکات انبار/تولید تخم قابل بازگردانی نیستند');
+      return null;
+    }
+    if (!log) return null;
     toastMsg.deleted('ثبت');
     return log as DailyLog;
   };

@@ -65,18 +65,20 @@ export default function DlgTabPanel({
       const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' ثبت روزانه حذف شوند؟', { danger: true });
       if (!ok) return;
       const backups: DailyLog[] = [];
+      let deletedCount = 0;
       for (const id of ids) {
         const it = logs.find(x => x.id === id);
         if (!it) continue;
         // D5.5/B3 — bulk delete atomic (cascade + remove + outbox)
         const deleted = await onDeleteLog(it, { skipConfirm: true });
         if (deleted) backups.push(it);
+        deletedCount++;
       }
       if (backups.length > 0) {
         setUndoData({ log: backups });
         setTimeout(() => setUndoData((cur) => cur && Array.isArray(cur.log) && cur.log.length === backups.length ? null : cur), 8000);
       }
-      toastMsg.deletedBulk(backups.length, 'ثبت');
+      toastMsg.deletedBulk(deletedCount, 'ثبت');
       logAction('delete', 'dlg', 'حذف گروهی ثبت روزانه: ' + backups.length);
     },
     onArchive: async (ids) => {
