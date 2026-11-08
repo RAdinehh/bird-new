@@ -28,10 +28,12 @@ interface CheckStockInput {
   feedSourceId: string;
   feedDelivered: string | number | null;
   whsItems: Item[];
+  formulas?: { id: string; name: string; lines: { ingredientId: string; percent: number }[] }[];
+  ingredients?: { id: string; stockItemId: string; name: string }[];
 }
 
 export function checkStock(params: CheckStockInput): StockShortage[] {
-  const { vaccines, medications, feedSourceType, feedSourceId, feedDelivered, whsItems } = params;
+  const { vaccines, medications, feedSourceType, feedSourceId, feedDelivered, whsItems, formulas, ingredients } = params;
   const list: StockShortage[] = [];
 
   const check = (itemId: string | undefined, qty: number | null | undefined) => {
@@ -53,6 +55,19 @@ export function checkStock(params: CheckStockInput): StockShortage[] {
 
   if (feedSourceType === 'item' && feedSourceId) {
     check(feedSourceId, parseNum(feedDelivered));
+  }
+
+  if (feedSourceType === 'formula' && feedSourceId) {
+    const formula = formulas?.find(f => f.id === feedSourceId);
+    const delivered = parseNum(feedDelivered);
+    if (formula && delivered && delivered > 0) {
+      for (const line of formula.lines) {
+        const ing = ingredients?.find(i => i.id === line.ingredientId);
+        if (!ing || !ing.stockItemId) continue;
+        const qty = (line.percent / 100) * delivered;
+        check(ing.stockItemId, qty);
+      }
+    }
   }
 
   return list;

@@ -168,6 +168,8 @@ export function useDlgSave(params: UseDlgSaveParams) {
       feedSourceId: form.feedSourceId,
       feedDelivered: form.feedDelivered,
       whsItems,
+      formulas,
+      ingredients,
     });
     if (shortages.length > 0) {
       const txt = shortages.map(s => `• ${s.name}: نیاز ${toFa(s.need)} ${s.unit}، موجودی ${toFa(s.have)} ${s.unit}`);
