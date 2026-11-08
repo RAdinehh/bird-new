@@ -320,6 +320,57 @@ export function useDlgSave(params: UseDlgSaveParams) {
             prevCount: oldLogSnapshot?.deathsCount || 0,
             prevFlockId: oldLogSnapshot?.flockId,
           });
+
+          // 🅰️ Phase F-A — 4 events (publish-only، بدون consumer فعلی)
+          if (finalData.feedSourceId && (finalData.feedDelivered || 0) > 0) {
+            void outbox.publish('dlg:feed:consumed', {
+              logId,
+              flockId: finalData.flockId,
+              date: finalData.date,
+              itemId: finalData.feedSourceId,
+              quantity: finalData.feedDelivered || 0,
+              isFormula: finalData.feedSourceType === 'formula',
+            });
+          }
+
+          const __eggTotal = (finalData.eatingEggs || 0) + (finalData.fertileEggs || 0) + (finalData.brokenEggs || 0) + (finalData.otherEggs || 0);
+          if (__eggTotal > 0) {
+            void outbox.publish('dlg:egg:recorded', {
+              logId,
+              flockId: finalData.flockId,
+              date: finalData.date,
+              eating: finalData.eatingEggs || 0,
+              fertile: finalData.fertileEggs || 0,
+              broken: finalData.brokenEggs || 0,
+              other: finalData.otherEggs || 0,
+            });
+          }
+
+          for (const v of finalData.vaccines || []) {
+            if (v.itemId && v.quantity && v.quantity > 0) {
+              void outbox.publish('dlg:vaccine:given', {
+                logId,
+                flockId: finalData.flockId,
+                date: finalData.date,
+                itemId: v.itemId,
+                quantity: v.quantity,
+                name: v.name || '',
+              });
+            }
+          }
+
+          for (const m of finalData.medications || []) {
+            if (m.itemId && m.quantity && m.quantity > 0) {
+              void outbox.publish('dlg:medication:given', {
+                logId,
+                flockId: finalData.flockId,
+                date: finalData.date,
+                itemId: m.itemId,
+                quantity: m.quantity,
+                name: m.name || '',
+              });
+            }
+          }
         }
 
         toastMsg.saved('ثبت روزانه');
