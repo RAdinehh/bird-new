@@ -18,6 +18,7 @@ import { getAgeDays } from '../../flk/store';
 import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { LogSection, Row } from '../helpers';
+import { applyCorrections } from '../api/applyCorrections';
 import { Grid2, Grid3 } from '../../../shr/components/ui';
 import { CardActions } from '../../../shr/components/ui';
 
@@ -40,10 +41,14 @@ export interface LogCardProps {
 
 export default function LogCard(props: LogCardProps) {
   const {
-    log: l, index: i, flock, birdName,
+    log: rawLog, index: i, flock, birdName,
     isOpen, selectionMode, vaccineEnabled, medicineEnabled, ms,
     onToggle, onEdit, onArchive, onRestore, onDelete,
   } = props;
+
+  // 🆕 مقدار effective = با corrections اعمال‌شده
+  const l = applyCorrections(rawLog);
+  const hasCorrections = (rawLog.corrections || []).some(c => !c.revoked);
 
   // 🆕 خواندن محدوده استاندارد بر اساس پرنده و سن
   const customStandards = useSet((s: any) => s.customStandards) || {};
@@ -88,7 +93,10 @@ export default function LogCard(props: LogCardProps) {
       title={flock?.name || '—'}
       subtitle={`${toFa(l.date)}${l.entryTime ? ` • ${toFa(l.entryTime)}` : ''}${l.birdAgeDays !== null && l.birdAgeDays > 0 ? ` • ${toFa(l.birdAgeDays)} روز` : ''}${birdName ? ` • ${birdName}` : ''}`}
       isOpen={isOpen} onToggle={onToggle}
-      badge={l.deathsCount > 0 ? <Tag tone="amber">{toFa(l.deathsCount)} تلفات</Tag> : undefined}
+      badge={<>
+        {hasCorrections && <Tag tone="blue">✓ اصلاح‌شده</Tag>}
+        {l.deathsCount > 0 && <Tag tone="amber">{toFa(l.deathsCount)} تلفات</Tag>}
+      </>}
       stats={<>
         {l.temperature !== null && <span>🌡 {toFa(l.temperature)}°</span>}
         {l.humidity !== null && <span>💧 {toFa(l.humidity)}٪</span>}
@@ -233,6 +241,51 @@ export default function LogCard(props: LogCardProps) {
       {l.notes && (
         <LogSection title="📝 یادداشت">
           <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{l.notes}</div>
+        </LogSection>
+      )}
+
+      {hasCorrections && (
+        <LogSection title="📝 تاریخچه اصلاحات">
+          {(rawLog.corrections || []).map(corr => (
+            <div
+              key={corr.id}
+              style={{
+                fontSize: 'var(--fs-xs)',
+                padding: 'var(--pad-tight)',
+                background: corr.revoked ? 'var(--input-bg)' : 'var(--warn-soft)',
+                border: `1px solid ${corr.revoked ? 'var(--border)' : 'var(--warn)'}`,
+                borderRadius: 'var(--r-sm)',
+                opacity: corr.revoked ? 0.6 : 1,
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 6,
+                alignItems: 'baseline',
+              }}
+            >
+              <span style={{
+                fontFamily: 'monospace',
+                fontWeight: 700,
+                color: 'var(--muted)',
+              }}>{toFa(corr.timestamp)}</span>
+              <span style={{ color: 'var(--text)', fontWeight: 600 }}>
+                {Object.keys(corr.changes).map(k => {
+                  const oldVal = (rawLog as any)[k];
+                  const newVal = (corr.changes as any)[k];
+                  return `${k}: ${oldVal ?? '—'} → ${newVal ?? '—'}`;
+                }).join(' • ')}
+              </span>
+              <span style={{ color: 'var(--muted)' }}>({corr.reason})</span>
+              {corr.revoked && (
+                <span style={{
+                  background: 'var(--danger-soft)',
+                  color: 'var(--danger)',
+                  fontWeight: 700,
+                  padding: '1px 6px',
+                  borderRadius: 3,
+                }}>لغو شده</span>
+              )}
+            </div>
+          ))}
         </LogSection>
       )}
 
