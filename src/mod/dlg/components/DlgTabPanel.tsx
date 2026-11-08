@@ -34,7 +34,7 @@ interface Props {
   medicineEnabled: boolean;
   onEdit: (l: DailyLog) => void;
   onAdd: () => void;
-  onDeleteLog: (l: DailyLog) => Promise<DailyLog | null>;
+  onDeleteLog: (l: DailyLog, opts?: { skipConfirm?: boolean }) => Promise<DailyLog | null>;
 }
 
 export default function DlgTabPanel({
@@ -43,7 +43,7 @@ export default function DlgTabPanel({
   vaccineEnabled, medicineEnabled,
   onEdit, onAdd, onDeleteLog,
 }: Props) {
-  const { add, remove, archive, restore } = useDlg();
+  const { add, archive, restore } = useDlg();
   const [undoData, setUndoData] = useState<{ log: DailyLog | DailyLog[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -68,8 +68,9 @@ export default function DlgTabPanel({
       for (const id of ids) {
         const it = logs.find(x => x.id === id);
         if (!it) continue;
-        backups.push(it);
-        try { remove(id); } catch { /* silent */ }
+        // D5.5/B3 — bulk delete atomic (cascade + remove + outbox)
+        const deleted = await onDeleteLog(it, { skipConfirm: true });
+        if (deleted) backups.push(it);
       }
       if (backups.length > 0) {
         setUndoData({ log: backups });

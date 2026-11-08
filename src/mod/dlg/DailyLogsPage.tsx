@@ -27,7 +27,7 @@ import { useDlgSave } from './hooks/useDlgSave';
 type TabId = 'today' | 'history' | 'archive';
 
 export default function DailyLogsPage() {
-  const { logs, add, remove } = useDlg();
+  const { logs, add } = useDlg();
   const vaccineEnabled = useSet(s => s.features?.vaccine !== false);
   const medicineEnabled = useSet(s => s.features?.medicine !== false);
   const fmt = useFormat();
@@ -61,10 +61,12 @@ export default function DailyLogsPage() {
     selectedFlock, flockAliveCount, isLayerFlock, num, int,
   });
 
-  const handleDeleteLog = async (l: DailyLog): Promise<DailyLog | null> => {
-    const { ok, undoData: log } = await deleteLog(l);
+  const handleDeleteLog = async (
+    l: DailyLog,
+    opts?: { skipConfirm?: boolean },
+  ): Promise<DailyLog | null> => {
+    const { ok, undoData: log } = await deleteLog(l, opts);
     if (!ok || !log) return null;
-    remove(l.id);
     toastMsg.deleted('ثبت');
     return log as DailyLog;
   };

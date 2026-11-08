@@ -78,7 +78,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
     selectedFlock, flockAliveCount, isLayerFlock, num, int,
   } = params;
 
-  const { logs, add, update } = useDlg();
+  const { logs, add, update, remove } = useDlg();
   const { items: whsItems, addMovement, deleteMovement } = useWhs();
   const { formulas, ingredients } = useFed();
   const { addProduction, updateProduction, deleteProduction, findByLogId } = useEgg();
@@ -323,30 +323,65 @@ export function useDlgSave(params: UseDlgSaveParams) {
   };
 
   /** منطق حذف */
-  const deleteLog = async (l: DailyLog): Promise<{
+  const deleteLog = async (
+    l: DailyLog,
+    opts: { skipConfirm?: boolean } = {},
+  ): Promise<{
     ok: boolean;
     undoData: DailyLog | null;
   }> => {
-    const ok = await showConfirmAsync('تأیید حذف', 'این ثبت روزانه و داده‌های مرتبط حذف شوند؟', { danger: true });
-    if (!ok) return { ok: false, undoData: null };
+    // D5.5/B3 — تأیید (در bulk delete skip می‌شود)
+    if (!opts.skipConfirm) {
+      const ok = await showConfirmAsync('تأیید حذف', 'این ثبت روزانه و داده‌های مرتبط حذف شوند؟', { danger: true });
+      if (!ok) return { ok: false, undoData: null };
+    }
 
     const log = logs.find(x => x.id === l.id);
     if (!log) return { ok: false, undoData: null };
 
-    if (log.feedMovementIds) log.feedMovementIds.forEach(id => deleteMovement(id));
-    const prod = findByLogId(log.id);
-    if (prod) deleteProduction(prod.id);
+    // D5.5/B3 — atomic (cascade + remove + outbox)
+    const result = await atomicTransaction<string>({
+      stores: [dlgStore, whsStore, eggStore, flkStore],
+      execute: () => {
+        // حذف movement‌های دان
+        if (log.feedMovementIds) {
+          log.feedMovementIds.forEach(id => deleteMovement(id));
+        }
 
-    try {
-      bus.emit('dlg:log:deleted', {
-        logId: log.id,
-        flockId: log.flockId,
-        date: log.date,
-        deathsCount: log.deathsCount || 0,
-        feedMovementIds: log.feedMovementIds || [],
-      }, { source: 'dlg/delete' });
-    } catch { /* silent */ }
+        // حذف movement‌های واکسن/دارو
+        log.vaccines?.forEach(v => {
+          if (v.movementId) deleteMovement(v.movementId);
+        });
+        log.medications?.forEach(m => {
+          if (m.movementId) deleteMovement(m.movementId);
+        });
 
+        // حذف production تخم
+        const prod = findByLogId(log.id);
+        if (prod) deleteProduction(prod.id);
+
+        // حذف خود لاگ (D5.5/B3 — داخل atomic)
+        remove(log.id);
+
+        return log.id;
+      },
+      onSuccess: (logId) => {
+        const prod = findByLogId(logId);
+        void outbox.publish('dlg:log:deleted', {
+          logId,
+          flockId: log.flockId,
+          date: log.date,
+          deathsCount: log.deathsCount || 0,
+          feedMovementIds: log.feedMovementIds || [],
+          eggProductionId: prod?.id,
+        });
+      },
+      onError: (err) => {
+        toastMsg.error('خطا در حذف — همه‌چیز لغو شد: ' + err.message);
+      },
+    });
+
+    if (!result.ok) return { ok: false, undoData: null };
     return { ok: true, undoData: log };
   };
 
