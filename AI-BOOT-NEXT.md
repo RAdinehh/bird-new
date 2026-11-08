@@ -1,7 +1,7 @@
 # AI-BOOT-NEXT.md - راهنمای AI بعدی
 
 آخرین به‌روزرسانی: 1405/08/18
-آخرین commit: 04bfefdc
+آخرین commit: 5d8f8590
 
 ## 0. شروع
 
@@ -20,18 +20,17 @@ Bird-new = نرم‌افزار مدیریت مرغداری (PWA فارسی، RTL
 
 ## 2. کجاییم
 
-DONE:
+### DONE
 - C1 (data layer): DailyLogCorrection + applyCorrections
 - C2 (actions): addCorrection + revokeCorrection
 - C3-a (LogCard display): badge + تاریخچه + revoke
 - C3-b (CorrectionModal): modal جدا
 - C3-fix: propagation به dashboard + گزارش‌ها (6 commit)
+- C3-complete (B3 + L1 + L2): بخش اصلاح تکمیل شد
 
-PENDING:
-1. B3 - ویرایش لاگ با Correction
-2. L1-L3 - بسط CorrectionModal
-3. تناقض C3 (inline vs modal)
-4. C4 - DailyLogHistoryModal
+### PENDING (اولویت)
+1. تناقض C3 - DECISIONS inline vs کد modal (تصمیم آگاهانه)
+2. C4 - DailyLogHistoryModal (3 تب: امروز / Timeline / تجمیع)
 
 ## 3. قوانین آهنین
 
@@ -82,6 +81,7 @@ npx vitest run src/test/dlg-corrections.test.ts src/test/dlg-applyCorrections-re
 - T-C1: قبل از patch روی applyCorrections، همه تست‌های موجود
 - T-C2: فیلد مشتق - همیشه applyCorrections(log)
 - T-C3: مشتق‌ها: temperature, humidity, feedConsumed, deathsCount, birdAgeDays
+- T-C4: بعد از write_text یک grep -c روی نشانه‌های کلیدی (باگ L2 امروز)
 
 ## 8. اگر گیر کردی
 
@@ -98,5 +98,6 @@ tail -100 docs/DECISIONS.md
 2. cat AI-BOOT-NEXT.md
 3. cat CLAUDE.md && cat docs/CONSTITUTION.md
 
-وضعیت: جلسه قبل 6 commit Correction propagation تموم شد. حالا C4 مونده.
+وضعیت: بخش اصلاح (C1+C2+C3+C3-fix+C3-complete) تموم شد.
+بعدی: تناقض C3 (تصمیم) + C4 (DailyLogHistoryModal).
 قانون: فارسی حرف بزن. تصمیم مهم را از کاربر بپرس.

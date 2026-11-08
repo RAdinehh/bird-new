@@ -985,3 +985,53 @@ UI تغییر: صفر.
 - تناقض C3 - DECISIONS inline vs کد modal
 
 ---
+
+
+---
+
+## Corrections C3-complete — B3 + L1 + L2 (1405/08/18)
+
+**زمینه:** تکمیل بخش اصلاح در `/dlg`. سه شکاف باقی‌مانده حل شد.
+
+**B3 — ویرایش لاگ با Correction:**
+- تصمیم: دکمه «ویرایش» در `LogCard` **مخفی** اگر `hasCorrections === true`
+- دلیل: ویرایش base مقدار Correction را بی‌معنا می‌کند (Correction نسبت به مقدار قبلی بود)
+- راه‌حل: کاربر باید اول Corrections را revoke کند، بعد ویرایش کند
+
+**L1 — min/max قابل اصلاح:**
+- تصمیم: ۴ فیلد جدید به `CORRECTABLE_FIELDS`:
+  - `temperatureMin`, `temperatureMax`, `humidityMin`, `humidityMax`
+- میانگین (`temperature`, `humidity`) حفظ شد — legacy support
+- `applyCorrections` از قبل recompute میانگین را انجام می‌دهد
+
+**L2 — deathsCount safety (سه‌گانه):**
+- `deaths=[]` → **synthesize** record خودکار (uuid, cause='unknown', notes='اصلاح خودکار')
+- `deaths=[1 record]` → **sync** count (applyCorrections)
+- `deaths=[multi]` → **block** + warning banner + submit disabled
+
+**کامیت‌ها:**
+
+| # | SHA | کار |
+|---|---|---|
+| 1 | `a06dfe76` | B3 (edit hidden) + L1 (4 min/max fields) |
+| 2 | `35e9bac6` | L2 (dashboard deathsCount) — ناقص |
+| 3 | `5d8f8590` | L2 (CorrectionModal) — fix ناقص |
+
+**درس (تله):**
+- **T-C4:** در اسکریپت Python، بعد از `replace_unique` همیشه `Path.write_text()` صدا بزن. اگر تغییر در حافظه موند و نوشته نشد، rollback فایل اصلی را برمی‌گرداند، ولی **verify نکردی**. بعد از `write_text` یک `grep -c` روی نشانه‌های کلیدی بزن.
+
+**وضعیت فعلی بخش اصلاح:**
+- ✅ C1: data layer
+- ✅ C2: actions
+- ✅ C3-a: display (badge + history)
+- ✅ C3-b: CorrectionModal (modal جدا)
+- ✅ C3-fix: propagation (dashboard + گزارش‌ها)
+- ✅ C3-complete: B3 + L1 + L2
+- ⏸ تناقض C3 (inline vs modal) — تصمیم آگاهانه، مانده
+- ⏸ C4 — DailyLogHistoryModal — مانده
+
+**تست‌ها:** ۱۵ pass (بدون تغییر)
+**tsc:** پاس
+**UI تغییر:** حداقل — `CorrectionModal` ۴ field اضافه، ویرایش مخفی در LogCard اگر correction دارد، warning banner در multi-record
+
+---

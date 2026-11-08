@@ -1,3 +1,24 @@
+## تکمیل بخش اصلاح - Corrections C3-complete (1405/08/18)
+
+### DONE - 3 commit (B3 + L1 + L2)
+
+| # | Commit | کار |
+|---|---|---|
+| 1 | a06dfe76 | B3 (edit hidden if hasCorrections) + L1 (min/max fields) |
+| 2 | 35e9bac6 | L2 (dashboard deathsCount) - ناقص |
+| 3 | 5d8f8590 | L2 (CorrectionModal) - fix ناقص |
+
+### وضعیت
+- 15/15 tests pass
+- tsc سبز
+- push شده
+
+### نتیجه
+- بخش اصلاح از نظر propagation + safety کامل
+- باقی‌مانده: تناقض C3 (inline vs modal) + C4 (DailyLogHistoryModal)
+
+---
+
 ## جلسه 1405/08/18 - Corrections C3-fix
 
 ### DONE - 6 commit
