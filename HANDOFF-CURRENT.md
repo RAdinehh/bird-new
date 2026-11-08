@@ -2,7 +2,7 @@
 
 > **این فایل دستی نوشته می‌شود. STATUS.md خودکار است.**
 > آخرین آپدیت: 1405/11/08
-> آخرین commit: `f496a05d`
+> آخرین commit: `a5f649af`
 
 ## ⚠️ قبل از هر کار
 
@@ -14,8 +14,8 @@
 
 | مورد | ادعای HANDOFF v11 | واقعیت (verify شده) |
 |---|---|---|
-| HEAD | `bc503023` | **`d2c0c706`** |
-| tsc | پاس | **۲ خطا** (`store.ts:607`, `:611` EquipmentCategory/Unit) |
+| HEAD (ادعای v11) | `bc503023` | **الان: `a5f649af`** |
+| tsc | پاس | **۰** ✅ (D.3a-fix در `bc17bb12`) |
 | D.3b as any | ۵ عدد | **۱ عدد** (خط `:573`) |
 | D6 برآورد | ۳۰ دقیقه | **۳-۴ جلسه** (v11 خودش: ۱۲-۱۴ ساعت) |
 
@@ -64,7 +64,6 @@
 - **`softCount: 0` هاردکد** در `toEgg.ts:52`
 - **`checkStock` formula ناقص** در `checkStock.ts:55`
 - **`calculateFCR` helpers-audit:246 فرمول غلط** — FlockHistoryModal
-- **LogCard تخم نمایش نمی‌دهد**
 - **`entryTime` Zod mismatch**
 - **۳ نسخهٔ موازی avgWeight**
 
@@ -95,9 +94,11 @@
 
 ## 🎯 ترتیب بعدی
 
-1. **D.3a-fix** (۱۵ دقیقه) ← بستن tsc
-2. **فاز E** (چند جلسه) ← UI/UX dlg
-3. بعد از E: D.3b، D.4، ...
+1. **E.2a** — `aliveCount: flockAliveCount` + نمایش warning در LogCard (۳۰ دقیقه)
+2. **E.2b** — `?? 0` به‌جای `|| 0` در ۳ rep (۳۰ دقیقه)
+3. **E.3** — `checkStock` formula (۱ ساعت، PR-risk بالا)
+4. **E.4** — `UndoBar` کامل (۲ ساعت)
+5. بعد: D.3b → D.4 → D7-D10
 
 ## 📝 آپدیت این فایل
 

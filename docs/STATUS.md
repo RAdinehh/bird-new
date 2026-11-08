@@ -1,24 +1,22 @@
 # 📊 STATUS — auto-generated
 
 > **این فایل دستی نوشته نمی‌شود — bootstrap.sh می‌سازد.**
-> تاریخ: 2026-11-08T12:29:29Z
+> تاریخ: 2026-11-08T12:34:47Z
 
 ## HEAD
 ```
+a5f649af chore: track CLAUDE.md + bootstrap.sh + docs/STATUS.md — سیستم مستندات کامل
+b610e267 docs: HANDOFF-CURRENT به‌روز — E.1a/E.1b انجام شد
 f496a05d feat(dlg/E1b): نمایش تخم در LogCard — UX gap رفع
-637a2ae5 fix(dlg/E1a): block save on validation errors — باگ واقعی
-bc17bb12 fix(tra/D6-D3a-fix): narrow cast EquipmentCategory/Unit — ۲ tsc error رفع
 ```
-**short: f496a05d**
+**short: a5f649af**
 
 ## tsc errors: **0** ✅
 
 ## Working tree
 ```
-?? CLAUDE.md
-?? HANDOFF-CURRENT.md
-?? bootstrap.sh
-?? docs/STATUS.md
+ M HANDOFF-CURRENT.md
+ M docs/STATUS.md
 ```
 
 ## Tests
