@@ -14,7 +14,7 @@
 
 | مورد | ادعای HANDOFF v11 | واقعیت (verify شده) |
 |---|---|---|
-| HEAD (ادعای v11) | `bc503023` | **الان: `docs/STATUS.md` را ببین** |
+| HEAD (ادعای v11) | `` | **الان: `docs/STATUS.md` را ببین** |
 | tsc | پاس | **۰** ✅ (D.3a-fix ✅) |
 | D.3b as any | ۵ عدد | **۱ عدد** (خط `:573`) |
 | D6 برآورد | ۳۰ دقیقه | **۳-۴ جلسه** (v11 خودش: ۱۲-۱۴ ساعت) |
@@ -77,7 +77,7 @@
 | `docs/CONSTITUTION.md` | L1-L14 |
 | `docs/DECISIONS.md` | تاریخ تصمیمات |
 | `HANDOFF-v11.md` | آخرین HANDOFF رسمی (header کهنه) |
-| `~/.bird_bak/DLG-AUDIT.md` | audit dlg (روی `69d6a675`) |
+| `~/.bird_bak/DLG-AUDIT.md` | audit dlg (روی ``) |
 
 ## 📋 قوانین آهنین (خلاصه)
 
