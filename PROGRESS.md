@@ -1238,3 +1238,37 @@ PENDING — گام بعدی:
 - C3: اتصال calc به dsh و flk (helpers-audit:246 فرمول غلط FCR)
 - بخش A/B dlg (تحلیل شده، پیاده نشده): مدل داده + زنجیره اتمیک
 - بخش E/F/G/H dlg (از تحلیل اولیه)
+
+## جلسه 1405/11/08 (9 ادامه — audit + C7 + C3)
+
+آخرین commit: fc6b82f9
+
+DONE:
+- audit کامل dlg (۳۴ فیلد، ۹ فاز)
+- C7a — حذف shift (7bc2ae37)
+- C7b — حذف brokenTarget/otherTarget (0c28be12)
+- C7d — birdAgeDays نمایش در LogCard (2bc5c02c)
+- EggDiscard — feature کامل (ae573922)
+- C3a — hen-day با layingAliveCount (ab24ff89)
+- C3b — feedConsumed در LogCard + dsh (917a029a)
+- C3c — feedConsumed در ۶ نقطه (ac330f92)
+- C3d — ۴ alert جدید (7ed19857)
+- C3e — ۴ alert جدید (4795ea0b)
+- C3f — useGroupKpi bug fix (06b9a7b1)
+- C3g-fix — rename در ۵ تست (fc6b82f9)
+
+آمار:
+- commits: ۴۵ (از 86feb29c)
+- تست کل: ۱۹۱۸ pass | ۱۷ skip
+- صفر regression
+- فیلدهای مرده حل: ۶
+- باگ‌های fix: ۶
+- شکاف‌های حل: hen-day sexed، feedConsumed، ۸ alert، دور ریخت تخم
+
+PENDING — گام بعدی:
+- D5 (atomicSave + pre-flight در useDlgSave) — اولویت ۱
+- E (UI/UX فرم ۴۷ فیلدی) — اولویت ۲
+- F (cross-module events) — اولویت ۳
+- G (Draft Mode)
+- H (گزارش/CSV)
+- C8 (EggSale.quality در tra)

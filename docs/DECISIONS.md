@@ -493,3 +493,80 @@ breedKey + ageDays + flockType در FieldHint
 5. تست baseline، باگ‌های 9 ماهه کشف می‌کند (production Hy-Line/Lohmann)
 
 آخرین تصمیم: 1405/11/08
+
+## جلسه 1405/11/08 (9 ادامه — audit + C7 + C3)
+
+آخرین commit: fc6b82f9
+
+### یافته‌های audit (۹ فاز، ۳۴ فیلد)
+
+- ۶ فیلد ۱۰۰٪ مرده: shift، lightHours، brokenTarget، otherTarget، feedConsumed، softCount
+- ۷ فیلد نیمه‌کاره: ventilation، litter، behavior، distribution، sound، appearance، feedType
+- ۹ فیلد کاملاً سالم: id، flockId، date، temperatureMin/Max، humidityMin/Max، feedDelivered، feedRemaining، waterAmount، weightSamples
+
+### تصمیمات C7 (پاک‌سازی)
+
+C7a — حذف shift:
+دلیل: entryTime کافی است، shift صفر مصرف‌کننده
+commit: 7bc2ae37
+
+C7b — حذف brokenTarget/otherTarget:
+دلیل: صفر UI، صفر cascade، صفر intelligence
+commit: 0c28be12
+
+C7d — birdAgeDays به LogCard:
+حل: display در subtitle، صفر منطق جدید
+commit: 2bc5c02c
+
+EggDiscard — feature جدید:
+دلیل: شکاف دور ریخت تخم (انباشت در calcStock)
+commit: ae573922
+
+### تصمیمات C3 (اتصال calc به dsh/flk)
+
+C3a — hen-day با layingAliveCount:
+قبل: (totalHealthy / (aliveCount * days)) * 100
+بعد: (totalHealthy / (layingAliveCount * days)) * 100
+layingAliveCount = layer/breeder فقط + femaleCount برای sexed
+commit: ab24ff89
+
+C3b — feedConsumed در LogCard + dsh:
+label: «دان داده‌شده» (به‌جای «مصرفی»)
+Row «دان مصرف‌شده» (اگر متفاوت)
+waterFeedRatio با feedConsumed (fallback به feedDelivered)
+commit: 917a029a
+
+C3c — ۶ مصرف‌کننده باقی:
+flk/useGroupKpi، rep/*، dsh/BenchmarkCard، filter
+همه با fallback: l.feedConsumed || l.feedDelivered || 0
+commit: ac330f92
+
+C3d — ۴ alert جدید:
+humidity (از stdEnv)، ventilation ('low')، litter ('wet'/'clumped')، behavior ('lethargic')
+AlertCategory گسترش
+commit: 7ed19857
+
+C3e — ۴ alert جدید:
+sound ('cough'/'sneeze')، distribution ('cornered')، water (نسبت)، feed (مصرف‌نشده)
+commit: 4795ea0b
+
+C3f — useGroupKpi bug fix:
+قبل: totalDeaths = Math.max(0, totalInitial - totalCurrent) — تخمین غلط (فروش = تلفات)
+بعد: sum of death/cull events
+commit: 06b9a7b1
+
+C3g-fix — rename در ۵ تست:
+rename feedAmount → feedDelivered در analytics، flk-migrations-feed*، intelligence*
+commit: fc6b82f9
+
+### درس‌های جلسه ۹ (ادامه)
+
+۷. بعد از rename بزرگ، npx vitest run کامل (۵ دقیقه) الزامی
+۸. END_BLOCK بجای __EOF__ در markdown
+۹. anchor line-based مقاوم‌تر از text-replace
+۱۰. rename + cascade در یک جلسه (نه جدا)
+۱۱. audit قبل از کد (۳۴ فیلد audit = ۶ فیلد مرده)
+۱۲. هر feature باید consumer داشته باشد در همان commit
+۱۳. توقف بعد از هر milestone
+
+آخرین تصمیم: 1405/11/08
