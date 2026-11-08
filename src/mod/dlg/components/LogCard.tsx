@@ -19,6 +19,7 @@ import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { LogSection, Row } from '../helpers';
 import { applyCorrections } from '../api/applyCorrections';
+import { showConfirmAsync } from '../../../cor/store/dialog';
 import { Grid2, Grid3 } from '../../../shr/components/ui';
 import { CardActions } from '../../../shr/components/ui';
 import type { ReactNode } from 'react';
@@ -291,7 +292,14 @@ export default function LogCard(props: LogCardProps) {
               ) : (
                 <button
                   type="button"
-                  onClick={(e) => { e.stopPropagation(); onRevokeCorrection(corr.id); }}
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    const ok = await showConfirmAsync(
+                      'لغو اصلاح',
+                      `اصلاح ${toFa(corr.timestamp)} لغو شود؟ (مقادیر به حالت قبل برمی‌گردند)`
+                    );
+                    if (ok) onRevokeCorrection(corr.id);
+                  }}
                   style={{
                     padding: '1px 6px',
                     background: 'transparent',
