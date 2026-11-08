@@ -1,4 +1,5 @@
 import { remaining } from '../tra/store';
+import { applyCorrections } from '../dlg/api/applyCorrections';
 import { healthyCount } from '../egg/store';
 import { toEn } from '../../shr/utils/fa';
 import { format as formatJ } from 'date-fns-jalali';
@@ -97,7 +98,7 @@ export function eggsInMonth(productions: any[], month: string): { healthy: numbe
 export function feedInMonth(logs: any[], month: string): number {
   return logs
     .filter(l => monthKey(l.date) === month)
-    .reduce((a, l) => a + (l.feedConsumed ?? l.feedDelivered ?? 0), 0);
+    .map(applyCorrections).reduce((a, l) => a + (l.feedConsumed ?? l.feedDelivered ?? 0), 0);
 }
 
 /** تلفات در یک ماه */

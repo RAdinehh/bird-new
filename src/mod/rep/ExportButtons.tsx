@@ -7,6 +7,7 @@ import { useCtc } from '../ctc/store';
 import { useBrd } from '../brd/store';
 import { useDlg } from '../dlg/store';
 import { toFa } from '../../shr/utils/fa';
+import { applyCorrections } from '../dlg/api/applyCorrections';
 
 export default function ExportButtons() {
   const { invoices } = useTra();
@@ -123,7 +124,8 @@ export default function ExportButtons() {
       .map(l => {
         const f = flocks.find(x => x.id === l.flockId);
         const deaths = (l.deaths || []).reduce((a, x) => a + (x.count || 0), 0);
-        return [l.date, f?.name || '—', l.temperature || '', l.humidity || '', l.feedConsumed ?? l.feedDelivered ?? '', l.waterAmount || '', deaths];
+        const _eff = applyCorrections(l);
+        return [_eff.date, f?.name || '—', _eff.temperature || '', _eff.humidity || '', _eff.feedConsumed ?? _eff.feedDelivered ?? '', _eff.waterAmount || '', (_eff.deaths || []).reduce((a, d) => a + (d.count || 0), 0)];
       });
     exportTableToCSV('گزارش-ثبت-روزانه', headers, rows);
   };
