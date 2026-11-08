@@ -32,6 +32,14 @@
 - **D.3a-fix** — narrow cast EquipmentCategory/Unit (tsc ۰)
 - **Phase E.1a** — `handleSave` block on errors ✅
 - **Phase E.1b** — `LogCard` نمایش تخم ✅
+- **Phase E.2a** — `flockAliveCount` + دان/پرنده در LogCard ✅
+- **Phase E.2b** — `?? 0` به‌جای `|| 0` در ۳ rep ✅
+- **Phase E.3** — `checkStock` فرمول (جلوگیری negative stock) ✅
+- **Phase E.4a** — Undo امن (hadCascades flag) ✅
+- **Phase E.4b** — Undo کامل (snapshot + restoreLogFull) ✅
+- **Phase D.3b** — آخرین `as any` در deleteInvoice ✅
+- **Phase D.4-A** — `ctcStore` به `ALL_STORES` ✅
+- **Phase D.4-B** — `deleteInvoice` atomic (snapshot + 16 throw + **negative test اثبات rollback**) ✅
 
 ### 🚧 In progress — D6 (tra atomic)
 
@@ -40,15 +48,11 @@
 | ~~D.3a-fix~~ | ~~fix ۲ خطای tsc~~ | ✅ انجام شد | ✅ |
 | ~~E.1a~~ | ~~handleSave block~~ | ✅ | ✅ |
 | ~~E.1b~~ | ~~LogCard تخم~~ | ✅ | ✅ |
-| **E.2a** | `aliveCount: flockAliveCount` در buildData | ۳۰ دقیقه | ⏳ |
-| **E.2b** | `?? 0` به‌جای `\|\| 0` در ۳ rep | ۳۰ دقیقه | ⏳ |
-| D.3b | حذف ۱ `as any` (خط ۵۷۳) | ۲۰ دقیقه | ⏳ |
-| D.4 | `deleteInvoice` atomic | **۳ ساعت PR-risk** | ⏳ |
 | E | `updateInvoice` atomic | **۵ ساعت PR-risk** | ⏳ |
 | F | `add` atomic | ۳ ساعت | ⏳ |
 | G | tests | ۲ ساعت | ⏳ |
 
-**جمع D6: ۱۲-۱۴ ساعت = ۳-۴ جلسه**
+**D6 باقی: E (updateInvoice) + F (add) + G (tests) = ۱۰ ساعت**
 
 ### ⏳ بعدی — به ترتیب پیشنهادی
 
@@ -94,11 +98,11 @@
 
 ## 🎯 ترتیب بعدی
 
-1. **E.2a** — `aliveCount: flockAliveCount` + نمایش warning در LogCard (۳۰ دقیقه)
-2. **E.2b** — `?? 0` به‌جای `|| 0` در ۳ rep (۳۰ دقیقه)
-3. **E.3** — `checkStock` formula (۱ ساعت، PR-risk بالا)
-4. **E.4** — `UndoBar` کامل (۲ ساعت)
-5. بعد: D.3b → D.4 → D7-D10
+1. **D.6-E** — `updateInvoice` atomic (۵ ساعت، PR-risk)
+2. **D.6-F** — `add` atomic (۳ ساعت)
+3. **D.6-G** — tests (۲ ساعت)
+4. بعد: D7-D10 (egg/inc/flk/whs atomic)
+5. بعد: Phase E — UI/UX فرم ۴۷ فیلدی
 
 ## 📝 آپدیت این فایل
 
