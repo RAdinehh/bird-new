@@ -5,6 +5,7 @@ import { create } from 'zustand';
 import { bus } from '../../cor/events';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
+import { useWhs } from '../whs/store';
 
 export type EggType = 'eating' | 'fertile' | 'broken';
 
@@ -96,8 +97,17 @@ export const useEgg = create<State>()(
       addProduction: (p) => {
         const id = uuid();
         const newProd: any = { ...p, eatingMovementId: '', fertileMovementId: '', consumptionMovementId: '', id, createdAt: now() };
-        try { void bus.emit('egg:production:created', { prodId: id, production: newProd }, { source: 'egg' }).catch(() => {}); } catch {}
-        set({ productions: [...get().productions, newProd] });
+        const prevProds = get().productions;
+        const prevWhsItems = useWhs.getState().items;
+        const prevWhsMovs = useWhs.getState().movements;
+        set({ productions: [...prevProds, newProd] });
+        try {
+          bus.emitSync('egg:production:created', { prodId: id, production: newProd }, { source: 'egg' });
+        } catch (e) {
+          set({ productions: prevProds });
+          useWhs.setState({ items: prevWhsItems, movements: prevWhsMovs });
+          throw e;
+        }
         return newProd.id;
       },
       findByLogId: (logId) => get().productions.find(x => x.sourceLogId === logId),
@@ -105,15 +115,32 @@ export const useEgg = create<State>()(
         const prev = get().productions.find(x => x.id === id);
         if (!prev) return;
         const merged: any = { ...prev, ...patch };
-        try { void bus.emit('egg:production:updated', { prodId: id, production: merged, prevProduction: prev }, { source: 'egg' }).catch(() => {}); } catch {}
+        const prevProds = get().productions;
+        const prevWhsItems = useWhs.getState().items;
+        const prevWhsMovs = useWhs.getState().movements;
         set({ productions: get().productions.map(x => x.id === id ? merged : x) });
+        try {
+          bus.emitSync('egg:production:updated', { prodId: id, production: merged, prevProduction: prev }, { source: 'egg' });
+        } catch (e) {
+          set({ productions: prevProds });
+          useWhs.setState({ items: prevWhsItems, movements: prevWhsMovs });
+          throw e;
+        }
       },
       deleteProduction: (id) => {
         const prev = get().productions.find(x => x.id === id);
-        if (prev) {
-          try { void bus.emit('egg:production:deleted', { prodId: id, production: prev }, { source: 'egg' }).catch(() => {}); } catch {}
-        }
+        if (!prev) return;
+        const prevProds = get().productions;
+        const prevWhsItems = useWhs.getState().items;
+        const prevWhsMovs = useWhs.getState().movements;
         set({ productions: get().productions.filter(x => x.id !== id) });
+        try {
+          bus.emitSync('egg:production:deleted', { prodId: id, production: prev }, { source: 'egg' });
+        } catch (e) {
+          set({ productions: prevProds });
+          useWhs.setState({ items: prevWhsItems, movements: prevWhsMovs });
+          throw e;
+        }
       },
 
       addSale: (s) => set({ sales: [...get().sales, { ...s, id: uuid(), createdAt: now() }] }),
