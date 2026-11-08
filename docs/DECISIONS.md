@@ -826,3 +826,29 @@ Zustand `set()` = atomic (single shallow merge). هر action یک `set()` دار
 **نتیجه:** صفر inline محاسبه mean/cv در `dsh`.
 
 **درس:** `calc/formulas/weight` و `dlg/store` **دو نقش متفاوت** دارند — اولی for formulas (g، `MIN_SAMPLES=3`)، دومی for UI (kg، هر تعداد). این تفکیک **درست است، نه duplication**.
+
+---
+
+## H — CSV Export در ۵ صفحه (1405/11/08)
+
+**هدف:** کاربر بتواند داده‌های هر صفحه را در Excel/Google Sheets ببیند.
+
+**پیاده‌سازی:**
+- `shr/utils/export.ts` — `exportTableToCSV(filename, headers, rows)` (قبلاً موجود)
+- الگو: `FinancialPage` (که از قبل `ExportButtons` داشت)
+- **تکنیک anchor:** `rfind('</PageContainer>')` — امن‌تر از multi-line anchors
+
+**۵ صفحه با CSV جدید:**
+
+| # | صفحه | commit | ستون‌ها |
+|---|---|---|---|
+| ۱ | `/rep/production` | `2d082bf8` | ماه / تخم / دان / تلفات |
+| ۲ | `/rep/flocks` | `2d082bf8` | گله / نوع / تخم / مرگ‌ومیر / Hen-Day / دان / شکسته / رکوردها |
+| ۳ | `/egg/stats` | `8900ecfb` | تاریخ / گله / خوراکی / نطفه‌دار / شکسته / نرم / کثیف / کل |
+| ۴ | `/whs/items` | `8900ecfb` | نام / دسته / واحد / موجودی / حداقل / قیمت |
+| ۵ | `/` (dsh) | `8900ecfb` | ۱۰ شاخص کلیدی |
+
+**درس anchor برای AI بعدی:**
+- `rfind(anchor)` برای درج قبل از آخرین occurrence — مقاوم در برابر indent/space
+- `insert_before_last()` helper — امن‌تر از multi-line anchor
+- هر import باید در `grep` قبل از patch تأیید شود

@@ -90,9 +90,9 @@
 
 ### ⏳ بعدی — به ترتیب پیشنهادی
 
-1. **H-Batch2** — CSV در egg/Stats + whs/Items + dsh
-2. **`entryTime` Zod mismatch**
-3. بعد: G (Draft Mode), C8 (EggSale.quality)
+1. **`entryTime` Zod mismatch** — تنها شکاف DLG-AUDIT
+2. بعد: G (Draft Mode)
+3. C8 (EggSale.quality)
 4. D5.4 (`_v`/`_txid`) — همراه server
 
 ## 🐛 شکاف‌های باز (از DLG-AUDIT، به‌روز شده)
