@@ -875,3 +875,26 @@ Zustand `set()` = atomic (single shallow merge). هر action یک `set()` دار
 ---
 
 
+
+---
+
+## entryTime Zod mismatch — تصمیم «بماند» (1405/11/09)
+
+**تصمیم:** `entryTime` Zod validation (`optionalStr(10)`) با type اجباری (`entryTime: string`) هماهنگ نمی‌شود، ولی **پیاده‌سازی fix نمی‌شود**.
+
+**وضعیت فعلی:**
+- `types.ts` و `store.ts`: `entryTime: string` (اجباری)
+- `rules/dlg.ts:25`: `optionalStr(10)` (اختیاری در validation)
+- `FormModal` TimePicker: بدون `required`
+- `buildData.ts`: پاس دادن مستقیم (بدون parse)
+
+**نتیجه runtime:** کاربر می‌تواند `entryTime = ''` ذخیره کند. هیچ باگ واقعی — log بدون `entryTime` ذخیره می‌شود.
+
+**چرا fix نمی‌کنیم:**
+- صفر باگ runtime
+- type-level mismatch فقط
+- اگر fix شود → migration برای `entryTime: string | null` لازم است (ریسک بی‌دلیل)
+
+**اگر روزی fix خواست:** type را `entryTime: string | null` کنید + Zod را `optionalStr` حفظ + `buildData` fallback.
+
+**نتیجه DLG-AUDIT:** تمام شکاف‌های واقعی حل شدند (۷ orphan + ۴ باگ). این یکی «تصمیم آگاهانه بماند» است، نه شکاف.
