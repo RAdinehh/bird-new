@@ -17,7 +17,7 @@ import { useSet } from '../../set/store';
 import { getAgeDays } from '../../flk/store';
 import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
-import { Section, Row } from '../helpers';
+import { LogSection, Row } from '../helpers';
 import { Grid2, Grid3 } from '../../../shr/components/ui';
 import { CardActions } from '../../../shr/components/ui';
 
@@ -104,7 +104,7 @@ export default function LogCard(props: LogCardProps) {
         </div>
       )}
 
-      <Section title="🌡 محیط">
+      <LogSection title="🌡 محیط">
         <Grid2>
           {l.temperature !== null && <Row l="دما" v={`${toFa(l.temperature)} °C`} warn={tIsBad} />}
           {l.humidity !== null && <Row l="رطوبت" v={`${toFa(l.humidity)} ٪`} warn={hIsBad} />}
@@ -119,19 +119,19 @@ export default function LogCard(props: LogCardProps) {
           <Row l="تهویه" v={VENTILATION_LABEL[l.ventilation] || '—'} />
           <Row l="بستر" v={LITTER_LABEL[l.litter] || '—'} />
         </Grid2>
-      </Section>
+      </LogSection>
 
-      <Section title="🐔 مشاهده پرنده">
+      <LogSection title="🐔 مشاهده پرنده">
         <Grid3>
           <Row l="رفتار" v={BEHAVIOR_LABEL[l.behavior] || '—'} />
           <Row l="توزیع" v={DISTRIBUTION_LABEL[l.distribution] || '—'} />
           <Row l="صدا" v={SOUND_LABEL[l.sound] || '—'} />
         </Grid3>
         {l.appearance && <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', lineHeight: 1.7 }}>{l.appearance}</div>}
-      </Section>
+      </LogSection>
 
       {(l.feedDelivered !== null || l.waterAmount !== null) && (
-        <Section title="🌾 تغذیه و آب">
+        <LogSection title="🌾 تغذیه و آب">
           {l.feedType && <Row l="جیره/دان" v={l.feedType} />}
           {l.feedDelivered !== null && <Row l="دان داده‌شده" v={`${toFa(l.feedDelivered)} kg`} />}
           {l.feedConsumed !== null && l.feedConsumed !== undefined && l.feedConsumed !== l.feedDelivered && (
@@ -152,11 +152,11 @@ export default function LogCard(props: LogCardProps) {
             if (!l.waterAmount || !effectiveFeed || effectiveFeed <= 0) return null;
             return <Row l="نسبت آب/دان" v={toFa((l.waterAmount / effectiveFeed).toFixed(2))} />;
           })()}
-        </Section>
+        </LogSection>
       )}
 
       {((l.eatingEggs || 0) + (l.fertileEggs || 0) + (l.brokenEggs || 0) + (l.otherEggs || 0)) > 0 && (
-        <Section title="🥚 تخم">
+        <LogSection title="🥚 تخم">
           <Grid2>
             {l.eatingEggs ? <Row l="خوراکی" v={toFa(l.eatingEggs)} /> : null}
             {l.fertileEggs ? <Row l="نطفه‌دار" v={toFa(l.fertileEggs)} /> : null}
@@ -166,11 +166,11 @@ export default function LogCard(props: LogCardProps) {
             {l.otherEggs ? <Row l="سایر" v={toFa(l.otherEggs)} /> : null}
           </Grid2>
           <Row l="مجموع" v={toFa((l.eatingEggs||0)+(l.fertileEggs||0)+(l.brokenEggs||0)+(l.otherEggs||0))} />
-        </Section>
+        </LogSection>
       )}
 
       {l.weightSamples && l.weightSamples.length > 0 && (
-        <Section title="⚖️ وزن‌کشی">
+        <LogSection title="⚖️ وزن‌کشی">
           <Grid2>
             <Row l="تعداد نمونه" v={toFa(l.weightSamples.length)} />
             <Row l="میانگین" v={`${toFa(avgWeight(l.weightSamples))} kg`} />
@@ -179,11 +179,11 @@ export default function LogCard(props: LogCardProps) {
             <Row l="مجموع" v={`${toFa(sumWeight(l.weightSamples))} kg`} />
             <Row l="ضریب تغییرات" v={`${toFa(cvWeight(l.weightSamples))}٪`} />
           </Grid2>
-        </Section>
+        </LogSection>
       )}
 
       {l.deaths && l.deaths.length > 0 && (
-        <Section title="💀 تلفات">
+        <LogSection title="💀 تلفات">
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--danger-soft)', color: 'var(--danger)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
             <span>مجموع:</span>
             <span>{toFa(l.deaths.reduce((a, x) => a + (x.count || 0), 0))} پرنده</span>
@@ -197,43 +197,43 @@ export default function LogCard(props: LogCardProps) {
               {d.notes && <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>{d.notes}</span>}
             </div>
           ))}
-        </Section>
+        </LogSection>
       )}
 
       {vaccineEnabled && l.vaccines.length > 0 && (
-        <Section title="💉 واکسن">
+        <LogSection title="💉 واکسن">
           {l.vaccines.map(v => (
             <div key={v.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', borderRadius: 'var(--r-sm)', color: 'var(--accent)' }}>
               <b>{v.name}</b>{v.dose ? ` — دوز ${v.dose}` : ''}{v.method ? ` • ${v.method}` : ''}
             </div>
           ))}
-        </Section>
+        </LogSection>
       )}
 
       {medicineEnabled && l.medications.length > 0 && (
-        <Section title="💊 دارو">
+        <LogSection title="💊 دارو">
           {l.medications.map(m => (
             <div key={m.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', color: 'var(--text)' }}>
               <b>{m.name}</b>{m.dose ? ` — ${m.dose}` : ''}{m.withdrawalDays ? ` • منع مصرف ${toFa(m.withdrawalDays)} روز` : ''}
             </div>
           ))}
-        </Section>
+        </LogSection>
       )}
 
       {l.activities.length > 0 && (
-        <Section title="🔧 فعالیت‌ها">
+        <LogSection title="🔧 فعالیت‌ها">
           {l.activities.map(a => (
             <div key={a.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
               <b>{a.type}</b>{a.notes ? ` — ${a.notes}` : ''}
             </div>
           ))}
-        </Section>
+        </LogSection>
       )}
 
       {l.notes && (
-        <Section title="📝 یادداشت">
+        <LogSection title="📝 یادداشت">
           <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{l.notes}</div>
-        </Section>
+        </LogSection>
       )}
 
       <CardActions actions={[

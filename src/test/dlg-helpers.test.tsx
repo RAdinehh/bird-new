@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { renderHook, act } from '@testing-library/react';
 import {
-  Section, SectionTitle, Row,
+  LogSection, SectionTitle, Row,
   FormGroup, FormSub, FormSubFirst,
   FormTabs, useFormGroups,
 } from '../mod/dlg/helpers';
@@ -10,14 +10,14 @@ import {
 // ═══════════════════════════════════════════════
 // Section
 // ═══════════════════════════════════════════════
-describe('Section', () => {
+describe('LogSection', () => {
   it('title رندر میشه', () => {
-    render(<Section title="عنوان"><div>x</div></Section>);
+    render(<LogSection title="عنوان"><div>x</div></LogSection>);
     expect(screen.getByText('عنوان')).toBeInTheDocument();
   });
 
   it('children رندر میشن', () => {
-    render(<Section title="t"><span>child</span></Section>);
+    render(<LogSection title="t"><span>child</span></LogSection>);
     expect(screen.getByText('child')).toBeInTheDocument();
   });
 });

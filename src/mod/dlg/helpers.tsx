@@ -3,7 +3,7 @@
  */
 import type { ReactNode } from 'react';
 
-export function Section({ title, children }: { title: string; children: ReactNode }) {
+export function LogSection({ title, children }: { title: string; children: ReactNode }) {
   return (
     <>
       <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>{title}</div>
