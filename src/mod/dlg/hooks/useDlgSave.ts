@@ -72,6 +72,62 @@ function addJalaliDays(dateStr: string, days: number): string {
   } catch { return ''; }
 }
 
+/**
+ * B4-Recalc — recompute activeWithdrawal از همه لاگ‌های فلک
+ *
+ * قبلاً (B1c-minimal): activeWithdrawal از max(existing, new) محاسبه می‌شد.
+ * باگ: logId اشتباه + پاک نشدن در حذف.
+ *
+ * این تابع: از همه لاگ‌های فلک max(until) را حساب می‌کند و ownerLogId را ست می‌کند.
+ */
+function recomputeActiveWithdrawal(
+  logs: DailyLog[],
+  flockId: string,
+): void {
+  if (!flockId) return;
+  const flk = useFlk.getState();
+  const flock = flk.flocks.find(f => f.id === flockId);
+  if (!flock) return;
+
+  const flockLogs = logs.filter(l => l.flockId === flockId);
+
+  let maxUntil = '';
+  let ownerLogId = '';
+  let ownerMedName = '';
+  let ownerDays = 0;
+  let ownerStartedAt = '';
+
+  for (const log of flockLogs) {
+    for (const med of log.medications || []) {
+      const days = med.withdrawalDays || 0;
+      if (days <= 0) continue;
+      const until = addJalaliDays(log.date, days);
+      if (!until) continue;
+      if (until > maxUntil) {
+        maxUntil = until;
+        ownerLogId = log.id;
+        ownerMedName = med.name || 'دارو';
+        ownerDays = days;
+        ownerStartedAt = log.date;
+      }
+    }
+  }
+
+  if (maxUntil) {
+    flk.update(flockId, {
+      activeWithdrawal: {
+        until: maxUntil,
+        medicine: ownerMedName,
+        days: ownerDays,
+        startedAt: ownerStartedAt,
+        logId: ownerLogId,
+      },
+    } as any);
+  } else if (flock.activeWithdrawal) {
+    flk.update(flockId, { activeWithdrawal: undefined } as any);
+  }
+}
+
 export function useDlgSave(params: UseDlgSaveParams) {
   const {
     form, saving, setSaving, setOpen,
@@ -215,35 +271,10 @@ export function useDlgSave(params: UseDlgSaveParams) {
           logId = add(data);
         }
 
-        // ۸) activeWithdrawal (با B1c-minimal)
-        const meds = form.medications || [];
-        const maxWithdrawal = meds.reduce((a, m) => Math.max(a, m.withdrawalDays || 0), 0);
-        if (maxWithdrawal > 0 && form.flockId) {
-          const until = addJalaliDays(form.date, maxWithdrawal);
-          if (until) {
-            const flk = useFlk.getState();
-            const flock = flk.flocks.find(f => f.id === form.flockId);
-            if (flock) {
-              const existingUntil = flock.activeWithdrawal?.until || '';
-              const finalUntil = existingUntil && existingUntil > until ? existingUntil : until;
-              const medName = meds.find(m => (m.withdrawalDays || 0) === maxWithdrawal)?.name || 'دارو';
-              flk.update(form.flockId, {
-                activeWithdrawal: {
-                  until: finalUntil,
-                  medicine: medName,
-                  days: maxWithdrawal,
-                  startedAt: form.date,
-                  logId,
-                },
-              } as any);
-            }
-          }
-        } else if (form.flockId) {
-          const flk = useFlk.getState();
-          const flock = flk.flocks.find(f => f.id === form.flockId);
-          if (flock?.activeWithdrawal?.logId === logId) {
-            flk.update(form.flockId, { activeWithdrawal: undefined } as any);
-          }
+        // ۸) activeWithdrawal — recompute از همه لاگ‌ها (B4-Recalc)
+        if (form.flockId) {
+          const freshLogs = useDlg.getState().logs;
+          recomputeActiveWithdrawal(freshLogs, form.flockId);
         }
 
         // ۹) sync با egg
@@ -362,6 +393,10 @@ export function useDlgSave(params: UseDlgSaveParams) {
 
         // حذف خود لاگ (D5.5/B3 — داخل atomic)
         remove(log.id);
+
+        // B4-Recalc — recompute activeWithdrawal بعد از حذف
+        const freshLogs = useDlg.getState().logs;
+        recomputeActiveWithdrawal(freshLogs, log.flockId);
 
         return log.id;
       },
