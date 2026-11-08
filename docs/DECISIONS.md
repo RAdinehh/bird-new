@@ -852,3 +852,22 @@ Zustand `set()` = atomic (single shallow merge). هر action یک `set()` دار
 - `rfind(anchor)` برای درج قبل از آخرین occurrence — مقاوم در برابر indent/space
 - `insert_before_last()` helper — امن‌تر از multi-line anchor
 - هر import باید در `grep` قبل از patch تأیید شود
+
+---
+
+## C8 — Egg Quality grading: تصمیم «نه» (1405/11/08)
+
+**تصمیم:** C8 (افزودن `quality` / `weightClass` به EggSale/InvoiceItem) **پیادهسازی نمیشود**.
+
+**دلیل:**
+- کاربر هدف: **مرغ مادر (breeder)** — تخم برای جوجهکشی، کیفیت بصری مهم نیست
+- گوشتی و زینتی: تخم نمیفروشند
+- تخمگذار (layer): نژاد مشخص، وزن تخم را خودش میداند، نیازی به درجهبندی سیستمی نیست
+- نتیجه: feature برای ~۹۰٪ کاربران بیفایده
+
+**اگر آینده لازِم شد:**
+- پیادهسازی دقیق در `c31321d4` (revert شده) برای split soft/dirty موجود است
+- C8 مشابه: `quality` + migration قابل برگشت
+- راهنما: `git show c31321d4` برای reference
+
+**درس:** User domain knowledge > standard generic features. C8 در DLG-AUDIT ذکر شده بود، ولی کاربر واقعی (breeder-focused) آن را رد کرد.
