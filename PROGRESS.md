@@ -1316,3 +1316,32 @@ PENDING — گام بعدی:
   - D10 whs (batch movements)
 - بخش E (UI/UX) — چند جلسه
 - بخش F (cross-module) — ~۴ ساعت
+
+
+## جلسه 1405/11/08 (11 — D6 Phase A-D.3a)
+
+### DONE
+
+- D6-B: fix L6 (c3d7e2bc)
+- D6-C: 3 store به atomic (ff755acb)
+- D6-C.1: fix as any atomic (e63d7ba2)
+- D6-D.0-prod: 5 as any (109572c3)
+- D6-D.0-test: 8 as any (554a3f8a)
+- D6-D.1: atomicTransactionSync (b281f969)
+- D6-D.2: recycle bin بعد از set (350cb6e1)
+- D6-D.3a: 16 as any در deleteInvoice (a1cd27db)
+
+### آمار جلسه ۱۱
+
+- commits: 24 (رکورد)
+- 9 باگ حل (7 D5.5 + orphan bin + D.3a L5)
+- صفر regression
+- صفر as any جدید
+
+### PENDING — جلسه ۱۲
+
+- D.3b: 5 `} as any)` (Flock/Equipment) — 20 دقیقه
+- D.4: wrap deleteInvoice atomic — 3 ساعت PR-risk
+- E: updateInvoice atomic — 5 ساعت
+- F: add atomic — 3 ساعت
+- G: tests — 2 ساعت

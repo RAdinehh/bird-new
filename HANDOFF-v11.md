@@ -115,6 +115,42 @@ working tree: تمیز
 
 ---
 
+## 🎯 D6 — tra atomic (جلسه ۱۱ + ۱۲)
+
+### Done (جلسه ۱۱)
+
+| فاز | commit |
+|---|---|
+| D6-B — fix L6 | c3d7e2bc |
+| D6-C — ۳ store (hal, brd, inc) | ff755acb |
+| D6-C.1 — fix as any atomic | e63d7ba2 |
+| D6-D.0-prod — ۵ as any | 109572c3 |
+| D6-D.0-test — ۸ as any | 554a3f8a |
+| D6-D.1 — atomicTransactionSync | b281f969 |
+| D6-D.2 — recycle bin بعد از set | 350cb6e1 |
+| D6-D.3a — ۱۶ as any در deleteInvoice | a1cd27db |
+
+### Remaining (جلسه ۱۲+)
+
+- **D.3b** — ۵ `} as any)` (Flock/Equipment patch) — ~۲۰ دقیقه، نیاز verify
+- **D.4** — wrap deleteInvoice در atomicSync — ~۳ ساعت PR-risk
+- **E** — updateInvoice atomic — ~۵ ساعت PR-risk
+- **F** — add atomic — ~۳ ساعت
+- **G** — tests — ~۲ ساعت
+
+**جمع: ۱۲-۱۴ ساعت = ۳-۴ جلسه**
+
+### درس مهم D6
+
+- `deleteInvoice` ۲۷۰ خط، ۱۵ cascade، ۷ store
+- `updateInvoice` ۳۱۰ خط، ۵ cascade
+- ۲۳ as any در deleteInvoice قبل از D.3a (الان ۷ باقی)
+- **atomicTransactionSync** برای sync-only cascadeها (deleteInvoice)
+- **atomicTransaction** (async) برای async cascadeها (add, update)
+- **هر cascade جدا verify قبل از wrap**
+
+---
+
 ## 🎯 مسیر جلسه ۱۲
 
 ### D6-D10 — atomic برای ۵ ماژول باقی
