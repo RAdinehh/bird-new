@@ -30,7 +30,7 @@
 - D5.5 (save/delete atomic dlg)
 - D6-B, C, C.1, D.0-prod, D.0-test, D.1, D.2, D.3a
 - **D.3a-fix** — narrow cast EquipmentCategory/Unit (tsc ۰)
-- **Phase E.1a** — `handleSave` block on errors (`637a2ae5`)
+- **Phase E.1a** — `handleSave` block on errors ✅
 - **Phase E.1b** — `LogCard` نمایش تخم ✅
 
 ### 🚧 In progress — D6 (tra atomic)
@@ -38,7 +38,7 @@
 | فاز | کار | برآورد | وضعیت |
 |---|---|---|---|
 | ~~D.3a-fix~~ | ~~fix ۲ خطای tsc~~ | ✅ انجام شد | ✅ |
-| ~~E.1a~~ | ~~handleSave block~~ | ✅ `637a2ae5` | ✅ |
+| ~~E.1a~~ | ~~handleSave block~~ | ✅ | ✅ |
 | ~~E.1b~~ | ~~LogCard تخم~~ | ✅ | ✅ |
 | **E.2a** | `aliveCount: flockAliveCount` در buildData | ۳۰ دقیقه | ⏳ |
 | **E.2b** | `?? 0` به‌جای `\|\| 0` در ۳ rep | ۳۰ دقیقه | ⏳ |

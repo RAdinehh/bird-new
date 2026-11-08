@@ -48,3 +48,4 @@ coverage
 *.save-*
 limits_survey.txt
 full_limits_survey.txt
+docs/STATUS.md
