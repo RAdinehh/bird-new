@@ -21,6 +21,7 @@ import { LogSection, Row } from '../helpers';
 import { applyCorrections } from '../api/applyCorrections';
 import { Grid2, Grid3 } from '../../../shr/components/ui';
 import { CardActions } from '../../../shr/components/ui';
+import type { ReactNode } from 'react';
 
 export interface LogCardProps {
   log: DailyLog;
@@ -37,18 +38,22 @@ export interface LogCardProps {
   onArchive: () => void;
   onRestore: () => void;
   onDelete: () => void;
+  onCorrect: () => void;
+  onRevokeCorrection: (correctionId: string) => void;
+  correctionSlot?: ReactNode;
 }
 
 export default function LogCard(props: LogCardProps) {
   const {
     log: rawLog, index: i, flock, birdName,
     isOpen, selectionMode, vaccineEnabled, medicineEnabled, ms,
-    onToggle, onEdit, onArchive, onRestore, onDelete,
+    onToggle, onEdit, onArchive, onRestore, onDelete, onCorrect, onRevokeCorrection, correctionSlot,
   } = props;
 
   // 🆕 مقدار effective = با corrections اعمال‌شده
   const l = applyCorrections(rawLog);
   const hasCorrections = (rawLog.corrections || []).some(c => !c.revoked);
+  const hasAnyCorrections = (rawLog.corrections || []).length > 0;
 
   // 🆕 خواندن محدوده استاندارد بر اساس پرنده و سن
   const customStandards = useSet((s: any) => s.customStandards) || {};
@@ -244,7 +249,7 @@ export default function LogCard(props: LogCardProps) {
         </LogSection>
       )}
 
-      {hasCorrections && (
+      {hasAnyCorrections && (
         <LogSection title="📝 تاریخچه اصلاحات">
           {(rawLog.corrections || []).map(corr => (
             <div
@@ -275,7 +280,7 @@ export default function LogCard(props: LogCardProps) {
                 }).join(' • ')}
               </span>
               <span style={{ color: 'var(--muted)' }}>({corr.reason})</span>
-              {corr.revoked && (
+              {corr.revoked ? (
                 <span style={{
                   background: 'var(--danger-soft)',
                   color: 'var(--danger)',
@@ -283,6 +288,21 @@ export default function LogCard(props: LogCardProps) {
                   padding: '1px 6px',
                   borderRadius: 3,
                 }}>لغو شده</span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); onRevokeCorrection(corr.id); }}
+                  style={{
+                    padding: '1px 6px',
+                    background: 'transparent',
+                    border: '1px solid var(--border)',
+                    borderRadius: 3,
+                    fontSize: 10,
+                    color: 'var(--muted)',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                  }}
+                >↩️ لغو</button>
               )}
             </div>
           ))}
@@ -293,8 +313,10 @@ export default function LogCard(props: LogCardProps) {
         { label: 'ویرایش', onClick: onEdit, variant: 'outline', hidden: (l.status || 'active') !== 'active' },
         { label: '📦 آرشیو', onClick: onArchive, variant: 'outline', hidden: (l.status || 'active') !== 'active' },
         { label: '♻️ بازگردانی', onClick: onRestore, variant: 'primary', hidden: (l.status || 'active') === 'active' },
-        { label: 'حذف', onClick: onDelete, variant: 'danger-outline', hidden: (l.status || 'active') === 'active' }
+        { label: 'حذف', onClick: onDelete, variant: 'danger-outline', hidden: (l.status || 'active') === 'active' },
+        { label: '✏️ اصلاح', onClick: onCorrect, variant: 'outline', hidden: (l.status || 'active') !== 'active' }
       ]} />
+      {correctionSlot}
     </ExpandableCard>
   );
 }

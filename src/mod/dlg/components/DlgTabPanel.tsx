@@ -17,6 +17,7 @@ import { logAction } from '../../../cor/logger/auditLog';
 import { toFa } from '../../../shr/utils/fa';
 import { bus } from '../../../cor/events';
 import LogCard from './LogCard';
+import { CorrectionForm } from './CorrectionForm';
 import type { Flock } from '../../flk/store';
 import type { Bird } from '../../brd/store';
 
@@ -45,8 +46,9 @@ export default function DlgTabPanel({
   vaccineEnabled, medicineEnabled,
   onEdit, onAdd, onDeleteLog, onRestoreLogFull,
 }: Props) {
-  const { add, archive, restore } = useDlg();
+  const { add, archive, restore, addCorrection, revokeCorrection } = useDlg();
   const [undoData, setUndoData] = useState<{ log: DailyLog | DailyLog[]; snapshot?: DeleteSnapshot } | null>(null);
+  const [correctingLogId, setCorrectingLogId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useFab(active ? { label: 'ثبت امروز', onClick: onAdd } : null);
@@ -148,6 +150,19 @@ export default function DlgTabPanel({
         onArchive={() => archive(l.id)}
         onRestore={() => restore(l.id)}
         onDelete={() => handleDeleteOne(l)}
+        onCorrect={() => setCorrectingLogId(l.id)}
+        onRevokeCorrection={(corrId) => revokeCorrection(l.id, corrId)}
+        correctionSlot={correctingLogId === l.id ? (
+          <CorrectionForm
+            log={l}
+            onSave={(changes, reason, notes) => {
+              addCorrection(l.id, changes, reason, notes);
+              setCorrectingLogId(null);
+              toastMsg.saved('اصلاح');
+            }}
+            onCancel={() => setCorrectingLogId(null)}
+          />
+        ) : undefined}
       />
     );
   };
