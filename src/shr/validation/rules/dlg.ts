@@ -38,7 +38,6 @@ export function createDlgSchema(context: ValidationContext = {}) {
     humidity: floatRange('رطوبت', 0, MAX_HUM).nullable().optional(),
     humidityMin: floatRange('حداقل رطوبت', 0, MAX_HUM).nullable().optional(),
     humidityMax: floatRange('حداکثر رطوبت', 0, MAX_HUM).nullable().optional(),
-    lightHours: floatRange('ساعت نوردهی', 0, 24).nullable().optional(),
 
     // تغذیه
     feedDelivered: floatRange('مقدار دان مصرفی', 0, MAX_FEED).nullable().optional(),

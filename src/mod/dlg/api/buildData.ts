@@ -87,7 +87,6 @@ export function buildLogData(input: BuildDataInput): Omit<DailyLog, 'id' | 'stat
     humidityMax: hMax,
     ventilation: form.ventilation,
     litter: form.litter,
-    lightHours: int(form.lightHours),
     behavior: form.behavior,
     distribution: form.distribution,
     appearance: form.appearance.trim(),

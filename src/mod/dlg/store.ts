@@ -64,7 +64,6 @@ export interface DailyLog {
   humidityMax: number | null;
   ventilation: string; // ok | low | high
   litter: string; // dry | wet | clumped
-  lightHours: number | null;   // ← جدید: ساعت نوردهی
 
   // پرنده
   behavior: string; // active | lethargic | excited
@@ -138,7 +137,6 @@ export const useDlg = create<State>()(
           ...l,
           id: uuid(),
           status: 'active',
-          lightHours: (l as any).lightHours ?? null,
           feedConsumed: (l as any).feedConsumed ?? null,
           birdAgeDays: (l as any).birdAgeDays ?? null,
           brokenEggs: (l as any).brokenEggs ?? null,
@@ -170,7 +168,7 @@ export const useDlg = create<State>()(
     }),
     {
       name: 'pm-dlg',
-      version: 13,
+      version: 14,
       migrate: (persisted: any, version: number) => {
         if (version < 2 && persisted?.logs) {
           persisted.logs = persisted.logs.map((l: any) => ({
@@ -208,7 +206,6 @@ export const useDlg = create<State>()(
         if (version < 6 && persisted?.logs) {
           persisted.logs = persisted.logs.map((l: any) => ({
             ...l,
-            lightHours: l.lightHours ?? null,
             eggsCount: l.eggsCount ?? null,
             brokenEggs: l.brokenEggs ?? null,
             dirtyEggs: l.dirtyEggs ?? null,
@@ -274,6 +271,14 @@ export const useDlg = create<State>()(
             };
           });
         }
+        // ═══ v14 — حذف lightHours (فیلد مرده، صفر مصرف‌کننده در UI) ═══
+        if (version < 14 && persisted?.logs) {
+          persisted.logs = persisted.logs.map((l: any) => {
+            const { lightHours: _lh, ...rest } = l;
+            return rest;
+          });
+        }
+
         // ═══ v13 — حذف shift + brokenTarget/otherTarget ═══
         if (version < 13 && persisted?.logs) {
           persisted.logs = persisted.logs.map((l: any) => {

@@ -9,7 +9,6 @@ export interface F {
   temperature: string; temperatureMin: string; temperatureMax: string;
   humidity: string; humidityMin: string; humidityMax: string;
   ventilation: string; litter: string;
-  lightHours: string;
   behavior: string; distribution: string; appearance: string; sound: string;
   feedType: string; feedDelivered: string; feedRemaining: string;
   feedSourceType: 'formula' | 'item' | ''; feedSourceId: string; feedMovementIds: string[];
