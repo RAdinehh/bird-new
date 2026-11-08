@@ -14,8 +14,9 @@ import { useWhs, stockWarning, expiryWarning } from '../../whs/store';
 import { useAlt, activeAlerts, countByLevel } from '../../alt/store';
 import { runRules } from '../../alt/rules';
 import { useBrd } from '../../brd/store';
-import { useDlg } from '../../dlg/store';
+import { useDlg, avgWeight as avgWeightFn, cvWeight as cvWeightFn } from '../../dlg/store';
 import { monthKey, currentMonth, todayJalali, dateDiffDays } from '../utils';
+import { aggregateEggMetrics } from '../../../shr/calc/formulas/egg';
 import { calculateWaterMetrics } from '../../../shr/calc/formulas/water';
 
 function fcrBorder(diff: number): string {
@@ -145,31 +146,21 @@ const [, _setTick] = useState(0);
   const survivalRate = totalInitial > 0 ? (aliveCount / totalInitial) * 100 : 100;
   const cumulativeMortality = totalInitial > 0 ? ((totalInitial - aliveCount) / totalInitial) * 100 : 0;
 
-  // Hen-Day — میانگین ۷ روز اخیر
-  const henDay7 = useMemo(() => {
-    const last7: any[] = [];
-    for (let i = 0; i < 7; i++) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const key = formatJ(d, 'yyyy/MM/dd');
-      const prods = productions.filter(p => p.date === key);
-      prods.forEach(p => last7.push(p));
-    }
-    if (last7.length === 0 || layingAliveCount === 0) return 0;
-    const totalHealthy = last7.reduce((a, p) => a + healthyCount(p), 0);
-    const days = new Set(last7.map(p => p.date)).size;
-    if (days === 0) return 0;
-    return (totalHealthy / (layingAliveCount * days)) * 100;
-  }, [productions, layingAliveCount]);
-
-  // تخم شکسته درصد — ۷ روز (fix: totalCount شامل broken است، جمع دوباره = باگ)
-  const brokenRate7 = useMemo(() => {
+  // Hen-Day + Broken Rate — ۷ روز، از aggregateEggMetrics (orphan connected)
+  const eggMetrics7d = useMemo(() => {
     const last7 = productions.filter(p => dateDiffDays(p.date) <= 7);
-    const total = last7.reduce((a, p) => a + (p.totalCount || 0), 0);
+    const days = Math.max(1, new Set(last7.map(p => p.date)).size);
+    const healthy = last7.reduce((a, p) => a + healthyCount(p), 0);
     const broken = last7.reduce((a, p) => a + (p.brokenCount || 0), 0);
-    if (total === 0) return 0;
-    return (broken / total) * 100;
-  }, [productions]);
+    const dirty = last7.reduce((a, p) => a + (p.softCount || 0) + (p.dirtyCount || 0), 0);
+    return aggregateEggMetrics(
+      days, healthy, broken, dirty,
+      layingAliveCount, totalInitial, null, null
+    );
+  }, [productions, layingAliveCount, totalInitial]);
+
+  const henDay7 = eggMetrics7d.henDayPct;
+  const brokenRate7 = eggMetrics7d.brokenRatePct;
 
   // ============ ۳. عملکرد تولیدی ============
   // روند ۷ روزه تخم
@@ -285,20 +276,21 @@ const [, _setTick] = useState(0);
     const weights = samples.map(s => s.weight).filter(w => w > 0);
     if (weights.length === 0) return { avgWeight: 0, cv: 0, adg: 0, hasData: false };
 
-    const mean = weights.reduce((a, w) => a + w, 0) / weights.length;
-    const variance = weights.reduce((a, w) => a + Math.pow(w - mean, 2), 0) / weights.length;
-    const stdDev = Math.sqrt(variance);
-    const cv = mean > 0 ? (stdDev / mean) * 100 : 0;
+    // 🆕 یکسان‌سازی با dlg/store (calc orphan connected)
+    const weightSamples = weights.map((w, i) => ({ id: `w${i}`, weight: w }));
+    const avgKg = avgWeightFn(weightSamples);
+    const cvPct = cvWeightFn(weightSamples);
 
-    // ADG: میانگین وزن / سن گله (روز)
+    // ADG: میانگین وزن / سن گله (روز) — semantic متفاوت از calc.adgG
+    const mean = weights.reduce((a, w) => a + w, 0) / weights.length;
     const flockId = lastWeightLog.flockId;
     const flock = activeFlocks.find(f => f.id === flockId);
     const ageDays = flock ? getAgeDays(flock) : 0;
     const adg = ageDays > 0 ? (mean * 1000) / ageDays : 0; // گرم در روز
 
     return {
-      avgWeight: Math.round(mean * 1000) / 1000,
-      cv: Math.round(cv * 10) / 10,
+      avgWeight: avgKg,
+      cv: cvPct,
       adg: Math.round(adg * 10) / 10,
       hasData: true,
     };
