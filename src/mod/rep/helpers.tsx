@@ -1,22 +1,9 @@
 /**
  * helpers.tsx — helperهای مشترک ماژول rep
  */
-import type { ReactNode } from 'react';
 import { toFa } from '../../shr/utils/fa';
 
-export function Section({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div style={{
-      background: 'var(--card)',
-      border: '1px solid var(--border)',
-      borderRadius: 'var(--r-lg)',
-      padding: '14px 16px'
-    }}>
-      <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, marginBottom: 4 }}>{title}</div>
-      {children}
-    </div>
-  );
-}
+export { Section } from '../../shr/components/ui/Layout';
 
 export function StatCard({ label, value, unit, color }: {
   label: string;

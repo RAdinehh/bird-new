@@ -39,3 +39,24 @@ export function SectionTitle({ children }: { children: React.ReactNode }) {
     }}>{children}</div>
   );
 }
+
+/**
+ * Section — کارت با عنوان (title داخل کارت، children بعد از title)
+ * استفاده در گزارش‌ها، تنظیمات، AboutTab
+ * برای LogCard/StatsCard به LogSection/StatsCard ماژول خودشان مراجعه کن
+ */
+export function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div style={{
+      background: 'var(--card)',
+      border: '1px solid var(--border)',
+      borderRadius: 'var(--r-lg)',
+      padding: '14px 16px',
+    }}>
+      <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, marginBottom: 4 }}>
+        {title}
+      </div>
+      {children}
+    </div>
+  );
+}
