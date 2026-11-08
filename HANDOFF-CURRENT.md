@@ -53,26 +53,35 @@
 - **Phase D.9** — flk merge/unmerge atomic by design (single set، ۵ تست + DECISIONS) ✅
 - **Phase D.10** — whs atomic by design (single set، ۸ تست + DECISIONS) ✅
 - **dlg negative tests** — `deleteLog`/`restoreLogFull` rollback اثبات (۴ تست، `d4f9dd23`) ✅
+- **Phase E-cleanup** — حذف `lightHours` (فیلد مرده) + migration v14 ✅
+- **Phase E-hints-cleanup** — حذف ۲۴ hint، ۴ حیاتی باقی ✅
+- **Phase E-layout** — ۴ SectionTitle استاندارد در FormModal ✅
+- **Phase E-section-1** — `dlg.Section` → `LogSection` (شامل تست) ✅
+- **Phase E-section-2** — `egg.Section` → `StatsCard` ✅
+- **Phase E-section-3** — `rep.Section` → `Layout.tsx` (استاندارد رسمی) ✅
+- **Phase E-section-4** — `set.Section` → `Layout.tsx` (یکسان‌سازی) ✅
+- **Phase F-A** — ۶ رویداد dlg publish می‌شوند (feed/egg/vaccine/medication) ✅
 
 ### 🚧 In progress — D6 (tra atomic)
 
 | فاز | کار | وضعیت |
 |---|---|---|
-| **D.6** | tra atomic (add/update/delete + integration) | ✅ |
-| **D.7** | egg atomic (4 phase + cascade) | ✅ |
-| **D.8** | inc atomic (addHatch/deleteHatch) | ✅ |
-| **D.9** | flk atomic by design (merge/unmerge) | ✅ |
-| **D.10** | whs atomic by design (movements) | ✅ |
+| **D.6-D.10** | D-Series (tra/egg/inc/flk/whs atomic) | ✅ |
+| **Phase E-Cleanup** | lightHours، hint، SectionTitle، Section | ✅ |
+| **Phase F-A** | ۶ رویداد dlg publish | ✅ |
+| **Phase F-B** | reactive alt/dsh (رد شد — monolithic frontend) | ❌ |
 
-**🏆 D-Series کامل — ۶ ماژول atomic با ۴۷ تست: dlg, tra, egg, inc, flk, whs**
+**🏆 این جلسه: ۹ commit، ۶ رویداد dlg زنده، Sectionها تفکیک شدند، hint‌ها پاک‌سازی شدند**
 
 ### ⏳ بعدی — به ترتیب پیشنهادی
 
-1. **Phase E — UI/UX فرم ۴۷ فیلدی dlg** ← **مهم‌ترین برای کاربر** (چند جلسه)
-2. F (cross-module events), G (Draft Mode), H (CSV)
-3. C8 (EggSale.quality)
-4. D5.4 (`_v`/`_txid`) — همراه server
-5. Cleanup: ۷ calc orphan، softCount، entryTime، avgWeight
+1. **۷ calc orphan** (FCR, Mortality, Egg, Weight, Stocking, EPEF, Water) — از DLG-AUDIT
+2. **`softCount: 0` هاردکد** — `toEgg.ts:52`
+3. **`calculateFCR` helpers-audit:246** فرمول غلط (FlockHistoryModal)
+4. **`entryTime` Zod mismatch**
+5. **۳ نسخهٔ موازی avgWeight**
+6. بعد: G (Draft Mode), H (CSV), C8 (EggSale.quality)
+7. D5.4 (`_v`/`_txid`) — همراه server
 
 ## 🐛 شکاف‌های باز (از DLG-AUDIT)
 
