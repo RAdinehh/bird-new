@@ -263,81 +263,27 @@ working tree: تمیز
 
 ## 🎯 مسیر جلسه ۱۰
 
-### اولویت‌های باقی‌مانده
+### D5 — Atomic آماده-آینده ✅ کامل شد
 
-| # | کار | اولویت | حجم |
+زیرفازهای D5:
+
+| # | زیرفاز | commit | وضعیت |
 |---|---|---|---|
-| ۱ | D5 — atomicSave + pre-flight در useDlgSave | 🔴 بالا | ~۶ ساعت |
-| ۲ | E — UI/UX فرم ۴۷ فیلدی | 🟠 متوسط | ~۱۰ ساعت، چند جلسه |
-| ۳ | F — cross-module events (dlg:saved → whs/egg/flk) | 🟠 متوسط | ~۴ ساعت |
-| ۴ | G — Draft Mode (autosave + recovery) | 🟡 پایین | ~۳ ساعت |
-| ۵ | H — گزارش/CSV | 🟡 پایین | ~۲ ساعت |
-| ۶ | C8 — EggSale.quality در tra | 🟡 پایین | ~۲ ساعت |
+| D5.1 | infrastructure atomic | 25501955 | ✅ |
+| D5.2 | StorageAdapter | 67811088 | ✅ |
+| D5.3 | Outbox Pattern | 5616e461 | ✅ |
+| D5.4 | `_v`/`_txid` + migration | — | ⏸ کنسل (جلسه ۱۲) |
+| D5.5 | Refactor useDlgSave | 88b8d6e0, 816f5fa8, 30735781, 5de7d548 | ✅ |
+| D5.6 | ۵ تست atomic | (commit آخر) | ✅ |
 
-### ترتیب پیشنهادی جلسه ۱۰
+۵ باگ فاجعه‌بار حل شد (orphan movement، egg، activeWithdrawal، catch خالی، flockId تغییر).
 
-D5 (atomicSave — استحکام core) → F (cross-module — یکپارچگی) → E (UI/UX — چند جلسه)
+TODO — جلسه ۱۲:
+- D5.4 (`_v`/`_txid`) — همراه server
+- B4-Recalc (activeWithdrawal recompute) — ~۳۰ دقیقه
+- act() warning در تست ۳ — cosmetic
 
 ---
-
-## 🔴 D5 — نقشه دقیق (اولویت اول جلسه ۱۰)
-
-### ۸ تصمیم B که هنوز پیاده نشده
-
-| # | تصمیم | وضعیت |
-|---|---|---|
-| B1 | flockId قفل در ویرایش | ❌ |
-| B2 | date قفل در ویرایش | ❌ |
-| B4 | activeWithdrawal cleanup | ❌ |
-| B5 | حذف catch {} خالی | ❌ |
-| B6 | atomicSave (snapshot + rollback) | ❌ |
-| B7 | deleteLog اتمیک | ❌ |
-| B8 | تاریخچه ویرایش | ❌ |
-
-### باگ‌های فعلی که D5 حل می‌کند
-
-۱. useDlgSave atomic نیست — اگر Phase 3 fail شود، Phase 1-2 حذف شده‌اند
-   - useDlgSave.ts:113-131 — حذف دان قبل از ساخت
-   - useDlgSave.ts:145-148 — catch {} خالی (L6 violation)
-
-۲. activeWithdrawal روی گله پاک نمی‌شود
-   - useDlgSave.ts — فقط if (maxWithdrawal > 0)، else ندارد
-   - اگر کاربر دارو را حذف کند، activeWithdrawal باقی می‌ماند
-
-۳. update با flockId تغییر → orphan egg
-   - کاربر گله را عوض می‌کند، log.flockId تغییر می‌کند
-   - egg.production هم تغییر می‌کند (via findByLogId)
-   - ولی flk.activeWithdrawal گله قدیم orphan
-
-۴. deleteLog غیراتمیک
-   - useDlgSave.ts:301 — حذف movement‌ها
-   - اگر deleteProduction fail شود → movement‌ها حذف شده‌اند، production مانده
-
-### الگوی پیشنهادی atomicSave
-
-نقشه فازها (بدون کد):
-- Phase 1: Pre-flight (checkStock بدون mutation)
-- Phase 2: Snapshot (dlgLogs، whsMovements، whsItems، eggProductions، flkFlocks)
-- Phase 3: Execute whs cascade (throw اگر fail)
-- Phase 4: executeDlgSave (logId)
-- Phase 5: egg cascade
-- Phase 6: flk cascade (activeWithdrawal)
-- catch: Rollback همه از snapshot، return { ok: false, error }
-- Phase 7: Commit فقط بعد از موفقیت — bus.emit، toast، return { ok: true }
-
-### تغییرات لازم D5
-
-| فایل | تغییر |
-|---|---|
-| useDlgSave.ts | atomicSave + snapshot + rollback |
-| whs/store.ts | addMovement از return '' به throw new Error() |
-| whs/MovesPage.tsx، whs/ItemsPage.tsx | try/catch |
-| tra/invoiceHelpers.ts، tra/store.ts، tra/applyStock.ts | try/catch |
-| FormModal.tsx | flockId/date قفل در ویرایش |
-| rules/dlg.ts | cross-field validation |
-| تست‌ها | ۸-۱۰ تست برای cascade |
-
-حجم: ~۶ ساعت، ۷-۸ فایل، commit جدا
 
 ---
 

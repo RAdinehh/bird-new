@@ -570,3 +570,38 @@ commit: fc6b82f9
 ۱۳. توقف بعد از هر milestone
 
 آخرین تصمیم: 1405/11/08
+
+
+## جلسه 1405/11/08 (11 — D5 Atomic کامل)
+
+### D5.5 — Refactor useDlgSave (atomic)
+
+**B1b — flockId/date guard (88b8d6e0)**
+قبل: کاربر می‌توانست flockId/date را در ویرایش عوض کند → orphan egg
+بعد: guard + toast خطا
+
+**B1c — activeWithdrawal cleanup (816f5fa8)**
+قبل: اگر دارو حذف شود، activeWithdrawal orphan
+بعد: else branch + guard `logId === current` (B4-Recalc در جلسه ۱۲)
+
+**B2 — save() atomic (30735781)**
+atomicTransaction + outbox + حذف catch {} خالی (L6) + throw در silent fails
+
+**B3 — deleteLog atomic + bulk fix (5de7d548)**
+- deleteLog: atomicTransaction + outbox + remove داخل atomic
+- bulk delete (DlgTabPanel): قبلاً remove خالص (silent باگ) → حالا onDeleteLog atomic
+
+### D5.4 کنسل شد
+
+`_v`/`_txid` صفر consumer، صفر ارزش فوری. همراه با server در جلسه ۱۲.
+
+### درس‌های جلسه ۱۱
+
+1. atomic + outbox + storage infrastructure = ~۹۰۰ خط، ۳ commit (D5.1-D5.3)
+2. consumer متصل (D5.5) = ~۲۰۰ خط تغییر، ۴ commit (B1b+B1c+B2+B3)
+3. تست atomic = ۵ تست (B4)
+4. باگ پنهان bulk delete (DlgTabPanel) — از قبل، بدون cascade
+5. `AppEvents` typed — قبل از وصل به bus، چک کن
+6. act() warning در تست — cosmetic، صفر ریسک
+
+آخرین تصمیم: 1405/11/08

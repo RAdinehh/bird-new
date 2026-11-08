@@ -1272,3 +1272,47 @@ PENDING — گام بعدی:
 - G (Draft Mode)
 - H (گزارش/CSV)
 - C8 (EggSale.quality در tra)
+
+
+## جلسه 1405/11/08 (11 — D5 Atomic کامل)
+
+### DONE
+
+- D5.1 — infrastructure atomic (25501955)
+- D5.2 — StorageAdapter (67811088)
+- D5.3 — Outbox Pattern (5616e461)
+- D5.5-B1b — flockId/date guard (88b8d6e0)
+- D5.5-B1c — activeWithdrawal cleanup (816f5fa8)
+- D5.5-B2 — save() atomic (30735781)
+- D5.5-B3 — deleteLog atomic + bulk fix (5de7d548)
+- D5.5-B4 — ۵ تست atomic (این commit)
+
+### آمار
+
+- commits: ۸
+- تست‌های جدید: ۵ (atomic)
+- فایل‌های جدید: ~۱۰ (cor/atomic, cor/storage, cor/outbox, test)
+- صفر regression
+
+### ۵ باگ فاجعه‌بار حل شد
+
+1. orphan movement (silent fail → throw → rollback)
+2. orphan egg (rollback)
+3. activeWithdrawal orphan (B1c guard)
+4. catch {} خالی (L6)
+5. flockId/date تغییر در ویرایش (guard)
++ bulk delete silent باگ (DlgTabPanel)
+
+### PENDING — جلسه ۱۲
+
+- D5.4 (`_v`/`_txid`) — همراه server
+- B4-Recalc (activeWithdrawal recompute) — ~۳۰ دقیقه
+- act() warning در تست ۳ — cosmetic
+- ۵ ماژول next با atomic:
+  - D6 tra (updateInvoice/deleteInvoice)
+  - D7 egg (saveProduction)
+  - D8 inc (saveEggEntry + invoice)
+  - D9 flk (merge/unmerge)
+  - D10 whs (batch movements)
+- بخش E (UI/UX) — چند جلسه
+- بخش F (cross-module) — ~۴ ساعت
