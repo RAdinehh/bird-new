@@ -49,28 +49,29 @@
 - **Phase D.7-P3** — `whs.handlers` egg cascade (6 swallow → throw) ✅
 - **Phase D.7-P4a** — negative test (اثبات atomic end-to-end egg↔whs) ✅
 - **Phase D.7-P4b** — `ProductionsPage` bulk atomic + silent catch رفع ✅
+- **Phase D.8** — inc atomic (`addHatch`/`deleteHatch` + flk cascade، ۴ تست) ✅
+- **Phase D.9** — flk merge/unmerge atomic by design (single set، ۵ تست + DECISIONS) ✅
+- **Phase D.10** — whs atomic by design (single set، ۸ تست + DECISIONS) ✅
 
 ### 🚧 In progress — D6 (tra atomic)
 
-| فاز | کار | برآورد | وضعیت |
-|---|---|---|---|
-| ~~D.6-E~~ | ~~`updateInvoice` atomic~~ | ✅ | ✅ |
-| ~~D.6-F~~ | ~~`addInvoice` atomic~~ | ✅ | ✅ |
-| ~~D.6-G~~ | ~~integration tests~~ | ✅ | ✅ |
-| ~~D.7~~ | ~~egg atomic (4 phase)~~ | ✅ | ✅ |
-| **D8** | inc atomic (`saveEggEntry` + invoice) | ~۱ ساعت | ⏳ |
-| **D9** | flk atomic (`mergeFlocks`/`unmergeFlocks`) | ~۱.۵ ساعت | ⏳ |
-| **D10** | whs atomic (batch movements) | ~۱ ساعت | ⏳ |
+| فاز | کار | وضعیت |
+|---|---|---|
+| **D.6** | tra atomic (add/update/delete + integration) | ✅ |
+| **D.7** | egg atomic (4 phase + cascade) | ✅ |
+| **D.8** | inc atomic (addHatch/deleteHatch) | ✅ |
+| **D.9** | flk atomic by design (merge/unmerge) | ✅ |
+| **D.10** | whs atomic by design (movements) | ✅ |
 
-**D.6 (tra) + D.7 (egg) کامل — ۳ ماژول atomic با تست: dlg, tra, egg**
+**🏆 D-Series کامل — ۶ ماژول atomic با ۳۸ تست: dlg, tra, egg, inc, flk, whs**
 
 ### ⏳ بعدی — به ترتیب پیشنهادی
 
-1. **D8/D9/D10** — inc/flk/whs atomic (~۳.۵ ساعت جمع)
-2. **Phase E — UI/UX فرم ۴۷ فیلدی dlg** ← **مهم‌ترین برای کاربر**
-3. F (cross-module events), G (Draft), H (CSV)
-4. C8 (EggSale.quality)
-5. D5.4 (`_v`/`_txid`) — همراه server
+1. **Phase E — UI/UX فرم ۴۷ فیلدی dlg** ← **مهم‌ترین برای کاربر** (چند جلسه)
+2. F (cross-module events), G (Draft Mode), H (CSV)
+3. C8 (EggSale.quality)
+4. D5.4 (`_v`/`_txid`) — همراه server
+5. Cleanup: ۷ calc orphan، softCount، entryTime، avgWeight
 
 ## 🐛 شکاف‌های باز (از DLG-AUDIT)
 
@@ -107,11 +108,11 @@
 
 ## 🎯 ترتیب بعدی
 
-1. **D8** — inc atomic (~۱ ساعت) — الگوی D.6/D.7
-2. **D9** — flk atomic (~۱.۵ ساعت)
-3. **D10** — whs atomic (~۱ ساعت)
-4. بعد: **Phase E — UI/UX فرم ۴۷ فیلدی dlg** (چند جلسه) ← مهم‌ترین برای کاربر
-5. بعد: F, G, H, C8, D5.4
+1. **Phase E — UI/UX فرم ۴۷ فیلدی dlg** (چند جلسه) ← مهم‌ترین برای کاربر
+2. F (cross-module events), G (Draft), H (CSV)
+3. C8 (EggSale.quality)
+4. D5.4 (`_v`/`_txid`) — همراه server
+5. Cleanup: ۷ calc orphan، softCount، entryTime، avgWeight
 
 ## 📝 آپدیت این فایل
 
