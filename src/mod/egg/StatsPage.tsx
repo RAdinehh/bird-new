@@ -205,7 +205,7 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
           )}
 
           {/* خلاصه */}
-          <Section icon="📊" title={`خلاصه ${rangeLabel}`} />
+          <StatsCard icon="📊" title={`خلاصه ${rangeLabel}`} />
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <SummaryCard icon="🥚" label="کل تخم" value={toFa(stats.total.toLocaleString('fa-IR'))} sub={`در ${toFa(coverage.days)} روز`} tone="accent" />
             <SummaryCard icon="📅" label="میانگین روزانه" value={canAvg ? toFa(stats.avgHealthy.toLocaleString('fa-IR')) : '—'} sub={canAvg ? 'تخم سالم' : 'داده کم'} tone="info" />
@@ -214,7 +214,7 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
           </div>
 
           {/* کیفیت تخم */}
-          <Section icon="⭐" title="کیفیت تخم" extra={rangeLabel} />
+          <StatsCard icon="⭐" title="کیفیت تخم" extra={rangeLabel} />
           <div style={{ padding: '14px 16px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 12 }}>
             <QualityBar icon="🌱" label="نطفه‌دار" pct={stats.fertilePct} count={stats.fertile} total={stats.total} color="var(--purple)" />
             <QualityBar icon="🥚" label="خوراکی" pct={stats.eatingPct} count={stats.eating} total={stats.total} color="var(--accent)" />
@@ -227,7 +227,7 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
           {/* روند روزانه */}
           {trend.days.length >= 2 && (
             <>
-              <Section icon="📈" title="روند روزانه" extra={`${toFa(trend.days.length)} روز`} />
+              <StatsCard icon="📈" title="روند روزانه" extra={`${toFa(trend.days.length)} روز`} />
               <div style={{ padding: '14px 16px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 12 }}>
 
                 {/* انتخاب نوع نمودار */}
@@ -275,7 +275,7 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
           {/* مقایسه گله‌ها */}
           {flockRank.length >= 2 && (
             <>
-              <Section icon="🏆" title="رتبه‌بندی گله‌ها" />
+              <StatsCard icon="🏆" title="رتبه‌بندی گله‌ها" />
               <div style={{ padding: '12px 14px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {flockRank.map((r, i) => {
                   const brokenPct = r.total > 0 ? Math.round((r.broken / r.total) * 1000) / 10 : 0;
@@ -301,7 +301,7 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
           {/* الگوی روزهای هفته */}
           {byWeekday.length >= 3 && (
             <>
-              <Section icon="📆" title="الگوی روزهای هفته" />
+              <StatsCard icon="📆" title="الگوی روزهای هفته" />
               <div style={{ padding: '12px 14px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {byWeekday.map((d, i) => (
                   <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: i === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
@@ -317,7 +317,7 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
           {/* بهترین روزها */}
           {dayRank.length > 0 && (
             <>
-              <Section icon="🌟" title="بهترین روزها" />
+              <StatsCard icon="🌟" title="بهترین روزها" />
               <div style={{ padding: '12px 14px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {dayRank.map((d, i) => (
                   <div key={d.date} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
@@ -337,7 +337,7 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
 
 // ============ Helpers ============
 
-function Section({ icon, title, extra }: { icon: string; title: string; extra?: string }) {
+function StatsCard({ icon, title, extra }: { icon: string; title: string; extra?: string }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 8 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
