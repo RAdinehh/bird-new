@@ -84,4 +84,23 @@ describe('calculateEPEF — edge', () => {
     });
     expect(r.epef).toBe(0);
   });
+
+
+  it('guards: ageDays=0 → epef=0، tone=info', () => {
+    const r = calculateEPEF({ livabilityPct: 95, finalWeightKg: 2.5, ageDays: 0, fcr: 1.6 });
+    expect(r.epef).toBe(0);
+    expect(r.tone).toBe('info');
+  });
+
+  it('guards: fcr=0 → epef=0، tone=info', () => {
+    const r = calculateEPEF({ livabilityPct: 95, finalWeightKg: 2.5, ageDays: 42, fcr: 0 });
+    expect(r.epef).toBe(0);
+    expect(r.tone).toBe('info');
+  });
+
+  it('guards: finalWeightKg=0 → epef=0، tone=info', () => {
+    const r = calculateEPEF({ livabilityPct: 95, finalWeightKg: 0, ageDays: 42, fcr: 1.6 });
+    expect(r.epef).toBe(0);
+    expect(r.tone).toBe('info');
+  });
 });

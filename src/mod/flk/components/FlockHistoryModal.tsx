@@ -16,6 +16,8 @@ import type { DailyLog as DlgLog } from '../../dlg/store';
 import { aggregateConsumptionEvents } from '../consumptionEventsCalc';
 import { useBrd } from '../../brd/store';
 import { getStandardFor } from '../../set/standards/resolve';
+import { getAgeDays } from '../helpers-store';
+import { calculateEPEF } from '../../../shr/calc/formulas/epef';
 
 const REASON_OPTIONS: { value: FlockEventReasonCode; label: string }[] = [
   { value: 'data_entry_error', label: 'خطای ثبت' },
@@ -173,6 +175,45 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   })();
   const fcrResult = calculateFCR(consumptionSummary, weightBySex, flock, stdFCR);
   const deathRate = aggregateDeathsBySex(flock.sexBalanceEvents, flock.initialMaleCount, flock.initialFemaleCount);
+
+  // 🆕 EPEF — فقط برای گله گوشتی، نیاز به FCR دقیق + وزن + سن
+  const epefResult = (() => {
+    if (flock.type !== 'broiler') return { epef: 0, tone: 'info' as const };
+    if (fcrResult.fcr === null || fcrResult.confidence !== 'exact') return { epef: 0, tone: 'info' as const };
+    const ageDays = getAgeDays(flock);
+    if (ageDays <= 0) return { epef: 0, tone: 'info' as const };
+
+    let finalWeightKg = 0;
+    if (weightBySex?.hasData) {
+      if (weightBySex.mixed.hasData && weightBySex.mixed.avg > 0) {
+        finalWeightKg = weightBySex.mixed.avg;
+      } else if (weightBySex.male.hasData || weightBySex.female.hasData) {
+        const m = weightBySex.male.count || 0;
+        const f = weightBySex.female.count || 0;
+        const u = weightBySex.mixed.count || 0;
+        const total = m + f + u;
+        finalWeightKg = total > 0
+          ? (weightBySex.male.avg * m + weightBySex.female.avg * f + weightBySex.mixed.avg * u) / total
+          : 0;
+      }
+    }
+    if (finalWeightKg <= 0) return { epef: 0, tone: 'info' as const };
+
+    const totalDeaths =
+      (deathRate.male.deaths || 0) + (deathRate.female.deaths || 0) + (deathRate.unknown.deaths || 0);
+    const initial = flock.initialCount || 0;
+    const livabilityPct = initial > 0
+      ? Math.max(0, Math.min(100, ((initial - totalDeaths) / initial) * 100))
+      : 0;
+    if (livabilityPct <= 0) return { epef: 0, tone: 'info' as const };
+
+    return calculateEPEF({
+      livabilityPct,
+      finalWeightKg,
+      ageDays,
+      fcr: fcrResult.fcr,
+    });
+  })();
 
   const sexAggregates = (() => {
     const isSexed = !!flock.genderSplitAt;
@@ -532,7 +573,23 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               </div>
             </div>
           )}
-          {consumptionCount === 0 ? (
+          {epefResult.epef > 0 && (
+        <div>
+          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>🏆 EPEF</div>
+          <div style={{ padding: '8px 10px', background: `var(--${epefResult.tone === 'accent' ? 'accent-soft' : epefResult.tone === 'warn' ? 'warn-soft' : 'danger-soft'})`, border: `1px solid var(--${epefResult.tone === 'accent' ? 'accent-border' : epefResult.tone === 'warn' ? 'warn' : 'danger'})`, borderRadius: 'var(--r-md)', fontSize: 11 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+              <span style={{ fontSize: 14, fontWeight: 700 }}>{toFa(epefResult.epef.toFixed(1))}</span>
+              <span style={{ fontSize: 9, padding: '1px 5px', borderRadius: 3, background: `var(--${epefResult.tone === 'accent' ? 'accent' : epefResult.tone === 'warn' ? 'warn' : 'danger'})`, color: 'white', fontWeight: 700 }}>
+                {epefResult.tone === 'accent' ? 'خوب' : epefResult.tone === 'warn' ? 'متوسط' : 'ضعیف'}
+              </span>
+            </div>
+            <div style={{ fontSize: 10, color: 'var(--muted)', lineHeight: 1.6 }}>
+              EPEF = (بقا٪ × وزن × 100) ÷ (سن × FCR) — شاخص گله گوشتی
+            </div>
+          </div>
+        </div>
+      )}
+      {consumptionCount === 0 ? (
             <div style={{ padding: 'var(--sp-8)', textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>
               <div style={{ fontSize: 40, marginBottom: 8 }}>🍽️</div>
               <div>هنوز مصرف ثبت نشده</div>
