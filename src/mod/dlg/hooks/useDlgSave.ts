@@ -4,9 +4,9 @@
  * همه‌ی cascadeها (whs, egg)، اعتبارسنجی و emit event اینجاست.
  */
 import { useDlg } from '../store';
-import { useWhs } from '../../whs/store';
+import { useWhs, type Movement } from '../../whs/store';
 import { useFed } from '../../fed/store';
-import { useEgg } from '../../egg/store';
+import { useEgg, type EggProduction } from '../../egg/store';
 import { checkStock } from '../api/checkStock';
 import { buildFeedMovements, buildVaccineMovement, buildMedicationMovement } from '../api/toWhs';
 import { buildLogData } from '../api/buildData';
@@ -40,6 +40,13 @@ export interface UseDlgSaveParams {
   int: (s: string) => number | null;
 }
 
+
+export interface DeleteSnapshot {
+  feedMovements: Movement[];
+  vaccineMovements: Array<{ vaccineId: string; movement: Movement }>;
+  medicationMovements: Array<{ medicationId: string; movement: Movement }>;
+  production: EggProduction | null;
+}
 
 /** افزودن N روز به تاریخ شمسی YYYY/MM/DD */
 function findPreviousRemaining(
@@ -364,6 +371,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
     ok: boolean;
     undoData: DailyLog | null;
     hadCascades: boolean;
+    snapshot?: DeleteSnapshot;
   }> => {
     // D5.5/B3 — تأیید (در bulk delete skip می‌شود)
     if (!opts.skipConfirm) {
@@ -379,6 +387,23 @@ export function useDlgSave(params: UseDlgSaveParams) {
       (log.vaccines || []).some(v => !!v.movementId) ||
       (log.medications || []).some(m => !!m.movementId) ||
       !!findByLogId(log.id);
+
+    // E.4b — snapshot قبل از حذف
+    const snapshot: DeleteSnapshot | undefined = hadCascades ? (() => {
+      const movementsMap = new Map(useWhs.getState().movements.map((m: Movement) => [m.id, m]));
+      const feedMovements = (log.feedMovementIds || [])
+        .map((id) => movementsMap.get(id))
+        .filter((m): m is Movement => !!m);
+      const vaccineMovements = (log.vaccines || [])
+        .filter((v) => !!v.movementId)
+        .map((v) => ({ vaccineId: v.id, movement: movementsMap.get(v.movementId!) }))
+        .filter((x): x is { vaccineId: string; movement: Movement } => !!x.movement);
+      const medicationMovements = (log.medications || [])
+        .filter((m) => !!m.movementId)
+        .map((m) => ({ medicationId: m.id, movement: movementsMap.get(m.movementId!) }))
+        .filter((x): x is { medicationId: string; movement: Movement } => !!x.movement);
+      return { feedMovements, vaccineMovements, medicationMovements, production: findByLogId(log.id) || null };
+    })() : undefined;
 
     // D5.5/B3 — atomic (cascade + remove + outbox)
     const result = await atomicTransaction<string>({
@@ -427,8 +452,52 @@ export function useDlgSave(params: UseDlgSaveParams) {
     });
 
     if (!result.ok) return { ok: false, undoData: null, hadCascades };
-    return { ok: true, undoData: log, hadCascades };
+    return { ok: true, undoData: log, hadCascades, snapshot };
   };
 
-  return { save, deleteLog };
+  const restoreLogFull = async (log: DailyLog, snapshot: DeleteSnapshot): Promise<boolean> => {
+    const result = await atomicTransaction<string>({
+      stores: [dlgStore, whsStore, eggStore, flkStore],
+      execute: () => {
+        const newFeedIds: string[] = [];
+        for (const mv of snapshot.feedMovements) {
+          const { id: _oid, createdAt: _oc, ...mvData } = mv;
+          const nid = addMovement(mvData);
+          if (nid) newFeedIds.push(nid);
+        }
+        const vacMap = new Map<string, string>();
+        for (const vm of snapshot.vaccineMovements) {
+          const { id: _oid, createdAt: _oc, ...mvData } = vm.movement;
+          const nid = addMovement(mvData);
+          if (nid) vacMap.set(vm.vaccineId, nid);
+        }
+        const medMap = new Map<string, string>();
+        for (const mm of snapshot.medicationMovements) {
+          const { id: _oid, createdAt: _oc, ...mvData } = mm.movement;
+          const nid = addMovement(mvData);
+          if (nid) medMap.set(mm.medicationId, nid);
+        }
+        const updatedLog: DailyLog = {
+          ...log,
+          feedMovementIds: newFeedIds,
+          vaccines: (log.vaccines || []).map((v) => ({ ...v, movementId: vacMap.get(v.id) || '' })),
+          medications: (log.medications || []).map((m) => ({ ...m, movementId: medMap.get(m.id) || '' })),
+        };
+        const newLogId = add(updatedLog);
+        if (snapshot.production) {
+          const { id: _oid, createdAt: _oc, sourceLogId: _os, ...prodData } = snapshot.production;
+          addProduction({ ...prodData, sourceLogId: newLogId });
+        }
+        const freshLogs = useDlg.getState().logs;
+        recomputeActiveWithdrawal(freshLogs, log.flockId);
+        return newLogId;
+      },
+      onError: (err) => {
+        toastMsg.error('خطا در بازگردانی: ' + err.message);
+      },
+    });
+    return result.ok;
+  };
+
+  return { save, deleteLog, restoreLogFull };
 }

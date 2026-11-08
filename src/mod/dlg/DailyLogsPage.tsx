@@ -56,7 +56,7 @@ export default function DailyLogsPage() {
   } = useDlgForm({ activeFlocks, halls, todayStr });
 
   // ⭐ hook ذخیره‌سازی
-  const { save, deleteLog } = useDlgSave({
+  const { save, deleteLog, restoreLogFull } = useDlgSave({
     form, setForm, saving, setSaving, setErr, setOpen,
     selectedFlock, flockAliveCount, isLayerFlock, num, int,
   });
@@ -64,16 +64,11 @@ export default function DailyLogsPage() {
   const handleDeleteLog = async (
     l: DailyLog,
     opts?: { skipConfirm?: boolean },
-  ): Promise<DailyLog | null> => {
-    const { ok, undoData: log, hadCascades } = await deleteLog(l, opts);
-    if (!ok) return null;
-    if (hadCascades) {
-      toastMsg.info('ثبت حذف شد — حرکات انبار/تولید تخم قابل بازگردانی نیستند');
-      return null;
-    }
-    if (!log) return null;
+  ): Promise<{ log: DailyLog; snapshot?: any } | null> => {
+    const { ok, undoData: log, snapshot } = await deleteLog(l, opts);
+    if (!ok || !log) return null;
     toastMsg.deleted('ثبت');
-    return log as DailyLog;
+    return { log: log as DailyLog, snapshot };
   };
 
   // ─── فیلترها ───
@@ -237,6 +232,7 @@ export default function DailyLogsPage() {
               onEdit={openEdit}
               onAdd={openNew}
               onDeleteLog={handleDeleteLog}
+              onRestoreLogFull={restoreLogFull}
             />
           </div>
           <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
@@ -252,6 +248,7 @@ export default function DailyLogsPage() {
               onEdit={openEdit}
               onAdd={openNew}
               onDeleteLog={handleDeleteLog}
+              onRestoreLogFull={restoreLogFull}
             />
           </div>
           <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
@@ -267,6 +264,7 @@ export default function DailyLogsPage() {
               onEdit={openEdit}
               onAdd={openNew}
               onDeleteLog={handleDeleteLog}
+              onRestoreLogFull={restoreLogFull}
             />
           </div>
         </div>

@@ -4,6 +4,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useFab } from '../../../shr/hooks/useFab';
 import { useDlg, type DailyLog } from '../store';
+import type { DeleteSnapshot } from '../hooks/useDlgSave';
 import { useFilterSort, FilterBar, type getDlgLogsConfig } from '../../../shr/filter';
 import { Btn, Empty, PageContainer } from '../../../shr/components/ui';
 import HelpBanner from '../../../shr/components/HelpBanner';
@@ -34,17 +35,18 @@ interface Props {
   medicineEnabled: boolean;
   onEdit: (l: DailyLog) => void;
   onAdd: () => void;
-  onDeleteLog: (l: DailyLog, opts?: { skipConfirm?: boolean }) => Promise<DailyLog | null>;
+  onDeleteLog: (l: DailyLog, opts?: { skipConfirm?: boolean }) => Promise<{ log: DailyLog; snapshot?: DeleteSnapshot } | null>;
+  onRestoreLogFull: (log: DailyLog, snapshot: DeleteSnapshot) => Promise<boolean>;
 }
 
 export default function DlgTabPanel({
   tab, active,
   logs, flocks, birds, config,
   vaccineEnabled, medicineEnabled,
-  onEdit, onAdd, onDeleteLog,
+  onEdit, onAdd, onDeleteLog, onRestoreLogFull,
 }: Props) {
   const { add, archive, restore } = useDlg();
-  const [undoData, setUndoData] = useState<{ log: DailyLog | DailyLog[] } | null>(null);
+  const [undoData, setUndoData] = useState<{ log: DailyLog | DailyLog[]; snapshot?: DeleteSnapshot } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useFab(active ? { label: 'ثبت امروز', onClick: onAdd } : null);
@@ -71,7 +73,7 @@ export default function DlgTabPanel({
         if (!it) continue;
         // D5.5/B3 — bulk delete atomic (cascade + remove + outbox)
         const deleted = await onDeleteLog(it, { skipConfirm: true });
-        if (deleted) backups.push(it);
+        if (deleted) backups.push(deleted.log);
         deletedCount++;
       }
       if (backups.length > 0) {
@@ -95,20 +97,20 @@ export default function DlgTabPanel({
     if (ms.selectionMode) setExpandedId(null);
   }, [ms.selectionMode]);
 
-  const undoDeleteLog = () => {
+  const undoDeleteLog = async () => {
     if (undoData == null) return;
     const arr = Array.isArray(undoData.log) ? undoData.log : [undoData.log];
     try {
+      if (!Array.isArray(undoData.log) && undoData.snapshot) {
+        await onRestoreLogFull(undoData.log, undoData.snapshot);
+      } else {
+        for (const log of arr) add(log);
+      }
       for (const log of arr) {
-        add(log);
         try {
           bus.emit('dlg:deaths:recorded', {
-            logId: log.id,
-            flockId: log.flockId,
-            date: log.date,
-            count: log.deathsCount || 0,
-            deaths: log.deaths || [],
-            isEdit: false,
+            logId: log.id, flockId: log.flockId, date: log.date,
+            count: log.deathsCount || 0, deaths: log.deaths || [], isEdit: false,
           }, { source: 'dlg/undoDelete' });
         } catch { /* silent */ }
       }
@@ -120,10 +122,10 @@ export default function DlgTabPanel({
   };
 
   const handleDeleteOne = async (l: DailyLog) => {
-    const log = await onDeleteLog(l);
-    if (!log) return;
-    setUndoData({ log });
-    setTimeout(() => setUndoData((cur) => cur && !Array.isArray(cur.log) && cur.log.id === log.id ? null : cur), 6000);
+    const result = await onDeleteLog(l);
+    if (!result) return;
+    setUndoData({ log: result.log, snapshot: result.snapshot });
+    setTimeout(() => setUndoData((cur) => cur && !Array.isArray(cur.log) && cur.log.id === result.log.id ? null : cur), 6000);
   };
 
   const renderLogCard = (l: DailyLog, i: number) => {
