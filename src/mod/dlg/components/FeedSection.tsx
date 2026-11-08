@@ -10,7 +10,6 @@ import { WATER_SYSTEM_LABEL } from '../../../shr/utils/systemType';
 import { useFed } from '../../fed/store';
 import { useWhs } from '../../whs/store';
 import type { F } from '../types';
-import { FieldHint } from '../../../shr/intelligence';
 import { useFlk, getAgeDays } from '../../flk/store';
 import { parseNumericValue } from '../../../shr/intelligence/useAnomalyHint';
 
@@ -128,13 +127,13 @@ export default function FeedSection({ form, setForm, vErrors, showError, markTou
           <Field label="مقدار دان مصرفی">
             <NumField placeholder="۵۰" value={form.feedDelivered} onChange={e => setForm({ ...form, feedDelivered: e.target.value })} unit="kg" min={0} />
           </Field>
-          {!showError('feedDelivered') && <FieldHint fieldPath="dlg.feedDelivered" value={form.feedDelivered} context={{ flockSize, breedKey: selectedFlock?.breedId, ageDays: flockAge ?? undefined, flockType: selectedFlock?.type }} />}
+          
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
           <Field label="دان باقیمانده">
             <NumField placeholder="۰" value={form.feedRemaining} onChange={e => setForm({ ...form, feedRemaining: e.target.value })} unit="kg" min={0} />
           </Field>
-          {!showError('feedRemaining') && <FieldHint fieldPath="dlg.feedRemaining" value={form.feedRemaining} context={{ feedDelivered: feedAmtNum ?? undefined, flockSize, breedKey: selectedFlock?.breedId, ageDays: flockAge ?? undefined, flockType: selectedFlock?.type }} />}
+          
         </div>
       </Grid2>
 
@@ -148,13 +147,13 @@ export default function FeedSection({ form, setForm, vErrors, showError, markTou
               <Field label="تعداد بار">
                 <NumField placeholder="۵" value={form.waterFillCount} onChange={e => setForm({ ...form, waterFillCount: e.target.value })} unit="بار" min={0} />
               </Field>
-              {!showError('waterFillCount') && <FieldHint fieldPath="dlg.waterFillCount" value={form.waterFillCount} />}
+              
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
               <Field label="حجم هر بار">
                 <NumField placeholder="۲۰" value={form.waterFillVolume} onChange={e => setForm({ ...form, waterFillVolume: e.target.value })} unit="L" min={0} />
               </Field>
-              {!showError('waterFillVolume') && <FieldHint fieldPath="dlg.waterFillVolume" value={form.waterFillVolume} />}
+              
             </div>
           </Grid2>
           {(form.waterFillCount && form.waterFillVolume) && (
@@ -174,7 +173,7 @@ export default function FeedSection({ form, setForm, vErrors, showError, markTou
             <Field label="مقدار آب مصرفی (تخمینی)">
               <NumField placeholder="۱۰۰" value={form.waterAmount} onChange={e => setForm({ ...form, waterAmount: e.target.value })} unit="L" min={0} />
             </Field>
-            {!showError('waterAmount') && <FieldHint fieldPath="dlg.waterAmount" value={form.waterAmount} context={{ flockSize, breedKey: selectedFlock?.breedId, ageDays: flockAge ?? undefined, flockType: selectedFlock?.type }} />}
+            
           </div>
         </>
       )}
