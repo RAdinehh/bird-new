@@ -82,7 +82,7 @@ const [, _setTick] = useState(0);
 
   const todayLogs = useMemo(() => logs.filter(l => l.date === today), [logs, today]);
   const effectiveTodayLogs = useMemo(() => todayLogs.map(applyCorrections), [todayLogs]);
-  const deathsToday = effectiveTodayLogs.reduce((a, l) => a + (l.deaths || []).reduce((b, x) => b + (x.count || 0), 0), 0);
+  const deathsToday = effectiveTodayLogs.reduce((a, l) => a + (l.deathsCount || 0), 0);
   const feedToday = effectiveTodayLogs.reduce((a, l) => a + (l.feedDelivered || 0), 0);
   const waterToday = effectiveTodayLogs.reduce((a, l) => a + (l.waterAmount || 0), 0);
   const tempToday = effectiveTodayLogs.length > 0 ? (effectiveTodayLogs[0].temperature || 0) : 0;
