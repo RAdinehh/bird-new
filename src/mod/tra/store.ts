@@ -102,6 +102,8 @@ export const useTra = create<State>()(
         } catch {}
       },
       addInvoice: (i) => {
+        const __snaps = ALL_STORES.map(s => ({ store: s, snap: s.getSnapshot() }));
+        try {
         const id = uuid();
         const num = generateInvoiceNumber(i.type, i.date, get().invoices);
         const newInv = { ...i, id, number: i.number || num, createdAt: now(), updatedAt: now() } as any;
@@ -110,9 +112,9 @@ export const useTra = create<State>()(
           // 🎯 ۱. اعمال روی گله‌ها (خرید/فروش پرنده)
           try { items = applyInvoiceFlocks({ ...newInv, items }); } catch(e) { console.error('[tra add] applyInvoiceFlocks failed:', e); throw e; }
           // 🎯 ۲. اتصال تجهیزات به فاکتور
-          try { items = applyInvoiceEquipment({ ...newInv, items }); } catch(e) { console.error('❌ [tra] applyInvoiceEquipment error:', e); }
+          try { items = applyInvoiceEquipment({ ...newInv, items }); } catch(e) { console.error('❌ [tra] applyInvoiceEquipment error:', e); throw e; }
           // 🎯 ۳. اتصال فروش تخم به ماژول egg
-          try { items = applyInvoiceEgg({ ...newInv, items }); } catch(e) { console.error('[tra add] applyInvoiceEgg failed:', e); }
+          try { items = applyInvoiceEgg({ ...newInv, items }); } catch(e) { console.error('[tra add] applyInvoiceEgg failed:', e); throw e; }
           try { items = applyInvoiceStock({ ...newInv, items }); } catch(e) { const _msg = e instanceof Error ? e.message : String(e); console.error('[tra add] applyInvoiceStock failed:', e); throw new Error('حرکت انبار ناموفق — ' + _msg); }
           // 🎯 ۴. اتصال به انبار از طریق Event Bus (حرکت‌ها + movementId)
           // ✅ آپدیت انبار فقط از طریق applyInvoiceStock انجام می‌شود
@@ -123,12 +125,19 @@ export const useTra = create<State>()(
         const final: Invoice = { ...newInv, items, payments: syncedPayments };
         // 🆕 آبشار بانکی: تخصیص پرداخت‌ها به اقساط
         if (final.installments && final.installments.length > 0) {
-          try { final.installments = applyPaymentsToInstallments(final.installments, syncedPayments); } catch(e) {}
+          try { final.installments = applyPaymentsToInstallments(final.installments, syncedPayments); } catch(e) { console.error('[tra add] applyPaymentsToInstallments failed:', e); throw e; }
         }
         set({ invoices: [...get().invoices, final] });
       syncAllocations(get, final.id, final.payments || [], [], '[addInvoice] alloc:');
-        try { setPartyCredit(final.partyId, computePartyCredit(final.partyId, get().invoices, get().allocations)); } catch(e) { console.error('[tra add] setPartyCredit failed:', e); }
+        try { setPartyCredit(final.partyId, computePartyCredit(final.partyId, get().invoices, get().allocations)); } catch(e) { console.error('[tra add] setPartyCredit failed:', e); throw e; }
         return id;
+              } catch (__err) {
+          for (const { store, snap } of __snaps) {
+            try { store.restore(snap); } catch (e) { console.error('[atomic rollback]', store.name, e); }
+          }
+          showToast('خطا در ثبت فاکتور — همه تغییرات لغو شد: ' + (__err instanceof Error ? __err.message : String(__err)), 'error');
+          throw __err;
+        }
       },
       updateInvoice: (id, patch) => {
         const __snaps = ALL_STORES.map(s => ({ store: s, snap: s.getSnapshot() }));
