@@ -90,17 +90,17 @@ export function applyCorrections(log: DailyLog): DailyLog {
 
   if (deathsCountChanged && !deathsArrayChanged) {
     const currentDeaths = effective.deaths || [];
-    if (currentDeaths.length === 0) {
-      effective = { ...effective, deathsCount: 0 };
-    } else if (currentDeaths.length === 1) {
+    if (currentDeaths.length === 1) {
+      // تک‌رکورد: count را همگام کن
       effective = {
         ...effective,
         deaths: [{ ...currentDeaths[0], count: effective.deathsCount }],
       };
-    } else {
-      // چند رکورد — نمی‌توان ساده همگام کرد؛ sum را اعمال می‌کنیم (safety)
+    } else if (currentDeaths.length > 1) {
+      // چند‌رکورد: از sum recompute (safety — invariant حفظ شود)
       effective = { ...effective, deathsCount: sumDeathsCount(currentDeaths) };
     }
+    // currentDeaths.length === 0: مقدار corrected کاربر را حفظ کن (بدون تغییر)
   } else if (deathsArrayChanged) {
     effective = { ...effective, deathsCount: sumDeathsCount(effective.deaths) };
   }
