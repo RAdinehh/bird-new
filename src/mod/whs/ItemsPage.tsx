@@ -10,6 +10,7 @@ import {
 import { useCtc } from '../ctc/store';
 import { useHal } from '../hal/store';
 import { Btn, Empty, PageContainer } from '../../shr/components/ui';
+import { exportTableToCSV } from '../../shr/utils/export';
 import { useMultiSelect } from '../../shr/multiSelect/useMultiSelect';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import { toFa, toEn } from '../../shr/utils/fa';
@@ -487,6 +488,20 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         currentStockForEdit={currentStockForEdit}
         save={save}
       />
-    </PageContainer>
+          <div style={{ marginTop: 12 }}>
+        <Btn full variant="primary" onClick={() => {
+          const headers = ['نام', 'دسته', 'واحد', 'موجودی', 'حداقل', 'قیمت'];
+          const rows = list.map(it => [
+            it.name,
+            it.category,
+            it.unit,
+            it.currentStock || 0,
+            it.minStock || 0,
+            it.lastPrice || 0,
+          ]);
+          exportTableToCSV('انبار', headers, rows);
+        }}>دانلود CSV</Btn>
+      </div>
+</PageContainer>
   );
 }

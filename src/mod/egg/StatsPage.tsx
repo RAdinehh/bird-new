@@ -4,7 +4,8 @@
 import { useState, useMemo } from 'react';
 import { useEgg } from './store';
 import { useFlk } from '../flk/store';
-import { PageContainer, Select, Empty } from '../../shr/components/ui';
+import { PageContainer, Select, Empty, Btn } from '../../shr/components/ui';
+import { exportTableToCSV } from '../../shr/utils/export';
 import { toFa } from '../../shr/utils/fa';
 import { BarChart, LineChart, DualBarChart, PieChart } from '../../shr/components/Charts';
 
@@ -331,7 +332,23 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
           )}
         </>
       )}
-    </PageContainer>
+          <div style={{ marginTop: 12 }}>
+        <Btn full variant="primary" onClick={() => {
+          const headers = ['تاریخ', 'گله', 'خوراکی', 'نطفه‌دار', 'شکسته', 'نرم', 'کثیف', 'کل'];
+          const rows = filtered.map(p => [
+            p.date,
+            p.flockId,
+            p.eatingCount || 0,
+            p.fertileCount || 0,
+            p.brokenCount || 0,
+            p.softCount || 0,
+            p.dirtyCount || 0,
+            p.totalCount || 0,
+          ]);
+          exportTableToCSV('آمار-تخم', headers, rows);
+        }}>دانلود CSV</Btn>
+      </div>
+</PageContainer>
   );
 }
 

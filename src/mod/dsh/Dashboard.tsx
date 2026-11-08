@@ -8,6 +8,8 @@ import TodayCard from './TodayCard';
 import AnalyticsCards from './AnalyticsCards';
 import ListCards from './ListCards';
 import { useDashboardData } from './hooks/useDashboardData';
+import { Btn } from '../../shr/components/ui';
+import { exportTableToCSV } from '../../shr/utils/export';
 
 export default function Dashboard() {
   const {
@@ -48,6 +50,24 @@ export default function Dashboard() {
         </>
       ) : null}
       <QuickActions />
-    </PageContainer>
+          <div style={{ marginTop: 12 }}>
+        <Btn full variant="primary" onClick={() => {
+          const headers = ['شاخص', 'مقدار'];
+          const rows = [
+            ['گله‌های فعال', activeFlocks.length],
+            ['نرخ بقا٪', survivalRate.toFixed(2)],
+            ['Hen-Day ۷ روز٪', henDay7.toFixed(2)],
+            ['شکسته ۷ روز٪', brokenRate7.toFixed(2)],
+            ['FCR', fcr.toFixed(2)],
+            ['آب/دان', waterFeedRatio.toFixed(2)],
+            ['هزینه هر تخم', costPerEgg.toFixed(2)],
+            ['سود ماه', profit],
+            ['مطالبات', receivables],
+            ['ارزش انبار', inventoryValue],
+          ];
+          exportTableToCSV('داشبورد', headers, rows);
+        }}>دانلود CSV</Btn>
+      </div>
+</PageContainer>
   );
 }
