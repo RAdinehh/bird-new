@@ -49,7 +49,7 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
               
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-              <Field label="📦 سایر (نرم/کثیف)" error={showError('otherEggs')}>
+              <Field label="📦 سایر" error={showError('otherEggs')}>
                 <NumField placeholder="۰" value={form.otherEggs} onChange={e => setForm({...form, otherEggs: e.target.value})} unit="عدد" min={0} />
               </Field>
               
