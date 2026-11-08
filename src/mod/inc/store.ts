@@ -227,6 +227,12 @@ export const useInc = create<State>()(
       deleteCandling: (id) => set({ candlings: get().candlings.filter(x => x.id !== id) }),
 
       addHatch: (h) => {
+        const __prevHatches = get().hatches;
+        const __prevFlks = useFlk.getState().flocks;
+        const __prevGroups = useFlk.getState().groups;
+        const __prevGroupMembers = useFlk.getState().groupMembers;
+        const __prevConsumptionEvents = useFlk.getState().consumptionEvents;
+        try {
         const id = uuid();
         const newHatch: any = { ...h, id, createdAt: now() };
 
@@ -273,25 +279,49 @@ export const useInc = create<State>()(
 
               newHatch.generatedFlockId = flockId;
             }
-          } catch (e) { console.error('[addHatch] auto flock failed:', e); }
+          } catch (e) { console.error('[addHatch] auto flock failed:', e); throw e; }
         }
 
         set({ hatches: [...get().hatches, newHatch] });
+              } catch (__err) {
+          set({ hatches: __prevHatches });
+          useFlk.setState({
+            flocks: __prevFlks, groups: __prevGroups,
+            groupMembers: __prevGroupMembers, consumptionEvents: __prevConsumptionEvents,
+          });
+          showToast('خطا در ثبت هچ — همه تغییرات لغو شد', 'error');
+          throw __err;
+        }
       },
       updateHatch: (id, patch) => set({ hatches: get().hatches.map(x => x.id === id ? {...x, ...patch} : x) }),
       deleteHatch: (id) => {
+        const __prevHatchesD = get().hatches;
+        const __prevFlksD = useFlk.getState().flocks;
+        const __prevGroupsD = useFlk.getState().groups;
+        const __prevGroupMembersD = useFlk.getState().groupMembers;
+        const __prevConsumptionEventsD = useFlk.getState().consumptionEvents;
+        try {
         const h = get().hatches.find(x => x.id === id);
         // 🆕 فیکس ۶: حذف گله متصل به هچ
         if (h && (h as any).generatedFlockId) {
           try {
             useFlk.getState().remove((h as any).generatedFlockId);
-          } catch (e) { console.error('[deleteHatch] flock cleanup failed:', e); }
+          } catch (e) { console.error('[deleteHatch] flock cleanup failed:', e); throw e; }
         }
         if (h?.generatedFlockId) {
           showToast('این هچ قبلاً گله ساخته — ابتدا گله را حذف کنید', 'error');
           return;
         }
         set({ hatches: get().hatches.filter(x => x.id !== id) });
+              } catch (__err) {
+          set({ hatches: __prevHatchesD });
+          useFlk.setState({
+            flocks: __prevFlksD, groups: __prevGroupsD,
+            groupMembers: __prevGroupMembersD, consumptionEvents: __prevConsumptionEventsD,
+          });
+          showToast('خطا در حذف هچ — همه تغییرات لغو شد', 'error');
+          throw __err;
+        }
       }
     }),
     { name: 'pm-inc' }
