@@ -49,7 +49,7 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
               
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-              <Field label="📦 سایر" help="همه تخم‌های غیرسالم را اینجا وارد کنید: نرم، کثیف، شکسته، ترک‌خورده یا هر مورد دیگر. تفکیک دقیق در صفحه «تخم‌گذاری» موجود است." error={showError('otherEggs')}>
+              <Field label="📦 سایر" help="همه تخم‌های غیرسالم را اینجا وارد کنید: نرم، کثیف، ترک‌خورده یا هر مورد دیگر. تفکیک دقیق در صفحه «تخم‌گذاری» موجود است." error={showError('otherEggs')}>
                 <NumField placeholder="۰" value={form.otherEggs} onChange={e => setForm({...form, otherEggs: e.target.value})} unit="عدد" min={0} />
               </Field>
               
