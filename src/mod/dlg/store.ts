@@ -145,6 +145,15 @@ interface State {
   remove: (id: string) => void;
   archive: (id: string) => void;
   restore: (id: string) => void;
+  /** 🆕 اصلاح یک لاگ (append-only) */
+  addCorrection: (
+    logId: string,
+    changes: Partial<DailyLog>,
+    reason: string,
+    notes?: string,
+  ) => string | null;
+  /** 🆕 لغو یک اصلاح (idempotent) */
+  revokeCorrection: (logId: string, correctionId: string) => boolean;
 }
 
 export const useDlg = create<State>()(
@@ -174,6 +183,50 @@ export const useDlg = create<State>()(
           ? { ...x, ...patch, updatedAt: new Date().toISOString() }
           : x)
       }),
+      addCorrection: (logId, changes, reason, notes) => {
+        const target = get().logs.find(x => x.id === logId);
+        if (!target) return null;
+        const now = new Date();
+        const timestamp = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        const correction: DailyLogCorrection = {
+          id: uuid(),
+          timestamp,
+          reason,
+          changes,
+          notes,
+          revoked: false,
+          createdAt: now.toISOString(),
+        };
+        set({
+          logs: get().logs.map(x => x.id === logId
+            ? {
+                ...x,
+                corrections: [...(x.corrections || []), correction],
+                updatedAt: now.toISOString(),
+              }
+            : x)
+        });
+        return correction.id;
+      },
+      revokeCorrection: (logId, correctionId) => {
+        const target = get().logs.find(x => x.id === logId);
+        if (!target) return false;
+        const correction = (target.corrections || []).find(c => c.id === correctionId);
+        if (!correction) return false;
+        if (correction.revoked) return false;
+        set({
+          logs: get().logs.map(x => x.id === logId
+            ? {
+                ...x,
+                corrections: (x.corrections || []).map(c =>
+                  c.id === correctionId ? { ...c, revoked: true } : c
+                ),
+                updatedAt: new Date().toISOString(),
+              }
+            : x)
+        });
+        return true;
+      },
       remove: (id) => set({ logs: get().logs.filter(x => x.id !== id) }),
       archive: (id) => set({
         logs: get().logs.map(x => x.id === id
