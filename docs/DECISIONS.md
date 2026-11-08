@@ -643,3 +643,22 @@ atomicTransaction + outbox + حذف catch {} خالی (L6) + throw در silent f
 - E, F, G, H, C8
 
 آخرین تصمیم: 1405/11/08
+
+
+---
+
+## D9 (1405/11/08) — flk merge/unmerge = atomic by design
+
+**نتیجه verify:** `mergeFlocks` + `unmergeFlocks` هر کدام **single set()** در Zustand.
+
+**چرا atomic است:**
+- Zustand `set()` = atomic by nature (single shallow merge)
+- صفر cross-store cascade
+- صفر bus.emit
+- صفر external subscriber
+
+**Pre-flight:** validation (flock existence, type match) **قبل از** set() اجرا می‌شود → throw → صفر mutation.
+
+**تست:** `src/test/flk-merge-atomic.test.ts` (5 test) — verify functional + structural.
+
+**پیامد برای AI جدید:** نیازی به wrap این action ها با `atomicTransactionSync` نیست — theater می‌شود. اگر نیاز به atomic cross-store آینده شد (مثلاً merge + flk history)، از `atomicTransactionSync([flkStore, ...])` استفاده کن.
