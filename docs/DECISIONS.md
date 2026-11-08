@@ -739,3 +739,28 @@ Zustand `set()` = atomic (single shallow merge). هر action یک `set()` دار
 - `StatsCard` = header-only (بدون children)
 - `dlg:feed:consumed`، `dlg:vaccine:given`، `dlg:medication:given`، `dlg:egg:recorded` **publish می‌شوند** ولی **consumer ندارند** — این عمدی است، پیش‌نیاز آینده
 - اگر خواستی `alt`/`dsh` را reactive کنی → اول race condition + delay را حل کن، بعد
+
+---
+
+## Egg — `سایر (نرم/کثیف)` تصمیم UX نهایی (1405/11/08)
+
+**تصمیم:** فیلد `otherEggs` در dlg یک **فیلد واحد** برای همه انواع تخم غیرسالم است.
+
+**پیاده‌سازی:**
+- `dlg/EggsWeightSection`: یک فیلد `📦 سایر (نرم/کثیف)`
+- `toEgg.ts`: `softCount: 0, dirtyCount: otherEggs`
+- `EggProduction` همچنان `softCount` و `dirtyCount` جدا دارد (برای `egg/ProductionFormModal` که تفکیک کامل دارد)
+
+**چرا:**
+- کاربر (مرغدار) می‌خواهد یک عدد کلی وارد کند (نرم + کثیف + شکسته + سایر با هم)
+- تفکیک دقیق در dlg لازم نیست — در صفحه اختصاصی egg انجام می‌شود
+- سادگی UX > دقت داده در ثبت روزانه
+
+**تاریخچه:**
+- `c31321d4` (split به softEggs + dirtyEggs) **revert شد**
+- `ed37542b` = revert
+
+**پیامد برای AI جدید:**
+- `softCount: 0` در `toEgg.ts:51` **باگ نیست** — تصمیم UX مستند
+- اگر کاربر تفکیک بخواهد: `egg/ProductionFormModal` دارد
+- اگر آینده split لازم شد: `git show c31321d4` (کد موجود در تاریخچه)
