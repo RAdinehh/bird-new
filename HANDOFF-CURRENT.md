@@ -65,6 +65,8 @@
 - **EPEF calc orphan** — متصل در FlockHistoryModal (broiler + FCR دقیق) ✅
 - **brokenRate7 fix** — double-count bug در dsh + aggregateEggMetrics helper ✅
 - **Egg سایر** — برچسب ساده + HelpIcon «نرم، کثیف، ترک‌خورده...» ✅
+- **Mortality calc** — متصل در FlockHistoryModal (نرخ تلفات تجمعی + ۱۱ تست) ✅
+- **Weight calc** — متصل در EggsWeightSection (≥3 نمونه، fallback legacy برای ۲) + uniformity ✅
 
 ### 🚧 In progress — D6 (tra atomic)
 
@@ -79,14 +81,12 @@
 
 ### ⏳ بعدی — به ترتیب پیشنهادی
 
-1. **Mortality** orphan — نرخ تلفات
-2. **Weight** orphan — جایگزین ۳ نسخه avgWeight
-3. **Stocking** orphan — چگالی گله در سالن
-4. **Water** orphan — نسبت آب/دان (جایگزین inline)
-5. **`entryTime` Zod mismatch**
-6. **`dsh` استفاده از `aggregateEggMetrics`** (helper آماده، متصل نشده)
-7. بعد: G (Draft), H (CSV), C8 (EggSale.quality)
-8. D5.4 (`_v`/`_txid`) — همراه server
+1. **Stocking** orphan — چگالی گله در سالن
+2. **Water** orphan — نسبت آب/دان
+3. **`entryTime` Zod mismatch**
+4. **`dsh` استفاده از `aggregateEggMetrics`** (helper آماده)
+5. بعد: G (Draft), H (CSV), C8 (EggSale.quality)
+6. D5.4 (`_v`/`_txid`) — همراه server
 
 ## 🐛 شکاف‌های باز (از DLG-AUDIT)
 

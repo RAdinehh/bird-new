@@ -764,3 +764,21 @@ Zustand `set()` = atomic (single shallow merge). هر action یک `set()` دار
 - `softCount: 0` در `toEgg.ts:51` **باگ نیست** — تصمیم UX مستند
 - اگر کاربر تفکیک بخواهد: `egg/ProductionFormModal` دارد
 - اگر آینده split لازم شد: `git show c31321d4` (کد موجود در تاریخچه)
+
+---
+
+## calc orphan — Mortality + Weight (1405/11/08)
+
+**Mortality:** متصل در `FlockHistoryModal` (commit `fd3fca23`).
+- `cumulativePct` از `deathRate` sex-aware جمع می‌شود
+- `dailyPct`/`weeklyPct` صفر می‌مانند (نیاز به data روزانه که در aggregate نیست)
+- UI: کارت `💀 نرخ تلفات` بعد از FCR/EPEF
+
+**Weight:** متصل در `EggsWeightSection` (commit `65c82b57`).
+- hybrid: `calculateWeightMetrics` وقتی ≥3 نمونه، fallback `dlg/store.avgWeight` برای ۲
+- **Uniformity** اضافه شد (شاخص صنعت، قبلاً نمایش داده نمی‌شد)
+- واحد kg حفظ شد (`avgWeightG / 1000`)
+
+**پیامد:**
+- از ۷ calc orphan: FCR، EPEF، Egg، Mortality، Weight — **۵/۷**
+- باقی: Stocking، Water
