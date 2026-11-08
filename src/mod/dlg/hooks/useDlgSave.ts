@@ -233,6 +233,14 @@ export function useDlgSave(params: UseDlgSaveParams) {
             } as any);
           }
         }
+      } else if (form.flockId) {
+        // 🆕 D5.5/B1c-minimal — اگر دارو حذف شد، activeWithdrawal پاک شود
+        // فقط اگر این لاگ مالک فعلی باشد (چند-لاگ → B4-Recalc در HANDOFF v11)
+        const flk = useFlk.getState();
+        const flock = flk.flocks.find(f => f.id === form.flockId);
+        if (flock?.activeWithdrawal?.logId === logId) {
+          flk.update(form.flockId, { activeWithdrawal: undefined } as any);
+        }
       }
     } catch { /* silent */ }
 
