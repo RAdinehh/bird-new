@@ -8,6 +8,7 @@ export {
   eggStore,
   flkStore,
   traStore,
+  ctcStore,
   ALL_STORES,
 } from './stores';
 export type {

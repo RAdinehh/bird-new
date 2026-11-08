@@ -9,6 +9,7 @@ import { useWhs } from '../../mod/whs/store';
 import { useEgg } from '../../mod/egg/store';
 import { useFlk } from '../../mod/flk/store';
 import { useTra } from '../../mod/tra/store';
+import { useCtc } from '../../mod/ctc/store';
 import { useHal } from '../../mod/hal/store';
 import { useBrd } from '../../mod/brd/store';
 import { useInc } from '../../mod/inc/store';
@@ -70,6 +71,13 @@ export const flkStore: AtomicStore = {
     groupMembers: snap.groupMembers,
     consumptionEvents: snap.consumptionEvents,
   }),
+};
+
+/** ctc — contacts (cascade از tra: setPartyCredit) */
+export const ctcStore: AtomicStore = {
+  name: 'ctc',
+  getSnapshot: () => useCtc.getState().contacts,
+  restore: (snap) => useCtc.setState({ contacts: snap }),
 };
 
 /** tra — invoices + settlements + deals (نیاز به D6) */
@@ -153,4 +161,5 @@ export const ALL_STORES: AtomicStore[] = [
   halStore,
   brdStore,
   incStore,
+  ctcStore,
 ];
