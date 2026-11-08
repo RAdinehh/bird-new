@@ -74,19 +74,27 @@
 - **C** — `dsh/henDay7 + brokenRate7` → `aggregateEggMetrics` ✅
 - **D** — `avgWeight unify` — `dsh inline` → `dlg/store.avgWeight/cvWeight` (۳ → ۲) ✅
 - **H-Batch1** — CSV export در `/rep/production` + `/rep/flocks` ✅
+- **H-Batch2** — CSV در `/egg/stats` + `/whs/items` ✅
+- **H-Batch3** — CSV در `/` (dsh) — ۱۰ شاخص کلیدی ✅
+- **Herbal Medicine** — ۳ لایه محافظت (group + hide withdrawal + backend safety) ✅
+- **Corrections (C1)** — `corrections[]` data layer + `applyCorrections` + ۴ تست ✅
+- **Corrections (C2)** — `addCorrection` + `revokeCorrection` + ۵ تست ✅
 
-### 🚧 In progress — Stocking + Water
+### 🚧 In progress — Corrections C3+C4
 
 | فاز | کار | وضعیت |
 |---|---|---|
 | **D-Series** | tra/egg/inc/flk/whs atomic | ✅ |
 | **Phase E-Cleanup** | lightHours، hint، SectionTitle، Section | ✅ |
 | **Phase F-A** | ۶ رویداد dlg publish | ✅ |
-| **calc orphan** | FCR، EPEF، Egg، Mortality، Weight | ✅ |
-| **Stocking** | چگالی گله | ⏳ |
-| **Water** | نسبت آب/دان | ⏳ |
+| **calc orphan (7/7)** | FCR، EPEF، Egg، Mortality، Weight، Stocking، Water | ✅ |
+| **H (CSV ۵ صفحه)** | dashboard + rep + egg + whs | ✅ |
+| **Herbal Medicine** | ۳ لایه محافظت | ✅ |
+| **Corrections C1+C2** | data + actions | ✅ |
+| **Corrections C3** | UI در LogCard | ⏳ |
+| **Corrections C4** | Tabs در DailyLogsPage | ⏳ |
 
-**🏆 این جلسه: ۱۵+ commit، ۵/۷ calc orphan، ۴ باگ رفع**
+**🏆 این جلسه: ۴۵+ commit، ۷/۷ calc orphan، H (CSV ۵ صفحه)، Herbal، Corrections C1+C2، ۴ تصمیم آگاهانه، صفر regression**
 
 ### ⏳ بعدی — به ترتیب پیشنهادی
 
@@ -141,12 +149,11 @@
 
 **→ یکسان با «⏳ بعدی» بالا**
 
-1. **Stocking calc orphan** — چگالی گله در سالن
-2. **Water calc orphan** — نسبت آب/دان
-3. **`entryTime` Zod mismatch**
-4. **`dsh` استفاده از `aggregateEggMetrics`**
-5. بعد: G (Draft), H (CSV), C8 (EggSale.quality)
-6. D5.4 (`_v`/`_txid`) — همراه server
+1. **Corrections (C3)** — UI فرم اصلاح در `LogCard` (مرحله ۳)
+2. **Corrections (C4)** — ۳ تب (امروز/Timeline/تجمیع) در `DailyLogsPage` (مرحله ۴)
+3. **`entryTime` Zod mismatch** — تصمیم «بماند» (DECISIONS)
+4. بعد: G (Draft Mode) — تصمیم «نه» (DECISIONS)
+5. C8 (EggSale.quality) — تصمیم «نه» (DECISIONS)
 
 ## 📝 آپدیت این فایل
 
