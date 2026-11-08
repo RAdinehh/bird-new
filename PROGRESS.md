@@ -1,3 +1,31 @@
+## جلسه 1405/11/09 - Corrections C3-fix
+
+### DONE - 6 commit
+
+| # | Commit | کار |
+|---|---|---|
+| 1 | 75c69875 | applyCorrections recompute |
+| 2 | f2371ced | Fix deaths=[] bug |
+| 3 | 281785c8 | dashboard + BenchmarkCard |
+| 4 | 04bfefdc | گزارش‌ها (analytics/FlockReport/Export) |
+
+### وضعیت تست‌ها
+- 15/15 pass
+- tsc سبز
+- push شده
+
+### نتیجه
+- Correction در همه consumer‌ها propagate می‌شود
+- UI: صفر تغییر
+
+### PENDING
+1. B3 - ویرایش لاگ با Correction
+2. L1-L3 - بسط CorrectionModal
+3. تناقض C3 (inline vs modal)
+4. C4 - DailyLogHistoryModal
+
+---
+
 # PROGRESS.md — وضعیت ۲۰۵ مفهوم
 
 ## 🎯 CURRENT

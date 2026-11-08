@@ -941,3 +941,47 @@ Zustand `set()` = atomic (single shallow merge). هر action یک `set()` دار
 - دکمه `↩️ لغو`
 - Strikethrough برای revoked
 - Divider = `1px dashed var(--border)` (از `SectionTitle`)
+
+
+---
+
+## Corrections C3-fix - propagation به dashboard + گزارش‌ها (1405/11/09)
+
+زمینه: پس از C1+C2 (data + actions) و C3-a (LogCard display)، applyCorrections فقط در LogCard صدا زده می‌شد. Correction در Dashboard / Benchmark / گزارش‌ها نادیده گرفته می‌شد.
+
+۶ کامیت:
+
+| # | SHA | کار |
+|---|---|---|
+| 1 | 75c69875 | applyCorrections recompute: temp/humidity از (min+max)/2، feedConsumed از delivered-remaining، deaths<->deathsCount |
+| 2 | f2371ced | Fix bug: deaths=[] نباید deathsCount را صفر کند |
+| 3 | 281785c8 | useDashboardData + BenchmarkCard: map(applyCorrections) |
+| 4 | 04bfefdc | rep/analytics + FlockReportPage + ExportButtons: map(applyCorrections) |
+
+تصمیمات ثبت‌شده:
+
+- فیلدهای مشتق پس از Correction recompute می‌شوند
+- feedConsumed = delivered - remaining (approximation - source of truth در calculateFeedMetrics)
+- deaths=[] -> deathsCount کاربر حفظ (بدون sync)
+- deaths=[single] -> count sync
+- deaths=[multi] -> deathsCount = sum (invariant)
+
+تست‌ها: 15 pass
+- src/test/dlg-corrections.test.ts (4)
+- src/test/dlg-applyCorrections-recompute.test.ts (6 - جدید)
+- src/test/dlg-store-corrections.test.ts (5)
+
+UI تغییر: صفر.
+
+تله‌ها:
+- T-C1: قبل از patch روی applyCorrections، همه تست‌های موجود را اجرا کن
+- T-C2: فیلد مشتق هرگز مستقیم از لاگ خام نخوان - همیشه applyCorrections(log)
+- T-C3: فیلدهای مشتق dlg: temperature, humidity, feedConsumed, deathsCount, birdAgeDays
+
+باقی‌مانده:
+- B3 - ویرایش لاگ با Correction
+- L1-L3 - بسط CorrectionModal (min/max, deaths[], feedConsumed)
+- C4 - DailyLogHistoryModal
+- تناقض C3 - DECISIONS inline vs کد modal
+
+---
