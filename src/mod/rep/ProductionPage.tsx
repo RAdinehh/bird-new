@@ -4,7 +4,8 @@ import { useDlg } from '../dlg/store';
 import { useFlk } from '../flk/store';
 import { eggsInMonth, feedInMonth, deathsInMonth, lastMonths, monthLabel } from './analytics';
 import { BarChart, DualBarChart, LineChart } from '../../shr/components/Charts';
-import { PageContainer } from '../../shr/components/ui';
+import { PageContainer, Btn } from '../../shr/components/ui';
+import { exportTableToCSV } from '../../shr/utils/export';
 import { toFa } from '../../shr/utils/fa';
 import { StatCard, Section } from './helpers';
 
@@ -150,6 +151,18 @@ export default function ProductionPage() {
           <BarChart data={deathData} color="var(--danger)" />
         </Section>
       ) : null}
-    </PageContainer>
+          <Section title="📤 خروجی CSV">
+        <Btn full variant="primary" onClick={() => {
+          const headers = ['ماه', 'تخم سالم', 'دان (kg)', 'تلفات'];
+          const rows = months.map(m => {
+            const e = eggsInMonth(productions, m);
+            const fd = feedInMonth(logs, m);
+            const dd = deathsInMonth(logs, m);
+            return [monthLabel(m), e.healthy, fd, dd];
+          });
+          exportTableToCSV('گزارش-تولید', headers, rows);
+        }}>دانلود CSV</Btn>
+      </Section>
+</PageContainer>
   );
 }

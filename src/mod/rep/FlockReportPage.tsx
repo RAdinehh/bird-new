@@ -4,7 +4,8 @@ import { useBrd } from '../brd/store';
 import { useEgg, healthyCount, henDayRate, brokenRate } from '../egg/store';
 import { useDlg } from '../dlg/store';
 import { BarChart } from '../../shr/components/Charts';
-import { PageContainer, Tag } from '../../shr/components/ui';
+import { PageContainer, Tag, Btn } from '../../shr/components/ui';
+import { exportTableToCSV } from '../../shr/utils/export';
 import { toFa } from '../../shr/utils/fa';
 import { StatCard, Section } from './helpers';
 
@@ -170,6 +171,23 @@ export default function FlockReportPage() {
           </Section>
         </>
       ) : null}
-    </PageContainer>
+          <Section title="📤 خروجی CSV">
+        <Btn full variant="primary" onClick={() => {
+          const headers = ['گله', 'نوع', 'تعداد', 'تخم کل', 'مرگ‌ومیر٪', 'Hen-Day٪', 'دان (kg)', 'شکسته٪', 'رکوردها'];
+          const rows = flockData.map(d => [
+            d.flock.name,
+            d.flock.type,
+            d.flockCount,
+            d.totalEggs,
+            d.mortality.toFixed(1),
+            d.avgHenDay.toFixed(1),
+            d.totalFeed,
+            d.avgBroken.toFixed(1),
+            d.productionsCount + d.logsCount,
+          ]);
+          exportTableToCSV('گزارش-گله‌ها', headers, rows);
+        }}>دانلود CSV</Btn>
+      </Section>
+</PageContainer>
   );
 }
