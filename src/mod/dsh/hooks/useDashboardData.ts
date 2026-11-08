@@ -16,6 +16,7 @@ import { runRules } from '../../alt/rules';
 import { useBrd } from '../../brd/store';
 import { useDlg } from '../../dlg/store';
 import { monthKey, currentMonth, todayJalali, dateDiffDays } from '../utils';
+import { calculateWaterMetrics } from '../../../shr/calc/formulas/water';
 
 function fcrBorder(diff: number): string {
   if (diff <= 0) return 'var(--accent-border)';
@@ -195,14 +196,22 @@ const [, _setTick] = useState(0);
     return Math.round((feed / eggsWeight) * 100) / 100;
   }, [logs, productions, thisMonth]);
 
-  // نسبت آب به دان
-  const waterFeedRatio = useMemo(() => {
+  // نسبت آب به دان — از calculateWaterMetrics (orphan connected)
+  const waterMetrics7d = useMemo(() => {
     const last7 = logs.filter(l => dateDiffDays(l.date) <= 7);
     const water = last7.reduce((a, l) => a + (l.waterAmount || 0), 0);
     const feed = last7.reduce((a, l) => a + (l.feedConsumed || l.feedDelivered || 0), 0);
-    if (feed === 0) return 0;
-    return Math.round((water / feed) * 10) / 10;
-  }, [logs]);
+    return calculateWaterMetrics({
+      waterAmountL: water,
+      feedConsumedKg: feed,
+      aliveCount,
+      standardWaterFeedRatio: null,
+    });
+  }, [logs, aliveCount]);
+
+  const waterFeedRatio = waterMetrics7d.waterFeedRatio;
+  const waterFeedTone = waterMetrics7d.waterFeedTone;
+  const waterFeedWarning = waterMetrics7d.warning;
 
   // ============ ۴. مالی ============
   const salesThisMonth = useMemo(() =>
@@ -458,7 +467,7 @@ const [, _setTick] = useState(0);
     activeFlocks, todayProd, eggsToday, brokenToday, todayLogs, deathsToday, feedToday, waterToday, tempToday, humidToday,
     daysUntilDue, upcomingDues, pendingChecks,
     aliveCount, totalInitial, survivalRate, cumulativeMortality,
-    henDay7, brokenRate7, eggTrend, fcr, waterFeedRatio,
+    henDay7, brokenRate7, eggTrend, fcr, waterFeedRatio, waterFeedTone, waterFeedWarning,
     salesThisMonth, purchasesThisMonth, profit, receivables, inventoryValue, costPerEgg,
     feedPerBirdGrams, waterPerBirdMl, weightMetrics, momComparison,
     benchmarkData, aggregatedAlerts, active, counts, stockAlerts, activeEntries, hasData,
