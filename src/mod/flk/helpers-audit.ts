@@ -239,6 +239,8 @@ export interface FCRResult {
   totalFeedKg: number;
   feedPerBird: number;
   totalLiveWeightKg: number | null;
+  /** 🆕 افزایش وزن = وزن زنده − وزن اولیه جوجه‌ها (مبنای صحیح FCR) */
+  totalGainKg?: number | null;
   source: string;
   note: string;
 }
@@ -251,6 +253,8 @@ export function calculateFCR(
     maleCount?: number | null;
     femaleCount?: number | null;
     unknownCount?: number | null;
+    /** 🆕 وزن اولیه جوجه (kg) — پیش‌فرض 0.04 */
+    chickWeight?: number | null;
   },
   standardFCR?: number | null,
 ): FCRResult {
@@ -284,14 +288,32 @@ export function calculateFCR(
   }
 
   if (weightComplete) {
+    // 🆕 FCR استاندارد: دان ÷ افزایش وزن (نه وزن زنده)
+    const initialTotalKg = (flock.chickWeight ?? 0.04) * currentCount;
+    const totalGainKg = totalLiveWeight - initialTotalKg;
+
+    if (totalGainKg <= 0) {
+      return {
+        fcr: null,
+        confidence: 'insufficient',
+        totalFeedKg: r2(totalFeedKg),
+        feedPerBird: r2(feedPerBird),
+        totalLiveWeightKg: r2(totalLiveWeight),
+        totalGainKg: 0,
+        source: 'افزایش وزن صفر یا منفی',
+        note: 'وزن فعلی کمتر از وزن اولیه جوجه‌ها — FCR قابل محاسبه نیست',
+      };
+    }
+
     return {
-      fcr: r2(totalFeedKg / totalLiveWeight),
+      fcr: r2(totalFeedKg / totalGainKg),
       confidence: 'exact',
       totalFeedKg: r2(totalFeedKg),
       feedPerBird: r2(feedPerBird),
       totalLiveWeightKg: r2(totalLiveWeight),
+      totalGainKg: r2(totalGainKg),
       source: 'دان + وزن واقعی',
-      note: `FCR = ${r2(totalFeedKg)}kg دان ÷ ${Math.round(totalLiveWeight)}kg وزن زنده`,
+      note: `FCR = ${r2(totalFeedKg)}kg دان ÷ ${r2(totalGainKg)}kg افزایش وزن`,
     };
   }
 
