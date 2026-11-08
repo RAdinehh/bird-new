@@ -18,6 +18,7 @@ import { useBrd } from '../../brd/store';
 import { getStandardFor } from '../../set/standards/resolve';
 import { getAgeDays } from '../helpers-store';
 import { calculateEPEF } from '../../../shr/calc/formulas/epef';
+import { calculateMortality } from '../../../shr/calc/formulas/mortality';
 
 const REASON_OPTIONS: { value: FlockEventReasonCode; label: string }[] = [
   { value: 'data_entry_error', label: 'خطای ثبت' },
@@ -212,6 +213,22 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
       finalWeightKg,
       ageDays,
       fcr: fcrResult.fcr,
+    });
+  })();
+
+  // 🆕 Mortality — نرخ تلفات تجمعی
+  const mortalityResult = (() => {
+    const totalDeaths = (deathRate.male.deaths || 0) + (deathRate.female.deaths || 0) + (deathRate.unknown.deaths || 0);
+    if (!flock.initialCount || flock.initialCount <= 0) return null;
+    return calculateMortality({
+      deathsToday: 0,
+      deathsThisWeek: 0,
+      deathsCumulative: totalDeaths,
+      aliveToday: flock.currentCount || 0,
+      initialCount: flock.initialCount,
+      standardDailyPct: null,
+      standardWeeklyPct: null,
+      standardTotalPct: null,
     });
   })();
 
@@ -585,6 +602,20 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
             </div>
             <div style={{ fontSize: 10, color: 'var(--muted)', lineHeight: 1.6 }}>
               EPEF = (بقا٪ × وزن × 100) ÷ (سن × FCR) — شاخص گله گوشتی
+            </div>
+          </div>
+        </div>
+      )}
+      {mortalityResult && mortalityResult.cumulativePct > 0 && (
+        <div>
+          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>💀 نرخ تلفات</div>
+          <div style={{ padding: '8px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 11 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+              <span style={{ fontSize: 14, fontWeight: 700 }}>{toFa(mortalityResult.cumulativePct.toFixed(2))}٪</span>
+              <span style={{ fontSize: 9, padding: '1px 5px', borderRadius: 3, background: 'var(--muted)', color: 'white', fontWeight: 700 }}>تجمعی</span>
+            </div>
+            <div style={{ fontSize: 10, color: 'var(--muted)', lineHeight: 1.6 }}>
+              از {toFa(flock.initialCount || 0)} پرنده اولیه
             </div>
           </div>
         </div>
