@@ -2,7 +2,6 @@
  * helpers.tsx — ماژول set
  */
 import { useEffect, useState, useRef } from 'react';
-import type { ReactNode } from 'react';
 import { clearLogs, exportLogs, getLogs, logCount, type LogEntry } from '../../cor/logger/logger';
 import { showAlert, showConfirmAsync, showSuccess } from '../../cor/store/dialog';
 import { showToast } from '../../cor/store/toast';
