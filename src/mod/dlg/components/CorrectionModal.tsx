@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { Modal, Btn, BtnRow, Field, NumField, Select, Input } from '../../../shr/components/ui';
 import type { DailyLog } from '../store';
 import { toEn, toFa } from '../../../shr/utils/fa';
+import { v4 as uuid } from 'uuid';
 
 const CORRECTABLE_FIELDS = [
   { key: 'temperature',    label: '🌡 دما (میا.)',   unit: '°C' },
@@ -24,6 +25,11 @@ const CORRECTABLE_FIELDS = [
 ] as const;
 
 type CorrectableKey = typeof CORRECTABLE_FIELDS[number]['key'];
+
+/** آیا این لاگ چند رکورد تلفات دارد؟ */
+function hasMultiDeaths(log: DailyLog | null): boolean {
+  return (log?.deaths?.length || 0) > 1;
+}
 
 const REASONS = [
   'اشتباه شمارش',
@@ -68,13 +74,34 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
   const oldDisplay = oldValue != null ? toFa(String(oldValue)) : '—';
 
   const handleSave = () => {
+    if (!log) return;
+
+    // L2-guard: multi-record deathsCount — رد
+    if (activeField === 'deathsCount' && hasMultiDeaths(log)) {
+      return;
+    }
+
     if (value.trim() === '') {
       onSave(log.id, { [activeField]: null } as Partial<DailyLog>, reason, notes || undefined);
-    } else {
-      const num = parseFloat(toEn(value).replace('٫', '.'));
-      if (isNaN(num)) return;
-      onSave(log.id, { [activeField]: num } as Partial<DailyLog>, reason, notes || undefined);
+      return;
     }
+
+    const num = parseFloat(toEn(value).replace('٫', '.'));
+    if (isNaN(num)) return;
+
+    const changes: Partial<DailyLog> = { [activeField]: num };
+
+    // L2-synth: deathsCount با deaths=[] — synthesize record
+    if (activeField === 'deathsCount' && (log.deaths?.length || 0) === 0 && num > 0) {
+      changes.deaths = [{
+        id: uuid(),
+        count: num,
+        cause: 'unknown',
+        notes: 'اصلاح خودکار',
+      }];
+    }
+
+    onSave(log.id, changes, reason, notes || undefined);
   };
 
   return (
@@ -84,7 +111,11 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
       title="ثبت اصلاح"
       footer={
         <BtnRow>
-          <Btn variant="primary" onClick={handleSave}>✓ ثبت اصلاح</Btn>
+          <Btn
+            variant="primary"
+            onClick={handleSave}
+            disabled={activeField === 'deathsCount' && hasMultiDeaths(log)}
+          >✓ ثبت اصلاح</Btn>
           <Btn onClick={onClose}>انصراف</Btn>
         </BtnRow>
       }
@@ -112,7 +143,23 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 'var(--sp-3)' }}>
-          <Field label="مقدار جدید">
+          {activeField === 'deathsCount' && hasMultiDeaths(log) && (
+          <div style={{
+            padding: 'var(--pad-normal)',
+            background: 'var(--warn-soft)',
+            border: '1px dashed var(--warn)',
+            borderRadius: 'var(--r-md)',
+            fontSize: 'var(--fs-sm)',
+            color: 'var(--warn)',
+            lineHeight: 1.7,
+          }}>
+            ⚠ این لاگ {toFa(log.deaths.length)} رکورد تلفات دارد.
+            اصلاح تعداد کل روی مجموع اعمال نمی‌شود.
+            برای اصلاح، ابتدا از ویرایش لاگ رکوردها را تغییر دهید.
+          </div>
+        )}
+
+        <Field label="مقدار جدید">
             <NumField value={value} onChange={e => setValue(e.target.value)} unit={currentField?.unit} />
           </Field>
           <Field label="مقدار قبلی">
