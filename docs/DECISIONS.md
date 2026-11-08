@@ -605,3 +605,41 @@ atomicTransaction + outbox + حذف catch {} خالی (L6) + throw در silent f
 6. act() warning در تست — cosmetic، صفر ریسک
 
 آخرین تصمیم: 1405/11/08
+
+
+## جلسه 1405/11/08 (11 — D5 + B4-Recalc کامل)
+
+### D5 کامل شد — ۷ باگ حل، atomic زنده
+
+**B4-Recalc (bc503023)**: recompute activeWithdrawal از همه لاگ‌ها
+
+### ۷ باگ D5
+
+1. orphan movement — atomicTransaction
+2. orphan egg — rollback
+3. activeWithdrawal پاک نمی‌شد — B1c
+4. catch {} خالی — L6
+5. flockId/date تغییر در ویرایش — guard
+6. bulk delete silent — DlgTabPanel onDeleteLog
+7. activeWithdrawal logId orphan — B4-Recalc
+
+### infrastructure D5
+
+- cor/atomic/ (~۲۶۲ خط)
+- cor/storage/ (~۱۷۰ خط)
+- cor/outbox/ (~۳۷۷ خط)
+
+### آمار ۳ جلسه
+
+- commits: ۶۲
+- تست‌های جدید: ~۲۵۵
+- تست کل: ۱۹۲۳ پاس + ۱۷ skip
+- صفر regression
+
+### TODO جلسه ۱۲+
+
+- D6-D10: tra, egg, inc, flk, whs (~۳۰ دقیقه هر کدام)
+- D5.4 (_v/_txid — همراه server)
+- E, F, G, H, C8
+
+آخرین تصمیم: 1405/11/08
