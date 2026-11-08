@@ -878,7 +878,7 @@ Zustand `set()` = atomic (single shallow merge). هر action یک `set()` دار
 
 ---
 
-## entryTime Zod mismatch — تصمیم «بماند» (1405/11/09)
+## entryTime Zod mismatch — تصمیم «بماند» (1405/08/18)
 
 **تصمیم:** `entryTime` Zod validation (`optionalStr(10)`) با type اجباری (`entryTime: string`) هماهنگ نمی‌شود، ولی **پیاده‌سازی fix نمی‌شود**.
 
@@ -901,7 +901,7 @@ Zustand `set()` = atomic (single shallow merge). هر action یک `set()` دار
 
 ---
 
-## Corrections (C1 + C2) — Data + Actions (1405/11/09)
+## Corrections (C1 + C2) — Data + Actions (1405/08/18)
 
 **زمینه:** سناریوی چندبار در روز (صبح، ظهر، شب) + تصحیح اشتباهات — الگوی `flk` (Event + Correction + Revoke) در `dlg` پیاده می‌شود.
 
@@ -945,7 +945,7 @@ Zustand `set()` = atomic (single shallow merge). هر action یک `set()` دار
 
 ---
 
-## Corrections C3-fix - propagation به dashboard + گزارش‌ها (1405/11/09)
+## Corrections C3-fix - propagation به dashboard + گزارش‌ها (1405/08/18)
 
 زمینه: پس از C1+C2 (data + actions) و C3-a (LogCard display)، applyCorrections فقط در LogCard صدا زده می‌شد. Correction در Dashboard / Benchmark / گزارش‌ها نادیده گرفته می‌شد.
 
