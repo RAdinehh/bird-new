@@ -4,6 +4,7 @@
 import { Btn, Field, Grid2, NumField, Select } from '../../../shr/components/ui';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { avgWeight, cvWeight } from '../store';
+import { calculateWeightMetrics } from '../../../shr/calc/formulas/weight';
 import type { F } from '../types';
 import { useFlk, getAgeDays } from '../../flk/store';
 
@@ -67,9 +68,32 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
           </Field>
           <Field label="خلاصه">
             <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)' }}>
-              {form.weightSamples.length >= 2
-                ? <>میانگین: {toFa(avgWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) || 0 }))))} kg • CV: {toFa(cvWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) || 0 }))))}٪</>
-                : <>💡 حداقل ۲ نمونه اضافه کن تا میانگین محاسبه شود</>}
+              {(() => {
+                const samples = form.weightSamples
+                  .map(w => ({ id: w.id, weight: num(w.weight) || 0 }))
+                  .filter(w => w.weight > 0);
+
+                // 🆕 calculateWeightMetrics وقتی ۳ نمونه یا بیشتر (MIN_SAMPLES=3)
+                if (samples.length >= 3) {
+                  const result = calculateWeightMetrics({
+                    samples,
+                    previousAvgWeightG: null,
+                    ageDays: flockAge ?? 0,
+                    standardWeightG: null,
+                  });
+                  if (result.hasData) {
+                    const avgKg = Math.round((result.avgWeightG / 1000) * 1000) / 1000;
+                    return <>میانگین: {toFa(avgKg)} kg • CV: {toFa(result.cvPct)}٪ • یکنواختی: {toFa(result.uniformityPct)}٪</>;
+                  }
+                }
+
+                // fallback: ۲ نمونه — legacy
+                if (form.weightSamples.length >= 2) {
+                  return <>میانگین: {toFa(avgWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) || 0 }))))} kg • CV: {toFa(cvWeight(form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) || 0 }))))}٪</>;
+                }
+
+                return <>💡 حداقل ۲ نمونه اضافه کن تا میانگین محاسبه شود</>;
+              })()}
             </div>
           </Field>
         </Grid2>
