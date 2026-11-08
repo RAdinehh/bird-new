@@ -61,6 +61,10 @@
 - **Phase E-section-3** — `rep.Section` → `Layout.tsx` (استاندارد رسمی) ✅
 - **Phase E-section-4** — `set.Section` → `Layout.tsx` (یکسان‌سازی) ✅
 - **Phase F-A** — ۶ رویداد dlg publish می‌شوند (feed/egg/vaccine/medication) ✅
+- **FCR calc orphan** — اصلاح باگ (feed/liveWeight → feed/weightGain) + ۵ تست ✅
+- **EPEF calc orphan** — متصل در FlockHistoryModal (broiler + FCR دقیق) ✅
+- **brokenRate7 fix** — double-count bug در dsh + aggregateEggMetrics helper ✅
+- **Egg سایر** — برچسب ساده + HelpIcon «نرم، کثیف، ترک‌خورده...» ✅
 
 ### 🚧 In progress — D6 (tra atomic)
 
@@ -75,13 +79,14 @@
 
 ### ⏳ بعدی — به ترتیب پیشنهادی
 
-1. **۷ calc orphan** (FCR, Mortality, Egg, Weight, Stocking, EPEF, Water) — از DLG-AUDIT
-2. **`softCount: 0` هاردکد** — `toEgg.ts:52`
-3. **`calculateFCR` helpers-audit:246** فرمول غلط (FlockHistoryModal)
-4. **`entryTime` Zod mismatch**
-5. **۳ نسخهٔ موازی avgWeight**
-6. بعد: G (Draft Mode), H (CSV), C8 (EggSale.quality)
-7. D5.4 (`_v`/`_txid`) — همراه server
+1. **Mortality** orphan — نرخ تلفات
+2. **Weight** orphan — جایگزین ۳ نسخه avgWeight
+3. **Stocking** orphan — چگالی گله در سالن
+4. **Water** orphan — نسبت آب/دان (جایگزین inline)
+5. **`entryTime` Zod mismatch**
+6. **`dsh` استفاده از `aggregateEggMetrics`** (helper آماده، متصل نشده)
+7. بعد: G (Draft), H (CSV), C8 (EggSale.quality)
+8. D5.4 (`_v`/`_txid`) — همراه server
 
 ## 🐛 شکاف‌های باز (از DLG-AUDIT)
 
