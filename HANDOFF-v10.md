@@ -425,3 +425,102 @@ D5 (atomicSave) — اولین کار جلسه ۱۰
 
 *آخرین به‌روزرسانی: 1405/11/08*
 *HEAD: fc6b82f9*
+
+
+---
+
+## 🏛️ معماری آماده-آینده (جلسه ۱۰ پیاده می‌شود)
+
+### چرا آماده-آینده
+
+نرم‌افزار در آینده:
+- multi-user (چند مرغداری روی یک سرور)
+- server-backed (همگام‌سازی cloud)
+- offline-first (PWA)
+
+Atomic ساده (بدون future-proof) = ۴ ساعت الان، ~۲۰ ساعت refactor بعد.
+Atomic آماده-آینده = ۶.۵ ساعت الان، صفر refactor بعد.
+
+### دو فیلد کلیدی که همه‌چیز را ممکن می‌کند
+
+هر رکورد در هر store (dlg, whs, egg, flk, tra) دو فیلد جدید:
+- _v: number — version (optimistic locking)
+- _txid?: string — آخرین transaction ID (idempotency)
+
+الان: صفر کاربرد (local single-user)
+آینده: conflict resolution + retry safety
+
+### لایه‌های جدید
+
+src/cor/atomic/ — تراکنش اتمیک (local)
+  types.ts — AtomicStore, AtomicOptions
+  transaction.ts — snapshot + preflight + rollback (~۱۰۰ خط)
+  stores.ts — ثبت ۵ store (dlg, whs, egg, flk, tra) (~۵۰ خط)
+
+src/cor/storage/ — لایه انتزاعی ذخیره‌سازی
+  types.ts — StorageAdapter interface (~۳۰ خط)
+  local.ts — Zustand persist (فعال) (~۸۰ خط)
+  indexeddb.ts — stub (آینده)
+  server.ts — stub (آینده)
+
+src/cor/outbox/ — صف رویدادها (الگوی SAP/Odoo)
+  types.ts — OutboxEvent, OutboxProcessor (~۳۰ خط)
+  outbox.ts — publish/subscribe/retry (~۸۰ خط)
+  processors.ts — local processor + server stub (~۵۰ خط)
+
+### StorageAdapter interface
+
+    interface StorageAdapter {
+      getAll<T>(key: string): Promise<T[]>;
+      getById<T>(key: string, id: string): Promise<T | null>;
+      insert<T>(key: string, item: T): Promise<void>;
+      update<T>(key: string, id: string, patch: Partial<T>): Promise<void>;
+      delete<T>(key: string, id: string): Promise<void>;
+      beginTransaction(): Promise<string>;
+      commitTransaction(txid: string): Promise<void>;
+      rollbackTransaction(txid: string): Promise<void>;
+      subscribe?(key: string, cb: (data: any[]) => void): () => void;
+    }
+
+الان: LocalStorage (Zustand persist)
+آینده: ServerStorage (REST/GraphQL) — بدون تغییر در ماژول‌ها
+
+### الگوی Outbox
+
+به‌جای bus.emit مستقیم:
+    outbox.publish('dlg:log:saved', { logId, txid });
+
+مزایا:
+- الان: رویداد گم نمی‌شود (اگر subscriber fail کند)
+- آینده: صف به سرور می‌رود، multi-user sync خودکار
+- همیشه: retry خودکار
+
+### حجم پیاده‌سازی
+
+    atomic (۳ فایل)         ~۲۰۰ خط  ~۲ ساعت
+    storage (۲ فایل فعال)   ~۱۱۰ خط  ~۱ ساعت
+    outbox (۲ فایل فعال)    ~۱۳۰ خط  ~۱ ساعت
+    _v/_txid در types        ~۲۰ خط   ~۱۵ دقیقه
+    migration v14            ~۲۰ خط   ~۲۰ دقیقه
+    تست‌ها                  ~۱۵۰ خط   ~۱ ساعت
+    Refactor useDlgSave       ~۵۰ خط  ~۱ ساعت
+    جمع                     ~۶۸۰ خط  ~۶.۵ ساعت
+
+### ۵ ماژول مصرف‌کننده (بعد از D5)
+
+- dlg → dlg:log:saved، dlg:log:deleted
+- tra → tra:invoice:saved، tra:invoice:deleted
+- egg → egg:production:saved
+- inc → inc:entry:saved
+- flk → flk:merge، flk:unmerge
+
+### آنچه نمی‌سازیم (جلوگیری از over-engineering)
+
+- WebSocket client: stub بعد
+- Conflict resolution UI: _v کافی است، UI بعد
+- Multi-user permissions: لایه auth جدا
+- Server backend: فقط interface
+- IndexedDB adapter: stub
+- Offline queue با merge: outbox ساده
+
+قاعده: shapeها الان، contents بعد.
