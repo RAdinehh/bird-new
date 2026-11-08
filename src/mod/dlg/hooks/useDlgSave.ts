@@ -260,6 +260,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
           feedMovementIds: newMovementIds,
           birdAgeDays,
           previousRemainingKg,
+          flockAliveCount,
         });
         finalData = data;
 

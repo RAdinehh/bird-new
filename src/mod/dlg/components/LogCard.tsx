@@ -137,6 +137,11 @@ export default function LogCard(props: LogCardProps) {
           {l.feedConsumed !== null && l.feedConsumed !== undefined && l.feedConsumed !== l.feedDelivered && (
             <Row l="دان مصرف‌شده" v={`${toFa(l.feedConsumed)} kg`} />
           )}
+          {l.feedConsumed !== null && l.feedConsumed > 0 && flock && (flock.currentCount || 0) > 0 && (() => {
+            const g = (l.feedConsumed * 1000) / (flock.currentCount || 1);
+            const isWarn = g < 5 || g > 300;
+            return <Row l="دان/پرنده" v={`${toFa(g.toFixed(1))} g`} warn={isWarn} />;
+          })()}
           {l.feedRemaining !== null && <Row l="باقیمانده" v={`${toFa(l.feedRemaining)} kg`} />}
           {l.waterAmount !== null && <Row l="آب" v={`${toFa(l.waterAmount)} L`} />}
           {l.waterFillCount !== null && l.waterFillVolume !== null && (

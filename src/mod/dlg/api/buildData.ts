@@ -14,6 +14,7 @@ export interface BuildDataInput {
   feedMovementIds: string[];
   birdAgeDays?: number | null;
   previousRemainingKg?: number | null;
+  flockAliveCount?: number | null;
 }
 
 /** تبدیل رشته‌ی فارسی به عدد اعشاری */
@@ -37,7 +38,7 @@ function calcTotalWater(count: number | null, volume: number | null): number | n
 }
 
 export function buildLogData(input: BuildDataInput): Omit<DailyLog, 'id' | 'status' | 'createdAt' | 'updatedAt'> {
-  const { form, processedVaccines, processedMedications, feedMovementIds, birdAgeDays, previousRemainingKg } = input;
+  const { form, processedVaccines, processedMedications, feedMovementIds, birdAgeDays, previousRemainingKg, flockAliveCount } = input;
 
   const feedAmt = num(form.feedDelivered);
 
@@ -50,7 +51,7 @@ export function buildLogData(input: BuildDataInput): Omit<DailyLog, 'id' | 'stat
     feedDeliveredKg: feedAmt ?? 0,
     feedRemainingKg: feedRemainingNum,
     previousRemainingKg: previousRemainingKg ?? null,
-    aliveCount: 1,  // فقط برای feedPerBirdG — در DailyLog ذخیره نمی‌شود
+    aliveCount: flockAliveCount && flockAliveCount > 0 ? flockAliveCount : 1,
   });
   const feedConsumed = feedCalc.feedConsumedKg > 0 ? feedCalc.feedConsumedKg : null;
 
