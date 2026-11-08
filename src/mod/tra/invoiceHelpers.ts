@@ -301,7 +301,7 @@ export function applyInvoiceEquipment(inv: Invoice, prev?: Invoice): InvoiceItem
         e.sourceInvoiceId === inv.id && !activeEqIds.has(e.id)
       );
       for (const orphan of orphans) {
-        try { hal.deleteEquip(orphan.id); } catch {}
+        try { hal.deleteEquip(orphan.id); } catch (e) { console.error('[applyInvoiceEquipment] hal.deleteEquip (orphan) failed:', e); }
       }
     }
 
@@ -325,7 +325,7 @@ const eqId = it.equipmentId;
         if (eq) {
           if (!eq.sourceInvoiceId) {
             const whsId = eq.warehouseItemId || ensureWhsItem(it, inv, whs);
-            try { hal.updateEquip(eqId, { sourceInvoiceId: inv.id, warehouseItemId: whsId || undefined } as any); } catch {}
+            try { hal.updateEquip(eqId, { sourceInvoiceId: inv.id, warehouseItemId: whsId || undefined } as any); } catch (e) { console.error('[applyInvoiceEquipment] hal.updateEquip failed:', e); }
           } else if (eq.sourceInvoiceId === inv.id) {
             const whsId = eq.warehouseItemId || ensureWhsItem(it, inv, whs);
             try {
