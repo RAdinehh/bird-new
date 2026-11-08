@@ -9,7 +9,7 @@ import type { Flock } from '../../flk/store';
 import { toFa } from '../../../shr/utils/fa';
 import { FEED_SYSTEM_LABEL, WATER_SYSTEM_LABEL } from '../../../shr/utils/systemType';
 import SmartSelect from '../../../shr/components/SmartSelect';
-import { Btn, BtnRow, Field, Grid2, Modal, ErrorBox } from '../../../shr/components/ui';
+import { Btn, BtnRow, Field, Grid2, Modal, ErrorBox, SectionTitle } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 import TimePicker from '../../../shr/components/TimePicker';
 import { useFormat } from '../../../shr/units';
@@ -86,10 +86,10 @@ export default function FormModal(props: FormModalProps) {
         </div>
       )}
 
-      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🌡 محیط و پرنده</div>
+      <SectionTitle>🌡 محیط و پرنده</SectionTitle>
       <EnvironmentSection form={form} setForm={setForm} vErrors={vErrors} showError={showError} markTouched={markTouched} />
 
-      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🍽 تغذیه و آب</div>
+      <SectionTitle>🍽 تغذیه و آب</SectionTitle>
       <FeedSection form={form} setForm={setForm} vErrors={vErrors} showError={showError} markTouched={markTouched} />
 
       {isLayerType && !isFlockMature && selectedFlock && (
@@ -100,12 +100,12 @@ export default function FormModal(props: FormModalProps) {
 
       {isLayerFlock && (
         <>
-          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🥚 تخم و وزن</div>
+          <SectionTitle>🥚 تخم و وزن</SectionTitle>
           <EggsWeightSection form={form} setForm={setForm} vErrors={vErrors} flockAliveCount={flockAliveCount} showError={showError} markTouched={markTouched} />
         </>
       )}
 
-      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🏥 سلامت</div>
+      <SectionTitle>🏥 سلامت</SectionTitle>
       <HealthSection
         form={form} setForm={setForm} vErrors={vErrors}
         flockAliveCount={flockAliveCount}
