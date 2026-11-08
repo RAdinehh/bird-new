@@ -15,6 +15,7 @@ import { useAlt, activeAlerts, countByLevel } from '../../alt/store';
 import { runRules } from '../../alt/rules';
 import { useBrd } from '../../brd/store';
 import { useDlg, avgWeight as avgWeightFn, cvWeight as cvWeightFn } from '../../dlg/store';
+import { applyCorrections } from '../../dlg/api/applyCorrections';
 import { monthKey, currentMonth, todayJalali, dateDiffDays } from '../utils';
 import { aggregateEggMetrics } from '../../../shr/calc/formulas/egg';
 import { calculateWaterMetrics } from '../../../shr/calc/formulas/water';
@@ -80,11 +81,12 @@ const [, _setTick] = useState(0);
   const brokenToday = todayProd.reduce((a, p) => a + (p.brokenCount || 0), 0);
 
   const todayLogs = useMemo(() => logs.filter(l => l.date === today), [logs, today]);
-  const deathsToday = todayLogs.reduce((a, l) => a + (l.deaths || []).reduce((b, x) => b + (x.count || 0), 0), 0);
-  const feedToday = todayLogs.reduce((a, l) => a + (l.feedDelivered || 0), 0);
-  const waterToday = todayLogs.reduce((a, l) => a + (l.waterAmount || 0), 0);
-  const tempToday = todayLogs.length > 0 ? (todayLogs[0].temperature || 0) : 0;
-  const humidToday = todayLogs.length > 0 ? (todayLogs[0].humidity || 0) : 0;
+  const effectiveTodayLogs = useMemo(() => todayLogs.map(applyCorrections), [todayLogs]);
+  const deathsToday = effectiveTodayLogs.reduce((a, l) => a + (l.deaths || []).reduce((b, x) => b + (x.count || 0), 0), 0);
+  const feedToday = effectiveTodayLogs.reduce((a, l) => a + (l.feedDelivered || 0), 0);
+  const waterToday = effectiveTodayLogs.reduce((a, l) => a + (l.waterAmount || 0), 0);
+  const tempToday = effectiveTodayLogs.length > 0 ? (effectiveTodayLogs[0].temperature || 0) : 0;
+  const humidToday = effectiveTodayLogs.length > 0 ? (effectiveTodayLogs[0].humidity || 0) : 0;
 
   // ============ سرسیدهای نزدیک ============
   const daysUntilDue = useCallback((dueDate: string): number | null => {
@@ -181,7 +183,7 @@ const [, _setTick] = useState(0);
   const fcr = useMemo(() => {
     const monthLogs = logs.filter(l => monthKey(l.date) === thisMonth);
     const monthProd = productions.filter(p => monthKey(p.date) === thisMonth);
-    const feed = monthLogs.reduce((a, l) => a + (l.feedConsumed || l.feedDelivered || 0), 0);
+    const feed = monthLogs.map(applyCorrections).reduce((a, l) => a + (l.feedConsumed || l.feedDelivered || 0), 0);
     const eggsWeight = monthProd.reduce((a, p) => a + (p.totalCount || 0) * 0.06, 0);
     if (eggsWeight <= 0) return 0;
     return Math.round((feed / eggsWeight) * 100) / 100;
@@ -191,7 +193,7 @@ const [, _setTick] = useState(0);
   const waterMetrics7d = useMemo(() => {
     const last7 = logs.filter(l => dateDiffDays(l.date) <= 7);
     const water = last7.reduce((a, l) => a + (l.waterAmount || 0), 0);
-    const feed = last7.reduce((a, l) => a + (l.feedConsumed || l.feedDelivered || 0), 0);
+    const feed = last7.map(applyCorrections).reduce((a, l) => a + (l.feedConsumed || l.feedDelivered || 0), 0);
     return calculateWaterMetrics({
       waterAmountL: water,
       feedConsumedKg: feed,
