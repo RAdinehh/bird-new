@@ -34,7 +34,7 @@ export function SectionTitle({ children }: { children: React.ReactNode }) {
       borderTop: '1px dashed var(--border)',
       fontSize: 'var(--fs-base)',
       fontWeight: 600,
-      color: 'var(--muted)',
+      color: 'var(--text)',
       letterSpacing: '.3px',
     }}>{children}</div>
   );
