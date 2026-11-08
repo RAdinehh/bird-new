@@ -68,16 +68,18 @@
 - **Mortality calc** — متصل در FlockHistoryModal (نرخ تلفات تجمعی + ۱۱ تست) ✅
 - **Weight calc** — متصل در EggsWeightSection (≥3 نمونه، fallback legacy برای ۲) + uniformity ✅
 
-### 🚧 In progress — D6 (tra atomic)
+### 🚧 In progress — Stocking + Water
 
 | فاز | کار | وضعیت |
 |---|---|---|
-| **D.6-D.10** | D-Series (tra/egg/inc/flk/whs atomic) | ✅ |
+| **D-Series** | tra/egg/inc/flk/whs atomic | ✅ |
 | **Phase E-Cleanup** | lightHours، hint، SectionTitle، Section | ✅ |
 | **Phase F-A** | ۶ رویداد dlg publish | ✅ |
-| **Phase F-B** | reactive alt/dsh (رد شد — monolithic frontend) | ❌ |
+| **calc orphan** | FCR، EPEF، Egg، Mortality، Weight | ✅ |
+| **Stocking** | چگالی گله | ⏳ |
+| **Water** | نسبت آب/دان | ⏳ |
 
-**🏆 این جلسه: ۹ commit، ۶ رویداد dlg زنده، Sectionها تفکیک شدند، hint‌ها پاک‌سازی شدند**
+**🏆 این جلسه: ۱۵+ commit، ۵/۷ calc orphan، ۴ باگ رفع**
 
 ### ⏳ بعدی — به ترتیب پیشنهادی
 
@@ -88,13 +90,15 @@
 5. بعد: G (Draft), H (CSV), C8 (EggSale.quality)
 6. D5.4 (`_v`/`_txid`) — همراه server
 
-## 🐛 شکاف‌های باز (از DLG-AUDIT)
+## 🐛 شکاف‌های باز (از DLG-AUDIT، به‌روز شده)
 
-- **۷ تابع calc orphan** — FCR, Mortality, Egg, Weight, Stocking, EPEF, Water
-- **`softCount: 0` هاردکد** در `toEgg.ts:52`
-- **`calculateFCR` helpers-audit:246 فرمول غلط** — FlockHistoryModal
+- **۲ calc orphan باقی‌مانده** — Stocking, Water (۵ از ۷ انجام: FCR، EPEF، Egg، Mortality، Weight)
 - **`entryTime` Zod mismatch**
 - **۳ نسخهٔ موازی avgWeight**
+
+**حل‌شده (نه باگ):**
+- `softCount: 0` → تصمیم UX (DECISIONS 1405/11/08)
+- `calculateFCR` helpers-audit:246 → fix در `7afd3aa5`
 
 ## 📚 فایل‌های کلیدی
 
@@ -123,15 +127,14 @@
 
 ## 🎯 ترتیب بعدی
 
-**→ این ترتیب با «⏳ بعدی» بالا یکسان است — بخش قبلی (Phase E) تکمیل شد.**
+**→ یکسان با «⏳ بعدی» بالا**
 
-1. **۷ calc orphan** — FCR, Mortality, Egg, Weight, Stocking, EPEF, Water
-2. **`softCount: 0`** — `toEgg.ts:52`
-3. **`calculateFCR` helpers-audit:246**
-4. **`entryTime` Zod mismatch**
-5. **۳ نسخهٔ موازی avgWeight**
-6. بعد: G (Draft), H (CSV), C8 (EggSale.quality)
-7. D5.4 (`_v`/`_txid`) — همراه server
+1. **Stocking calc orphan** — چگالی گله در سالن
+2. **Water calc orphan** — نسبت آب/دان
+3. **`entryTime` Zod mismatch**
+4. **`dsh` استفاده از `aggregateEggMetrics`**
+5. بعد: G (Draft), H (CSV), C8 (EggSale.quality)
+6. D5.4 (`_v`/`_txid`) — همراه server
 
 ## 📝 آپدیت این فایل
 
