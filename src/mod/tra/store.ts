@@ -441,22 +441,21 @@ export const useTra = create<State>()(
       deleteInvoice: (id) => {
         const inv = get().invoices.find(x => x.id === id);
         // 🆕 Backup Before Mutation (recycle bin)
-        if (inv) {
-          const linkedFlocks = useFlk.getState().flocks
-            .filter((f) => f.sourceInvoiceId === id)
-            .map((f) => ({ 
-              id: f.id, 
-              sourceCategory: f.sourceCategory || '',
-              birdId: f.birdId || null,
-              breedId: f.breedId || null,
-            }));
-          saveToRecycleBin<DeletedInvoiceSnapshot>(
-            'tra',
-            { invoice: inv, linkedFlocks, linkedSettlement: inv.relatedSettlementId ? (() => { const _st = get().settlements.find(x => x.id === inv.relatedSettlementId); return _st ? { id: _st.id, periodStart: _st.periodStart, periodEnd: _st.periodEnd } : undefined; })() : undefined },
-            (existing) => existing.invoice.id === id,
-          );
-          console.info('[deleteInvoice] 🗑️ saved to recycle bin:', id);
-        }
+        // D6-D2: Capture recycle-bin data BEFORE mutations
+        const _recycleFlocks = inv ? useFlk.getState().flocks
+          .filter((f) => f.sourceInvoiceId === id)
+          .map((f) => ({
+            id: f.id,
+            sourceCategory: f.sourceCategory || '',
+            birdId: f.birdId || null,
+            breedId: f.breedId || null,
+          })) : [];
+        const _recycleSettlement = inv?.relatedSettlementId
+          ? (() => {
+              const _st = get().settlements.find(x => x.id === inv.relatedSettlementId);
+              return _st ? { id: _st.id, periodStart: _st.periodStart, periodEnd: _st.periodEnd } : undefined;
+            })()
+          : undefined;
         // Cascade: reset settlement if linked
         if (inv?.relatedSettlementId) {
           const st = get().settlements.find(x => x.id === inv.relatedSettlementId);
@@ -682,6 +681,20 @@ export const useTra = create<State>()(
           }
         }
         set({ invoices: get().invoices.filter(x => x.id !== id) });
+
+        // D6-D2: Recycle bin AFTER successful removal (prevents orphan bin)
+        if (inv && !get().invoices.some(x => x.id === id)) {
+          try {
+            saveToRecycleBin<DeletedInvoiceSnapshot>(
+              'tra',
+              { invoice: inv, linkedFlocks: _recycleFlocks, linkedSettlement: _recycleSettlement },
+              (existing) => existing.invoice.id === id,
+            );
+            console.info('[deleteInvoice] 🗑️ saved to recycle bin:', id);
+          } catch (e) {
+            console.error('[deleteInvoice] recycle bin failed:', e);
+          }
+        }
     try { verifyInvariantsIfDev(); } catch(e) { console.error('[tra delete] verifyInvariantsIfDev failed:', e); }
         try { if (inv) setPartyCredit(inv.partyId, computePartyCredit(inv.partyId, get().invoices, get().allocations)); } catch(e) { console.error('[tra delete] setPartyCredit failed:', e); }
       },
