@@ -40,23 +40,35 @@
 - **Phase D.3b** — آخرین `as any` در deleteInvoice ✅
 - **Phase D.4-A** — `ctcStore` به `ALL_STORES` ✅
 - **Phase D.4-B** — `deleteInvoice` atomic (snapshot + 16 throw + **negative test اثبات rollback**) ✅
+- **Phase D.6-E** — `updateInvoice` atomic (8 throw + test) ✅
+- **Phase D.6-F** — `addInvoice` atomic (4 throw + test) ✅
+- **Phase D.6-G** — integration tests (توالی add/update/delete + rollback) ✅
+- **allocations** — در traStore snapshot/restore ✅
+- **Phase D.7-P1** — `bus.emitSync` (پایه sync atomic events) ✅
+- **Phase D.7-P2** — `egg.store` atomic (3 action + snapshot + rollback) ✅
+- **Phase D.7-P3** — `whs.handlers` egg cascade (6 swallow → throw) ✅
+- **Phase D.7-P4a** — negative test (اثبات atomic end-to-end egg↔whs) ✅
+- **Phase D.7-P4b** — `ProductionsPage` bulk atomic + silent catch رفع ✅
 
 ### 🚧 In progress — D6 (tra atomic)
 
 | فاز | کار | برآورد | وضعیت |
 |---|---|---|---|
-| ~~D.3a-fix~~ | ~~fix ۲ خطای tsc~~ | ✅ انجام شد | ✅ |
-| E | `updateInvoice` atomic | **۵ ساعت PR-risk** | ⏳ |
-| F | `add` atomic | ۳ ساعت | ⏳ |
-| G | tests | ۲ ساعت | ⏳ |
+| ~~D.6-E~~ | ~~`updateInvoice` atomic~~ | ✅ | ✅ |
+| ~~D.6-F~~ | ~~`addInvoice` atomic~~ | ✅ | ✅ |
+| ~~D.6-G~~ | ~~integration tests~~ | ✅ | ✅ |
+| ~~D.7~~ | ~~egg atomic (4 phase)~~ | ✅ | ✅ |
+| **D8** | inc atomic (`saveEggEntry` + invoice) | ~۱ ساعت | ⏳ |
+| **D9** | flk atomic (`mergeFlocks`/`unmergeFlocks`) | ~۱.۵ ساعت | ⏳ |
+| **D10** | whs atomic (batch movements) | ~۱ ساعت | ⏳ |
 
-**D6 باقی: E (updateInvoice) + F (add) + G (tests) = ۱۰ ساعت**
+**D.6 (tra) + D.7 (egg) کامل — ۳ ماژول atomic با تست: dlg, tra, egg**
 
 ### ⏳ بعدی — به ترتیب پیشنهادی
 
-1. **فاز E — UI/UX فرم ۴۷ فیلدی dlg** ← **مهم‌ترین برای کاربر**
-2. D7-D10 (egg/inc/flk/whs atomic) — ~۳۰ دقیقه هر کدام
-3. F, G, H
+1. **D8/D9/D10** — inc/flk/whs atomic (~۳.۵ ساعت جمع)
+2. **Phase E — UI/UX فرم ۴۷ فیلدی dlg** ← **مهم‌ترین برای کاربر**
+3. F (cross-module events), G (Draft), H (CSV)
 4. C8 (EggSale.quality)
 5. D5.4 (`_v`/`_txid`) — همراه server
 
@@ -95,11 +107,11 @@
 
 ## 🎯 ترتیب بعدی
 
-1. **D.6-E** — `updateInvoice` atomic (۵ ساعت، PR-risk)
-2. **D.6-F** — `add` atomic (۳ ساعت)
-3. **D.6-G** — tests (۲ ساعت)
-4. بعد: D7-D10 (egg/inc/flk/whs atomic)
-5. بعد: Phase E — UI/UX فرم ۴۷ فیلدی
+1. **D8** — inc atomic (~۱ ساعت) — الگوی D.6/D.7
+2. **D9** — flk atomic (~۱.۵ ساعت)
+3. **D10** — whs atomic (~۱ ساعت)
+4. بعد: **Phase E — UI/UX فرم ۴۷ فیلدی dlg** (چند جلسه) ← مهم‌ترین برای کاربر
+5. بعد: F, G, H, C8, D5.4
 
 ## 📝 آپدیت این فایل
 
