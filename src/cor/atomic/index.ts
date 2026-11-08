@@ -1,7 +1,7 @@
 /**
  * atomic/index.ts — نقطه ورود
  */
-export { atomicTransaction } from './transaction';
+export { atomicTransaction, atomicTransactionSync } from './transaction';
 export {
   dlgStore,
   whsStore,
@@ -13,5 +13,6 @@ export {
 export type {
   AtomicStore,
   AtomicOptions,
+  AtomicOptionsSync,
   AtomicResult,
 } from './types';

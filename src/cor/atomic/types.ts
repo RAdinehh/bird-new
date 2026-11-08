@@ -39,6 +39,25 @@ export interface AtomicOptions<T> {
 }
 
 /**
+ * گزینه‌های atomicTransactionSync (برای سناریوهای sync-only)
+ *
+ * مثل AtomicOptions، ولی preflight و execute sync هستند.
+ * استفاده: deleteInvoice (همه cascade sync).
+ */
+export interface AtomicOptionsSync<T> {
+  /** Phase 1 — پیش از هر mutation (sync) */
+  preflight?: () => void;
+  /** کدام storeها snapshot شوند */
+  stores: AtomicStore[];
+  /** Phase 3 — اجرای cascade (sync — اگر throw کند → rollback) */
+  execute: () => T;
+  /** Phase 4 — بعد از موفقیت (sync) */
+  onSuccess?: (result: T) => void;
+  /** Phase 5 — بعد از rollback (sync) */
+  onError?: (err: Error) => void;
+}
+
+/**
  * نتیجه atomicTransaction
  */
 export interface AtomicResult<T> {
