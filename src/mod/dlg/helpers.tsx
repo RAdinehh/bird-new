@@ -14,7 +14,7 @@ export function Section({ title, children }: { title: string; children: ReactNod
 
 export function SectionTitle({ children }: { children: ReactNode }) {
   return (
-    <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>{children}</div>
+    <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 600, color: 'var(--text)', letterSpacing: '.3px' }}>{children}</div>
   );
 }
 
