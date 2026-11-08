@@ -73,6 +73,7 @@
 **🏆 ۷/۷ calc orphan همه متصل: FCR، EPEF، Egg، Mortality، Weight، Stocking، Water**
 - **C** — `dsh/henDay7 + brokenRate7` → `aggregateEggMetrics` ✅
 - **D** — `avgWeight unify` — `dsh inline` → `dlg/store.avgWeight/cvWeight` (۳ → ۲) ✅
+- **H-Batch1** — CSV export در `/rep/production` + `/rep/flocks` ✅
 
 ### 🚧 In progress — Stocking + Water
 
@@ -89,9 +90,10 @@
 
 ### ⏳ بعدی — به ترتیب پیشنهادی
 
-1. **`entryTime` Zod mismatch** — تنها شکاف باقی‌مانده از DLG-AUDIT
-2. بعد: G (Draft Mode), H (CSV), C8 (EggSale.quality)
-3. D5.4 (`_v`/`_txid`) — همراه server
+1. **H-Batch2** — CSV در egg/Stats + whs/Items + dsh
+2. **`entryTime` Zod mismatch**
+3. بعد: G (Draft Mode), C8 (EggSale.quality)
+4. D5.4 (`_v`/`_txid`) — همراه server
 
 ## 🐛 شکاف‌های باز (از DLG-AUDIT، به‌روز شده)
 
