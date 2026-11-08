@@ -13,7 +13,8 @@ export interface EggSyncInput {
   eatingEggs: number;
   fertileEggs: number;
   brokenEggs: number;
-  otherEggs: number;
+  softEggs: number;
+  dirtyEggs: number;
 }
 
 export interface EggSyncData {
@@ -34,22 +35,22 @@ export interface EggSyncData {
 /** آیا این log نیاز به egg.production داره؟ */
 export function shouldSyncToEgg(input: EggSyncInput): boolean {
   if (!input.isLayerFlock) return false;
-  const total = input.eatingEggs + input.fertileEggs + input.brokenEggs + input.otherEggs;
+  const total = input.eatingEggs + input.fertileEggs + input.brokenEggs + input.softEggs + input.dirtyEggs;
   return total > 0;
 }
 
 /** ساخت داده‌ی egg.production از ورودی dlg */
 export function buildEggProductionData(input: EggSyncInput): EggSyncData {
-  const { logId, flockId, date, eatingEggs, fertileEggs, brokenEggs, otherEggs } = input;
+  const { logId, flockId, date, eatingEggs, fertileEggs, brokenEggs, softEggs, dirtyEggs } = input;
   return {
     flockId,
     date,
     eatingCount: eatingEggs,
     fertileCount: fertileEggs,
-    totalCount: eatingEggs + fertileEggs + brokenEggs + otherEggs,
+    totalCount: eatingEggs + fertileEggs + brokenEggs + softEggs + dirtyEggs,
     brokenCount: brokenEggs,
-    softCount: 0,
-    dirtyCount: otherEggs,
+    softCount: softEggs,
+    dirtyCount: dirtyEggs,
     avgWeight: null,
     notes: '',
     sourceLogId: logId,

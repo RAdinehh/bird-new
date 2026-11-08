@@ -96,7 +96,8 @@ export interface DailyLog {
   // 🆕 تخم - تفکیک جدید
   eatingEggs?: number | null;
   fertileEggs?: number | null;
-  otherEggs?: number | null;
+  softEggs?: number | null;
+  dirtyEggs?: number | null;
 
   // تلفات
   deathsCount: number;
@@ -142,7 +143,8 @@ export const useDlg = create<State>()(
           brokenEggs: (l as any).brokenEggs ?? null,
           eatingEggs: (l as any).eatingEggs ?? null,
           fertileEggs: (l as any).fertileEggs ?? null,
-          otherEggs: (l as any).otherEggs ?? null,
+          softEggs: (l as any).softEggs ?? null,
+          dirtyEggs: (l as any).dirtyEggs ?? null,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         } as DailyLog;
@@ -168,7 +170,7 @@ export const useDlg = create<State>()(
     }),
     {
       name: 'pm-dlg',
-      version: 14,
+      version: 15,
       migrate: (persisted: any, version: number) => {
         if (version < 2 && persisted?.logs) {
           persisted.logs = persisted.logs.map((l: any) => ({
@@ -284,6 +286,17 @@ export const useDlg = create<State>()(
           persisted.logs = persisted.logs.map((l: any) => {
             const { shift: _s, brokenTarget: _bt, otherTarget: _ot, ...rest } = l;
             return rest;
+          });
+        }
+        // ═══ v15 — split otherEggs → softEggs + dirtyEggs ═══
+        if (version < 15 && persisted?.logs) {
+          persisted.logs = persisted.logs.map((l: any) => {
+            const oldOther = l.otherEggs;
+            const { otherEggs: _oe, ...rest } = l;
+            if (oldOther === null || oldOther === undefined) {
+              return { ...rest, softEggs: null, dirtyEggs: null };
+            }
+            return { ...rest, softEggs: 0, dirtyEggs: oldOther };
           });
         }
         return persisted;

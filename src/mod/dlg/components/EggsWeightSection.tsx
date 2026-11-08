@@ -49,13 +49,18 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
               
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-              <Field label="📦 سایر (نرم/کثیف)" error={showError('otherEggs')}>
-                <NumField placeholder="۰" value={form.otherEggs} onChange={e => setForm({...form, otherEggs: e.target.value})} unit="عدد" min={0} />
+              <Field label="🥚 نرم" error={showError('softEggs')}>
+                <NumField placeholder="۰" value={form.softEggs} onChange={e => setForm({...form, softEggs: e.target.value})} unit="عدد" min={0} />
               </Field>
               
             </div>
           </Grid2>
-      {form.weightSamples.length > 0 && (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+            <Field label="🧹 تخم کثیف" error={showError('dirtyEggs')}>
+              <NumField placeholder="۰" value={form.dirtyEggs} onChange={e => setForm({...form, dirtyEggs: e.target.value})} unit="عدد" min={0} />
+            </Field>
+          </div>
+          {form.weightSamples.length > 0 && (
         <Grid2>
           <Field label="جنسیت">
             <Select value={form.weightGender} onChange={e => setForm({ ...form, weightGender: e.target.value as any })}>
