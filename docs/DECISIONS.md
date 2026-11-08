@@ -709,3 +709,33 @@ Zustand `set()` = atomic (single shallow merge). هر action یک `set()` دار
 - اگر DRY واقعی خواستید → فایل‌به‌فایل با `sed` + بررسی دستی، **نه brace parser خودکار** (تجربه شکست خورده)
 
 **درس:** DRY کردن تعریف تابع با brace parser خودکار، در برابر تنوع ساختار (parمتر nested, default value) شکننده است. رویکرد امن: تغییر inline style بدون حذف تابع.
+
+---
+
+## UI/F (1405/11/08) — ۶ رویداد dlg کامل + Section یکسان‌سازی
+
+**زمینه:** `events.ts` ۶ رویداد `dlg:*` تعریف کرده بود ولی `save()` فقط ۲ را publish می‌کرد (`deaths`, `log:deleted`). بقیه (`feed:consumed`, `egg:recorded`, `vaccine:given`, `medication:given`) تعریف + processor داشتند ولی هرگز publish نمی‌شدند.
+
+**تصمیم F-A:** در `useDlgSave.save()` → `onSuccess`، ۴ publish جدید اضافه شد (با شرط‌های منطقی: `feedSourceId > 0`, `eggTotal > 0`, `itemId && quantity > 0`).
+
+**نتیجه:** ۶ از ۶ رویداد dlg الان زنده. صفر consumer جدید (به‌جز flk که از قبل بود). صفر تغییر رفتار کاربر.
+
+**چرا F-B (تغییر `alt`/`dsh` از direct read به event) رد شد:**
+- در monolithic frontend، `useDlg()` مستقیم همگام است
+- Event = async → delay + ordering + idempotency = ریسک بدون فایده
+- SAP: event = notification، نه command
+- Odoo: bus برای broadcast، ORM برای state اصلی
+- تصمیم: state اصلی از store، event فقط برای cross-module notification
+
+**UI/Section — ۴ کامپوننت با اسم `Section` بودند، الان تفکیک شدند:**
+- `dlg.Section` → **`LogSection`** (تخت، داخل `LogCard`)
+- `egg.Section` (local در `StatsPage`) → **`StatsCard`** (self-closing، بدون children)
+- `rep.Section` → **`Layout.tsx`** (استاندارد رسمی)
+- `set.Section` → **`Layout.tsx`** (یکسان با rep)
+
+**پیامد برای AI جدید:**
+- `Section` در `Layout.tsx` = استاندارد رسمی (card، title-inside)
+- `LogSection` = flat (داخل کارت، بدون border)
+- `StatsCard` = header-only (بدون children)
+- `dlg:feed:consumed`، `dlg:vaccine:given`، `dlg:medication:given`، `dlg:egg:recorded` **publish می‌شوند** ولی **consumer ندارند** — این عمدی است، پیش‌نیاز آینده
+- اگر خواستی `alt`/`dsh` را reactive کنی → اول race condition + delay را حل کن، بعد
