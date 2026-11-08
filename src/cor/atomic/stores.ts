@@ -9,6 +9,9 @@ import { useWhs } from '../../mod/whs/store';
 import { useEgg } from '../../mod/egg/store';
 import { useFlk } from '../../mod/flk/store';
 import { useTra } from '../../mod/tra/store';
+import { useHal } from '../../mod/hal/store';
+import { useBrd } from '../../mod/brd/store';
+import { useInc } from '../../mod/inc/store';
 import type { AtomicStore } from './types';
 
 /** dlg — فقط logs */
@@ -87,6 +90,59 @@ export const traStore: AtomicStore = {
   }),
 };
 
+/** hal — halls + zones + equipment (cascade از tra) */
+export const halStore: AtomicStore = {
+  name: 'hal',
+  getSnapshot: () => {
+    const s = useHal.getState();
+    return {
+      halls: s.halls,
+      zones: s.zones,
+      equipment: s.equipment,
+    };
+  },
+  restore: (snap) => useHal.setState({
+    halls: snap.halls,
+    zones: snap.zones,
+    equipment: snap.equipment,
+  }),
+};
+
+/** brd — birds + breeds (cascade از tra purchase) */
+export const brdStore: AtomicStore = {
+  name: 'brd',
+  getSnapshot: () => {
+    const s = useBrd.getState();
+    return { birds: s.birds, breeds: s.breeds };
+  },
+  restore: (snap) => useBrd.setState({
+    birds: snap.birds,
+    breeds: snap.breeds,
+  }),
+};
+
+/** inc — devices + eggEntries + candlings + hatches + hatchGroups (cascade از tra purchase) */
+export const incStore: AtomicStore = {
+  name: 'inc',
+  getSnapshot: () => {
+    const s = useInc.getState();
+    return {
+      devices: s.devices,
+      eggEntries: s.eggEntries,
+      candlings: s.candlings,
+      hatches: s.hatches,
+      hatchGroups: (s as any).hatchGroups || [],
+    };
+  },
+  restore: (snap) => useInc.setState({
+    devices: snap.devices,
+    eggEntries: snap.eggEntries,
+    candlings: snap.candlings,
+    hatches: snap.hatches,
+    hatchGroups: snap.hatchGroups,
+  } as any),
+};
+
 /** همه storeها (برای استفاده در ماژول‌ها) */
 export const ALL_STORES: AtomicStore[] = [
   dlgStore,
@@ -94,4 +150,7 @@ export const ALL_STORES: AtomicStore[] = [
   eggStore,
   flkStore,
   traStore,
+  halStore,
+  brdStore,
+  incStore,
 ];
