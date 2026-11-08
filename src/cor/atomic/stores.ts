@@ -89,12 +89,14 @@ export const traStore: AtomicStore = {
       invoices: s.invoices,
       settlements: s.settlements,
       deals: s.deals,
+      allocations: s.allocations,
     };
   },
   restore: (snap) => useTra.setState({
     invoices: snap.invoices,
     settlements: snap.settlements,
     deals: snap.deals,
+    allocations: snap.allocations,
   }),
 };
 
