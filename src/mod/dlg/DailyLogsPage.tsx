@@ -141,9 +141,13 @@ export default function DailyLogsPage() {
     (id) => setTab(id as TabId),
   );
 
-  const handleSave = () => {
+  const handleSave = async () => {
     attemptSave();
-    save();
+    if (Object.keys(vErrors).length > 0) {
+      toastMsg.error('لطفاً خطاها را برطرف کنید');
+      return;
+    }
+    await save();
   };
 
   const tabCount = (t: TabId) =>
