@@ -131,6 +131,8 @@ export const useTra = create<State>()(
         return id;
       },
       updateInvoice: (id, patch) => {
+        const __snaps = ALL_STORES.map(s => ({ store: s, snap: s.getSnapshot() }));
+        try {
         const prev = get().invoices.find(x => x.id === id);
         if (!prev) return;
         if (prev.paidAt) {
@@ -146,9 +148,9 @@ export const useTra = create<State>()(
 
         if (!merged.isPreorder || isReceiving) {
           try { itemsFinal = applyInvoiceFlocks(mergedWithItems, isReceiving ? undefined : prev); } catch(e) { console.error('[updateInvoice] applyInvoiceFlocks failed:', e); throw e; }
-          try { itemsFinal = applyInvoiceEquipment({ ...mergedWithItems, items: itemsFinal }, isReceiving ? undefined : prev); } catch(e) { console.error('❌ [tra] applyInvoiceEquipment error (update):', e); }
-          try { itemsFinal = applyInvoiceEgg({ ...mergedWithItems, items: itemsFinal }, isReceiving ? undefined : prev); } catch(e) {}
-          try { itemsFinal = applyInvoiceStock({ ...mergedWithItems, items: itemsFinal }, isReceiving ? undefined : prev); } catch(e) {}
+          try { itemsFinal = applyInvoiceEquipment({ ...mergedWithItems, items: itemsFinal }, isReceiving ? undefined : prev); } catch(e) { console.error('❌ [tra] applyInvoiceEquipment error (update):', e); throw e; }
+          try { itemsFinal = applyInvoiceEgg({ ...mergedWithItems, items: itemsFinal }, isReceiving ? undefined : prev); } catch(e) { console.error('[updateInvoice] applyInvoiceEgg failed:', e); throw e; }
+          try { itemsFinal = applyInvoiceStock({ ...mergedWithItems, items: itemsFinal }, isReceiving ? undefined : prev); } catch(e) { console.error('[updateInvoice] applyInvoiceStock failed:', e); throw e; }
 
           // 🆕 فیکس ۴: Revoke old sell events + recreate new
           try {
@@ -197,7 +199,7 @@ export const useTra = create<State>()(
                 } as any);
               }
             }
-          } catch (e) { console.error('[updateInvoice] sell events revoke failed:', e); }
+          } catch (e) { console.error('[updateInvoice] sell events revoke failed:', e); throw e; }
         }
         const prevPayments = (prev.payments || []) as any[];
         const newPaymentsInput = (mergedWithItems.payments || []) as any[];
@@ -208,7 +210,7 @@ export const useTra = create<State>()(
         const newPPIds = new Set(syncedPayments.map((p: any) => p.partyPaymentId).filter(Boolean));
         for (const ppId of prevPPIds) {
           if (!newPPIds.has(ppId as string)) {
-            try { get().deletePartyPayment(ppId as string); } catch(e) { console.error('[tra delete] deletePartyPayment failed:', e); }
+            try { get().deletePartyPayment(ppId as string); } catch(e) { console.error('[tra delete] deletePartyPayment failed:', e); throw e; }
           }
         }
         for (const p of syncedPayments) {
@@ -221,19 +223,19 @@ export const useTra = create<State>()(
                 notes: p.notes || '', status: p.status,
                 clearedDate: p.clearedDate, bouncedDate: p.bouncedDate,
               });
-            } catch(e) {}
+            } catch(e) { console.error('[updateInvoice] updatePartyPayment failed:', e); throw e; }
           }
         }
         const final: Invoice = { ...mergedWithItems, items: itemsFinal, payments: syncedPayments };
         // 🆕 آبشار بانکی: تخصیص پرداخت‌ها به اقساط
         if (final.installments && final.installments.length > 0) {
-          try { final.installments = applyPaymentsToInstallments(final.installments, syncedPayments); } catch(e) {}
+          try { final.installments = applyPaymentsToInstallments(final.installments, syncedPayments); } catch(e) { console.error('[updateInvoice] applyPaymentsToInstallments failed:', e); throw e; }
         }
         set({ invoices: get().invoices.map(x => x.id === id ? final : x) });
         try {
           setPartyCredit(final.partyId, computePartyCredit(final.partyId, get().invoices, get().allocations));
           if (prev.partyId && prev.partyId !== final.partyId) setPartyCredit(prev.partyId, computePartyCredit(prev.partyId, get().invoices, get().allocations));
-        } catch(e) {}
+        } catch(e) { console.error('[updateInvoice] setPartyCredit failed:', e); throw e; }
         if (patch.payments) {
       const oldAllocs = get().allocations.filter(a => a.invoiceId === id);
       syncAllocations(get, id, merged.payments || [], oldAllocs, '[updateInvoice] alloc sync:');
@@ -246,6 +248,13 @@ export const useTra = create<State>()(
           set({ invoices: get().invoices.map(x => x.id === id ? { ...x, nextReminderAt: undefined, updatedAt: now() } : x) });
         }
       } catch(e) { console.error('[updateInvoice] auto-cancel reminder:', e); }
+              } catch (__err) {
+          for (const { store, snap } of __snaps) {
+            try { store.restore(snap); } catch (e) { console.error('[atomic rollback]', store.name, e); }
+          }
+          showToast('خطا در ویرایش — همه تغییرات لغو شد: ' + (__err instanceof Error ? __err.message : String(__err)), 'error');
+          throw __err;
+        }
       },
       markDispute: (invoiceId, reason, note) => {
         const today = getTodayJalali();
