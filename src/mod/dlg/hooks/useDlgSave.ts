@@ -14,6 +14,8 @@ import { decideEggAction } from '../api/toEgg';
 import { bus } from '../../../cor/events';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
+import { atomicTransaction, dlgStore, whsStore, eggStore, flkStore } from '../../../cor/atomic';
+import { outbox } from '../../../cor/outbox';
 import { toFa } from '../../../shr/utils/fa';
 import { recordHistory } from '../../../shr/intelligence';
 import type { F } from '../types';
@@ -85,7 +87,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
     if (saving) return false;
     setSaving(true);
 
-    // 🆕 D5.5/B1b — flockId/date قفل در ویرایش
+    // D5.5/B1b — flockId/date قفل در ویرایش
     if (form.id) {
       const oldLog = logs.find(l => l.id === form.id);
       if (oldLog) {
@@ -102,7 +104,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
       }
     }
 
-    // ۱) چک موجودی
+    // Phase 1 — Pre-flight (بدون mutation)
     const shortages = checkStock({
       vaccines: form.vaccines,
       medications: form.medications,
@@ -121,194 +123,202 @@ export function useDlgSave(params: UseDlgSaveParams) {
       if (!ok) { setSaving(false); return false; }
     }
 
-    // ۲) اعتبارسنجی — به Zod منتقل شد (rules/dlg.ts)
-
+    // Pre-compute (pure)
     const feedAmt = num(form.feedDelivered);
-    const newMovementIds: string[] = [];
-
-    // ۳) حذف movementهای قدیمی دان
-    if (form.feedMovementIds.length > 0) {
-      form.feedMovementIds.forEach(id => deleteMovement(id));
-    }
-
-    // ۴) ساخت movementهای جدید دان
-    if (form.feedSourceId && feedAmt && feedAmt > 0) {
-      const feedData = buildFeedMovements({
-        feedSourceType: form.feedSourceType,
-        feedSourceId: form.feedSourceId,
-        feedDelivered: feedAmt,
-        flockName: selectedFlock?.name || '',
-        formulas,
-        ingredients,
-      });
-      feedData.forEach(d => {
-        const item = whsItems.find(x => x.id === d.itemId);
-        const price = Number(item?.lastPrice) || Number(item?.avgPrice) || 0;
-        const mid = addMovement({
-          itemId: d.itemId, type: 'out',
-          quantity: d.quantity, unitPrice: price, reason: 'consumption',
-          date: form.date, partyId: '',
-          notes: d.notes,
-          flockId: form.flockId || undefined,
-        } as any);
-        if (mid) newMovementIds.push(mid);
-      });
-    }
-
-    // ۵) حذف movementهای قدیمی واکسن/دارو (اگه ویرایش)
-    if (form.id) {
-      const oldLog = logs.find(l => l.id === form.id);
-      oldLog?.vaccines?.forEach(v => {
-        if (v.movementId) { try { deleteMovement(v.movementId); } catch {} }
-      });
-      oldLog?.medications?.forEach(m => {
-        if (m.movementId) { try { deleteMovement(m.movementId); } catch {} }
-      });
-    }
-
-    // ۶) ساخت movementهای جدید واکسن/دارو
-    const processedVaccines = form.vaccines.map(v => {
-      const d = buildVaccineMovement(v);
-      if (!d) return { ...v, movementId: '' };
-      const vacItem = whsItems.find(x => x.id === d.itemId);
-      const vacPrice = Number(vacItem?.lastPrice) || Number(vacItem?.avgPrice) || 0;
-      const mid = addMovement({ ...d, type: 'out', unitPrice: vacPrice, reason: 'consumption', date: form.date, partyId: '', flockId: form.flockId || undefined } as any);
-      return { ...v, movementId: mid || '' };
-    });
-    const processedMedications = form.medications.map(m => {
-      const d = buildMedicationMovement(m);
-      if (!d) return { ...m, movementId: '' };
-      const medItem = whsItems.find(x => x.id === d.itemId);
-      const medPrice = Number(medItem?.lastPrice) || Number(medItem?.avgPrice) || 0;
-      const mid = addMovement({ ...d, type: 'out', unitPrice: medPrice, reason: 'consumption', date: form.date, partyId: '', flockId: form.flockId || undefined } as any);
-      return { ...m, movementId: mid || '' };
-    });
-
-    // ۷) ساخت داده نهایی
-    const birdAgeDays = selectedFlock
-      ? getBirdAgeAt(selectedFlock, form.date)
-      : null;
-
+    const birdAgeDays = selectedFlock ? getBirdAgeAt(selectedFlock, form.date) : null;
     const previousRemainingKg = findPreviousRemaining(logs, form);
+    const oldLogSnapshot = form.id ? (logs.find(l => l.id === form.id) || null) : null;
 
-    const data = buildLogData({
-      form,
-      processedVaccines,
-      processedMedications,
-      feedMovementIds: newMovementIds,
-      birdAgeDays,
-      previousRemainingKg,
-    });
+    let finalData: Omit<DailyLog, 'id' | 'status' | 'createdAt' | 'updatedAt'> | null = null;
 
-    // ۸) ذخیره
-    let logId: string;
-    if (form.id) {
-      update(form.id, data);
-      logId = form.id;
-    } else {
-      logId = add(data);
-    }
+    // Phase 2-6 — Execute atomic
+    const result = await atomicTransaction<string>({
+      stores: [dlgStore, whsStore, eggStore, flkStore],
+      execute: () => {
+        // ۳) حذف movementهای قدیمی دان
+        if (form.feedMovementIds.length > 0) {
+          form.feedMovementIds.forEach(id => deleteMovement(id));
+        }
 
-    // 🆕 ذخیره activeWithdrawal روی گله (Silent — بدون نمایش)
-    try {
-      const meds = form.medications || [];
-      const maxWithdrawal = meds.reduce((a, m) => Math.max(a, m.withdrawalDays || 0), 0);
-      if (maxWithdrawal > 0 && form.flockId) {
-        const until = addJalaliDays(form.date, maxWithdrawal);
-        if (until) {
+        // ۴) ساخت movementهای جدید دان
+        const newMovementIds: string[] = [];
+        if (form.feedSourceId && feedAmt && feedAmt > 0) {
+          const feedData = buildFeedMovements({
+            feedSourceType: form.feedSourceType,
+            feedSourceId: form.feedSourceId,
+            feedDelivered: feedAmt,
+            flockName: selectedFlock?.name || '',
+            formulas,
+            ingredients,
+          });
+          feedData.forEach(d => {
+            const item = whsItems.find(x => x.id === d.itemId);
+            const price = Number(item?.lastPrice) || Number(item?.avgPrice) || 0;
+            const mid = addMovement({
+              itemId: d.itemId, type: 'out',
+              quantity: d.quantity, unitPrice: price, reason: 'consumption',
+              date: form.date, partyId: '',
+              notes: d.notes,
+              flockId: form.flockId || undefined,
+            } as any);
+            if (!mid) throw new Error(`حرکت انبار برای "${d.notes}" ساخته نشد`);
+            newMovementIds.push(mid);
+          });
+        }
+
+        // ۵) حذف movementهای قدیمی واکسن/دارو
+        if (form.id && oldLogSnapshot) {
+          oldLogSnapshot.vaccines?.forEach(v => {
+            if (v.movementId) deleteMovement(v.movementId);
+          });
+          oldLogSnapshot.medications?.forEach(m => {
+            if (m.movementId) deleteMovement(m.movementId);
+          });
+        }
+
+        // ۶) ساخت movementهای جدید واکسن/دارو
+        const processedVaccines = form.vaccines.map(v => {
+          const d = buildVaccineMovement(v);
+          if (!d) return { ...v, movementId: '' };
+          const vacItem = whsItems.find(x => x.id === d.itemId);
+          const vacPrice = Number(vacItem?.lastPrice) || Number(vacItem?.avgPrice) || 0;
+          const mid = addMovement({ ...d, type: 'out', unitPrice: vacPrice, reason: 'consumption', date: form.date, partyId: '', flockId: form.flockId || undefined } as any);
+          if (!mid) throw new Error('حرکت واکسن ساخته نشد');
+          return { ...v, movementId: mid };
+        });
+        const processedMedications = form.medications.map(m => {
+          const d = buildMedicationMovement(m);
+          if (!d) return { ...m, movementId: '' };
+          const medItem = whsItems.find(x => x.id === d.itemId);
+          const medPrice = Number(medItem?.lastPrice) || Number(medItem?.avgPrice) || 0;
+          const mid = addMovement({ ...d, type: 'out', unitPrice: medPrice, reason: 'consumption', date: form.date, partyId: '', flockId: form.flockId || undefined } as any);
+          if (!mid) throw new Error('حرکت دارو ساخته نشد');
+          return { ...m, movementId: mid };
+        });
+
+        // ۷) ساخت داده نهایی + ذخیره
+        const data = buildLogData({
+          form,
+          processedVaccines,
+          processedMedications,
+          feedMovementIds: newMovementIds,
+          birdAgeDays,
+          previousRemainingKg,
+        });
+        finalData = data;
+
+        let logId: string;
+        if (form.id) {
+          update(form.id, data);
+          logId = form.id;
+        } else {
+          logId = add(data);
+        }
+
+        // ۸) activeWithdrawal (با B1c-minimal)
+        const meds = form.medications || [];
+        const maxWithdrawal = meds.reduce((a, m) => Math.max(a, m.withdrawalDays || 0), 0);
+        if (maxWithdrawal > 0 && form.flockId) {
+          const until = addJalaliDays(form.date, maxWithdrawal);
+          if (until) {
+            const flk = useFlk.getState();
+            const flock = flk.flocks.find(f => f.id === form.flockId);
+            if (flock) {
+              const existingUntil = flock.activeWithdrawal?.until || '';
+              const finalUntil = existingUntil && existingUntil > until ? existingUntil : until;
+              const medName = meds.find(m => (m.withdrawalDays || 0) === maxWithdrawal)?.name || 'دارو';
+              flk.update(form.flockId, {
+                activeWithdrawal: {
+                  until: finalUntil,
+                  medicine: medName,
+                  days: maxWithdrawal,
+                  startedAt: form.date,
+                  logId,
+                },
+              } as any);
+            }
+          }
+        } else if (form.flockId) {
           const flk = useFlk.getState();
           const flock = flk.flocks.find(f => f.id === form.flockId);
-          if (flock) {
-            const existingUntil = flock.activeWithdrawal?.until || '';
-            const finalUntil = existingUntil && existingUntil > until ? existingUntil : until;
-            const medName = meds.find(m => (m.withdrawalDays || 0) === maxWithdrawal)?.name || 'دارو';
-            flk.update(form.flockId, {
-              activeWithdrawal: {
-                until: finalUntil,
-                medicine: medName,
-                days: maxWithdrawal,
-                startedAt: form.date,
-                logId,
-              },
-            } as any);
+          if (flock?.activeWithdrawal?.logId === logId) {
+            flk.update(form.flockId, { activeWithdrawal: undefined } as any);
           }
         }
-      } else if (form.flockId) {
-        // 🆕 D5.5/B1c-minimal — اگر دارو حذف شد، activeWithdrawal پاک شود
-        // فقط اگر این لاگ مالک فعلی باشد (چند-لاگ → B4-Recalc در HANDOFF v11)
-        const flk = useFlk.getState();
-        const flock = flk.flocks.find(f => f.id === form.flockId);
-        if (flock?.activeWithdrawal?.logId === logId) {
-          flk.update(form.flockId, { activeWithdrawal: undefined } as any);
+
+        // ۹) sync با egg
+        const action = decideEggAction({
+          input: {
+            logId,
+            flockId: form.flockId,
+            date: form.date,
+            isLayerFlock,
+            eatingEggs: int(form.eatingEggs) || 0,
+            fertileEggs: int(form.fertileEggs) || 0,
+            brokenEggs: int(form.brokenEggs) || 0,
+            otherEggs: int(form.otherEggs) || 0,
+          },
+          existing: findByLogId(logId),
+        });
+        if (action.type === 'add') addProduction(action.data);
+        else if (action.type === 'update') updateProduction(action.id, action.data);
+        else if (action.type === 'delete') deleteProduction(action.id);
+
+        return logId;
+      },
+      // Phase 7 — Commit (فقط بعد از موفقیت ۱۰۰٪)
+      onSuccess: (logId) => {
+        if (finalData) {
+          void outbox.publish('dlg:deaths:recorded', {
+            logId,
+            flockId: finalData.flockId,
+            date: finalData.date,
+            count: finalData.deathsCount || 0,
+            deaths: finalData.deaths || [],
+            isEdit: !!form.id,
+            prevCount: oldLogSnapshot?.deathsCount || 0,
+            prevFlockId: oldLogSnapshot?.flockId,
+          });
         }
-      }
-    } catch { /* silent */ }
 
-    // ۹) sync با egg
-    try {
-      const action = decideEggAction({
-        input: {
-          logId,
-          flockId: form.flockId,
-          date: form.date,
-          isLayerFlock,
-          eatingEggs: int(form.eatingEggs) || 0,
-          fertileEggs: int(form.fertileEggs) || 0,
-          brokenEggs: int(form.brokenEggs) || 0,
-          otherEggs: int(form.otherEggs) || 0,
-        },
-        existing: findByLogId(logId),
-      });
-      if (action.type === 'add') addProduction(action.data);
-      else if (action.type === 'update') updateProduction(action.id, action.data);
-      else if (action.type === 'delete') deleteProduction(action.id);
-    } catch { /* silent */ }
+        toastMsg.saved('ثبت روزانه');
 
-    // ۱۰) emit event برای تلفات
-    const oldLog = form.id ? (logs.find(l => l.id === form.id) || null) : null;
-    try {
-      bus.emit('dlg:deaths:recorded', {
-        logId,
-        flockId: data.flockId,
-        date: data.date,
-        count: data.deathsCount || 0,
-        deaths: data.deaths || [],
-        isEdit: !!form.id,
-        prevCount: oldLog?.deathsCount || 0,
-        prevFlockId: oldLog?.flockId,
-      }, { source: 'dlg/save' });
-    } catch { /* silent */ }
+        try {
+          const ctxIntel = { flockSize: flockAliveCount, currentCount: flockAliveCount, femaleCount: selectedFlock?.femaleCount ?? undefined };
+          const recN = (p: string, v: number | null) => {
+            if (v !== null && Number.isFinite(v) && v > 0) recordHistory(p, v, ctxIntel);
+          };
+          recN('dlg.feedDelivered', num(form.feedDelivered));
+          recN('dlg.feedRemaining', num(form.feedRemaining));
+          recN('dlg.waterAmount', num(form.waterAmount));
+          recN('dlg.waterFillCount', num(form.waterFillCount));
+          recN('dlg.waterFillVolume', num(form.waterFillVolume));
+          if (finalData) {
+            recN('dlg.temperature', typeof finalData.temperature === 'number' ? finalData.temperature : null);
+            recN('dlg.humidity', typeof finalData.humidity === 'number' ? finalData.humidity : null);
+            recN('dlg.deathsCount', Number(finalData.deathsCount) || null);
+          }
+          recN('dlg.temperatureMin', num(form.temperatureMin));
+          recN('dlg.temperatureMax', num(form.temperatureMax));
+          recN('dlg.eatingEggs', int(form.eatingEggs));
+          recN('dlg.fertileEggs', int(form.fertileEggs));
+          recN('dlg.brokenEggs', int(form.brokenEggs));
+          recN('dlg.otherEggs', int(form.otherEggs));
+          recN('egg.eatingCount', int(form.eatingEggs));
+          recN('egg.fertileCount', int(form.fertileEggs));
+          recN('egg.brokenCount', int(form.brokenEggs));
+        } catch { /* silent */ }
+      },
+      onError: (err) => {
+        toastMsg.error('خطا در ذخیره — همه تغییرات لغو شد: ' + err.message);
+      },
+    });
 
-    toastMsg.saved('ثبت روزانه');
+    setSaving(false);
 
-    // 🆕 ثبت تاریخچه برای Intelligence (silent — بدون تغییر UX)
-    try {
-      const ctxIntel = { flockSize: flockAliveCount, currentCount: flockAliveCount, femaleCount: selectedFlock?.femaleCount ?? undefined };
-      const recN = (p: string, v: number | null) => {
-        if (v !== null && Number.isFinite(v) && v > 0) recordHistory(p, v, ctxIntel);
-      };
-      recN('dlg.feedDelivered', num(form.feedDelivered));
-      recN('dlg.feedRemaining', num(form.feedRemaining));
-      recN('dlg.waterAmount', num(form.waterAmount));
-      recN('dlg.waterFillCount', num(form.waterFillCount));
-      recN('dlg.waterFillVolume', num(form.waterFillVolume));
-      recN('dlg.temperature', typeof data.temperature === 'number' ? data.temperature : null);
-      recN('dlg.temperatureMin', num(form.temperatureMin));
-      recN('dlg.temperatureMax', num(form.temperatureMax));
-      recN('dlg.humidity', typeof data.humidity === 'number' ? data.humidity : null);
-      recN('dlg.deathsCount', Number(data.deathsCount) || null);
-      recN('dlg.eatingEggs', int(form.eatingEggs));
-      recN('dlg.fertileEggs', int(form.fertileEggs));
-      recN('dlg.brokenEggs', int(form.brokenEggs));
-      recN('dlg.otherEggs', int(form.otherEggs));
-      // 🆕 sync با egg.* (cross_field lte_female — تشخیص «تخم بیشتر از مرغ»)
-      recN('egg.eatingCount', int(form.eatingEggs));
-      recN('egg.fertileCount', int(form.fertileEggs));
-      recN('egg.brokenCount', int(form.brokenEggs));
-    } catch { /* silent */ }
+    if (!result.ok) return false;
 
     setOpen(false);
-    setSaving(false);
     return true;
   };
 
