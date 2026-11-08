@@ -49,6 +49,22 @@ export interface Activity {
   notes: string;
 }
 
+export interface DailyLogCorrection {
+  id: string;
+  /** ساعت اصلاح (HH:MM) */
+  timestamp: string;
+  /** دلیل (از dropdown) */
+  reason: string;
+  /** فقط فیلدهای تغییرکرده */
+  changes: Partial<DailyLog>;
+  /** توضیح آزاد */
+  notes?: string;
+  /** لغو شده توسط کاربر */
+  revoked?: boolean;
+  /** زمان ثبت اصلاح */
+  createdAt: string;
+}
+
 export interface DailyLog {
   id: string;
   flockId: string;
@@ -114,6 +130,9 @@ export interface DailyLog {
 
   // متادیتا
   status: LogStatus;
+  /** 🆕 اصلاحات اعمال‌شده (append-only، قابل لغو) */
+  corrections?: DailyLogCorrection[];
+
   birdAgeDays: number | null;
   createdAt: string;
   updatedAt: string;
@@ -143,6 +162,7 @@ export const useDlg = create<State>()(
           eatingEggs: (l as any).eatingEggs ?? null,
           fertileEggs: (l as any).fertileEggs ?? null,
           otherEggs: (l as any).otherEggs ?? null,
+          corrections: (l as any).corrections ?? [],
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         } as DailyLog;
@@ -168,8 +188,16 @@ export const useDlg = create<State>()(
     }),
     {
       name: 'pm-dlg',
-      version: 14,
+      version: 15,
       migrate: (persisted: any, version: number) => {
+        // ═══ v15 — corrections[] (اختیاری، backward-compat) ═══
+        if (version < 15 && persisted?.logs) {
+          persisted.logs = persisted.logs.map((l: any) => ({
+            ...l,
+            corrections: l.corrections ?? [],
+          }));
+        }
+
         if (version < 2 && persisted?.logs) {
           persisted.logs = persisted.logs.map((l: any) => ({
             ...l,
