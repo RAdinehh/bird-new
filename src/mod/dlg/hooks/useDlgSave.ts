@@ -122,9 +122,9 @@ function recomputeActiveWithdrawal(
         startedAt: ownerStartedAt,
         logId: ownerLogId,
       },
-    } as any);
+    });
   } else if (flock.activeWithdrawal) {
-    flk.update(flockId, { activeWithdrawal: undefined } as any);
+    flk.update(flockId, { activeWithdrawal: undefined });
   }
 }
 
@@ -216,7 +216,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
               date: form.date, partyId: '',
               notes: d.notes,
               flockId: form.flockId || undefined,
-            } as any);
+            });
             if (!mid) throw new Error(`حرکت انبار برای "${d.notes}" ساخته نشد`);
             newMovementIds.push(mid);
           });
@@ -238,7 +238,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
           if (!d) return { ...v, movementId: '' };
           const vacItem = whsItems.find(x => x.id === d.itemId);
           const vacPrice = Number(vacItem?.lastPrice) || Number(vacItem?.avgPrice) || 0;
-          const mid = addMovement({ ...d, type: 'out', unitPrice: vacPrice, reason: 'consumption', date: form.date, partyId: '', flockId: form.flockId || undefined } as any);
+          const mid = addMovement({ ...d, type: 'out', unitPrice: vacPrice, reason: 'consumption', date: form.date, partyId: '', flockId: form.flockId || undefined });
           if (!mid) throw new Error('حرکت واکسن ساخته نشد');
           return { ...v, movementId: mid };
         });
@@ -247,7 +247,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
           if (!d) return { ...m, movementId: '' };
           const medItem = whsItems.find(x => x.id === d.itemId);
           const medPrice = Number(medItem?.lastPrice) || Number(medItem?.avgPrice) || 0;
-          const mid = addMovement({ ...d, type: 'out', unitPrice: medPrice, reason: 'consumption', date: form.date, partyId: '', flockId: form.flockId || undefined } as any);
+          const mid = addMovement({ ...d, type: 'out', unitPrice: medPrice, reason: 'consumption', date: form.date, partyId: '', flockId: form.flockId || undefined });
           if (!mid) throw new Error('حرکت دارو ساخته نشد');
           return { ...m, movementId: mid };
         });
