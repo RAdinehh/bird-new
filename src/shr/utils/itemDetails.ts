@@ -134,4 +134,6 @@ export interface ItemCategoryFields {
   model?: string;
   warrantyMonths?: number | null;
   equipmentId?: string;
+  equipmentKind?: string;
+  brand?: string;
 }

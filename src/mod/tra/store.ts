@@ -154,10 +154,10 @@ export const useTra = create<State>()(
               const st4 = useFlk.getState();
               const affected = new Map<string, number>();
               for (const it of itemsFinal || []) {
-                const itCat = (it as any).category || mergedWithItems.category;
+                const itCat = it.category || mergedWithItems.category;
                 if (!BIRD_CATS.includes(itCat)) continue;
                 if (!it.flockId) continue;
-                const qty = ((it as any).healthyCount ?? it.quantity) || 0;
+                const qty = (it.healthyCount ?? it.quantity) || 0;
                 if (qty <= 0) continue;
                 affected.set(it.flockId, (affected.get(it.flockId) || 0) + qty);
               }
@@ -487,8 +487,8 @@ export const useTra = create<State>()(
           const flk = useFlk.getState();
           for (const it of inv.items || []) {
             if (!it.birdId || !it.flockId) continue;
-            if (!BIRD_CATS.includes((it as any).category || inv.category)) continue;
-            const qty = ((it as any).healthyCount ?? it.quantity) || 0;
+            if (!BIRD_CATS.includes(it.category || inv.category)) continue;
+            const qty = (it.healthyCount ?? it.quantity) || 0;
             if (qty <= 0) continue;
             const f = flk.flocks.find(x => x.id === it.flockId);
             if (!f) continue;
@@ -497,9 +497,9 @@ export const useTra = create<State>()(
             const patchRevert: any = {
               currentCount: inv.type === 'purchase' ? Math.max(0, cur - qty) : cur + qty,
             };
-            const mDelta = Number((it as any).maleCount || 0);
-            const fDelta = Number((it as any).femaleCount || 0);
-            const uDelta = Number((it as any).unknownCount || 0);
+            const mDelta = Number(it.maleCount || 0);
+            const fDelta = Number(it.femaleCount || 0);
+            const uDelta = Number(it.unknownCount || 0);
             const gSum = mDelta + fDelta + uDelta;
             if (gSum > 0) {
               if (mDelta > 0) patchRevert.maleCount = Math.max(0, (f.maleCount ?? 0) + sign * mDelta);
@@ -521,7 +521,7 @@ export const useTra = create<State>()(
             const st6 = useFlk.getState();
             const affectedIds6 = new Set<string>();
             for (const it of inv.items || []) {
-              const fid = (it as any).flockId;
+              const fid = it.flockId;
               if (fid) affectedIds6.add(fid);
             }
             if (affectedIds6.size > 0) {
@@ -588,10 +588,10 @@ export const useTra = create<State>()(
       try {
         const halState = useHal.getState();
         for (const it of inv.items || []) {
-          const cat = (it as any).category || inv.category;
+          const cat = it.category || inv.category;
           if (cat !== 'equipment') continue;
-          if ((it as any).equipmentKind === 'consumable') continue;
-          const eqId = (it as any).equipmentId;
+          if (it.equipmentKind === 'consumable') continue;
+          const eqId = it.equipmentId;
           const qty = Number(it.quantity) || 1;
           if (!eqId) continue;
           const eq = halState.equipment.find((e: any) => e.id === eqId);
@@ -602,10 +602,10 @@ export const useTra = create<State>()(
             // تجهیز حذف شده بود → بازسازی
             try {
               halState.addEquip({
-                hallId: (it as any).hallId || '',
-                zoneId: (it as any).zoneId || '',
-                category: (it as any).equipmentCategory || 'other',
-                type: (it as any).equipmentType || 'other',
+                hallId: it.hallId || '',
+                zoneId: it.zoneId || '',
+                category: it.equipmentCategory || 'other',
+                type: it.equipmentType || 'other',
                 name: it.description || 'تجهیز',
                 count: qty,
                 unit: it.unit || 'pcs',
@@ -613,10 +613,10 @@ export const useTra = create<State>()(
                 purchasedAt: '',
                 warranty: null,
                 notes: `بازگشت از حذف فاکتور ${inv.number || ''}`,
-                brand: (it as any).brand || '',
+                brand: it.brand || '',
                 supplierId: '',
                 sourceInvoiceId: '',
-                model: (it as any).model || '',
+                model: it.model || '',
                 status: 'active',
               } as any);
             } catch (e) { console.error('[tra delete] equip restore:', e); }
@@ -646,13 +646,13 @@ export const useTra = create<State>()(
       try {
         const whsState = useWhs.getState();
         for (const it of inv.items || []) {
-          const cat = (it as any).category || inv.category;
+          const cat = it.category || inv.category;
           const isStock = ['feed', 'medicine', 'vaccine', 'herbal', 'other', 'manure', 'broken', 'egg', 'fertile_egg'].includes(cat);
-          const isEquipConsumable = cat === 'equipment' && (it as any).equipmentKind === 'consumable';
+          const isEquipConsumable = cat === 'equipment' && it.equipmentKind === 'consumable';
           if (!isStock && !isEquipConsumable) continue;
           const qty = Number(it.quantity) || 0;
           if (qty <= 0) continue;
-          const stockItemId = (it as any).stockItemId;
+          const stockItemId = it.stockItemId;
           if (!stockItemId) continue;
           const wItem = whsState.items.find((i: any) => i.id === stockItemId);
           if (!wItem) continue;
