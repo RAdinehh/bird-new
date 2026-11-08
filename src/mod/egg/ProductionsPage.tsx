@@ -6,6 +6,7 @@ import ProductionFormModal from './components/ProductionFormModal';
 import DiscardFormModal from './components/DiscardFormModal';
 import { format as formatJ } from 'date-fns-jalali';
 import { useFab } from '../../shr/hooks/useFab';
+import { useWhs } from '../whs/store';
 import { useEgg, healthyCount, henDayRate, brokenRate, type EggProduction } from './store';
 import { useFlk, getAgeDays } from '../flk/store';
 import { useBrd } from '../brd/store';
@@ -86,11 +87,21 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
       const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' ثبت تخم‌گذاری حذف شوند؟', { danger: true });
       if (!ok) return;
       const backups: any[] = [];
-      for (const id of ids) {
-        const it = productions.find(p => p.id === id);
-        if (!it) continue;
-        backups.push(it);
-        try { deleteProduction(id); } catch {}
+      const { productions: __prevProds } = useEgg.getState();
+      const __prevWhsItems = useWhs.getState().items;
+      const __prevWhsMovs = useWhs.getState().movements;
+      try {
+        for (const id of ids) {
+          const it = productions.find(p => p.id === id);
+          if (!it) continue;
+          backups.push(it);
+          deleteProduction(id);
+        }
+      } catch (e) {
+        useEgg.setState({ productions: __prevProds });
+        useWhs.setState({ items: __prevWhsItems, movements: __prevWhsMovs });
+        showToast('خطا در حذف گروهی — همه تغییرات لغو شد: ' + (e instanceof Error ? e.message : String(e)), 'error');
+        return;
       }
       if (backups.length > 0) {
         setUndoData({ item: backups });
@@ -108,12 +119,17 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
   const undoDelete = () => {
     const item = undoData;
     if (!item) return;
+    const arr = Array.isArray(item.item) ? item.item : [item.item];
+    const { productions: __prevProdsR } = useEgg.getState();
+    const __prevWhsItemsR = useWhs.getState().items;
+    const __prevWhsMovsR = useWhs.getState().movements;
     try {
-      const arr = Array.isArray(item.item) ? item.item : [item.item];
       for (const it of arr) addProduction(it);
       toastMsg.restoredBulk(arr.length, 'ثبت')
-    } catch {
-      toastMsg.error('بازگردانی ناموفق')
+    } catch (e) {
+      useEgg.setState({ productions: __prevProdsR });
+      useWhs.setState({ items: __prevWhsItemsR, movements: __prevWhsMovsR });
+      toastMsg.error('بازگردانی ناموفق: ' + (e instanceof Error ? e.message : String(e)));
     }
     setUndoData(null);
   };
