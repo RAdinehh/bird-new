@@ -52,6 +52,7 @@
 - **Phase D.8** — inc atomic (`addHatch`/`deleteHatch` + flk cascade، ۴ تست) ✅
 - **Phase D.9** — flk merge/unmerge atomic by design (single set، ۵ تست + DECISIONS) ✅
 - **Phase D.10** — whs atomic by design (single set، ۸ تست + DECISIONS) ✅
+- **dlg negative tests** — `deleteLog`/`restoreLogFull` rollback اثبات (۴ تست، `d4f9dd23`) ✅
 
 ### 🚧 In progress — D6 (tra atomic)
 
@@ -63,7 +64,7 @@
 | **D.9** | flk atomic by design (merge/unmerge) | ✅ |
 | **D.10** | whs atomic by design (movements) | ✅ |
 
-**🏆 D-Series کامل — ۶ ماژول atomic با ۳۸ تست: dlg, tra, egg, inc, flk, whs**
+**🏆 D-Series کامل — ۶ ماژول atomic با ۴۷ تست: dlg, tra, egg, inc, flk, whs**
 
 ### ⏳ بعدی — به ترتیب پیشنهادی
 
