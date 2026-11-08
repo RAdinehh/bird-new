@@ -19,6 +19,8 @@ import { getStandardFor } from '../../set/standards/resolve';
 import { getAgeDays } from '../helpers-store';
 import { calculateEPEF } from '../../../shr/calc/formulas/epef';
 import { calculateMortality } from '../../../shr/calc/formulas/mortality';
+import { calculateStockingDensity } from '../../../shr/calc/formulas/stocking';
+import { useHal } from '../../hal/store';
 
 const REASON_OPTIONS: { value: FlockEventReasonCode; label: string }[] = [
   { value: 'data_entry_error', label: 'خطای ثبت' },
@@ -229,6 +231,23 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
       standardDailyPct: null,
       standardWeeklyPct: null,
       standardTotalPct: null,
+    });
+  })();
+
+  // 🆕 Stocking — چگالی گله (پرنده در متر مربع)
+  const stockingResult = (() => {
+    if (!flock.hallId) return null;
+    const hall = useHal.getState().halls.find(h => h.id === flock.hallId);
+    if (!hall) return null;
+    const areaSqM = (hall.length || 0) * (hall.width || 0);
+    if (areaSqM <= 0) return null;
+    const aliveCount = flock.currentCount || 0;
+    if (aliveCount <= 0) return null;
+
+    return calculateStockingDensity({
+      aliveCount,
+      hallAreaSqM: areaSqM,
+      standardDensityMax: null,  // استاندارد نژاد در future
     });
   })();
 
@@ -617,6 +636,22 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
             <div style={{ fontSize: 10, color: 'var(--muted)', lineHeight: 1.6 }}>
               از {toFa(flock.initialCount || 0)} پرنده اولیه
             </div>
+          </div>
+        </div>
+      )}
+      {stockingResult && stockingResult.densityBirdPerSqM > 0 && (
+        <div>
+          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>📐 چگالی</div>
+          <div style={{ padding: '8px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 11 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+              <span style={{ fontSize: 14, fontWeight: 700 }}>{toFa(stockingResult.densityBirdPerSqM)}</span>
+              <span style={{ fontSize: 9, padding: '1px 5px', borderRadius: 3, background: 'var(--muted)', color: 'white', fontWeight: 700 }}>پرنده/م²</span>
+            </div>
+            {stockingResult.warning && (
+              <div style={{ fontSize: 10, color: 'var(--warn)', lineHeight: 1.6, fontWeight: 600 }}>
+                ⚠ {stockingResult.warning}
+              </div>
+            )}
           </div>
         </div>
       )}
