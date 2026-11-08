@@ -20,6 +20,7 @@ import { deriveSaleEvents, sumSexForFlock } from '../flk/helpers-sex';
 import { applyInvoiceStock } from './applyStock';
 import { generateInvoiceNumber, paidSum } from './calc';
 import { showToast } from '../../cor/store/toast';
+import { ALL_STORES } from '../../cor/atomic';
 import { useInc } from '../inc/store';
 import { setPartyCredit } from '../ctc/store';
 import { partyBalance } from './formulas';
@@ -440,6 +441,8 @@ export const useTra = create<State>()(
       },
       listDeletedInvoices: () => listRecycleBin<DeletedInvoiceSnapshot>('tra').map((e) => e.item),
       deleteInvoice: (id) => {
+        const __snaps = ALL_STORES.map(s => ({ store: s, snap: s.getSnapshot() }));
+        try {
         const inv = get().invoices.find(x => x.id === id);
         // 🆕 Backup Before Mutation (recycle bin)
         // D6-D2: Capture recycle-bin data BEFORE mutations
@@ -476,7 +479,7 @@ export const useTra = create<State>()(
           const flkState = useFlk.getState();
           const linked = flkState.flocks.filter((f: any) => f.sourceInvoiceId === id);
           linked.forEach((f: any) => {
-            try { flkState.update(f.id, { sourceInvoiceId: '', sourceCategory: '' }); } catch (e) { console.error('[tra delete] flock unlink failed:', e); }
+            try { flkState.update(f.id, { sourceInvoiceId: '', sourceCategory: '' }); } catch (e) { console.error('[tra delete] flock unlink failed:', e); throw e; }
           });
           if (linked.length > 0) {
             // Merge info — no separate toast (single notification policy)
@@ -551,7 +554,7 @@ export const useTra = create<State>()(
                 }),
               });
             }
-          } catch (e) { console.error('[deleteInvoice] post-loop fix failed:', e); }
+          } catch (e) { console.error('[deleteInvoice] post-loop fix failed:', e); throw e; }
 
       // 🆕 فیکس ۳: Revoke sell events این فاکتور
       try {
@@ -573,7 +576,7 @@ export const useTra = create<State>()(
             }),
           });
         }
-      } catch (e) { console.error('[deleteInvoice] sell events revoke failed:', e); }
+      } catch (e) { console.error('[deleteInvoice] sell events revoke failed:', e); throw e; }
           // 🎯 rollback حرکات انبار از طریق Event Bus
           // ⚠️ Event Bus حذف شد — manual reversal کافی است (پایین‌تر انجام می‌شه)
       // 🎯 rollback فروش تخم (egg.sales) — جلوگیری از orphan
@@ -581,9 +584,9 @@ export const useTra = create<State>()(
         const eggState = useEgg.getState();
         const linkedSales = (eggState.sales || []).filter((s: any) => s.sourceInvoiceId === id);
         for (const sale of linkedSales) {
-          try { eggState.deleteSale(sale.id); } catch (e) { console.error('[tra delete] egg.deleteSale failed:', e); }
+          try { eggState.deleteSale(sale.id); } catch (e) { console.error('[tra delete] egg.deleteSale failed:', e); throw e; }
         }
-      } catch (e) { console.error('[tra delete] egg sales reversal:', e); }
+      } catch (e) { console.error('[tra delete] egg sales reversal:', e); throw e; }
 
       // 🎯 rollback تجهیزات فروش — برگرداندن به hal
       try {
@@ -598,7 +601,7 @@ export const useTra = create<State>()(
           const eq = halState.equipment.find((e: any) => e.id === eqId);
           if (eq) {
             // تجهیز هنوز هست → تعداد رو برگردون
-            try { halState.updateEquip(eqId, { count: (eq.count || 0) + qty }); } catch (e) { console.error('[tra delete] hal.updateEquip failed:', e); }
+            try { halState.updateEquip(eqId, { count: (eq.count || 0) + qty }); } catch (e) { console.error('[tra delete] hal.updateEquip failed:', e); throw e; }
           } else {
             // تجهیز حذف شده بود → بازسازی
             try {
@@ -620,27 +623,27 @@ export const useTra = create<State>()(
                 model: it.model || '',
                 status: 'active',
               });
-            } catch (e) { console.error('[tra delete] equip restore:', e); }
+            } catch (e) { console.error('[tra delete] equip restore:', e); throw e; }
           }
         }
-      } catch (e) { console.error('[tra delete] hal equip reversal:', e); }
+      } catch (e) { console.error('[tra delete] hal equip reversal:', e); throw e; }
 
           // 🎯 rollback ورودی‌های تخم در جوجه‌کشی
           try {
             const incState = useInc.getState();
             const linkedEntries = (incState.eggEntries || []).filter((e: any) => e.sourceInvoiceId === id);
             for (const entry of linkedEntries) {
-              try { incState.deleteEntry(entry.id); } catch (e) { console.error('[tra delete] inc.deleteEntry failed:', e); }
+              try { incState.deleteEntry(entry.id); } catch (e) { console.error('[tra delete] inc.deleteEntry failed:', e); throw e; }
             }
-          } catch (e) { console.error('[tra delete] inc entries reversal failed:', e); }
+          } catch (e) { console.error('[tra delete] inc entries reversal failed:', e); throw e; }
       // 🆕 حذف Equipmentهای ساخته‌شده از این فاکتور
       try {
         const halState = useHal.getState();
         const linkedEq = halState.equipment.filter((e: any) => e.sourceInvoiceId === id);
         for (const eq of linkedEq) {
-          try { halState.deleteEquip(eq.id); } catch (e) { console.error('[tra delete] hal.deleteEquip failed:', e); }
+          try { halState.deleteEquip(eq.id); } catch (e) { console.error('[tra delete] hal.deleteEquip failed:', e); throw e; }
         }
-      } catch (e) { console.error('[tra delete] equipment cleanup:', e); }
+      } catch (e) { console.error('[tra delete] equipment cleanup:', e); throw e; }
         }
         // 🆕 برگشت موجودی انبار (out movement)
     if (inv) {
@@ -670,15 +673,15 @@ export const useTra = create<State>()(
               sourceModule: 'tra',
               sourceId: inv.id,
             });
-          } catch (e) { console.error('[tra delete] whs reversal:', e); }
+          } catch (e) { console.error('[tra delete] whs reversal:', e); throw e; }
         }
-      } catch (e) { console.error('[tra delete] whs state:', e); }
+      } catch (e) { console.error('[tra delete] whs state:', e); throw e; }
     }
 
     if (inv) {
           const paymentIds = new Set((inv.payments || []).map((p: any) => p.partyPaymentId).filter(Boolean));
           for (const ppId of paymentIds) {
-            try { get().deletePartyPayment(ppId as string); } catch(e) { console.error('[tra delete] deletePartyPayment failed:', e); }
+            try { get().deletePartyPayment(ppId as string); } catch(e) { console.error('[tra delete] deletePartyPayment failed:', e); throw e; }
           }
         }
         set({ invoices: get().invoices.filter(x => x.id !== id) });
@@ -697,7 +700,14 @@ export const useTra = create<State>()(
           }
         }
     try { verifyInvariantsIfDev(); } catch(e) { console.error('[tra delete] verifyInvariantsIfDev failed:', e); }
-        try { if (inv) setPartyCredit(inv.partyId, computePartyCredit(inv.partyId, get().invoices, get().allocations)); } catch(e) { console.error('[tra delete] setPartyCredit failed:', e); }
+        try { if (inv) setPartyCredit(inv.partyId, computePartyCredit(inv.partyId, get().invoices, get().allocations)); } catch(e) { console.error('[tra delete] setPartyCredit failed:', e); throw e; }
+              } catch (__err) {
+          for (const { store, snap } of __snaps) {
+            try { store.restore(snap); } catch (e) { console.error('[atomic rollback]', store.name, e); }
+          }
+          showToast('خطا در حذف — همه تغییرات لغو شد: ' + (__err instanceof Error ? __err.message : String(__err)), 'error');
+          throw __err;
+        }
       },
 
       // ═══ Phase 6: پرداخت‌های طرف حساب ═══
