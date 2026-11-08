@@ -7,16 +7,20 @@ import type { DailyLog } from '../store';
 import { toEn, toFa } from '../../../shr/utils/fa';
 
 const CORRECTABLE_FIELDS = [
-  { key: 'temperature',   label: '🌡 دما',       unit: '°C' },
-  { key: 'humidity',      label: '💧 رطوبت',     unit: '٪' },
-  { key: 'feedDelivered', label: '🌾 دان داده',  unit: 'kg' },
-  { key: 'feedRemaining', label: '🌾 دان باقی',  unit: 'kg' },
-  { key: 'waterAmount',   label: '💧 آب',        unit: 'L' },
-  { key: 'deathsCount',   label: '💀 تلفات',     unit: '' },
-  { key: 'eatingEggs',    label: '🥚 خوراکی',    unit: 'عدد' },
-  { key: 'fertileEggs',   label: '🌱 نطفه‌دار',  unit: 'عدد' },
-  { key: 'brokenEggs',    label: '💔 شکسته',     unit: 'عدد' },
-  { key: 'otherEggs',     label: '📦 سایر',      unit: 'عدد' },
+  { key: 'temperature',    label: '🌡 دما (میا.)',   unit: '°C' },
+  { key: 'temperatureMin', label: '🌡 حداقل دما',    unit: '°C' },
+  { key: 'temperatureMax', label: '🌡 حداکثر دما',   unit: '°C' },
+  { key: 'humidity',       label: '💧 رطوبت (میا.)', unit: '٪' },
+  { key: 'humidityMin',    label: '💧 حداقل رطوبت',  unit: '٪' },
+  { key: 'humidityMax',    label: '💧 حداکثر رطوبت', unit: '٪' },
+  { key: 'feedDelivered',  label: '🌾 دان داده',     unit: 'kg' },
+  { key: 'feedRemaining',  label: '🌾 دان باقی',     unit: 'kg' },
+  { key: 'waterAmount',    label: '💧 آب',           unit: 'L' },
+  { key: 'deathsCount',    label: '💀 تلفات',        unit: '' },
+  { key: 'eatingEggs',     label: '🥚 خوراکی',       unit: 'عدد' },
+  { key: 'fertileEggs',    label: '🌱 نطفه‌دار',     unit: 'عدد' },
+  { key: 'brokenEggs',     label: '💔 شکسته',        unit: 'عدد' },
+  { key: 'otherEggs',      label: '📦 سایر',         unit: 'عدد' },
 ] as const;
 
 type CorrectableKey = typeof CORRECTABLE_FIELDS[number]['key'];
