@@ -17,7 +17,7 @@ import { logAction } from '../../../cor/logger/auditLog';
 import { toFa } from '../../../shr/utils/fa';
 import { bus } from '../../../cor/events';
 import LogCard from './LogCard';
-import { CorrectionForm } from './CorrectionForm';
+import CorrectionModal from './CorrectionModal';
 import type { Flock } from '../../flk/store';
 import type { Bird } from '../../brd/store';
 
@@ -48,7 +48,7 @@ export default function DlgTabPanel({
 }: Props) {
   const { add, archive, restore, addCorrection, revokeCorrection } = useDlg();
   const [undoData, setUndoData] = useState<{ log: DailyLog | DailyLog[]; snapshot?: DeleteSnapshot } | null>(null);
-  const [correctingLogId, setCorrectingLogId] = useState<string | null>(null);
+  const [correctingLog, setCorrectingLog] = useState<DailyLog | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useFab(active ? { label: 'ثبت امروز', onClick: onAdd } : null);
@@ -150,19 +150,8 @@ export default function DlgTabPanel({
         onArchive={() => archive(l.id)}
         onRestore={() => restore(l.id)}
         onDelete={() => handleDeleteOne(l)}
-        onCorrect={() => setCorrectingLogId(l.id)}
+        onCorrect={() => setCorrectingLog(l)}
         onRevokeCorrection={(corrId) => revokeCorrection(l.id, corrId)}
-        correctionSlot={correctingLogId === l.id ? (
-          <CorrectionForm
-            log={l}
-            onSave={(changes, reason, notes) => {
-              addCorrection(l.id, changes, reason, notes);
-              setCorrectingLogId(null);
-              toastMsg.saved('اصلاح');
-            }}
-            onCancel={() => setCorrectingLogId(null)}
-          />
-        ) : undefined}
       />
     );
   };
@@ -231,6 +220,17 @@ export default function DlgTabPanel({
           {list.map((l, i) => renderLogCard(l, i))}
         </>
       )}
-    </PageContainer>
+    <CorrectionModal
+      open={!!correctingLog}
+      onClose={() => setCorrectingLog(null)}
+      log={correctingLog}
+      onSave={(logId, changes, reason, notes) => {
+        addCorrection(logId, changes, reason, notes);
+        toastMsg.saved('اصلاح');
+        setCorrectingLog(null);
+      }}
+    />
+
+        </PageContainer>
   );
 }

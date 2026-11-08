@@ -41,14 +41,13 @@ export interface LogCardProps {
   onDelete: () => void;
   onCorrect: () => void;
   onRevokeCorrection: (correctionId: string) => void;
-  correctionSlot?: ReactNode;
 }
 
 export default function LogCard(props: LogCardProps) {
   const {
     log: rawLog, index: i, flock, birdName,
     isOpen, selectionMode, vaccineEnabled, medicineEnabled, ms,
-    onToggle, onEdit, onArchive, onRestore, onDelete, onCorrect, onRevokeCorrection, correctionSlot,
+    onToggle, onEdit, onArchive, onRestore, onDelete, onCorrect, onRevokeCorrection,
   } = props;
 
   // 🆕 مقدار effective = با corrections اعمال‌شده
@@ -324,7 +323,6 @@ export default function LogCard(props: LogCardProps) {
         { label: 'حذف', onClick: onDelete, variant: 'danger-outline', hidden: (l.status || 'active') === 'active' },
         { label: '✏️ اصلاح', onClick: onCorrect, variant: 'outline', hidden: (l.status || 'active') !== 'active' }
       ]} />
-      {correctionSlot}
     </ExpandableCard>
   );
 }
