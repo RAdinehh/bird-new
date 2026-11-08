@@ -11,16 +11,7 @@ import { downloadBackup, exportAll, formatSize, getStats, importAll, readFile, t
 import { toEn, toFa } from '../../shr/utils/fa';
 import { MODULE_LABELS, useSet } from './store';
 
-export function Section({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div>
-      <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', padding: '4px 4px 8px', letterSpacing: '.5px' }}>{title}</div>
-      <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', padding: '10px 10px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {children}
-      </div>
-    </div>
-  );
-}
+export { Section } from '../../shr/components/ui/Layout';
 
 export function InfoRow({ label, value }: { label: string; value: any }) {
   return (
