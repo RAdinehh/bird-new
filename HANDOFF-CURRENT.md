@@ -118,11 +118,15 @@
 
 ## 🎯 ترتیب بعدی
 
-1. **Phase E — UI/UX فرم ۴۷ فیلدی dlg** (چند جلسه) ← مهم‌ترین برای کاربر
-2. F (cross-module events), G (Draft), H (CSV)
-3. C8 (EggSale.quality)
-4. D5.4 (`_v`/`_txid`) — همراه server
-5. Cleanup: ۷ calc orphan، softCount، entryTime، avgWeight
+**→ این ترتیب با «⏳ بعدی» بالا یکسان است — بخش قبلی (Phase E) تکمیل شد.**
+
+1. **۷ calc orphan** — FCR, Mortality, Egg, Weight, Stocking, EPEF, Water
+2. **`softCount: 0`** — `toEgg.ts:52`
+3. **`calculateFCR` helpers-audit:246**
+4. **`entryTime` Zod mismatch**
+5. **۳ نسخهٔ موازی avgWeight**
+6. بعد: G (Draft), H (CSV), C8 (EggSale.quality)
+7. D5.4 (`_v`/`_txid`) — همراه server
 
 ## 📝 آپدیت این فایل
 
