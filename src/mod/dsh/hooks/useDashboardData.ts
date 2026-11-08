@@ -161,10 +161,10 @@ const [, _setTick] = useState(0);
     return (totalHealthy / (layingAliveCount * days)) * 100;
   }, [productions, layingAliveCount]);
 
-  // تخم شکسته درصد — ۷ روز
+  // تخم شکسته درصد — ۷ روز (fix: totalCount شامل broken است، جمع دوباره = باگ)
   const brokenRate7 = useMemo(() => {
     const last7 = productions.filter(p => dateDiffDays(p.date) <= 7);
-    const total = last7.reduce((a, p) => a + (p.totalCount || 0) + (p.brokenCount || 0), 0);
+    const total = last7.reduce((a, p) => a + (p.totalCount || 0), 0);
     const broken = last7.reduce((a, p) => a + (p.brokenCount || 0), 0);
     if (total === 0) return 0;
     return (broken / total) * 100;

@@ -73,3 +73,34 @@ export function calculateEggMetrics(params: EggParams): EggResult {
     dirtyTone: dirtyR < 2 ? 'accent' : dirtyR < 5 ? 'warn' : 'danger',
   };
 }
+
+
+/**
+ * aggregateEggMetrics — تجمیع metrics تخم برای N روز
+ *
+ * calculateEggMetrics برای یک روز طراحی شده. برای ۷ روز اخیر،
+ * مجموع healthy/broken/dirty را می‌گیریم و بر N تقسیم می‌کنیم،
+ * بعد calculateEggMetrics را صدا می‌زنیم.
+ */
+export function aggregateEggMetrics(
+  days: number,
+  eggsHealthyTotal: number,
+  eggsBrokenTotal: number,
+  eggsDirtyTotal: number,
+  aliveToday: number,
+  initialCount: number,
+  standardHenDayPct: number | null,
+  standardHenHousedPct: number | null,
+): EggResult {
+  const n = days > 0 ? days : 1;
+  return calculateEggMetrics({
+    eggsToday: eggsHealthyTotal / n,
+    eggsBroken: eggsBrokenTotal / n,
+    eggsDirty: eggsDirtyTotal / n,
+    eggsCumulative: 0,
+    aliveToday,
+    initialCount,
+    standardHenDayPct,
+    standardHenHousedPct,
+  });
+}
