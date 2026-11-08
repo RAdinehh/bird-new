@@ -687,3 +687,25 @@ Zustand `set()` = atomic (single shallow merge). هر action یک `set()` دار
 - نیازی به wrap whs action ها با `atomicTransactionSync` نیست — theater می‌شود
 - اگر `batchMovements`/`transferStock` آینده اضافه شد، snapshot/rollback در همان action لازم است (الگوی D.7)
 - تست fake items باید `initialStock` داشته باشند (کشف D10)
+
+---
+
+## UI/SectionTitle (1405/11/08) — یکسان‌سازی بصری، نه DRY
+
+**زمینه:** ۷ نسخه `SectionTitle` در کد پیدا شد (Layout.tsx + 6 helpers.tsx محلی) با ۳ سبک مختلف (A: کوچک/خاکستری، B: مشکی بدون border، C: مشکی با border-top).
+
+**تصمیم:**
+- سبک C به‌عنوان استاندارد انتخاب شد (اکثریت ~۳۰ مورد)
+- `Layout.tsx` به سبک C تغییر کرد (commit `4c045f1c` + `b73e7969`)
+- ۶ نسخه محلی فقط از نظر `fontWeight` هماهنگ شدند (700 → 600)
+- **تلاش برای حذف ۶ نسخه محلی با re-export شکست خورد** (brace parser باگ داشت، tsc 12+ خطا)
+
+**نتیجه:**
+- ✅ بصری: ۴۶ فایل حالا یکسان (weight 600 + color text + border-top dashed)
+- 🟡 DRY: ۶ نسخه هنوز جدا — `dsh/cards.tsx`, `egg/dlg/whs/fed/tra` helpers
+
+**هشدار برای AI جدید:**
+- اگر روزی `Layout.tsx` SectionTitle عوض شد → ۶ فایل محلی باید دستی هماهنگ شوند
+- اگر DRY واقعی خواستید → فایل‌به‌فایل با `sed` + بررسی دستی، **نه brace parser خودکار** (تجربه شکست خورده)
+
+**درس:** DRY کردن تعریف تابع با brace parser خودکار، در برابر تنوع ساختار (parمتر nested, default value) شکننده است. رویکرد امن: تغییر inline style بدون حذف تابع.
