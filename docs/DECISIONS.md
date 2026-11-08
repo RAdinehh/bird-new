@@ -874,18 +874,4 @@ Zustand `set()` = atomic (single shallow merge). هر action یک `set()` دار
 
 ---
 
-## C8 — Egg Quality grading: تصمیم «نه» (1405/11/08)
 
-**تصمیم:** C8 (افزودن `quality` / `weightClass` به EggSale/InvoiceItem) **پیاده‌سازی نمی‌شود**.
-
-**دلیل:**
-- کاربر هدف: **مرغ مادر (breeder)** — تخم برای جوجه‌کشی، کیفیت بصری مهم نیست
-- گوشتی و زینتی: تخم نمی‌فروشند
-- تخم‌گذار (layer): نژاد مشخص، وزن تخم را خودش می‌داند
-- نتیجه: feature برای ~۹۰٪ کاربران بی‌فایده
-
-**اگر آینده لازم شد:**
-- `git show c31321d4` برای reference (split soft/dirty)
-- C8 مشابه: `quality` + migration قابل برگشت
-
-**درس:** User domain knowledge > standard generic features.
