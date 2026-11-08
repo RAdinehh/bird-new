@@ -131,7 +131,7 @@ export const incStore: AtomicStore = {
       eggEntries: s.eggEntries,
       candlings: s.candlings,
       hatches: s.hatches,
-      hatchGroups: (s as any).hatchGroups || [],
+      hatchGroups: s.hatchGroups,
     };
   },
   restore: (snap) => useInc.setState({
@@ -140,7 +140,7 @@ export const incStore: AtomicStore = {
     candlings: snap.candlings,
     hatches: snap.hatches,
     hatchGroups: snap.hatchGroups,
-  } as any),
+  }),
 };
 
 /** همه storeها (برای استفاده در ماژول‌ها) */
