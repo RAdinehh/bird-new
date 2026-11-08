@@ -62,14 +62,14 @@ export default function EnvironmentSection({ form, setForm, vErrors, showError, 
       </Grid2>
 
       <Grid2>
-        <Field label="تهویه">
+        <Field label="تهویه" hint="ضعیف = افزایش دما، استرس گرمایی • شدید = افزایش سردی، استرس سرمایی">
           <Select value={form.ventilation} onChange={e => setForm({ ...form, ventilation: e.target.value })}>
             <option value="ok">مناسب</option>
             <option value="low">ضعیف</option>
             <option value="high">شدید</option>
           </Select>
         </Field>
-        <Field label="بستر">
+        <Field label="بستر" hint="مرطوب = خیس شدن بستر • کلوخه = بستر سفت، زیر و رو لازم">
           <Select value={form.litter} onChange={e => setForm({ ...form, litter: e.target.value })}>
             <option value="dry">خشک</option>
             <option value="wet">مرطوب</option>
@@ -79,7 +79,7 @@ export default function EnvironmentSection({ form, setForm, vErrors, showError, 
       </Grid2>
 
       <Grid3>
-        <Field label="رفتار">
+        <Field label="رفتار" hint="بی‌حال = احتمال بیماری • پرهیجان = استرس">
           <Select value={form.behavior} onChange={e => setForm({ ...form, behavior: e.target.value })}>
             <option value="active">فعال</option>
             <option value="lethargic">بی‌حال</option>
@@ -92,7 +92,7 @@ export default function EnvironmentSection({ form, setForm, vErrors, showError, 
             <option value="cornered">گوشه‌گیر</option>
           </Select>
         </Field>
-        <Field label="صدا">
+        <Field label="صدا" hint="سرفه یا عطسه = بیماری تنفسی محتمل">
           <Select value={form.sound} onChange={e => setForm({ ...form, sound: e.target.value })}>
             <option value="normal">طبیعی</option>
             <option value="cough">سرفه</option>
@@ -101,7 +101,7 @@ export default function EnvironmentSection({ form, setForm, vErrors, showError, 
         </Field>
       </Grid3>
 
-      <Field label="ظاهر عمومی">
+      <Field label="ظاهر عمومی" hint="رنگ پر، چشم، تاج، منقار — جزئیات را بنویسید">
         <Textarea rows={2} placeholder="رنگ پر، چشم، تاج، منقار..." value={form.appearance} onChange={e => setForm({ ...form, appearance: e.target.value })} />
       </Field>
 
