@@ -145,9 +145,9 @@ function eggApplyCascade(productionId: string, p: any): void {
 
 function eggDeleteCascade(prev: any): void {
   const whs = useWhs.getState();
-  if (prev.eatingMovementId) { try { whs.deleteMovement(prev.eatingMovementId); } catch {} }
-  if (prev.fertileMovementId) { try { whs.deleteMovement(prev.fertileMovementId); } catch {} }
-  if (prev.consumptionMovementId) { try { whs.deleteMovement(prev.consumptionMovementId); } catch {} }
+  if (prev.eatingMovementId) { try { whs.deleteMovement(prev.eatingMovementId); } catch (e) { throw e; } }
+  if (prev.fertileMovementId) { try { whs.deleteMovement(prev.fertileMovementId); } catch (e) { throw e; } }
+  if (prev.consumptionMovementId) { try { whs.deleteMovement(prev.consumptionMovementId); } catch (e) { throw e; } }
 }
 
 export function registerEggWhsHandlers(): () => void {
@@ -155,18 +155,18 @@ export function registerEggWhsHandlers(): () => void {
     try {
       if (!data.production) return;
       eggApplyCascade(data.prodId, data.production);
-    } catch (e) { try { console.error('[whs] egg created failed:', e); } catch {} }
+    } catch (e) { console.error('[whs] egg created failed:', e); throw e; }
   });
   const off2 = bus.on('egg:production:updated', (data) => {
     try {
       if (data.prevProduction) eggDeleteCascade(data.prevProduction);
       if (data.production) eggApplyCascade(data.prodId, data.production);
-    } catch (e) { try { console.error('[whs] egg updated failed:', e); } catch {} }
+    } catch (e) { console.error('[whs] egg updated failed:', e); throw e; }
   });
   const off3 = bus.on('egg:production:deleted', (data) => {
     try {
       if (data.production) eggDeleteCascade(data.production);
-    } catch (e) { try { console.error('[whs] egg deleted failed:', e); } catch {} }
+    } catch (e) { console.error('[whs] egg deleted failed:', e); throw e; }
   });
   return () => { off1(); off2(); off3(); };
 }
