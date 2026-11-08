@@ -808,3 +808,21 @@ Zustand `set()` = atomic (single shallow merge). هر action یک `set()` دار
 | ۵ | Weight | `65c82b57` |
 | ۶ | Stocking | `95c52d2c` |
 | ۷ | Water | `68b8dcb7` |
+
+---
+
+## C+D — aggregateEggMetrics + avgWeight unify (1405/11/08)
+
+**C:** `dsh/henDay7 + brokenRate7` → `aggregateEggMetrics` (commit `45e9878c`).
+- helper از قبل ساخته شده در `5b581c3f`
+- نتیجه: صفر inline loop، صفر brokenRate bug
+- تست: `calc-egg.test.ts` (11) + `Dashboard.test.tsx` (1) پاس
+
+**D:** `avgWeight unify` (commit `45e9878c`).
+- **قبل:** ۳ نسخه (`dlg/store`, `calc/formulas/weight`, `dsh inline`)
+- **بعد:** ۲ نسخه — `dlg/store` (kg، برای UI) + `calc/formulas/weight` (g، برای calc)
+- `dsh inline` → `dlg/store.avgWeight/cvWeight` (kg حفظ شد، صفر تغییر بصری)
+
+**نتیجه:** صفر inline محاسبه mean/cv در `dsh`.
+
+**درس:** `calc/formulas/weight` و `dlg/store` **دو نقش متفاوت** دارند — اولی for formulas (g، `MIN_SAMPLES=3`)، دومی for UI (kg، هر تعداد). این تفکیک **درست است، نه duplication**.

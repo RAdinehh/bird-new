@@ -71,6 +71,8 @@
 - **Water calc** — متصل در dsh (calculateWaterMetrics جایگزین inline) ✅
 
 **🏆 ۷/۷ calc orphan همه متصل: FCR، EPEF، Egg، Mortality، Weight، Stocking، Water**
+- **C** — `dsh/henDay7 + brokenRate7` → `aggregateEggMetrics` ✅
+- **D** — `avgWeight unify` — `dsh inline` → `dlg/store.avgWeight/cvWeight` (۳ → ۲) ✅
 
 ### 🚧 In progress — Stocking + Water
 
@@ -87,22 +89,21 @@
 
 ### ⏳ بعدی — به ترتیب پیشنهادی
 
-1. **`entryTime` Zod mismatch** — type اجباری، validation اختیاری
-2. **`dsh` استفاده از `aggregateEggMetrics`** — helper آماده
-3. **۳ نسخهٔ موازی avgWeight** — یکسان‌سازی
-4. بعد: G (Draft Mode), H (CSV), C8 (EggSale.quality)
-5. D5.4 (`_v`/`_txid`) — همراه server
+1. **`entryTime` Zod mismatch** — تنها شکاف باقی‌مانده از DLG-AUDIT
+2. بعد: G (Draft Mode), H (CSV), C8 (EggSale.quality)
+3. D5.4 (`_v`/`_txid`) — همراه server
 
 ## 🐛 شکاف‌های باز (از DLG-AUDIT، به‌روز شده)
 
-- **`entryTime` Zod mismatch** — type اجباری، validation اختیاری
-- **۳ نسخهٔ موازی avgWeight** (dlg/store، calc/weight، dsh inline)
-- **`dsh` aggregateEggMetrics** — helper آماده، متصل نشده
+- **`entryTime` Zod mismatch** — تنها شکاف باقی‌مانده از DLG-AUDIT
 
 **حل‌شده در این جلسه:**
 - ۷/۷ calc orphan متصل
-- `softCount: 0` → تصمیم UX (DECISIONS)
-- `calculateFCR` helpers-audit:246 → fix در `7afd3aa5`
+- `softCount: 0` → تصمیم UX
+- `calculateFCR` helpers-audit:246 → fix
+- ۳ نسخه avgWeight → ۲ (dlg/store + calc/formulas)
+- `aggregateEggMetrics` متصل در dsh
+- avgWeight/cvWeight unify در dsh
 
 **حل‌شده (نه باگ):**
 - `softCount: 0` → تصمیم UX (DECISIONS 1405/11/08)
