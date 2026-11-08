@@ -85,6 +85,23 @@ export function useDlgSave(params: UseDlgSaveParams) {
     if (saving) return false;
     setSaving(true);
 
+    // 🆕 D5.5/B1b — flockId/date قفل در ویرایش
+    if (form.id) {
+      const oldLog = logs.find(l => l.id === form.id);
+      if (oldLog) {
+        if (oldLog.flockId !== form.flockId) {
+          toastMsg.error('گله در ویرایش قابل تغییر نیست — لاگ را حذف و مجدد ثبت کنید');
+          setSaving(false);
+          return false;
+        }
+        if (oldLog.date !== form.date) {
+          toastMsg.error('تاریخ در ویرایش قابل تغییر نیست — لاگ را حذف و مجدد ثبت کنید');
+          setSaving(false);
+          return false;
+        }
+      }
+    }
+
     // ۱) چک موجودی
     const shortages = checkStock({
       vaccines: form.vaccines,
