@@ -82,7 +82,8 @@ export function Sheet({
         <div style={{
           display: 'flex', alignItems: 'center',
           justifyContent: 'space-between',
-          paddingBottom: 4, gap: 8,
+          paddingBottom: 10, marginBottom: 8, gap: 8,
+          borderBottom: '1px solid var(--border)',
         }}>
           {title ? (
             <div style={{

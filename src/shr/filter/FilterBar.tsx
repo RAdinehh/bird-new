@@ -164,7 +164,7 @@ export function FilterBar<T>({
           <button type="button" onClick={() => setOpenGroup(true)}
             aria-label="گروه‌بندی" style={topBtn(groupBy !== 'none')}>
             <span>📁</span>
-            <span>{groupBy !== 'none' ? 'گروه‌بندی' : 'گروه'}</span>
+            <span>گروه</span>
           </button>
         )}
         
