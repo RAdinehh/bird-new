@@ -40,6 +40,7 @@ export interface LogCardProps {
   onRestore: () => void;
   onDelete: () => void;
   onCorrect: () => void;
+  onHistory?: () => void;
   onRevokeCorrection: (correctionId: string) => void;
 }
 
@@ -47,7 +48,7 @@ export default function LogCard(props: LogCardProps) {
   const {
     log: rawLog, index: i, flock, birdName,
     isOpen, selectionMode, vaccineEnabled, medicineEnabled, ms,
-    onToggle, onEdit, onArchive, onRestore, onDelete, onCorrect, onRevokeCorrection,
+    onToggle, onEdit, onArchive, onRestore, onDelete, onCorrect, onRevokeCorrection, onHistory,
   } = props;
 
   // 🆕 مقدار effective = با corrections اعمال‌شده
@@ -321,7 +322,8 @@ export default function LogCard(props: LogCardProps) {
         { label: '📦 آرشیو', onClick: onArchive, variant: 'outline', hidden: (l.status || 'active') !== 'active' },
         { label: '♻️ بازگردانی', onClick: onRestore, variant: 'primary', hidden: (l.status || 'active') === 'active' },
         { label: 'حذف', onClick: onDelete, variant: 'danger-outline', hidden: (l.status || 'active') === 'active' },
-        { label: '✏️ اصلاح', onClick: onCorrect, variant: 'outline', hidden: (l.status || 'active') !== 'active' }
+        { label: '✏️ اصلاح', onClick: onCorrect, variant: 'outline', hidden: (l.status || 'active') !== 'active' },
+        { label: '📜 تاریخچه', onClick: () => onHistory?.(), variant: 'outline', hidden: onHistory === undefined }
       ]} />
     </ExpandableCard>
   );
