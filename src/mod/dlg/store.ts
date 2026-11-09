@@ -4,6 +4,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
+import type { DlgEvent } from './types-events';
 
 export interface Death {
   id: string;
@@ -127,6 +128,9 @@ export interface DailyLog {
 
   // یادداشت
   notes: string;
+
+  // 🆕 v16 — رویدادهای ثبت روزانه (الگوی FlockEvent)
+  events?: DlgEvent[];
 
   // متادیتا
   status: LogStatus;
