@@ -169,7 +169,7 @@
 ### ۳.۱ کار با کاربر
 1. کاربر کدنویس نیست — اسکریپت آماده بده، توضیح فنی نه
 2. یه تغییر در هر مرحله — چند کار با هم ممنوع
-3. بعد از هر تغییر: `python3 ~/auto_fast.py "پیام"`
+3. بعد از هر تغییر: `bash scripts/cp.sh "پیام"`
 4. قبل از تغییر بزرگ تأیید بگیر (shr، layout، store، props)
 
 ### ۳.۲ کامپوننت‌های قفل‌شده 🔒
@@ -197,7 +197,6 @@
 - `.bak`, `.save*` هرگز commit نشن
 - پیام commit با `feat:` / `fix:` / `docs:` / `refactor:`
 - قبل از تغییر بزرگ: `git tag before-xxx`
-- `auto_fast.py` خودش tsc + build + commit + push + rollback داره
 
 ### ۳.۵ مستندات
 - هر تغییر مهم → `docs/STATUS.md`
