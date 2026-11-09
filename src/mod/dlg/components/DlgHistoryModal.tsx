@@ -10,7 +10,6 @@ import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
 import { useDlg, type DailyLog } from '../store';
 import type { DlgEvent, DlgEventType } from '../types-events';
-import CorrectionModal from './CorrectionModal';
 
 const TYPE_META: Record<DlgEventType, { icon: string; label: string; tone: string }> = {
   create:     { icon: '➕', label: 'ثبت اولیه',   tone: 'var(--accent)' },
@@ -41,7 +40,6 @@ type TimelineItem =
   | { kind: 'correction'; time: string; correction: NonNullable<DailyLog['corrections']>[number] };
 
 export default function DlgHistoryModal({ open, onClose, log }: Props) {
-  const [correctionOpen, setCorrectionOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const { addCorrection, revokeEvent, revokeCorrection } = useDlg();
 
@@ -89,12 +87,6 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
     revokeCorrection(log.id, corrId);
   };
 
-  const handleSaveCorrection = (logId: string, changes: Partial<DailyLog>, reason: string, notes?: string) => {
-    addCorrection(logId, changes, reason, notes);
-    toastMsg.saved('اصلاح');
-    setCorrectionOpen(false);
-  };
-
   if (!log) return null;
 
   return (
@@ -104,7 +96,7 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, flexWrap: 'wrap', gap: 6 }}>
           <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>{toFa(items.length)} رویداد</span>
-          <Btn size="sm" variant="outline" onClick={() => setCorrectionOpen(true)} style={{ borderColor: 'var(--accent)', color: 'var(--accent)', borderWidth: 1.5, fontWeight: 700 }}>+ ثبت اصلاح</Btn>
+          
         </div>
         {items.length === 0 ? (
           <div style={{ padding: 24, textAlign: 'center', color: 'var(--muted)' }}><div style={{ fontSize: 40, marginBottom: 8 }}>📜</div><div>هنوز رویدادی ثبت نشده</div></div>
@@ -118,7 +110,7 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
         )}
         {hidden > 0 && <div style={{ marginTop: 10 }}><ShowMoreButton count={hidden} onClick={() => setShowAll(true)} /></div>}
       </Modal>
-      <CorrectionModal open={correctionOpen} onClose={() => setCorrectionOpen(false)} log={log} onSave={handleSaveCorrection} />
+      
     </>
   );
 }
