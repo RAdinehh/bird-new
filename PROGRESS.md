@@ -1397,3 +1397,12 @@ PENDING — گام بعدی:
 - E: updateInvoice atomic — 5 ساعت
 - F: add atomic — 3 ساعت
 - G: tests — 2 ساعت
+
+---
+
+## dlg v16 events — 1405/08/18
+
+۸ کامیت: ddcf8f65, 14e35a9b, 501f5d53, 71debd9d, d04dfc15, dd8b9285, fa0e29d9, 04c8516f
+- tsc سبز، ۱۵/۱۵ تست dlg pass
+- نیمه‌کاره: DlgHistoryModal → LogCard وصل نیست
+- PENDING: تست addEvent/revokeEvent (L11)، ثبت DECISIONS (L12)، وصل دکمه
