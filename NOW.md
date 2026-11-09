@@ -3,17 +3,19 @@
 > آخرین آپدیت: 1405/11/09
 
 ## HEAD
-94686c33 — feat(dlg): FlockPickerSheet چند لاگ در روز (گله‌محور، A)
+726938c0 — feat(dlg): گروه‌بندی داینامیک (گله/تاریخ) با FilterBar
 
 ## 🔨 کار جاری
-فاز ۱ — dlg گله‌محور. FlockPickerSheet چند لاگ در روز (A) انجام شد.
+فاز ۱ — dlg گله‌محور. FlockPickerSheet (A) + گروه‌بندی داینامیک ✅
 
 ## ✅ امروز (1405/11/09)
-- زیرساخت: NOW+RESUME+cp+IDEAS+start.sh + قانون -۱ (فقط فارسی)
-- AGENTS ۲۲ قانون (۱۳-۲۲)
+- زیرساخت: NOW+RESUME+cp+IDEAS+start.sh + قانون -۱
+- AGENTS ۲۲ قانون
 - باگ activeFlocks حل شد
-- C4 Dunning مستند شد
-- FlockPickerSheet: چند لاگ در روز (A — با جزئیات زمان)
+- C4 Dunning مستند
+- FlockPickerSheet چند لاگ در روز (A)
+- گروه‌بندی داینامیک (`config.groupDefs` در `_types.ts` + `FilterBar` + `dlg.tsx` + `DlgTabPanel`)
+- FlockPickerSheet A: expandable + «➕ ثبت جدید برای همین گله»
 
 ## ⚠️ هشدارها
 - tsc: ۰ خطا ✅
@@ -21,12 +23,12 @@
 - WIP: تمیز ✅
 
 ## 🎯 قدم بعدی
-1. تست دستی FlockPickerSheet در اپ (npm run dev)
-2. گروه‌بندی تب «امروز» بر اساس گله (اختیاری)
-3. خواندن کد dlg (فاز ۱-۵)
+1. تست کامل (سایر صفحات هم گروه‌بندی دارن؟)
+2. خواندن کد dlg (فاز ۱-۵)
+3. گروه‌بندی برای fll/whs/egg هم فعال شه؟
 
 ## ❓ سؤال باز
-- تست دستی یا ادامه کد؟
+- بعدی: گروه‌بندی برای بقیه ماژول‌ها یا کار دیگه؟
 
 ## 📋 منبع حقیقت
 CLAUDE.md (قانون -۱), AGENTS.md, CONSTITUTION.md, DECISIONS.md, STATUS.md
