@@ -1,39 +1,29 @@
 # NOW.md — وضعیت لحظه‌ای
 
-> هر checkpoint بازنویسی می‌شود، نه append.
 > آخرین آپدیت: 1405/11/09
 
 ## HEAD
-7ff23ab8 — حذف _archive + رفع ارجاعات
+c84b65d0 — cp: faz-0: NOW+RESUME+IDEAS+AGENTS
 
 ## 🔨 کار جاری
-فاز ۰ — استقرار سیستم حفظ زمینه
-قدم بعد: RESUME.sh + IDEAS.md + AGENTS (۱۰ قانون جدید)
+فاز ۰ تمام شد. الآن: تست واقعی RESUME.sh با AI جدید.
 
-## ✅ امروز (1405/11/09)
-- مستندات: ۴۶ → ۲۵ فایل
-- AGENTS.md تمیز (تکرار قوانین ۸-۱۲ حذف)
-- docs/PROGRESS.md حذف (auto_fast وجود ندارد)
-- docs/_archive حذف (۱۰ فایل)
-- scripts/cp.sh ساخته شد (Save Game)
+## ✅ امروز
+- مستندات ۴۶→۲۵، AGENTS (۱۰ قانون جدید)، NOW+RESUME+cp+IDEAS
+- _archive، PROGRESS، CONCEPTS، SALE-AUDIT، PLAN، HANDOFF حذف شدن
 
 ## ⚠️ هشدارها
-- WIP: باگ `activeFlocks` در DlgTabPanel.tsx:252
-- ۲ فایل modified: DlgTabPanel + FlockPickerSheet
-- tsc: ۱ خطا (بعد از بازگشت WIP)
-- تست: ✅ ۱۵ pass (Correction)
+- WIP: `activeFlocks` در DlgTabPanel.tsx:252
+- tsc: ۱ خطا (بعد از WIP)
+- تست: ✅ ۱۵ pass
 
 ## 🎯 قدم بعدی
-1. RESUME.sh
-2. IDEAS.md
-3. AGENTS: +۱۰ قانون (۱۳-۲۲)
-4. fix `activeFlocks`
-5. خواندن کد dlg
+1. تست RESUME.sh با AI جدید
+2. اگه OK → fix `activeFlocks`
+3. خواندن کد dlg (فاز ۱-۵)
 
 ## ❓ سؤال باز
-- `activeFlocks` الآن یا بعد؟
+- تست الآن یا بعد از fix؟
 
 ## 📋 منبع حقیقت
-- CLAUDE.md, AGENTS.md
-- docs/CONSTITUTION.md, docs/DECISIONS.md
-- docs/STATUS.md (auto)
+CLAUDE.md, AGENTS.md, CONSTITUTION.md, DECISIONS.md, STATUS.md
