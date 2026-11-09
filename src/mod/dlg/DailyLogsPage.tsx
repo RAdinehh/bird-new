@@ -21,10 +21,11 @@ import { toastMsg } from '../../cor/store/toast';
 import { format as formatJ } from 'date-fns-jalali';
 import FormModal from './components/FormModal';
 import DlgTabPanel from './components/DlgTabPanel';
+import AggregateTabPanel from './components/AggregateTabPanel';
 import { useDlgForm } from './hooks/useDlgForm';
 import { useDlgSave } from './hooks/useDlgSave';
 
-type TabId = 'today' | 'history' | 'archive';
+type TabId = 'today' | 'history' | 'archive' | 'aggregate';
 
 export default function DailyLogsPage() {
   const { logs, add } = useDlg();
@@ -133,7 +134,7 @@ export default function DailyLogsPage() {
   const { showError, markTouched, attemptSave } = useFormErrors(vErrors);
 
   // ─── carousel ───
-  const tabIds: TabId[] = ['today', 'history', 'archive'];
+  const tabIds: TabId[] = ['today', 'history', 'archive', 'aggregate'];
   const { containerRef, trackRef, setInstant } = useCarousel(
     tabIds,
     tab,
@@ -149,15 +150,18 @@ export default function DailyLogsPage() {
     await save();
   };
 
+  const totalActiveLogs = logs.filter(l => (l.status || 'active') === 'active').length;
   const tabCount = (t: TabId) =>
     t === 'today' ? todaysLogs.length :
     t === 'history' ? historicalLogs.length :
+    t === 'aggregate' ? totalActiveLogs :
     archivedLogs.length;
 
   const tabs: { id: TabId; label: string }[] = [
     { id: 'today', label: 'امروز' },
     { id: 'history', label: 'تاریخچه' },
     { id: 'archive', label: 'آرشیو' },
+    { id: 'aggregate', label: '📊 جمع‌بندی' },
   ];
 
   return (
@@ -264,6 +268,13 @@ export default function DailyLogsPage() {
               onAdd={openNew}
               onDeleteLog={handleDeleteLog}
               onRestoreLogFull={restoreLogFull}
+            />
+          </div>
+          <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
+            <AggregateTabPanel
+              active={tab === 'aggregate'}
+              logs={logs}
+              flocks={activeFlocks}
             />
           </div>
         </div>
