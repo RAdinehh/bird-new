@@ -10,6 +10,7 @@ import { useEgg, type EggProduction } from '../../egg/store';
 import { checkStock } from '../api/checkStock';
 import { buildFeedMovements, buildVaccineMovement, buildMedicationMovement } from '../api/toWhs';
 import { buildLogData } from '../api/buildData';
+import { extractEvents } from '../api/extractEvents';
 import { decideEggAction } from '../api/toEgg';
 import { bus } from '../../../cor/events';
 import { showConfirmAsync } from '../../../cor/store/dialog';
@@ -285,6 +286,13 @@ export function useDlgSave(params: UseDlgSaveParams) {
           logId = form.id;
         } else {
           logId = add(data);
+          // 🆕 v16 — رویدادهای اولیه (الگوی FlockEvent)
+          try {
+            const initialEvents = extractEvents({ ...data, id: logId } as any);
+            for (const ev of initialEvents) {
+              useDlg.getState().addEvent(logId, ev);
+            }
+          } catch { /* silent */ }
         }
 
         // ۸) activeWithdrawal — recompute از همه لاگ‌ها (B4-Recalc)
