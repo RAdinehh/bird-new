@@ -158,6 +158,8 @@ interface State {
   ) => string | null;
   /** 🆕 لغو یک اصلاح (idempotent) */
   revokeCorrection: (logId: string, correctionId: string) => boolean;
+  addEvent: (logId: string, ev: Omit<DlgEvent, 'id'|'logId'|'createdAt'>) => string;
+  revokeEvent: (logId: string, eventId: string) => boolean;
 }
 
 export const useDlg = create<State>()(
@@ -224,6 +226,34 @@ export const useDlg = create<State>()(
                 ...x,
                 corrections: (x.corrections || []).map(c =>
                   c.id === correctionId ? { ...c, revoked: true } : c
+                ),
+                updatedAt: new Date().toISOString(),
+              }
+            : x)
+        });
+        return true;
+      },
+      addEvent: (logId, ev) => {
+        const event: DlgEvent = { ...ev, id: uuid(), logId, createdAt: new Date().toISOString() };
+        set({
+          logs: get().logs.map(x => x.id === logId
+            ? { ...x, events: [...(x.events || []), event], updatedAt: new Date().toISOString() }
+            : x)
+        });
+        return event.id;
+      },
+      revokeEvent: (logId, eventId) => {
+        const target = get().logs.find(x => x.id === logId);
+        if (!target) return false;
+        const event = (target.events || []).find(e => e.id === eventId);
+        if (!event) return false;
+        if (event.revoked) return false;
+        set({
+          logs: get().logs.map(x => x.id === logId
+            ? {
+                ...x,
+                events: (x.events || []).map(e =>
+                  e.id === eventId ? { ...e, revoked: true, updatedAt: new Date().toISOString() } : e
                 ),
                 updatedAt: new Date().toISOString(),
               }
