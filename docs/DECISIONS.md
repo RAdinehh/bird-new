@@ -1035,3 +1035,28 @@ UI تغییر: صفر.
 **UI تغییر:** حداقل — `CorrectionModal` ۴ field اضافه، ویرایش مخفی در LogCard اگر correction دارد، warning banner در multi-record
 
 ---
+
+
+---
+
+## تناقض C3 — inline vs modal (1405/08/18)
+
+**مسئله:** DECISIONS قبلی می‌گفت C3 = فرم اصلاح **inline** (الگوی flk)،
+ولی پیاده‌سازی نهایی `CorrectionModal` (modal جدا) شد.
+
+**تصمیم نهایی: modal جدا (کنسل inline).**
+
+**دلیل:**
+1. UX: LogCard badge + دکمه «✏️ اصلاح» → **۱ کلیک** تا modal
+2. inline در `DailyLogHistoryModal` نیاز به ۲+ کلیک دارد (باز modal تاریخچه → انتخاب لاگ → فرم)
+3. `CorrectionModal` ۱۵ تست pass، صفر regression
+4. `applyCorrections` propagation در همه consumerها کار می‌کند (C3-fix)
+5. کاربر معمولاً **یک فیلد** را اصلاح می‌کند — inline برای چند فیلد اضافه‌کاری بود
+
+**DECISIONS قبلی (باطل‌شده):**
+> C3 — LogCard + فرم اصلاح inline (الگوی flk)
+
+**DECISIONS فعلی (معتبر):**
+> C3 — `CorrectionModal` جدا (modal نه inline)
+
+---
