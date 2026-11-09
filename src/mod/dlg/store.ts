@@ -245,8 +245,16 @@ export const useDlg = create<State>()(
     }),
     {
       name: 'pm-dlg',
-      version: 15,
+      version: 16,
       migrate: (persisted: any, version: number) => {
+        // ═══ v16 — events[] (الگوی FlockEvent) ═══
+        if (version < 16 && persisted?.logs) {
+          persisted.logs = persisted.logs.map((l: any) => ({
+            ...l,
+            events: l.events ?? [],
+          }));
+        }
+
         // ═══ v15 — corrections[] (اختیاری، backward-compat) ═══
         if (version < 15 && persisted?.logs) {
           persisted.logs = persisted.logs.map((l: any) => ({
