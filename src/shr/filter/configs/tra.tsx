@@ -2,6 +2,7 @@
 import { IconFolder, IconActivity, IconTag, IconDollar, IconClock, IconUser, IconCalendar, IconChart } from '../../icons';
 import { type Deal, type Invoice, DEAL_LABEL as TRA_DEAL_LABEL, remaining as traRemaining, ageDays as traAgeDays, agingBucket as traAgingBucket, WORKFLOW_LABEL as TRA_WORKFLOW_LABEL } from '../../../mod/tra/store';
 import type { FilterConfig } from './_types';
+import { toFa } from '../../utils/fa';
 
 // ═══════════════════════════════════════════════════
 // tra/DealsPage — معاملات (قراردادها)
@@ -241,6 +242,28 @@ export function getTraInvoicesConfig(ctx: {
         key: 'dueDate', label: 'سرسید', icon: <IconCalendar size={18} />,
         hint: 'نزدیک‌ترین سرسید اول',
         compare: (a: Invoice, b: Invoice) => (a.dueDate || '').localeCompare(b.dueDate || ''),
+      },
+    ],
+    groupDefs: [
+      {
+        key: 'partyId', label: 'طرف حساب',
+        getKey: (i: Invoice) => i.partyId || 'unknown',
+        getLabel: (key: string) => ctx.partyNames[key] || 'بدون طرف حساب',
+      },
+      {
+        key: 'date', label: 'تاریخ',
+        getKey: (i: Invoice) => i.date || 'unknown',
+        getLabel: (key: string) => toFa(key),
+      },
+      {
+        key: 'category', label: 'دسته کالا',
+        getKey: (i: Invoice) => i.category || 'unknown',
+        getLabel: (key: string) => ctx.categories.find(([v]) => v === key)?.[1] || 'نامشخص',
+      },
+      {
+        key: 'workflow', label: 'وضعیت پرداخت',
+        getKey: (i: Invoice) => i.workflowStatus || 'draft',
+        getLabel: (key: string) => (TRA_WORKFLOW_LABEL as any)[key] || 'پیش‌نویس',
       },
     ],
     persistKey: 'tra-invoices',

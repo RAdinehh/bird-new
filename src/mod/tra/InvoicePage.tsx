@@ -15,6 +15,7 @@ import { useCtc } from '../ctc/store';
 import { Btn, Empty, PageContainer, Tag } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { useFilterSort, FilterBar, getTraInvoicesConfig } from '../../shr/filter';
+import { useGroupedList } from '../../shr/filter/useGroupedList';
 import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import HelpBanner from '../../shr/components/HelpBanner';
 import InvoicePrint from './InvoicePrint';
@@ -211,33 +212,20 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
   const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
           resetAll, hasActiveFilters, total: totalFiltered, count, sortStack, appendSort } = fsResult;
 
-  // 🆕 منطق گروه‌بندی (Group By)
-  const groupedList = useMemo(() => {
-    if (groupBy === 'none') return null;
-    const groups: Record<string, { title: string; items: typeof list }> = {};
-    for (const inv of list) {
-      let key = '';
-      let title = '';
-      if (groupBy === 'partyId') {
-        key = inv.partyId || 'unknown';
-        const p = parties.find(c => c.id === inv.partyId);
-        title = p ? p.name : 'بدون طرف حساب';
-      } else if (groupBy === 'date') {
-        key = inv.date || 'unknown';
-        title = toFa(inv.date);
-      } else if (groupBy === 'category') {
-        key = inv.category || 'unknown';
-        const cat = CATEGORIES[isPurchase ? 'purchase' : 'sale'].find(c => c[0] === inv.category);
-        title = cat ? cat[1] : 'نامشخص';
-      } else if (groupBy === 'workflow') {
-        key = inv.workflowStatus || 'draft';
-        title = WORKFLOW_LABEL[inv.workflowStatus as keyof typeof WORKFLOW_LABEL] || 'پیش‌نویس';
-      }
-      if (!groups[key]) groups[key] = { title, items: [] };
-      groups[key].items.push(inv);
-    }
-    return Object.values(groups).sort((a, b) => a.title.localeCompare(b.title, 'fa'));
-  }, [list, groupBy, parties, isPurchase]);
+  // 🆕 گروه‌بندی از هوک مشترک
+  const grouped = useGroupedList({
+    list,
+    groupDefs: config.groupDefs,
+    groupBy,
+    ctx: {
+      partyNames: Object.fromEntries(parties.map(p => [p.id, p.name])),
+      categories: CATEGORIES[isPurchase ? 'purchase' : 'sale'],
+    },
+  });
+  const groupedList = useMemo(
+    () => grouped ? [...grouped].sort((a, b) => a.title.localeCompare(b.title, 'fa')) : null,
+    [grouped],
+  );
   const undoDelete = () => {
     if (!undoData) return;
     const arr = Array.isArray((undoData as any).item) ? (undoData as any).item : [(undoData as any).item];

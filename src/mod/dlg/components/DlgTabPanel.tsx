@@ -8,6 +8,7 @@ import FlockPickerSheet from './FlockPickerSheet';
 import { useDlg, type DailyLog } from '../store';
 import type { DeleteSnapshot } from '../hooks/useDlgSave';
 import { useFilterSort, FilterBar, type getDlgLogsConfig } from '../../../shr/filter';
+import { useGroupedList } from '../../../shr/filter/useGroupedList';
 import { Btn, Empty, PageContainer } from '../../../shr/components/ui';
 import { AccordionSection } from '../../../shr/components/AccordionSection';
 import HelpBanner from '../../../shr/components/HelpBanner';
@@ -71,6 +72,8 @@ export default function DlgTabPanel({
     persistKey: config.persistKey,
     initialSort: config.initialSort,
   });
+
+  const grouped = useGroupedList({ list, groupDefs: config.groupDefs, groupBy, ctx: { flocks: activeFlocks } });
 
   const ms = useMultiSelect({
     items: logs,
@@ -231,27 +234,19 @@ export default function DlgTabPanel({
         />
       ) : (
         <>
-          {groupBy !== 'none' && config.groupDefs ? (() => {
-            const gDef = config.groupDefs.find(g => g.key === groupBy);
-            if (!gDef) return list.map((l, i) => renderLogCard(l, i));
-            const groups = list.reduce((acc, log) => {
-              const k = gDef.getKey(log);
-              if (!acc[k]) acc[k] = [];
-              acc[k].push(log);
-              return acc;
-            }, {} as Record<string, DailyLog[]>);
-            return Object.entries(groups).map(([key, items]) => (
+          {grouped ? (
+            grouped.map(g => (
               <AccordionSection
-                key={key}
-                title={gDef.getLabel(key, { flocks: activeFlocks })}
+                key={g.key}
+                title={g.title}
                 icon="📁"
-                summary={`${toFa(items.length)} ثبت`}
+                summary={`${toFa(g.items.length)} ثبت`}
                 defaultOpen={true}
               >
-                {items.map((l, i) => renderLogCard(l, i))}
+                {g.items.map((l, i) => renderLogCard(l, i))}
               </AccordionSection>
-            ));
-          })() : (
+            ))
+          ) : (
             list.map((l, i) => renderLogCard(l, i))
           )}
         </>
