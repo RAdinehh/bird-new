@@ -8,6 +8,7 @@ import type { Flock } from '../../flk/store';
 import type { Hall } from '../../hal/store';
 import { isLayingReady } from '../../flk/store';
 import { useFed } from '../../fed/store';
+import { useDlg } from '../store';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { feedSystemFromHall, waterSystemFromHall } from '../../../shr/utils/systemType';
 import { showAlert } from '../../../cor/store/dialog';
@@ -38,6 +39,7 @@ export interface UseDlgFormParams {
 
 export function useDlgForm({ activeFlocks, halls, todayStr }: UseDlgFormParams) {
   const { formulas } = useFed();
+  const dlgLogs = useDlg(s => s.logs);
   const [form, setForm] = useState<F>(newLog());
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -60,9 +62,9 @@ export function useDlgForm({ activeFlocks, halls, todayStr }: UseDlgFormParams) 
     return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
   };
 
-  const openNew = () => {
+  const openNew = (flockId?: string) => {
     if (activeFlocks.length === 0) { showToast('اول یک گله بسازید', 'warn'); return; }
-    const flock = activeFlocks[0];
+    const flock = flockId ? (activeFlocks.find(f => f.id === flockId) || activeFlocks[0]) : activeFlocks[0];
     const sys = detectSystems(flock.id);
     // 🆕 اگر فقط یک فرمول active هست، خودکار انتخاب شه
     const activeFormulas = formulas.filter((f) => f.status === 'active');
