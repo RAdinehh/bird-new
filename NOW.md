@@ -3,27 +3,30 @@
 > آخرین آپدیت: 1405/11/09
 
 ## HEAD
-c84b65d0 — cp: faz-0: NOW+RESUME+IDEAS+AGENTS
+94686c33 — feat(dlg): FlockPickerSheet چند لاگ در روز (گله‌محور، A)
 
 ## 🔨 کار جاری
-فاز ۰ تمام شد. الآن: تست واقعی RESUME.sh با AI جدید.
+فاز ۱ — dlg گله‌محور. FlockPickerSheet چند لاگ در روز (A) انجام شد.
 
-## ✅ امروز
-- مستندات ۴۶→۲۵، AGENTS (۱۰ قانون جدید)، NOW+RESUME+cp+IDEAS
-- _archive، PROGRESS، CONCEPTS، SALE-AUDIT، PLAN، HANDOFF حذف شدن
-
-## ✅ WIP حل شد — activeFlocks fix شد
+## ✅ امروز (1405/11/09)
+- زیرساخت: NOW+RESUME+cp+IDEAS+start.sh + قانون -۱ (فقط فارسی)
+- AGENTS ۲۲ قانون (۱۳-۲۲)
+- باگ activeFlocks حل شد
+- C4 Dunning مستند شد
+- FlockPickerSheet: چند لاگ در روز (A — با جزئیات زمان)
 
 ## ⚠️ هشدارها
-- تست: ✅ ۱۵ pass
+- tsc: ۰ خطا ✅
+- تست: ۱۵ pass ✅
+- WIP: تمیز ✅
 
 ## 🎯 قدم بعدی
-1. تست RESUME.sh با AI جدید
-2. اگه OK → fix `activeFlocks`
+1. تست دستی FlockPickerSheet در اپ (npm run dev)
+2. گروه‌بندی تب «امروز» بر اساس گله (اختیاری)
 3. خواندن کد dlg (فاز ۱-۵)
 
 ## ❓ سؤال باز
-- تست الآن یا بعد از fix؟
+- تست دستی یا ادامه کد؟
 
 ## 📋 منبع حقیقت
-CLAUDE.md, AGENTS.md, CONSTITUTION.md, DECISIONS.md, STATUS.md
+CLAUDE.md (قانون -۱), AGENTS.md, CONSTITUTION.md, DECISIONS.md, STATUS.md
