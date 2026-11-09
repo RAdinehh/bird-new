@@ -74,6 +74,21 @@ export function getDlgLogsConfig(ctx: {
         compare: (a: DailyLog, b: DailyLog) => (a.createdAt || '').localeCompare(b.createdAt || ''),
       },
     ],
+    groupDefs: [
+      {
+        key: 'flockId', label: 'گله',
+        getKey: (l: DailyLog) => l.flockId || 'unknown',
+        getLabel: (key: string, ctx: any) => {
+          const f = ctx?.flocks?.find((x: any) => x.id === key);
+          return f?.name || 'نامشخص';
+        },
+      },
+      {
+        key: 'date', label: 'تاریخ',
+        getKey: (l: DailyLog) => l.date || 'unknown',
+        getLabel: (key: string) => key,
+      },
+    ],
     persistKey: 'dlg-logs',
     initialSort: { key: 'date', dir: 'desc' },
   };

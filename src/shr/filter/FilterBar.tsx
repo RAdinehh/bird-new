@@ -26,6 +26,7 @@ interface Props<T> {
   appendSort?: (key: string) => void;
   groupBy?: string;
   setGroupBy?: (val: string) => void;
+  groupDefs?: { key: string; label: string }[];
   recycleCount?: number;
   onOpenRecycleBin?: () => void;
   recycleLabel?: string;
@@ -43,6 +44,7 @@ export function FilterBar<T>({
   appendSort,
   groupBy = 'none',
   setGroupBy,
+  groupDefs,
   recycleCount = 0,
   onOpenRecycleBin,
   recycleLabel = 'فاکتور',
@@ -388,10 +390,14 @@ export function FilterBar<T>({
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {[
               { val: 'none', label: 'بدون گروه‌بندی' },
-              { val: 'partyId', label: 'طرف حساب' },
-              { val: 'date', label: 'تاریخ' },
-              { val: 'category', label: 'دسته کالا' },
-              { val: 'workflow', label: 'وضعیت پرداخت' }
+              ...(groupDefs 
+                ? groupDefs.map(g => ({ val: g.key, label: g.label }))
+                : [
+                    { val: 'partyId', label: 'طرف حساب' },
+                    { val: 'date', label: 'تاریخ' },
+                    { val: 'category', label: 'دسته کالا' },
+                    { val: 'workflow', label: 'وضعیت پرداخت' }
+                  ])
             ].map(opt => (
               <button key={opt.val} type="button" 
                 onClick={() => { setGroupBy(opt.val); setOpenGroup(false); }}

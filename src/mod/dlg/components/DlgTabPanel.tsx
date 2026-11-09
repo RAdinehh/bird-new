@@ -9,6 +9,7 @@ import { useDlg, type DailyLog } from '../store';
 import type { DeleteSnapshot } from '../hooks/useDlgSave';
 import { useFilterSort, FilterBar, type getDlgLogsConfig } from '../../../shr/filter';
 import { Btn, Empty, PageContainer } from '../../../shr/components/ui';
+import { AccordionSection } from '../../../shr/components/AccordionSection';
 import HelpBanner from '../../../shr/components/HelpBanner';
 import MultiSelectBar from '../../../shr/multiSelect/MultiSelectBar';
 import { useMultiSelect } from '../../../shr/multiSelect/useMultiSelect';
@@ -58,6 +59,7 @@ export default function DlgTabPanel({
   const allLogs = useDlg(s => s.logs);
   const todayStr = formatJ(new Date(), 'yyyy/MM/dd');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [groupBy, setGroupBy] = useState<string>('none');
 
   useFab(active ? { label: 'ثبت امروز', onClick: () => setPickerOpen(true) } : null);
 
@@ -192,6 +194,9 @@ export default function DlgTabPanel({
         hasActiveFilters={hasActiveFilters}
         total={total}
         count={count}
+        groupBy={groupBy}
+        setGroupBy={setGroupBy}
+        groupDefs={config.groupDefs}
       />
       {!ms.selectionMode && list.length > 1 && (
         <div style={{ fontSize: '10px', color: 'var(--dim)', textAlign: 'center', paddingBottom: 2 }}>
@@ -226,7 +231,29 @@ export default function DlgTabPanel({
         />
       ) : (
         <>
-          {list.map((l, i) => renderLogCard(l, i))}
+          {groupBy !== 'none' && config.groupDefs ? (() => {
+            const gDef = config.groupDefs.find(g => g.key === groupBy);
+            if (!gDef) return list.map((l, i) => renderLogCard(l, i));
+            const groups = list.reduce((acc, log) => {
+              const k = gDef.getKey(log);
+              if (!acc[k]) acc[k] = [];
+              acc[k].push(log);
+              return acc;
+            }, {} as Record<string, DailyLog[]>);
+            return Object.entries(groups).map(([key, items]) => (
+              <AccordionSection
+                key={key}
+                title={gDef.getLabel(key, { flocks: activeFlocks })}
+                icon="📁"
+                summary={`${toFa(items.length)} ثبت`}
+                defaultOpen={true}
+              >
+                {items.map((l, i) => renderLogCard(l, i))}
+              </AccordionSection>
+            ));
+          })() : (
+            list.map((l, i) => renderLogCard(l, i))
+          )}
         </>
       )}
     <CorrectionModal
