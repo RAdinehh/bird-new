@@ -252,7 +252,8 @@ export default function DlgTabPanel({
         flocks={activeFlocks}
         logs={allLogs}
         todayStr={todayStr}
-        onSelect={(flock, existing) => { if (existing) onEdit(existing); else onAdd(flock.id); }}
+        onEdit={onEdit}
+        onAdd={onAdd}
       />
         </PageContainer>
   );
