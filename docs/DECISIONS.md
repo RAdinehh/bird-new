@@ -1074,11 +1074,11 @@ UI تغییر: صفر.
 | 2 | `66938716` | wire به `DailyLogsPage` (line-based) |
 
 **الگو:** کپی از `flk/components/FlockHistoryModal.tsx`
-**تست:** ۱۵ pass بدون تغییر — ⚠️ نقض L11 (AggregateTabPanel تست ندارد)
+**تست:** ۴ تست اختصاصی pass (`dlg-AggregateTabPanel.test.tsx`) + ۱۵ تست دما/رطوبت/feed/deaths pass
 **tsc:** پاس
 **UI:** تب سوم «تجمیع» فعال
 
 **بدهی باز:**
-- تست AggregateTabPanel (نقض L11)
+- ~~تست AggregateTabPanel~~ ✅ موجود (۴ تست pass)
 - سؤال ۲ (temp aggregation)
 - L3 (feedConsumed correction)
