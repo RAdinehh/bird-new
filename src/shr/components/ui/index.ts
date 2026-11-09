@@ -19,3 +19,4 @@ export * from './Temp';
 
 export * from './CardActions';
 export * from './ModalFooter';
+export * from './Segmented';
