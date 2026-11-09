@@ -1082,3 +1082,35 @@ UI تغییر: صفر.
 - ~~تست AggregateTabPanel~~ ✅ موجود (۴ تست pass)
 - سؤال ۲ (temp aggregation)
 - L3 (feedConsumed correction)
+
+---
+
+## dlg v16 — DlgEvent[] (الگوی FlockEvent) — 1405/08/18
+
+**زمینه:** کاربر چند بار در روز وارد گله می‌شه — صبح تلفات، ظهر دما، عصر واکسن، شب اصلاح دوز. مدل قبلی هر فیلد رو عدد تکی داشت (`temperature`, `feedDelivered`, `waterAmount`), پس نمی‌تونست چند ورودی در یک روز رو ثبت کنه.
+
+**تصمیم:** الگوی `FlockEvent` (flk) عیناً برای dlg پیاده بشه:
+- `DlgEvent` type در `types-events.ts` — ۱۰ نوع: create, reading, feed, water, death, egg, vaccine, medication, weight, correction
+- فیلد `events?: DlgEvent[]` در `DailyLog`
+- `addEvent(logId, ev)` + `revokeEvent(logId, eventId)` در store
+- `extractEvents(log)` — استخراج رویدادها از فیلدهای موجود (برای لاگ‌های جدید)
+- migration v16: لاگ‌های قدیمی → `events: []`
+
+**کامیت‌ها:**
+| SHA | کار |
+|---|---|
+| `ddcf8f65` | DlgEvent types + events[] field |
+| `14e35a9b` | migration v16 |
+| `501f5d53` | addEvent + revokeEvent |
+| `71debd9d` | extractEvents |
+| `d04dfc15` | hook در save (لاگ جدید) |
+| `dd8b9285` | DlgHistoryModal (اول) |
+| `04c8516f` | TabButton + ShowMoreButton در shr/ui |
+| `fa0e29d9` | DlgHistoryModal (نهایی) |
+
+**بدون تغییر رفتار:** فیلدهای فعلی `DailyLog` (`temperature`, `deathsCount`, `feedDelivered`, ...) همون‌جور می‌مونن. `events` موازی ذخیره می‌شه — ۱۷ مصرف‌کنندهٔ خارجی نمی‌شکنن.
+
+**PENDING:**
+- L11 — تست `addEvent`/`revokeEvent`
+- وصل `DlgHistoryModal` به `DlgTabPanel`
+- `buildData` از events — قدم ۷ نقشه (هنوز نه)
