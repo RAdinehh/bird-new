@@ -46,7 +46,7 @@ interface Props {
 
 export default function DlgTabPanel({
   tab, active,
-  logs, flocks, birds, config,
+  logs, activeFlocks, flocks, birds, config,
   vaccineEnabled, medicineEnabled,
   onEdit, onAdd, onDeleteLog, onRestoreLogFull,
 }: Props) {
@@ -249,7 +249,7 @@ export default function DlgTabPanel({
       <FlockPickerSheet
         open={pickerOpen}
         onClose={() => setPickerOpen(false)}
-        flocks={flocks}
+        flocks={activeFlocks}
         logs={allLogs}
         todayStr={todayStr}
         onSelect={(flock, existing) => { if (existing) onEdit(existing); else onAdd(flock.id); }}
