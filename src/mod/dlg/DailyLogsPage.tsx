@@ -230,6 +230,7 @@ export default function DailyLogsPage() {
               flocks={flocks}
               birds={birds}
               config={config}
+              activeFlocks={activeFlocks}
               vaccineEnabled={vaccineEnabled}
               medicineEnabled={medicineEnabled}
               onEdit={openEdit}
@@ -246,6 +247,7 @@ export default function DailyLogsPage() {
               flocks={flocks}
               birds={birds}
               config={config}
+              activeFlocks={activeFlocks}
               vaccineEnabled={vaccineEnabled}
               medicineEnabled={medicineEnabled}
               onEdit={openEdit}
@@ -262,6 +264,7 @@ export default function DailyLogsPage() {
               flocks={flocks}
               birds={birds}
               config={config}
+              activeFlocks={activeFlocks}
               vaccineEnabled={vaccineEnabled}
               medicineEnabled={medicineEnabled}
               onEdit={openEdit}

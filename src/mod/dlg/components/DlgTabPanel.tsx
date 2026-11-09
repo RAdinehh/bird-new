@@ -32,6 +32,7 @@ interface Props {
   tab: TabId;
   active: boolean;
   logs: DailyLog[];
+  activeFlocks: Flock[];
   flocks: Flock[];
   birds: Bird[];
   config: DlgConfig;
