@@ -12,9 +12,9 @@ c84b65d0 — cp: faz-0: NOW+RESUME+IDEAS+AGENTS
 - مستندات ۴۶→۲۵، AGENTS (۱۰ قانون جدید)، NOW+RESUME+cp+IDEAS
 - _archive، PROGRESS، CONCEPTS، SALE-AUDIT، PLAN، HANDOFF حذف شدن
 
+## ✅ WIP حل شد — activeFlocks fix شد
+
 ## ⚠️ هشدارها
-- WIP: `activeFlocks` در DlgTabPanel.tsx:252
-- tsc: ۱ خطا (بعد از WIP)
 - تست: ✅ ۱۵ pass
 
 ## 🎯 قدم بعدی
