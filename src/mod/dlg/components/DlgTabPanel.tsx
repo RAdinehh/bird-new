@@ -2,7 +2,9 @@
  * DlgTabPanel — محتوای یک تب از ثبت روزانه (carousel)
  */
 import { useState, useMemo, useEffect } from 'react';
+import { format as formatJ } from 'date-fns-jalali';
 import { useFab } from '../../../shr/hooks/useFab';
+import FlockPickerSheet from './FlockPickerSheet';
 import { useDlg, type DailyLog } from '../store';
 import type { DeleteSnapshot } from '../hooks/useDlgSave';
 import { useFilterSort, FilterBar, type getDlgLogsConfig } from '../../../shr/filter';
@@ -36,7 +38,7 @@ interface Props {
   vaccineEnabled: boolean;
   medicineEnabled: boolean;
   onEdit: (l: DailyLog) => void;
-  onAdd: () => void;
+  onAdd: (flockId?: string) => void;
   onDeleteLog: (l: DailyLog, opts?: { skipConfirm?: boolean }) => Promise<{ log: DailyLog; snapshot?: DeleteSnapshot } | null>;
   onRestoreLogFull: (log: DailyLog, snapshot: DeleteSnapshot) => Promise<boolean>;
 }
@@ -51,9 +53,12 @@ export default function DlgTabPanel({
   const [undoData, setUndoData] = useState<{ log: DailyLog | DailyLog[]; snapshot?: DeleteSnapshot } | null>(null);
   const [correctingLog, setCorrectingLog] = useState<DailyLog | null>(null);
   const [historyLog, setHistoryLog] = useState<DailyLog | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const allLogs = useDlg(s => s.logs);
+  const todayStr = formatJ(new Date(), 'yyyy/MM/dd');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  useFab(active ? { label: 'ثبت امروز', onClick: onAdd } : null);
+  useFab(active ? { label: 'ثبت امروز', onClick: () => setPickerOpen(true) } : null);
 
   const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
           resetAll, hasActiveFilters, total, count } = useFilterSort<DailyLog>({
@@ -216,7 +221,7 @@ export default function DlgTabPanel({
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>}
           title={tab === 'today' ? 'امروز ثبتی ندارید' : tab === 'archive' ? 'آرشیو خالی است' : 'تاریخچه خالی است'}
           desc={tab === 'today' ? 'اولین ثبت امروز را انجام دهید.' : 'پس از ثبت اولین روز، اینجا نمایش داده می‌شود.'}
-          action={tab !== 'archive' ? <Btn variant="primary" onClick={onAdd}>+ ثبت امروز</Btn> : undefined}
+          action={tab !== 'archive' ? <Btn variant="primary" onClick={() => setPickerOpen(true)}>+ ثبت امروز</Btn> : undefined}
         />
       ) : (
         <>
@@ -240,6 +245,14 @@ export default function DlgTabPanel({
         log={historyLog}
       />
 
+      <FlockPickerSheet
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        flocks={flocks}
+        logs={allLogs}
+        todayStr={todayStr}
+        onSelect={(flock, existing) => { if (existing) onEdit(existing); else onAdd(flock.id); }}
+      />
         </PageContainer>
   );
 }
