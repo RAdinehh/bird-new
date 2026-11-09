@@ -1114,3 +1114,23 @@ UI تغییر: صفر.
 - L11 — تست `addEvent`/`revokeEvent`
 - وصل `DlgHistoryModal` به `DlgTabPanel`
 - `buildData` از events — قدم ۷ نقشه (هنوز نه)
+
+## C4 Dunning — computeUpcoming (tra)
+
+**تاریخ:** 1405/11/09 (ثبت بعدی)
+**وضعیت:** ✅ پیاده‌شده، تست‌شده
+**فایل:** `src/mod/tra/helpers.tsx:96`
+**تست:** `src/test/tra-helpers.test.ts:43` (۷ تست)
+
+**منطق:**
+- فاکتورهای with dueDate
+- نه mute شده
+- نه snoozed (nextReminderAt > today)
+- dueDate ≤ ۷ روز آینده
+- مرتب: overdue اول، بعد future
+
+**مصرف‌کننده:** `ReceivablesPage.tsx` — لیست «یادآورهای نزدیک»
+
+**تفکیک از C4-log:**
+- C4-log = اصلاحات روزانه (dlg) — AggregateTabPanel
+- C4 Dunning = یادآور مطالبات (tra) — computeUpcoming
