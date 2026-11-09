@@ -14,5 +14,12 @@ echo "## IDEAS.md"
 cat IDEAS.md 2>/dev/null || echo "(نیست)"
 echo "## tsc (max 20s)"
 timeout 20 npx tsc --noEmit 2>&1 | tail -3 || echo "(skip)"
-echo "## tests (max 20s)"
-timeout 20 npx vitest run 2>&1 | tail -3 || echo "(skip)"
+echo "## قوانین AGENTS (خلاصه)"
+grep -E "^### قانون|^## 🆕" AGENTS.md 2>/dev/null | head -30
+echo "## تست Correction (15 تست، ~5s)"
+timeout 15 npx vitest run \
+  src/test/dlg-corrections.test.ts \
+  src/test/dlg-applyCorrections-recompute.test.ts \
+  src/test/dlg-store-corrections.test.ts 2>&1 \
+  | grep -E "Tests |Test Files" | tail -2 \
+  || echo "(timeout/خطا)"
