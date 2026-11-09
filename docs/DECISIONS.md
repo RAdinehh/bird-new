@@ -1028,7 +1028,7 @@ UI تغییر: صفر.
 - ✅ C3-fix: propagation (dashboard + گزارش‌ها)
 - ✅ C3-complete: B3 + L1 + L2
 - ⏸ تناقض C3 (inline vs modal) — تصمیم آگاهانه، مانده
-- ⏸ C4 — DailyLogHistoryModal — مانده
+- ✅ C4-log — AggregateTabPanel (82774a95, 66938716) — انجام شد
 
 **تست‌ها:** ۱۵ pass (بدون تغییر)
 **tsc:** پاس
@@ -1060,3 +1060,25 @@ UI تغییر: صفر.
 > C3 — `CorrectionModal` جدا (modal نه inline)
 
 ---
+
+
+---
+
+## C4-log — AggregateTabPanel (1405/08/18)
+
+**نام‌گذاری:** C4 اصلاحات = **C4-log** (تفکیک از C4 Dunning).
+
+| # | SHA | کار |
+|---|-----|-----|
+| 1 | `82774a95` | `AggregateTabPanel` — تب جمع‌بندی در `/dlg` |
+| 2 | `66938716` | wire به `DailyLogsPage` (line-based) |
+
+**الگو:** کپی از `flk/components/FlockHistoryModal.tsx`
+**تست:** ۱۵ pass بدون تغییر — ⚠️ نقض L11 (AggregateTabPanel تست ندارد)
+**tsc:** پاس
+**UI:** تب سوم «تجمیع» فعال
+
+**بدهی باز:**
+- تست AggregateTabPanel (نقض L11)
+- سؤال ۲ (temp aggregation)
+- L3 (feedConsumed correction)

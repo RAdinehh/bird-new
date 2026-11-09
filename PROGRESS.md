@@ -7,6 +7,9 @@
 | 1 | a06dfe76 | B3 (edit hidden if hasCorrections) + L1 (min/max fields) |
 | 2 | 35e9bac6 | L2 (dashboard deathsCount) - ناقص |
 | 3 | 5d8f8590 | L2 (CorrectionModal) - fix ناقص |
+| 4 | 790e9126 | C3-decision: inline کنسل، modal تأیید |
+| 5 | 82774a95 | C4-log-a: AggregateTabPanel |
+| 6 | 66938716 | C4-log-b: wire به DailyLogsPage |
 
 ### وضعیت
 - 15/15 tests pass
@@ -15,7 +18,7 @@
 
 ### نتیجه
 - بخش اصلاح از نظر propagation + safety کامل
-- باقی‌مانده: تناقض C3 (inline vs modal) + C4 (DailyLogHistoryModal)
+- Done: تناقض C3 (790e9126) + C4-log (82774a95, 66938716)
 
 ---
 
@@ -43,7 +46,7 @@
 1. B3 - ویرایش لاگ با Correction
 2. L1-L3 - بسط CorrectionModal
 3. تناقض C3 (inline vs modal)
-4. C4 - DailyLogHistoryModal
+4. ~~C4-log~~ ✅ انجام شد (66938716)
 
 ---
 

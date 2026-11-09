@@ -1,7 +1,7 @@
 # AI-BOOT-NEXT.md - راهنمای AI بعدی
 
 آخرین به‌روزرسانی: 1405/08/18
-آخرین commit: 5d8f8590
+آخرین commit (verify شده): 66938716
 
 ## 0. شروع
 
@@ -27,10 +27,12 @@ Bird-new = نرم‌افزار مدیریت مرغداری (PWA فارسی، RTL
 - C3-b (CorrectionModal): modal جدا
 - C3-fix: propagation به dashboard + گزارش‌ها (6 commit)
 - C3-complete (B3 + L1 + L2): بخش اصلاح تکمیل شد
+- C4-log-a (82774a95): AggregateTabPanel
+- C4-log-b (66938716): wire به DailyLogsPage
 
 ### PENDING (اولویت)
 1. تناقض C3 - DECISIONS inline vs کد modal (تصمیم آگاهانه)
-2. C4 - DailyLogHistoryModal (3 تب: امروز / Timeline / تجمیع)
+2. ~~C4-log~~ ✅ انجام شد (66938716)
 
 ## 3. قوانین آهنین
 
@@ -99,5 +101,5 @@ tail -100 docs/DECISIONS.md
 3. cat CLAUDE.md && cat docs/CONSTITUTION.md
 
 وضعیت: بخش اصلاح (C1+C2+C3+C3-fix+C3-complete) تموم شد.
-بعدی: تناقض C3 (تصمیم) + C4 (DailyLogHistoryModal).
+بعدی: سؤال ۲ (temp aggregation) + L3 (feedConsumed) + تست AggregateTabPanel (نقض L11).
 قانون: فارسی حرف بزن. تصمیم مهم را از کاربر بپرس.

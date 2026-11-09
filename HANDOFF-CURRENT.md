@@ -1,7 +1,7 @@
 # 🤖 HANDOFF-CURRENT — وضعیت فعلی
 
 > **این فایل دستی نوشته می‌شود. STATUS.md خودکار است.**
-> آخرین آپدیت: 1405/11/08
+> آخرین آپدیت: 1405/08/18 (جلسه ۱۲)
 > **برای HEAD فعلی: `cat docs/STATUS.md` — این فایل SHA هاردکد نمی‌کند.**
 
 ## ⚠️ قبل از هر کار
@@ -80,7 +80,7 @@
 - **Corrections (C1)** — `corrections[]` data layer + `applyCorrections` + ۴ تست ✅
 - **Corrections (C2)** — `addCorrection` + `revokeCorrection` + ۵ تست ✅
 
-### 🚧 In progress — Corrections C3+C4
+### ✅ Done — Corrections C3-complete + C4-log (جلسه ۱۲)
 
 | فاز | کار | وضعیت |
 |---|---|---|
@@ -92,7 +92,7 @@
 | **Herbal Medicine** | ۳ لایه محافظت | ✅ |
 | **Corrections C1+C2** | data + actions | ✅ |
 | **Corrections C3** | UI در LogCard | ⏳ |
-| **Corrections C4** | Tabs در DailyLogsPage | ⏳ |
+| **Corrections C4-log** | AggregateTabPanel + wiring | ✅ (82774a95, 66938716) |
 
 **🏆 این جلسه: ۴۵+ commit، ۷/۷ calc orphan، H (CSV ۵ صفحه)، Herbal، Corrections C1+C2، ۴ تصمیم آگاهانه، صفر regression**
 
