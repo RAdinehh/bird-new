@@ -53,6 +53,18 @@ export function FilterBar<T>({
   const [openSort, setOpenSort] = useState(false);
   const [openGroup, setOpenGroup] = useState(false);
 
+  const getGroupLabel = (val: string): string => {
+    if (val === 'none') return 'گروه';
+    if (groupDefs) return groupDefs.find(g => g.key === val)?.label || 'گروه';
+    const fallback: Record<string, string> = {
+      partyId: 'طرف حساب',
+      date: 'تاریخ',
+      category: 'دسته کالا',
+      workflow: 'وضعیت پرداخت',
+    };
+    return fallback[val] || 'گروه';
+  };
+
   // 🆕 الگوی useTabBadge: پالس ۵ ثانیه‌ای فقط وقتی تعداد زیاد می‌شود
   const [isPulsing, setIsPulsing] = useState(false);
   const [isAcknowledged, setIsAcknowledged] = useState(false);
@@ -164,7 +176,7 @@ export function FilterBar<T>({
           <button type="button" onClick={() => setOpenGroup(true)}
             aria-label="گروه‌بندی" style={topBtn(groupBy !== 'none')}>
             <span>📁</span>
-            <span>گروه</span>
+            <span>{getGroupLabel(groupBy)}</span>
           </button>
         )}
         
