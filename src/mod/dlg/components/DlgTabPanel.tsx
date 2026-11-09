@@ -18,6 +18,7 @@ import { toFa } from '../../../shr/utils/fa';
 import { bus } from '../../../cor/events';
 import LogCard from './LogCard';
 import CorrectionModal from './CorrectionModal';
+import DlgHistoryModal from './DlgHistoryModal';
 import type { Flock } from '../../flk/store';
 import type { Bird } from '../../brd/store';
 
@@ -49,6 +50,7 @@ export default function DlgTabPanel({
   const { add, archive, restore, addCorrection, revokeCorrection } = useDlg();
   const [undoData, setUndoData] = useState<{ log: DailyLog | DailyLog[]; snapshot?: DeleteSnapshot } | null>(null);
   const [correctingLog, setCorrectingLog] = useState<DailyLog | null>(null);
+  const [historyLog, setHistoryLog] = useState<DailyLog | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useFab(active ? { label: 'ثبت امروز', onClick: onAdd } : null);
@@ -151,6 +153,7 @@ export default function DlgTabPanel({
         onRestore={() => restore(l.id)}
         onDelete={() => handleDeleteOne(l)}
         onCorrect={() => setCorrectingLog(l)}
+          onHistory={() => setHistoryLog(l)}
         onRevokeCorrection={(corrId) => revokeCorrection(l.id, corrId)}
       />
     );
@@ -230,6 +233,12 @@ export default function DlgTabPanel({
         setCorrectingLog(null);
       }}
     />
+
+      <DlgHistoryModal
+        open={!!historyLog}
+        onClose={() => setHistoryLog(null)}
+        log={historyLog}
+      />
 
         </PageContainer>
   );
