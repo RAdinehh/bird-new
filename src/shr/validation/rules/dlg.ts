@@ -48,6 +48,8 @@ export function createDlgSchema(context: ValidationContext = {}) {
     waterAmount: floatRange('مقدار آب', 0, 100000).nullable().optional(),
     waterFillCount: intNonNeg('تعداد بار آب').nullable().optional(),
     waterFillVolume: floatNonNeg('حجم هر بار آب', 1000).nullable().optional(),
+    feedMethod: z.string().optional().default(''),
+    waterMethod: z.string().optional().default(''),
 
     // تخم‌گذاری
     eatingEggs: intRange('تخم خوراکی', 0, 100000),
@@ -138,6 +140,25 @@ export function createDlgSchema(context: ValidationContext = {}) {
           path: ['deaths'],
         });
       }
+
+    // 🆕 دان و آب شرطی (اتومات = اجباری)
+    const FEED_AUTO = ['semi_auto', 'auto_sensor', 'auto_chain'];
+    if (FEED_AUTO.includes(d.feedMethod) && (!d.feedDelivered || d.feedDelivered <= 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'مقدار دان مصرفی اجباری است (دانخوری اتومات)',
+        path: ['feedDelivered'],
+      });
+    }
+
+    const WATER_AUTO = ['nipple', 'trough', 'tank'];
+    if (WATER_AUTO.includes(d.waterMethod) && (!d.waterAmount || d.waterAmount <= 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'مقدار آب مصرفی اجباری است (آبخوری اتومات)',
+        path: ['waterAmount'],
+      });
+    }
 
     // 🆕 اجبار: حداقل یک ردیف تلفات (حتی اگه 0 باشه)
     if ((d.deaths || []).length === 0) {

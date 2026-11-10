@@ -115,6 +115,8 @@ export default function DailyLogsPage() {
       feedDelivered: num(form.feedDelivered),
       feedRemaining: num(form.feedRemaining),
       feedSourceId: form.feedSourceId || '',
+      feedMethod: form.feedMethod || '',
+      waterMethod: form.waterMethod || '',
       waterAmount: num(form.waterAmount),
       waterFillCount: int(form.waterFillCount),
       waterFillVolume: num(form.waterFillVolume),

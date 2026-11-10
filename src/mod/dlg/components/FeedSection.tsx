@@ -23,6 +23,8 @@ interface Props {
 
 export default function FeedSection({ form, setForm, vErrors, showError, markTouched }: Props) {
   const { formulas, ingredients } = useFed();
+  const isFeedAuto = ['semi_auto', 'auto_sensor', 'auto_chain'].includes(form.feedMethod || '');
+  const isWaterAuto = ['nipple', 'trough', 'tank'].includes(form.waterMethod || '');
   const { items: whsItems } = useWhs();
   const feedItems = useMemo(() => whsItems.filter(x => x.category === 'feed'), [whsItems]);
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
@@ -124,7 +126,7 @@ export default function FeedSection({ form, setForm, vErrors, showError, markTou
 
       <Grid2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-          <Field label="مقدار دان مصرفی">
+          <Field label="مقدار دان مصرفی" required={isFeedAuto}>
             <NumField placeholder="۵۰" value={form.feedDelivered} onChange={e => setForm({ ...form, feedDelivered: e.target.value })} unit="kg" min={0} />
           </Field>
           
@@ -170,7 +172,7 @@ export default function FeedSection({ form, setForm, vErrors, showError, markTou
             ⚠️ سیستم {WATER_SYSTEM_LABEL[form.waterMethod as 'nipple' | 'trough' | 'tank']} — فعلاً فقط دستی پیاده شده
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-            <Field label="مقدار آب مصرفی (تخمینی)">
+            <Field label="مقدار آب مصرفی (تخمینی)" required={isWaterAuto}>
               <NumField placeholder="۱۰۰" value={form.waterAmount} onChange={e => setForm({ ...form, waterAmount: e.target.value })} unit="L" min={0} />
             </Field>
             
