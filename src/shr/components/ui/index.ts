@@ -21,3 +21,4 @@ export * from './CardActions';
 export * from './ModalFooter';
 export * from './Segmented';
 export * from './Row';
+export * from './ActionMenu';
