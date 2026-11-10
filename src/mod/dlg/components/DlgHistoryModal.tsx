@@ -94,7 +94,7 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
   }, [groups, showAll]);
 
   // شناسه آخرین رویداد — فقط این قابل لغو است
-  const latestItemId = items[0]?.kind === 'event' ? items[0].event.id : (items[0]?.kind === 'correction' ? items[0].correction.id : null);
+  const latestItemId = items.length > 0 ? (items[0].kind === 'event' ? items[0].event.id : items[0].correction.id) : null;
 
   const handleExport = () => {
     if (!log) return;
@@ -165,11 +165,15 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
                 📅 {group.label}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {group.items.map(it => {
+                {group.items.map((it, idx) => {
+                  // فقط اگر این آیتم، در کل لیست (items) جدیدترین باشه، لغو داره
+                  const isTrulyLatest = it.kind === 'event' 
+                    ? it.event.id === latestItemId 
+                    : it.correction.id === latestItemId;
                   if (it.kind === 'event') {
-                    return <EventRow key={it.event.id} ev={it.event} isLatest={it.event.id === latestItemId} onRevoke={() => handleRevokeEvent(it.event)} />;
+                    return <EventRow key={it.event.id} ev={it.event} isLatest={isTrulyLatest} onRevoke={() => handleRevokeEvent(it.event)} />;
                   }
-                  return <CorrectionRow key={it.correction.id} corr={it.correction} log={log} isLatest={it.correction.id === latestItemId} onRevoke={() => handleRevokeCorrection(it.correction.id)} />;
+                  return <CorrectionRow key={it.correction.id} corr={it.correction} log={log} isLatest={isTrulyLatest} onRevoke={() => handleRevokeCorrection(it.correction.id)} />;
                 })}
               </div>
             </div>
