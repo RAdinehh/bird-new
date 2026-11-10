@@ -143,6 +143,24 @@ function recomputeActiveWithdrawal(
   }
 }
 
+
+function hasMeaningfulData(form: F): boolean {
+  if (form.temperature || form.temperatureMin || form.temperatureMax) return true;
+  if (form.humidity || form.humidityMin || form.humidityMax) return true;
+  if (form.feedDelivered || form.feedRemaining || form.feedType || form.feedSourceId) return true;
+  if (form.waterAmount || form.waterFillCount || form.waterFillVolume) return true;
+  if (form.eatingEggs || form.fertileEggs || form.brokenEggs || form.otherEggs) return true;
+  if (form.deaths && form.deaths.length > 0) return true;
+  if (form.vaccines && form.vaccines.length > 0) return true;
+  if (form.medications && form.medications.length > 0) return true;
+  if (form.activities && form.activities.length > 0) return true;
+  if (form.weightSamples && form.weightSamples.length > 0) return true;
+  if (form.notes) return true;
+  if (form.appearance) return true;
+  if (form.weightGender) return true;
+  return false;
+}
+
 export function useDlgSave(params: UseDlgSaveParams) {
   const {
     form, saving, setSaving, setOpen,
@@ -156,6 +174,12 @@ export function useDlgSave(params: UseDlgSaveParams) {
 
   const save = async (): Promise<boolean> => {
     if (saving) return false;
+
+    // 🆕 جلوگیری از ثبت لاگ خالی (برای فرم‌های جدید)
+    if (!form.id && !hasMeaningfulData(form)) {
+      toastMsg.error('هیچ داده‌ای وارد نشده است. حداقل یک فیلد (دما، دان، تلفات، ...) را پر کنید.');
+      return false;
+    }
     setSaving(true);
 
     // D5.5/B1b — flockId/date قفل در ویرایش

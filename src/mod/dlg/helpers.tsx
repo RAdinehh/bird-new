@@ -18,14 +18,7 @@ export function SectionTitle({ children }: { children: ReactNode }) {
   );
 }
 
-export function Row({ l, v, warn }: { l: string; v: string; warn?: boolean }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: warn ? 'var(--warn-soft)' : 'var(--input-bg)', borderRadius: 'var(--r-sm)', color: warn ? 'var(--warn)' : undefined, fontWeight: warn ? 700 : undefined }}>
-      <span style={{ color: warn ? 'var(--warn)' : 'var(--muted)' }}>{l}:</span>
-      <span style={{ fontWeight: 600, color: warn ? 'var(--warn)' : 'var(--text)' }}>{v}</span>
-    </div>
-  );
-}
+export { Row } from '../../shr/components/ui';
 
 
 // ═══════════════════════════════════════════════════════════════
