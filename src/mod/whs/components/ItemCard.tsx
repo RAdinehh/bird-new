@@ -140,7 +140,7 @@ export default function ItemCard(props: ItemCardProps) {
 
       <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
         <CardActions actions={[
-          { label: '🔄 اصلاح', onClick: onAdjust, variant: 'primary' },
+          { label: 'اصلاح', onClick: onAdjust, variant: 'primary' },
           { label: 'ویرایش', onClick: onEdit, variant: 'outline' },
           { label: 'حذف', onClick: handleDelete, variant: 'danger-outline' }
         ]} />

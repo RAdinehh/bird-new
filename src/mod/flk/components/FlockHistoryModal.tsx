@@ -384,7 +384,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
       title={'📜 رویدادها • ' + flock.name}
       footer={
         <BtnRow>
-          <Btn onClick={handleExport}>📥 CSV</Btn>
+          <Btn onClick={handleExport}>CSV</Btn>
           <Btn onClick={onClose}>بستن</Btn>
         </BtnRow>
       }

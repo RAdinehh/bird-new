@@ -176,7 +176,7 @@ export default function ArchivePage({ active = true }: Props = {}) {
                   gap: 'var(--sp-2)',
                   flexWrap: 'wrap',
                 }}>
-                  <Tag tone="gray">📦 آرشیو</Tag>
+                  <Tag tone="gray">آرشیو</Tag>
                   <span style={{ flex: 1, fontWeight: 700 }}>{z.name}</span>
                   <Btn size="sm" variant="primary" onClick={() => restoreZone(z)}>بازگردانی</Btn>
                   <Btn size="sm" onClick={() => permDeleteZone(z)}>حذف</Btn>

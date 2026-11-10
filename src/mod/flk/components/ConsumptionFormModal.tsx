@@ -69,7 +69,7 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
   };
 
   return (
-    <Modal open={open} onClose={onClose} title={'🍽️ ثبت دان/آب — ' + flock.name}>
+    <Modal open={open} onClose={onClose} title={'ثبت دان/آب — ' + flock.name}>
 
       {/* ═══ داده اصلی — دو ستونه ═══ */}
       <div style={GROUP_TITLE}>📥 داده اصلی</div>

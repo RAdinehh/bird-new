@@ -212,8 +212,8 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
   if (!log) return null;
 
   return (
-    <Modal open={open} onClose={onClose} title={`📜 تاریخچه — ${log.entryTime ? toFa(log.entryTime) + ' • ' : ''}${toFa(log.date)}`}
-      footer={<BtnRow><Btn onClick={handleExport}>📥 CSV</Btn><Btn onClick={onClose}>بستن</Btn></BtnRow>}
+    <Modal open={open} onClose={onClose} title={`تاریخچه — ${log.entryTime ? toFa(log.entryTime) + ' • ' : ''}${toFa(log.date)}`}
+      footer={<BtnRow><Btn onClick={handleExport}>CSV</Btn><Btn onClick={onClose}>بستن</Btn></BtnRow>}
     >
       {/* ═══ هدر خلاصه سبز ═══ */}
       <div style={{

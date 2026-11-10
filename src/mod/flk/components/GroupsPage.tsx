@@ -283,7 +283,7 @@ export default function GroupsPage({ open, onClose }: Props) {
         </div>
         <div style={{ display: 'flex', gap: 6, paddingTop: 8, borderTop: '1px dashed var(--border)' }}>
           <Btn size="sm" onClick={() => handleEdit(node)} style={{ flex: 1 }}>ویرایش</Btn>
-          <Btn size="sm" onClick={() => handleArchive(node)} style={{ flex: 1 }}>📦 آرشیو</Btn>
+          <Btn size="sm" onClick={() => handleArchive(node)} style={{ flex: 1 }}>آرشیو</Btn>
           <Btn size="sm" onClick={() => handleDelete(node)} style={{ flex: 1, color: 'var(--danger)' }}>حذف</Btn>
         </div>
         <GroupKpiRow group={node} onOpen={() => setReportGroupId(node.id)} />

@@ -59,7 +59,7 @@ export default function FlockGroupsModal({ open, onClose, flock }: Props) {
   };
 
   return (
-    <Modal open={open} onClose={onClose} title={'📁 گروه‌های «' + flock.name + '»'}>
+    <Modal open={open} onClose={onClose} title={'گروه‌های «' + flock.name + '»'}>
       {availableGroups.length === 0 ? (
         <div style={{ padding: 32, textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>
           <div style={{ fontSize: 40, marginBottom: 8 }}>📁</div>

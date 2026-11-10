@@ -225,7 +225,7 @@ export default function GroupReportModal({ open, onClose, groupId }: Props) {
       )}
 
       <BtnRow>
-        <Btn onClick={handleExportCSV} disabled={kpi.byFlock.length === 0}>📥 CSV</Btn>
+        <Btn onClick={handleExportCSV} disabled={kpi.byFlock.length === 0}>CSV</Btn>
         <Btn variant="primary" onClick={onClose}>بستن</Btn>
       </BtnRow>
     </Modal>

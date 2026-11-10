@@ -59,7 +59,7 @@ export default function SettlementDetailModal({
     <Modal
       open={open}
       onClose={onClose}
-      title={`📅 تسویه دوره‌ای — ${toFa(settlement.periodStart)} تا ${toFa(settlement.periodEnd)}`}
+      title={`تسویه دوره‌ای — ${toFa(settlement.periodStart)} تا ${toFa(settlement.periodEnd)}`}
     >
       {/* KPI بالای modal (الگو: FlockHistoryModal) */}
       <div style={{

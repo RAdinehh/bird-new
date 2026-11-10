@@ -58,7 +58,7 @@ export default function DeviceFormModal(props: DeviceFormModalProps) {
           <Field label="وضعیت" required>
             <Select value={form.status} onChange={e => setForm({...form, status: e.target.value as DeviceStatus})}>
               <option value="active">✅ فعال</option>
-              <option value="idle">⏸ غیرفعال</option>
+              <option value="idle">غیرفعال</option>
               <option value="maintenance"><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🔧</span> تعمیر</option>
               <option value="broken">❌ خراب</option>
             </Select>

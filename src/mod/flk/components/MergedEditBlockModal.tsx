@@ -21,7 +21,7 @@ export default function MergedEditBlockModal({ open, onClose, onUnmerge, flockNa
       center
       footer={
         <BtnRow>
-          <Btn variant="primary" onClick={() => { onClose(); onUnmerge(); }}>♻️ بازگردانی گله</Btn>
+          <Btn variant="primary" onClick={() => { onClose(); onUnmerge(); }}>بازگردانی گله</Btn>
           <Btn onClick={onClose}>انصراف</Btn>
         </BtnRow>
       }

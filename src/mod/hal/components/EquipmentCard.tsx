@@ -302,7 +302,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                       onRestore(e.id);
                       logAction('update', 'hal', 'بازگردانی تجهیز: ' + e.name);
                       toastMsg.success('تجهیز بازگردانی شد');
-                    }} style={{ width: '100%' }}>♻️ بازگردانی</Btn>
+                    }} style={{ width: '100%' }}>بازگردانی</Btn>
                   ) : (
                     <Btn size="sm" variant="danger" onClick={() => onRetire(e)} style={{ width: '100%' }}>🔚 اسقاط / فروش</Btn>
                   )}

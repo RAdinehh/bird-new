@@ -38,7 +38,7 @@ export default function Hal() {
   }, [tabParam, setTabParam]);
   const visibleTabs = useMemo(() => {
     if (archivedCount > 0) {
-      return [...BASE_TABS, { id: 'archive', label: `📦 آرشیو (${archivedCount})` }];
+      return [...BASE_TABS, { id: 'archive', label: `آرشیو (${archivedCount})` }];
     }
     return BASE_TABS;
   }, [archivedCount]);

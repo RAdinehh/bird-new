@@ -254,14 +254,14 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
 
         return (
           <CardActions actions={[
-            { label: nextWs === 'confirmed' ? '✅ ثبت نهایی' : nextWs === 'received' ? '📦 کالا رسید' : '💰 پرداخت کردم', onClick: onTransferClick, variant: 'primary', hidden: !nextWs || skipCashReceived },
-            { label: '✅ حل شد', onClick: onResolveDispute || (() => {}), variant: 'primary', hidden: !onResolveDispute },
-            { label: '♻️ بازگردانی', onClick: () => { if (linkedFlock) { restore(linkedFlock.id); toastMsg.success('گله با موفقیت بازیابی شد'); } }, variant: 'primary', hidden: !isFlockArchived },
+            { label: nextWs === 'confirmed' ? 'ثبت نهایی' : nextWs === 'received' ? 'کالا رسید' : 'پرداخت کردم', onClick: onTransferClick, variant: 'primary', hidden: !nextWs || skipCashReceived },
+            { label: 'حل شد', onClick: onResolveDispute || (() => {}), variant: 'primary', hidden: !onResolveDispute },
+            { label: 'بازگردانی', onClick: () => { if (linkedFlock) { restore(linkedFlock.id); toastMsg.success('گله با موفقیت بازیابی شد'); } }, variant: 'primary', hidden: !isFlockArchived },
             { label: 'ویرایش', onClick: onEdit || (() => {}), variant: 'outline', hidden: !onEdit },
-            { label: '🔗 اتصال دستی', onClick: () => setFlockPickerOpen(true), variant: 'outline', hidden: !(!linkedFlock && hasBirdItems) },
-            { label: '🐔 مشاهده گله', onClick: () => { if (linkedFlock) window.location.href = '/flk?focus=' + linkedFlock.id; }, variant: 'outline', hidden: !isFlockActive },
-            { label: '⚠️ اختلاف', onClick: onDispute || (() => {}), variant: 'outline', hidden: !onDispute },
-            { label: '🔓 بازگشایی', onClick: onReopen || (() => {}), variant: 'outline', hidden: !onReopen },
+            { label: 'اتصال دستی', onClick: () => setFlockPickerOpen(true), variant: 'outline', hidden: !(!linkedFlock && hasBirdItems) },
+            { label: 'مشاهده گله', onClick: () => { if (linkedFlock) window.location.href = '/flk?focus=' + linkedFlock.id; }, variant: 'outline', hidden: !isFlockActive },
+            { label: 'اختلاف', onClick: onDispute || (() => {}), variant: 'outline', hidden: !onDispute },
+            { label: 'بازگشایی', onClick: onReopen || (() => {}), variant: 'outline', hidden: !onReopen },
             { label: 'حذف بدحساب', onClick: onWriteOff || (() => {}), variant: 'danger-outline', hidden: !onWriteOff },
           ]} />
         );

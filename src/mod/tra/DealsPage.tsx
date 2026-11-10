@@ -750,12 +750,12 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                 
                 <CardActions actions={[
                   {
-                    label: d.status === 'open' ? 'تسویه شد' : '🔓 بازگشایی',
+                    label: d.status === 'open' ? 'تسویه شد' : 'بازگشایی',
                     variant: d.status === 'open' ? 'outline' : 'primary',
                     onClick: () => d.status === 'open' ? updateDeal(d.id, { status: 'settled' }) : handleReopenDeal(d),
                   },
                   {
-                    label: '📅 تسویه',
+                    label: 'تسویه',
                     variant: 'outline',
                     onClick: () => { setSettlementDeal(d); setSettlementOpen(true); },
                   },

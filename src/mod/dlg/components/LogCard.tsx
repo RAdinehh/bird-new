@@ -323,11 +323,10 @@ export default function LogCard(props: LogCardProps) {
 
       <CardActions actions={[
         { label: 'ویرایش', onClick: onEdit, variant: 'outline', hidden: (l.status || 'active') !== 'active' || hasCorrections },
-        { label: '📦 آرشیو', onClick: onArchive, variant: 'outline', hidden: (l.status || 'active') !== 'active' },
-        { label: '♻️ بازگردانی', onClick: onRestore, variant: 'primary', hidden: (l.status || 'active') === 'active' },
+        { label: 'اصلاح', onClick: onCorrect, variant: 'outline', hidden: (l.status || 'active') !== 'active' },
+        { label: 'تاریخچه', onClick: () => onHistory?.(), variant: 'outline', hidden: onHistory === undefined },
+        { label: 'بازگردانی', onClick: onRestore, variant: 'outline', hidden: (l.status || 'active') === 'active' },
         { label: 'حذف', onClick: onDelete, variant: 'danger-outline', hidden: (l.status || 'active') === 'active' },
-        { label: '✏️ اصلاح', onClick: onCorrect, variant: 'outline', hidden: (l.status || 'active') !== 'active' },
-        { label: '📜 تاریخچه', onClick: () => onHistory?.(), variant: 'outline', hidden: onHistory === undefined }
       ]} />
     </ExpandableCard>
   );

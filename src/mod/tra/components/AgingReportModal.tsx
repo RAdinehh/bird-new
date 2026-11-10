@@ -181,7 +181,7 @@ td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; }
       size="lg"
       footer={
         <ModalFooter actions={[
-          { label: '📥 CSV', role: 'primary', onClick: handleCSV, disabled: rows.length === 0 },
+          { label: 'CSV', role: 'primary', onClick: handleCSV, disabled: rows.length === 0 },
           { label: '📄 چاپ', role: 'secondary', onClick: handlePrint, disabled: rows.length === 0 },
           { label: 'بستن', role: 'secondary', onClick: onClose },
         ]} />

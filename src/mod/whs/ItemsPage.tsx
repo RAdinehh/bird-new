@@ -171,7 +171,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
   const adjustStock = async (it: Item) => {
     const current = it.currentStock || 0;
     const input = await showPromptAsync(
-      '🔄 اصلاح موجودی',
+      'اصلاح موجودی',
       `موجودی فعلی: ${toFa(current)} ${UNIT_LABEL[it.unit]}\n\nموجودی واقعی چقدر است؟`,
       {
         placeholder: 'مثلاً — ۱۵۰',

@@ -135,7 +135,7 @@ export default function FlocksModal(props: FlocksModalProps) {
             <Btn onClick={onRestore} style={{ color: 'var(--accent)' }}>📦 بازگردانی</Btn>
           )}
           {form.id && form.status !== 'archived' && onArchive && (
-            <Btn onClick={onArchive}>📦 آرشیو</Btn>
+            <Btn onClick={onArchive}>آرشیو</Btn>
           )}
           <Btn variant="primary" onClick={onSave} disabled={props.saving}>ذخیره</Btn>
           <Btn onClick={onClose}>لغو</Btn>

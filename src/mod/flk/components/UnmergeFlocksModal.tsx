@@ -153,7 +153,7 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
       size="lg"
       footer={
         sortedSources.length > 0
-          ? <BtnRow><Btn variant="primary" onClick={handleConfirm} disabled={!effectiveSelectedId}>♻️ بازگردانی</Btn><Btn onClick={onClose}>انصراف</Btn></BtnRow>
+          ? <BtnRow><Btn variant="primary" onClick={handleConfirm} disabled={!effectiveSelectedId}>بازگردانی</Btn><Btn onClick={onClose}>انصراف</Btn></BtnRow>
           : <BtnRow><Btn onClick={onClose}>بستن</Btn></BtnRow>
       }
     >
