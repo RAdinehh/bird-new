@@ -160,15 +160,6 @@ export function createDlgSchema(context: ValidationContext = {}) {
       });
     }
 
-    // 🆕 اجبار: حداقل یک ردیف تلفات (حتی اگه 0 باشه)
-    if ((d.deaths || []).length === 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'حداقل یک ردیف تلفات وارد کنید (اگر تلفات نداشتید، 0)',
-        path: ['deaths'],
-      });
-    }
-
     if (flockAlive > 0) {
       if (d.deathsCount > flockAlive) {
         ctx.addIssue({

@@ -54,7 +54,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
           </div>
           <Grid2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-              <Field label="تعداد" required error={showError('deathsCount') || showError('deaths')} onTouch={() => markTouched('deathsCount')}>
+              <Field label="تعداد" error={showError('deathsCount') || showError('deaths')} onTouch={() => markTouched('deathsCount')}>
                 <NumField placeholder="اگر تلفات نبود، 0 وارد کنید" value={String(d.count ?? '')}
                   onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, count: parseInt(toEn(e.target.value)) || 0 } : x) }))}
                   min={0} max={flockAliveCount || undefined} unit="پرنده" />
