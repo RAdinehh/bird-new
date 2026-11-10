@@ -126,7 +126,9 @@ export default function DlgTabPanel({
         try {
           bus.emit('dlg:deaths:recorded', {
             logId: log.id, flockId: log.flockId, date: log.date,
-            count: log.deathsCount || 0, deaths: log.deaths || [], isEdit: false,
+            count: log.deathsCount || 0,
+            deaths: (log.deaths || []).filter(d => typeof d.count === 'number' && d.count > 0) as Array<{ id: string; count: number; cause: string; notes: string }>,
+            isEdit: false,
           }, { source: 'dlg/undoDelete' });
         } catch { /* silent */ }
       }

@@ -59,7 +59,7 @@ export function createDlgSchema(context: ValidationContext = {}) {
     deathsCount: intRange('تلفات', 0, 100000),
     deaths: z.array(z.object({
       id: z.string(),
-      count: intNonNeg('تعداد تلفات'),
+      count: z.union([z.number(), z.null()]),
       cause: z.string().optional().default(''),
       notes: z.string().optional().default(''),
     })).default([]),
@@ -138,6 +138,15 @@ export function createDlgSchema(context: ValidationContext = {}) {
           path: ['deaths'],
         });
       }
+
+    // 🆕 اجبار: حداقل یک ردیف تلفات (حتی اگه 0 باشه)
+    if ((d.deaths || []).length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'حداقل یک ردیف تلفات وارد کنید (اگر تلفات نداشتید، 0)',
+        path: ['deaths'],
+      });
+    }
 
     if (flockAlive > 0) {
       if (d.deathsCount > flockAlive) {

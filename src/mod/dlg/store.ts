@@ -8,7 +8,7 @@ import type { DlgEvent } from './types-events';
 
 export interface Death {
   id: string;
-  count: number;
+  count: number | null;
   cause: string;
   notes: string;
   /** 🆕 جنسیت تلفات — undefined = unknown (قبل از تفکیک) */

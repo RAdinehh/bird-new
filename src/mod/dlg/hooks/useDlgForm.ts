@@ -26,7 +26,8 @@ export function newLog(flockId = ''): F {
     waterMethod: '', waterAmount: '', waterFillCount: '', waterFillVolume: '',
     weightSamples: [], weightGender: '',
     eatingEggs: '', fertileEggs: '', brokenEggs: '', otherEggs: '',
-    deaths: [], vaccines: [], medications: [], activities: [],
+    deaths: [{ id: crypto.randomUUID(), count: null, cause: '', notes: '' }],
+    vaccines: [], medications: [], activities: [],
     notes: '',
   };
 }

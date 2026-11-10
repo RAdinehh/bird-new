@@ -46,8 +46,8 @@ export function extractEvents(log: DailyLog): WithoutId[] {
 
   // death
   for (const d of log.deaths || []) {
-    if (d.count > 0) {
-      out.push({ ...base, type: 'death', count: d.count, cause: d.cause, notes: d.notes });
+    if ((d.count ?? 0) > 0) {
+      out.push({ ...base, type: 'death', count: d.count as number, cause: d.cause, notes: d.notes });
     }
   }
 

@@ -364,7 +364,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
             flockId: finalData.flockId,
             date: finalData.date,
             count: finalData.deathsCount || 0,
-            deaths: finalData.deaths || [],
+            deaths: (finalData.deaths || []).filter(d => typeof d.count === 'number' && d.count > 0) as Array<{ id: string; count: number; cause: string; notes: string }>,
             isEdit: !!form.id,
             prevCount: oldLogSnapshot?.deathsCount || 0,
             prevFlockId: oldLogSnapshot?.flockId,
