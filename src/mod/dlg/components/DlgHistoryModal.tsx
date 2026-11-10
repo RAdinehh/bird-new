@@ -287,119 +287,98 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
 }
 
 function EventRow({ ev, isLatest, onRevoke }: { ev: DlgEvent; isLatest: boolean; onRevoke: () => void }) {
+  if (ev.type === 'death' && (!ev.count || ev.count === 0)) return null;
+
   const meta = TYPE_META[ev.type];
   const isRevoked = ev.revoked === true;
   const time = ev.entryTime || (ev.createdAt ? ev.createdAt.slice(11, 16) : '—');
-  const fieldLabel = ev.field ? (FIELD_LABEL[ev.field] || ev.field) : '';
-  const hasBeforeAfter = ev.before !== undefined && ev.after !== undefined;
   
-  // فیلتر: تلفات ۰ نباید رندر شود
-  if (ev.type === 'death' && (!ev.count || ev.count === 0)) return null;
+  let label = '';
+  let mainVal: string | null = null;
+  let beforeVal: string | null = null;
+  let afterVal: string | null = null;
 
-  let mainValue: string | null = null;
-  if (hasBeforeAfter) {
-    mainValue = `${toFa(String(ev.before ?? '—'))} → ${toFa(String(ev.after ?? '—'))}`;
+  if (ev.before !== undefined && ev.after !== undefined) {
+    label = FIELD_LABEL[ev.field || ''] || ev.field || 'مقدار';
+    beforeVal = String(ev.before ?? '—');
+    afterVal = String(ev.after ?? '—');
   } else if (ev.type === 'water' && ev.amount !== undefined) {
-    mainValue = `${toFa(ev.amount)} لیتر`;
+    label = 'مصرف آب';
+    mainVal = `${toFa(ev.amount)} لیتر`;
   } else if (ev.type === 'feed' && ev.amount !== undefined) {
-    mainValue = `${toFa(ev.amount)} کیلوگرم`;
+    label = 'مصرف دان';
+    mainVal = `${toFa(ev.amount)} کیلوگرم`;
   } else if (ev.type === 'death' && ev.count !== undefined) {
-    mainValue = `${toFa(ev.count)} عدد`;
+    label = 'تلفات';
+    mainVal = `${toFa(ev.count)} عدد`;
+  } else if (ev.type === 'vaccine') {
+    label = 'واکسن';
+    mainVal = ev.notes || ev.reason || 'ثبت شده';
+  } else if (ev.type === 'medication') {
+    label = 'دارو';
+    mainVal = ev.notes || ev.reason || 'ثبت شده';
+  } else if (ev.field) {
+    label = FIELD_LABEL[ev.field] || ev.field;
+    mainVal = `${toFa(ev.value ?? 0)}`;
   } else if (ev.value !== undefined && ev.value !== null) {
-    mainValue = `${toFa(ev.value)}`;
-  } else if (ev.amount !== undefined) {
-    mainValue = `${toFa(ev.amount)}`;
-  } else if (ev.count !== undefined) {
-    mainValue = `${toFa(ev.count)}`;
+    label = 'مقدار';
+    mainVal = `${toFa(ev.value)}`;
   }
 
   return (
     <div style={{
-      background: 'transparent',
+      padding: '10px 12px',
+      background: 'var(--input-bg)',
+      borderRadius: 'var(--r-md)',
       border: '1px solid var(--border)',
-      borderRadius: 0,
-      opacity: isRevoked ? 0.6 : 1,
-      overflow: 'hidden',
+      opacity: isRevoked ? 0.7 : 1,
       display: 'flex',
       flexDirection: 'column',
+      gap: 6,
     }}>
-      {/* ═══ هدر: راست (آیکون+نوع) / چپ (زمان) ═══ */}
-      <div style={{
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '6px 4px',
-        background: 'var(--input-bg)',
-        borderBottom: '1px dashed var(--border)',
-      }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          
-          <b style={{ color: meta.tone, fontSize: 'var(--fs-sm)' }}>{meta.label}</b>
-        </span>
-        <span style={{
-          fontFamily: 'monospace', fontSize: 'var(--fs-xs)',
-          color: 'var(--muted)', fontWeight: 700, letterSpacing: '.5px',
-        }}>{toFa(time)}</span>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <b style={{ color: meta.tone, fontSize: 'var(--fs-sm)', fontWeight: 700 }}>{meta.label}</b>
+          <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(time)}</span>
+        </div>
+        {isRevoked && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--danger)' }}>لغو شده</span>}
       </div>
 
-      {/* ═══ بدنه: فیلد و مقدار (راست‌چین) ═══ */}
-      <div style={{ padding: '4px 4px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {fieldLabel && mainValue && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', fontWeight: 600 }}>{fieldLabel}:</span>
-            <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-sm)', fontWeight: 700, textAlign: 'left' }}>
-              {hasBeforeAfter ? (
-                <>
-                  <span style={{ color: 'var(--danger)' }}>{toFa(String(ev.before ?? '—'))}</span>
-                  <span style={{ color: 'var(--muted)', margin: '0 6px' }}>→</span>
-                  <span style={{ color: 'var(--accent)' }}>{toFa(String(ev.after ?? '—'))}</span>
-                </>
-              ) : mainValue}
-            </span>
-          </div>
-        )}
-        {!fieldLabel && mainValue && (
-          <div style={{ fontFamily: 'monospace', fontSize: 'var(--fs-md)', fontWeight: 700, color: meta.tone, textAlign: 'left' }}>
-            {mainValue}
-          </div>
-        )}
-        
-        {ev.reason && (
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'flex', gap: 4, marginTop: 2 }}>
-            <span style={{ fontWeight: 600 }}>دلیل:</span>
-            <span>{ev.reason}</span>
-          </div>
-        )}
-        {ev.notes && (
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontStyle: 'italic', marginTop: 2 }}>
-            «{ev.notes}»
-          </div>
-        )}
-      </div>
+      {label && (
+        <Row
+          l={label}
+          v={
+            beforeVal !== null && afterVal !== null ? (
+              <span style={{ fontFamily: 'monospace' }}>
+                <span style={{ color: 'var(--danger)' }}>{toFa(beforeVal)}</span>
+                <span style={{ color: 'var(--muted)', margin: '0 6px' }}>←</span>
+                <span style={{ color: 'var(--accent)' }}>{toFa(afterVal)}</span>
+              </span>
+            ) : (
+              <span style={{ fontFamily: 'monospace', color: meta.tone }}>{mainVal}</span>
+            )
+          }
+        />
+      )}
 
-      {/* ═══ فوتر: لغو (چپ) و وضعیت ═══ */}
-      {(isRevoked || (isLatest && ev.type !== 'create')) && (
-        <div style={{
-          padding: '6px 12px',
-          borderTop: '1px dashed var(--border)',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          background: 'transparent',
-        }}>
-          {isRevoked ? (
-            <span style={{ padding: '2px 8px', background: 'var(--danger-soft)', color: 'var(--danger)', borderRadius: 4, fontSize: 'var(--fs-xs)', fontWeight: 700 }}>
-              لغو شده
-            </span>
-          ) : <span />}
-          {isLatest && !isRevoked && ev.type !== 'create' && (
-            <button
-              type="button"
-              onClick={onRevoke}
-              style={{
-                padding: '4px 10px', background: 'transparent',
-                border: '1px solid var(--border)', borderRadius: 'var(--r-sm)',
-                fontSize: 'var(--fs-xs)', color: 'var(--muted)',
-                cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600,
-              }}
-            >↩️ لغو</button>
-          )}
+      {ev.reason && (
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'flex', gap: 4 }}>
+          <span style={{ fontWeight: 600 }}>دلیل:</span>
+          <span>{ev.reason}</span>
+        </div>
+      )}
+
+      {isLatest && !isRevoked && ev.type !== 'create' && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 2 }}>
+          <button
+            type="button"
+            onClick={onRevoke}
+            style={{
+              padding: '2px 8px', background: 'transparent',
+              border: '1px solid var(--border)', borderRadius: 'var(--r-sm)',
+              fontSize: 'var(--fs-2xs)', color: 'var(--danger)', cursor: 'pointer'
+            }}
+          >لغو</button>
         </div>
       )}
     </div>
@@ -411,79 +390,61 @@ function CorrectionRow({ corr, log, isLatest, onRevoke }: { corr: NonNullable<Da
   const time = corr.timestamp ? corr.timestamp.slice(11, 16) : '—';
   return (
     <div style={{
-      background: 'transparent',
-      border: `1px solid ${isRevoked ? 'var(--border)' : 'var(--warn)'}`,
-      borderRadius: 0,
-      opacity: isRevoked ? 0.6 : 1,
-      overflow: 'hidden',
+      padding: '10px 12px',
+      background: 'var(--input-bg)',
+      borderRadius: 'var(--r-md)',
+      border: '1px solid var(--border)',
+      opacity: isRevoked ? 0.7 : 1,
       display: 'flex',
       flexDirection: 'column',
+      gap: 6,
     }}>
-      {/* هدر */}
-      <div style={{
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '6px 4px',
-        background: 'var(--warn-soft)',
-        borderBottom: '1px dashed var(--warn)',
-      }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: 16 }}>🔧</span>
-          <b style={{ color: 'var(--warn)', fontSize: 'var(--fs-sm)' }}>اصلاح</b>
-        </span>
-        <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.5px' }}>{toFa(time)}</span>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <b style={{ color: 'var(--warn)', fontSize: 'var(--fs-sm)', fontWeight: 700 }}>اصلاح دستی</b>
+          <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(time)}</span>
+        </div>
+        {isRevoked && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--danger)' }}>لغو شده</span>}
       </div>
 
-      {/* بدنه: فیلدها (راست‌چین) */}
-      <div style={{ padding: '4px 4px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         {Object.keys(corr.changes).map(k => {
           const before = (log as any)[k];
           const after = (corr.changes as any)[k];
           return (
-            <div key={k} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', fontWeight: 600 }}>
-                {FIELD_LABEL[k] || k}:
-              </span>
-              <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-sm)', fontWeight: 700, textAlign: 'left' }}>
-                <span style={{ color: 'var(--danger)' }}>{toFa(String(before ?? '—'))}</span>
-                <span style={{ color: 'var(--muted)', margin: '0 6px' }}>→</span>
-                <span style={{ color: 'var(--accent)' }}>{toFa(String(after ?? '—'))}</span>
-              </span>
-            </div>
+            <Row
+              key={k}
+              l={FIELD_LABEL[k] || k}
+              v={
+                <span style={{ fontFamily: 'monospace' }}>
+                  <span style={{ color: 'var(--danger)' }}>{toFa(String(before ?? '—'))}</span>
+                  <span style={{ color: 'var(--muted)', margin: '0 6px' }}>←</span>
+                  <span style={{ color: 'var(--accent)' }}>{toFa(String(after ?? '—'))}</span>
+                </span>
+              }
+            />
           );
         })}
-        {corr.reason && (
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'flex', gap: 4, marginTop: 4 }}>
-            <span style={{ fontWeight: 600 }}>دلیل:</span>
-            <span>{corr.reason}</span>
-          </div>
-        )}
       </div>
 
-      {/* فوتر */}
-      {(isRevoked || isLatest) && (
-        <div style={{
-          padding: '6px 12px',
-          borderTop: '1px dashed var(--border)',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          background: 'transparent',
-        }}>
-          {isRevoked ? (
-            <span style={{ padding: '2px 8px', background: 'var(--danger-soft)', color: 'var(--danger)', borderRadius: 4, fontSize: 'var(--fs-xs)', fontWeight: 700 }}>
-              لغو شده
-            </span>
-          ) : <span />}
-          {isLatest && !isRevoked && (
-            <button
-              type="button"
-              onClick={onRevoke}
-              style={{
-                padding: '4px 10px', background: 'transparent',
-                border: '1px solid var(--border)', borderRadius: 'var(--r-sm)',
-                fontSize: 'var(--fs-xs)', color: 'var(--muted)',
-                cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600,
-              }}
-            >↩️ لغو</button>
-          )}
+      {corr.reason && (
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'flex', gap: 4 }}>
+          <span style={{ fontWeight: 600 }}>دلیل:</span>
+          <span>{corr.reason}</span>
+        </div>
+      )}
+
+      {isLatest && !isRevoked && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 2 }}>
+          <button
+            type="button"
+            onClick={onRevoke}
+            style={{
+              padding: '2px 8px', background: 'transparent',
+              border: '1px solid var(--border)', borderRadius: 'var(--r-sm)',
+              fontSize: 'var(--fs-2xs)', color: 'var(--danger)', cursor: 'pointer'
+            }}
+          >لغو</button>
         </div>
       )}
     </div>
