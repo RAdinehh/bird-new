@@ -32,13 +32,13 @@ export default function EnvironmentSection({ form, setForm, vErrors, showError, 
 
       <Grid2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-          <Field label="حداقل دما" error={showError('temperatureMin')}>
+          <Field label="حداقل دما" required error={showError('temperatureMin')} onTouch={() => markTouched('temperatureMin')}>
             <NumField placeholder="۲۰" value={form.temperatureMin} onChange={e => setForm({ ...form, temperatureMin: e.target.value })} unit="°C" min={-10} max={50} />
           </Field>
           
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-          <Field label="حداکثر دما" error={showError('temperatureMax')}>
+          <Field label="حداکثر دما" required error={showError('temperatureMax')} onTouch={() => markTouched('temperatureMax')}>
             <NumField placeholder="۲۵" value={form.temperatureMax} onChange={e => setForm({ ...form, temperatureMax: e.target.value })} unit="°C" min={-10} max={50} />
           </Field>
           

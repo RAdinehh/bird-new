@@ -33,8 +33,8 @@ export function createDlgSchema(context: ValidationContext = {}) {
 
     // محیط
     temperature: floatRange('دما', MIN_TEMP, MAX_TEMP).nullable().optional(),
-    temperatureMin: floatRange('حداقل دما', MIN_TEMP, MAX_TEMP).nullable().optional(),
-    temperatureMax: floatRange('حداکثر دما', MIN_TEMP, MAX_TEMP).nullable().optional(),
+    temperatureMin: floatRange('حداقل دما', MIN_TEMP, MAX_TEMP),
+    temperatureMax: floatRange('حداکثر دما', MIN_TEMP, MAX_TEMP),
     humidity: floatRange('رطوبت', 0, MAX_HUM).nullable().optional(),
     humidityMin: floatRange('حداقل رطوبت', 0, MAX_HUM).nullable().optional(),
     humidityMax: floatRange('حداکثر رطوبت', 0, MAX_HUM).nullable().optional(),
