@@ -4,6 +4,7 @@
  * همه‌ی cascadeها (whs, egg)، اعتبارسنجی و emit event اینجاست.
  */
 import { useDlg } from '../store';
+import { buildCorrectionEvents } from '../api/buildCorrectionEvents';
 import { useWhs, type Movement } from '../../whs/store';
 import { useFed } from '../../fed/store';
 import { useEgg, type EggProduction } from '../../egg/store';
@@ -282,8 +283,18 @@ export function useDlgSave(params: UseDlgSaveParams) {
 
         let logId: string;
         if (form.id) {
+          const oldLog = logs.find(l => l.id === form.id);
           update(form.id, data);
           logId = form.id;
+          // 🆕 Audit Trail — ثبت رویداد ویرایش
+          if (oldLog) {
+            try {
+              const evts = buildCorrectionEvents(oldLog, data, 'ویرایش مستقیم');
+              for (const ev of evts) {
+                useDlg.getState().addEvent(logId, ev);
+              }
+            } catch { /* silent */ }
+          }
         } else {
           logId = add(data);
           // 🆕 v16 — رویدادهای اولیه (الگوی FlockEvent)
