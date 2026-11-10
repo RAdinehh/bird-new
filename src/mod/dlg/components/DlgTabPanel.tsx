@@ -60,7 +60,8 @@ export default function DlgTabPanel({
   const allLogs = useDlg(s => s.logs);
   const todayStr = formatJ(new Date(), 'yyyy/MM/dd');
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [groupBy, setGroupBy] = useState<string>('none');
+  const [groupBy, setGroupBy] = useState<string>(tab === 'history' ? 'flockId' : 'none');
+  useEffect(() => { if (tab === 'history' && groupBy === 'none') setGroupBy('flockId'); }, [tab]);
 
   useFab(active ? { label: 'ثبت امروز', onClick: () => setPickerOpen(true) } : null);
 

@@ -56,7 +56,7 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
     const readingByTime = new Map<string, DlgEvent[]>();
     for (const ev of log.events || []) {
       if (ev.type === 'reading') {
-        const k = ev.createdAt || '';
+        const k = ev.entryTime || ev.createdAt || '';
         if (!readingByTime.has(k)) readingByTime.set(k, []);
         readingByTime.get(k)!.push(ev);
       } else {
@@ -164,10 +164,10 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
     >
       {/* ═══ هدر خلاصه سبز ═══ */}
       <div style={{
-        padding: '10px 12px',
+        padding: '4px 4px',
         background: 'var(--accent-soft)',
         border: '1px solid var(--accent-border)',
-        borderRadius: 'var(--r-md)',
+        borderRadius: 0,
         marginBottom: 10,
         display: 'flex',
         flexDirection: 'column',
@@ -220,7 +220,7 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
             type="button"
             onClick={() => { setFilter('all'); setFilterSheetOpen(false); }}
             style={{
-              padding: '10px 12px', background: filter === 'all' ? 'var(--accent-soft)' : 'var(--card)',
+              padding: '4px 4px', background: filter === 'all' ? 'var(--accent-soft)' : 'var(--card)',
               border: `1px solid ${filter === 'all' ? 'var(--accent)' : 'var(--border)'}`,
               borderRadius: 'var(--r-sm)', color: filter === 'all' ? 'var(--accent)' : 'var(--text)',
               textAlign: 'right', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700,
@@ -239,7 +239,7 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
                 type="button"
                 onClick={() => { setFilter(type); setFilterSheetOpen(false); }}
                 style={{
-                  padding: '10px 12px', background: isActive ? 'var(--accent-soft)' : 'var(--card)',
+                  padding: '4px 4px', background: isActive ? 'var(--accent-soft)' : 'var(--card)',
                   border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
                   borderRadius: 'var(--r-sm)', color: isActive ? 'var(--accent)' : 'var(--text)',
                   textAlign: 'right', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700,
@@ -293,22 +293,31 @@ function EventRow({ ev, isLatest, onRevoke }: { ev: DlgEvent; isLatest: boolean;
   const fieldLabel = ev.field ? (FIELD_LABEL[ev.field] || ev.field) : '';
   const hasBeforeAfter = ev.before !== undefined && ev.after !== undefined;
   
+  // فیلتر: تلفات ۰ نباید رندر شود
+  if (ev.type === 'death' && (!ev.count || ev.count === 0)) return null;
+
   let mainValue: string | null = null;
   if (hasBeforeAfter) {
     mainValue = `${toFa(String(ev.before ?? '—'))} → ${toFa(String(ev.after ?? '—'))}`;
+  } else if (ev.type === 'water' && ev.amount !== undefined) {
+    mainValue = `${toFa(ev.amount)} لیتر`;
+  } else if (ev.type === 'feed' && ev.amount !== undefined) {
+    mainValue = `${toFa(ev.amount)} کیلوگرم`;
+  } else if (ev.type === 'death' && ev.count !== undefined) {
+    mainValue = `${toFa(ev.count)} عدد`;
   } else if (ev.value !== undefined && ev.value !== null) {
     mainValue = `${toFa(ev.value)}`;
   } else if (ev.amount !== undefined) {
-    mainValue = `${toFa(ev.amount)} ${ev.unit || ''}`;
+    mainValue = `${toFa(ev.amount)}`;
   } else if (ev.count !== undefined) {
     mainValue = `${toFa(ev.count)}`;
   }
 
   return (
     <div style={{
-      background: 'var(--card)',
+      background: 'transparent',
       border: '1px solid var(--border)',
-      borderRadius: 'var(--r-md)',
+      borderRadius: 0,
       opacity: isRevoked ? 0.6 : 1,
       overflow: 'hidden',
       display: 'flex',
@@ -317,7 +326,7 @@ function EventRow({ ev, isLatest, onRevoke }: { ev: DlgEvent; isLatest: boolean;
       {/* ═══ هدر: راست (آیکون+نوع) / چپ (زمان) ═══ */}
       <div style={{
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '8px 12px',
+        padding: '6px 4px',
         background: 'var(--input-bg)',
         borderBottom: '1px dashed var(--border)',
       }}>
@@ -332,7 +341,7 @@ function EventRow({ ev, isLatest, onRevoke }: { ev: DlgEvent; isLatest: boolean;
       </div>
 
       {/* ═══ بدنه: فیلد و مقدار (راست‌چین) ═══ */}
-      <div style={{ padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{ padding: '4px 4px', display: 'flex', flexDirection: 'column', gap: 6 }}>
         {fieldLabel && mainValue && (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
             <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', fontWeight: 600 }}>{fieldLabel}:</span>
@@ -372,7 +381,7 @@ function EventRow({ ev, isLatest, onRevoke }: { ev: DlgEvent; isLatest: boolean;
           padding: '6px 12px',
           borderTop: '1px dashed var(--border)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          background: 'var(--card)',
+          background: 'transparent',
         }}>
           {isRevoked ? (
             <span style={{ padding: '2px 8px', background: 'var(--danger-soft)', color: 'var(--danger)', borderRadius: 4, fontSize: 'var(--fs-xs)', fontWeight: 700 }}>
@@ -402,9 +411,9 @@ function CorrectionRow({ corr, log, isLatest, onRevoke }: { corr: NonNullable<Da
   const time = corr.timestamp ? corr.timestamp.slice(11, 16) : '—';
   return (
     <div style={{
-      background: 'var(--card)',
+      background: 'transparent',
       border: `1px solid ${isRevoked ? 'var(--border)' : 'var(--warn)'}`,
-      borderRadius: 'var(--r-md)',
+      borderRadius: 0,
       opacity: isRevoked ? 0.6 : 1,
       overflow: 'hidden',
       display: 'flex',
@@ -413,7 +422,7 @@ function CorrectionRow({ corr, log, isLatest, onRevoke }: { corr: NonNullable<Da
       {/* هدر */}
       <div style={{
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '8px 12px',
+        padding: '6px 4px',
         background: 'var(--warn-soft)',
         borderBottom: '1px dashed var(--warn)',
       }}>
@@ -425,7 +434,7 @@ function CorrectionRow({ corr, log, isLatest, onRevoke }: { corr: NonNullable<Da
       </div>
 
       {/* بدنه: فیلدها (راست‌چین) */}
-      <div style={{ padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{ padding: '4px 4px', display: 'flex', flexDirection: 'column', gap: 6 }}>
         {Object.keys(corr.changes).map(k => {
           const before = (log as any)[k];
           const after = (corr.changes as any)[k];
@@ -456,7 +465,7 @@ function CorrectionRow({ corr, log, isLatest, onRevoke }: { corr: NonNullable<Da
           padding: '6px 12px',
           borderTop: '1px dashed var(--border)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          background: 'var(--card)',
+          background: 'transparent',
         }}>
           {isRevoked ? (
             <span style={{ padding: '2px 8px', background: 'var(--danger-soft)', color: 'var(--danger)', borderRadius: 4, fontSize: 'var(--fs-xs)', fontWeight: 700 }}>
@@ -485,12 +494,12 @@ function CorrectionRow({ corr, log, isLatest, onRevoke }: { corr: NonNullable<Da
 function MergedReadingRow({ time, events }: { time: string; events: DlgEvent[] }) {
   const timeStr = events[0].entryTime || (time ? time.slice(11, 16) : '—');
   return (
-    <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: 'var(--input-bg)', borderBottom: '1px dashed var(--border)' }}>
+    <div style={{ background: 'transparent', border: '1px solid var(--border)', borderRadius: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 4px', background: 'var(--input-bg)', borderBottom: '1px dashed var(--border)' }}>
         <span style={{ color: 'var(--info)', fontSize: 'var(--fs-sm)', fontWeight: 700 }}>اندازه‌گیری محیط</span>
         <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.5px' }}>{toFa(timeStr)}</span>
       </div>
-      <div style={{ padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{ padding: '4px 4px', display: 'flex', flexDirection: 'column', gap: 6 }}>
         {events.map(ev => (
           <Row
             key={ev.id}
