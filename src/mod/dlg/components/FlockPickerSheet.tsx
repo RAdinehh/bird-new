@@ -3,7 +3,7 @@
  * استاندارد: Batch-Centric + ExpandableCard (L10)
  */
 import { useMemo, useState } from 'react';
-import { Sheet, CardActions, Tag } from '../../../shr/components/ui';
+import { Sheet, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { toFa } from '../../../shr/utils/fa';
 import { useBrd } from '../../brd/store';
@@ -67,7 +67,7 @@ export default function FlockPickerSheet({ open, onClose, flocks, logs, todayStr
           const isExpanded = expandedFlockId === flock.id;
           const metaParts = [
             showBreed ? breed : null,
-            `${typeInfo.icon} ${typeInfo.label}`,
+            typeInfo.label,
             `${toFa(age)} روز`,
             `${toFa(alive)} زنده`,
             deathsToday > 0 ? `💀 ${toFa(deathsToday)}` : null,
@@ -91,20 +91,37 @@ export default function FlockPickerSheet({ open, onClose, flocks, logs, todayStr
                 else setExpandedFlockId(isExpanded ? null : flock.id);
               }}
             >
-              <CardActions
-                actions={[
-                  ...existingLogs.map(log => ({
-                    label: `✏️ ویرایش ${toFa(log.entryTime || '—')}`,
-                    variant: 'outline' as const,
-                    onClick: () => { onEdit(log); onClose(); },
-                  })),
-                  {
-                    label: '➕ ثبت جدید',
-                    variant: 'primary' as const,
-                    onClick: () => { onAdd(flock.id); onClose(); },
-                  },
-                ]}
-              />
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, paddingTop: 8 }}>
+                {existingLogs.map(log => (
+                  <button
+                    key={log.id}
+                    type="button"
+                    onClick={() => { onEdit(log); onClose(); }}
+                    style={{
+                      flex: '1 1 calc(50% - 6px)', minWidth: 110,
+                      padding: '8px 10px', background: 'var(--card)',
+                      border: '1px solid var(--border)', borderRadius: 'var(--r-sm)',
+                      color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
+                      cursor: 'pointer', fontWeight: 600,
+                    }}
+                  >
+                    ✏️ {toFa(log.entryTime || '—')}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => { onAdd(flock.id); onClose(); }}
+                  style={{
+                    flex: '1 1 calc(50% - 6px)', minWidth: 110,
+                    padding: '8px 10px', background: 'var(--accent)',
+                    border: '1px solid var(--accent)', borderRadius: 'var(--r-sm)',
+                    color: '#fff', fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
+                    fontWeight: 600, cursor: 'pointer',
+                  }}
+                >
+                  ➕ ثبت جدید
+                </button>
+              </div>
             </ExpandableCard>
           );
         })}
