@@ -129,20 +129,24 @@ export default function LogCard(props: LogCardProps) {
         {(l.humidityMin !== null || l.humidityMax !== null) && (
           <Row l="بازه رطوبت" v={`${l.humidityMin !== null ? toFa(l.humidityMin) : '—'} تا ${l.humidityMax !== null ? toFa(l.humidityMax) : '—'} ٪`} />
         )}
-        <Grid2>
-          <Row l="تهویه" v={VENTILATION_LABEL[l.ventilation] || '—'} />
-          <Row l="بستر" v={LITTER_LABEL[l.litter] || '—'} />
-        </Grid2>
+        {(l.ventilation !== 'ok' || l.litter !== 'dry') && (
+          <Grid2>
+            {l.ventilation !== 'ok' && <Row l="تهویه" v={VENTILATION_LABEL[l.ventilation] || '—'} />}
+            {l.litter !== 'dry' && <Row l="بستر" v={LITTER_LABEL[l.litter] || '—'} />}
+          </Grid2>
+        )}
       </LogSection>
 
-      <LogSection title="🐔 مشاهده پرنده">
-        <Grid3>
-          <Row l="رفتار" v={BEHAVIOR_LABEL[l.behavior] || '—'} />
-          <Row l="توزیع" v={DISTRIBUTION_LABEL[l.distribution] || '—'} />
-          <Row l="صدا" v={SOUND_LABEL[l.sound] || '—'} />
-        </Grid3>
-        {l.appearance && <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', lineHeight: 1.7 }}>{l.appearance}</div>}
-      </LogSection>
+      {(l.behavior !== 'active' || l.distribution !== 'uniform' || l.sound !== 'normal' || l.appearance) && (
+        <LogSection title="🐔 مشاهده پرنده">
+          <Grid3>
+            {l.behavior !== 'active' && <Row l="رفتار" v={BEHAVIOR_LABEL[l.behavior] || '—'} />}
+            {l.distribution !== 'uniform' && <Row l="توزیع" v={DISTRIBUTION_LABEL[l.distribution] || '—'} />}
+            {l.sound !== 'normal' && <Row l="صدا" v={SOUND_LABEL[l.sound] || '—'} />}
+          </Grid3>
+          {l.appearance && <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', lineHeight: 1.7 }}>{l.appearance}</div>}
+        </LogSection>
+      )}
 
       {(l.feedDelivered !== null || l.waterAmount !== null) && (
         <LogSection title="🌾 تغذیه و آب">
