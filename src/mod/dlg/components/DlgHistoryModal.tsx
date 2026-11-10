@@ -41,6 +41,7 @@ interface Props { open: boolean; onClose: () => void; log: DailyLog | null; }
 
 type TimelineItem =
   | { kind: 'event'; time: string; event: DlgEvent }
+  | { kind: 'merged-reading'; time: string; events: DlgEvent[] }
   | { kind: 'correction'; time: string; correction: NonNullable<DailyLog['corrections']>[number] };
 
 export default function DlgHistoryModal({ open, onClose, log }: Props) {
@@ -52,7 +53,20 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
   const items: TimelineItem[] = useMemo(() => {
     if (!log) return [];
     const list: TimelineItem[] = [];
-    for (const ev of log.events || []) list.push({ kind: 'event', time: ev.createdAt || '', event: ev });
+    const readingByTime = new Map<string, DlgEvent[]>();
+    for (const ev of log.events || []) {
+      if (ev.type === 'reading') {
+        const k = ev.createdAt || '';
+        if (!readingByTime.has(k)) readingByTime.set(k, []);
+        readingByTime.get(k)!.push(ev);
+      } else {
+        list.push({ kind: 'event', time: ev.createdAt || '', event: ev });
+      }
+    }
+    for (const [time, evs] of readingByTime.entries()) {
+      if (evs.length > 1) list.push({ kind: 'merged-reading', time, events: evs });
+      else list.push({ kind: 'event', time, event: evs[0] });
+    }
     for (const corr of log.corrections || []) list.push({ kind: 'correction', time: corr.timestamp || '', correction: corr });
     return list.sort((a, b) => b.time.localeCompare(a.time));
   }, [log]);
@@ -60,7 +74,9 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
   const typeCounts = useMemo(() => {
     const m = new Map<string, number>();
     for (const it of items) {
-      const k = it.kind === 'event' ? it.event.type : 'correction';
+      const k = it.kind === 'event' ? it.event.type
+              : it.kind === 'merged-reading' ? 'reading'
+              : 'correction';
       m.set(k, (m.get(k) || 0) + 1);
     }
     return m;
@@ -69,7 +85,9 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
   const filtered = useMemo(() => {
     if (filter === 'all') return items;
     return items.filter(it => {
-      const k = it.kind === 'event' ? it.event.type : 'correction';
+      const k = it.kind === 'event' ? it.event.type
+              : it.kind === 'merged-reading' ? 'reading'
+              : 'correction';
       return k === filter;
     });
   }, [items, filter]);
@@ -99,20 +117,26 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
   }, [groups, showAll]);
 
   // شناسه آخرین رویداد — فقط این قابل لغو است
-  const latestItemId = items.length > 0 ? (items[0].kind === 'event' ? items[0].event.id : items[0].correction.id) : null;
+  const latestItemId = items.length > 0 && items[0].kind !== 'merged-reading' ? (items[0].kind === 'event' ? items[0].event.id : items[0].correction.id) : null;
 
   const handleExport = () => {
     if (!log) return;
     try {
       const headers = ['زمان', 'نوع', 'فیلد', 'قبل', 'بعد', 'دلیل', 'لغو شده'];
-      const rows = items.map(it => {
+      const rows = items.flatMap(it => {
+        if (it.kind === 'merged-reading') {
+          return it.events.map(ev => {
+            const m = TYPE_META[ev.type];
+            return [ev.entryTime || ev.createdAt, m.label, ev.field || '', ev.value ?? '', '', ev.reason || ev.notes || '', ev.revoked ? 'بله' : 'خیر'];
+          });
+        }
         if (it.kind === 'event') {
           const m = TYPE_META[it.event.type];
-          return [it.event.entryTime || it.event.createdAt, m.label, it.event.field || '', it.event.before ?? '', it.event.after ?? it.event.value ?? it.event.amount ?? it.event.count ?? '', it.event.reason || it.event.notes || '', it.event.revoked ? 'بله' : 'خیر'];
+          return [[it.event.entryTime || it.event.createdAt, m.label, it.event.field || '', it.event.before ?? '', it.event.after ?? it.event.value ?? it.event.amount ?? it.event.count ?? '', it.event.reason || it.event.notes || '', it.event.revoked ? 'بله' : 'خیر']];
         }
         const c = it.correction;
         const fields = Object.keys(c.changes).map(k => `${FIELD_LABEL[k] || k}: ${(log as any)[k] ?? '—'}→${(c.changes as any)[k] ?? '—'}`).join(' • ');
-        return [c.timestamp, 'اصلاح', fields, '', '', c.reason, c.revoked ? 'بله' : 'خیر'];
+        return [[c.timestamp, 'اصلاح', fields, '', '', c.reason, c.revoked ? 'بله' : 'خیر']];
       });
       const csv = [headers.join(','), ...rows.map(r => r.map(x => `"${String(x).replace(/"/g, '""')}"`).join(','))].join('\n');
       downloadCSV(`dlg-${log.id}.csv`, '\uFEFF' + csv);
@@ -241,14 +265,15 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
                 📅 {group.label}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {group.items.map((it, idx) => {
-                  // فقط اگر این آیتم، در کل لیست (items) جدیدترین باشه، لغو داره
-                  const isTrulyLatest = it.kind === 'event' 
-                    ? it.event.id === latestItemId 
-                    : it.correction.id === latestItemId;
+                {group.items.map((it) => {
+                  if (it.kind === 'merged-reading') {
+                    return <MergedReadingRow key={it.events[0].id} time={it.time} events={it.events} />;
+                  }
                   if (it.kind === 'event') {
+                    const isTrulyLatest = it.event.id === latestItemId;
                     return <EventRow key={it.event.id} ev={it.event} isLatest={isTrulyLatest} onRevoke={() => handleRevokeEvent(it.event)} />;
                   }
+                  const isTrulyLatest = it.correction.id === latestItemId;
                   return <CorrectionRow key={it.correction.id} corr={it.correction} log={log} isLatest={isTrulyLatest} onRevoke={() => handleRevokeCorrection(it.correction.id)} />;
                 })}
               </div>
@@ -452,6 +477,28 @@ function CorrectionRow({ corr, log, isLatest, onRevoke }: { corr: NonNullable<Da
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+
+function MergedReadingRow({ time, events }: { time: string; events: DlgEvent[] }) {
+  const timeStr = events[0].entryTime || (time ? time.slice(11, 16) : '—');
+  return (
+    <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: 'var(--input-bg)', borderBottom: '1px dashed var(--border)' }}>
+        <span style={{ color: 'var(--info)', fontSize: 'var(--fs-sm)', fontWeight: 700 }}>اندازه‌گیری محیط</span>
+        <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.5px' }}>{toFa(timeStr)}</span>
+      </div>
+      <div style={{ padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {events.map(ev => (
+          <Row
+            key={ev.id}
+            l={FIELD_LABEL[ev.field || ''] || ev.field || 'مقدار'}
+            v={<span style={{ fontFamily: 'monospace', color: 'var(--info)' }}>{toFa(ev.value ?? 0)}</span>}
+          />
+        ))}
+      </div>
     </div>
   );
 }
