@@ -11,7 +11,7 @@ import { toastMsg } from '../../../cor/store/toast';
 import { useDlg, type DailyLog } from '../store';
 import type { DlgEvent, DlgEventType } from '../types-events';
 
-const TYPE_META: Record<DlgEventType, { label: string; tone: string }> = {
+const TYPE_META: Record<string, { label: string; tone: string }> = {
   create:     { label: 'ثبت اولیه',   tone: 'var(--accent)' },
   reading:    { label: 'اندازه‌گیری',  tone: 'var(--info)' },
   feed:       { label: 'دان',         tone: 'var(--warn)' },
@@ -22,6 +22,7 @@ const TYPE_META: Record<DlgEventType, { label: string; tone: string }> = {
   medication: { label: 'دارو',        tone: 'var(--warn)' },
   weight:     { label: 'وزن',         tone: 'var(--info)' },
   correction: { label: 'اصلاح',       tone: 'var(--warn)' },
+  health:     { label: 'سلامت',       tone: 'var(--accent)' },
 };
 
 const FIELD_LABEL: Record<string, string> = {
@@ -42,6 +43,8 @@ interface Props { open: boolean; onClose: () => void; log: DailyLog | null; }
 type TimelineItem =
   | { kind: 'event'; time: string; event: DlgEvent }
   | { kind: 'merged-reading'; time: string; events: DlgEvent[] }
+  | { kind: 'merged-health'; time: string; events: DlgEvent[] }
+  | { kind: 'merged-nutrition'; time: string; events: DlgEvent[] }
   | { kind: 'correction'; time: string; correction: NonNullable<DailyLog['corrections']>[number] };
 
 export default function DlgHistoryModal({ open, onClose, log }: Props) {
@@ -54,17 +57,35 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
     if (!log) return [];
     const list: TimelineItem[] = [];
     const readingByTime = new Map<string, DlgEvent[]>();
+    const healthByTime = new Map<string, DlgEvent[]>();
+    const nutritionByTime = new Map<string, DlgEvent[]>();
     for (const ev of log.events || []) {
       if (ev.type === 'reading') {
         const k = ev.entryTime || ev.createdAt || '';
         if (!readingByTime.has(k)) readingByTime.set(k, []);
         readingByTime.get(k)!.push(ev);
+      } else if (['vaccine', 'medication', 'death', 'activity'].includes(ev.type)) {
+        const k = ev.entryTime || ev.createdAt || '';
+        if (!healthByTime.has(k)) healthByTime.set(k, []);
+        healthByTime.get(k)!.push(ev);
+      } else if (['feed', 'water'].includes(ev.type)) {
+        const k = ev.entryTime || ev.createdAt || '';
+        if (!nutritionByTime.has(k)) nutritionByTime.set(k, []);
+        nutritionByTime.get(k)!.push(ev);
       } else {
         list.push({ kind: 'event', time: ev.createdAt || '', event: ev });
       }
     }
     for (const [time, evs] of readingByTime.entries()) {
       if (evs.length > 1) list.push({ kind: 'merged-reading', time, events: evs });
+      else list.push({ kind: 'event', time, event: evs[0] });
+    }
+    for (const [time, evs] of healthByTime.entries()) {
+      if (evs.length > 1) list.push({ kind: 'merged-health', time, events: evs });
+      else list.push({ kind: 'event', time, event: evs[0] });
+    }
+    for (const [time, evs] of nutritionByTime.entries()) {
+      if (evs.length > 1) list.push({ kind: 'merged-nutrition', time, events: evs });
       else list.push({ kind: 'event', time, event: evs[0] });
     }
     for (const corr of log.corrections || []) list.push({ kind: 'correction', time: corr.timestamp || '', correction: corr });
@@ -76,6 +97,8 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
     for (const it of items) {
       const k = it.kind === 'event' ? it.event.type
               : it.kind === 'merged-reading' ? 'reading'
+              : it.kind === 'merged-health' ? 'health'
+              : it.kind === 'merged-nutrition' ? 'nutrition'
               : 'correction';
       m.set(k, (m.get(k) || 0) + 1);
     }
@@ -87,6 +110,8 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
     return items.filter(it => {
       const k = it.kind === 'event' ? it.event.type
               : it.kind === 'merged-reading' ? 'reading'
+              : it.kind === 'merged-health' ? 'health'
+              : it.kind === 'merged-nutrition' ? 'nutrition'
               : 'correction';
       return k === filter;
     });
@@ -95,12 +120,17 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
   const groups = useMemo(() => {
     const map = new Map<string, TimelineItem[]>();
     for (const it of filtered) {
-      const key = it.kind === 'event' ? (it.event.date || '') : (log?.date || '');
+      const d = it.kind === 'event' ? it.event.date : (it.kind === 'correction' ? (log?.date || '') : it.events[0].date);
+      const t = it.kind === 'event' ? it.event.entryTime : (it.kind === 'correction' ? (log?.entryTime || '') : it.events[0].entryTime);
+      const key = `${d}|${t || ''}`;
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(it);
     }
     const sortedKeys = Array.from(map.keys()).sort((a, b) => b.localeCompare(a));
-    return sortedKeys.map(k => ({ label: k || 'نامشخص', items: map.get(k)! }));
+    return sortedKeys.map(k => {
+      const [date, time] = k.split('|');
+      return { label: date, time, items: map.get(k)! };
+    });
   }, [filtered, log]);
 
   const visibleData = useMemo(() => {
@@ -117,7 +147,18 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
   }, [groups, showAll]);
 
   // شناسه آخرین رویداد — فقط این قابل لغو است
-  const latestItemId = items.length > 0 && items[0].kind !== 'merged-reading' ? (items[0].kind === 'event' ? items[0].event.id : items[0].correction.id) : null;
+  const latestItemId = (() => {
+    let latest: { time: string; id: string } | null = null;
+    for (const ev of log?.events || []) {
+      const t = ev.createdAt || '';
+      if (!latest || t > latest.time) latest = { time: t, id: ev.id };
+    }
+    for (const corr of log?.corrections || []) {
+      const t = corr.timestamp || '';
+      if (!latest || t > latest.time) latest = { time: t, id: corr.id };
+    }
+    return latest?.id || null;
+  })();
 
   const handleExport = () => {
     if (!log) return;
@@ -128,6 +169,18 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
           return it.events.map(ev => {
             const m = TYPE_META[ev.type];
             return [ev.entryTime || ev.createdAt, m.label, ev.field || '', ev.value ?? '', '', ev.reason || ev.notes || '', ev.revoked ? 'بله' : 'خیر'];
+          });
+        }
+        if (it.kind === 'merged-nutrition') {
+          return it.events.map(ev => {
+            const m = TYPE_META[ev.type];
+            return [ev.entryTime || ev.createdAt, m.label, '', ev.amount ?? '', '', '', ev.revoked ? 'بله' : 'خیر'];
+          });
+        }
+        if (it.kind === 'merged-health') {
+          return it.events.map(ev => {
+            const m = TYPE_META[ev.type];
+            return [ev.entryTime || ev.createdAt, m.label, ev.notes || '', '', '', ev.reason || '', ev.revoked ? 'بله' : 'خیر'];
           });
         }
         if (it.kind === 'event') {
@@ -159,7 +212,7 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
   if (!log) return null;
 
   return (
-    <Modal open={open} onClose={onClose} title={`📜 تاریخچه — ${toFa(log.date)}${log.entryTime ? ' • ' + toFa(log.entryTime) : ''}`}
+    <Modal open={open} onClose={onClose} title={`📜 تاریخچه — ${log.entryTime ? toFa(log.entryTime) + ' • ' : ''}${toFa(log.date)}`}
       footer={<BtnRow><Btn onClick={handleExport}>📥 CSV</Btn><Btn onClick={onClose}>بستن</Btn></BtnRow>}
     >
       {/* ═══ هدر خلاصه سبز ═══ */}
@@ -260,14 +313,21 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
       ) : (
         <>
           {visibleData.items.map(group => (
-            <div key={group.label} style={{ marginBottom: 10 }}>
-              <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>
-                📅 {group.label}
+            <div key={group.label + group.time} style={{ marginBottom: 10 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>
+                <span>📅 {toFa(group.label)}</span>
+                {group.time && <span style={{ fontFamily: 'monospace' }}>{toFa(group.time)}</span>}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {group.items.map((it) => {
                   if (it.kind === 'merged-reading') {
-                    return <MergedReadingRow key={it.events[0].id} time={it.time} events={it.events} />;
+                    return <MergedReadingRow key={it.events[0].id} events={it.events} />;
+                  }
+                  if (it.kind === 'merged-health') {
+                    return <MergedHealthRow key={it.events[0].id} events={it.events} />;
+                  }
+                  if (it.kind === 'merged-nutrition') {
+                    return <MergedNutritionRow key={it.events[0].id} events={it.events} />;
                   }
                   if (it.kind === 'event') {
                     const isTrulyLatest = it.event.id === latestItemId;
@@ -288,179 +348,157 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
 
 function EventRow({ ev, isLatest, onRevoke }: { ev: DlgEvent; isLatest: boolean; onRevoke: () => void }) {
   if (ev.type === 'death' && (!ev.count || ev.count === 0)) return null;
+  if (ev.type === 'create') return null;
 
   const meta = TYPE_META[ev.type];
   const isRevoked = ev.revoked === true;
-  const time = ev.entryTime || (ev.createdAt ? ev.createdAt.slice(11, 16) : '—');
   
-  let label = '';
-  let mainVal: string | null = null;
-  let beforeVal: string | null = null;
-  let afterVal: string | null = null;
-
+  // استخراج مقدار برای نمایش در یک خط
+  let valueStr: string | React.ReactNode = '';
   if (ev.before !== undefined && ev.after !== undefined) {
-    label = FIELD_LABEL[ev.field || ''] || ev.field || 'مقدار';
-    beforeVal = String(ev.before ?? '—');
-    afterVal = String(ev.after ?? '—');
+    valueStr = (
+      <span style={{ fontFamily: 'monospace' }}>
+        <span style={{ color: 'var(--danger)' }}>{toFa(String(ev.before ?? '—'))}</span>
+        <span style={{ color: 'var(--muted)', margin: '0 4px' }}>←</span>
+        <span style={{ color: 'var(--accent)' }}>{toFa(String(ev.after ?? '—'))}</span>
+      </span>
+    );
   } else if (ev.type === 'water' && ev.amount !== undefined) {
-    label = 'مصرف آب';
-    mainVal = `${toFa(ev.amount)} لیتر`;
+    valueStr = `${toFa(ev.amount)} لیتر`;
   } else if (ev.type === 'feed' && ev.amount !== undefined) {
-    label = 'مصرف دان';
-    mainVal = `${toFa(ev.amount)} کیلوگرم`;
+    valueStr = `${toFa(ev.amount)} کیلوگرم`;
   } else if (ev.type === 'death' && ev.count !== undefined) {
-    label = 'تلفات';
-    mainVal = `${toFa(ev.count)} عدد`;
-  } else if (ev.type === 'vaccine') {
-    label = 'واکسن';
-    mainVal = ev.notes || ev.reason || 'ثبت شده';
-  } else if (ev.type === 'medication') {
-    label = 'دارو';
-    mainVal = ev.notes || ev.reason || 'ثبت شده';
+    valueStr = `${toFa(ev.count)} عدد`;
+  } else if (ev.type === 'vaccine' || ev.type === 'medication') {
+    valueStr = ev.notes || ev.reason || 'ثبت شده';
   } else if (ev.field) {
-    label = FIELD_LABEL[ev.field] || ev.field;
-    mainVal = `${toFa(ev.value ?? 0)}`;
+    valueStr = toFa(ev.value ?? 0);
   } else if (ev.value !== undefined && ev.value !== null) {
-    label = 'مقدار';
-    mainVal = `${toFa(ev.value)}`;
+    valueStr = toFa(ev.value);
   }
 
   return (
     <div style={{
-      padding: '10px 12px',
+      padding: '8px 10px',
       background: 'var(--input-bg)',
-      borderRadius: 'var(--r-md)',
+      borderRadius: 'var(--r-sm)',
       border: '1px solid var(--border)',
       opacity: isRevoked ? 0.7 : 1,
       display: 'flex',
       flexDirection: 'column',
-      gap: 6,
+      gap: 4,
     }}>
+      {/* Header: نوع + زمان */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <b style={{ color: meta.tone, fontSize: 'var(--fs-sm)', fontWeight: 700 }}>{meta.label}</b>
-          <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(time)}</span>
+          {ev.field && ev.type !== 'water' && ev.type !== 'feed' && ev.type !== 'death' && ev.type !== 'vaccine' && ev.type !== 'medication' && (
+            <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>({FIELD_LABEL[ev.field] || ev.field})</span>
+          )}
         </div>
-        {isRevoked && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--danger)' }}>لغو شده</span>}
       </div>
 
-      {label && (
-        <Row
-          l={label}
-          v={
-            beforeVal !== null && afterVal !== null ? (
-              <span style={{ fontFamily: 'monospace' }}>
-                <span style={{ color: 'var(--danger)' }}>{toFa(beforeVal)}</span>
-                <span style={{ color: 'var(--muted)', margin: '0 6px' }}>←</span>
-                <span style={{ color: 'var(--accent)' }}>{toFa(afterVal)}</span>
-              </span>
-            ) : (
-              <span style={{ fontFamily: 'monospace', color: meta.tone }}>{mainVal}</span>
-            )
-          }
-        />
-      )}
-
-      {ev.reason && (
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'flex', gap: 4 }}>
-          <span style={{ fontWeight: 600 }}>دلیل:</span>
-          <span>{ev.reason}</span>
+      {/* Body: مقدار + دلیل + دکمه لغو */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }}>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-sm)', fontWeight: 700, color: meta.tone }}>
+            {valueStr}
+          </span>
+          {ev.reason && (
+            <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)' }}>({ev.reason})</span>
+          )}
         </div>
-      )}
-
-      {isLatest && !isRevoked && ev.type !== 'create' && (
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 2 }}>
-          <button
-            type="button"
-            onClick={onRevoke}
-            style={{
-              padding: '2px 8px', background: 'transparent',
-              border: '1px solid var(--border)', borderRadius: 'var(--r-sm)',
-              fontSize: 'var(--fs-2xs)', color: 'var(--danger)', cursor: 'pointer'
-            }}
-          >لغو</button>
+        
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          {isRevoked && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--danger)' }}>لغو شده</span>}
+          {isLatest && !isRevoked && (
+            <button
+              type="button"
+              onClick={onRevoke}
+              style={{
+                padding: '2px 8px', background: 'transparent',
+                border: '1px solid var(--border)', borderRadius: 'var(--r-sm)',
+                fontSize: 'var(--fs-2xs)', color: 'var(--danger)', cursor: 'pointer'
+              }}
+            >لغو</button>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
 
 function CorrectionRow({ corr, log, isLatest, onRevoke }: { corr: NonNullable<DailyLog['corrections']>[number]; log: DailyLog; isLatest: boolean; onRevoke: () => void }) {
   const isRevoked = corr.revoked === true;
-  const time = corr.timestamp ? corr.timestamp.slice(11, 16) : '—';
+  return (
+    <div style={{
+      padding: '8px 10px',
+      background: 'var(--input-bg)',
+      borderRadius: 'var(--r-sm)',
+      border: '1px solid var(--border)',
+      opacity: isRevoked ? 0.7 : 1,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 4,
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <b style={{ color: 'var(--warn)', fontSize: 'var(--fs-sm)', fontWeight: 700 }}>اصلاح دستی</b>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 2 }}>
+        {Object.keys(corr.changes).map(k => {
+          const before = (log as any)[k];
+          const after = (corr.changes as any)[k];
+          return (
+            <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
+              <span style={{ color: 'var(--muted)' }}>{FIELD_LABEL[k] || k}:</span>
+              <span style={{ fontFamily: 'monospace' }}>
+                <span style={{ color: 'var(--danger)' }}>{toFa(String(before ?? '—'))}</span>
+                <span style={{ color: 'var(--muted)', margin: '0 4px' }}>←</span>
+                <span style={{ color: 'var(--accent)' }}>{toFa(String(after ?? '—'))}</span>
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }}>
+        <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)' }}>
+          {corr.reason ? `دلیل: ${corr.reason}` : ''}
+        </span>
+        <div style={{ display: 'flex', gap: 6 }}>
+          {isRevoked && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--danger)' }}>لغو شده</span>}
+          {isLatest && !isRevoked && (
+            <button
+              type="button"
+              onClick={onRevoke}
+              style={{
+                padding: '2px 8px', background: 'transparent',
+                border: '1px solid var(--border)', borderRadius: 'var(--r-sm)',
+                fontSize: 'var(--fs-2xs)', color: 'var(--danger)', cursor: 'pointer'
+              }}
+            >لغو</button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+function MergedReadingRow({ events }: { events: DlgEvent[] }) {
   return (
     <div style={{
       padding: '10px 12px',
       background: 'var(--input-bg)',
       borderRadius: 'var(--r-md)',
       border: '1px solid var(--border)',
-      opacity: isRevoked ? 0.7 : 1,
       display: 'flex',
       flexDirection: 'column',
       gap: 6,
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <b style={{ color: 'var(--warn)', fontSize: 'var(--fs-sm)', fontWeight: 700 }}>اصلاح دستی</b>
-          <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(time)}</span>
-        </div>
-        {isRevoked && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--danger)' }}>لغو شده</span>}
+        <b style={{ color: 'var(--info)', fontSize: 'var(--fs-sm)', fontWeight: 700 }}>اندازه‌گیری محیط</b>
       </div>
-
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        {Object.keys(corr.changes).map(k => {
-          const before = (log as any)[k];
-          const after = (corr.changes as any)[k];
-          return (
-            <Row
-              key={k}
-              l={FIELD_LABEL[k] || k}
-              v={
-                <span style={{ fontFamily: 'monospace' }}>
-                  <span style={{ color: 'var(--danger)' }}>{toFa(String(before ?? '—'))}</span>
-                  <span style={{ color: 'var(--muted)', margin: '0 6px' }}>←</span>
-                  <span style={{ color: 'var(--accent)' }}>{toFa(String(after ?? '—'))}</span>
-                </span>
-              }
-            />
-          );
-        })}
-      </div>
-
-      {corr.reason && (
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'flex', gap: 4 }}>
-          <span style={{ fontWeight: 600 }}>دلیل:</span>
-          <span>{corr.reason}</span>
-        </div>
-      )}
-
-      {isLatest && !isRevoked && (
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 2 }}>
-          <button
-            type="button"
-            onClick={onRevoke}
-            style={{
-              padding: '2px 8px', background: 'transparent',
-              border: '1px solid var(--border)', borderRadius: 'var(--r-sm)',
-              fontSize: 'var(--fs-2xs)', color: 'var(--danger)', cursor: 'pointer'
-            }}
-          >لغو</button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-
-function MergedReadingRow({ time, events }: { time: string; events: DlgEvent[] }) {
-  const timeStr = events[0].entryTime || (time ? time.slice(11, 16) : '—');
-  return (
-    <div style={{ background: 'transparent', border: '1px solid var(--border)', borderRadius: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 4px', background: 'var(--input-bg)', borderBottom: '1px dashed var(--border)' }}>
-        <span style={{ color: 'var(--info)', fontSize: 'var(--fs-sm)', fontWeight: 700 }}>اندازه‌گیری محیط</span>
-        <span style={{ fontFamily: 'monospace', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, letterSpacing: '.5px' }}>{toFa(timeStr)}</span>
-      </div>
-      <div style={{ padding: '4px 4px', display: 'flex', flexDirection: 'column', gap: 6 }}>
         {events.map(ev => (
           <Row
             key={ev.id}
@@ -468,6 +506,60 @@ function MergedReadingRow({ time, events }: { time: string; events: DlgEvent[] }
             v={<span style={{ fontFamily: 'monospace', color: 'var(--info)' }}>{toFa(ev.value ?? 0)}</span>}
           />
         ))}
+      </div>
+    </div>
+  );
+}
+
+function MergedHealthRow({ events }: { events: DlgEvent[] }) {
+  return (
+    <div style={{
+      padding: '10px 12px',
+      background: 'var(--input-bg)',
+      borderRadius: 'var(--r-md)',
+      border: '1px solid var(--border)',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 6,
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <b style={{ color: 'var(--accent)', fontSize: 'var(--fs-sm)', fontWeight: 700 }}>سلامت (واکسن / دارو / تلفات / فعالیت)</b>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        {events.map(ev => {
+          let l = '', v = '';
+          if (ev.type === 'vaccine') { l = 'واکسن'; v = ev.notes || 'ثبت شده'; }
+          else if (ev.type === 'medication') { l = 'دارو'; v = ev.notes || 'ثبت شده'; }
+          else if (ev.type === 'death') { l = 'تلفات'; v = `${toFa(ev.count || 0)} عدد`; }
+          else if (ev.type === 'activity') { l = 'فعالیت'; v = ev.notes || 'ثبت شده'; }
+          return <Row key={ev.id} l={l} v={<span style={{ fontFamily: 'monospace', color: 'var(--accent)' }}>{v}</span>} />;
+        })}
+      </div>
+    </div>
+  );
+}
+
+function MergedNutritionRow({ events }: { events: DlgEvent[] }) {
+  return (
+    <div style={{
+      padding: '10px 12px',
+      background: 'var(--input-bg)',
+      borderRadius: 'var(--r-md)',
+      border: '1px solid var(--border)',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 6,
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <b style={{ color: 'var(--warn)', fontSize: 'var(--fs-sm)', fontWeight: 700 }}>تغذیه و آب</b>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        {events.map(ev => {
+          let l = '', v = '';
+          if (ev.type === 'feed') { l = 'مصرف دان'; v = `${toFa(ev.amount || 0)} کیلوگرم`; }
+          else if (ev.type === 'water') { l = 'مصرف آب'; v = `${toFa(ev.amount || 0)} لیتر`; }
+          return <Row key={ev.id} l={l} v={<span style={{ fontFamily: 'monospace', color: 'var(--warn)' }}>{v}</span>} />;
+        })}
       </div>
     </div>
   );

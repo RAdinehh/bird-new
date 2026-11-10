@@ -64,6 +64,11 @@ export function extractEvents(log: DailyLog): WithoutId[] {
     }
   }
 
+  // activity
+  for (const a of log.activities || []) {
+    out.push({ ...base, type: 'activity' as DlgEventType, notes: a.notes || a.type || 'فعالیت' });
+  }
+
   // vaccine
   for (const v of log.vaccines || []) {
     out.push({ ...base, type: 'vaccine', notes: v.name });

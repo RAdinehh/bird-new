@@ -13,7 +13,8 @@ export type DlgEventType =
   | 'vaccine'
   | 'medication'
   | 'weight'
-  | 'correction';
+  | 'correction'
+  | 'activity';
 
 export type DlgEventReasonCode =
   | 'data_entry_error'
