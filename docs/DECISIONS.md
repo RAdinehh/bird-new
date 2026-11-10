@@ -1134,3 +1134,68 @@ UI تغییر: صفر.
 **تفکیک از C4-log:**
 - C4-log = اصلاحات روزانه (dlg) — AggregateTabPanel
 - C4 Dunning = یادآور مطالبات (tra) — computeUpcoming
+
+## 🔍 تحلیل معماری: بخش تغذیه/دان/آب dlg (1405/11/11)
+
+### وضعیت فعلی — چه چیز کار می‌کنه، چه چیزی نه
+
+#### ✅ سناریوهای پشتیبانی‌شده
+- **جیرهٔ کامل:** کاربر جیره X رو ۵۰kg می‌ده → `buildFeedMovements` BOM می‌شکنه → ۳ حرکت جدا
+- **یه آیتم تکی:** فقط ۲۰kg ذرت → یه Movement
+- **دستی/اتومات:** `detectSystems` از hall.feederType/drinkerType تشخیص می‌ده
+
+#### ❌ سناریوهای پشتیبانی‌نشده (مشکل جدی)
+- چند آیتم تکی در یه لاگ (۳۰kg ذرت + ۱۰kg سویا)
+- ترکیبی (جیره + آیتم اضافی)
+- جیرهٔ چندگانه در روز (صبح جیره A، عصر جیره B)
+- دان دستی + جیره اتومات با هم
+
+**علت ریشه‌ای:** `DailyLog.feedSourceId: string` تکی است، نه آرایه.
+
+### معماری — قابل ارتقاست؟ ✅ ۸۵٪
+- fed.store جدا (Formula.lines[] با percent)
+- whs.store جدا (Movement با sourceModule + sourceId)
+- buildFeedMovements تابع خالص (قابل بازنویسی)
+- FeedSection فقط UI (بدون state logic)
+- Event Bus (outbound)
+
+### نقاط ضعف معماری
+1. `Movement` بدون `formulaId` (ردیابی معکوس ممکن نیست)
+2. `Movement` بدون `batchNumber`/`supplierId` (ردیابی دسته ناقص)
+3. `Formula` بدون `version` (نسخه‌بندی نیست)
+4. `feedSourceId` تکی (multi-source نیست)
+5. بدون `feedWaste`, `numberOfFeedings`, `feedTime`
+6. بدون کیفیت آب (pH, کلر, سختی)
+7. بدون FCR روزانه
+8. بدون پیش‌بینی اتمام دان
+
+### مسیر ارتقاء (اولویت)
+**فوری (این هفته):**
+- [ ] IDEA-27: `Formula.version: number`
+- [ ] IDEA-26: `Movement.formulaId` + `formulaVersion`
+- [ ] IDEA-25: `feedSources: FeedSource[]` جای `feedSourceId`
+
+**میان‌مدت (۲ هفته):**
+- [ ] `Movement.batchNumber` + `supplierId`
+- [ ] `Formula` مقادیر تغذیه‌ای (پروتئین، انرژی، کلسیم، ...)
+- [ ] `DailyLog.feedWaste` + `numberOfFeedings` + `feedTime`
+- [ ] `DailyLog.waterQuality` (pH, کلر, سختی)
+
+**بلندمدت (۱ ماه):**
+- [ ] FCR روزانه (auto)
+- [ ] پیش‌بینی اتمام دان (auto)
+- [ ] مقایسه با استاندارد نژاد (auto)
+
+### استانداردهای بین‌المللی مرتبط
+- AAFCO (آمریکا): برچسب جیره + مقادیر تغذیه‌ای
+- FEDIAF (اروپا): نسخه‌بندی + برچسب
+- FDA 21 CFR Part 11: رکورد دستکاری‌ناپذیر
+- GFSI: ردیابی معکوس
+- ISO 22000: ردیابی دسته
+
+### آمادگی نهایی
+- مزرعه کوچک-متوسط: ✅ کافیه
+- مزرعه صنعتی: ❌ ناقص
+- ممیزی FDA: ❌ ناقص
+- تغذیه دقیق multi-source: ❌ ناقص
+- تحلیل هزینه دقیق: 🟡 نیمه (بدون batchNumber)
