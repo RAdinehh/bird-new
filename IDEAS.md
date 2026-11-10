@@ -45,3 +45,17 @@
 - ⚠️ دان شرطی: manual=اختیاری، auto=اجباری (پیاده شد)
 - ⚠️ تلفات: اختیاری (برگشت)
 - ⚠️ ستاره از Field.tsx خودکار میاد (color: --danger)
+
+### 🔴 نقص حیاتی: چند منبع دان + ردیابی جیره (1405/11/11)
+- [IDEA-25] [dlg+whs+fed] تغییر `feedSourceId: string` → `feedSources: Array<{type, id, quantity}>` — چرا: کاربر باید بتونه هم جیره، هم چند آیتم تکی، هم ترکیبشون رو در یه لاگ ثبت کنه
+- [IDEA-26] [whs] اضافه `formulaId` + `formulaVersion` به `Movement` — چرا: الان Movement نمی‌دونه از کدوم جیره اومده، ردیابی معکوس ممکن نیست
+- [IDEA-27] [fed] اضافه `version: number` به `Formula` — چرا: نسخه‌بندی برای ممیزی (استاندارد FDA 21 CFR Part 11)
+- [IDEA-28] [dlg] `buildFeedMovements` رو بازنویسی کن برای `feedSources[]` — چرا: باید هر منبع رو جدا پردازش کنه
+- [IDEA-29] [dlg] UI جدید `FeedSection`: multi-source با مقادیر (دکمهٔ «افزودن منبع دیگر») — چرا: الان فقط یه منبع در هر لاگ
+
+### 📋 استانداردهای بین‌المللی مرتبط (مرجع)
+- AAFCO (آمریکا): برچسب جیره + مقادیر تغذیه‌ای
+- FEDIAF (اروپا): نسخه‌بندی و برچسب
+- FDA 21 CFR Part 11: رکورد دستکاری‌ناپذیر
+- Global Food Safety Initiative (GFSI): ردیابی معکوس
+- ISO 22000: ردیابی دسته
