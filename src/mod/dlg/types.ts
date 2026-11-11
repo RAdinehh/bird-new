@@ -10,7 +10,7 @@ export interface F {
   humidity: string; humidityMin: string; humidityMax: string;
   ventilation: string; litter: string;
   behavior: string; distribution: string; appearance: string; sound: string;
-  feedType: string; feedDelivered: string; feedRemaining: string;
+  feedType: string; feedDelivered: string; feedRemaining: string; feedWaste: string;
   feedSourceType: 'formula' | 'item' | ''; feedSourceId: string; feedSources?: FeedSource[]; feedMovementIds: string[];
   feedMethod: 'scoop' | 'bag' | 'semi_auto' | 'auto_sensor' | 'auto_chain' | '';
   waterMethod: 'manual' | 'nipple' | 'trough' | 'tank' | '';

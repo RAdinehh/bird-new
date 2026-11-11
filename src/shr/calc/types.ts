@@ -141,6 +141,8 @@ export interface FeedParams {
   feedDeliveredKg: number;
   feedRemainingKg: number | null;
   previousRemainingKg: number | null;
+  /** 🆕 هدر رفته (ریخته‌شده/خراب) */
+  feedWasteKg?: number | null;
   aliveCount: number;
 }
 

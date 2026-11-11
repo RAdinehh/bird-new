@@ -102,6 +102,8 @@ export interface DailyLog {
   feedDelivered: number | null;    // kg (دان داده‌شده)
   feedConsumed: number | null;     // kg (دان مصرف‌شده — مشتق)
   feedRemaining: number | null; // kg
+  /** 🆕 هدر رفته (ریخته‌شده یا خراب) — برای محاسبه دقیق‌تر feedConsumed */
+  feedWaste: number | null;
   feedSourceType: 'formula' | 'item' | '';
   feedSourceId: string;
   /** 🆕 منابع دان چندگانه (اختیاری — برای سازگاری با داده‌های قدیمی) */

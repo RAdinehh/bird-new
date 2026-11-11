@@ -22,6 +22,7 @@ export function calculateFeedMetrics(params: FeedParams): FeedResult {
     feedDeliveredKg,
     feedRemainingKg,
     previousRemainingKg,
+    feedWasteKg,
     aliveCount,
   } = params;
 
@@ -47,6 +48,11 @@ export function calculateFeedMetrics(params: FeedParams): FeedResult {
       mode = 'simple';
       feedConsumedKg = feedDeliveredKg;
     }
+  }
+
+  // 🆕 کسر هدر رفته (اگر داده شده)
+  if (feedWasteKg != null && feedWasteKg > 0) {
+    feedConsumedKg = Math.max(0, feedConsumedKg - feedWasteKg);
   }
 
   if (feedConsumedKg < 0) {

@@ -256,13 +256,17 @@ export default function FeedSection({ form, setForm }: Props) {
         <Field label="دان باقی‌مانده">
           <NumField placeholder="۰" value={form.feedRemaining} onChange={e => setForm({ ...form, feedRemaining: e.target.value })} unit="kg" min={0} />
         </Field>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingBottom: 4 }}>دان مصرف‌شده به ازای هر پرنده</span>
-          <div style={{ height: 44, padding: '0 12px', background: feedPerBirdG > 0 ? 'var(--info-soft)' : 'var(--input-bg)', border: `1px solid ${feedPerBirdG > 0 ? 'var(--info)' : 'var(--border)'}`, borderRadius: 'var(--r-sm)', display: 'flex', alignItems: 'center', fontFamily: 'monospace', fontWeight: 700, color: feedPerBirdG > 0 ? 'var(--info)' : 'var(--muted)' }}>
-            {feedPerBirdG > 0 ? `${toFa(feedPerBirdG.toFixed(1))} گرم` : (totalFeed > 0 && remainingNum === totalFeed ? 'مصرف صفر' : '—')}
-          </div>
-        </div>
+        <Field label="هدر رفته (اختیاری)" hint="ریخته‌شده یا خراب">
+          <NumField placeholder="۰" value={form.feedWaste} onChange={e => setForm({ ...form, feedWaste: e.target.value })} unit="kg" min={0} />
+        </Field>
       </Grid2>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingBottom: 4 }}>دان مصرف‌شده به ازای هر پرنده</span>
+        <div style={{ height: 44, padding: '0 12px', background: feedPerBirdG > 0 ? 'var(--info-soft)' : 'var(--input-bg)', border: `1px solid ${feedPerBirdG > 0 ? 'var(--info)' : 'var(--border)'}`, borderRadius: 'var(--r-sm)', display: 'flex', alignItems: 'center', fontFamily: 'monospace', fontWeight: 700, color: feedPerBirdG > 0 ? 'var(--info)' : 'var(--muted)' }}>
+          {feedPerBirdG > 0 ? `${toFa(feedPerBirdG.toFixed(1))} گرم` : (totalFeed > 0 && remainingNum === totalFeed ? 'مصرف صفر' : '—')}
+        </div>
+      </div>
 
       {form.waterMethod === 'manual' && (
         <>
@@ -287,8 +291,8 @@ export default function FeedSection({ form, setForm }: Props) {
 
       {form.waterMethod !== 'manual' && form.waterMethod !== '' && (
         <>
-          <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 600 }}>
-            ⚠️ سیستم {WATER_SYSTEM_LABEL[form.waterMethod as 'nipple' | 'trough' | 'tank']} — فعلاً فقط دستی پیاده شده
+          <div style={{ padding: 'var(--pad-normal)', background: 'var(--info-soft)', border: '1px solid var(--info)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 600 }}>
+            💡 سیستم {WATER_SYSTEM_LABEL[form.waterMethod as 'nipple' | 'trough' | 'tank']} — مقدار تخمینی روزانه را وارد کنید
           </div>
           <Field label="مقدار آب مصرفی (تخمینی)" required={isWaterAuto}>
             <NumField placeholder="۱۰۰" value={form.waterAmount} onChange={e => setForm({ ...form, waterAmount: e.target.value })} unit="L" min={0} />

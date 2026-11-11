@@ -21,7 +21,7 @@ export function newLog(flockId = ''): F {
     humidity: '', humidityMin: '', humidityMax: '',
     ventilation: 'ok', litter: 'dry',
     behavior: 'active', distribution: 'uniform', appearance: '', sound: 'normal',
-    feedType: '', feedDelivered: '', feedRemaining: '',
+    feedType: '', feedDelivered: '', feedRemaining: '', feedWaste: '',
     feedSourceType: '', feedSourceId: '', feedSources: [], feedMovementIds: [], feedMethod: '',
     waterMethod: '', waterAmount: '', waterFillCount: '', waterFillVolume: '',
     weightSamples: [], weightGender: '',
@@ -102,6 +102,7 @@ export function useDlgForm({ activeFlocks, halls, todayStr }: UseDlgFormParams) 
       feedType: l.feedType,
       feedDelivered: l.feedDelivered !== null ? toFa(l.feedDelivered) : '',
       feedRemaining: l.feedRemaining !== null ? toFa(l.feedRemaining) : '',
+      feedWaste: (l.feedWaste != null) ? toFa(l.feedWaste) : '',
       feedSourceType: l.feedSourceType || '',
       feedSourceId: l.feedSourceId || '',
       feedSources: l.feedSources && l.feedSources.length > 0

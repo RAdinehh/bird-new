@@ -51,6 +51,7 @@ export function buildLogData(input: BuildDataInput): Omit<DailyLog, 'id' | 'stat
     feedDeliveredKg: feedAmt ?? 0,
     feedRemainingKg: feedRemainingNum,
     previousRemainingKg: previousRemainingKg ?? null,
+    feedWasteKg: num(form.feedWaste),
     aliveCount: flockAliveCount && flockAliveCount > 0 ? flockAliveCount : 1,
   });
   const feedConsumed = feedCalc.feedConsumedKg > 0 ? feedCalc.feedConsumedKg : null;
@@ -95,6 +96,7 @@ export function buildLogData(input: BuildDataInput): Omit<DailyLog, 'id' | 'stat
     feedDelivered: feedAmt,
     feedConsumed,
     feedRemaining: num(form.feedRemaining),
+    feedWaste: num(form.feedWaste),
     feedSourceType: form.feedSourceType,
     feedSourceId: form.feedSourceId,
     feedMovementIds,
