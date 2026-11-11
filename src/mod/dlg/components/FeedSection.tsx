@@ -42,7 +42,9 @@ export default function FeedSection({ form, setForm }: Props) {
       : []);
 
   const totalFeed = sources.reduce((s, x) => s + (x.quantity || 0), 0);
-  const feedPerBirdG = flockSize > 0 && totalFeed > 0 ? (totalFeed * 1000) / flockSize : 0;
+  const remainingNum = num(form.feedRemaining) || 0;
+  const consumedFeed = Math.max(0, totalFeed - remainingNum);
+  const feedPerBirdG = flockSize > 0 && consumedFeed > 0 ? (consumedFeed * 1000) / flockSize : 0;
 
   const syncSources = (newSources: FeedSource[]) => {
     const total = newSources.reduce((s, x) => s + (x.quantity || 0), 0);
@@ -163,9 +165,9 @@ export default function FeedSection({ form, setForm }: Props) {
           <NumField placeholder="۰" value={form.feedRemaining} onChange={e => setForm({ ...form, feedRemaining: e.target.value })} unit="kg" min={0} />
         </Field>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingBottom: 4 }}>دان به ازای هر پرنده</span>
+          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingBottom: 4 }}>دان مصرف‌شده به ازای هر پرنده</span>
           <div style={{ height: 44, padding: '0 12px', background: feedPerBirdG > 0 ? 'var(--info-soft)' : 'var(--input-bg)', border: `1px solid ${feedPerBirdG > 0 ? 'var(--info)' : 'var(--border)'}`, borderRadius: 'var(--r-sm)', display: 'flex', alignItems: 'center', fontFamily: 'monospace', fontWeight: 700, color: feedPerBirdG > 0 ? 'var(--info)' : 'var(--muted)' }}>
-            {feedPerBirdG > 0 ? `${toFa(feedPerBirdG.toFixed(1))} گرم` : '—'}
+            {feedPerBirdG > 0 ? `${toFa(feedPerBirdG.toFixed(1))} گرم` : (totalFeed > 0 && remainingNum === totalFeed ? 'مصرف صفر' : '—')}
           </div>
         </div>
       </Grid2>
