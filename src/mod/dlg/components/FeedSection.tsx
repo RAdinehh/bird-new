@@ -74,6 +74,12 @@ export default function FeedSection({ form, setForm }: Props) {
         🌾 منابع دان مصرفی
       </div>
 
+      {formulas.length === 0 && feedItems.length === 0 && (
+        <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 600 }}>
+          ⚠️ هنوز هیچ جیره‌ای نساخته‌اید و دان تکی هم تعریف نکرده‌اید. ابتدا از بخش «تغذیه» یک جیره بسازید، سپس به اینجا برگردید.
+        </div>
+      )}
+
       {sources.length === 0 && (
         <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--muted)', textAlign: 'center' }}>
           هنوز منبعی اضافه نشده — از دکمه پایین اضافه کنید
@@ -150,9 +156,11 @@ export default function FeedSection({ form, setForm }: Props) {
         );
       })}
 
-      <Btn size="sm" variant="outline" onClick={addSource} style={{ width: '100%' }}>
-        + افزودن منبع دیگر
-      </Btn>
+      {(formulas.length > 0 || feedItems.length > 0) && (
+        <Btn size="sm" variant="outline" onClick={addSource} style={{ width: '100%' }}>
+          + افزودن منبع دیگر
+        </Btn>
+      )}
 
       {sources.length > 1 && (
         <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700, textAlign: 'center' }}>
