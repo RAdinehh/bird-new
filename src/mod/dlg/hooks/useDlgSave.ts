@@ -240,14 +240,31 @@ export function useDlgSave(params: UseDlgSaveParams) {
         // ۴) ساخت movementهای جدید دان
         const newMovementIds: string[] = [];
         if (form.feedSourceId && feedAmt && feedAmt > 0) {
-          const feedData = buildFeedMovements({
-            feedSourceType: form.feedSourceType,
-            feedSourceId: form.feedSourceId,
-            feedDelivered: feedAmt,
-            flockName: selectedFlock?.name || '',
-            formulas,
-            ingredients,
-          });
+          // 🆕 IDEA-25: پشتیبانی از چند منبع (اگر feedSources پر است)
+          let feedData: ReturnType<typeof buildFeedMovements> = [];
+          if (form.feedSources && form.feedSources.length > 0) {
+            for (const src of form.feedSources) {
+              if (src.quantity > 0 && src.refId) {
+                feedData.push(...buildFeedMovements({
+                  feedSourceType: src.type,
+                  feedSourceId: src.refId,
+                  feedDelivered: src.quantity,
+                  flockName: selectedFlock?.name || '',
+                  formulas,
+                  ingredients,
+                }));
+              }
+            }
+          } else {
+            feedData = buildFeedMovements({
+              feedSourceType: form.feedSourceType,
+              feedSourceId: form.feedSourceId,
+              feedDelivered: feedAmt,
+              flockName: selectedFlock?.name || '',
+              formulas,
+              ingredients,
+            });
+          }
           feedData.forEach(d => {
             const item = whsItems.find(x => x.id === d.itemId);
             const price = Number(item?.lastPrice) || Number(item?.avgPrice) || 0;
