@@ -50,6 +50,15 @@ export interface Activity {
   notes: string;
 }
 
+/** 🆕 منبع دان (چندگانه) — برای پشتیبانی چند نوع دان در یک لاگ */
+export interface FeedSource {
+  id: string;
+  type: 'formula' | 'item';
+  refId: string;
+  /** مقدار مصرفی به کیلوگرم */
+  quantity: number;
+}
+
 export interface DailyLogCorrection {
   id: string;
   /** ساعت اصلاح (HH:MM) */
@@ -95,6 +104,8 @@ export interface DailyLog {
   feedRemaining: number | null; // kg
   feedSourceType: 'formula' | 'item' | '';
   feedSourceId: string;
+  /** 🆕 منابع دان چندگانه (اختیاری — برای سازگاری با داده‌های قدیمی) */
+  feedSources?: FeedSource[];
   feedMethod: 'scoop' | 'bag' | 'semi_auto' | 'auto_sensor' | 'auto_chain' | '';
   feedMovementIds: string[];
 

@@ -1,7 +1,7 @@
 /**
  * types.ts — نوع‌های مشترک ماژول dlg
  */
-import type { Death, Vaccine, Medication, Activity } from './store';
+import type { Death, Vaccine, Medication, Activity, FeedSource } from './store';
 
 export interface F {
   id?: string;
@@ -11,7 +11,7 @@ export interface F {
   ventilation: string; litter: string;
   behavior: string; distribution: string; appearance: string; sound: string;
   feedType: string; feedDelivered: string; feedRemaining: string;
-  feedSourceType: 'formula' | 'item' | ''; feedSourceId: string; feedMovementIds: string[];
+  feedSourceType: 'formula' | 'item' | ''; feedSourceId: string; feedSources?: FeedSource[]; feedMovementIds: string[];
   feedMethod: 'scoop' | 'bag' | 'semi_auto' | 'auto_sensor' | 'auto_chain' | '';
   waterMethod: 'manual' | 'nipple' | 'trough' | 'tank' | '';
   waterAmount: string; waterFillCount: string; waterFillVolume: string;

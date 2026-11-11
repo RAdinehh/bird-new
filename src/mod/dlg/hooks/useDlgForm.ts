@@ -22,7 +22,7 @@ export function newLog(flockId = ''): F {
     ventilation: 'ok', litter: 'dry',
     behavior: 'active', distribution: 'uniform', appearance: '', sound: 'normal',
     feedType: '', feedDelivered: '', feedRemaining: '',
-    feedSourceType: '', feedSourceId: '', feedMovementIds: [], feedMethod: '',
+    feedSourceType: '', feedSourceId: '', feedSources: [], feedMovementIds: [], feedMethod: '',
     waterMethod: '', waterAmount: '', waterFillCount: '', waterFillVolume: '',
     weightSamples: [], weightGender: '',
     eatingEggs: '', fertileEggs: '', brokenEggs: '', otherEggs: '',
