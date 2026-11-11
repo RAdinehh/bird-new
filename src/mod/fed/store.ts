@@ -111,6 +111,8 @@ export interface Formula {
   date: string;
   status: 'draft' | 'active' | 'archived';
   notes: string;
+  /** 🆕 نسخه — با هر تغییر در lines یک واحد زیاد می‌شود */
+  version: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -127,7 +129,7 @@ interface State {
   addRequirement: (r: Omit<Requirement, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateRequirement: (id: string, patch: Partial<Requirement>) => void;
   deleteRequirement: (id: string) => void;
-  addFormula: (f: Omit<Formula, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  addFormula: (f: Omit<Formula, 'id' | 'createdAt' | 'updatedAt' | 'version'>) => void;
   updateFormula: (id: string, patch: Partial<Formula>) => void;
   deleteFormula: (id: string) => void;
 }
@@ -214,15 +216,26 @@ export const useFed = create<State>()(
 
       deleteIngredient: (id) => set({
         ingredients: get().ingredients.filter(x => x.id !== id),
-        formulas: get().formulas.map(f => ({ ...f, lines: f.lines.filter(l => l.ingredientId !== id) }))
+        formulas: get().formulas.map(f => {
+          const newLines = f.lines.filter(l => l.ingredientId !== id);
+          if (newLines.length === f.lines.length) return f;
+          return { ...f, lines: newLines, version: (f.version ?? 1) + 1, updatedAt: now() };
+        })
       }),
 
       addRequirement: (r) => set({ requirements: [...get().requirements, { ...r, id: uuid(), createdAt: now(), updatedAt: now() }] }),
       updateRequirement: (id, patch) => set({ requirements: get().requirements.map(x => x.id === id ? { ...x, ...patch, updatedAt: now() } : x) }),
       deleteRequirement: (id) => set({ requirements: get().requirements.filter(x => x.id !== id) }),
 
-      addFormula: (f) => set({ formulas: [...get().formulas, { ...f, id: uuid(), createdAt: now(), updatedAt: now() }] }),
-      updateFormula: (id, patch) => set({ formulas: get().formulas.map(x => x.id === id ? { ...x, ...patch, updatedAt: now() } : x) }),
+      addFormula: (f) => set({ formulas: [...get().formulas, { ...f, version: 1, id: uuid(), createdAt: now(), updatedAt: now() }] }),
+      updateFormula: (id, patch) => set({
+        formulas: get().formulas.map(x => {
+          if (x.id !== id) return x;
+          const currentVersion = x.version ?? 1;
+          const linesChanged = patch.lines !== undefined && JSON.stringify(patch.lines) !== JSON.stringify(x.lines);
+          return { ...x, ...patch, version: linesChanged ? currentVersion + 1 : currentVersion, updatedAt: now() };
+        }),
+      }),
       deleteFormula: (id) => set({ formulas: get().formulas.filter(x => x.id !== id) })
     }),
     { name: 'pm-fed' }
