@@ -44,6 +44,24 @@ export interface LogCardProps {
   onRevokeCorrection: (correctionId: string) => void;
 }
 
+const FIELD_LABEL: Record<string, string> = {
+  temperature: 'دما',
+  temperatureMin: 'حداقل دما',
+  temperatureMax: 'حداکثر دما',
+  humidity: 'رطوبت',
+  humidityMin: 'حداقل رطوبت',
+  humidityMax: 'حداکثر رطوبت',
+  feedDelivered: 'دان داده‌شده',
+  feedRemaining: 'دان باقی‌مانده',
+  feedConsumed: 'دان مصرفی',
+  waterAmount: 'آب مصرفی',
+  deathsCount: 'تلفات',
+  eatingEggs: 'تخم خوراکی',
+  fertileEggs: 'تخم نطفه‌دار',
+  brokenEggs: 'تخم شکسته',
+  otherEggs: 'تخم سایر',
+};
+
 export default function LogCard(props: LogCardProps) {
   const {
     log: rawLog, index: i, flock, birdName,
@@ -100,7 +118,6 @@ export default function LogCard(props: LogCardProps) {
       subtitle={`${toFa(l.date)}${l.entryTime ? ` • ${toFa(l.entryTime)}` : ''}${l.birdAgeDays !== null && l.birdAgeDays > 0 ? ` • ${toFa(l.birdAgeDays)} روز` : ''}${birdName ? ` • ${birdName}` : ''}`}
       isOpen={isOpen} onToggle={onToggle}
       badge={<>
-        {hasCorrections && <Tag tone="blue">✓ اصلاح‌شده</Tag>}
         {l.deathsCount > 0 && <Tag tone="amber">{toFa(l.deathsCount)} تلفات</Tag>}
       </>}
       stats={<>
@@ -281,7 +298,7 @@ export default function LogCard(props: LogCardProps) {
                 {Object.keys(corr.changes).map(k => {
                   const oldVal = (rawLog as any)[k];
                   const newVal = (corr.changes as any)[k];
-                  return `${k}: ${oldVal ?? '—'} → ${newVal ?? '—'}`;
+                  return `${FIELD_LABEL[k] || k}: ${oldVal ?? '—'} → ${newVal ?? '—'}`;
                 }).join(' • ')}
               </span>
               <span style={{ color: 'var(--muted)' }}>({corr.reason})</span>
@@ -322,7 +339,7 @@ export default function LogCard(props: LogCardProps) {
       )}
 
       <CardActions actions={[
-        { label: 'ویرایش', onClick: onEdit, variant: 'outline', hidden: (l.status || 'active') !== 'active' || hasCorrections },
+        { label: 'ویرایش', onClick: onEdit, variant: 'outline', hidden: (l.status || 'active') !== 'active' },
         { label: 'اصلاح', onClick: onCorrect, variant: 'outline', hidden: (l.status || 'active') !== 'active' },
         { label: 'تاریخچه', onClick: () => onHistory?.(), variant: 'outline', hidden: onHistory === undefined },
         { label: 'بازگردانی', onClick: onRestore, variant: 'outline', hidden: (l.status || 'active') === 'active' },

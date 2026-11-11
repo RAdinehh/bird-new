@@ -79,10 +79,6 @@ export interface Movement {
   sourceId?: string;
   /** 🆕 Phase G-1: موقعیت انبار (پیش‌فرض 'stock', برای امانی 'consignment:partyId') */
   locationId?: string;
-  /** 🆕 شماره دسته (Batch) — auto برای 'in'، از item برای 'out' */
-  batchNumber?: string;
-  /** 🆕 تأمین‌کننده — برای ردیابی معکوس (GFSI/ISO 22000) */
-  supplierId?: string;
   /** 🆕 تاریخ انقضا (برای دارو) */
   expiryDate?: string;
   /** 🆕 ردیابی جیره: کدوم جیره */
@@ -105,17 +101,6 @@ interface State {
 /** تولید شماره دسته — B-YYYY-MM-DD-NNN */
 
 const now = () => new Date().toISOString();
-
-/** 🆕 IDEA-31: تولید شماره بچ خودکار — B-YYYY-MM-DD-NNN یا [sourceCode]-YYYY-MM-DD-NNN */
-function generateBatchNumber(item: Item, movements: Movement[]): string {
-  const today = new Date().toISOString().slice(0, 10);
-  const prefix = item.sourceCode ? `${item.sourceCode}-` : 'B-';
-  const todayIns = movements.filter(m =>
-    m.type === 'in' && m.itemId === item.id && m.batchNumber?.includes(today)
-  );
-  const seq = String(todayIns.length + 1).padStart(3, '0');
-  return `${prefix}${today}-${seq}`;
-}
 
 /** میانگین موزون قیمت یک قلم (با fallback) */
 export function getAvgPrice(item: Item): number {
@@ -281,11 +266,6 @@ export const useWhs = create<State>()(
         assertMovement(m);
         const item = get().items.find(x => x.id === m.itemId);
         if (item === undefined) return '';
-
-        // 🆕 IDEA-31: auto-fill batchNumber و supplierId
-        const isIn = m.type === 'in';
-        const finalBatch = m.batchNumber || (isIn ? generateBatchNumber(item, get().movements) : undefined);
-        const finalSupplier = m.supplierId || item.supplierId || undefined;
         // 🆕 Phase G-1: per-location update
         const loc = m.locationId || 'stock';
         const byLoc = item.stockByLocation ?? { stock: item.currentStock ?? 0 };
@@ -310,7 +290,7 @@ export const useWhs = create<State>()(
         }
         const newId = uuid();
         set({
-          movements: [...get().movements, { ...m, locationId: loc, id: newId, createdAt: now(), batchNumber: finalBatch, supplierId: finalSupplier }],
+          movements: [...get().movements, { ...m, locationId: loc, id: newId, createdAt: now() }],
           items: get().items.map(x => x.id === m.itemId ? {
             ...x,
             stockByLocation: newByLoc,
