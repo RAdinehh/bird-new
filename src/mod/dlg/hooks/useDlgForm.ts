@@ -70,7 +70,12 @@ export function useDlgForm({ activeFlocks, halls, todayStr }: UseDlgFormParams) 
     const activeFormulas = formulas.filter((f) => f.status === 'active');
     const autoFormula = activeFormulas.length === 1 ? activeFormulas[0] : null;
     const feedDefault = autoFormula
-      ? { feedSourceType: 'formula' as const, feedSourceId: autoFormula.id, feedType: autoFormula.name || '' }
+      ? {
+          feedSourceType: 'formula' as const,
+          feedSourceId: autoFormula.id,
+          feedType: autoFormula.name || '',
+          feedSources: [{ id: crypto.randomUUID(), type: 'formula' as const, refId: autoFormula.id, quantity: 0 }],
+        }
       : {};
     setForm({ ...newLog(flock.id), date: todayStr, entryTime: currentTime(), ...sys, ...feedDefault });
     setErr(''); setOpen(true);
@@ -93,6 +98,11 @@ export function useDlgForm({ activeFlocks, halls, todayStr }: UseDlgFormParams) 
       feedRemaining: l.feedRemaining !== null ? toFa(l.feedRemaining) : '',
       feedSourceType: l.feedSourceType || '',
       feedSourceId: l.feedSourceId || '',
+      feedSources: l.feedSources && l.feedSources.length > 0
+        ? l.feedSources.map(s => ({ ...s }))
+        : (l.feedSourceId
+          ? [{ id: crypto.randomUUID(), type: (l.feedSourceType || 'item') as 'formula' | 'item', refId: l.feedSourceId, quantity: l.feedDelivered || 0 }]
+          : []),
       feedMovementIds: l.feedMovementIds || [],
       feedMethod: l.feedMethod || '',
       waterMethod: l.waterMethod || '',
