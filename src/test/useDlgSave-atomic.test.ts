@@ -57,7 +57,7 @@ const emptyForm = (): F => ({
   flockId: 'flock-1',
   date: '1405/08/08',
   entryTime: '08:00',
-  temperature: '', temperatureMin: '', temperatureMax: '',
+  temperature: '25', temperatureMin: '20', temperatureMax: '30',
   humidity: '', humidityMin: '', humidityMax: '',
   ventilation: 'ok', litter: 'dry', lightHours: '',
   behavior: 'active', distribution: 'uniform', appearance: '', sound: 'normal',

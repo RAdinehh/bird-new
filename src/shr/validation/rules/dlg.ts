@@ -43,6 +43,16 @@ export function createDlgSchema(context: ValidationContext = {}) {
     feedDelivered: floatRange('مقدار دان مصرفی', 0, MAX_FEED).nullable().optional(),
     feedRemaining: floatRange('دان باقیمانده', 0, MAX_FEED).nullable().optional(),
     feedSourceId: optionalId(),
+    feedSources: z.array(z.object({
+      id: z.string(),
+      type: z.enum(['formula', 'item']),
+      refId: z.string(),
+      quantity: z.number().min(0),
+    })).optional().default([]),
+    feedMethodSource: z.enum(['hall', 'manual']).optional(),
+    waterMethodSource: z.enum(['hall', 'manual']).optional(),
+    feedMethodFromHall: z.string().optional(),
+    waterMethodFromHall: z.string().optional(),
 
     // آب
     waterAmount: floatRange('مقدار آب', 0, 100000).nullable().optional(),
@@ -158,6 +168,28 @@ export function createDlgSchema(context: ValidationContext = {}) {
         message: 'مقدار آب مصرفی اجباری است (آبخوری اتومات)',
         path: ['waterAmount'],
       });
+    }
+
+    // 🆕 چک feedSources: اگر پر بود، هر منبع باید refId و quantity داشته باشد
+    const sourcesArr = d.feedSources || [];
+    if (sourcesArr.length > 0) {
+      for (let i = 0; i < sourcesArr.length; i++) {
+        const src = sourcesArr[i];
+        if (!src.refId) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `منبع ${(i + 1).toLocaleString('fa-IR')}: باید یک گزینه انتخاب شود`,
+            path: ['feedSources', i, 'refId'],
+          });
+        }
+        if (!src.quantity || src.quantity <= 0) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `منبع ${(i + 1).toLocaleString('fa-IR')}: مقدار باید بیشتر از صفر باشد`,
+            path: ['feedSources', i, 'quantity'],
+          });
+        }
+      }
     }
 
     if (flockAlive > 0) {
