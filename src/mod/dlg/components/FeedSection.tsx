@@ -2,8 +2,8 @@
  * FeedSection — تغذیه و آب
  * IDEA-25: پشتیبانی چند منبع دان (backward-compatible)
  */
-import { useMemo } from 'react';
-import { Field, Grid2, NumField, Btn } from '../../../shr/components/ui';
+import { useMemo, useState } from 'react';
+import { Field, Grid2, NumField, Btn, Select } from '../../../shr/components/ui';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { UNIT_LABEL } from '../../whs/store';
 import { toFa, toEn } from '../../../shr/utils/fa';
@@ -26,6 +26,21 @@ export default function FeedSection({ form, setForm }: Props) {
   const { formulas, ingredients } = useFed();
   const isFeedAuto = ['semi_auto', 'auto_sensor', 'auto_chain'].includes(form.feedMethod || '');
   const isWaterAuto = ['nipple', 'trough', 'tank'].includes(form.waterMethod || '');
+  const FEED_METHOD_OPTIONS = [
+    { value: 'scoop', label: 'قیفی (سطل)' },
+    { value: 'bag', label: 'کیسه‌ای' },
+    { value: 'semi_auto', label: 'نیمه‌اتومات' },
+    { value: 'auto_sensor', label: 'اتومات با سنسور' },
+    { value: 'auto_chain', label: 'اتومات زنجیری' },
+  ];
+  const WATER_METHOD_OPTIONS = [
+    { value: 'manual', label: 'دستی (سطل/مخزن)' },
+    { value: 'nipple', label: 'نیپل اتومات' },
+    { value: 'trough', label: 'کانالی' },
+    { value: 'tank', label: 'مخزن اتومات' },
+  ];
+  const [editFeedMethod, setEditFeedMethod] = useState(false);
+  const [editWaterMethod, setEditWaterMethod] = useState(false);
   const { items: whsItems } = useWhs();
   const feedItems = useMemo(() => whsItems.filter(x => x.category === 'feed'), [whsItems]);
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
@@ -70,6 +85,45 @@ export default function FeedSection({ form, setForm }: Props) {
 
   return (
     <>
+      <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>🔧 سیستم سالن</span>
+          {(form.feedMethodSource === 'manual' || form.waterMethodSource === 'manual') && (
+            <span style={{ padding: '2px 8px', background: 'var(--warn-soft)', color: 'var(--warn)', borderRadius: 4, fontSize: 'var(--fs-2xs)', fontWeight: 700 }}>
+              ⚠️ تغییر دستی
+            </span>
+          )}
+        </div>
+        <Grid2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Field label="دانخوری">
+              <Select value={form.feedMethod || ''} onChange={e => setForm(f => ({ ...f, feedMethod: e.target.value as 'scoop' | 'bag' | 'semi_auto' | 'auto_sensor' | 'auto_chain' | '', feedMethodSource: 'manual' }))}>
+                <option value="">—</option>
+                {FEED_METHOD_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </Select>
+            </Field>
+            {form.feedMethodSource === 'manual' && form.feedMethodFromHall && form.feedMethodFromHall !== form.feedMethod && (
+              <button type="button" onClick={() => setForm(f => ({ ...f, feedMethod: f.feedMethodFromHall as 'scoop' | 'bag' | 'semi_auto' | 'auto_sensor' | 'auto_chain' | '', feedMethodSource: 'hall' }))} style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0', textDecoration: 'underline' }}>
+                ↺ بازگشت به سالن ({FEED_METHOD_OPTIONS.find(o => o.value === form.feedMethodFromHall)?.label})
+              </button>
+            )}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Field label="آبخوری">
+              <Select value={form.waterMethod || ''} onChange={e => setForm(f => ({ ...f, waterMethod: e.target.value as 'manual' | 'nipple' | 'trough' | 'tank' | '', waterMethodSource: 'manual' }))}>
+                <option value="">—</option>
+                {WATER_METHOD_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </Select>
+            </Field>
+            {form.waterMethodSource === 'manual' && form.waterMethodFromHall && form.waterMethodFromHall !== form.waterMethod && (
+              <button type="button" onClick={() => setForm(f => ({ ...f, waterMethod: f.waterMethodFromHall as 'manual' | 'nipple' | 'trough' | 'tank' | '', waterMethodSource: 'hall' }))} style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0', textDecoration: 'underline' }}>
+                ↺ بازگشت به سالن ({WATER_METHOD_OPTIONS.find(o => o.value === form.waterMethodFromHall)?.label})
+              </button>
+            )}
+          </div>
+        </Grid2>
+      </div>
+
       <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginBottom: 6 }}>
         🌾 منابع دان مصرفی
       </div>

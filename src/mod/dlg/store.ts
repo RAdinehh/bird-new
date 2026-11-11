@@ -112,6 +112,14 @@ export interface DailyLog {
   // آب
   waterAmount: number | null;   // L
   waterMethod: 'manual' | 'nipple' | 'trough' | 'tank' | '';
+  /** 🆕 منبع feedMethod: از سالن یا override دستی */
+  feedMethodSource?: 'hall' | 'manual';
+  /** 🆕 منبع waterMethod: از سالن یا override دستی */
+  waterMethodSource?: 'hall' | 'manual';
+  /** 🆕 مقدار اصلی feedMethod در سالن (برای ممیزی) */
+  feedMethodFromHall?: string;
+  /** 🆕 مقدار اصلی waterMethod در سالن (برای ممیزی) */
+  waterMethodFromHall?: string;
   waterFillCount: number | null;
   waterFillVolume: number | null;
 

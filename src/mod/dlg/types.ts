@@ -14,6 +14,10 @@ export interface F {
   feedSourceType: 'formula' | 'item' | ''; feedSourceId: string; feedSources?: FeedSource[]; feedMovementIds: string[];
   feedMethod: 'scoop' | 'bag' | 'semi_auto' | 'auto_sensor' | 'auto_chain' | '';
   waterMethod: 'manual' | 'nipple' | 'trough' | 'tank' | '';
+  feedMethodSource?: 'hall' | 'manual';
+  waterMethodSource?: 'hall' | 'manual';
+  feedMethodFromHall?: string;
+  waterMethodFromHall?: string;
   waterAmount: string; waterFillCount: string; waterFillVolume: string;
   weightSamples: { id: string; weight: string }[];
   eatingEggs: string; fertileEggs: string; brokenEggs: string; otherEggs: string;

@@ -77,7 +77,13 @@ export function useDlgForm({ activeFlocks, halls, todayStr }: UseDlgFormParams) 
           feedSources: [{ id: crypto.randomUUID(), type: 'formula' as const, refId: autoFormula.id, quantity: 0 }],
         }
       : {};
-    setForm({ ...newLog(flock.id), date: todayStr, entryTime: currentTime(), ...sys, ...feedDefault });
+    const sourceDefault = {
+      feedMethodSource: 'hall' as const,
+      waterMethodSource: 'hall' as const,
+      feedMethodFromHall: sys.feedMethod,
+      waterMethodFromHall: sys.waterMethod,
+    };
+    setForm({ ...newLog(flock.id), date: todayStr, entryTime: currentTime(), ...sys, ...feedDefault, ...sourceDefault });
     setErr(''); setOpen(true);
   };
 
@@ -106,6 +112,10 @@ export function useDlgForm({ activeFlocks, halls, todayStr }: UseDlgFormParams) 
       feedMovementIds: l.feedMovementIds || [],
       feedMethod: l.feedMethod || '',
       waterMethod: l.waterMethod || '',
+      feedMethodSource: l.feedMethodSource,
+      waterMethodSource: l.waterMethodSource,
+      feedMethodFromHall: l.feedMethodFromHall,
+      waterMethodFromHall: l.waterMethodFromHall,
       waterAmount: l.waterAmount !== null ? toFa(l.waterAmount) : '',
       waterFillCount: l.waterFillCount !== null ? toFa(l.waterFillCount) : '',
       waterFillVolume: l.waterFillVolume !== null ? toFa(l.waterFillVolume) : '',
@@ -124,7 +134,16 @@ export function useDlgForm({ activeFlocks, halls, todayStr }: UseDlgFormParams) 
 
   const onFlockChange = (flockId: string) => {
     const sys = detectSystems(flockId);
-    setForm(f => ({ ...f, flockId, feedMethod: sys.feedMethod, waterMethod: sys.waterMethod }));
+    setForm(f => ({
+      ...f,
+      flockId,
+      feedMethod: sys.feedMethod,
+      waterMethod: sys.waterMethod,
+      feedMethodSource: 'hall',
+      waterMethodSource: 'hall',
+      feedMethodFromHall: sys.feedMethod,
+      waterMethodFromHall: sys.waterMethod,
+    }));
   };
 
   const selectedFlock = activeFlocks.find(f => f.id === form.flockId);
