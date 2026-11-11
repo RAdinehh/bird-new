@@ -11,6 +11,7 @@ import { DEATH_CAUSES } from '../store';
 import { useWhs } from '../../whs/store';
 import { useFlk } from '../../flk/store';
 import type { F } from '../types';
+import { FieldHint } from '../../../shr/intelligence/FieldHint';
 
 interface Props {
   form: F;
@@ -59,6 +60,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
                   onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, count: parseInt(toEn(e.target.value)) || 0 } : x) }))}
                   min={0} max={flockAliveCount || undefined} unit="پرنده" />
               </Field>
+              <FieldHint fieldPath="dlg.deathsCount" value={d.count ?? 0} context={{ currentCount: flockAliveCount }} />
               
             </div>
             <Field label="علت">

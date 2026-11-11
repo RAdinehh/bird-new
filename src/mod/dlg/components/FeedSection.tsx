@@ -297,6 +297,7 @@ export default function FeedSection({ form, setForm }: Props) {
           <Field label="مقدار آب مصرفی (تخمینی)" required={isWaterAuto}>
             <NumField placeholder="۱۰۰" value={form.waterAmount} onChange={e => setForm({ ...form, waterAmount: e.target.value })} unit="L" min={0} />
           </Field>
+          <FieldHint fieldPath="dlg.waterAmount" value={form.waterAmount} context={{ flockSize: flockSize || undefined }} />
         </>
       )}
     </>
