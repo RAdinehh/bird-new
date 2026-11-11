@@ -118,6 +118,7 @@ export default function LogCard(props: LogCardProps) {
       subtitle={`${toFa(l.date)}${l.entryTime ? ` • ${toFa(l.entryTime)}` : ''}${l.birdAgeDays !== null && l.birdAgeDays > 0 ? ` • ${toFa(l.birdAgeDays)} روز` : ''}${birdName ? ` • ${birdName}` : ''}`}
       isOpen={isOpen} onToggle={onToggle}
       badge={<>
+        {hasCorrections && <Tag tone="blue">اصلاح‌شده</Tag>}
         {l.deathsCount > 0 && <Tag tone="amber">{toFa(l.deathsCount)} تلفات</Tag>}
       </>}
       stats={<>
