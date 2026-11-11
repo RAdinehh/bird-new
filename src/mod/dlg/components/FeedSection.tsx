@@ -12,7 +12,10 @@ import { useFed } from '../../fed/store';
 import { useWhs } from '../../whs/store';
 import type { F } from '../types';
 import type { FeedSource } from '../store';
-import { useFlk } from '../../flk/store';
+import { useFlk, getAgeDays } from '../../flk/store';
+import { useBrd } from '../../brd/store';
+import { FieldHint } from '../../../shr/intelligence/FieldHint';
+import { getStandardFor, findInRange } from '../../set/standards/resolve';
 
 interface Props {
   form: F;
@@ -47,6 +50,7 @@ export default function FeedSection({ form, setForm }: Props) {
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
 
   const { flocks } = useFlk();
+  const { breeds } = useBrd();
   const selectedFlock = flocks.find(f => f.id === form.flockId);
   const flockSize = selectedFlock?.currentCount || selectedFlock?.initialCount || 0;
 
@@ -60,6 +64,22 @@ export default function FeedSection({ form, setForm }: Props) {
   const remainingNum = num(form.feedRemaining) || 0;
   const consumedFeed = Math.max(0, totalFeed - remainingNum);
   const feedPerBirdG = flockSize > 0 && consumedFeed > 0 ? (consumedFeed * 1000) / flockSize : 0;
+
+  // 🆕 استاندارد نژاد → انتظار دان/پرنده
+  let expectedPerBirdG: number | null = null;
+  try {
+    const breedObj = breeds.find((b: any) => b.id === selectedFlock?.breedId);
+    const bName = breedObj?.name || (selectedFlock as any)?.breedLabel || '';
+    if (bName) {
+      const std = getStandardFor(bName);
+      if (std) {
+        const ag = selectedFlock ? getAgeDays(selectedFlock) : 0;
+        const rng = findInRange(std.feed, ag);
+        expectedPerBirdG = rng?.feedG ?? null;
+      }
+    }
+  } catch { /* silent */ }
+  // debug info برای نمایش موقت در UI
 
   const syncSources = (newSources: FeedSource[]) => {
     const total = newSources.reduce((s, x) => s + (x.quantity || 0), 0);
@@ -214,6 +234,17 @@ export default function FeedSection({ form, setForm }: Props) {
         <Btn size="sm" variant="outline" onClick={addSource} style={{ width: '100%' }}>
           + افزودن منبع دیگر
         </Btn>
+      )}
+
+      {totalFeed > 0 && (
+        <FieldHint
+          fieldPath="dlg.feedDelivered"
+          value={totalFeed}
+          context={{
+            flockSize: flockSize || undefined,
+            perBirdGramsPerDay: expectedPerBirdG || undefined,
+          }}
+        />
       )}
 
       {sources.length > 1 && (
