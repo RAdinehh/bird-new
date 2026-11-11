@@ -1,36 +1,26 @@
 # NOW.md — وضعیت لحظه‌ای
 
-> آخرین آپدیت: 1405/11/09
+> آخرین آپدیت: 1405/11/11
 
 ## HEAD
-11badb90 — refactor(dlg): FlockPickerSheet با ExpandableCard (L10)
+c1b8cfc9 — تحلیل معماری تغذیه/دان/آب ثبت شد
 
 ## 🔨 کار جاری
-فاز ۱ — dlg گله‌محور + زیرساخت گروه‌بندی داینامیک
+استراحت. کار بعدی: IDEA-27 (formulaVersion).
 
-## ✅ امروز (1405/11/09)
-- زیرساخت: NOW+RESUME+cp+IDEAS+start.sh + قانون -۱
-- AGENTS ۲۲ قانون
-- باگ activeFlocks حل شد
-- C4 Dunning مستند
-- FlockPickerSheet چند لاگ در روز (A) + ExpandableCard (L10)
-- گروه‌بندی داینامیک مشترک (`useGroupedList` هوک)
-- dlg + tra migrate شدن به هوک
-- خط جداکننده Sheet + اسم گروه فعال روی دکمه
+## ✅ کارهای اخیر
+- ۵۰+ کامیت: زیرساخت حفظ زمینه + یکدست‌سازی UI + فیلدهای اجباری
+- ۲۹ ایده در IDEAS.md (IDEA-1 تا IDEA-29)
+- تحلیل معماری تغذیه در DECISIONS.md
 
-## ⚠️ هشدارها
-- tsc: ۰ خطا ✅
-- تست: ۱۵ pass ✅
-- WIP: تمیز ✅
+## ⚠️ نقص‌های باز
+- IDEA-25: `feedSourceId` تکی → باید array شود
+- IDEA-26: `Movement.formulaId` نیست
+- IDEA-27: `Formula.version` نیست
+- `entryTime` با zod اجباری نشده
 
-## 🎯 قدم بعدی (اولویت)
-1. `whs` (انبار) — گروه‌بندی بر اساس دسته/انبار
-2. `egg` (تخم) — گروه‌بندی بر اساس گله/تاریخ
-3. `fed` (دان) — گروه‌بندی بر اساس نوع
-4. `inc` (جوجه‌کشی) — گروه‌بندی بر اساس ماشین/وضعیت
-
-## ❓ سؤال باز
-- ادامه با whs یا استراحت؟
+## 🎯 قدم بعدی
+IDEA-27 → IDEA-26 → IDEA-25
 
 ## 📋 منبع حقیقت
-CLAUDE.md (قانون -۱), AGENTS.md, CONSTITUTION.md, DECISIONS.md, STATUS.md
+CLAUDE.md (قانون -۱), AGENTS.md, CONSTITUTION.md, DECISIONS.md
