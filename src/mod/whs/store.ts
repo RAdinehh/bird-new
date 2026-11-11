@@ -80,8 +80,13 @@ export interface Movement {
   /** 🆕 Phase G-1: موقعیت انبار (پیش‌فرض 'stock', برای امانی 'consignment:partyId') */
   locationId?: string;
   /** 🆕 شماره دسته (Batch) — برای تخم و دارو */
+  batchNumber?: string;
   /** 🆕 تاریخ انقضا (برای دارو) */
   expiryDate?: string;
+  /** 🆕 ردیابی جیره: کدوم جیره */
+  formulaId?: string;
+  /** 🆕 ردیابی جیره: کدوم نسخهٔ جیره */
+  formulaVersion?: number;
 }
 
 interface State {

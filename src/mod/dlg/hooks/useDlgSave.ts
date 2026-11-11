@@ -257,6 +257,8 @@ export function useDlgSave(params: UseDlgSaveParams) {
               date: form.date, partyId: '',
               notes: d.notes,
               flockId: form.flockId || undefined,
+              formulaId: d.formulaId,
+              formulaVersion: d.formulaVersion,
             });
             if (!mid) throw new Error(`حرکت انبار برای "${d.notes}" ساخته نشد`);
             newMovementIds.push(mid);

@@ -10,6 +10,10 @@ export interface NewMovementData {
   itemId: string;
   quantity: number;
   notes: string;
+  /** 🆕 ردیابی: از کدوم جیره */
+  formulaId?: string;
+  /** 🆕 ردیابی: نسخهٔ جیره */
+  formulaVersion?: number;
 }
 
 interface FormulaLine { ingredientId: string; percent: number }
@@ -17,6 +21,7 @@ interface FormulaLike {
   id: string;
   name: string;
   lines: FormulaLine[];
+  version?: number;
 }
 interface IngredientLike {
   id: string;
@@ -52,6 +57,8 @@ export function buildFeedMovements(params: {
           itemId: ing.stockItemId,
           quantity: Math.round(qty * 1000) / 1000,
           notes: `ثبت روزانه — جیره ${formula.name}`,
+          formulaId: formula.id,
+          formulaVersion: formula.version ?? 1,
         });
       });
     }
