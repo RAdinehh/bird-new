@@ -97,20 +97,14 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         </div>
       ))}
 
-      <Grid2>
-        <Btn size="sm" full onClick={() => setForm(f => ({ ...f, deaths: [...f.deaths, { id: crypto.randomUUID(), count: 0, cause: '', notes: '' }] }))}>
-          + تلفات
-        </Btn>
-        <div />
-      </Grid2>
+      <Btn size="sm" full onClick={() => setForm(f => ({ ...f, deaths: [...f.deaths, { id: crypto.randomUUID(), count: 0, cause: '', notes: '' }] }))}>
+        + تلفات
+      </Btn>
 
       {vaccineEnabled && (<>
-        <Grid2>
-          <Btn size="sm" full onClick={() => setForm(f => ({ ...f, vaccines: [...f.vaccines, { id: crypto.randomUUID(), name: '', dose: '', method: '', reaction: '', itemId: '', quantity: null, movementId: '' }] }))}>
-            + واکسن
-          </Btn>
-          <div />
-        </Grid2>
+        <Btn size="sm" full onClick={() => setForm(f => ({ ...f, vaccines: [...f.vaccines, { id: crypto.randomUUID(), name: '', dose: '', method: '', reaction: '', itemId: '', quantity: null, movementId: '' }] }))}>
+          + واکسن
+        </Btn>
         {form.vaccines.map((v, i) => (
           <div key={v.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -150,12 +144,9 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
       </>)}
 
       {medicineEnabled && (<>
-        <Grid2>
-          <Btn size="sm" full onClick={() => setForm(f => ({ ...f, medications: [...f.medications, { id: crypto.randomUUID(), name: '', dose: '', method: '', withdrawalDays: null, itemId: '', quantity: null, movementId: '' }] }))}>
-            + دارو
-          </Btn>
-          <div />
-        </Grid2>
+        <Btn size="sm" full onClick={() => setForm(f => ({ ...f, medications: [...f.medications, { id: crypto.randomUUID(), name: '', dose: '', method: '', withdrawalDays: null, itemId: '', quantity: null, movementId: '' }] }))}>
+          + دارو
+        </Btn>
         {form.medications.map((m, i) => (
           <div key={m.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

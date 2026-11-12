@@ -14,12 +14,9 @@ export default function ActivitiesSection({ form, setForm }: Props) {
   return (
     <>
 
-      <Grid2>
-        <Btn size="sm" full onClick={() => setForm(f => ({ ...f, activities: [...f.activities, { id: crypto.randomUUID(), type: '', notes: '' }] }))}>
-          + فعالیت
-        </Btn>
-        <div></div>
-      </Grid2>
+      <Btn size="sm" full onClick={() => setForm(f => ({ ...f, activities: [...f.activities, { id: crypto.randomUUID(), type: '', notes: '' }] }))}>
+        + فعالیت
+      </Btn>
       {form.activities.map((a, i) => (
         <div key={a.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
