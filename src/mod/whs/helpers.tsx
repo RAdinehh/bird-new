@@ -5,17 +5,8 @@ import type { ReactNode, CSSProperties } from 'react';
 import { Tag } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
 import { CATEGORY_ICON, type Item } from './store';
+export { Row } from '../../shr/components/ui';
 
-export function Row({ l, v }: { l: string; v: string }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between',
-       fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-       borderRadius: 'var(--r-sm)' }}>
-      <span style={{ color: 'var(--muted)' }}>{l}:</span>
-      <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
-    </div>
-  );
-}
 
 export function SectionTitle({ children }: { children: ReactNode }) {
   return (
