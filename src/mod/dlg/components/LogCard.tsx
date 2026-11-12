@@ -16,6 +16,7 @@ import { getEffectiveEnv } from '../../set/standards/resolve';
 import { useSet } from '../../set/store';
 import { getAgeDays } from '../../flk/store';
 import { Btn, Tag } from '../../../shr/components/ui';
+import { BadgeOverflow, type BadgeItem } from '../../../shr/components/ui/BadgeOverflow';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { LogSection, Row } from '../helpers';
 import { applyCorrections } from '../api/applyCorrections';
@@ -110,6 +111,11 @@ export default function LogCard(props: LogCardProps) {
   const hasProblem = tIsBad || hIsBad || l.deathsCount > 0;
   const accent: any = hasProblem ? 'warn' : 'accent';
 
+  // 🆕 BadgeOverflow badges
+  const allBadges: BadgeItem[] = [];
+  if (hasCorrections) allBadges.push({ key: 'corrections', node: <Tag tone="blue">اصلاح‌شده</Tag> });
+  if (l.deathsCount > 0) allBadges.push({ key: 'deaths', node: <Tag tone="amber">{toFa(l.deathsCount)} تلفات</Tag> });
+
   return (
     <ExpandableCard
       id={l.id} ms={ms} accent={accent}
@@ -117,10 +123,7 @@ export default function LogCard(props: LogCardProps) {
       title={flock?.name || '—'}
       subtitle={`${toFa(l.date)}${l.entryTime ? ` • ${toFa(l.entryTime)}` : ''}${l.birdAgeDays !== null && l.birdAgeDays > 0 ? ` • ${toFa(l.birdAgeDays)} روز` : ''}${birdName ? ` • ${birdName}` : ''}`}
       isOpen={isOpen} onToggle={onToggle}
-      badge={<>
-        {hasCorrections && <Tag tone="blue">اصلاح‌شده</Tag>}
-        {l.deathsCount > 0 && <Tag tone="amber">{toFa(l.deathsCount)} تلفات</Tag>}
-      </>}
+      badge={<BadgeOverflow badges={allBadges} max={2} modalTitle={`برچسب‌های «${flock?.name || 'لاگ'}»`} />}
       stats={<>
         {l.temperature !== null && <span>🌡 {toFa(l.temperature)}°</span>}
         {l.humidity !== null && <span>💧 {toFa(l.humidity)}٪</span>}
