@@ -20,6 +20,7 @@ import { toFa } from '../../shr/utils/fa';
 import { toastMsg } from '../../cor/store/toast';
 import { format as formatJ } from 'date-fns-jalali';
 import FormModal from './components/FormModal';
+import { Tabs } from '../../shr/components/ui';
 import DlgTabPanel from './components/DlgTabPanel';
 import AggregateTabPanel from './components/AggregateTabPanel';
 import { useDlgForm } from './hooks/useDlgForm';
@@ -164,55 +165,20 @@ export default function DailyLogsPage() {
     t === 'aggregate' ? totalActiveLogs :
     archivedLogs.length;
 
-  const tabs: { id: TabId; label: string }[] = [
-    { id: 'today', label: 'امروز' },
-    { id: 'history', label: 'تاریخچه' },
-    { id: 'archive', label: 'آرشیو' },
-    { id: 'aggregate', label: '📊 جمع‌بندی' },
+  const tabs: { id: TabId; label: string; count: number }[] = [
+    { id: 'today', label: 'امروز', count: todaysLogs.length },
+    { id: 'history', label: 'تاریخچه', count: historicalLogs.length },
+    { id: 'archive', label: 'آرشیو', count: archivedLogs.length },
+    { id: 'aggregate', label: '📊 جمع‌بندی', count: totalActiveLogs },
   ];
 
   return (
     <div>
-      {/* Tab Bar */}
-      <div style={{
-        display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
-        padding: '0 12px', background: 'var(--header-bg)',
-        position: 'sticky', top: 52, zIndex: 11,
-      }}>
-        {tabs.map(t => (
-          <div
-            key={t.id}
-            onClick={() => { setInstant(); setTab(t.id); }}
-            style={{
-              padding: '11px 14px',
-              fontSize: 'var(--fs-base)',
-              fontWeight: 600,
-              color: tab === t.id ? 'var(--accent)' : 'var(--muted)',
-              cursor: 'pointer',
-              position: 'relative',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 5,
-            }}
-          >
-            {t.label}
-            <span style={{
-              fontSize: 12,
-              background: tab === t.id ? 'var(--accent-soft)' : 'var(--input-bg)',
-              color: tab === t.id ? 'var(--accent)' : 'var(--muted)',
-              padding: '1px 5px',
-              borderRadius: 8,
-              fontWeight: 700,
-            }}>{toFa(tabCount(t.id))}</span>
-            {tab === t.id && (
-              <div style={{
-                position: 'absolute', bottom: 0, right: 14, left: 14, height: 3,
-                background: 'var(--accent)', borderRadius: '3px 3px 0 0',
-              }} />
-            )}
-          </div>
-        ))}
-      </div>
+      <Tabs
+        tabs={tabs}
+        activeTab={tab}
+        onTabChange={(id: TabId) => { setInstant(); setTab(id); }}
+      />
 
       {/* Carousel */}
       <div
