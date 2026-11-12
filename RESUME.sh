@@ -12,6 +12,8 @@ echo "## NOW.md"
 cat NOW.md 2>/dev/null || echo "(نیست)"
 echo "## IDEAS.md"
 cat IDEAS.md 2>/dev/null || echo "(نیست)"
+echo "## BUGS.md (باگ‌های معلق)"
+grep -m 5 "^- \[ \] \[BUG-[0-9]" BUGS.md 2>/dev/null || echo "(هیچ باگ معلقی نیست)"
 echo "## MASTER-ROADMAP (نقشه راه)"
 if [ -f docs/MASTER-ROADMAP.md ]; then
   echo "--- اولین قدم (اولین کار انجام‌نشده) ---"
@@ -24,7 +26,7 @@ fi
 echo "## tsc (max 20s)"
 timeout 20 npx tsc --noEmit 2>&1 | tail -3 || echo "(skip)"
 echo "## قوانین AGENTS (خلاصه)"
-grep -E "^### قانون|^## 🆕" AGENTS.md 2>/dev/null | head -30
+grep -E "^### قانون|^## 🆕" AGENTS.md 2>/dev/null | head -50
 echo "## تست Correction (15 تست، ~5s)"
 timeout 15 npx vitest run \
   src/test/dlg-corrections.test.ts \
