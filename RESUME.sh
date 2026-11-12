@@ -12,6 +12,15 @@ echo "## NOW.md"
 cat NOW.md 2>/dev/null || echo "(نیست)"
 echo "## IDEAS.md"
 cat IDEAS.md 2>/dev/null || echo "(نیست)"
+echo "## MASTER-ROADMAP (نقشه راه)"
+if [ -f docs/MASTER-ROADMAP.md ]; then
+  echo "--- اولین قدم (اولین کار انجام‌نشده) ---"
+  grep -m 1 "^\- \[ \]" docs/MASTER-ROADMAP.md 2>/dev/null || echo "(همه کارها تمومه)"
+  echo "--- تعداد کارهای باقی‌مونده ---"
+  grep -c "^\- \[ \]" docs/MASTER-ROADMAP.md 2>/dev/null || echo "0"
+else
+  echo "(MASTER-ROADMAP نیست)"
+fi
 echo "## tsc (max 20s)"
 timeout 20 npx tsc --noEmit 2>&1 | tail -3 || echo "(skip)"
 echo "## قوانین AGENTS (خلاصه)"

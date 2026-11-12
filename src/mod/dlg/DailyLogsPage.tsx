@@ -1,7 +1,7 @@
 /**
  * DailyLogsPage — ثبت روزانه (carousel tabs مثل hal)
  */
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useDlg, type DailyLog } from './store';
 import { useFlk } from '../flk/store';
 import { useSet } from '../set/store';
@@ -159,18 +159,17 @@ export default function DailyLogsPage() {
   };
 
   const totalActiveLogs = logs.filter(l => (l.status || 'active') === 'active').length;
-  const tabCount = (t: TabId) =>
-    t === 'today' ? todaysLogs.length :
-    t === 'history' ? historicalLogs.length :
-    t === 'aggregate' ? totalActiveLogs :
-    archivedLogs.length;
-
-  const tabs: { id: TabId; label: string; count: number }[] = [
-    { id: 'today', label: 'امروز', count: todaysLogs.length },
-    { id: 'history', label: 'تاریخچه', count: historicalLogs.length },
-    { id: 'archive', label: 'آرشیو', count: archivedLogs.length },
-    { id: 'aggregate', label: '📊 جمع‌بندی', count: totalActiveLogs },
+  const tabs: { id: TabId; label: string }[] = [
+    { id: 'today', label: 'امروز' },
+    { id: 'history', label: 'تاریخچه' },
+    ...(archivedLogs.length > 0 ? [{ id: 'archive' as TabId, label: 'آرشیو' }] : []),
+    { id: 'aggregate', label: '📊 جمع‌بندی' },
   ];
+
+  // اگه در تب آرشیو بودیم و خالی شد، برگرد به «امروز»
+  useEffect(() => {
+    if (tab === 'archive' && archivedLogs.length === 0) setTab('today');
+  }, [tab, archivedLogs.length]);
 
   return (
     <div>

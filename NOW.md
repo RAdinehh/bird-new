@@ -1,26 +1,45 @@
 # NOW.md — وضعیت لحظه‌ای
 
-> آخرین آپدیت: 1405/11/11
+> بازنویسی می‌شود، نه append. هر checkpoint آپدیت.
+> آخرین آپدیت: 1405/11/12
 
 ## HEAD
-92583bac + IDEA-25 کامل + IDEA-30 ثبت شد
+ce4f0554 + مستندسازی MASTER-ROADMAP
 
 ## 🔨 کار جاری
-IDEA-25 (multi-source) کامل شد. منتظر تصمیم بعدی.
+فاز ۰ — تثبیت مستندسازی. پس از اتمام → فاز ۱ (L7).
 
-## ✅ کارهای اخیر
-- ۵۰+ کامیت: زیرساخت حفظ زمینه + یکدست‌سازی UI + فیلدهای اجباری
-- ۲۹ ایده در IDEAS.md (IDEA-1 تا IDEA-29)
-- تحلیل معماری تغذیه در DECISIONS.md
+## ✅ امروز (1405/11/12)
+- Audit کامل پروژه (کد واقعی، بدون حدس)
+- Baseline ثبت: ۲۳۶ تست، ۱۲/۱۲ zod، ۳۶۱۱ توکن، ۷ ماژول anomaly
+- نقاط ضعف: ۳ فایل > ۱۰۰۰ خط، ۶۹ catch {}، ۱۶۱ as any
+- docs/MASTER-ROADMAP.md ساخته شد
 
-## ⚠️ نقص‌های باز
-- IDEA-25: `feedSourceId` تکی → باید array شود
-- IDEA-26: `Movement.formulaId` نیست
-- IDEA-27: `Formula.version` نیست
-- `entryTime` با zod اجباری نشده
+## 🎯 قدم بعدی (فاز ۰)
+1. [x] MASTER-ROADMAP.md
+2. [ ] NOW.md (این)
+3. [ ] RESUME.sh آپدیت
+4. [ ] AGENTS.md قانون ۲۹
 
-## 🎯 قدم بعدی
-IDEA-27 → IDEA-26 → IDEA-25
+## 🚀 فاز ۱ (بعد از فاز ۰)
+شکستن ۳ فایل بزرگ:
+- tra/DealsPage.tsx (۱۶۳۵ خط)
+- tra/store.ts (۱۳۲۵ خط)
+- flk/FlockHistoryModal.tsx (۱۰۵۲ خط)
+
+## ⚠️ هشدارها
+- tsc: ۰ خطا ✅
+- تست: ۲۳۶ فایل (وضعیت دقیق: باید اجرا شو)
+- فایل‌های بزرگ: نقض L7
+
+## ❓ سؤالات باز
+- فاز ۲/۴/۵ ضروری‌ان یا اختیاری؟
+- اولویت فاز ۱ (L7) یا فاز ۳ (features)؟
 
 ## 📋 منبع حقیقت
-CLAUDE.md (قانون -۱), AGENTS.md, CONSTITUTION.md, DECISIONS.md
+- docs/MASTER-ROADMAP.md ← اول این
+- AGENTS.md (۲۲+ قانون)
+- CLAUDE.md (قانون -۱: فقط فارسی)
+- docs/CONSTITUTION.md
+- docs/DECISIONS.md
+- docs/UI-PATTERNS-REGISTRY.md
