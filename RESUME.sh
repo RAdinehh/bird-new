@@ -27,6 +27,8 @@ echo "## tsc (max 20s)"
 timeout 20 npx tsc --noEmit 2>&1 | tail -3 || echo "(skip)"
 echo "## قوانین AGENTS (خلاصه)"
 grep -E "^### قانون|^## 🆕" AGENTS.md 2>/dev/null | head -50
+echo "## VERIFY (ادعا vs واقعیت — قانون ۳۳)"
+bash scripts/verify.sh 2>&1 | tail -15
 echo "## تست Correction (15 تست، ~5s)"
 timeout 15 npx vitest run \
   src/test/dlg-corrections.test.ts \
