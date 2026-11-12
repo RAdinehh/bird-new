@@ -2,7 +2,7 @@
  * HealthSection — تلفات + واکسن + دارو
  */
 import { useMemo } from 'react';
-import { Btn, Field, Grid2, Input, NumField, Select, Textarea, AlertBox } from '../../../shr/components/ui';
+import { Btn, Field, Grid2, Input, NumField, Select, Textarea, AlertBox, Tag } from '../../../shr/components/ui';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { UNIT_LABEL } from '../../whs/store';
 import { formatQty } from '../../../shr/utils/fa';
@@ -30,6 +30,8 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
   const isSexed = !!flock?.genderSplitAt;
   const vaccineItems = useMemo(() => whsItems.filter(x => x.category === 'vaccine'), [whsItems]);
   const medicineItems = useMemo(() => whsItems.filter(x => x.category === 'medicine' || x.category === 'herbal'), [whsItems]);
+  const chemicalItems = useMemo(() => medicineItems.filter(x => x.category === 'medicine'), [medicineItems]);
+  const herbalItems = useMemo(() => medicineItems.filter(x => x.category === 'herbal'), [medicineItems]);
 
   return (
     <>
@@ -110,7 +112,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
             </Grid2>
             {vaccineItems.length > 0 && (
               <Grid2>
-                <Field label="از انبار" autoFrom="انبار (مصرف کسر می‌شه)" hint="اگه انتخاب کنی، به‌طور خودکار از موجودی انبار کم می‌شه">
+                <Field label={<>از انبار <Tag tone="blue">{toFa(vaccineItems.length)} نوع</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)" hint="اگه انتخاب کنی، به‌طور خودکار از موجودی انبار کم می‌شه">
                   <SmartSelect
                     value={v.itemId || ''}
                     onChange={id => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null } : x) }))}
@@ -161,7 +163,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
             </Field>)}
             {medicineItems.length > 0 && (
               <Grid2>
-                <Field label="از انبار" autoFrom="انبار (مصرف کسر می‌شه)" hint="اگه انتخاب کنی، به‌طور خودکار از موجودی انبار کم می‌شه">
+                <Field label={<>از انبار <Tag tone="red">{toFa(chemicalItems.length)} 💊</Tag> <Tag tone="green">{toFa(herbalItems.length)} 🌿</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)" hint="اگه انتخاب کنی، به‌طور خودکار از موجودی انبار کم می‌شه">
                   <SmartSelect
                     value={m.itemId || ''}
                     onChange={id => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null } : x) }))}
