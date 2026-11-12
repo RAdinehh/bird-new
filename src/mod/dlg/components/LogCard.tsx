@@ -127,8 +127,8 @@ export default function LogCard(props: LogCardProps) {
       stats={<>
         {l.temperature !== null && <span>🌡 {toFa(l.temperature)}°</span>}
         {l.humidity !== null && <span>💧 {toFa(l.humidity)}٪</span>}
-        {l.feedDelivered !== null && <span>🌾 {toFa(l.feedDelivered)} kg</span>}
-        {l.waterAmount !== null && <span>💧 {toFa(l.waterAmount)} L</span>}
+        {l.feedDelivered !== null && <span>🌾 {toFa(l.feedDelivered)} کیلوگرم</span>}
+        {l.waterAmount !== null && <span>💧 {toFa(l.waterAmount)} لیتر</span>}
       </>}
     >
       {(tIsBad || hIsBad) && (
@@ -143,19 +143,15 @@ export default function LogCard(props: LogCardProps) {
         <Grid2>
           {l.temperature !== null && <Row l="دما" v={`${toFa(l.temperature)} °C`} warn={tIsBad} />}
           {l.humidity !== null && <Row l="رطوبت" v={`${toFa(l.humidity)} ٪`} warn={hIsBad} />}
+          {(l.temperatureMin !== null || l.temperatureMax !== null) && (
+            <Row l="بازه دما" v={`${l.temperatureMin !== null ? toFa(l.temperatureMin) : '—'} تا ${l.temperatureMax !== null ? toFa(l.temperatureMax) : '—'} °C`} />
+          )}
+          {(l.humidityMin !== null || l.humidityMax !== null) && (
+            <Row l="بازه رطوبت" v={`${l.humidityMin !== null ? toFa(l.humidityMin) : '—'} تا ${l.humidityMax !== null ? toFa(l.humidityMax) : '—'} ٪`} />
+          )}
+          {l.ventilation !== 'ok' && <Row l="تهویه" v={VENTILATION_LABEL[l.ventilation] || '—'} />}
+          {l.litter !== 'dry' && <Row l="بستر" v={LITTER_LABEL[l.litter] || '—'} />}
         </Grid2>
-        {(l.temperatureMin !== null || l.temperatureMax !== null) && (
-          <Row l="بازه دما" v={`${l.temperatureMin !== null ? toFa(l.temperatureMin) : '—'} تا ${l.temperatureMax !== null ? toFa(l.temperatureMax) : '—'} °C`} />
-        )}
-        {(l.humidityMin !== null || l.humidityMax !== null) && (
-          <Row l="بازه رطوبت" v={`${l.humidityMin !== null ? toFa(l.humidityMin) : '—'} تا ${l.humidityMax !== null ? toFa(l.humidityMax) : '—'} ٪`} />
-        )}
-        {(l.ventilation !== 'ok' || l.litter !== 'dry') && (
-          <Grid2>
-            {l.ventilation !== 'ok' && <Row l="تهویه" v={VENTILATION_LABEL[l.ventilation] || '—'} />}
-            {l.litter !== 'dry' && <Row l="بستر" v={LITTER_LABEL[l.litter] || '—'} />}
-          </Grid2>
-        )}
       </LogSection>
 
       {(l.behavior !== 'active' || l.distribution !== 'uniform' || l.sound !== 'normal' || l.appearance) && (
@@ -171,26 +167,28 @@ export default function LogCard(props: LogCardProps) {
 
       {(l.feedDelivered !== null || l.waterAmount !== null) && (
         <LogSection title="🌾 تغذیه و آب">
-          {l.feedType && <Row l="جیره/دان" v={l.feedType} />}
-          {l.feedDelivered !== null && <Row l="دان داده‌شده" v={`${toFa(l.feedDelivered)} kg`} />}
-          {l.feedConsumed !== null && l.feedConsumed !== undefined && l.feedConsumed !== l.feedDelivered && (
-            <Row l="دان مصرف‌شده" v={`${toFa(l.feedConsumed)} kg`} />
-          )}
-          {l.feedConsumed !== null && l.feedConsumed > 0 && flock && (flock.currentCount || 0) > 0 && (() => {
-            const g = (l.feedConsumed * 1000) / (flock.currentCount || 1);
-            const isWarn = g < 5 || g > 300;
-            return <Row l="دان/پرنده" v={`${toFa(g.toFixed(1))} g`} warn={isWarn} />;
-          })()}
-          {l.feedRemaining !== null && <Row l="باقیمانده" v={`${toFa(l.feedRemaining)} kg`} />}
-          {l.waterAmount !== null && <Row l="آب" v={`${toFa(l.waterAmount)} L`} />}
-          {l.waterFillCount !== null && l.waterFillVolume !== null && (
-            <Row l="روش آب" v={`${toFa(l.waterFillCount)} بار × ${toFa(l.waterFillVolume)} L`} />
-          )}
-          {(() => {
-            const effectiveFeed = (l.feedConsumed && l.feedConsumed > 0) ? l.feedConsumed : l.feedDelivered;
-            if (!l.waterAmount || !effectiveFeed || effectiveFeed <= 0) return null;
-            return <Row l="نسبت آب/دان" v={toFa((l.waterAmount / effectiveFeed).toFixed(2))} />;
-          })()}
+          <Grid2>
+            {l.feedType && <Row l="جیره/دان" v={l.feedType} />}
+            {l.feedDelivered !== null && <Row l="دان داده‌شده" v={`${toFa(l.feedDelivered)} کیلوگرم`} />}
+            {l.feedConsumed !== null && l.feedConsumed !== undefined && l.feedConsumed !== l.feedDelivered && (
+              <Row l="دان مصرف‌شده" v={`${toFa(l.feedConsumed)} کیلوگرم`} />
+            )}
+            {l.feedConsumed !== null && l.feedConsumed > 0 && flock && (flock.currentCount || 0) > 0 && (() => {
+              const g = (l.feedConsumed * 1000) / (flock.currentCount || 1);
+              const isWarn = g < 5 || g > 300;
+              return <Row l="دان/پرنده" v={`${toFa(g.toFixed(1))} گرم`} warn={isWarn} />;
+            })()}
+            {l.feedRemaining !== null && <Row l="باقیمانده" v={`${toFa(l.feedRemaining)} کیلوگرم`} />}
+            {l.waterAmount !== null && <Row l="آب" v={`${toFa(l.waterAmount)} لیتر`} />}
+            {l.waterFillCount !== null && l.waterFillVolume !== null && (
+              <Row l="روش آب" v={`${toFa(l.waterFillCount)} بار × ${toFa(l.waterFillVolume)} لیتر`} />
+            )}
+            {(() => {
+              const effectiveFeed = (l.feedConsumed && l.feedConsumed > 0) ? l.feedConsumed : l.feedDelivered;
+              if (!l.waterAmount || !effectiveFeed || effectiveFeed <= 0) return null;
+              return <Row l="نسبت آب/دان" v={toFa((l.waterAmount / effectiveFeed).toFixed(2))} />;
+            })()}
+          </Grid2>
         </LogSection>
       )}
 
@@ -212,10 +210,10 @@ export default function LogCard(props: LogCardProps) {
         <LogSection title="⚖️ وزن‌کشی">
           <Grid2>
             <Row l="تعداد نمونه" v={toFa(l.weightSamples.length)} />
-            <Row l="میانگین" v={`${toFa(avgWeight(l.weightSamples))} kg`} />
+            <Row l="میانگین" v={`${toFa(avgWeight(l.weightSamples))} کیلوگرم`} />
           </Grid2>
           <Grid2>
-            <Row l="مجموع" v={`${toFa(sumWeight(l.weightSamples))} kg`} />
+            <Row l="مجموع" v={`${toFa(sumWeight(l.weightSamples))} کیلوگرم`} />
             <Row l="ضریب تغییرات" v={`${toFa(cvWeight(l.weightSamples))}٪`} />
           </Grid2>
         </LogSection>
