@@ -324,5 +324,28 @@ npx vitest run src/test/deal-journey.test.ts
 
 ---
 
+
+## 🔨 Refactor Progress — DealsPage (فاز ۱)
+
+> هدف: ۱۶۳۵ → ۱۰ فایل، هر ≤۵۰۰ خط. Two Hats (فقط جابه‌جایی).
+
+### تکمیل‌شده
+| # | فایل | خط | commit | تاریخ |
+|---|---|---|---|---|
+| 1 | `deals/types.ts` | ۲۹ | `25461d51` | ۱۴۰۵/۱۱/۱۲ |
+| 2 | `deals/useDealCalc.ts` | ۵۰ | `a744d80e` | ۱۴۰۵/۱۱/۱۲ |
+
+`DealsPage.tsx`: ۱۶۳۵ → **۱۵۴۴** (−۹۱ خط)
+
+### در صف (ترتیب کم‌ریسک → پرخطر)
+3. `forms/GoodsForm.tsx` (~۲۶۸) 🟢
+4. `forms/DeliveriesForm.tsx` (~۱۰۳) 🟢
+5. `forms/SalesForm.tsx` (~۶۲) 🟢
+6. `forms/PaymentsForm.tsx` (~۱۰۴) 🟢
+7. `DealsListView.tsx` (~۳۲۷) 🟡
+8. `DealFormShell.tsx` (~۱۳۹) 🟡
+9. `handlers.ts` (~۱۳۰) 🔴
+10. `useDealsData.ts` (~۲۱۳) 🔴
+
 *این سند زنده است — با هر تغییر مهم در DealsPage آپدیت کن.*
-*آخرین به‌روزرسانی: ۱۴۰۵/۰۸/۰۹*
+*آخرین به‌روزرسانی: ۱۴۰۵/۱۱/۱۲*
