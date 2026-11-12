@@ -117,7 +117,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
             </Grid2>
             {vaccineItems.length > 0 && (
               <Grid2>
-                <Field label={<>از انبار <Tag tone="blue">{toFa(vaccineItems.length)} نوع</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)" hint="اگه انتخاب کنی، به‌طور خودکار از موجودی انبار کم می‌شه">
+                <Field label={<>از انبار <Tag tone="blue">{toFa(vaccineItems.length)} نوع</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)">
                   <SmartSelect
                     value={v.itemId || ''}
                     onChange={id => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null } : x) }))}
@@ -147,40 +147,40 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         <Btn size="sm" full onClick={() => setForm(f => ({ ...f, medications: [...f.medications, { id: crypto.randomUUID(), name: '', dose: '', method: '', withdrawalDays: null, itemId: '', quantity: null, movementId: '' }] }))}>
           + دارو
         </Btn>
-        {form.medications.map((m, i) => (
+        {form.medications.map((m, i) => {
+          const selectedItem = medicineItems.find(w => w.id === m.itemId);
+          const isHerbal = selectedItem?.category === 'herbal';
+          
+          return (
           <div key={m.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>دارو {toFa(i + 1)}</span>
               <button type="button" onClick={() => setForm(f => ({ ...f, medications: f.medications.filter(x => x.id !== m.id) }))} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
             </div>
-            <Grid2>
-              <Input placeholder="نام" value={m.name} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, name: e.target.value } : x) }))} />
-              <Input placeholder="دوز" value={m.dose} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, dose: e.target.value } : x) }))} />
-            </Grid2>
-
-            {!(() => { const __sel = medicineItems.find(y => y.id === m.itemId); return __sel?.category === 'herbal'; })() && (
-              <Grid2>
-                <Field label="دوره پرهیز (روز)" hint="چند روز بعد از مصرف، گوشت و تخم قابل فروش نیست">
-              <NumField
-                placeholder="مثلاً ۷"
-                value={m.withdrawalDays !== null && m.withdrawalDays !== undefined ? String(m.withdrawalDays) : ''}
-                onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, withdrawalDays: e.target.value === '' ? null : (parseInt(toEn(e.target.value)) || null) } : x) }))}
-                unit="روز" min={0}
-              />
-            </Field>
-            <div />
-          </Grid2>
-        )}
+            
             {medicineItems.length > 0 && (
               <Grid2>
-                <Field label={<>از انبار <Tag tone="red">{toFa(chemicalItems.length)} 💊</Tag> <Tag tone="green">{toFa(herbalItems.length)} 🌿</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)" hint="اگه انتخاب کنی، به‌طور خودکار از موجودی انبار کم می‌شه">
+                <Field label={<>از انبار <Tag tone="red">{toFa(chemicalItems.length)} 💊</Tag> <Tag tone="green">{toFa(herbalItems.length)} 🌿</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)">
                   <SmartSelect
                     value={m.itemId || ''}
-                    onChange={id => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null } : x) }))}
+                    onChange={id => setForm(f => ({ 
+                      ...f, 
+                      medications: f.medications.map(x => {
+                        if (x.id !== m.id) return x;
+                        const newItem = medicineItems.find(w => w.id === id);
+                        return { 
+                          ...x, 
+                          itemId: id, 
+                          quantity: id ? (x.quantity ?? 0) : null,
+                          name: newItem ? newItem.name : x.name,
+                          withdrawalDays: newItem ? newItem.withdrawalDays : x.withdrawalDays
+                        };
+                      }) 
+                    }))}
                     options={medicineItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}`, group: w.category === 'herbal' ? 'herbal' : 'chemical' }))}
-groupLabels={{ chemical: '💊 شیمیایی', herbal: '🌿 گیاهی' }}
+                    groupLabels={{ chemical: '💊 شیمیایی', herbal: '🌿 گیاهی' }}
                     groupIcons={{ chemical: '💊', herbal: '🌿' }}
-                                        placeholder="— متصل نکن —"
+                    placeholder="— متصل نکن —"
                     modalTitle="انتخاب از انبار"
                     autoThreshold={6}
                   />
@@ -190,15 +190,36 @@ groupLabels={{ chemical: '💊 شیمیایی', herbal: '🌿 گیاهی' }}
                     <NumField
                       value={m.quantity !== null && m.quantity !== undefined ? String(m.quantity) : ''}
                       onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 } : x) }))}
-                      unit={UNIT_LABEL[medicineItems.find(w => w.id === m.itemId)?.unit || 'pcs'] || ''}
+                      unit={UNIT_LABEL[selectedItem?.unit || 'pcs'] || ''}
                       min={0}
                     />
                   </Field>
                 )}
               </Grid2>
             )}
+            
+            <Grid2>
+              <Field label="نام">
+                <Input placeholder="نام دارو" value={m.name} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, name: e.target.value } : x) }))} />
+              </Field>
+              <Field label="دوز">
+                <Input placeholder="دوز" value={m.dose} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, dose: e.target.value } : x) }))} />
+              </Field>
+            </Grid2>
+
+            {!isHerbal && (
+              <Field label="دوره پرهیز (روز)" hint="چند روز بعد از مصرف، گوشت و تخم قابل فروش نیست">
+                <NumField
+                  placeholder="مثلاً ۷"
+                  value={m.withdrawalDays !== null && m.withdrawalDays !== undefined ? String(m.withdrawalDays) : ''}
+                  onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, withdrawalDays: e.target.value === '' ? null : (parseInt(toEn(e.target.value)) || null) } : x) }))}
+                  unit="روز" min={0}
+                />
+              </Field>
+            )}
           </div>
-        ))}
+          );
+        })}
       </>)}
 
     </>
