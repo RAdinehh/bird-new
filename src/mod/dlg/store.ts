@@ -454,24 +454,37 @@ export const SOUND_LABEL: Record<string, string> = {
 
 /** دلایل رایج تلفات */
 export const DEATH_CAUSES: [string, string][] = [
-  ['', '— نامشخص —'],
-  ['disease_respiratory', 'بیماری تنفسی'],
-  ['disease_digestive', 'بیماری گوارشی'],
-  ['disease_other', 'بیماری دیگر'],
-  ['heat', 'گرمازدگی'],
-  ['cold', 'سرمازدگی'],
-  ['suffocation', 'خفگی / کمبود تهویه'],
-  ['cannibalism', 'پرنده‌خواری'],
-  ['predator', 'شکارچی'],
-  ['injury', 'آسیب / تصادف'],
-  ['weak', 'ضعف بدنی'],
-  ['deformity', 'نقص مادرزادی'],
-  ['old_age', 'پیری'],
-  ['unknown', 'نامشخص']
+  ['',             'نامشخص'],
+  ['disease',      'بیماری (تنفسی/گوارشی)'],
+  ['heat_stress',  'تنش دمایی (گرما/سرما)'],
+  ['suffocation',  'خفگی / تهویه'],
+  ['cannibalism',  'هم‌نوع‌خواری'],
+  ['injury',       'آسیب / تصادف'],
+  ['weakness',     'ضعف / تحلیل بدنی'],
+  ['egg_disorder', 'اختلال تخم‌گذاری'],
+  ['culling',      'حذف فنی (کشتار)'],
+  ['other',        'سایر'],
 ];
 
+/** نگاشت کلیدهای قدیمی به کلیدهای جدید (سازگاری داده‌های گذشته) */
+export const CAUSE_ALIAS: Record<string, string> = {
+  disease_respiratory: 'disease',
+  disease_digestive:   'disease',
+  disease_other:       'disease',
+  heat:                'heat_stress',
+  cold:                'heat_stress',
+  technical_fault:     'suffocation',
+  predator:            'injury',
+  crushing:            'injury',
+  old_age:             'weakness',
+  hypocalcemia:        'weakness',
+  deformity:           'other',
+  unknown:             '',
+};
+
 export function causeLabel(key: string): string {
-  return DEATH_CAUSES.find(x => x[0] === key)?.[1] || '—';
+  const normalized = CAUSE_ALIAS[key] ?? key;
+  return DEATH_CAUSES.find(x => x[0] === normalized)?.[1] || '—';
 }
 
 
