@@ -9,7 +9,7 @@ import type { Flock } from '../../flk/store';
 import { toFa } from '../../../shr/utils/fa';
 import { FEED_SYSTEM_LABEL, WATER_SYSTEM_LABEL } from '../../../shr/utils/systemType';
 import SmartSelect from '../../../shr/components/SmartSelect';
-import { Btn, BtnRow, Field, Grid2, Modal, ErrorBox, SectionTitle } from '../../../shr/components/ui';
+import { Btn, BtnRow, Field, Grid2, Modal, ErrorBox, SectionTitle, AlertBox } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 import TimePicker from '../../../shr/components/TimePicker';
 import { useFormat } from '../../../shr/units';
@@ -86,9 +86,7 @@ export default function FormModal(props: FormModalProps) {
       <FeedSection form={form} setForm={setForm} vErrors={vErrors} showError={showError} markTouched={markTouched} />
 
       {isLayerType && !isFlockMature && selectedFlock && (
-        <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--warn)', lineHeight: 1.7, marginBottom: 8 }}>
-          💡 این گله هنوز به سن تخم‌گذاری نرسیده ({fmt.int(getAgeDays(selectedFlock))} از {fmt.int(selectedFlock.layingStartDay)} روز). فرم تخم‌گذاری بعد از بلوغ فعال می‌شود.
-        </div>
+        <AlertBox tone="warn" variant="dashed" size="sm" icon={false} style={{ fontWeight: 'normal', lineHeight: 1.7, marginBottom: 8 }}>💡 این گله هنوز به سن تخم‌گذاری نرسیده ({fmt.int(getAgeDays(selectedFlock))} از {fmt.int(selectedFlock.layingStartDay)} روز). فرم تخم‌گذاری بعد از بلوغ فعال می‌شود.</AlertBox>
       )}
 
       {isLayerFlock && (

@@ -3,7 +3,7 @@
  * IDEA-25: پشتیبانی چند منبع دان (backward-compatible)
  */
 import { useMemo, useState } from 'react';
-import { Field, Grid2, NumField, Btn, Select, Sheet } from '../../../shr/components/ui';
+import { Field, Grid2, NumField, Btn, Select, Sheet, AlertBox } from '../../../shr/components/ui';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { UNIT_LABEL } from '../../whs/store';
 import { toFa, toEn } from '../../../shr/utils/fa';
@@ -148,9 +148,7 @@ export default function FeedSection({ form, setForm }: Props) {
       </div>
 
       {formulas.length === 0 && feedItems.length === 0 && (
-        <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 600 }}>
-          ⚠️ هنوز هیچ جیره‌ای نساخته‌اید و دان تکی هم تعریف نکرده‌اید. ابتدا از بخش «تغذیه» یک جیره بسازید، سپس به اینجا برگردید.
-        </div>
+        <AlertBox tone="warn" variant="dashed" size="xs" icon={false}>⚠️ هنوز هیچ جیره‌ای نساخته‌اید و دان تکی هم تعریف نکرده‌اید. ابتدا از بخش «تغذیه» یک جیره بسازید، سپس به اینجا برگردید.</AlertBox>
       )}
 
       {sources.length === 0 && (
@@ -220,10 +218,14 @@ export default function FeedSection({ form, setForm }: Props) {
             )}
 
             {it && (
-              <div style={{ padding: 6, background: it.currentStock - src.quantity < it.minStock ? 'var(--warn-soft)' : 'var(--accent-soft)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: it.currentStock - src.quantity < it.minStock ? 'var(--warn)' : 'var(--accent)' }}>
-                موجودی: {toFa(it.currentStock)} {UNIT_LABEL[it.unit]}
-                {src.quantity > 0 && ` • بعد از مصرف: ${toFa(it.currentStock - src.quantity)} ${UNIT_LABEL[it.unit]}`}
-              </div>
+              <AlertBox
+                tone={it.currentStock - src.quantity < it.minStock ? 'warn' : 'accent'}
+                variant="flat"
+                size="xs"
+                icon={false}
+                style={{ padding: 6, borderRadius: 'var(--r-sm)', fontWeight: 'normal' }}
+              >موجودی: {toFa(it.currentStock)} {UNIT_LABEL[it.unit]}
+                {src.quantity > 0 && ` • بعد از مصرف: ${toFa(it.currentStock - src.quantity)} ${UNIT_LABEL[it.unit]}`}</AlertBox>
             )}
           </div>
         );

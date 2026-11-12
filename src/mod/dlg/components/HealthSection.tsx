@@ -2,7 +2,7 @@
  * HealthSection — تلفات + واکسن + دارو
  */
 import { useMemo } from 'react';
-import { Btn, Field, Grid2, Input, NumField, Select, Textarea } from '../../../shr/components/ui';
+import { Btn, Field, Grid2, Input, NumField, Select, Textarea, AlertBox } from '../../../shr/components/ui';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { UNIT_LABEL } from '../../whs/store';
 import { formatQty } from '../../../shr/utils/fa';
@@ -38,11 +38,16 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         const total = form.deaths.reduce((a, x) => a + (x.count || 0), 0);
         const exceeds = flockAliveCount > 0 && total > flockAliveCount;
         return (
-          <div style={{ padding: 'var(--pad-normal)', background: exceeds ? 'var(--danger-soft)' : 'var(--warn-soft)', border: `1px solid ${exceeds ? 'var(--danger)' : 'var(--warn-border, var(--border))'}`, borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: exceeds ? 'var(--danger)' : 'var(--warn)', fontWeight: 700, textAlign: 'center' }}>
-            مجموع: {toFa(total)} پرنده
+          <AlertBox
+            tone={exceeds ? 'danger' : 'warn'}
+            variant="solid"
+            size="sm"
+            align="center"
+            icon={false}
+            style={{ border: `1px solid ${exceeds ? 'var(--danger)' : 'var(--border)'}` }}
+          >مجموع: {toFa(total)} پرنده
             {flockAliveCount ? ` از ${toFa(flockAliveCount)}` : ''}
-            {exceeds && ' ⚠️ بیشتر از موجودی گله'}
-          </div>
+            {exceeds && ' ⚠️ بیشتر از موجودی گله'}</AlertBox>
         );
       })()}
 
