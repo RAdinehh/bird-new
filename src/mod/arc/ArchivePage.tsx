@@ -8,6 +8,7 @@ import { toFa } from '../../shr/utils/fa';
 import { toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { useFilterSort, FilterBar, getArcArchiveConfig } from '../../shr/filter';
+import { Row } from '../../shr/components/ui';
 
 type Kind = 'flocks';
 
@@ -161,14 +162,6 @@ export default function ArchivePage() {
   );
 }
 
-function Row({ l, v }: { l: string; v: string }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-      <span style={{ color: 'var(--muted)' }}>{l}:</span>
-      <span style={{ fontWeight: 600, color: 'var(--text)' }}>{v}</span>
-    </div>
-  );
-}
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
