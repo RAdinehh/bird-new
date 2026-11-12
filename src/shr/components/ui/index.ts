@@ -23,3 +23,4 @@ export * from './Segmented';
 export * from './Row';
 export * from './ActionMenu';
 export * from './Tabs';
+export * from './AlertBox';
