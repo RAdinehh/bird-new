@@ -4,18 +4,21 @@
 > آخرین آپدیت: 1405/11/12
 
 ## HEAD
-6cb70044 — session-end.sh + قانون ۳۰
+پایان جلسه — قانون ۳۱ + BUGS.md + استاندارد شکستن
 
 ## 🔨 کار جاری
-فاز ۰ کامل. آماده برای فاز ۱ (L7) — یا استراحت.
+فاز ۰ کامل. آماده برای فاز ۱ (شکستن DealsPage).
 
 ## ✅ امروز (1405/11/12)
 - Audit کامل (۲۳۶ تست، ۱۲/۱۲ zod، ۳۶۱۱ توکن، ۷ anomaly)
-- MASTER-ROADMAP.md + NOW.md + RESUME.sh + AGENTS قانون ۲۹
-- session-end.sh + AGENTS قانون ۳۰ (پایان جلسه)
+- MASTER-ROADMAP + NOW + RESUME + AGENTS ۲۹+۳۰+۳۱
+- session-end.sh
+- BUGS.md (باگ‌های معلق)
+- استاندارد شکستن (Two Hats + معیار + مثال DealsPage)
 
 ## 🎯 قدم بعدی
-فاز ۱ — شکستن `tra/DealsPage.tsx` (۱۶۳۵ خط)
+فاز ۱ — شکستن `tra/DealsPage.tsx` (۱۶۳۵ → ۱۰ فایل)
+اول: تحلیل عمیق → نقشه → تأیید کاربر → شکستن تدریجی
 
 ## ⚠️ هشدارها
 - tsc: ۰ خطا ✅
@@ -23,5 +26,5 @@
 
 ## 📋 منبع حقیقت
 docs/MASTER-ROADMAP.md ← اول این
-AGENTS.md (۳۰ قانون)
-CLAUDE.md (قانون -۱)
+AGENTS.md (۳۱ قانون)
+BUGS.md (باگ‌های معلق)
