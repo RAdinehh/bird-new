@@ -3,6 +3,7 @@ import React from 'react';
  * helpers.tsx — ماژول hal
  */
 import type { ReactNode, CSSProperties } from 'react';
+export { Row } from '../../shr/components/ui';
 
 export function chip(active: boolean): CSSProperties {
   return {
@@ -16,21 +17,6 @@ export function chip(active: boolean): CSSProperties {
   };
 }
 
-export function Row({ l, v, accent }: { l: ReactNode; v: ReactNode; accent?: boolean }) {
-  return (
-    <div style={{
-      display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
-      padding: 'var(--pad-tight)',
-      background: accent ? 'var(--accent-soft)' : 'var(--input-bg)',
-      borderRadius: 'var(--r-sm)',
-      color: accent ? 'var(--accent)' : undefined,
-      fontWeight: accent ? 700 : undefined,
-    }}>
-      <span style={{ color: accent ? 'var(--accent)' : 'var(--muted)' }}>{l}:</span>
-      <span style={{ fontWeight: 600 }}>{v}</span>
-    </div>
-  );
-}
 
 export function Pill({ label, value }: { label: string; value: string }) {
   return (

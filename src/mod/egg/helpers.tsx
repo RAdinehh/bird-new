@@ -2,17 +2,8 @@
  * helpers.tsx — helperهای مشترک ماژول egg
  */
 import type { ReactNode, CSSProperties } from 'react';
+export { Row } from '../../shr/components/ui';
 
-export function Row({ l, v, accent }: { l: string; v: string; accent?: boolean }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)',
-       padding: 'var(--pad-tight)', background: accent ? 'var(--accent-soft)' : 'var(--input-bg)',
-       borderRadius: 'var(--r-sm)' }}>
-      <span style={{ color: accent ? 'var(--accent)' : 'var(--muted)' }}>{l}:</span>
-      <span style={{ fontWeight: 600, color: accent ? 'var(--accent)' : 'var(--text)' }}>{v}</span>
-    </div>
-  );
-}
 
 export function SectionTitle({ children }: { children: ReactNode }) {
   return (
