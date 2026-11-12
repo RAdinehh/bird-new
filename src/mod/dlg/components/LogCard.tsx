@@ -131,14 +131,6 @@ export default function LogCard(props: LogCardProps) {
         {l.waterAmount !== null && <span>💧 {toFa(l.waterAmount)} لیتر</span>}
       </>}
     >
-      {(tIsBad || hIsBad) && (
-        <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>
-          ⚠ {tIsBad ? `دما ${tWarn === 'danger' ? 'خطرناک' : 'نامناسب'}` : ''}
-          {tIsBad && hIsBad ? ' • ' : ''}
-          {hIsBad ? `رطوبت ${hWarn === 'danger' ? 'خطرناک' : 'نامناسب'}` : ''}
-        </div>
-      )}
-
       <LogSection title="🌡 محیط">
         <Grid2>
           {l.temperature !== null && <Row l="دما" v={`${toFa(l.temperature)} °C`} warn={tIsBad} />}
