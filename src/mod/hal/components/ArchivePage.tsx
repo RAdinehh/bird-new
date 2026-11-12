@@ -10,6 +10,7 @@ import { toastMsg } from '../../../cor/store/toast';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { logAction } from '../../../cor/logger/auditLog';
 import { toFa } from '../../../shr/utils/fa';
+import { TabButton } from '../../../shr/components/ui';
 
 type Seg = 'halls' | 'zones' | 'equip';
 
@@ -107,27 +108,9 @@ export default function ArchivePage({ active = true }: Props = {}) {
             border: '1px solid var(--border)',
           }}>
             {segmented.map(s => (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => setSeg(s.id)}
-                style={{
-                  flex: 1,
-                  padding: '8px 6px',
-                  border: 'none',
-                  background: seg === s.id ? 'var(--card-solid)' : 'transparent',
-                  color: seg === s.id ? 'var(--accent)' : 'var(--muted)',
-                  fontWeight: 700,
-                  fontSize: 'var(--fs-sm)',
-                  fontFamily: 'inherit',
-                  borderRadius: 'var(--r-sm)',
-                  cursor: 'pointer',
-                  boxShadow: seg === s.id ? '0 1px 2px rgba(0,0,0,.06)' : 'none',
-                  transition: 'all var(--dur-fast)',
-                }}
-              >
+              <TabButton key={s.id} active={seg === s.id} onClick={() => setSeg(s.id)}>
                 {s.label} ({toFa(s.count)})
-              </button>
+              </TabButton>
             ))}
           </div>
 

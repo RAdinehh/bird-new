@@ -20,7 +20,7 @@ import { createFlkSchema } from '../../shr/validation/rules/flk';
 import { toEn, toFa } from '../../shr/utils/fa';
 import { recordHistory } from '../../shr/intelligence';
 import type { TabId } from './types-flocks';
-import FlocksTabs from './components/FlocksTabs';
+import { Tabs } from '../../shr/components/ui';
 import FlockTabPanel from './components/FlockTabPanel';
 import FlocksModal from './components/FlocksModal';
 import GroupsPage from './components/GroupsPage';
@@ -213,7 +213,7 @@ export default function FlocksPage() {
 
   return (
     <div>
-      <FlocksTabs
+      <Tabs
         tabs={tabs}
         activeTab={tab}
         onTabChange={(id) => { setInstant(); setTab(id); }}
