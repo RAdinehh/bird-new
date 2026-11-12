@@ -42,11 +42,9 @@
 ### فاز ۱ — بحرانی: نقض L7 (اولویت اول)
 هدف: صفر فایل > ۱۰۰۰ خط.
 
-| فایل | خط | شکستن به |
-|------|-----|----------|
-| tra/DealsPage.tsx | ۱۶۳۵ | ۴ فایل |
-| tra/store.ts | ۱۳۲۵ | ۳ فایل |
-| flk/FlockHistoryModal.tsx | ۱۰۵۲ | ۲ فایل |
+- [ ] شکستن `tra/DealsPage.tsx` (۱۶۳۵) → ۴ فایل
+- [ ] شکستن `tra/store.ts` (۱۳۲۵) → ۳ فایل
+- [ ] شکستن `flk/FlockHistoryModal.tsx` (۱۰۵۲) → ۲ فایل
 
 **Checkpoint:** هر فایل → tsc + تست + commit.
 
