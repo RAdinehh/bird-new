@@ -42,17 +42,17 @@
 ### فاز ۱ — بحرانی: نقض L7 (اولویت اول)
 هدف: صفر فایل > ۱۰۰۰ خط.
 
-- [~] شکستن `tra/DealsPage.tsx` (۱۶۳۵) → ۱۰ فایل (نقشه در بخش «استاندارد شکستن»)
+- [⏸] شکستن `tra/DealsPage.tsx` (متوقف — قانون ۳۲: منتظر اتمام featureهای tra) (۱۶۳۵) → ۱۰ فایل (نقشه در بخش «استاندارد شکستن»)
   - [x] گام ۱: `deals/types.ts` (۲۹) — `25461d51`
   - [x] گام ۲: `deals/useDealCalc.ts` (۵۰) — `a744d80e`
-  - [ ] گام ۳: `forms/GoodsForm.tsx` (~۲۶۸)
-  - [ ] گام ۴: `forms/DeliveriesForm.tsx` (~۱۰۳)
-  - [ ] گام ۵: `forms/SalesForm.tsx` (~۶۲)
-  - [ ] گام ۶: `forms/PaymentsForm.tsx` (~۱۰۴)
-  - [ ] گام ۷: `DealsListView.tsx` (~۳۲۷)
-  - [ ] گام ۸: `DealFormShell.tsx` (~۱۳۹)
-  - [ ] گام ۹: `handlers.ts` (~۱۳۰)
-  - [ ] گام ۱۰: `useDealsData.ts` (~۲۱۳)
+  - [⏸] گام ۳: `forms/GoodsForm.tsx` (~۲۶۸)
+  - [⏸] گام ۴: `forms/DeliveriesForm.tsx` (~۱۰۳)
+  - [⏸] گام ۵: `forms/SalesForm.tsx` (~۶۲)
+  - [⏸] گام ۶: `forms/PaymentsForm.tsx` (~۱۰۴)
+  - [⏸] گام ۷: `DealsListView.tsx` (~۳۲۷)
+  - [⏸] گام ۸: `DealFormShell.tsx` (~۱۳۹)
+  - [⏸] گام ۹: `handlers.ts` (~۱۳۰)
+  - [⏸] گام ۱۰: `useDealsData.ts` (~۲۱۳)
 - [ ] شکستن `tra/store.ts` (۱۳۲۵) → ۳ فایل
 - [ ] شکستن `flk/FlockHistoryModal.tsx` (۱۰۵۲) → ۲ فایل
 

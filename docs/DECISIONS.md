@@ -16,6 +16,15 @@
 - فایل‌های متاثر:
 ~~~
 
+
+## [۱۴۰۵/۱۱/۱۲] توقف refactor DealsPage + قانون ۳۲ و ۳۳
+
+- **تصمیم:** refactor DealsPage در گام ۲/۱۰ متوقف شد. قانون ۳۲ (بدون دوباره‌کاری) و ۳۳ (Handoff Contract) به AGENTS.md اضافه شد.
+- **دلیل:** tra در آینده feature جدید می‌گیرد → refactor الان = دوباره‌کاری. ضمناً مسئلهٔ «AI بعدی ادعای AI قبلی را نقض می‌کند» با قانون ۳۳ حل می‌شود.
+- **جایگزین رد شده:** ادامهٔ refactor تا گام ۱۰ — چون با feature آیندهٔ tra تداخل می‌کرد.
+- **عواقب:** گام ۳-۱۰ در MASTER-ROADMAP با ⏸. شرط از سرگیری: اتمام featureهای tra.
+- **فایل‌های متاثر:** `AGENTS.md`, `RESUME.sh`, `NOW.md`, `docs/MASTER-ROADMAP.md`, `docs/modules/tra-deals.md`
+
 ---
 
 ## تاریخچه

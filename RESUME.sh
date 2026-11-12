@@ -34,3 +34,9 @@ timeout 15 npx vitest run \
   src/test/dlg-store-corrections.test.ts 2>&1 \
   | grep -E "Tests |Test Files" | tail -2 \
   || echo "(timeout/خطا)"
+
+echo "## 🔍 Verification Data (قانون ۳۳)"
+echo "DealsPage.tsx: $(wc -l < src/mod/tra/DealsPage.tsx 2>/dev/null) خط"
+echo "فایل‌های tra/deals/:"
+ls -1 src/mod/tra/deals/ 2>/dev/null | sed 's/^/  - /' || echo "  (هیچ)"
+echo "— NOW.md ادعا vs بالا مقایسه شود —"
