@@ -25,6 +25,15 @@
 - **عواقب:** گام ۳-۱۰ در MASTER-ROADMAP با ⏸. شرط از سرگیری: اتمام featureهای tra.
 - **فایل‌های متاثر:** `AGENTS.md`, `RESUME.sh`, `NOW.md`, `docs/MASTER-ROADMAP.md`, `docs/modules/tra-deals.md`
 
+
+## [۱۴۰۵/۱۱/۱۲] قانون ۳۴ — Design System + تفکیک success از accent
+
+- **تصمیم:** `--success` مستقل از `--accent` تعریف شد. `AlertBox` کامپوننت مشترک ساخته شد. قانون ۳۴ در AGENTS.md رسمی شد.
+- **دلیل:** `--accent` دو نقش داشت (primary + success) — با تغییر تم، حالت «موفقیت» هم رنگ عوض می‌کرد (مثلاً تم آبی → موفقیت آبی، درست نیست).
+- **جایگزین رد شده:** تغییر ۷۷۷ استفادهٔ `--accent` به `--primary` — چون پرخطر و بی‌دلیل بود (اکثرشون primary هستن، درست).
+- **عواقب:** Tag سبز همیشه سبز می‌مونه. AlertBox جایگزین ۴ کادر تکرارشده شد. فایل‌های بعدی باید از Tag/AlertBox استفاده کنن.
+- **فایل‌های متاثر:** `global.css`, `Card.tsx`, `ExpandableCard.tsx`, `AlertBox.tsx` (جدید), `index.ts`, `FeedSection.tsx`, `FormModal.tsx`, `HealthSection.tsx`, `AGENTS.md`, `docs/modules/dlg-daily.md`
+
 ---
 
 ## تاریخچه
