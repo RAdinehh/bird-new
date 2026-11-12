@@ -27,7 +27,7 @@ export function Tag({
   children: React.ReactNode;
 }) {
   const tones: Record<string, { bg: string; color: string }> = {
-    green: { bg: 'var(--accent-soft)', color: 'var(--accent)' },
+    green: { bg: 'var(--success-soft)', color: 'var(--success)' },
     accent: { bg: 'var(--accent-soft)', color: 'var(--accent)' },
     amber: { bg: 'var(--warn-soft)', color: 'var(--warn)' },
     warn: { bg: 'var(--warn-soft)', color: 'var(--warn)' },

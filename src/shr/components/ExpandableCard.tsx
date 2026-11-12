@@ -31,7 +31,7 @@ interface Props {
 
 const COLORS: Record<AccentKey, { c: string; s: string }> = {
   accent: { c: 'var(--accent)', s: 'var(--accent-soft)' },
-  green:  { c: 'var(--accent)', s: 'var(--accent-soft)' },
+  green:  { c: 'var(--success)', s: 'var(--success-soft)' },
   warn:   { c: 'var(--warn)',   s: 'var(--warn-soft)' },
   amber:  { c: 'var(--warn)',   s: 'var(--warn-soft)' },
   dim:    { c: 'var(--dim)',    s: 'var(--input-bg)' },
