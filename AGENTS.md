@@ -239,3 +239,24 @@ AI هرگز >۱ سؤال در یک پیام نمی‌پرسد. ۲۰ سؤال →
 - commit checkpoint + شرط از سرگیری بنویس → ⏸
 
 **ستون ۵ — Handoff Mismatch = باگ:** اگه AI جدید دید ادعای ✅ در واقع ❌ است → `BUGS.md` با تگ `handoff-mismatch`. نه «بعداً می‌بینیم».
+
+### قانون ۳۴ — رنگ فقط از Semantic Role (Design System)
+هر رنگ باید نقش مشخص داشته باشد. رنگ خام در کامپوننت‌ها ممنوع.
+
+| نقش | متغیر | کاربرد |
+|-----|-------|--------|
+| primary | `--primary` (alias `--accent`) | عملیات اصلی، دکمه، لینک |
+| success | `--success` | موفقیت، تأیید، حالت مثبت |
+| warning | `--warn` | هشدار غیربحرانی |
+| danger | `--danger` | خطا، عملیات خطرناک |
+| info | `--info` | اطلاع‌رسانی خنثی |
+
+**قواعد:**
+1. رنگ خام hex در `.tsx` ممنوع (به جز در `global.css` تعریف)
+2. `green` در Tag = `--success` (نه `--accent`)
+3. کادرهای هشدار → از `<AlertBox tone="..." variant="...">` استفاده کن
+4. success ≠ primary — تم عوض شد، موفقیت سبز می‌مونه
+
+**کامپوننت‌های آماده:**
+- `<Tag tone="green|amber|red|blue|gray|purple">`
+- `<AlertBox tone="warn|danger|info|success|accent" variant="dashed|solid|flat">`
