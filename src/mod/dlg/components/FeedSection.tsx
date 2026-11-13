@@ -11,9 +11,11 @@ import { toFa, toEn } from '../../../shr/utils/fa';
 import { WATER_SYSTEM_LABEL } from '../../../shr/utils/systemType';
 import { useFed } from '../../fed/store';
 import { useWhs } from '../../whs/store';
+import { useSet } from '../../set/store';
 import type { F } from '../types';
 import type { FeedSource } from '../store';
 import { useFlk, getAgeDays } from '../../flk/store';
+import { getBirdAgeAt } from '../../flk/helpers-store';
 import { useBrd } from '../../brd/store';
 import { FieldHint } from '../../../shr/intelligence/FieldHint';
 import { getStandardFor, findInRange } from '../../set/standards/resolve';
@@ -48,6 +50,7 @@ export default function FeedSection({ form, setForm }: Props) {
   const [editFeedMethod, setEditFeedMethod] = useState(false);
   const [editWaterMethod, setEditWaterMethod] = useState(false);
   const { items: whsItems } = useWhs();
+  const customStandards = useSet(s => (s as any).customStandards) || {};
   const feedItems = useMemo(() => whsItems.filter(x => x.category === 'feed'), [whsItems]);
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
   const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
@@ -74,9 +77,12 @@ export default function FeedSection({ form, setForm }: Props) {
     const breedObj = breeds.find((b: any) => b.id === selectedFlock?.breedId);
     const bName = breedObj?.name || (selectedFlock as any)?.breedLabel || '';
     if (bName) {
-      const std = getStandardFor(bName);
+      const std = getStandardFor(bName, { customStandards });
       if (std) {
-        const ag = selectedFlock ? getAgeDays(selectedFlock) : 0;
+        // 🆕 استفاده از تاریخ لاگ برای سن دقیق (آپدیت آنی)
+        const ag = selectedFlock 
+          ? (form.date ? getBirdAgeAt(selectedFlock, form.date) : getAgeDays(selectedFlock)) 
+          : 0;
         const rng = findInRange(std.feed, ag);
         expectedPerBirdG = rng?.feedG ?? null;
       }
@@ -148,6 +154,7 @@ export default function FeedSection({ form, setForm }: Props) {
   };
   const isUnderfed = daysAvailable > 0 && daysAvailable < 0.8;
   const finalSummaryTone = cardHasShortage ? 'danger' : isUnderfed ? 'warn' : 'accent';
+
 
   return (
     <>
@@ -336,6 +343,7 @@ export default function FeedSection({ form, setForm }: Props) {
 
       {sources.length > 0 && (
         <SummaryCard tone={finalSummaryTone}>
+
           <span>مجموع مصرف: <b style={{ color: 'var(--text)' }}>{toFa(totalFeed.toFixed(1))} کیلوگرم</b></span>
           {dailyNeedKg > 0 && (
             <span>نیاز روزانه: <b style={{ color: 'var(--text)' }}>{toFa(dailyNeedKg.toFixed(1))} کیلوگرم</b></span>
@@ -343,7 +351,9 @@ export default function FeedSection({ form, setForm }: Props) {
           {daysAvailable > 0 && (
             <span>دوام دانخوری: <b style={{ color: isUnderfed ? 'var(--warn)' : 'var(--text)' }}>{isUnderfed ? `⚠️ ${formatDays(daysAvailable)}` : formatDays(daysAvailable)}</b></span>
           )}
-          <span>مصرف هر پرنده: <b style={{ color: 'var(--text)' }}>{feedPerBirdG > 0 ? `${toFa(feedPerBirdG.toFixed(1))} گرم` : '—'}</b></span>
+          {expectedPerBirdG !== null && (
+            <span>استاندارد روزانه نژاد: <b style={{ color: 'var(--text)' }}>{toFa(expectedPerBirdG)} گرم/پرنده</b></span>
+          )}
         </SummaryCard>
       )}
 
