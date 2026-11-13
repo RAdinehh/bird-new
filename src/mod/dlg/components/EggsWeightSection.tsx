@@ -100,21 +100,19 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
       )}
 
       {form.weightSamples.map((w, i) => (
-        <div key={w.id} style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-            <div style={{ flex: 1 }}>
-              <NumField
-                placeholder="وزن (kg)"
-                value={w.weight}
-                error={showError(`weightSamples.${i}.weight`)}
-                onBlur={() => markTouched(`weightSamples.${i}.weight`)}
-                onChange={e => setForm(f => ({ ...f, weightSamples: f.weightSamples.map(x => x.id === w.id ? { ...x, weight: e.target.value } : x) }))}
-                unit="kg" min={0} />
-            </div>
+        <div key={w.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>نمونه {toFa(i + 1)}</span>
             <button type="button" onClick={() => setForm(f => ({ ...f, weightSamples: f.weightSamples.filter(x => x.id !== w.id) }))}
-              style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 18, lineHeight: 1, padding: '4px 6px', flexShrink: 0 }}>✕</button>
+              style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
           </div>
-          
+          <NumField
+            placeholder="وزن (kg)"
+            value={w.weight}
+            error={showError(`weightSamples.${i}.weight`)}
+            onBlur={() => markTouched(`weightSamples.${i}.weight`)}
+            onChange={e => setForm(f => ({ ...f, weightSamples: f.weightSamples.map(x => x.id === w.id ? { ...x, weight: e.target.value } : x) }))}
+            unit="kg" min={0} />
         </div>
       ))}
 
