@@ -547,7 +547,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                       <MoneyField placeholder="مبلغ" value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: Math.max(0, parseFloat(toEn(e.target.value).replace('٫','.')) || 0) })} min={0} />
                     </Field>
                     <Field label="مبلغ کل این قلم">
-                      <div style={{ height: 38, display: 'flex', alignItems: 'center', fontWeight: 800, color: 'var(--accent)', direction: 'rtl', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', justifyContent: 'flex-end' }}>
+                      <div style={{ height: 38, display: 'flex', alignItems: 'center', fontWeight: 800, color: 'var(--accent)', direction: 'rtl', background: 'var(--input-bg)', border: '1.5px solid var(--accent-border)', borderRadius: 'var(--r-md)', padding: '0 12px', justifyContent: 'flex-end' }}>
                         {it.total > 0 ? `${toFa(it.total.toLocaleString('fa-IR'))} تومان` : ''}
                       </div>
                     </Field>
