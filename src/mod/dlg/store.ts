@@ -44,11 +44,6 @@ export interface Medication {
   movementId?: string;
 }
 
-export interface Activity {
-  id: string;
-  type: string;
-  notes: string;
-}
 
 /** 🆕 منبع دان (چندگانه) — برای پشتیبانی چند نوع دان در یک لاگ */
 export interface FeedSource {
@@ -145,7 +140,6 @@ export interface DailyLog {
   medications: Medication[];
 
   // فعالیت‌ها
-  activities: Activity[];
 
   // یادداشت
   notes: string;

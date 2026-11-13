@@ -7,7 +7,7 @@ const mkBase = (overrides: any = {}) => ({
   entryTime: '07:30',
   eatingEggs: 0, fertileEggs: 0, brokenEggs: 0, otherEggs: 0,
   deathsCount: 0, deaths: [], vaccines: [], medications: [],
-  weightSamples: [], activities: [], notes: '',
+  weightSamples: [], notes: '',
   ...overrides,
 });
 

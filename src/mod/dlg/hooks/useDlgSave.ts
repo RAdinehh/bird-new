@@ -153,7 +153,6 @@ function hasMeaningfulData(form: F): boolean {
   if (form.deaths && form.deaths.length > 0) return true;
   if (form.vaccines && form.vaccines.length > 0) return true;
   if (form.medications && form.medications.length > 0) return true;
-  if (form.activities && form.activities.length > 0) return true;
   if (form.weightSamples && form.weightSamples.length > 0) return true;
   if (form.notes) return true;
   if (form.appearance) return true;

@@ -44,7 +44,6 @@ const baseLog = (overrides: Partial<DailyLog> = {}): DailyLog => ({
   deaths: [],
   vaccines: [],
   medications: [],
-  activities: [],
   notes: '',
   status: 'active',
   birdAgeDays: 30,

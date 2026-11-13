@@ -18,7 +18,7 @@ const makeLog = () => ({
   weightSamples: [], weightGender: '',
   brokenEggs: null,
   deathsCount: 0, deaths: [],
-  vaccines: [], medications: [], activities: [],
+  vaccines: [], medications: [],
   notes: '',
 });
 

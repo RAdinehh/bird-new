@@ -121,7 +121,6 @@ export function buildLogData(input: BuildDataInput): Omit<DailyLog, 'id' | 'stat
     deaths: form.deaths,
     vaccines: processedVaccines,
     medications: processedMedications,
-    activities: form.activities,
     notes: form.notes.trim(),
   };
 }

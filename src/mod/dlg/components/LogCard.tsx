@@ -249,16 +249,6 @@ export default function LogCard(props: LogCardProps) {
         </LogSection>
       )}
 
-      {l.activities.length > 0 && (
-        <LogSection title="🔧 فعالیت‌ها">
-          {l.activities.map(a => (
-            <div key={a.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-              <b>{a.type}</b>{a.notes ? ` — ${a.notes}` : ''}
-            </div>
-          ))}
-        </LogSection>
-      )}
-
       {l.notes && (
         <LogSection title="📝 یادداشت">
           <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{l.notes}</div>

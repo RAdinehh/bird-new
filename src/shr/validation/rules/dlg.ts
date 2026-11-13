@@ -106,11 +106,6 @@ export function createDlgSchema(context: ValidationContext = {}) {
       weight: z.coerce.number(),
     })).default([]),
 
-    activities: z.array(z.object({
-      id: z.string(),
-      type: z.string().optional().default(''),
-      notes: z.string().optional().default(''),
-    })).default([]),
 
     notes: optionalStr(2000),
   }).superRefine((data, ctx) => {

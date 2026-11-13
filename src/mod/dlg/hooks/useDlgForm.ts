@@ -26,7 +26,7 @@ export function newLog(flockId = ''): F {
     waterMethod: '', waterAmount: '', waterFillCount: '', waterFillVolume: '',
     weightSamples: [], weightGender: '',
     eatingEggs: '', fertileEggs: '', brokenEggs: '', otherEggs: '',
-    deaths: [], vaccines: [], medications: [], activities: [],
+    deaths: [], vaccines: [], medications: [],
     notes: '',
   };
 }
@@ -127,7 +127,7 @@ export function useDlgForm({ activeFlocks, halls, todayStr }: UseDlgFormParams) 
       otherEggs: l.otherEggs != null ? toFa(l.otherEggs) : '',
       weightGender: l.weightGender || '',
       deaths: l.deaths || [], vaccines: l.vaccines || [],
-      medications: l.medications || [], activities: l.activities || [],
+      medications: l.medications || [],
       notes: l.notes,
     });
     setErr(''); setOpen(true);

@@ -1,7 +1,7 @@
 /**
  * types.ts — نوع‌های مشترک ماژول dlg
  */
-import type { Death, Vaccine, Medication, Activity, FeedSource } from './store';
+import type { Death, Vaccine, Medication, FeedSource } from './store';
 
 export interface F {
   id?: string;
@@ -23,6 +23,6 @@ export interface F {
   eatingEggs: string; fertileEggs: string; brokenEggs: string; otherEggs: string;
   weightGender: '' | 'male' | 'female' | 'mixed';
   deaths: Death[];
-  vaccines: Vaccine[]; medications: Medication[]; activities: Activity[];
+  vaccines: Vaccine[]; medications: Medication[];
   notes: string;
 }

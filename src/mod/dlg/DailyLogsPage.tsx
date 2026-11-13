@@ -135,7 +135,6 @@ export default function DailyLogsPage() {
       vaccines: form.vaccines,
       medications: form.medications,
       weightSamples: form.weightSamples.map(w => ({ id: w.id, weight: num(w.weight) || 0 })),
-      activities: form.activities,
       notes: form.notes || '',
     },
   );

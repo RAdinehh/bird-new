@@ -39,7 +39,6 @@ const minimalLog: Omit<DailyLog, 'id' | 'status' | 'createdAt' | 'updatedAt'> = 
   deaths: [],
   vaccines: [],
   medications: [],
-  activities: [],
   notes: '',
   birdAgeDays: null,
 };

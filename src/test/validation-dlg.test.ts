@@ -14,7 +14,6 @@ const mkBase = (overrides: any = {}) => ({
   vaccines: [],
   medications: [],
   weightSamples: [],
-  activities: [],
   notes: '',
   ...overrides,
 });

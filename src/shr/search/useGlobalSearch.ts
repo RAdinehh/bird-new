@@ -122,8 +122,7 @@ export function useGlobalSearch(query: string): GroupedResult[] {
          l.notes].filter(Boolean).join(' • '),
         [l.notes, l.feedType, l.ventilation, l.behavior, l.sound,
          ...(l.vaccines || []).map(v => v.name),
-         ...(l.medications || []).map(m => m.name),
-         ...(l.activities || []).map((a: any) => a.name || a.title || '')])),
+         ...(l.medications || []).map(m => m.name)])),
 
       fed: [
         ...(ingredients || []).map(i => mk(i.id, 'fed', i.name, 'ماده', [i.name, i.notes, i.category])),

@@ -18,7 +18,6 @@ import EnvironmentSection from './EnvironmentSection';
 import FeedSection from './FeedSection';
 import EggsWeightSection from './EggsWeightSection';
 import HealthSection from './HealthSection';
-import ActivitiesSection from './ActivitiesSection';
 
 export interface FormModalProps {
   open: boolean;
@@ -103,7 +102,6 @@ export default function FormModal(props: FormModalProps) {
         vaccineEnabled={vaccineEnabled}
         medicineEnabled={medicineEnabled} showError={showError} markTouched={markTouched} />
 
-      <ActivitiesSection form={form} setForm={setForm} />
 
       {err && <ErrorBox>{err}</ErrorBox>}
     </Modal>
