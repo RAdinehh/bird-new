@@ -336,43 +336,16 @@ export default function FeedSection({ form, setForm }: Props) {
 
       {sources.length > 0 && (
         <SummaryCard tone={finalSummaryTone}>
-          {cardHasShortage && (
-            <div style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-              ⚠️ موجودی انبار کافی نیست — ثبت این جیره ممکن نیست
-            </div>
-          )}
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
-            <span>مجموع مصرف:</span>
-            <span>{toFa(totalFeed.toFixed(1))} کیلوگرم</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)' }}>
-            <span>مصرف هر پرنده:</span>
-            <span>{feedPerBirdG > 0 ? `${toFa(feedPerBirdG.toFixed(1))} گرم` : (totalFeed > 0 && remainingNum === totalFeed ? 'مصرف صفر' : '—')}</span>
-          </div>
+          <span>مجموع مصرف: <b style={{ color: 'var(--text)' }}>{toFa(totalFeed.toFixed(1))} کیلوگرم</b></span>
           {dailyNeedKg > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)' }}>
-              <span>نیاز روزانه گله:</span>
-              <span>{toFa(dailyNeedKg.toFixed(1))} کیلوگرم</span>
-            </div>
+            <span>نیاز روزانه: <b style={{ color: 'var(--text)' }}>{toFa(dailyNeedKg.toFixed(1))} کیلوگرم</b></span>
           )}
           {daysAvailable > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)', fontWeight: 700, marginTop: 4, paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
-              <span>دوام دانخوری:</span>
-              <span>{isUnderfed ? `⚠️ ${formatDays(daysAvailable)} (کمبود)` : `✓ ${formatDays(daysAvailable)}`}</span>
-            </div>
+            <span>دوام دانخوری: <b style={{ color: isUnderfed ? 'var(--warn)' : 'var(--text)' }}>{isUnderfed ? `⚠️ ${formatDays(daysAvailable)}` : formatDays(daysAvailable)}</b></span>
           )}
-
-          <FieldHint
-            fieldPath="dlg.feedDelivered"
-            value={totalFeed}
-            context={{
-              flockSize: flockSize || undefined,
-              perBirdGramsPerDay: expectedPerBirdG || undefined,
-            }}
-          />
+          <span>مصرف هر پرنده: <b style={{ color: 'var(--text)' }}>{feedPerBirdG > 0 ? `${toFa(feedPerBirdG.toFixed(1))} گرم` : '—'}</b></span>
         </SummaryCard>
       )}
-
 
       {form.waterMethod === 'manual' && (
         <>
