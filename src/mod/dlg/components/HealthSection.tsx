@@ -105,11 +105,12 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
 
       {vaccineEnabled && (<>
         {form.vaccines.map((v, i) => (
-          <div key={v.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div key={v.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${expandedId === 'v-' + v.id ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8, transition: 'border-color 0.15s ease' }}>
+            <div onClick={() => setExpandedId(expandedId === 'v-' + v.id ? null : 'v-' + v.id)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: expandedId === 'v-' + v.id ? 'default' : 'pointer' }}>
               <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>واکسن {toFa(i + 1)}</span>
-              <button type="button" onClick={() => setForm(f => ({ ...f, vaccines: f.vaccines.filter(x => x.id !== v.id) }))} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ fontSize: 11, color: 'var(--muted)' }}>{expandedId === 'v-' + v.id ? '▲' : '▼'}</span><button type="button" onClick={(e) => { e.stopPropagation(); setForm(f => ({ ...f, vaccines: f.vaccines.filter(x => x.id !== v.id) })) }} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button></div>
             </div>
+            {expandedId === 'v-' + v.id && (<>
             <Grid2>
               <Input placeholder="نام" value={v.name} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, name: e.target.value } : x) }))} />
               <Input placeholder="دوز" value={v.dose} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, dose: e.target.value } : x) }))} />
@@ -138,6 +139,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
                 )}
               </Grid2>
             )}
+            </>)}
           </div>
         ))}
       </>)}
