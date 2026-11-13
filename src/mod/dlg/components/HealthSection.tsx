@@ -1,7 +1,7 @@
 /**
  * HealthSection — تلفات + واکسن + دارو
  */
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Btn, Field, Grid2, Input, NumField, Select, Textarea, AlertBox, Tag, SummaryCard } from '../../../shr/components/ui';
 import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
 import SmartSelect from '../../../shr/components/SmartSelect';
@@ -34,6 +34,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
   const chemicalItems = useMemo(() => medicineItems.filter(x => x.category === 'medicine'), [medicineItems]);
   const herbalItems = useMemo(() => medicineItems.filter(x => x.category === 'herbal'), [medicineItems]);
   const causeOptions = useMemo(() => DEATH_CAUSES.map(([v, l]) => ({ value: v, label: l })), []);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   return (
     <>
@@ -55,49 +56,52 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         </div>
 
 
-      {form.deaths.map((d, i) => (
-        <div key={d.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>{d.count === 0 && !d.cause ? "رکورد جدید" : "رکورد " + toFa(i + 1)}</span>
-            <button type="button" onClick={() => setForm(f => ({ ...f, deaths: f.deaths.filter(x => x.id !== d.id) }))}
-              style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
-          </div>
-          <Grid2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-              <Field label="تعداد" error={showError('deathsCount') || showError('deaths')} onTouch={() => markTouched('deathsCount')}>
-                <NumField placeholder="اگر تلفات نبود، 0 وارد کنید" value={String(d.count ?? '')}
-                  onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, count: parseInt(toEn(e.target.value)) || 0 } : x) }))}
-                  min={0} max={flockAliveCount || undefined} unit="پرنده" />
-              </Field>
-              <FieldHint fieldPath="dlg.deathsCount" value={d.count ?? 0} context={{ currentCount: flockAliveCount }} />
-              
+        {form.deaths.map((d, i) => (
+          <div key={d.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${expandedId === 'd-' + d.id ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8, transition: 'border-color 0.15s ease' }}>
+            <div onClick={() => setExpandedId(expandedId === 'd-' + d.id ? null : 'd-' + d.id)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: expandedId === 'd-' + d.id ? 'default' : 'pointer' }}>
+              <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>{d.count === 0 && !d.cause ? "رکورد جدید" : "رکورد " + toFa(i + 1)}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ fontSize: 11, color: 'var(--muted)' }}>{expandedId === 'd-' + d.id ? '▲' : '▼'}</span>
+                <button type="button" onClick={(e) => { e.stopPropagation(); setForm(f => ({ ...f, deaths: f.deaths.filter(x => x.id !== d.id) })) }}
+                  style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+              </div>
             </div>
-            <Field label="علت">
-              <SmartSelect
-                value={d.cause || ''}
-                onChange={val => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, cause: val } : x) }))}
-                options={causeOptions}
-                placeholder="— انتخاب کنید —"
-                modalTitle="علت تلفات"
-              />
+            {expandedId === 'd-' + d.id && (<>
+            <Grid2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+                <Field label="تعداد" error={showError('deathsCount') || showError('deaths')} onTouch={() => markTouched('deathsCount')}>
+                  <NumField placeholder="اگر تلفات نبود، 0 وارد کنید" value={String(d.count ?? '')}
+                    onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, count: parseInt(toEn(e.target.value)) || 0 } : x) }))}
+                    min={0} max={flockAliveCount || undefined} unit="پرنده" />
+                </Field>
+                <FieldHint fieldPath="dlg.deathsCount" value={d.count ?? 0} context={{ currentCount: flockAliveCount }} />
+              </div>
+              <Field label="علت">
+                <SmartSelect
+                  value={d.cause || ''}
+                  onChange={val => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, cause: val } : x) }))}
+                  options={causeOptions}
+                  placeholder="— انتخاب کنید —"
+                  modalTitle="علت تلفات"
+                />
+              </Field>
+            </Grid2>
+            {isSexed && (
+              <Field label="جنسیت تلفات">
+                <Select value={d.sex || 'unknown'} onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, sex: e.target.value as 'male' | 'female' | 'unknown' } : x) }))}>
+                  <option value="male">نر</option>
+                  <option value="female">ماده</option>
+                  <option value="unknown">نامشخص</option>
+                </Select>
+              </Field>
+            )}
+            <Field label="توضیحات">
+              <Textarea rows={2} placeholder="جزئیات..." value={d.notes || ''}
+                onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, notes: e.target.value } : x) }))} />
             </Field>
-          </Grid2>
-          {isSexed && (
-            <Field label="جنسیت تلفات">
-              <Select value={d.sex || 'unknown'} onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, sex: e.target.value as 'male' | 'female' | 'unknown' } : x) }))}>
-                <option value="male">نر</option>
-                <option value="female">ماده</option>
-                <option value="unknown">نامشخص</option>
-              </Select>
-            </Field>
-          )}
-          <Field label="توضیحات">
-            <Textarea rows={2} placeholder="جزئیات..." value={d.notes || ''}
-              onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, notes: e.target.value } : x) }))} />
-          </Field>
-        </div>
-      ))}
-
+            </>)}
+          </div>
+        ))}
 
       {vaccineEnabled && (<>
         {form.vaccines.map((v, i) => (
