@@ -40,7 +40,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
     <>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <Btn size="sm" full onClick={() => {
+          <Btn size="sm" full variant="outline" onClick={() => {
             const newId = crypto.randomUUID();
             setForm(f => ({ ...f, deaths: [...f.deaths, { id: newId, count: 0, cause: '', notes: '' }] }));
             setExpandedId('d-' + newId);
@@ -48,7 +48,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
             + تلفات
           </Btn>
           {vaccineEnabled && (
-            <Btn size="sm" full onClick={() => {
+            <Btn size="sm" full variant="outline" onClick={() => {
               const newId = crypto.randomUUID();
               setForm(f => ({ ...f, vaccines: [...f.vaccines, { id: newId, name: '', dose: '', method: '', reaction: '', itemId: '', quantity: null, movementId: '' }] }));
               setExpandedId('v-' + newId);
@@ -57,7 +57,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
             </Btn>
           )}
           {medicineEnabled && (
-            <Btn size="sm" full onClick={() => {
+            <Btn size="sm" full variant="outline" onClick={() => {
               const newId = crypto.randomUUID();
               setForm(f => ({ ...f, medications: [...f.medications, { id: newId, name: '', dose: '', method: '', withdrawalDays: null, itemId: '', quantity: null, movementId: '' }] }));
               setExpandedId('m-' + newId);

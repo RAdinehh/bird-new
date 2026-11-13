@@ -88,7 +88,7 @@ export default function FormulaFormModal(props: Props) {
         ) : null}
 
         {form.lines.length > 1 ? (
-          <Btn size="sm" full onClick={autoBalance}>⚖ تقسیم مساوی (کمک)</Btn>
+          <Btn size="sm" full variant="outline" onClick={autoBalance}>⚖ تقسیم مساوی (کمک)</Btn>
         ) : null}
           {form.lines.map((line, idx) => {
             const ing = ingredients.find(x => x.id === line.ingredientId);
@@ -143,7 +143,7 @@ export default function FormulaFormModal(props: Props) {
             );
           })}
 
-        <Btn size="sm" full onClick={addLine}>+ افزودن ماده</Btn>
+        <Btn size="sm" full variant="outline" onClick={addLine}>+ افزودن ماده</Btn>
 
         <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> مواد مغذی محاسبه‌شده</SectionTitle>
         <Grid2>

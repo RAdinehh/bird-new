@@ -126,7 +126,7 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
         </div>
       ))}
 
-      <Btn size="sm" full onClick={() => {
+      <Btn size="sm" full variant="outline" onClick={() => {
         const newId = crypto.randomUUID();
         setForm(f => ({ ...f, weightSamples: [...f.weightSamples, { id: newId, weight: '' }] }));
         setExpandedId(newId);
