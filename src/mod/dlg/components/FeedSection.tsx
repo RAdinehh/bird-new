@@ -3,7 +3,7 @@
  * IDEA-25: پشتیبانی چند منبع دان (backward-compatible)
  */
 import { useMemo, useState } from 'react';
-import { Field, Grid2, NumField, Btn, Select, Sheet, AlertBox, Tag } from '../../../shr/components/ui';
+import { Field, Grid2, NumField, Btn, Select, Sheet, AlertBox, Tag, SummaryCard } from '../../../shr/components/ui';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { UNIT_LABEL } from '../../whs/store';
 import { toFa, toEn } from '../../../shr/utils/fa';
@@ -235,16 +235,31 @@ export default function FeedSection({ form, setForm }: Props) {
         </Btn>
       )}
 
+      <Grid2>
+        <Field label="دان باقی‌مانده" hint="اختیاری — برای مصرف دقیق، پر کنید">
+          <NumField placeholder="۰" value={form.feedRemaining} onChange={e => setForm({ ...form, feedRemaining: e.target.value })} unit="kg" min={0} />
+        </Field>
+        <Field label="هدر رفته" hint="اختیاری — ریخته‌شده یا خراب">
+          <NumField placeholder="۰" value={form.feedWaste} onChange={e => setForm({ ...form, feedWaste: e.target.value })} unit="kg" min={0} />
+        </Field>
+      </Grid2>
+
       {totalFeed > 0 && (
-        <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700 }}>
+        <SummaryCard tone="accent">
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
             <span>مجموع مصرف:</span>
             <span>{toFa(totalFeed.toFixed(1))} کیلوگرم</span>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)', color: 'var(--accent)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)' }}>
             <span>مصرف هر پرنده:</span>
             <span>{feedPerBirdG > 0 ? `${toFa(feedPerBirdG.toFixed(1))} گرم` : (totalFeed > 0 && remainingNum === totalFeed ? 'مصرف صفر' : '—')}</span>
           </div>
+          {feedPerBirdG > 0 && expectedPerBirdG && expectedPerBirdG > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)', color: feedPerBirdG > expectedPerBirdG * 1.2 || feedPerBirdG < expectedPerBirdG * 0.8 ? 'var(--warn)' : 'var(--accent)' }}>
+              <span>مقایسه با استاندارد:</span>
+              <span>{feedPerBirdG > expectedPerBirdG * 1.2 ? '⚠ بالاتر از نژاد' : feedPerBirdG < expectedPerBirdG * 0.8 ? '⚠ پایین‌تر از نژاد' : '✓ مطابق نژاد'}</span>
+            </div>
+          )}
           <FieldHint
             fieldPath="dlg.feedDelivered"
             value={totalFeed}
@@ -253,36 +268,27 @@ export default function FeedSection({ form, setForm }: Props) {
               perBirdGramsPerDay: expectedPerBirdG || undefined,
             }}
           />
-        </div>
+        </SummaryCard>
       )}
-
-      <Grid2>
-        <Field label="دان باقی‌مانده">
-          <NumField placeholder="۰" value={form.feedRemaining} onChange={e => setForm({ ...form, feedRemaining: e.target.value })} unit="kg" min={0} />
-        </Field>
-        <Field label="هدر رفته (اختیاری)" hint="ریخته‌شده یا خراب">
-          <NumField placeholder="۰" value={form.feedWaste} onChange={e => setForm({ ...form, feedWaste: e.target.value })} unit="kg" min={0} />
-        </Field>
-      </Grid2>
 
 
       {form.waterMethod === 'manual' && (
         <>
-          <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
-            💡 حالت دستی: تعداد بار × حجم هر بار
-          </div>
           <Grid2>
-            <Field label="تعداد بار">
-              <NumField placeholder="۵" value={form.waterFillCount} onChange={e => setForm({ ...form, waterFillCount: e.target.value })} unit="بار" min={0} />
+            <Field label="دفعات آبدهی">
+              <NumField placeholder="۵" value={form.waterFillCount} onChange={e => setForm({ ...form, waterFillCount: e.target.value })} unit="نوبت" min={0} />
             </Field>
-            <Field label="حجم هر بار">
+            <Field label="مقدار هر نوبت">
               <NumField placeholder="۲۰" value={form.waterFillVolume} onChange={e => setForm({ ...form, waterFillVolume: e.target.value })} unit="L" min={0} />
             </Field>
           </Grid2>
           {(form.waterFillCount && form.waterFillVolume) && (
-            <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700, textAlign: 'center' }}>
-              مجموع آب مصرفی: {toFa((int(form.waterFillCount) || 0) * (num(form.waterFillVolume) || 0))} لیتر
-            </div>
+            <SummaryCard tone="info">
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
+                <span>مجموع آب مصرفی:</span>
+                <span>{toFa((int(form.waterFillCount) || 0) * (num(form.waterFillVolume) || 0))} لیتر</span>
+              </div>
+            </SummaryCard>
           )}
         </>
       )}
@@ -296,6 +302,14 @@ export default function FeedSection({ form, setForm }: Props) {
             <NumField placeholder="۱۰۰" value={form.waterAmount} onChange={e => setForm({ ...form, waterAmount: e.target.value })} unit="L" min={0} />
           </Field>
           <FieldHint fieldPath="dlg.waterAmount" value={form.waterAmount} context={{ flockSize: flockSize || undefined }} />
+          {form.waterAmount && (
+            <SummaryCard tone="info">
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
+                <span>مجموع آب مصرفی:</span>
+                <span>{toFa(int(form.waterAmount) || 0)} لیتر</span>
+              </div>
+            </SummaryCard>
+          )}
         </>
       )}
     </>

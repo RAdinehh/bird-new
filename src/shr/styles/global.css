@@ -44,10 +44,13 @@ body {
   --accent-border: rgba(22,163,74,.35);
   --warn: #ea580c;
   --warn-soft: rgba(234,88,12,.12);
+  --warn-border: rgba(234,88,12,.35);
   --danger: #dc2626;
   --danger-soft: rgba(220,38,38,.12);
+  --danger-border: rgba(220,38,38,.35);
   --info: #0284c7;
   --info-soft: rgba(2,132,199,.12);
+  --info-border: rgba(2,132,199,.35);
   --purple: #7c3aed;
   --purple-soft: rgba(124,58,237,.12);
 
@@ -180,10 +183,13 @@ html[data-accent="olive"] {
   --accent-border: rgba(34,197,94,.4);
   --warn: #fb923c;
   --warn-soft: rgba(251,146,60,.15);
+  --warn-border: rgba(251,146,60,.4);
   --danger: #ef4444;
   --danger-soft: rgba(239,68,68,.15);
+  --danger-border: rgba(239,68,68,.4);
   --info: #38bdf8;
   --info-soft: rgba(56,189,248,.15);
+  --info-border: rgba(56,189,248,.4);
   --purple: #a78bfa;
   --purple-soft: rgba(167,139,250,.15);
 
