@@ -209,14 +209,14 @@ export default function PaymentsSection({
                   const isExpanded = expandedPaymentId === p.id;
                   const methodLabel = p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک';
                   return (
-                    <div key={p.id} style={{ padding: isExpanded ? 'var(--sp-3)' : 'var(--sp-2) var(--sp-3)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', transition: 'all 0.2s' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: isExpanded ? 'default' : 'pointer' }} onClick={() => setExpandedPaymentId(isExpanded ? null : p.id)}>
+                    <div key={p.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${isExpanded ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', marginBottom: 8 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: isExpanded ? 'default' : 'pointer' }} onClick={() => setExpandedPaymentId(isExpanded ? null : p.id)}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                          <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>
+                          <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             پرداخت {toFa(idx + 1)} — {methodLabel}
                           </span>
-                          <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>
-                            {toFa(p.date)}
+                          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+                            {toFa(p.date)}{p.checkNo ? ' • چک ' + toFa(p.checkNo) : ''}{p.bank ? ' • ' + p.bank : ''}
                           </span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
