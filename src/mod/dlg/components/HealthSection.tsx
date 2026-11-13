@@ -38,7 +38,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
   return (
     <>
 
-        <Grid2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <Btn size="sm" full onClick={() => setForm(f => ({ ...f, deaths: [...f.deaths, { id: crypto.randomUUID(), count: 0, cause: '', notes: '' }] }))}>
             + تلفات
           </Btn>
@@ -52,7 +52,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
               + دارو
             </Btn>
           )}
-        </Grid2>
+        </div>
 
 
       {form.deaths.map((d, i) => (
