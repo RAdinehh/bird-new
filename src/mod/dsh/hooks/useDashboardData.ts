@@ -179,15 +179,41 @@ const [, _setTick] = useState(0);
     return days;
   }, [productions, trendDays]);
 
-  // FCR ماه
-  const fcr = useMemo(() => {
-    const monthLogs = logs.filter(l => monthKey(l.date) === thisMonth);
-    const monthProd = productions.filter(p => monthKey(p.date) === thisMonth);
+  // ─── FCR ماه — تفکیک بر اساس نوع گله (قانون: broiler ≠ layer) ───
+  // FCR گوشتی: دان ÷ افزایش وزن بدن
+  const fcrBroiler = useMemo(() => {
+    const broilerFlocks = flocks.filter(f => f.type === 'broiler');
+    if (broilerFlocks.length === 0) return 0;
+    const broilerIds = new Set(broilerFlocks.map(f => f.id));
+    const monthLogs = logs.filter(l => monthKey(l.date) === thisMonth && broilerIds.has(l.flockId));
+    if (monthLogs.length === 0) return 0;
+    const feed = monthLogs.map(applyCorrections).reduce((a, l) => a + (l.feedConsumed || l.feedDelivered || 0), 0);
+    let totalGain = 0;
+    for (const f of broilerFlocks) {
+      const lastLog = [...monthLogs].reverse().find(l => l.flockId === f.id && l.weightSamples && l.weightSamples.length > 0);
+      if (lastLog && lastLog.weightSamples) {
+        const avgW = avgWeightFn(lastLog.weightSamples.map((w: any) => ({ id: w.id, weight: Number(w.weight) || 0 })));
+        const chickW = (f.chickWeight ?? 40) / 1000;
+        totalGain += (avgW - chickW) * (f.currentCount || 0);
+      }
+    }
+    return totalGain > 0 ? Math.round((feed / totalGain) * 100) / 100 : 0;
+  }, [logs, flocks, thisMonth]);
+
+  // FCR تخم‌گذار/مادر: دان ÷ وزن تخم
+  const fcrLayer = useMemo(() => {
+    const layerFlocks = flocks.filter(f => f.type === 'layer' || f.type === 'breeder');
+    if (layerFlocks.length === 0) return 0;
+    const layerIds = new Set(layerFlocks.map(f => f.id));
+    const monthLogs = logs.filter(l => monthKey(l.date) === thisMonth && layerIds.has(l.flockId));
+    const monthProd = productions.filter(p => monthKey(p.date) === thisMonth && layerIds.has(p.flockId));
     const feed = monthLogs.map(applyCorrections).reduce((a, l) => a + (l.feedConsumed || l.feedDelivered || 0), 0);
     const eggsWeight = monthProd.reduce((a, p) => a + (p.totalCount || 0) * 0.06, 0);
-    if (eggsWeight <= 0) return 0;
-    return Math.round((feed / eggsWeight) * 100) / 100;
-  }, [logs, productions, thisMonth]);
+    return eggsWeight > 0 ? Math.round((feed / eggsWeight) * 100) / 100 : 0;
+  }, [logs, productions, flocks, thisMonth]);
+
+  // فیلد قدیمی — سازگاری (اولویت به غیرصفر)
+  const fcr = fcrBroiler > 0 ? fcrBroiler : fcrLayer;
 
   // نسبت آب به دان — از calculateWaterMetrics (orphan connected)
   const waterMetrics7d = useMemo(() => {
@@ -479,7 +505,7 @@ const [, _setTick] = useState(0);
     activeFlocks, todayProd, eggsToday, brokenToday, todayLogs, deathsToday, feedToday, waterToday, tempToday, humidToday,
     daysUntilDue, upcomingDues, pendingChecks,
     aliveCount, totalInitial, survivalRate, cumulativeMortality,
-    henDay7, brokenRate7, eggTrend, fcr, waterFeedRatio, waterFeedTone, waterFeedWarning,
+    henDay7, brokenRate7, eggTrend, fcr, fcrBroiler, fcrLayer, waterFeedRatio, waterFeedTone, waterFeedWarning,
     salesThisMonth, purchasesThisMonth, profit, receivables, inventoryValue, costPerEgg,
     feedPerBirdGrams, waterPerBirdMl, weightMetrics, momComparison,
     benchmarkData, aggregatedAlerts, active, counts, stockAlerts, activeEntries, hasData,
