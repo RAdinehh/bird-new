@@ -283,7 +283,7 @@ export default function PaymentsSection({
             )}
 
             {/* دکمه افزودن پرداخت */}
-            <Btn size="sm" full variant="outline" onClick={addPayment} style={{ marginTop: 4 }}>
+            <Btn full variant="outline" onClick={addPayment} style={{ marginTop: 4 }}>
               + {form.payments.length === 0 ? 'افزودن اولین پرداخت' : 'افزودن پرداخت دیگر'}
             </Btn>
 

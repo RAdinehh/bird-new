@@ -560,17 +560,9 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           );
         })}
 
-        <button 
-          type="button" 
-          onClick={addItem} 
-          style={{
-            width: '100%', height: 40, padding: 0, boxSizing: 'border-box', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', 
-            fontWeight: 700, cursor: 'pointer', display: 'flex', 
-            alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 4
-          }}
-        >
-          + {form.items.length === 0 ? 'افزودن اولین قلم' : 'افزودن قلم دیگر'}
-        </button>
+        <Btn full onClick={addItem}>
+                + {form.items.length === 0 ? 'افزودن اولین قلم' : 'افزودن قلم دیگر'}
+              </Btn>
       </div>
       </div>
 
