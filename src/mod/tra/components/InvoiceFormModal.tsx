@@ -275,13 +275,13 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           return (
             <div key={it.id} style={{ 
               background: 'var(--card-solid)',
-              border: '1px solid var(--border)', 
+              border: `1px solid ${isExpanded ? 'var(--accent)' : 'var(--border)'}`, 
               borderRadius: 'var(--r-md)', 
-              padding: 'var(--sp-3)',  marginBottom: 'var(--sp-2)',
+              padding: 'var(--pad-normal)',  marginBottom: 8,
               display: 'flex', 
               flexDirection: 'column', 
-              gap: 'var(--sp-3)',
-              transition: 'all 0.2s',
+              gap: 8,
+              
             }}>
               {/* هدر قلم */}
               <div 

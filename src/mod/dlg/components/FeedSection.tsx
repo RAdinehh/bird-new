@@ -213,7 +213,7 @@ export default function FeedSection({ form, setForm }: Props) {
         const unitLabel = UNIT_LABEL['kg'] || 'کیلوگرم';
 
         return (
-          <div key={src.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${isExpanded ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div key={src.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${isExpanded ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
             
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: isExpanded ? 'default' : 'pointer' }} onClick={() => setExpandedSourceId(isExpanded ? null : src.id)}>
