@@ -22,6 +22,7 @@
   - نیاز به بررسی: منبع `stdHumMin/Max` در `envWarn` vs منبع نمایش بازه در `LogCard`
   - اقدام: در جلسهٔ بعدی dlg بررسی شود (fix در commit جدا)
 
-- [ ] [BUG-3] [1405/11/14] [عمومی] **handoff-mismatch**: AI قبلی ۳۳ کامیت کد زد ولی push نکرد و NOW.md رو آپدیت نکرد (ادعای `cc8a88d6`، واقعیت `fb118aba`). طبق قانون ۳۳، قبل از ادامه باید audit + push.
+- [x] [BUG-3] [1405/11/14] [عمومی] **handoff-mismatch**: AI قبلی ۳۳ کامیت کد زد ولی push نکرد و NOW.md رو آپدیت نکرد.
+  ✅ حل شد: commit `0420d7c4` — push ۳۵ کامیت + NOW آپدیت + BUG-3 ثبت
   - شواهد: `git log origin/main..HEAD` = ۳۴ commit، `NOW.md HEAD = cc8a88d6` vs `git HEAD = fb118aba`
   - اقدام: commit ۵ فایل WIP (`fc63218b`) + آپدیت NOW + push
