@@ -153,7 +153,7 @@ export default function FeedSection({ form, setForm }: Props) {
     return `${toFa(wd)} روز و ${toFa(rh)} ساعت`;
   };
   const isUnderfed = daysAvailable > 0 && daysAvailable < 0.8;
-  const finalSummaryTone = cardHasShortage ? 'danger' : isUnderfed ? 'warn' : 'accent';
+  const finalSummaryTone = isUnderfed ? 'warn' : 'accent';
 
 
   return (
@@ -276,16 +276,16 @@ export default function FeedSection({ form, setForm }: Props) {
                           <span style={{ color: 'var(--text)' }}>
                             • {ing.name} <span style={{ color: 'var(--muted)' }}>({toFa(line.percent)}٪)</span>
                           </span>
-                          <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                            {stockItem && (
-                              <span style={{ padding: '2px 6px', borderRadius: 'var(--r-sm)', background: unavailable ? 'var(--danger-soft)' : 'var(--input-bg)', color: unavailable ? 'var(--danger)' : 'var(--muted)', border: unavailable ? '1px solid var(--danger-border)' : '1px solid var(--border)', fontSize: 'var(--fs-2xs)', fontWeight: 700 }}>
-                                موجودی: {toFa(stockItem.currentStock)}
+                            <span style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                              {stockItem && (
+                                <span style={{ padding: '2px 6px', borderRadius: 'var(--r-sm)', background: unavailable ? 'var(--danger-soft)' : 'var(--success-soft)', color: unavailable ? 'var(--danger)' : 'var(--success)', border: unavailable ? '1px solid var(--danger-border)' : '1px solid var(--success-border)', fontSize: 'var(--fs-2xs)', fontWeight: 700, minWidth: 70, textAlign: 'center' }}>
+                                  موجودی: {toFa(stockItem.currentStock)}
+                                </span>
+                              )}
+                              <span style={{ color: unavailable ? 'var(--danger)' : 'var(--text)', fontWeight: 700, minWidth: 60, textAlign: 'left' }}>
+                                {need > 0 ? `${toFa(need.toFixed(1))} ${unitLabelIng}` : '—'}
                               </span>
-                            )}
-                            <span style={{ color: unavailable ? 'var(--danger)' : 'var(--text)', fontWeight: 700 }}>
-                              {need > 0 ? `${toFa(need.toFixed(1))} ${unitLabelIng}` : '—'}
                             </span>
-                          </span>
                         </div>
                       );
                     })}
@@ -343,16 +343,27 @@ export default function FeedSection({ form, setForm }: Props) {
 
       {sources.length > 0 && (
         <SummaryCard tone={finalSummaryTone}>
-
-          <span>مجموع مصرف: <b style={{ color: 'var(--text)' }}>{toFa(totalFeed.toFixed(1))} کیلوگرم</b></span>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span>مجموع مصرف:</span>
+            <b style={{ color: 'var(--text)' }}>{toFa(totalFeed.toFixed(1))} کیلوگرم</b>
+          </div>
           {dailyNeedKg > 0 && (
-            <span>نیاز روزانه: <b style={{ color: 'var(--text)' }}>{toFa(dailyNeedKg.toFixed(1))} کیلوگرم</b></span>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>نیاز روزانه:</span>
+              <b style={{ color: 'var(--text)' }}>{toFa(dailyNeedKg.toFixed(1))} کیلوگرم</b>
+            </div>
           )}
           {daysAvailable > 0 && (
-            <span>دوام دانخوری: <b style={{ color: isUnderfed ? 'var(--warn)' : 'var(--text)' }}>{isUnderfed ? `⚠️ ${formatDays(daysAvailable)}` : formatDays(daysAvailable)}</b></span>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>دوام دانخوری:</span>
+              <b style={{ color: isUnderfed ? 'var(--warn)' : 'var(--text)' }}>{isUnderfed ? `⚠️ ${formatDays(daysAvailable)}` : formatDays(daysAvailable)}</b>
+            </div>
           )}
           {expectedPerBirdG !== null && (
-            <span>استاندارد روزانه نژاد: <b style={{ color: 'var(--text)' }}>{toFa(expectedPerBirdG)} گرم/پرنده</b></span>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>استاندارد روزانه نژاد:</span>
+              <b style={{ color: 'var(--text)' }}>{toFa(expectedPerBirdG)} گرم/پرنده</b>
+            </div>
           )}
         </SummaryCard>
       )}
