@@ -17,6 +17,8 @@ interface Props {
   trendDays: number;
   setTrendDays: (d: 7 | 30 | 90) => void;
   fcr: number;
+  fcrBroiler: number;
+  fcrLayer: number;
   waterFeedRatio: number;
   weightMetrics: any;
   costPerEgg: number;
@@ -41,6 +43,8 @@ export default function AnalyticsCards({
   trendDays,
   setTrendDays,
   fcr,
+  fcrBroiler,
+  fcrLayer,
   waterFeedRatio,
   weightMetrics,
   costPerEgg,
@@ -131,27 +135,57 @@ export default function AnalyticsCards({
                   <LineChart data={eggTrend} color="var(--accent)" height={120} />
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4 }}>
-                  <MiniStat
-                    label="FCR ماه"
-                    value={fcr}
-                    suffix=""
-                    color={fcr === 0 ? 'info' : fcr <= 1.9 ? 'accent' : fcr <= 2.3 ? 'warn' : 'danger'}
-                  />
-                  <MiniStat
-                    label="آب/دان"
-                    value={waterFeedRatio}
-                    suffix=""
-                    color={waterFeedRatio === 0 ? 'info' : waterFeedRatio >= 1.6 && waterFeedRatio <= 2.2 ? 'accent' : 'warn'}
-                  />
-                  <MiniStat
-                    label="هزینه/تخم"
-                    value={costPerEgg}
-                    suffix="ت"
-                    color="info"
-                    noFormat
-                  />
-                </div>
+                {(fcrBroiler > 0 && fcrLayer > 0) ? (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+                    <MiniStat
+                      label="FCR گوشتی"
+                      value={fcrBroiler}
+                      suffix=""
+                      color={fcrBroiler <= 1.9 ? 'accent' : fcrBroiler <= 2.3 ? 'warn' : 'danger'}
+                    />
+                    <MiniStat
+                      label="FCR تخم"
+                      value={fcrLayer}
+                      suffix=""
+                      color={fcrLayer <= 1.9 ? 'accent' : fcrLayer <= 2.3 ? 'warn' : 'danger'}
+                    />
+                    <MiniStat
+                      label="آب/دان"
+                      value={waterFeedRatio}
+                      suffix=""
+                      color={waterFeedRatio === 0 ? 'info' : waterFeedRatio >= 1.6 && waterFeedRatio <= 2.2 ? 'accent' : 'warn'}
+                    />
+                    <MiniStat
+                      label="هزینه/تخم"
+                      value={costPerEgg}
+                      suffix="ت"
+                      color="info"
+                      noFormat
+                    />
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4 }}>
+                    <MiniStat
+                      label={fcrBroiler > 0 ? 'FCR گوشتی' : fcrLayer > 0 ? 'FCR تخم' : 'FCR ماه'}
+                      value={fcr}
+                      suffix=""
+                      color={fcr === 0 ? 'info' : fcr <= 1.9 ? 'accent' : fcr <= 2.3 ? 'warn' : 'danger'}
+                    />
+                    <MiniStat
+                      label="آب/دان"
+                      value={waterFeedRatio}
+                      suffix=""
+                      color={waterFeedRatio === 0 ? 'info' : waterFeedRatio >= 1.6 && waterFeedRatio <= 2.2 ? 'accent' : 'warn'}
+                    />
+                    <MiniStat
+                      label="هزینه/تخم"
+                      value={costPerEgg}
+                      suffix="ت"
+                      color="info"
+                      noFormat
+                    />
+                  </div>
+                )}
 
                 {weightMetrics.hasData && (
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4 }}>

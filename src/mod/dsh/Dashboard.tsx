@@ -19,7 +19,7 @@ export default function Dashboard() {
     activeFlocks, todayProd, eggsToday, brokenToday, todayLogs, deathsToday, feedToday, waterToday, tempToday, humidToday,
     daysUntilDue, upcomingDues, pendingChecks,
     aliveCount, totalInitial, survivalRate, cumulativeMortality,
-    henDay7, brokenRate7, eggTrend, fcr, waterFeedRatio,
+    henDay7, brokenRate7, eggTrend, fcr, fcrBroiler, fcrLayer, waterFeedRatio,
     salesThisMonth, purchasesThisMonth, profit, receivables, inventoryValue, costPerEgg,
     feedPerBirdGrams, waterPerBirdMl, weightMetrics, momComparison,
     benchmarkData, aggregatedAlerts, active, counts, stockAlerts, activeEntries, hasData,
@@ -42,7 +42,7 @@ export default function Dashboard() {
 
       <ListCards active={active} counts={counts} activeFlocks={activeFlocks} birds={birds} productions={productions} activeEntries={activeEntries} stockAlerts={stockAlerts} nav={nav} />
 
-      <AnalyticsCards survivalRate={survivalRate} survivalTone={survivalTone} henDay7={henDay7} henDayTone={henDayTone} brokenRate7={brokenRate7} brokenTone={brokenTone} cumulativeMortality={cumulativeMortality} eggTrend={eggTrend} trendDays={trendDays} setTrendDays={setTrendDays} fcr={fcr} waterFeedRatio={waterFeedRatio} weightMetrics={weightMetrics} costPerEgg={costPerEgg} salesThisMonth={salesThisMonth} purchasesThisMonth={purchasesThisMonth} profit={profit} receivables={receivables} inventoryValue={inventoryValue} momComparison={momComparison} nav={nav} />
+      <AnalyticsCards survivalRate={survivalRate} survivalTone={survivalTone} henDay7={henDay7} henDayTone={henDayTone} brokenRate7={brokenRate7} brokenTone={brokenTone} cumulativeMortality={cumulativeMortality} eggTrend={eggTrend} trendDays={trendDays} setTrendDays={setTrendDays} fcr={fcr} fcrBroiler={fcrBroiler} fcrLayer={fcrLayer} waterFeedRatio={waterFeedRatio} weightMetrics={weightMetrics} costPerEgg={costPerEgg} salesThisMonth={salesThisMonth} purchasesThisMonth={purchasesThisMonth} profit={profit} receivables={receivables} inventoryValue={inventoryValue} momComparison={momComparison} nav={nav} />
 
           <BenchmarkCard />
         <SexingWidget nav={nav} activeFlocks={activeFlocks} />
