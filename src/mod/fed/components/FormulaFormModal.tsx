@@ -95,14 +95,12 @@ export default function FormulaFormModal(props: Props) {
           const usedIds = form.lines.filter(l => l.id !== line.id).map(l => l.ingredientId);
           const available = ingredients.filter(i => !usedIds.includes(i.id));
           return (
-            <div key={line.id} style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)',
+            <div key={line.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)',
                border: '1px solid var(--border)', borderRadius: 'var(--r-md)',
                display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>ماده {toFa(idx + 1)}</span>
-                <button type="button" onClick={() => removeLine(line.id)} style={{ background: 'none',
-                   border: 'none', color: 'var(--danger)', cursor: 'pointer',
-                   fontFamily: 'inherit', fontSize: 'var(--fs-base)' }}>✕</button>
+<button type="button" onClick={() => removeLine(line.id)} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
               </div>
               <Select value={line.ingredientId} onChange={e => updateLine(line.id, { ingredientId: e.target.value })}>
                 {available.map(i => <option key={i.id} value={i.id}>{i.name} ({toFa(i.protein)}٪ پروتئین)</option>)}
