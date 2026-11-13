@@ -9,7 +9,7 @@ import type { Flock } from '../../flk/store';
 import { toFa } from '../../../shr/utils/fa';
 import { FEED_SYSTEM_LABEL, WATER_SYSTEM_LABEL } from '../../../shr/utils/systemType';
 import SmartSelect from '../../../shr/components/SmartSelect';
-import { Btn, BtnRow, Field, Grid2, Modal, ErrorBox, SectionTitle, AlertBox } from '../../../shr/components/ui';
+import { Btn, BtnRow, Field, Grid2, Modal, ErrorBox, SectionTitle, AlertBox, Textarea } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 import TimePicker from '../../../shr/components/TimePicker';
 import { useFormat } from '../../../shr/units';
@@ -101,6 +101,16 @@ export default function FormModal(props: FormModalProps) {
         flockAliveCount={flockAliveCount}
         vaccineEnabled={vaccineEnabled}
         medicineEnabled={medicineEnabled} showError={showError} markTouched={markTouched} />
+
+      <SectionTitle>📝 یادداشت روز</SectionTitle>
+      <Field label="یادداشت">
+        <Textarea
+          rows={3}
+          placeholder="توضیحات، شرایط جوی، رفتار گله..."
+          value={form.notes}
+          onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
+        />
+      </Field>
 
 
       {err && <ErrorBox>{err}</ErrorBox>}
