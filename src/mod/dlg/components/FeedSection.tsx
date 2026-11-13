@@ -4,6 +4,7 @@
  */
 import { useMemo, useState } from 'react';
 import { Field, Grid2, NumField, Btn, Select, Sheet, AlertBox, Tag, SummaryCard } from '../../../shr/components/ui';
+import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { UNIT_LABEL } from '../../whs/store';
 import { toFa, toEn } from '../../../shr/utils/fa';
@@ -30,6 +31,7 @@ export default function FeedSection({ form, setForm }: Props) {
   const isFeedAuto = ['semi_auto', 'auto_sensor', 'auto_chain'].includes(form.feedMethod || '');
   const isWaterAuto = ['nipple', 'trough', 'tank'].includes(form.waterMethod || '');
   const [hallSheetOpen, setHallSheetOpen] = useState(false);
+  const [expandedSourceId, setExpandedSourceId] = useState<string | null>(null);
   const FEED_METHOD_OPTIONS = [
     { value: 'scoop', label: 'قیفی (سطل)' },
     { value: 'bag', label: 'کیسه‌ای' },
@@ -80,6 +82,10 @@ export default function FeedSection({ form, setForm }: Props) {
       }
     }
   } catch { /* silent */ }
+
+  
+
+
   // debug info برای نمایش موقت در UI
 
   const syncSources = (newSources: FeedSource[]) => {
@@ -101,8 +107,34 @@ export default function FeedSection({ form, setForm }: Props) {
     syncSources(sources.filter((_, i) => i !== idx));
   };
   const addSource = () => {
-    syncSources([...sources, { id: crypto.randomUUID(), type: 'item', refId: '', quantity: 0 }]);
+    const newId = crypto.randomUUID();
+    syncSources([...sources, { id: newId, type: 'item', refId: '', quantity: 0 }]);
+    setExpandedSourceId(newId);
   };
+
+  // ─── محاسبه وضعیت کارت خلاصه ───
+  let cardHasShortage = false;
+  sources.forEach(src => {
+    if (src.type === 'formula') {
+      const f = formulas.find(x => x.id === src.refId);
+      if (f) {
+        f.lines.forEach(line => {
+          const ing = ingredients.find(i => i.id === line.ingredientId);
+          if (ing) {
+            const stockItem = whsItems.find(x => x.id === ing.stockItemId);
+            const need = src.quantity > 0 ? (line.percent / 100) * src.quantity : 0;
+            if (stockItem && stockItem.currentStock - need < 0) cardHasShortage = true;
+          }
+        });
+      }
+    } else if (src.type === 'item') {
+      const it = feedItems.find(x => x.id === src.refId);
+      if (it && Number(it.currentStock) - Number(src.quantity) < 0) cardHasShortage = true;
+    }
+  });
+  const standardDeviation = feedPerBirdG > 0 && expectedPerBirdG && expectedPerBirdG > 0 &&
+    (feedPerBirdG > expectedPerBirdG * 1.2 || feedPerBirdG < expectedPerBirdG * 0.8);
+  const summaryTone = cardHasShortage ? 'danger' : standardDeviation ? 'warn' : 'accent';
 
   return (
     <>
@@ -143,87 +175,130 @@ export default function FeedSection({ form, setForm }: Props) {
         </div>
       </Sheet>
 
-      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginBottom: 6 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginBottom: 6 }}>
         🌾 منابع دان مصرفی
+        
       </div>
 
       {formulas.length === 0 && feedItems.length === 0 && (
         <AlertBox tone="warn" variant="dashed" size="xs" icon={false}>⚠️ هنوز هیچ جیره‌ای نساخته‌اید و دان تکی هم تعریف نکرده‌اید. ابتدا از بخش «تغذیه» یک جیره بسازید، سپس به اینجا برگردید.</AlertBox>
       )}
 
-      {sources.length === 0 && (
-        <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--muted)', textAlign: 'center' }}>
-          هنوز منبعی اضافه نشده — از دکمه پایین اضافه کنید
-        </div>
-      )}
-
       {sources.map((src, idx) => {
         const f = src.type === 'formula' ? formulas.find(x => x.id === src.refId) : null;
         const it = src.type === 'item' ? feedItems.find(x => x.id === src.refId) : null;
-        return (
-          <div key={src.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>منبع {toFa(idx + 1)}</span>
-              <button type="button" onClick={() => removeSource(idx)} aria-label="حذف منبع" style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
-            </div>
-            <Grid2>
-              <Field label="انتخاب منبع">
-                <SmartSelect
-                  value={src.refId ? (src.type === 'formula' ? 'f:' : 'i:') + src.refId : ''}
-                  onChange={val => {
-                    if (val.startsWith('f:')) updateSource(idx, { type: 'formula', refId: val.slice(2) });
-                    else if (val.startsWith('i:')) updateSource(idx, { type: 'item', refId: val.slice(2) });
-                    else updateSource(idx, { type: 'item', refId: '' });
-                  }}
-                  options={[
-                    ...formulas.map(f => ({ value: 'f:' + f.id, label: f.name, subtitle: `${toFa(f.lines.length)} ماده`, group: 'formula' })),
-                    ...feedItems.map(it => ({ value: 'i:' + it.id, label: it.name, subtitle: `موجودی ${toFa(it.currentStock)} ${UNIT_LABEL[it.unit]}`, group: 'item' })),
-                  ]}
-                  groupLabels={{ formula: '📋 جیره‌ها', item: '🌾 دان تکی' }}
-                  groupIcons={{ formula: '📋', item: '🌾' }}
-                  placeholder="انتخاب..."
-                  modalTitle="انتخاب منبع"
-                  autoThreshold={6}
-                />
-              </Field>
-              <Field label="مقدار (kg)">
-                <NumField placeholder="۵۰" value={src.quantity > 0 ? String(src.quantity) : ''} onChange={e => updateSource(idx, { quantity: parseFloat(toEn(e.target.value)) || 0 })} unit="kg" min={0} />
-              </Field>
-            </Grid2>
+        const isExpanded = expandedSourceId === src.id;
+        const title = f?.name || it?.name || 'منبع جدید';
+        const subtitle = f ? 'جیره آماده' : it ? 'دان تکی' : 'هنوز منبعی انتخاب نشده';
+        const unitLabel = UNIT_LABEL['kg'] || 'کیلوگرم';
 
-            {f && (
-              <div style={{ padding: 8, background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>مواد اولیه جیره:</div>
-                {f.lines.length === 0 && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)' }}>⚠️ این جیره خطی ندارد</div>}
-                {f.lines.map(line => {
-                  const ing = ingredients.find(i => i.id === line.ingredientId);
-                  if (!ing) return null;
-                  const stockItem = whsItems.find(x => x.id === ing.stockItemId);
-                  const need = src.quantity > 0 ? (line.percent / 100) * src.quantity : 0;
-                  const after = stockItem ? stockItem.currentStock - need : 0;
-                  const warn = stockItem && after < 0;
+        return (
+          <div key={src.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${isExpanded ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: isExpanded ? 'default' : 'pointer' }} onClick={() => setExpandedSourceId(isExpanded ? null : src.id)}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
+                <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</span>
+                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{subtitle}</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                {src.quantity > 0 && (
+                  <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, color: `var(--${summaryTone})` }}>{toFa(src.quantity)} {unitLabel}</span>
+                )}
+                <button type="button" onClick={(e) => { e.stopPropagation(); removeSource(idx); }} aria-label="حذف منبع" style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit', fontWeight: 700 }}>✕</button>
+              </div>
+            </div>
+
+            {/* Body */}
+            {isExpanded && (
+              <>
+                <Grid2>
+                  <Field label={<>انتخاب منبع <HelpIcon text="**منطق انتخاب منبع:** شما می‌توانید در یک وعده، هم از **جیره آماده** و هم از **دان تکی** (مثل ذرت یا کنجاله) استفاده کنید. اگر جیره انتخاب کنید، سیستم به‌طور خودکار مواد اولیه آن جیره را بر اساس درصدهایش از انبار کسر می‌کند. اگر دان تکی انتخاب کنید، فقط همان آیتم از انبار کم می‌شود." /></>}>
+                    <SmartSelect
+                      value={src.refId ? (src.type === 'formula' ? 'f:' : 'i:') + src.refId : ''}
+                      onChange={val => {
+                        if (val.startsWith('f:')) updateSource(idx, { type: 'formula', refId: val.slice(2) });
+                        else if (val.startsWith('i:')) updateSource(idx, { type: 'item', refId: val.slice(2) });
+                        else updateSource(idx, { type: 'item', refId: '' });
+                      }}
+                      options={[
+                        ...formulas.map(f => ({ value: 'f:' + f.id, label: f.name, subtitle: `${toFa(f.lines.length)} ماده`, group: 'formula' })),
+                        ...feedItems.map(it => ({ value: 'i:' + it.id, label: it.name, subtitle: `موجودی ${toFa(it.currentStock)} ${UNIT_LABEL[it.unit]}`, group: 'item' })),
+                      ]}
+                      groupLabels={{ formula: '📋 جیره‌ها', item: '🌾 دان تکی' }}
+                      groupIcons={{ formula: '📋', item: '🌾' }}
+                      placeholder="انتخاب..."
+                      modalTitle="انتخاب منبع"
+                      autoThreshold={6}
+                    />
+                  </Field>
+                  <Field label="مقدار (kg)">
+                    <NumField placeholder="۵۰" value={src.quantity > 0 ? String(src.quantity) : ''} onChange={e => updateSource(idx, { quantity: parseFloat(toEn(e.target.value)) || 0 })} unit="kg" min={0} />
+                  </Field>
+                </Grid2>
+
+                {f && (
+                  <div style={{ padding: 8, background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 2 }}>مواد اولیه جیره:</div>
+                    {f.lines.length === 0 && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)' }}>⚠️ این جیره خطی ندارد</div>}
+                    {f.lines.map((line, lineIdx) => {
+                      const ing = ingredients.find(i => i.id === line.ingredientId);
+                      if (!ing) return null;
+                      const stockItem = whsItems.find(x => x.id === ing.stockItemId);
+                      const need = src.quantity > 0 ? (line.percent / 100) * src.quantity : 0;
+                      const after = stockItem ? stockItem.currentStock - need : 0;
+                      const unavailable = stockItem && after < 0;
+                      const unitLabelIng = UNIT_LABEL[stockItem?.unit || 'kg'] || 'کیلوگرم';
+                      const isLast = lineIdx === f.lines.length - 1;
+
+                      return (
+                        <div key={line.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-xs)', padding: '6px 0', borderBottom: isLast ? 'none' : '1px dashed var(--border)' }}>
+                          <span style={{ color: 'var(--text)' }}>
+                            • {ing.name} <span style={{ color: 'var(--muted)' }}>({toFa(line.percent)}٪)</span>
+                          </span>
+                          <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                            {stockItem && (
+                              <span style={{ padding: '2px 6px', borderRadius: 'var(--r-sm)', background: unavailable ? 'var(--danger-soft)' : 'var(--input-bg)', color: unavailable ? 'var(--danger)' : 'var(--muted)', border: unavailable ? '1px solid var(--danger-border)' : '1px solid var(--border)', fontSize: 'var(--fs-2xs)', fontWeight: 700 }}>
+                                موجودی: {toFa(stockItem.currentStock)}
+                              </span>
+                            )}
+                            <span style={{ color: unavailable ? 'var(--danger)' : 'var(--text)', fontWeight: 700 }}>
+                              {need > 0 ? `${toFa(need.toFixed(1))} ${unitLabelIng}` : '—'}
+                            </span>
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {it && (() => {
+                  const remaining = it.currentStock - src.quantity;
+                  const warn = remaining < it.minStock;
+                  const unitLabelIng = UNIT_LABEL[it.unit] || '';
                   return (
-                    <div key={line.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)' }}>
-                      <span>• {ing.name} <span style={{ color: 'var(--muted)' }}>({toFa(line.percent)}٪)</span></span>
-                      <span style={{ direction: 'ltr', color: warn ? 'var(--danger)' : undefined, fontWeight: warn ? 700 : 600 }}>
-                        {need > 0 ? `${toFa(need.toFixed(1))} kg` : '—'}
-                        {stockItem && <span style={{ color: warn ? 'var(--danger)' : 'var(--muted)', marginRight: 4 }}> [{toFa(stockItem.currentStock)}]</span>}
-                      </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '8px 12px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)' }}>
+                        <span style={{ color: 'var(--muted)' }}>موجودی انبار:</span>
+                        <span style={{ fontWeight: 700, color: 'var(--text)' }}>{toFa(it.currentStock)} {unitLabelIng}</span>
+                      </div>
+                      {src.quantity > 0 && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)' }}>
+                          <span style={{ color: 'var(--muted)' }}>مانده پس از مصرف:</span>
+                          <span style={{ fontWeight: 700, color: warn ? 'var(--danger)' : 'var(--accent)' }}>
+                            {toFa(remaining)} {unitLabelIng}
+                          </span>
+                        </div>
+                      )}
+                      {warn && (
+                        <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--warn)', marginTop: 2 }}>
+                          ⚠️ موجودی کافی نیست
+                        </div>
+                      )}
                     </div>
                   );
-                })}
-              </div>
-            )}
-
-            {it && (
-              <AlertBox
-                tone={it.currentStock - src.quantity < it.minStock ? 'warn' : 'accent'}
-                variant="flat"
-                size="xs"
-                icon={false}
-                style={{ padding: 6, borderRadius: 'var(--r-sm)', fontWeight: 'normal' }}
-              >موجودی: {toFa(it.currentStock)} {UNIT_LABEL[it.unit]}
-                {src.quantity > 0 && ` • بعد از مصرف: ${toFa(it.currentStock - src.quantity)} ${UNIT_LABEL[it.unit]}`}</AlertBox>
+                })()}
+              </>
             )}
           </div>
         );
@@ -235,17 +310,24 @@ export default function FeedSection({ form, setForm }: Props) {
         </Btn>
       )}
 
+
+
       <Grid2>
-        <Field label="دان باقی‌مانده" hint="اختیاری — برای مصرف دقیق، پر کنید">
+        <Field label={<>دان باقی‌مانده <HelpIcon text="**دان باقی‌مانده:** مقداری از دانی که در دانخوری سالن باقی مانده و پرنده‌ها آن را نخورده‌اند. با وارد کردن این عدد، سیستم مصرف واقعی دان را دقیق‌تر محاسبه می‌کند." /></>}>
           <NumField placeholder="۰" value={form.feedRemaining} onChange={e => setForm({ ...form, feedRemaining: e.target.value })} unit="kg" min={0} />
         </Field>
-        <Field label="هدر رفته" hint="اختیاری — ریخته‌شده یا خراب">
+        <Field label={<>هدر رفته <HelpIcon text="**هدر رفته:** مقداری از دانی که در مسیر یا دانخوری ریخته شده، یا فاسد شده و توسط پرنده مصرف نشده است. این مقدار از مجموع مصرف کسر می‌شود." /></>}>
           <NumField placeholder="۰" value={form.feedWaste} onChange={e => setForm({ ...form, feedWaste: e.target.value })} unit="kg" min={0} />
         </Field>
       </Grid2>
 
-      {totalFeed > 0 && (
-        <SummaryCard tone="accent">
+      {sources.length > 0 && (
+        <SummaryCard tone={summaryTone}>
+          {cardHasShortage && (
+            <div style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
+              ⚠️ موجودی انبار کافی نیست — ثبت این جیره ممکن نیست
+            </div>
+          )}
           <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
             <span>مجموع مصرف:</span>
             <span>{toFa(totalFeed.toFixed(1))} کیلوگرم</span>
@@ -257,9 +339,16 @@ export default function FeedSection({ form, setForm }: Props) {
           {feedPerBirdG > 0 && expectedPerBirdG && expectedPerBirdG > 0 && (
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)', color: feedPerBirdG > expectedPerBirdG * 1.2 || feedPerBirdG < expectedPerBirdG * 0.8 ? 'var(--warn)' : 'var(--accent)' }}>
               <span>مقایسه با استاندارد:</span>
-              <span>{feedPerBirdG > expectedPerBirdG * 1.2 ? '⚠ بالاتر از نژاد' : feedPerBirdG < expectedPerBirdG * 0.8 ? '⚠ پایین‌تر از نژاد' : '✓ مطابق نژاد'}</span>
+              <span>
+                {feedPerBirdG > expectedPerBirdG * 1.2 
+                  ? `مصرف ${toFa(feedPerBirdG.toFixed(0))} گرم (بالاتر از نژاد ${toFa(expectedPerBirdG.toFixed(0))} گرم)` 
+                  : feedPerBirdG < expectedPerBirdG * 0.8 
+                    ? `مصرف ${toFa(feedPerBirdG.toFixed(0))} گرم (پایین‌تر از نژاد ${toFa(expectedPerBirdG.toFixed(0))} گرم)` 
+                    : '✓ مطابق نژاد'}
+              </span>
             </div>
           )}
+
           <FieldHint
             fieldPath="dlg.feedDelivered"
             value={totalFeed}
