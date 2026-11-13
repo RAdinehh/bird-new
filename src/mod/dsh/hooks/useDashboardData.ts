@@ -336,9 +336,27 @@ const [, _setTick] = useState(0);
 
     const totalFeed = flockLogs.reduce((a, l) => a + (l.feedDelivered || 0), 0);
     const totalEggs = flockProd.reduce((a, p) => a + (p.totalCount || 0), 0);
-    const eggMass = totalEggs * 0.06; // kg (میانگین ۶۰ گرم)
 
-    const fcrActual = eggMass > 0 ? totalFeed / eggMass : 0;
+    // 🆕 FCR بر اساس نوع گله (قانون: broiler = وزن بدن، layer/breeder = وزن تخم)
+    let fcrActual = 0;
+    if (flock.type === 'broiler') {
+      // FCR گوشتی: دان ÷ افزایش وزن بدن
+      const lastWeightsLog = [...flockLogs]
+        .filter((l: any) => l.weightSamples && l.weightSamples.length > 0)
+        .sort((a, b) => b.date.localeCompare(a.date))[0] as any;
+      const weights = lastWeightsLog?.weightSamples || [];
+      const avgW = weights.length > 0
+        ? weights.reduce((a: number, w: any) => a + (Number(w.weight) || 0), 0) / weights.length
+        : 0;
+      const chickW = (flock.chickWeight ?? 40) / 1000; // گرم → کیلوگرم
+      const currentCount = flock.currentCount || flock.initialCount || 0;
+      const totalGain = (avgW - chickW) * currentCount;
+      fcrActual = totalGain > 0 ? totalFeed / totalGain : 0;
+    } else {
+      // FCR تخم‌گذار/مادر: دان ÷ وزن تخم
+      const eggMass = totalEggs * 0.06; // kg (میانگین ۶۰ گرم)
+      fcrActual = eggMass > 0 ? totalFeed / eggMass : 0;
+    }
 
     // Hen-Day این گله
     const aliveCount = flock.currentCount || flock.initialCount || 0;
