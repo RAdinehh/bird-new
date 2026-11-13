@@ -1,3 +1,4 @@
+import { useState } from 'react';
 /**
  * EggsWeightSection — تخم و وزن‌کشی
  */
@@ -18,6 +19,7 @@ interface Props {
 }
 
 export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCount, showError, markTouched }: Props) {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
 
   // context
@@ -100,23 +102,35 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
       )}
 
       {form.weightSamples.map((w, i) => (
-        <div key={w.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>نمونه {toFa(i + 1)}</span>
-            <button type="button" onClick={() => setForm(f => ({ ...f, weightSamples: f.weightSamples.filter(x => x.id !== w.id) }))}
-              style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+        <div key={w.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${expandedId === w.id ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
+          <div onClick={() => setExpandedId(expandedId === w.id ? null : w.id)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: expandedId === w.id ? 'default' : 'pointer' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
+              <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)' }}>نمونه {toFa(i + 1)}</span>
+              <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{w.weight ? `${toFa(Number(w.weight))} کیلوگرم` : 'بدون وزن'}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <button type="button" onClick={(e) => { e.stopPropagation(); setForm(f => ({ ...f, weightSamples: f.weightSamples.filter(x => x.id !== w.id) })) }} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+            </div>
           </div>
-          <NumField
-            placeholder="وزن (kg)"
-            value={w.weight}
-            error={showError(`weightSamples.${i}.weight`)}
-            onBlur={() => markTouched(`weightSamples.${i}.weight`)}
-            onChange={e => setForm(f => ({ ...f, weightSamples: f.weightSamples.map(x => x.id === w.id ? { ...x, weight: e.target.value } : x) }))}
-            unit="kg" min={0} />
+          {expandedId === w.id && (
+            <div style={{ marginTop: 4 }}>
+              <NumField
+                placeholder="وزن (kg)"
+                value={w.weight}
+                error={showError(`weightSamples.${i}.weight`)}
+                onBlur={() => markTouched(`weightSamples.${i}.weight`)}
+                onChange={e => setForm(f => ({ ...f, weightSamples: f.weightSamples.map(x => x.id === w.id ? { ...x, weight: e.target.value } : x) }))}
+                unit="kg" min={0} />
+            </div>
+          )}
         </div>
       ))}
 
-      <Btn size="sm" full onClick={() => setForm(f => ({ ...f, weightSamples: [...f.weightSamples, { id: crypto.randomUUID(), weight: '' }] }))}>
+      <Btn size="sm" full onClick={() => {
+        const newId = crypto.randomUUID();
+        setForm(f => ({ ...f, weightSamples: [...f.weightSamples, { id: newId, weight: '' }] }));
+        setExpandedId(newId);
+      }}>
         + افزودن نمونه وزن
       </Btn>
 
