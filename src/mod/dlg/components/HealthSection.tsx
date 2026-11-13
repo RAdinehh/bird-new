@@ -38,22 +38,6 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
   return (
     <>
 
-      {form.deaths.length > 0 && (() => {
-        const total = form.deaths.reduce((a, x) => a + (x.count || 0), 0);
-        const exceeds = flockAliveCount > 0 && total > flockAliveCount;
-        return (
-          <AlertBox
-            tone={exceeds ? 'danger' : 'warn'}
-            variant="solid"
-            size="sm"
-            align="center"
-            icon={false}
-            style={{ border: `1px solid ${exceeds ? 'var(--danger)' : 'var(--border)'}` }}
-          >مجموع: {toFa(total)} پرنده
-            {flockAliveCount ? ` از ${toFa(flockAliveCount)}` : ''}
-            {exceeds && ' ⚠️ بیشتر از موجودی گله'}</AlertBox>
-        );
-      })()}
         <Grid2>
           <Btn size="sm" full onClick={() => setForm(f => ({ ...f, deaths: [...f.deaths, { id: crypto.randomUUID(), count: 0, cause: '', notes: '' }] }))}>
             + تلفات
@@ -238,6 +222,43 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
           );
         })}
       </>)}
+
+      {(form.deaths.length > 0 || form.vaccines.length > 0 || form.medications.length > 0) && (() => {
+        const totalDeaths = form.deaths.reduce((a, x) => a + (x.count || 0), 0);
+        const exceeds = flockAliveCount > 0 && totalDeaths > flockAliveCount;
+        const vaccineCount = form.vaccines.length;
+        const medsTotal = form.medications.length;
+        const medsHerbal = form.medications.filter(m => medicineItems.find(w => w.id === m.itemId)?.category === 'herbal').length;
+        const medsChem = medsTotal - medsHerbal;
+        const tone = exceeds ? 'danger' : (totalDeaths > 0 ? 'warn' : 'accent');
+
+        return (
+          <SummaryCard tone={tone}>
+            {totalDeaths > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>تلفات:</span>
+                <b style={{ color: exceeds ? 'var(--danger)' : 'var(--text)' }}>
+                  {toFa(totalDeaths)} پرنده{flockAliveCount ? ` از ${toFa(flockAliveCount)}` : ''}{exceeds && ' ⚠️'}
+                </b>
+              </div>
+            )}
+            {vaccineCount > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>واکسن:</span>
+                <b style={{ color: 'var(--text)' }}>{toFa(vaccineCount)} مورد</b>
+              </div>
+            )}
+            {medsTotal > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>دارو:</span>
+                <b style={{ color: 'var(--text)' }}>
+                  {toFa(medsTotal)} مورد{medsHerbal > 0 ? ` (${toFa(medsChem)} 💊 + ${toFa(medsHerbal)} 🌿)` : ''}
+                </b>
+              </div>
+            )}
+          </SummaryCard>
+        );
+      })()}
 
     </>
   );
