@@ -3,7 +3,7 @@
  * IDEA-25: پشتیبانی چند منبع دان (backward-compatible)
  */
 import { useMemo, useState } from 'react';
-import { Field, Grid2, NumField, Btn, Select, Sheet, AlertBox } from '../../../shr/components/ui';
+import { Field, Grid2, NumField, Btn, Select, Sheet, AlertBox, Tag } from '../../../shr/components/ui';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { UNIT_LABEL } from '../../whs/store';
 import { toFa, toEn } from '../../../shr/utils/fa';
@@ -161,9 +161,13 @@ export default function FeedSection({ form, setForm }: Props) {
         const f = src.type === 'formula' ? formulas.find(x => x.id === src.refId) : null;
         const it = src.type === 'item' ? feedItems.find(x => x.id === src.refId) : null;
         return (
-          <div key={src.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 100px 32px', gap: 6, alignItems: 'end' }}>
-              <Field label={idx === 0 ? 'منبع' : `منبع ${toFa(idx + 1)}`}>
+          <div key={src.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>منبع {toFa(idx + 1)}</span>
+              <button type="button" onClick={() => removeSource(idx)} aria-label="حذف منبع" style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+            </div>
+            <Grid2>
+              <Field label="انتخاب منبع">
                 <SmartSelect
                   value={src.refId ? (src.type === 'formula' ? 'f:' : 'i:') + src.refId : ''}
                   onChange={val => {
@@ -182,16 +186,10 @@ export default function FeedSection({ form, setForm }: Props) {
                   autoThreshold={6}
                 />
               </Field>
-              <Field label="مقدار">
+              <Field label="مقدار (kg)">
                 <NumField placeholder="۵۰" value={src.quantity > 0 ? String(src.quantity) : ''} onChange={e => updateSource(idx, { quantity: parseFloat(toEn(e.target.value)) || 0 })} unit="kg" min={0} />
               </Field>
-              <button
-                type="button"
-                onClick={() => removeSource(idx)}
-                aria-label="حذف منبع"
-                style={{ width: 32, height: 36, background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-md)', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 16 }}
-              >✕</button>
-            </div>
+            </Grid2>
 
             {f && (
               <div style={{ padding: 8, background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -238,19 +236,23 @@ export default function FeedSection({ form, setForm }: Props) {
       )}
 
       {totalFeed > 0 && (
-        <FieldHint
-          fieldPath="dlg.feedDelivered"
-          value={totalFeed}
-          context={{
-            flockSize: flockSize || undefined,
-            perBirdGramsPerDay: expectedPerBirdG || undefined,
-          }}
-        />
-      )}
-
-      {sources.length > 1 && (
-        <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700, textAlign: 'center' }}>
-          مجموع مصرف: {toFa(totalFeed.toFixed(1))} کیلوگرم
+        <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700 }}>
+            <span>مجموع مصرف:</span>
+            <span>{toFa(totalFeed.toFixed(1))} کیلوگرم</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)', color: 'var(--accent)' }}>
+            <span>مصرف هر پرنده:</span>
+            <span>{feedPerBirdG > 0 ? `${toFa(feedPerBirdG.toFixed(1))} گرم` : (totalFeed > 0 && remainingNum === totalFeed ? 'مصرف صفر' : '—')}</span>
+          </div>
+          <FieldHint
+            fieldPath="dlg.feedDelivered"
+            value={totalFeed}
+            context={{
+              flockSize: flockSize || undefined,
+              perBirdGramsPerDay: expectedPerBirdG || undefined,
+            }}
+          />
         </div>
       )}
 
@@ -263,12 +265,6 @@ export default function FeedSection({ form, setForm }: Props) {
         </Field>
       </Grid2>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingBottom: 4 }}>دان مصرف‌شده به ازای هر پرنده</span>
-        <div style={{ height: 44, padding: '0 12px', background: feedPerBirdG > 0 ? 'var(--info-soft)' : 'var(--input-bg)', border: `1px solid ${feedPerBirdG > 0 ? 'var(--info)' : 'var(--border)'}`, borderRadius: 'var(--r-sm)', display: 'flex', alignItems: 'center', fontFamily: 'monospace', fontWeight: 700, color: feedPerBirdG > 0 ? 'var(--info)' : 'var(--muted)' }}>
-          {feedPerBirdG > 0 ? `${toFa(feedPerBirdG.toFixed(1))} گرم` : (totalFeed > 0 && remainingNum === totalFeed ? 'مصرف صفر' : '—')}
-        </div>
-      </div>
 
       {form.waterMethod === 'manual' && (
         <>
