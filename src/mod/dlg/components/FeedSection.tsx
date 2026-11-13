@@ -132,9 +132,22 @@ export default function FeedSection({ form, setForm }: Props) {
       if (it && Number(it.currentStock) - Number(src.quantity) < 0) cardHasShortage = true;
     }
   });
-  const standardDeviation = feedPerBirdG > 0 && expectedPerBirdG && expectedPerBirdG > 0 &&
-    (feedPerBirdG > expectedPerBirdG * 1.2 || feedPerBirdG < expectedPerBirdG * 0.8);
-  const summaryTone = cardHasShortage ? 'danger' : standardDeviation ? 'warn' : 'accent';
+  const dailyNeedKg = expectedPerBirdG && flockSize > 0
+    ? (expectedPerBirdG * flockSize) / 1000
+    : 0;
+  const totalAvailable = totalFeed + (Number(form.feedRemaining) || 0);
+  const daysAvailable = dailyNeedKg > 0 ? totalAvailable / dailyNeedKg : 0;
+  const formatDays = (d: number) => {
+    if (d <= 0) return '۰ ساعت';
+    if (d < 1) return `${toFa(Math.round(d * 24))} ساعت`;
+    const wd = Math.floor(d);
+    const rh = Math.round((d - wd) * 24);
+    if (rh === 0) return `${toFa(wd)} روز`;
+    if (rh === 24) return `${toFa(wd + 1)} روز`;
+    return `${toFa(wd)} روز و ${toFa(rh)} ساعت`;
+  };
+  const isUnderfed = daysAvailable > 0 && daysAvailable < 0.8;
+  const finalSummaryTone = cardHasShortage ? 'danger' : isUnderfed ? 'warn' : 'accent';
 
   return (
     <>
@@ -203,7 +216,7 @@ export default function FeedSection({ form, setForm }: Props) {
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
                 {src.quantity > 0 && (
-                  <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, color: `var(--${summaryTone})` }}>{toFa(src.quantity)} {unitLabel}</span>
+                  <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, color: `var(--${finalSummaryTone})` }}>{toFa(src.quantity)} {unitLabel}</span>
                 )}
                 <button type="button" onClick={(e) => { e.stopPropagation(); removeSource(idx); }} aria-label="حذف منبع" style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit', fontWeight: 700 }}>✕</button>
               </div>
@@ -322,7 +335,7 @@ export default function FeedSection({ form, setForm }: Props) {
       </Grid2>
 
       {sources.length > 0 && (
-        <SummaryCard tone={summaryTone}>
+        <SummaryCard tone={finalSummaryTone}>
           {cardHasShortage && (
             <div style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
               ⚠️ موجودی انبار کافی نیست — ثبت این جیره ممکن نیست
@@ -336,16 +349,16 @@ export default function FeedSection({ form, setForm }: Props) {
             <span>مصرف هر پرنده:</span>
             <span>{feedPerBirdG > 0 ? `${toFa(feedPerBirdG.toFixed(1))} گرم` : (totalFeed > 0 && remainingNum === totalFeed ? 'مصرف صفر' : '—')}</span>
           </div>
-          {feedPerBirdG > 0 && expectedPerBirdG && expectedPerBirdG > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)', color: feedPerBirdG > expectedPerBirdG * 1.2 || feedPerBirdG < expectedPerBirdG * 0.8 ? 'var(--warn)' : 'var(--accent)' }}>
-              <span>مقایسه با استاندارد:</span>
-              <span>
-                {feedPerBirdG > expectedPerBirdG * 1.2 
-                  ? `مصرف ${toFa(feedPerBirdG.toFixed(0))} گرم (بالاتر از نژاد ${toFa(expectedPerBirdG.toFixed(0))} گرم)` 
-                  : feedPerBirdG < expectedPerBirdG * 0.8 
-                    ? `مصرف ${toFa(feedPerBirdG.toFixed(0))} گرم (پایین‌تر از نژاد ${toFa(expectedPerBirdG.toFixed(0))} گرم)` 
-                    : '✓ مطابق نژاد'}
-              </span>
+          {dailyNeedKg > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)' }}>
+              <span>نیاز روزانه گله:</span>
+              <span>{toFa(dailyNeedKg.toFixed(1))} کیلوگرم</span>
+            </div>
+          )}
+          {daysAvailable > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)', fontWeight: 700, marginTop: 4, paddingTop: 4, borderTop: '1px dashed var(--border)' }}>
+              <span>دوام دانخوری:</span>
+              <span>{isUnderfed ? `⚠️ ${formatDays(daysAvailable)} (کمبود)` : `✓ ${formatDays(daysAvailable)}`}</span>
             </div>
           )}
 
