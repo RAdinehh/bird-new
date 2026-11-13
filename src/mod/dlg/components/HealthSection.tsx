@@ -2,7 +2,8 @@
  * HealthSection — تلفات + واکسن + دارو
  */
 import { useMemo } from 'react';
-import { Btn, Field, Grid2, Input, NumField, Select, Textarea, AlertBox, Tag } from '../../../shr/components/ui';
+import { Btn, Field, Grid2, Input, NumField, Select, Textarea, AlertBox, Tag, SummaryCard } from '../../../shr/components/ui';
+import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { UNIT_LABEL } from '../../whs/store';
 import { formatQty } from '../../../shr/utils/fa';
@@ -53,6 +54,22 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
             {exceeds && ' ⚠️ بیشتر از موجودی گله'}</AlertBox>
         );
       })()}
+        <Grid2>
+          <Btn size="sm" full onClick={() => setForm(f => ({ ...f, deaths: [...f.deaths, { id: crypto.randomUUID(), count: 0, cause: '', notes: '' }] }))}>
+            + تلفات
+          </Btn>
+          {vaccineEnabled && (
+            <Btn size="sm" full onClick={() => setForm(f => ({ ...f, vaccines: [...f.vaccines, { id: crypto.randomUUID(), name: '', dose: '', method: '', reaction: '', itemId: '', quantity: null, movementId: '' }] }))}>
+              + واکسن
+            </Btn>
+          )}
+          {medicineEnabled && (
+            <Btn size="sm" full onClick={() => setForm(f => ({ ...f, medications: [...f.medications, { id: crypto.randomUUID(), name: '', dose: '', method: '', withdrawalDays: null, itemId: '', quantity: null, movementId: '' }] }))}>
+              + دارو
+            </Btn>
+          )}
+        </Grid2>
+
 
       {form.deaths.map((d, i) => (
         <div key={d.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
