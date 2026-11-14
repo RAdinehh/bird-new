@@ -95,15 +95,27 @@ export default function LogCard(props: LogCardProps) {
     } catch { /* silent */ }
   }
 
+  // 🆕 BUG-2 fix: اولویت بازه کاربر بر استاندارد نژاد
+  const effTempMin = l.temperatureMin ?? stdTempMin;
+  const effTempMax = l.temperatureMax ?? stdTempMax;
+  const effHumMin = l.humidityMin ?? stdHumMin;
+  const effHumMax = l.humidityMax ?? stdHumMax;
+
   const envWarn = calculateEnvironmentWarnings({
     tempC: l.temperature,
-    tempMin: stdTempMin,
-    tempMax: stdTempMax,
+    tempMin: effTempMin,
+    tempMax: effTempMax,
     tempTarget: stdTempTarget,
     humidityPct: l.humidity,
-    humidityMin: stdHumMin,
-    humidityMax: stdHumMax,
+    humidityMin: effHumMin,
+    humidityMax: effHumMax,
   });
+
+  // 🆕 BUG-2: هشدار تناقض بازه کاربر با استاندارد نژاد
+  const humMismatch = l.humidityMin !== null && l.humidityMax !== null && stdHumMin !== null && stdHumMax !== null
+    && (l.humidityMin < stdHumMin - 10 || l.humidityMax > stdHumMax + 10);
+  const tempMismatch = l.temperatureMin !== null && l.temperatureMax !== null && stdTempMin !== null && stdTempMax !== null
+    && (l.temperatureMin < stdTempMin - 3 || l.temperatureMax > stdTempMax + 3);
   const tWarn = envWarn.tempTone;
   const hWarn = envWarn.humidityTone;
   const tIsBad = tWarn === 'warn' || tWarn === 'danger';
@@ -136,10 +148,16 @@ export default function LogCard(props: LogCardProps) {
           {l.temperature !== null && <Row l="دما" v={`${toFa(l.temperature)} °C`} warn={tIsBad} />}
           {l.humidity !== null && <Row l="رطوبت" v={`${toFa(l.humidity)} ٪`} warn={hIsBad} />}
           {(l.temperatureMin !== null || l.temperatureMax !== null) && (
-            <Row l="بازه دما" v={`${l.temperatureMin !== null ? toFa(l.temperatureMin) : '—'} تا ${l.temperatureMax !== null ? toFa(l.temperatureMax) : '—'} °C`} />
+            <Row l="بازه دما" v={`${l.temperatureMin !== null ? toFa(l.temperatureMin) : '—'} تا ${l.temperatureMax !== null ? toFa(l.temperatureMax) : '—'} °C`} warn={tempMismatch} />
+          )}
+          {tempMismatch && stdTempMin !== null && stdTempMax !== null && (
+            <Row l="⚠️ استاندارد نژاد" v={`${toFa(stdTempMin)} تا ${toFa(stdTempMax)} °C`} warn={true} />
           )}
           {(l.humidityMin !== null || l.humidityMax !== null) && (
-            <Row l="بازه رطوبت" v={`${l.humidityMin !== null ? toFa(l.humidityMin) : '—'} تا ${l.humidityMax !== null ? toFa(l.humidityMax) : '—'} ٪`} />
+            <Row l="بازه رطوبت" v={`${l.humidityMin !== null ? toFa(l.humidityMin) : '—'} تا ${l.humidityMax !== null ? toFa(l.humidityMax) : '—'} ٪`} warn={humMismatch} />
+          )}
+          {humMismatch && stdHumMin !== null && stdHumMax !== null && (
+            <Row l="⚠️ استاندارد نژاد" v={`${toFa(stdHumMin)} تا ${toFa(stdHumMax)} ٪`} warn={true} />
           )}
           {l.ventilation !== 'ok' && <Row l="تهویه" v={VENTILATION_LABEL[l.ventilation] || '—'} />}
           {l.litter !== 'dry' && <Row l="بستر" v={LITTER_LABEL[l.litter] || '—'} />}
