@@ -26,6 +26,8 @@ export interface Item {
   methionine?: number | null;
   lysine?: number | null;
   unit: ItemUnit;
+  /** 🆕 واحدهای فرعی اختصاصی (مثلاً کیسه ۱۰ کیلویی برای یک آیتم خاص) */
+  subUnits?: { name: string; factor: number }[];
   minStock: number;
   currentStock: number;
   lastPrice: number;
