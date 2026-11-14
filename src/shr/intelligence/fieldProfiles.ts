@@ -246,6 +246,7 @@ export const FIELD_PROFILES: Record<string, FieldProfile> = {
     expectedFrom: 'cross_field', comparison: 'ratio', crossFieldRule: 'dose_vs_flock',
   }),
   'whs.dosePerBird': P('whs.dosePerBird', 'volume', 0.01, 100),
+  'whs.dosePerLiter': P('whs.dosePerLiter', 'volume', 0.001, 1_000),
   'whs.withdrawalDays': P('whs.withdrawalDays', 'duration', 0, 90),
   'dlg.withdrawalDays': P('dlg.withdrawalDays', 'duration', 0, 90),
   'whs.qty_ml': P('whs.qty_ml', 'volume', 1, 100_000),

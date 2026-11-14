@@ -50,6 +50,7 @@ export interface Item {
   usageType?: string;              // oral | injectable | water | spray
   productionDate?: string;         // تاریخ تولید
   dosePerBird?: number;            // دوز مصرفی هر پرنده
+  dosePerLiter?: number | null;    // دوز در هر لیتر آب (آشامیدنی)
   /** موجودی اولیه هنگام ایجاد — پایه راستی‌آزمایی */
   initialStock?: number;
   /** قیمت موجودی اولیه (برای میانگین موزون) */
