@@ -9,7 +9,7 @@ import { UNIT_LABEL, type ItemUnit } from '../../whs/store';
 import { QuantityUnitInput, type UnitOption } from '../../../shr/components/ui';
 import { formatQty } from '../../../shr/utils/fa';
 import { toFa, toEn } from '../../../shr/utils/fa';
-import { DEATH_CAUSES } from '../store';
+import { DEATH_CAUSES, causeLabel } from '../store';
 import { useWhs } from '../../whs/store';
 import { useFlk } from '../../flk/store';
 import type { F } from '../types';
@@ -313,6 +313,13 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
     const medsChem = medsTotal - medsHerbal;
     const tone = exceeds ? 'danger' : (totalDeaths > 0 ? 'warn' : 'accent');
 
+    const medParts = [];
+    if (medsChem > 0) medParts.push(`${toFa(medsChem)} 💊`);
+    if (medsHerbal > 0) medParts.push(`${toFa(medsHerbal)} 🌿`);
+    const medSummary = medParts.join(' + ');
+    
+    const deathCauses = form.deaths.map(d => d.cause ? causeLabel(d.cause) : '').filter(Boolean).join('، ');
+
     return (
       <SummaryCard tone={tone}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, textAlign: 'right', width: '100%' }} dir="rtl">
@@ -324,9 +331,9 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
                   {toFa(totalDeaths)} پرنده {flockAliveCount ? `از ${toFa(flockAliveCount)}` : ''} {exceeds && '⚠️'}
                 </span>
               </div>
-              {form.deaths.filter(d => d.cause).length > 0 && (
+              {deathCauses && (
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingRight: 4 }}>
-                  علت: {form.deaths.map(d => d.cause).filter(Boolean).join('، ')}
+                  علت: {deathCauses}
                 </span>
               )}
             </div>
@@ -355,8 +362,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>داروها:</span>
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-                  {toFa(medsTotal)} مورد 
-                  {medsChem > 0 || medsHerbal > 0 ? ` [${medsChem > 0 ? `${toFa(medsChem)} 💊` : ''}${medsChem > 0 && medsHerbal > 0 ? ' + ' : ''}${medsHerbal > 0 ? `${toFa(medsHerbal)} 🌿` : ''}]` : ''}
+                  {toFa(medsTotal)} مورد {medSummary ? `[${medSummary}]` : ''}
                 </span>
               </div>
               <ul style={{ margin: 0, paddingRight: 16, fontSize: 'var(--fs-sm)', display: 'flex', flexDirection: 'column', gap: 4 }}>
