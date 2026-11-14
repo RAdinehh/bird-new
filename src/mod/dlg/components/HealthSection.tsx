@@ -134,7 +134,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
       <div onClick={() => setExpandedId(expandedId === 'v-' + v.id ? null : 'v-' + v.id)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: expandedId === 'v-' + v.id ? 'default' : 'pointer' }}>
        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
        <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v.name || 'واکسن ' + toFa(i + 1)}</span>
-       <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{v.dose ? 'دوز: ' + v.dose : 'بدون دوز'}{v.itemId ? ' • از انبار' : ''}</span>
+       <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{v.dose ? 'دوز: ' + toFa(v.dose) : 'بدون دوز'}{v.itemId ? ' • از انبار' : ''}</span>
       </div>
        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><button type="button" onClick={(e) => { e.stopPropagation(); setForm(f => ({ ...f, vaccines: f.vaccines.filter(x => x.id !== v.id) })) }} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button></div>
       </div>
@@ -214,7 +214,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
       <div onClick={() => setExpandedId(expandedId === 'm-' + m.id ? null : 'm-' + m.id)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: expandedId === 'm-' + m.id ? 'default' : 'pointer' }}>
        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
        <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name || 'دارو ' + toFa(i + 1)}</span>
-       <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{m.dose ? 'دوز: ' + m.dose : 'بدون دوز'}{isHerbal ? ' • گیاهی' : m.withdrawalDays ? ' • پرهیز: ' + m.withdrawalDays + ' روز' : ''}</span>
+       <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{m.dose ? 'دوز: ' + toFa(m.dose) : 'بدون دوز'}{isHerbal ? ' • گیاهی' : m.withdrawalDays ? ' • پرهیز: ' + m.withdrawalDays + ' روز' : ''}</span>
       </div>
        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><button type="button" onClick={(e) => { e.stopPropagation(); setForm(f => ({ ...f, medications: f.medications.filter(x => x.id !== m.id) })) }} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button></div>
       </div>
@@ -315,29 +315,34 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
 
     return (
       <SummaryCard tone={tone}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, textAlign: 'right', width: '100%' }} dir="rtl">
           {totalDeaths > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 4 }}>
-              <span style={{ fontWeight: 700, color: exceeds ? 'var(--danger)' : 'var(--text)' }}>تلفات:</span>
-              <span style={{ textAlign: 'left' }}>
-                {toFa(totalDeaths)} پرنده {flockAliveCount ? `از ${toFa(flockAliveCount)}` : ''} {exceeds && '⚠️'}
-                {form.deaths.filter(d => d.cause).length > 0 && (
-                  <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'block' }}>
-                    (علت: {form.deaths.map(d => d.cause).filter(Boolean).join('، ')})
-                  </span>
-                )}
-              </span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>تلفات:</span>
+                <span style={{ color: exceeds ? 'var(--danger)' : 'var(--text)', fontWeight: 600, fontSize: 'var(--fs-sm)' }}>
+                  {toFa(totalDeaths)} پرنده {flockAliveCount ? `از ${toFa(flockAliveCount)}` : ''} {exceeds && '⚠️'}
+                </span>
+              </div>
+              {form.deaths.filter(d => d.cause).length > 0 && (
+                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingRight: 4 }}>
+                  علت: {form.deaths.map(d => d.cause).filter(Boolean).join('، ')}
+                </span>
+              )}
             </div>
           )}
           
           {vaccineCount > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px dashed var(--border)', paddingTop: 6 }}>
-              <span style={{ fontWeight: 700 }}>واکسن‌ها ({toFa(vaccineCount)} مورد):</span>
-              <ul style={{ margin: 0, paddingRight: 16, fontSize: 'var(--fs-sm)', display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px dashed var(--border)', paddingTop: 8 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>واکسن‌ها:</span>
+                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(vaccineCount)} مورد</span>
+              </div>
+              <ul style={{ margin: 0, paddingRight: 16, fontSize: 'var(--fs-sm)', display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {form.vaccines.map((v, idx) => (
-                  <li key={v.id || idx} style={{ wordBreak: 'break-word' }}>
-                    <b>{v.name || 'بدون نام'}</b>
-                    {v.dose && <span style={{ color: 'var(--muted)' }}> (دوز: {v.dose})</span>}
+                  <li key={v.id || idx} style={{ wordBreak: 'break-word', listStyleType: 'disc' }}>
+                    <span style={{ fontWeight: 600 }}>{v.name || 'بدون نام'}</span>
+                    {v.dose && <span style={{ color: 'var(--muted)' }}> (دوز: {toFa(v.dose)})</span>}
                     {v.quantity ? <span style={{ color: 'var(--accent)' }}> [مقدار: {toFa(v.quantity)} {v.unit || ''}]</span> : null}
                   </li>
                 ))}
@@ -346,13 +351,19 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
           )}
 
           {medsTotal > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px dashed var(--border)', paddingTop: 6 }}>
-              <span style={{ fontWeight: 700 }}>داروها ({toFa(medsTotal)} مورد {medsHerbal > 0 ? `[${toFa(medsChem)} 💊 + ${toFa(medsHerbal)} 🌿]` : ''}):</span>
-              <ul style={{ margin: 0, paddingRight: 16, fontSize: 'var(--fs-sm)', display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px dashed var(--border)', paddingTop: 8 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>داروها:</span>
+                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+                  {toFa(medsTotal)} مورد 
+                  {medsChem > 0 || medsHerbal > 0 ? ` [${medsChem > 0 ? `${toFa(medsChem)} 💊` : ''}${medsChem > 0 && medsHerbal > 0 ? ' + ' : ''}${medsHerbal > 0 ? `${toFa(medsHerbal)} 🌿` : ''}]` : ''}
+                </span>
+              </div>
+              <ul style={{ margin: 0, paddingRight: 16, fontSize: 'var(--fs-sm)', display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {form.medications.map((m, idx) => (
-                  <li key={m.id || idx} style={{ wordBreak: 'break-word' }}>
-                    <b>{m.name || 'بدون نام'}</b>
-                    {m.dose && <span style={{ color: 'var(--muted)' }}> (دوز: {m.dose})</span>}
+                  <li key={m.id || idx} style={{ wordBreak: 'break-word', listStyleType: 'disc' }}>
+                    <span style={{ fontWeight: 600 }}>{m.name || 'بدون نام'}</span>
+                    {m.dose && <span style={{ color: 'var(--muted)' }}> (دوز: {toFa(m.dose)})</span>}
                     {m.quantity ? <span style={{ color: 'var(--accent)' }}> [مقدار: {toFa(m.quantity)} {m.unit || ''}]</span> : null}
                   </li>
                 ))}
