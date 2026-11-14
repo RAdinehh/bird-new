@@ -150,14 +150,8 @@ export default function LogCard(props: LogCardProps) {
           {(l.temperatureMin !== null || l.temperatureMax !== null) && (
             <Row l="بازه دما" v={`${l.temperatureMin !== null ? toFa(l.temperatureMin) : '—'} تا ${l.temperatureMax !== null ? toFa(l.temperatureMax) : '—'} °C`} warn={tempMismatch} />
           )}
-          {tempMismatch && stdTempMin !== null && stdTempMax !== null && (
-            <Row l="⚠️ استاندارد نژاد" v={`${toFa(stdTempMin)} تا ${toFa(stdTempMax)} °C`} warn={true} />
-          )}
           {(l.humidityMin !== null || l.humidityMax !== null) && (
             <Row l="بازه رطوبت" v={`${l.humidityMin !== null ? toFa(l.humidityMin) : '—'} تا ${l.humidityMax !== null ? toFa(l.humidityMax) : '—'} ٪`} warn={humMismatch} />
-          )}
-          {humMismatch && stdHumMin !== null && stdHumMax !== null && (
-            <Row l="⚠️ استاندارد نژاد" v={`${toFa(stdHumMin)} تا ${toFa(stdHumMax)} ٪`} warn={true} />
           )}
           {l.ventilation !== 'ok' && <Row l="تهویه" v={VENTILATION_LABEL[l.ventilation] || '—'} />}
           {l.litter !== 'dry' && <Row l="بستر" v={LITTER_LABEL[l.litter] || '—'} />}
