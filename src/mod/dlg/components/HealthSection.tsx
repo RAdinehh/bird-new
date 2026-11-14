@@ -130,8 +130,12 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
       </div>
       {expandedId === 'v-' + v.id && (<>
       <Grid2>
-       <Input placeholder="نام" value={v.name} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, name: e.target.value } : x) }))} />
-       <Input placeholder="دوز" value={v.dose} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, dose: e.target.value } : x) }))} />
+       <Field label="نام واکسن" required>
+        <Input placeholder="مثلاً نیوکاسل" value={v.name} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, name: e.target.value } : x) }))} />
+       </Field>
+       <Field label="دوز">
+        <Input placeholder="مثلاً ۰.۲ سی‌سی" value={v.dose} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, dose: e.target.value } : x) }))} />
+       </Field>
       </Grid2>
       {vaccineItems.length > 0 && (
        <Grid2>
