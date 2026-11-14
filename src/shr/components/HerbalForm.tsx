@@ -1,4 +1,5 @@
 import { Field, Grid2, Grid3, Input, Select, HelpIcon } from './ui';
+import SmartSelect from './SmartSelect';
 import { FORM_DESC, USE_METHOD_DESC } from '../constants/herbal';
 import { parseFaNum } from '../utils/fa';
 import {
@@ -50,10 +51,13 @@ export default function HerbalForm({ item, updateItem }: { item: any; updateItem
           </Select>
         </Field>
         <Field label={<>نوع دوا <HelpIcon text={h.form ? FORM_DESC[h.form] : "ابتدا نوع دوا را انتخاب کنید"} /></>}>
-          <Select value={h.form} onChange={e => setH({ form: e.target.value as MedicineForm })}>
-            <option value="">— انتخاب کنید —</option>
-            {Object.entries(FORM_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-          </Select>
+          <SmartSelect
+            value={h.form}
+            onChange={v => setH({ form: v as MedicineForm })}
+            options={Object.entries(FORM_LABEL).map(([k, v]) => ({ value: k, label: v }))}
+            placeholder="— انتخاب کنید —"
+            modalTitle="انتخاب نوع دوا"
+          />
         </Field>
       </Grid2>
 
@@ -85,10 +89,13 @@ export default function HerbalForm({ item, updateItem }: { item: any; updateItem
 
       <Grid2>
         <Field label={<>نحوه مصرف <HelpIcon text={h.useMethod ? USE_METHOD_DESC[h.useMethod] : "ابتدا نحوه مصرف را انتخاب کنید"} /></>}>
-          <Select value={h.useMethod} onChange={e => setH({ useMethod: e.target.value as MedicineUseMethod })}>
-            <option value="">— انتخاب کنید —</option>
-            {Object.entries(USE_METHOD_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-          </Select>
+          <SmartSelect
+            value={h.useMethod}
+            onChange={v => setH({ useMethod: v as MedicineUseMethod })}
+            options={Object.entries(USE_METHOD_LABEL).map(([k, v]) => ({ value: k, label: v }))}
+            placeholder="— انتخاب کنید —"
+            modalTitle="انتخاب نحوه مصرف"
+          />
         </Field>
         <Field label="مدت دوره (روز)">
           <Input
