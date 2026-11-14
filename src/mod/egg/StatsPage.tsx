@@ -1,3 +1,4 @@
+import { MiniStat } from '../../shr/components/ui/MiniStat';
 import { KpiCard } from '../../shr/components/ui/KpiCard';
 /**
  * StatsPage — آمار و تحلیل تخم‌گذاری
@@ -266,9 +267,9 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
 
                 {/* خلاصه روند */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, paddingTop: 10, borderTop: '1px dashed var(--border)' }}>
-                  <MiniStat label="بیشترین" value={toFa(trend.max.toLocaleString('fa-IR'))} color="var(--accent)" />
-                  <MiniStat label="میانگین" value={toFa(trend.avg.toLocaleString('fa-IR'))} color="var(--text)" />
-                  <MiniStat label="کمترین" value={toFa(trend.min.toLocaleString('fa-IR'))} color="var(--muted)" />
+                  <MiniStat variant="plain" label="بیشترین" value={toFa(trend.max.toLocaleString('fa-IR'))} color="var(--accent)" />
+                  <MiniStat variant="plain" label="میانگین" value={toFa(trend.avg.toLocaleString('fa-IR'))} color="var(--text)" />
+                  <MiniStat variant="plain" label="کمترین" value={toFa(trend.min.toLocaleString('fa-IR'))} color="var(--muted)" />
                 </div>
               </div>
             </>
@@ -405,11 +406,3 @@ function ChartTab({ active, onClick, icon, label }: { active: boolean; onClick: 
   );
 }
 
-function MiniStat({ label, value, color }: { label: string; value: string; color: string }) {
-  return (
-    <div style={{ textAlign: 'center' }}>
-      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 2 }}>{label}</div>
-      <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color, fontVariantNumeric: 'tabular-nums' }}>{value}</div>
-    </div>
-  );
-}

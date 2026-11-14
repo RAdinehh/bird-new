@@ -28,3 +28,4 @@ export * from './SummaryCard';
 export * from './QuantityUnitInput';
 export * from './KpiCard';
 export * from './StatBox';
+export * from './MiniStat';
