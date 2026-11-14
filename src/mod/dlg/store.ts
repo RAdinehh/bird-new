@@ -20,7 +20,6 @@ export type LogStatus = 'active' | 'archived';
 export interface WeightSample {
   id: string;
   weight: number; // kg
-  label?: string;
 }
 
 export interface Vaccine {
