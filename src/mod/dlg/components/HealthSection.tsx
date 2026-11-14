@@ -3,6 +3,7 @@
  */
 import { useMemo, useState } from 'react';
 import { Btn, Field, Grid2, Input, NumField, Select, Textarea, AlertBox, Tag, SummaryCard } from '../../../shr/components/ui';
+import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { UNIT_LABEL, type ItemUnit } from '../../whs/store';
@@ -54,7 +55,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
       const newId = crypto.randomUUID();
       setForm(f => ({ ...f, deaths: [...f.deaths, { id: newId, count: 0, cause: '', notes: '' }] }));
       setExpandedId('d-' + newId);
-      setTimeout(() => { const el = document.getElementById(`health-death-${newId}`); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150);
+      setTimeout(() => { const el = document.querySelector(`[data-focus-id="health-death-${newId}"]`); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150);
      }}>
       + تلفات
      </Btn>
@@ -62,7 +63,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
       <Btn full onClick={() => {
        const newId = crypto.randomUUID();
        setForm(f => ({ ...f, vaccines: [...f.vaccines, { id: newId, name: '', dose: '', method: '', reaction: '', itemId: '', quantity: null, movementId: '' }] }));
-       setExpandedId('v-' + newId); setTimeout(() => { const el = document.getElementById(`health-vaccine-${newId}`); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150);
+       setExpandedId('v-' + newId); setTimeout(() => { const el = document.querySelector(`[data-focus-id="health-vaccine-${newId}"]`); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150);
       }}>
        + واکسن
       </Btn>
@@ -71,7 +72,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
       <Btn full onClick={() => {
        const newId = crypto.randomUUID();
        setForm(f => ({ ...f, medications: [...f.medications, { id: newId, name: '', dose: '', method: '', withdrawalDays: null, itemId: '', quantity: null, movementId: '' }] }));
-       setExpandedId('m-' + newId); setTimeout(() => { const el = document.getElementById(`health-med-${newId}`); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150);
+       setExpandedId('m-' + newId); setTimeout(() => { const el = document.querySelector(`[data-focus-id="health-med-${newId}"]`); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150);
       }}>
        + دارو
       </Btn>
@@ -80,18 +81,18 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
 
 
     {form.deaths.map((d, i) => (
-     <div key={d.id} id={'health-death-' + d.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${expandedId === 'd-' + d.id ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
-      <div onClick={() => setExpandedId(expandedId === 'd-' + d.id ? null : 'd-' + d.id)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: expandedId === 'd-' + d.id ? 'default' : 'pointer' }}>
-       <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
-       <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.count === 0 && !d.cause ? "رکورد جدید" : "رکورد " + toFa(i + 1)}</span>
-       <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{(d.count ?? 0) > 0 ? `${toFa(d.count ?? 0)} پرنده` : 'بدون داده'}{d.cause ? ' • ' + (causeOptions.find(o => o.value === d.cause)?.label || '') : ''}</span>
-      </div>
-       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        
-        <button type="button" onClick={(e) => { e.stopPropagation(); setForm(f => ({ ...f, deaths: f.deaths.filter(x => x.id !== d.id) })) }}
-         style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
-       </div>
-      </div>
+     <ExpandableCard
+     key={d.id}
+     data-focus-id={'health-death-' + d.id}
+     variant="inner"
+     accent="accent"
+     title={d.count === 0 && !d.cause ? 'رکورد جدید' : 'رکورد ' + toFa(i + 1)}
+     subtitle={`${(d.count ?? 0) > 0 ? `${toFa(d.count ?? 0)} پرنده` : 'بدون داده'}${d.cause ? ' • ' + (causeOptions.find(o => o.value === d.cause)?.label || '') : ''}`}
+     isOpen={expandedId === 'd-' + d.id}
+     onToggle={() => setExpandedId(expandedId === 'd-' + d.id ? null : 'd-' + d.id)}
+     onDelete={() => setForm(f => ({ ...f, deaths: f.deaths.filter(x => x.id !== d.id) }))}
+    >
+      
       {expandedId === 'd-' + d.id && (<>
       <Grid2>
        <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
@@ -126,19 +127,23 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, notes: e.target.value } : x) }))} />
       </Field>
       </>)}
-     </div>
+     </ExpandableCard>
     ))}
 
    {vaccineEnabled && (<>
     {form.vaccines.map((v, i) => (
-     <div key={v.id} id={'health-vaccine-' + v.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${expandedId === 'v-' + v.id ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
-      <div onClick={() => setExpandedId(expandedId === 'v-' + v.id ? null : 'v-' + v.id)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: expandedId === 'v-' + v.id ? 'default' : 'pointer' }}>
-       <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
-       <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v.name || 'واکسن ' + toFa(i + 1)}</span>
-       <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{v.dose ? 'دوز: ' + toFa(v.dose) : 'بدون دوز'}{v.itemId ? ' • از انبار' : ''}</span>
-      </div>
-       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><button type="button" onClick={(e) => { e.stopPropagation(); setForm(f => ({ ...f, vaccines: f.vaccines.filter(x => x.id !== v.id) })) }} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button></div>
-      </div>
+     <ExpandableCard
+     key={v.id}
+     data-focus-id={'health-vaccine-' + v.id}
+     variant="inner"
+     accent="accent"
+     title={v.name || 'واکسن ' + toFa(i + 1)}
+     subtitle={`${v.dose ? 'دوز: ' + toFa(v.dose) : 'بدون دوز'}${v.itemId ? ' • از انبار' : ''}`}
+     isOpen={expandedId === 'v-' + v.id}
+     onToggle={() => setExpandedId(expandedId === 'v-' + v.id ? null : 'v-' + v.id)}
+     onDelete={() => setForm(f => ({ ...f, vaccines: f.vaccines.filter(x => x.id !== v.id) }))}
+    >
+      
       {expandedId === 'v-' + v.id && (<>
       {vaccineItems.length > 0 && (
         <Field label={<>از انبار <Tag tone="blue">{toFa(vaccineItems.length)} نوع</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)">
@@ -201,7 +206,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         return <><Grid2>{qtyField}{methodField}</Grid2>{reactionField}</>;
       })()}
     </>)}
-     </div>
+     </ExpandableCard>
     ))}
    </>)}
 
@@ -211,14 +216,18 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
      const isHerbal = selectedItem?.category === 'herbal';
      
      return (
-     <div key={m.id} id={'health-med-' + m.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${expandedId === 'm-' + m.id ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
-      <div onClick={() => setExpandedId(expandedId === 'm-' + m.id ? null : 'm-' + m.id)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: expandedId === 'm-' + m.id ? 'default' : 'pointer' }}>
-       <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
-       <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name || 'دارو ' + toFa(i + 1)}</span>
-       <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{m.dose ? 'دوز: ' + toFa(m.dose) : 'بدون دوز'}{isHerbal ? ' • گیاهی' : m.withdrawalDays ? ' • پرهیز: ' + m.withdrawalDays + ' روز' : ''}</span>
-      </div>
-       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><button type="button" onClick={(e) => { e.stopPropagation(); setForm(f => ({ ...f, medications: f.medications.filter(x => x.id !== m.id) })) }} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button></div>
-      </div>
+     <ExpandableCard
+     key={m.id}
+     data-focus-id={'health-med-' + m.id}
+     variant="inner"
+     accent="accent"
+     title={m.name || 'دارو ' + toFa(i + 1)}
+     subtitle={`${m.dose ? 'دوز: ' + toFa(m.dose) : 'بدون دوز'}${isHerbal ? ' • گیاهی' : m.withdrawalDays ? ' • پرهیز: ' + m.withdrawalDays + ' روز' : ''}`}
+     isOpen={expandedId === 'm-' + m.id}
+     onToggle={() => setExpandedId(expandedId === 'm-' + m.id ? null : 'm-' + m.id)}
+     onDelete={() => setForm(f => ({ ...f, medications: f.medications.filter(x => x.id !== m.id) }))}
+    >
+      
       {expandedId === 'm-' + m.id && (<>
       {medicineItems.length > 0 && (
         <Field label={<>از انبار <Tag tone="red">{toFa(chemicalItems.length)} 💊</Tag> <Tag tone="green">{toFa(herbalItems.length)} 🌿</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)">
@@ -300,7 +309,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         return <><Grid2>{qtyField}{methodField}</Grid2>{withdrawalField}</>;
       })()}
     </>)}
-     </div>
+     </ExpandableCard>
      );
     })}
    </>)}
