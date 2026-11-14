@@ -25,3 +25,4 @@ export * from './ActionMenu';
 export * from './Tabs';
 export * from './AlertBox';
 export * from './SummaryCard';
+export * from './QuantityUnitInput';
