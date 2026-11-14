@@ -5,7 +5,8 @@ import { useMemo, useState } from 'react';
 import { Btn, Field, Grid2, Input, NumField, Select, Textarea, AlertBox, Tag, SummaryCard } from '../../../shr/components/ui';
 import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
 import SmartSelect from '../../../shr/components/SmartSelect';
-import { UNIT_LABEL } from '../../whs/store';
+import { UNIT_LABEL, type ItemUnit } from '../../whs/store';
+import { QuantityUnitInput, type UnitOption } from '../../../shr/components/ui';
 import { formatQty } from '../../../shr/utils/fa';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { DEATH_CAUSES } from '../store';
@@ -35,6 +36,15 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
  const herbalItems = useMemo(() => medicineItems.filter(x => x.category === 'herbal'), [medicineItems]);
  const causeOptions = useMemo(() => DEATH_CAUSES.map(([v, l]) => ({ value: v, label: l })), []);
  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const buildUnitOptions = (itemId: string | undefined, items: any[]): UnitOption[] => {
+    const it = items.find(x => x.id === itemId);
+    if (!it) return [];
+    const opts: UnitOption[] = [{ value: it.unit, label: (UNIT_LABEL as any)[it.unit] || it.unit, factor: 1 }];
+    (it.subUnits || []).forEach((su: any) => opts.push({ value: su.name, label: su.name, factor: su.factor }));
+    return opts;
+  };
+
+
 
  return (
   <>
@@ -166,11 +176,16 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         </Field>
         {v.itemId && (
          <Field label="مقدار مصرفی" error={showError(`vaccines.${i}.quantity`)} onTouch={() => markTouched(`vaccines.${i}.quantity`)}>
-          <NumField
-           value={v.quantity ? String(v.quantity) : ''}
-           onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 } : x) }))}
-           unit={UNIT_LABEL[vaccineItems.find(w => w.id === v.itemId)?.unit || 'pcs'] || ''}
-           min={0}
+          <QuantityUnitInput
+           value={v.quantity || ''}
+           onChange={val => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, quantity: parseFloat(toEn(val).replace('٫','.')) || 0 } : x) }))}
+           unit={v.unit || (vaccineItems.find(w => w.id === v.itemId)?.unit) || 'pcs'}
+           onUnitChange={u => {
+             const opts = buildUnitOptions(v.itemId, vaccineItems);
+             const fct = opts.find((o: UnitOption) => o.value === u)?.factor || 1;
+             setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, unit: u, factor: fct } : x) }));
+           }}
+           options={buildUnitOptions(v.itemId, vaccineItems)}
           />
          </Field>
         )}
@@ -226,11 +241,16 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         </Field>
         {m.itemId && (
          <Field label="مقدار مصرفی" error={showError(`medications.${i}.quantity`)} onTouch={() => markTouched(`medications.${i}.quantity`)}>
-          <NumField
-           value={m.quantity ? String(m.quantity) : ''}
-           onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 } : x) }))}
-           unit={UNIT_LABEL[selectedItem?.unit || 'pcs'] || ''}
-           min={0}
+          <QuantityUnitInput
+           value={m.quantity || ''}
+           onChange={val => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, quantity: parseFloat(toEn(val).replace('٫','.')) || 0 } : x) }))}
+           unit={m.unit || selectedItem?.unit || 'pcs'}
+           onUnitChange={u => {
+             const opts = buildUnitOptions(m.itemId, medicineItems);
+             const fct = opts.find((o: UnitOption) => o.value === u)?.factor || 1;
+             setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, unit: u, factor: fct } : x) }));
+           }}
+           options={buildUnitOptions(m.itemId, medicineItems)}
           />
          </Field>
         )}

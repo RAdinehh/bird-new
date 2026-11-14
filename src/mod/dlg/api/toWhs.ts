@@ -75,20 +75,22 @@ export function buildFeedMovements(params: {
 
 /** واکسن: ساخت movement از یک آیتم واکسن (یا null) */
 export function buildVaccineMovement(v: Vaccine): NewMovementData | null {
-  if (!v.itemId || !v.quantity || v.quantity <= 0) return null;
+  const finalQty = (v.quantity || 0) * (v.factor || 1);
+  if (!v.itemId || finalQty <= 0) return null;
   return {
     itemId: v.itemId,
-    quantity: v.quantity,
+    quantity: finalQty,
     notes: `ثبت روزانه — واکسن ${v.name || ''}`,
   };
 }
 
 /** دارو: ساخت movement از یک آیتم دارو (یا null) */
 export function buildMedicationMovement(m: Medication): NewMovementData | null {
-  if (!m.itemId || !m.quantity || m.quantity <= 0) return null;
+  const finalQty = (m.quantity || 0) * (m.factor || 1);
+  if (!m.itemId || finalQty <= 0) return null;
   return {
     itemId: m.itemId,
-    quantity: m.quantity,
+    quantity: finalQty,
     notes: `ثبت روزانه — دارو ${m.name || ''}`,
   };
 }

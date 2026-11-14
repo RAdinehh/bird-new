@@ -30,6 +30,8 @@ export interface Vaccine {
   reaction: string;
   itemId?: string;
   quantity?: number | null;
+  unit?: string;
+  factor?: number;
   movementId?: string;
 }
 
@@ -41,6 +43,8 @@ export interface Medication {
   withdrawalDays: number | null;
   itemId?: string;
   quantity?: number | null;
+  unit?: string;
+  factor?: number;
   movementId?: string;
 }
 
