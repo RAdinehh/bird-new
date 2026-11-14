@@ -19,6 +19,7 @@ import { Btn, Tag } from '../../../shr/components/ui';
 import { BadgeOverflow, type BadgeItem } from '../../../shr/components/ui/BadgeOverflow';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { LogSection, Row } from '../helpers';
+import { USE_METHOD_LABEL } from '../../../shr/constants/herbal';
 import { applyCorrections } from '../api/applyCorrections';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { Grid2, Grid3 } from '../../../shr/components/ui';
@@ -225,39 +226,57 @@ export default function LogCard(props: LogCardProps) {
 
       {l.deaths && l.deaths.length > 0 && (
         <LogSection title="💀 تلفات">
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--danger-soft)', color: 'var(--danger)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-            <span>مجموع:</span>
-            <span>{toFa(l.deaths.reduce((a, x) => a + (x.count || 0), 0))} پرنده</span>
-          </div>
-          {l.deaths.map(d => (
-            <div key={d.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 3 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span><b>{toFa(d.count)}</b> پرنده</span>
-                <span style={{ color: 'var(--warn)', fontSize: 'var(--fs-xs)', fontWeight: 600 }}>{causeLabel(d.cause)}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
+            {l.deaths.map(d => (
+              <Row key={d.id} l={`${toFa(d.count)} پرنده`} v={causeLabel(d.cause) || 'نامشخص'} warn={true} />
+            ))}
+            {l.deaths.length > 1 && (
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, padding: '4px 8px', textAlign: 'left' }}>
+                مجموع: {toFa(l.deaths.reduce((a, x) => a + (x.count || 0), 0))} پرنده
               </div>
-              {d.notes && <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>{d.notes}</span>}
-            </div>
-          ))}
+            )}
+          </div>
         </LogSection>
       )}
 
       {vaccineEnabled && l.vaccines.length > 0 && (
         <LogSection title="💉 واکسن">
-          {l.vaccines.map(v => (
-            <div key={v.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', borderRadius: 'var(--r-sm)', color: 'var(--accent)' }}>
-              <b>{v.name}</b>{v.dose ? ` — دوز ${v.dose}` : ''}{v.method ? ` • ${v.method}` : ''}
-            </div>
-          ))}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
+            {l.vaccines.map(v => {
+              const methodLabel = v.method ? (USE_METHOD_LABEL[v.method as keyof typeof USE_METHOD_LABEL] || v.method) : null;
+              return (
+                <Row key={v.id}
+                  l={v.name || 'واکسن بدون نام'}
+                  v={[
+                    v.dose ? `دوز: ${toFa(v.dose)}` : null,
+                    v.quantity ? `مقدار: ${toFa(v.quantity)} ${v.unit || ''}` : null,
+                    methodLabel ? `روش: ${methodLabel}` : null,
+                  ].filter(Boolean).join(' • ') || '—'}
+                />
+              );
+            })}
+          </div>
         </LogSection>
       )}
 
       {medicineEnabled && l.medications.length > 0 && (
         <LogSection title="💊 دارو">
-          {l.medications.map(m => (
-            <div key={m.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', color: 'var(--text)' }}>
-              <b>{m.name}</b>{m.dose ? ` — ${m.dose}` : ''}{m.withdrawalDays ? ` • منع مصرف ${toFa(m.withdrawalDays)} روز` : ''}
-            </div>
-          ))}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
+            {l.medications.map(m => {
+              const methodLabel = m.method ? (USE_METHOD_LABEL[m.method as keyof typeof USE_METHOD_LABEL] || m.method) : null;
+              return (
+                <Row key={m.id}
+                  l={m.name || 'دارو بدون نام'}
+                  v={[
+                    m.dose ? `دوز: ${toFa(m.dose)}` : null,
+                    m.quantity ? `مقدار: ${toFa(m.quantity)} ${m.unit || ''}` : null,
+                    methodLabel ? `روش: ${methodLabel}` : null,
+                    m.withdrawalDays ? `پرهیز: ${toFa(m.withdrawalDays)} روز` : null,
+                  ].filter(Boolean).join(' • ') || '—'}
+                />
+              );
+            })}
+          </div>
         </LogSection>
       )}
 
