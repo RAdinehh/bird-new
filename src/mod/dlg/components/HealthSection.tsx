@@ -139,59 +139,67 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><button type="button" onClick={(e) => { e.stopPropagation(); setForm(f => ({ ...f, vaccines: f.vaccines.filter(x => x.id !== v.id) })) }} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button></div>
       </div>
       {expandedId === 'v-' + v.id && (<>
-      <Grid2>
-       <Field label="نام واکسن" required>
-        <Input placeholder="مثلاً نیوکاسل" value={v.name} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, name: e.target.value } : x) }))} />
-       </Field>
-       <Field label="دوز">
-        <Input placeholder="مثلاً ۰.۲ سی‌سی" value={v.dose} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, dose: e.target.value } : x) }))} />
-       </Field>
-      </Grid2>
-      <Grid2>
-       <Field label="روش مصرف">
-        <Select value={v.method || ''} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, method: e.target.value } : x) }))}>
-         <option value="">— نامشخص —</option>
-         <option value="eye_drop">قطره چشمی</option>
-         <option value="injection">تزریق</option>
-         <option value="drinking_water">آشامیدنی</option>
-         <option value="spray">اسپری</option>
-         <option value="wing_web">بال زدن (Wing Web)</option>
-        </Select>
-       </Field>
-       <Field label="واکنش">
-        <Input placeholder="مثلاً بدون واکنش" value={v.reaction || ''} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, reaction: e.target.value } : x) }))} />
-       </Field>
-      </Grid2>
       {vaccineItems.length > 0 && (
-       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <Field label={<>از انبار <Tag tone="blue">{toFa(vaccineItems.length)} نوع</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)">
-         <SmartSelect
-          value={v.itemId || ''}
-          onChange={id => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null } : x) }))}
-          options={vaccineItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}` }))}
-          placeholder="— متصل نکن —"
-          modalTitle="انتخاب از انبار"
-          autoThreshold={6}
-         />
-        </Field>
-        {v.itemId && (
-         <Field label="مقدار مصرفی" error={showError(`vaccines.${i}.quantity`)} onTouch={() => markTouched(`vaccines.${i}.quantity`)}>
-          <QuantityUnitInput
-           value={v.quantity || ''}
-           onChange={val => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, quantity: parseFloat(toEn(val).replace('٫','.')) || 0 } : x) }))}
-           unit={v.unit || (vaccineItems.find(w => w.id === v.itemId)?.unit) || 'pcs'}
-           onUnitChange={u => {
-             const opts = buildUnitOptions(v.itemId, vaccineItems);
-             const fct = opts.find((o: UnitOption) => o.value === u)?.factor || 1;
-             setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, unit: u, factor: fct } : x) }));
-           }}
-           options={buildUnitOptions(v.itemId, vaccineItems)}
+          <SmartSelect
+            value={v.itemId || ''}
+            onChange={id => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null } : x) }))}
+            options={vaccineItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}` }))}
+            placeholder="— متصل نکن —"
+            modalTitle="انتخاب از انبار"
+            autoThreshold={6}
           />
-         </Field>
-        )}
-       </div>
+        </Field>
       )}
-      </>)}
+      <Grid2>
+        <Field label="نام واکسن" required>
+          <Input placeholder="مثلاً نیوکاسل" value={v.name} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, name: e.target.value } : x) }))} />
+        </Field>
+        <Field label="دوز">
+          <Input placeholder="مثلاً ۰.۲ سی‌سی" value={v.dose} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, dose: e.target.value } : x) }))} />
+        </Field>
+      </Grid2>
+      {(() => {
+        const opts = buildUnitOptions(v.itemId, vaccineItems);
+        const hasSub = opts.length > 1;
+        const qtyField = v.itemId ? (
+          <Field label="مقدار مصرفی" error={showError(`vaccines.${i}.quantity`)} onTouch={() => markTouched(`vaccines.${i}.quantity`)}>
+            <QuantityUnitInput
+              value={v.quantity || ''}
+              onChange={val => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, quantity: parseFloat(toEn(val).replace('٫','.')) || 0 } : x) }))}
+              unit={v.unit || (vaccineItems.find(w => w.id === v.itemId)?.unit) || 'pcs'}
+              onUnitChange={u => {
+                const fct = opts.find((o: UnitOption) => o.value === u)?.factor || 1;
+                setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, unit: u, factor: fct } : x) }));
+              }}
+              options={opts}
+            />
+          </Field>
+        ) : null;
+        const methodField = (
+          <Field label="روش مصرف">
+            <Select value={v.method || ''} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, method: e.target.value } : x) }))}>
+              <option value="">— نامشخص —</option>
+              <option value="drinking_water">آشامیدنی (در آب)</option>
+              <option value="feed">خوراکی (مخلوط با دان)</option>
+              <option value="eye_drop">قطره چشمی / بینی</option>
+              <option value="injection">تزریقی (عضلانی/زیرجلدی)</option>
+              <option value="spray">اسپری</option>
+              <option value="wing_web">بال زدن (Wing Web)</option>
+              <option value="topical">موضعی</option>
+            </Select>
+          </Field>
+        );
+        const reactionField = (
+          <Field label="واکنش">
+            <Input placeholder="مثلاً بدون واکنش" value={v.reaction || ''} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, reaction: e.target.value } : x) }))} />
+          </Field>
+        );
+        if (!qtyField) return <Grid2>{methodField}{reactionField}</Grid2>;
+        if (hasSub) return <>{qtyField}<Grid2>{methodField}{reactionField}</Grid2></>;
+        return <><Grid2>{qtyField}{methodField}</Grid2>{reactionField}</>;
+      })()}
+    </>)}
      </div>
     ))}
    </>)}
@@ -211,83 +219,86 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><button type="button" onClick={(e) => { e.stopPropagation(); setForm(f => ({ ...f, medications: f.medications.filter(x => x.id !== m.id) })) }} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button></div>
       </div>
       {expandedId === 'm-' + m.id && (<>
-      
       {medicineItems.length > 0 && (
-       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <Field label={<>از انبار <Tag tone="red">{toFa(chemicalItems.length)} 💊</Tag> <Tag tone="green">{toFa(herbalItems.length)} 🌿</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)">
-         <SmartSelect
-          value={m.itemId || ''}
-          onChange={id => setForm(f => ({ 
-           ...f, 
-           medications: f.medications.map(x => {
-            if (x.id !== m.id) return x;
-            const newItem = medicineItems.find(w => w.id === id);
-            return { 
-             ...x, 
-             itemId: id, 
-             quantity: id ? (x.quantity ?? 0) : null,
-             name: newItem ? newItem.name : x.name,
-             withdrawalDays: newItem ? newItem.withdrawalDays : x.withdrawalDays
-            };
-           }) 
-          }))}
-          options={medicineItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}`, group: w.category === 'herbal' ? 'herbal' : 'chemical' }))}
-          groupLabels={{ chemical: '💊 شیمیایی', herbal: '🌿 گیاهی' }}
-          groupIcons={{ chemical: '💊', herbal: '🌿' }}
-          placeholder="— متصل نکن —"
-          modalTitle="انتخاب از انبار"
-          autoThreshold={6}
-         />
-        </Field>
-        {m.itemId && (
-         <Field label="مقدار مصرفی" error={showError(`medications.${i}.quantity`)} onTouch={() => markTouched(`medications.${i}.quantity`)}>
-          <QuantityUnitInput
-           value={m.quantity || ''}
-           onChange={val => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, quantity: parseFloat(toEn(val).replace('٫','.')) || 0 } : x) }))}
-           unit={m.unit || selectedItem?.unit || 'pcs'}
-           onUnitChange={u => {
-             const opts = buildUnitOptions(m.itemId, medicineItems);
-             const fct = opts.find((o: UnitOption) => o.value === u)?.factor || 1;
-             setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, unit: u, factor: fct } : x) }));
-           }}
-           options={buildUnitOptions(m.itemId, medicineItems)}
+          <SmartSelect
+            value={m.itemId || ''}
+            onChange={id => setForm(f => ({
+              ...f,
+              medications: f.medications.map(x => {
+                if (x.id !== m.id) return x;
+                const newItem = medicineItems.find(w => w.id === id);
+                return {
+                  ...x,
+                  itemId: id,
+                  quantity: id ? (x.quantity ?? 0) : null,
+                  name: newItem ? newItem.name : x.name,
+                  withdrawalDays: newItem ? newItem.withdrawalDays : x.withdrawalDays
+                };
+              })
+            }))}
+            options={medicineItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}`, group: w.category === 'herbal' ? 'herbal' : 'chemical' }))}
+            groupLabels={{ chemical: '💊 شیمیایی', herbal: '🌿 گیاهی' }}
+            groupIcons={{ chemical: '💊', herbal: '🌿' }}
+            placeholder="— متصل نکن —"
+            modalTitle="انتخاب از انبار"
+            autoThreshold={6}
           />
-         </Field>
-        )}
-       </div>
-      )}
-      
-      <Grid2>
-       <Field label="نام">
-        <Input placeholder="نام دارو" value={m.name} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, name: e.target.value } : x) }))} />
-       </Field>
-       <Field label="دوز">
-        <Input placeholder="دوز" value={m.dose} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, dose: e.target.value } : x) }))} />
-       </Field>
-      </Grid2>
-      <Grid2>
-       <Field label="روش مصرف">
-        <Select value={m.method || ''} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, method: e.target.value } : x) }))}>
-         <option value="">— نامشخص —</option>
-         <option value="injection">تزریق</option>
-         <option value="drinking_water">آشامیدنی</option>
-         <option value="oral">خوراکی (دهانی)</option>
-         <option value="spray">اسپری</option>
-         <option value="topical">موضعی</option>
-        </Select>
-       </Field>
-       {!isHerbal && (
-        <Field label="دوره پرهیز (روز)" hint="چند روز بعد از مصرف، گوشت و تخم قابل فروش نیست">
-         <NumField
-          placeholder="مثلاً ۷"
-          value={m.withdrawalDays !== null && m.withdrawalDays !== undefined ? String(m.withdrawalDays) : ''}
-          onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, withdrawalDays: e.target.value === '' ? null : (parseInt(toEn(e.target.value)) || null) } : x) }))}
-          unit="روز" min={0}
-         />
         </Field>
-       )}
+      )}
+      <Grid2>
+        <Field label="نام">
+          <Input placeholder="نام دارو" value={m.name} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, name: e.target.value } : x) }))} />
+        </Field>
+        <Field label="دوز">
+          <Input placeholder="دوز" value={m.dose} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, dose: e.target.value } : x) }))} />
+        </Field>
       </Grid2>
-      </>)}
+      {(() => {
+        const opts = buildUnitOptions(m.itemId, medicineItems);
+        const hasSub = opts.length > 1;
+        const qtyField = m.itemId ? (
+          <Field label="مقدار مصرفی" error={showError(`medications.${i}.quantity`)} onTouch={() => markTouched(`medications.${i}.quantity`)}>
+            <QuantityUnitInput
+              value={m.quantity || ''}
+              onChange={val => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, quantity: parseFloat(toEn(val).replace('٫','.')) || 0 } : x) }))}
+              unit={m.unit || selectedItem?.unit || 'pcs'}
+              onUnitChange={u => {
+                const fct = opts.find((o: UnitOption) => o.value === u)?.factor || 1;
+                setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, unit: u, factor: fct } : x) }));
+              }}
+              options={opts}
+            />
+          </Field>
+        ) : null;
+        const methodField = (
+          <Field label="روش مصرف">
+            <Select value={m.method || ''} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, method: e.target.value } : x) }))}>
+              <option value="">— نامشخص —</option>
+              <option value="drinking_water">آشامیدنی (در آب)</option>
+              <option value="feed">خوراکی (مخلوط با دان)</option>
+              <option value="injection">تزریقی (عضلانی/زیرجلدی)</option>
+              <option value="oral">دهانی (فردی/با سرنگ)</option>
+              <option value="spray">اسپری</option>
+              <option value="topical">موضعی</option>
+            </Select>
+          </Field>
+        );
+        const withdrawalField = !isHerbal ? (
+          <Field label="دوره پرهیز (روز)" hint="چند روز بعد از مصرف، گوشت و تخم قابل فروش نیست">
+            <NumField
+              placeholder="مثلاً ۷"
+              value={m.withdrawalDays !== null && m.withdrawalDays !== undefined ? String(m.withdrawalDays) : ''}
+              onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, withdrawalDays: e.target.value === '' ? null : (parseInt(toEn(e.target.value)) || null) } : x) }))}
+              unit="روز" min={0}
+            />
+          </Field>
+        ) : null;
+        if (!qtyField) return <Grid2>{methodField}{withdrawalField}</Grid2>;
+        if (hasSub) return <>{qtyField}<Grid2>{methodField}{withdrawalField}</Grid2></>;
+        return <><Grid2>{qtyField}{methodField}</Grid2>{withdrawalField}</>;
+      })()}
+    </>)}
      </div>
      );
     })}
