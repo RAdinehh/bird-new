@@ -1,6 +1,7 @@
 /**
  * ItemsFormModal — فرم افزودن/ویرایش قلم انبار
  */
+import { toEn } from '../../../shr/utils/fa';
 import { Btn, BtnRow, ErrorBox, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, SectionTitle, Select, Textarea } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
@@ -96,7 +97,7 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
                   </div>
                   <div style={{ flex: 1 }}>
                     <NumField placeholder="معادل" value={String(su.factor || '')} onChange={e => {
-                      const newSubs = (form.subUnits || []).map((s: any, i: number) => i === idx ? { ...s, factor: Number(e.target.value) || 0 } : s);
+                      const newSubs = (form.subUnits || []).map((s: any, i: number) => i === idx ? { ...s, factor: parseFloat(toEn(e.target.value)) || 0 } : s);
                       setForm({ ...form, subUnits: newSubs });
                     }} unit={(UNIT_LABEL as any)[form.unit]} min={0} />
                   </div>
@@ -111,7 +112,7 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
                 </div>
               </div>
             ))}
-            <Btn onClick={() => setForm({ ...form, subUnits: [...(form.subUnits || []), { name: '', factor: 1 }] })}>
+            <Btn onClick={() => setForm({ ...form, subUnits: [...(form.subUnits || []), { name: '', factor: 0 }] })}>
               + افزودن واحد فرعی
             </Btn>
           </div>
