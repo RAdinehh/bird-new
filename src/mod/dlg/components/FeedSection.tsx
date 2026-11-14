@@ -218,6 +218,12 @@ export default function FeedSection({ form, setForm }: Props) {
     <AlertBox tone="warn" variant="dashed" size="xs" icon={false}>⚠️ هنوز هیچ جیره‌ای نساخته‌اید و دان تکی هم تعریف نکرده‌اید. ابتدا از بخش «تغذیه» یک جیره بسازید، سپس به اینجا برگردید.</AlertBox>
    )}
 
+   {(formulas.length > 0 || feedItems.length > 0) && (
+      <Btn full onClick={addSource}>
+       + افزودن منبع دیگر
+      </Btn>
+    )}
+
    {sources.map((src, idx) => {
     const f = src.type === 'formula' ? formulas.find(x => x.id === src.refId) : null;
     const it = src.type === 'item' ? feedItems.find(x => x.id === src.refId) : null;
@@ -227,7 +233,7 @@ export default function FeedSection({ form, setForm }: Props) {
     const unitLabel = UNIT_LABEL['kg'] || 'کیلوگرم';
 
     return (
-     <div key={src.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${isExpanded ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
+     <div key={src.id} id={'feed-src-' + src.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${isExpanded ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
       
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: isExpanded ? 'default' : 'pointer' }} onClick={() => setExpandedSourceId(isExpanded ? null : src.id)}>
@@ -353,11 +359,7 @@ export default function FeedSection({ form, setForm }: Props) {
     );
    })}
 
-   {(formulas.length > 0 || feedItems.length > 0) && (
-    <Btn full onClick={addSource}>
-     + افزودن منبع دیگر
-    </Btn>
-   )}
+   
 
 
 
