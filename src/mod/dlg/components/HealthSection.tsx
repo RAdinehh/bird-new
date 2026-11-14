@@ -245,6 +245,18 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         <Input placeholder="دوز" value={m.dose} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, dose: e.target.value } : x) }))} />
        </Field>
       </Grid2>
+      <Grid2>
+       <Field label="روش مصرف">
+        <Select value={m.method || ''} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, method: e.target.value } : x) }))}>
+         <option value="">— نامشخص —</option>
+         <option value="injection">تزریق</option>
+         <option value="drinking_water">آشامیدنی</option>
+         <option value="oral">خوراکی (دهانی)</option>
+         <option value="spray">اسپری</option>
+         <option value="topical">موضعی</option>
+        </Select>
+       </Field>
+      </Grid2>
 
       {!isHerbal && (
        <Field label="دوره پرهیز (روز)" hint="چند روز بعد از مصرف، گوشت و تخم قابل فروش نیست">
