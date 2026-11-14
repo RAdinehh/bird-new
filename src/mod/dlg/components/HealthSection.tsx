@@ -163,7 +163,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
        </Field>
       </Grid2>
       {vaccineItems.length > 0 && (
-       <Grid2>
+       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <Field label={<>از انبار <Tag tone="blue">{toFa(vaccineItems.length)} نوع</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)">
          <SmartSelect
           value={v.itemId || ''}
@@ -189,7 +189,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
           />
          </Field>
         )}
-       </Grid2>
+       </div>
       )}
       </>)}
      </div>
@@ -213,7 +213,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
       {expandedId === 'm-' + m.id && (<>
       
       {medicineItems.length > 0 && (
-       <Grid2>
+       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <Field label={<>از انبار <Tag tone="red">{toFa(chemicalItems.length)} 💊</Tag> <Tag tone="green">{toFa(herbalItems.length)} 🌿</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)">
          <SmartSelect
           value={m.itemId || ''}
@@ -254,7 +254,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
           />
          </Field>
         )}
-       </Grid2>
+       </div>
       )}
       
       <Grid2>
