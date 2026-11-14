@@ -4,37 +4,37 @@
 > آخرین آپدیت: 1405/11/14
 
 ## HEAD
-fc63218b — refactor(dlg/fed/tra): یکدست‌سازی دکمه‌ها (۵ فایل WIP از AI قبلی)
-⚠️ ahead=34 از origin — push نشده
+89bbc421 — feat(dlg): وزن‌کشی تخم — کارت expandable + خلاصه هوشمند CV + واحد گرم
+✅ sync با origin (push شد)
 
 ## 🔨 کار جاری
-**ادامهٔ فاز ۰/۳ Design System + handoff-mismatch fix.**
+**فاز ۰/۳ Design System + بهبود بخش‌های فرم ثبت روزانه (dlg).**
 
-- ✅ ۳۳ کامیت AI قبلی (refactor دکمه‌ها، Expandable، FCR تفکیک‌شده، SummaryCard)
-- ✅ commit ۵ فایل WIP (`fc63218b`)
-- ✅ BUG-3 ثبت شد (handoff-mismatch: push نشده + NOW کهنه)
-- 🔴 BUG-1 (DealsPage هنوز ۱۵۴۵ خط)، BUG-2 (رطوبت — قبلاً ثبت)، BUG-3
-- 🔴 **push نشده** (۳۴ کامیت)
+- ✅ بازنویسی کامل EggsWeightSection:
+  - کارت‌های نمونه expandable (border accent سبز هنگام باز)
+  - خلاصه هوشمند CV داخل کارت باز (بدون تکرار)
+  - جنسیت دو ستونه کنار وزن
+  - واحد kg → گرم (رفع تناقض)
+  - رفع باگ NaN + محاسبه با نمونه خالی
+  - HelpIcon ? با راهنمای آستانه‌های ۸/۱۰/۱۲
 
 ## ✅ این جلسه (1405/11/14)
-- audit ۳۳ کامیت AI قبلی (tsc صفر، refactor خالص)
-- commit ۵ فایل WIP از AI قبلی (`fc63218b`)
-- ثبت BUG-3 (handoff-mismatch)
-- آپدیت NOW.md
+- بازنویسی EggsWeightSection (UI + منطق + رفع باگ)
+- ثبت IDEA-32 (آستانه پویای CV بر اساس نژاد)
+- commit 89bbc421 + push
 
 ## ⚠️ هشدارها
-- 🔴 **۳۴ کامیت push نشده** — ریسک بالا
 - tsc: ۰ خطا ✅
 - ۲۴ فایل > ۵۰۰ خط (نقض قانون ۳۲)
-- BUG باز: ۳ (BUG-1, BUG-2, BUG-3)
+- BUG باز: ۱ (BUG-2)
 
 ## 🎯 قدم بعدی (به ترتیب)
-1. push ۳۴ کامیت (فوری — ریسک)
-2. verify نهایی
-3. ادامه: BUG-2 (رطوبت) یا feature dlg (entryTime zod / IDEA-30)
+1. BUG-2 (رطوبت — dlg/LogCard.tsx)
+2. شکستن tra/store.ts (۱۳۲۵ خط) — طبق MASTER-ROADMAP
+3. IDEA-30 (هوشمندسازی FeedSection) یا IDEA-32
 
 ## 📋 منبع حقیقت
 docs/MASTER-ROADMAP.md ← اول این
 AGENTS.md (۲۷ قانون)
-BUGS.md (۳ باگ باز)
-docs/DESIGN-CONSISTENCY.md (قانون ۳۴: Semantic Role)
+BUGS.md (۱ باگ باز)
+docs/DESIGN-CONSISTENCY.md (قانون ۳۴)
