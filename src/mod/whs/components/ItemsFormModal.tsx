@@ -8,6 +8,7 @@ import SmartSelect from '../../../shr/components/SmartSelect';
 import { toFa } from '../../../shr/utils/fa';
 import { FieldHint } from '../../../shr/intelligence';
 import { CATEGORY_DEFAULTS, UNIT_LABEL, CATEGORY_ICON, CATEGORY_LABEL, type ItemUnit, type ItemCategory } from '../store';
+import HerbalForm from '../../../shr/components/HerbalForm';
 
 export interface ItemsFormModalProps {
   open: boolean;
@@ -213,7 +214,14 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
           </>
         )}
 
-        {form.category === 'feed' && (
+        {form.category === 'herbal' && (
+        <div style={{ marginTop: 12, marginBottom: 12 }}>
+          <SectionTitle>🌿 اطلاعات گیاهی (طب سنتی)</SectionTitle>
+          <HerbalForm item={form} updateItem={(patch: any) => setForm({ ...form, ...patch })} />
+        </div>
+      )}
+
+      {form.category === 'feed' && (
           <>
             <SectionTitle>🧪 ترکیبات تغذیه‌ای</SectionTitle>
             <Grid2>
