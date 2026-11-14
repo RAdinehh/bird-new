@@ -43,7 +43,7 @@ export function QuantityUnitInput({ value, onChange, unit, onUnitChange, options
           </Field>
         </div>
         {options.length > 1 && (
-          <div style={{ width: 85, flexShrink: 0 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
             <Field label="واحد">
               <Select value={unit} onChange={e => onUnitChange(e.target.value)}>
                 {options.map(o => (
