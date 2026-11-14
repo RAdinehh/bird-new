@@ -163,18 +163,18 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         const opts = buildUnitOptions(v.itemId, vaccineItems);
         const hasSub = opts.length > 1;
         const qtyField = v.itemId ? (
-          <Field label="مقدار مصرفی" error={showError(`vaccines.${i}.quantity`)} onTouch={() => markTouched(`vaccines.${i}.quantity`)}>
-            <QuantityUnitInput
-              value={v.quantity || ''}
-              onChange={val => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, quantity: parseFloat(toEn(val).replace('٫','.')) || 0 } : x) }))}
-              unit={v.unit || (vaccineItems.find(w => w.id === v.itemId)?.unit) || 'pcs'}
-              onUnitChange={u => {
-                const fct = opts.find((o: UnitOption) => o.value === u)?.factor || 1;
-                setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, unit: u, factor: fct } : x) }));
-              }}
-              options={opts}
-            />
-          </Field>
+          <QuantityUnitInput
+            error={showError(`vaccines.${i}.quantity`)}
+            onTouch={() => markTouched(`vaccines.${i}.quantity`)}
+            value={v.quantity || ''}
+            onChange={val => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, quantity: parseFloat(toEn(val).replace('٫','.')) || 0 } : x) }))}
+            unit={v.unit || (vaccineItems.find(w => w.id === v.itemId)?.unit) || 'pcs'}
+            onUnitChange={u => {
+              const fct = opts.find((o: UnitOption) => o.value === u)?.factor || 1;
+              setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, unit: u, factor: fct } : x) }));
+            }}
+            options={opts}
+          />
         ) : null;
         const methodField = (
           <Field label="روش مصرف">
@@ -258,18 +258,18 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         const opts = buildUnitOptions(m.itemId, medicineItems);
         const hasSub = opts.length > 1;
         const qtyField = m.itemId ? (
-          <Field label="مقدار مصرفی" error={showError(`medications.${i}.quantity`)} onTouch={() => markTouched(`medications.${i}.quantity`)}>
-            <QuantityUnitInput
-              value={m.quantity || ''}
-              onChange={val => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, quantity: parseFloat(toEn(val).replace('٫','.')) || 0 } : x) }))}
-              unit={m.unit || selectedItem?.unit || 'pcs'}
-              onUnitChange={u => {
-                const fct = opts.find((o: UnitOption) => o.value === u)?.factor || 1;
-                setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, unit: u, factor: fct } : x) }));
-              }}
-              options={opts}
-            />
-          </Field>
+          <QuantityUnitInput
+            error={showError(`medications.${i}.quantity`)}
+            onTouch={() => markTouched(`medications.${i}.quantity`)}
+            value={m.quantity || ''}
+            onChange={val => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, quantity: parseFloat(toEn(val).replace('٫','.')) || 0 } : x) }))}
+            unit={m.unit || selectedItem?.unit || 'pcs'}
+            onUnitChange={u => {
+              const fct = opts.find((o: UnitOption) => o.value === u)?.factor || 1;
+              setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, unit: u, factor: fct } : x) }));
+            }}
+            options={opts}
+          />
         ) : null;
         const methodField = (
           <Field label="روش مصرف">
