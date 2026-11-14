@@ -28,9 +28,9 @@ export function QuantityUnitInput({ value, onChange, unit, onUnitChange, options
   const showPreview = isValidNum && currentUnit && currentUnit.factor !== 1 && baseUnitOpt;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
       <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <NumField
             placeholder={placeholder || '۰'}
             value={value}
@@ -40,7 +40,7 @@ export function QuantityUnitInput({ value, onChange, unit, onUnitChange, options
           />
         </div>
         {options.length > 1 && (
-          <div style={{ width: 110 }}>
+          <div style={{ width: 80, flexShrink: 0 }}>
             <Select value={unit} onChange={e => onUnitChange(e.target.value)}>
               {options.map(o => (
                 <option key={o.value} value={o.value}>{o.label}</option>
@@ -50,7 +50,7 @@ export function QuantityUnitInput({ value, onChange, unit, onUnitChange, options
         )}
       </div>
       {showPreview && (
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600, paddingRight: 4 }}>
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600, paddingRight: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           💡 {toFa(numVal)} {currentUnit?.label} = {toFa(numVal * (currentUnit?.factor || 1))} {baseUnitOpt?.label}
         </div>
       )}
