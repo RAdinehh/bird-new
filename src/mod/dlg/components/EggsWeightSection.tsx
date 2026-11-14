@@ -109,8 +109,20 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
 - **۱۰٪ < CV ≤ ۱۲٪:** متوسط (نیاز به پایش)
 - **CV > ۱۲٪:** ضعیف (مشکل غذایی یا بیماری)`} /></div>
 
-    {form.weightSamples.map((w, i) => (
-     <div key={w.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${expandedId === w.id ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <Btn full onClick={() => {
+     const newId = crypto.randomUUID();
+     setForm(f => ({ ...f, weightSamples: [...f.weightSamples, { id: newId, weight: '' }] }));
+     setExpandedId(newId);
+    setTimeout(() => {
+      const el = document.getElementById(`egg-weight-${newId}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 150);
+    }}>
+     + افزودن نمونه وزن
+    </Btn>
+
+   {form.weightSamples.map((w, i) => (
+     <div key={w.id} id={'egg-weight-' + w.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${expandedId === w.id ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
       <div onClick={() => setExpandedId(expandedId === w.id ? null : w.id)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: expandedId === w.id ? 'default' : 'pointer' }}>
        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
         <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)' }}>نمونه {toFa(i + 1)}</span>
@@ -139,13 +151,7 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
      </div>
     ))}
 
-    <Btn full onClick={() => {
-     const newId = crypto.randomUUID();
-     setForm(f => ({ ...f, weightSamples: [...f.weightSamples, { id: newId, weight: '' }] }));
-     setExpandedId(newId);
-    }}>
-     + افزودن نمونه وزن
-    </Btn>
+    
    </div>
   </>
  );

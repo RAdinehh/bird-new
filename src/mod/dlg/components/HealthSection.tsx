@@ -79,7 +79,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
 
 
     {form.deaths.map((d, i) => (
-     <div key={d.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${expandedId === 'd-' + d.id ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
+     <div key={d.id} id={'health-death-' + d.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${expandedId === 'd-' + d.id ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
       <div onClick={() => setExpandedId(expandedId === 'd-' + d.id ? null : 'd-' + d.id)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: expandedId === 'd-' + d.id ? 'default' : 'pointer' }}>
        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
        <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.count === 0 && !d.cause ? "رکورد جدید" : "رکورد " + toFa(i + 1)}</span>
@@ -130,7 +130,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
 
    {vaccineEnabled && (<>
     {form.vaccines.map((v, i) => (
-     <div key={v.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${expandedId === 'v-' + v.id ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
+     <div key={v.id} id={'health-vaccine-' + v.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${expandedId === 'v-' + v.id ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
       <div onClick={() => setExpandedId(expandedId === 'v-' + v.id ? null : 'v-' + v.id)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: expandedId === 'v-' + v.id ? 'default' : 'pointer' }}>
        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
        <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v.name || 'واکسن ' + toFa(i + 1)}</span>
@@ -210,7 +210,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
      const isHerbal = selectedItem?.category === 'herbal';
      
      return (
-     <div key={m.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${expandedId === 'm-' + m.id ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
+     <div key={m.id} id={'health-med-' + m.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${expandedId === 'm-' + m.id ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
       <div onClick={() => setExpandedId(expandedId === 'm-' + m.id ? null : 'm-' + m.id)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: expandedId === 'm-' + m.id ? 'default' : 'pointer' }}>
        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
        <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name || 'دارو ' + toFa(i + 1)}</span>
