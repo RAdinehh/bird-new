@@ -245,7 +245,7 @@ export default function FeedSection({ form, setForm }: Props) {
             ...formulas.map(f => ({ value: 'f:' + f.id, label: f.name, subtitle: `${toFa(f.lines.length)} ماده`, group: 'formula' })),
             ...feedItems.map(it => ({ value: 'i:' + it.id, label: it.name, subtitle: `موجودی ${toFa(it.currentStock)} ${UNIT_LABEL[it.unit]}`, group: 'item' })),
            ]}
-           groupLabels={{ formula: '📋 جیره‌ها', item: '🌾 دان تکی' }}
+           groupLabels={{ formula: 'جیره‌ها', item: 'دان تکی' }}
            groupIcons={{ formula: '📋', item: '🌾' }}
            placeholder="انتخاب..."
            modalTitle="انتخاب منبع"

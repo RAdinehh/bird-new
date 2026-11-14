@@ -85,7 +85,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
       <Grid2>
        <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
         <Field label="تعداد" error={showError('deathsCount') || showError('deaths')} onTouch={() => markTouched('deathsCount')}>
-         <NumField placeholder="اگر تلفات نبود، 0 وارد کنید" value={String(d.count ?? '')}
+         <NumField placeholder="اگر تلفات نبود، 0 وارد کنید" value={d.count ? String(d.count) : ''}
           onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, count: parseInt(toEn(e.target.value)) || 0 } : x) }))}
           min={0} max={flockAliveCount || undefined} unit="پرنده" />
         </Field>
@@ -148,7 +148,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         {v.itemId && (
          <Field label="مقدار مصرفی" error={showError(`vaccines.${i}.quantity`)} onTouch={() => markTouched(`vaccines.${i}.quantity`)}>
           <NumField
-           value={v.quantity !== null && v.quantity !== undefined ? String(v.quantity) : ''}
+           value={v.quantity ? String(v.quantity) : ''}
            onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 } : x) }))}
            unit={UNIT_LABEL[vaccineItems.find(w => w.id === v.itemId)?.unit || 'pcs'] || ''}
            min={0}
@@ -208,7 +208,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         {m.itemId && (
          <Field label="مقدار مصرفی" error={showError(`medications.${i}.quantity`)} onTouch={() => markTouched(`medications.${i}.quantity`)}>
           <NumField
-           value={m.quantity !== null && m.quantity !== undefined ? String(m.quantity) : ''}
+           value={m.quantity ? String(m.quantity) : ''}
            onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, quantity: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 } : x) }))}
            unit={UNIT_LABEL[selectedItem?.unit || 'pcs'] || ''}
            min={0}
