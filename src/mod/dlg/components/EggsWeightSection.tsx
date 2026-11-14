@@ -2,7 +2,7 @@ import { useState } from 'react';
 /**
  * EggsWeightSection — تخم و وزن‌کشی
  */
-import { Btn, Field, Grid2, NumField, Select } from '../../../shr/components/ui';
+import { Btn, Field, Grid2, NumField, Select, Input } from '../../../shr/components/ui';
 import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { avgWeight, cvWeight } from '../store';
@@ -113,12 +113,15 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
      <div key={w.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${expandedId === w.id ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
       <div onClick={() => setExpandedId(expandedId === w.id ? null : w.id)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: expandedId === w.id ? 'default' : 'pointer' }}>
        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
-        <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)' }}>نمونه {toFa(i + 1)}</span>
+        <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)' }}>{w.label || `نمونه ${toFa(i + 1)}`}</span>
         <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{num(w.weight) ? `${toFa(Number(num(w.weight)))} گرم` : 'بدون وزن'}</span>
        </div>
        <button type="button" onClick={(e) => { e.stopPropagation(); setForm(f => ({ ...f, weightSamples: f.weightSamples.filter(x => x.id !== w.id) })); if (expandedId === w.id) setExpandedId(null); }} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
       </div>
       {expandedId === w.id && (<>
+       <Field label="عنوان (اختیاری)">
+        <Input placeholder="مثلاً قفس ۱ یا سالن شرقی" value={w.label || ''} onChange={e => setForm(f => ({ ...f, weightSamples: f.weightSamples.map(x => x.id === w.id ? { ...x, label: e.target.value } : x) }))} />
+       </Field>
        <Grid2>
         <Field label="وزن (گرم)" error={showError(`weightSamples.${i}.weight`)}>
          <NumField placeholder="۰" value={w.weight} onBlur={() => markTouched(`weightSamples.${i}.weight`)} onChange={e => setForm(f => ({ ...f, weightSamples: f.weightSamples.map(x => x.id === w.id ? { ...x, weight: e.target.value } : x) }))} unit="گرم" min={0} />

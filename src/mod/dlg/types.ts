@@ -19,7 +19,7 @@ export interface F {
   feedMethodFromHall?: string;
   waterMethodFromHall?: string;
   waterAmount: string; waterFillCount: string; waterFillVolume: string;
-  weightSamples: { id: string; weight: string }[];
+  weightSamples: { id: string; weight: string; label?: string }[];
   eatingEggs: string; fertileEggs: string; brokenEggs: string; otherEggs: string;
   weightGender: '' | 'male' | 'female' | 'mixed';
   deaths: Death[];
