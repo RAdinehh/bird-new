@@ -314,30 +314,53 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
     const tone = exceeds ? 'danger' : (totalDeaths > 0 ? 'warn' : 'accent');
 
     return (
-     <SummaryCard tone={tone}>
-      {totalDeaths > 0 && (
-       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <span>تلفات:</span>
-        <b style={{ color: exceeds ? 'var(--danger)' : 'var(--text)' }}>
-         {toFa(totalDeaths)} پرنده{flockAliveCount ? ` از ${toFa(flockAliveCount)}` : ''}{exceeds && ' ⚠️'}
-        </b>
-       </div>
-      )}
-      {vaccineCount > 0 && (
-       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <span>واکسن:</span>
-        <b style={{ color: 'var(--text)' }}>{toFa(vaccineCount)} مورد</b>
-       </div>
-      )}
-      {medsTotal > 0 && (
-       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <span>دارو:</span>
-        <b style={{ color: 'var(--text)' }}>
-         {toFa(medsTotal)} مورد{medsHerbal > 0 ? ` (${toFa(medsChem)} 💊 + ${toFa(medsHerbal)} 🌿)` : ''}
-        </b>
-       </div>
-      )}
-     </SummaryCard>
+      <SummaryCard tone={tone}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
+          {totalDeaths > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 4 }}>
+              <span style={{ fontWeight: 700, color: exceeds ? 'var(--danger)' : 'var(--text)' }}>تلفات:</span>
+              <span style={{ textAlign: 'left' }}>
+                {toFa(totalDeaths)} پرنده {flockAliveCount ? `از ${toFa(flockAliveCount)}` : ''} {exceeds && '⚠️'}
+                {form.deaths.filter(d => d.cause).length > 0 && (
+                  <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'block' }}>
+                    (علت: {form.deaths.map(d => d.cause).filter(Boolean).join('، ')})
+                  </span>
+                )}
+              </span>
+            </div>
+          )}
+          
+          {vaccineCount > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px dashed var(--border)', paddingTop: 6 }}>
+              <span style={{ fontWeight: 700 }}>واکسن‌ها ({toFa(vaccineCount)} مورد):</span>
+              <ul style={{ margin: 0, paddingRight: 16, fontSize: 'var(--fs-sm)', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {form.vaccines.map((v, idx) => (
+                  <li key={v.id || idx} style={{ wordBreak: 'break-word' }}>
+                    <b>{v.name || 'بدون نام'}</b>
+                    {v.dose && <span style={{ color: 'var(--muted)' }}> (دوز: {v.dose})</span>}
+                    {v.quantity ? <span style={{ color: 'var(--accent)' }}> [مقدار: {toFa(v.quantity)} {v.unit || ''}]</span> : null}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {medsTotal > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px dashed var(--border)', paddingTop: 6 }}>
+              <span style={{ fontWeight: 700 }}>داروها ({toFa(medsTotal)} مورد {medsHerbal > 0 ? `[${toFa(medsChem)} 💊 + ${toFa(medsHerbal)} 🌿]` : ''}):</span>
+              <ul style={{ margin: 0, paddingRight: 16, fontSize: 'var(--fs-sm)', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {form.medications.map((m, idx) => (
+                  <li key={m.id || idx} style={{ wordBreak: 'break-word' }}>
+                    <b>{m.name || 'بدون نام'}</b>
+                    {m.dose && <span style={{ color: 'var(--muted)' }}> (دوز: {m.dose})</span>}
+                    {m.quantity ? <span style={{ color: 'var(--accent)' }}> [مقدار: {toFa(m.quantity)} {m.unit || ''}]</span> : null}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </SummaryCard>
     );
    })()}
 
