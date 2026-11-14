@@ -27,6 +27,10 @@ interface Props {
   headerAction?: React.ReactNode;
   /** 🆕 شناسه برای scroll خودکار از URL ?focus=xxx */
   'data-focus-id'?: string;
+  /** 🆕 حالت کارت: outer (پیش‌فرض، بیرونی) یا inner (داخلی — بدون آیکون بزرگ/شورون/نوار رنگی، با دکمه حذف) */
+  variant?: 'outer' | 'inner';
+  /** 🆕 تابع حذف — دکمه X قرمز (فقط در حالت inner) */
+  onDelete?: () => void;
 }
 
 const COLORS: Record<AccentKey, { c: string; s: string }> = {
@@ -46,6 +50,8 @@ export default function ExpandableCard({
   title, subtitle, badge, summary, stats, isOpen, onToggle, children,
   id, ms, onTap, headerAction,
   'data-focus-id': focusId,
+  variant = 'outer',
+  onDelete,
 }: Props) {
   const lowPower = useSet((st: any) => st.lowPowerMode);
   const [prefersReduced, setPrefersReduced] = useState(false);
@@ -59,6 +65,96 @@ export default function ExpandableCard({
     } catch { /* silent */ }
   }, []);
   const noAnim = !!(lowPower || prefersReduced);
+
+  // ─── Inner variant: کارت‌های داخلی (بدون آیکون بزرگ، بدون شورون، با دکمه حذف) ───
+  if (variant === 'inner') {
+    const innerColor = (COLORS[accent] || COLORS.accent).c;
+    return (
+      <div
+        data-focus-id={focusId}
+        style={{
+          position: 'relative',
+          background: 'var(--card-solid)',
+          border: '1px solid ' + (isOpen ? innerColor : 'var(--border)'),
+          borderRadius: 'var(--r-md)',
+          marginBottom: 8,
+          transition: 'border-color var(--dur-base)',
+        }}
+      >
+        <div
+          role="button"
+          tabIndex={0}
+          aria-expanded={isOpen}
+          aria-label={(isOpen ? 'بستن ' : 'باز کردن ') + title}
+          onClick={() => { if (onTap) onTap(); else onToggle(); }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              if (onTap) onTap(); else onToggle();
+            }
+          }}
+          style={{
+            padding: 'var(--pad-normal)',
+            cursor: 'pointer',
+            outline: 'none',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            touchAction: 'manipulation',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</div>
+              {subtitle && (
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>{subtitle}</div>
+              )}
+            </div>
+            {headerAction && (
+              <div onClick={(e) => e.stopPropagation()} style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+                {headerAction}
+              </div>
+            )}
+            {onDelete && (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                aria-label="حذف"
+                style={{
+                  background: 'var(--danger-soft)',
+                  border: '1px solid var(--danger)',
+                  color: 'var(--danger)',
+                  cursor: 'pointer',
+                  borderRadius: 'var(--r-sm)',
+                  width: 28,
+                  height: 28,
+                  padding: 0,
+                  fontFamily: 'inherit',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >✕</button>
+            )}
+          </div>
+        </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateRows: isOpen ? '1fr' : '0fr',
+            transition: noAnim ? 'none' : 'grid-template-rows 250ms cubic-bezier(.16,1,.3,1)',
+          }}
+        >
+          <div style={{ overflow: 'hidden' }}>
+            <div style={{ padding: '0 var(--pad-normal) var(--pad-normal)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {children}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // ─── Multi-Select ───
   const isSelectionMode = !!(ms && ms.selectionMode);
