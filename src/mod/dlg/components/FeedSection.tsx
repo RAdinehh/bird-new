@@ -3,7 +3,7 @@
  * IDEA-25: پشتیبانی چند منبع دان (backward-compatible)
  */
 import { useMemo, useState } from 'react';
-import { Field, Grid2, NumField, Btn, Select, Sheet, AlertBox, Tag, SummaryCard } from '../../../shr/components/ui';
+import { Field, Grid2, NumField, Btn, Select, Sheet, AlertBox, Tag, SummaryCard, QuantityUnitInput, type UnitOption } from '../../../shr/components/ui';
 import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { UNIT_LABEL } from '../../whs/store';
@@ -26,6 +26,20 @@ interface Props {
  vErrors: Record<string, string>;
  showError: (field: string) => string | undefined;
  markTouched: (field: string) => void;
+}
+
+function getFeedUnitOpts(src: FeedSource, feedItems: any[]): UnitOption[] {
+  if (src.type === 'formula') {
+    return [{ value: 'kg', label: 'کیلوگرم', factor: 1 }];
+  }
+  const it = feedItems.find((x: any) => x.id === src.refId);
+  if (!it) return [{ value: 'kg', label: 'کیلوگرم', factor: 1 }];
+  const baseUnit = it.unit as string;
+  const opts: UnitOption[] = [{ value: baseUnit, label: (UNIT_LABEL as any)[baseUnit] || baseUnit, factor: 1 }];
+  (it.subUnits || []).forEach((su: any) => {
+    opts.push({ value: su.name, label: su.name, factor: su.factor });
+  });
+  return opts;
 }
 
 export default function FeedSection({ form, setForm }: Props) {
@@ -223,7 +237,7 @@ export default function FeedSection({ form, setForm }: Props) {
        </div>
        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
         {src.quantity > 0 && (
-         <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, color: `var(--${finalSummaryTone})` }}>{toFa(src.quantity)} {unitLabel}</span>
+         <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, color: `var(--${finalSummaryTone})` }}>{toFa(src.displayValue ?? src.quantity)} {src.displayUnit ? ((UNIT_LABEL as any)[src.displayUnit] || src.displayUnit) : unitLabel}</span>
         )}
         <button type="button" onClick={(e) => { e.stopPropagation(); removeSource(idx); }} aria-label="حذف منبع" style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit', fontWeight: 700 }}>✕</button>
        </div>
@@ -237,9 +251,9 @@ export default function FeedSection({ form, setForm }: Props) {
           <SmartSelect
            value={src.refId ? (src.type === 'formula' ? 'f:' : 'i:') + src.refId : ''}
            onChange={val => {
-            if (val.startsWith('f:')) updateSource(idx, { type: 'formula', refId: val.slice(2) });
-            else if (val.startsWith('i:')) updateSource(idx, { type: 'item', refId: val.slice(2) });
-            else updateSource(idx, { type: 'item', refId: '' });
+            if (val.startsWith('f:')) updateSource(idx, { type: 'formula', refId: val.slice(2), displayUnit: undefined, displayValue: undefined });
+            else if (val.startsWith('i:')) updateSource(idx, { type: 'item', refId: val.slice(2), displayUnit: undefined, displayValue: undefined });
+            else updateSource(idx, { type: 'item', refId: '', displayUnit: undefined, displayValue: undefined });
            }}
            options={[
             ...formulas.map(f => ({ value: 'f:' + f.id, label: f.name, subtitle: `${toFa(f.lines.length)} ماده`, group: 'formula' })),
@@ -252,9 +266,24 @@ export default function FeedSection({ form, setForm }: Props) {
            autoThreshold={6}
           />
          </Field>
-         <Field label="مقدار (kg)">
-          <NumField placeholder="۵۰" value={src.quantity > 0 ? String(src.quantity) : ''} onChange={e => updateSource(idx, { quantity: parseFloat(toEn(e.target.value)) || 0 })} unit="kg" min={0} />
-         </Field>
+         <QuantityUnitInput
+            label="مقدار"
+            value={src.displayValue !== undefined ? src.displayValue : (src.quantity > 0 ? src.quantity : '')}
+            unit={src.displayUnit || 'kg'}
+            options={getFeedUnitOpts(src, feedItems)}
+            onChange={val => {
+              const numVal = parseFloat(toEn(val).replace('٫','.')) || 0;
+              const opts = getFeedUnitOpts(src, feedItems);
+              const factor = opts.find(o => o.value === (src.displayUnit || 'kg'))?.factor || 1;
+              updateSource(idx, { displayValue: numVal, quantity: numVal * factor });
+            }}
+            onUnitChange={u => {
+              const opts = getFeedUnitOpts(src, feedItems);
+              const factor = opts.find(o => o.value === u)?.factor || 1;
+              const qtyKg = src.quantity;
+              updateSource(idx, { displayUnit: u, displayValue: factor > 0 ? qtyKg / factor : qtyKg });
+            }}
+          />
         </Grid2>
 
         {f && (

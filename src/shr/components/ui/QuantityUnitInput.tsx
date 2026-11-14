@@ -18,9 +18,10 @@ interface Props {
   error?: string;
   placeholder?: string;
   onTouch?: () => void;
+  label?: string;
 }
 
-export function QuantityUnitInput({ value, onChange, unit, onUnitChange, options, error, placeholder, onTouch }: Props) {
+export function QuantityUnitInput({ value, onChange, unit, onUnitChange, options, error, placeholder, onTouch, label }: Props) {
   const currentUnit = options.find(o => o.value === unit);
   const baseUnitOpt = options.find(o => o.factor === 1) || options[0];
 
@@ -33,7 +34,7 @@ export function QuantityUnitInput({ value, onChange, unit, onUnitChange, options
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
       <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <Field label="مقدار مصرفی" error={error} onTouch={onTouch}>
+          <Field label={label || "مقدار مصرفی"} error={error} onTouch={onTouch}>
             <NumField
               placeholder={placeholder || '۰'}
               value={value}

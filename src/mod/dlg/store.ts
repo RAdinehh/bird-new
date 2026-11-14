@@ -54,8 +54,12 @@ export interface FeedSource {
   id: string;
   type: 'formula' | 'item';
   refId: string;
-  /** مقدار مصرفی به کیلوگرم */
+  /** مقدار مصرفی به کیلوگرم (واحد پایه — همیشه) */
   quantity: number;
+  /** 🆕 واحد نمایشی (فقط UI) */
+  displayUnit?: string;
+  /** 🆕 مقدار نمایشی (فقط UI) */
+  displayValue?: number;
 }
 
 export interface DailyLogCorrection {
