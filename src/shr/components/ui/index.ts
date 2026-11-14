@@ -27,3 +27,4 @@ export * from './AlertBox';
 export * from './SummaryCard';
 export * from './QuantityUnitInput';
 export * from './KpiCard';
+export * from './StatBox';
