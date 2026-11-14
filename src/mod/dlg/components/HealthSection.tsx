@@ -62,7 +62,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
       <Btn full onClick={() => {
        const newId = crypto.randomUUID();
        setForm(f => ({ ...f, vaccines: [...f.vaccines, { id: newId, name: '', dose: '', method: '', reaction: '', itemId: '', quantity: null, movementId: '' }] }));
-       setExpandedId('v-' + newId);
+       setExpandedId('v-' + newId); setTimeout(() => { const el = document.getElementById(`health-vaccine-${newId}`); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150);
       }}>
        + واکسن
       </Btn>
@@ -71,7 +71,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
       <Btn full onClick={() => {
        const newId = crypto.randomUUID();
        setForm(f => ({ ...f, medications: [...f.medications, { id: newId, name: '', dose: '', method: '', withdrawalDays: null, itemId: '', quantity: null, movementId: '' }] }));
-       setExpandedId('m-' + newId);
+       setExpandedId('m-' + newId); setTimeout(() => { const el = document.getElementById(`health-med-${newId}`); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150);
       }}>
        + دارو
       </Btn>
