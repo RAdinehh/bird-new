@@ -137,6 +137,21 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         <Input placeholder="مثلاً ۰.۲ سی‌سی" value={v.dose} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, dose: e.target.value } : x) }))} />
        </Field>
       </Grid2>
+      <Grid2>
+       <Field label="روش مصرف">
+        <Select value={v.method || ''} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, method: e.target.value } : x) }))}>
+         <option value="">— نامشخص —</option>
+         <option value="eye_drop">قطره چشمی</option>
+         <option value="injection">تزریق</option>
+         <option value="drinking_water">آشامیدنی</option>
+         <option value="spray">اسپری</option>
+         <option value="wing_web">بال زدن (Wing Web)</option>
+        </Select>
+       </Field>
+       <Field label="واکنش">
+        <Input placeholder="مثلاً بدون واکنش" value={v.reaction || ''} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, reaction: e.target.value } : x) }))} />
+       </Field>
+      </Grid2>
       {vaccineItems.length > 0 && (
        <Grid2>
         <Field label={<>از انبار <Tag tone="blue">{toFa(vaccineItems.length)} نوع</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)">
