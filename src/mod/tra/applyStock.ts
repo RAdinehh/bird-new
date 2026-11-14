@@ -85,6 +85,7 @@ function ensureItem(it: InvoiceItem, inv: Invoice, whs: any): string {
       brand: (it as any).brand || '', hallId: (it as any).hallId || '',
       equipmentStatus: (it as any).equipmentStatus || '',
       usageType: (it as any).usageType || '',
+      usageTypes: (it as any).usageTypes || [],
       purchaseDate: inv.deliveryDate || inv.date || '',
       purchasePrice: Number(it.unitPrice) || 0,
     } as any);

@@ -2,6 +2,7 @@
 
 export const VET_METHOD_LABEL: Record<string, string> = {
   water: '💧 آشامیدنی (در آب)',
+  drinking_water: '💧 آشامیدنی (در آب)',
   oral: '🍽 خوراکی',
   injection: '💉 تزریقی',
   injectable: '💉 تزریقی',

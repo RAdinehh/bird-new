@@ -16,6 +16,7 @@ import { useFlk } from '../../flk/store';
 import type { F } from '../types';
 import { FieldHint } from '../../../shr/intelligence/FieldHint';
 import { calculateHealthDose } from '../../../shr/calc/formulas/health';
+import { VET_METHOD_OPTIONS } from '../../../shr/constants/vetMethods';
 import type { HealthRoute } from '../../../shr/calc/types';
 
 interface Props {
@@ -27,6 +28,15 @@ interface Props {
  medicineEnabled: boolean;
  showError: (field: string) => string | undefined;
  markTouched: (field: string) => void;
+}
+
+function getAllowedMethods(item: any): typeof VET_METHOD_OPTIONS {
+  if (!item) return VET_METHOD_OPTIONS;
+  const raw: string[] = item.usageTypes || (item.usageType ? [item.usageType] : []);
+  if (raw.length === 0) return VET_METHOD_OPTIONS;
+  const normalize = (k: string) => k === 'water' ? 'drinking_water' : k === 'injectable' ? 'injection' : k;
+  const normalized = raw.map(normalize);
+  return VET_METHOD_OPTIONS.filter(o => normalized.includes(o.value));
 }
 
 export default function HealthSection({ form, setForm, vErrors, flockAliveCount, vaccineEnabled, medicineEnabled, showError, markTouched }: Props) {
@@ -151,7 +161,14 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         <Field label={<>از انبار <Tag tone="blue">{toFa(vaccineItems.length)} نوع</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)">
           <SmartSelect
             value={v.itemId || ''}
-            onChange={id => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null } : x) }))}
+            onChange={id => setForm(f => ({
+          ...f,
+          vaccines: f.vaccines.map(x => {
+            if (x.id !== v.id) return x;
+            const newItem = vaccineItems.find(w => w.id === id);
+            return { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null, name: newItem ? newItem.name : x.name };
+          })
+        }))}
             options={vaccineItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}` }))}
             placeholder="— متصل نکن —"
             modalTitle="انتخاب از انبار"
@@ -172,7 +189,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         const hasSub = opts.length > 1;
         const vaccineItemCalc = vaccineItems.find(w => w.id === v.itemId);
         const vCalc = vaccineItemCalc ? calculateHealthDose({
-          route: (vaccineItemCalc.usageType || '') as HealthRoute,
+          route: ((v.method === 'drinking_water' ? 'water' : v.method === 'injection' ? 'injectable' : v.method) || '') as HealthRoute,
           waterAmountL: parseFloat(toEn(form.waterAmount)) || 0,
           aliveCount: flockAliveCount || 0,
           dosePerBirdMl: vaccineItemCalc.dosePerBird ?? null,
@@ -218,13 +235,9 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
           <Field label="روش مصرف">
             <Select value={v.method || ''} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, method: e.target.value } : x) }))}>
               <option value="">— نامشخص —</option>
-              <option value="drinking_water">آشامیدنی (در آب)</option>
-              <option value="feed">خوراکی (مخلوط با دان)</option>
-              <option value="eye_drop">قطره چشمی / بینی</option>
-              <option value="injection">تزریقی (عضلانی/زیرجلدی)</option>
-              <option value="spray">اسپری</option>
-              <option value="wing_web">بال زدن (Wing Web)</option>
-              <option value="topical">موضعی</option>
+              {getAllowedMethods(vaccineItems.find(w => w.id === v.itemId)).map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
             </Select>
           </Field>
         );
@@ -301,7 +314,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         const hasSub = opts.length > 1;
         const medItemCalc = medicineItems.find(w => w.id === m.itemId);
         const mCalc = medItemCalc ? calculateHealthDose({
-          route: (medItemCalc.usageType || '') as HealthRoute,
+          route: ((m.method === 'drinking_water' ? 'water' : m.method === 'injection' ? 'injectable' : m.method) || '') as HealthRoute,
           waterAmountL: parseFloat(toEn(form.waterAmount)) || 0,
           aliveCount: flockAliveCount || 0,
           dosePerBirdMl: medItemCalc.dosePerBird ?? null,
@@ -347,12 +360,9 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
           <Field label="روش مصرف">
             <Select value={m.method || ''} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, method: e.target.value } : x) }))}>
               <option value="">— نامشخص —</option>
-              <option value="drinking_water">آشامیدنی (در آب)</option>
-              <option value="feed">خوراکی (مخلوط با دان)</option>
-              <option value="injection">تزریقی (عضلانی/زیرجلدی)</option>
-              <option value="oral">دهانی (فردی/با سرنگ)</option>
-              <option value="spray">اسپری</option>
-              <option value="topical">موضعی</option>
+              {getAllowedMethods(medicineItems.find(w => w.id === m.itemId)).map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
             </Select>
           </Field>
         );

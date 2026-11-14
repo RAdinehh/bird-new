@@ -87,6 +87,7 @@ function autoLinkIngredient(ing: { name: string; category: string; price: number
       hallId: '',
       equipmentStatus: '',
       usageType: '',
+      usageTypes: [],
       purchaseDate: '',
       purchasePrice: ing.price || 0,
     } as any);

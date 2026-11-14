@@ -73,7 +73,7 @@ interface F {
   methionine: string;
   lysine: string;
   // ─── دارو/واکسن ───
-  usageType: string;
+  usageTypes: string[];
   productionDate: string;
   dosePerBird: string;
   dosePerLiter: string;
@@ -86,7 +86,7 @@ const empty = (): F => ({
   withdrawalDays: '', storage: 'room',
   notes: '',
   purchaseDate: '', purchasePrice: '', hallId: '', equipmentStatus: 'active', warrantyUntil: '', initialPrice: '',
-  usageType: '', productionDate: '', dosePerBird: '',
+  usageTypes: [], productionDate: '', dosePerBird: '',
     dosePerLiter: '',
     feedType: '', brand: '',
     protein: '', energy: '', fat: '', fiber: '',
@@ -225,7 +225,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
       equipmentStatus: it.equipmentStatus || 'active',
       warrantyUntil: it.warrantyUntil || '',
       initialPrice: '',
-      usageType: it.usageType || '',
+      usageTypes: (() => { const raw: string[] = (it as any).usageTypes || ((it as any).usageType ? [(it as any).usageType] : []); return raw.map((t: string) => t === 'water' ? 'drinking_water' : t === 'injectable' ? 'injection' : t); })(),
       productionDate: it.productionDate || '',
       dosePerBird: it.dosePerBird ? toFa(it.dosePerBird) : '',
       dosePerLiter: it.dosePerLiter !== null && it.dosePerLiter !== undefined ? toFa(it.dosePerLiter) : '',
@@ -303,7 +303,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         equipmentStatus: form.category === 'equipment' ? form.equipmentStatus : '',
         warrantyUntil: form.category === 'equipment' ? form.warrantyUntil : '',
         initialPrice: num(form.initialPrice),
-        usageType: isMed ? form.usageType : '',
+        usageTypes: isMed ? form.usageTypes : [],
         productionDate: isMed ? form.productionDate : '',
         dosePerBird: isMed && form.dosePerBird.trim() !== '' ? num(form.dosePerBird) : 0,
         dosePerLiter: isMed && form.dosePerLiter.trim() !== '' ? num(form.dosePerLiter) : null,
@@ -336,7 +336,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         hallId: form.category === 'equipment' ? form.hallId : '',
         equipmentStatus: form.category === 'equipment' ? form.equipmentStatus : '',
         warrantyUntil: form.category === 'equipment' ? form.warrantyUntil : '',
-        usageType: isMed ? form.usageType : '',
+        usageTypes: isMed ? form.usageTypes : [],
         productionDate: isMed ? form.productionDate : '',
         dosePerBird: isMed && form.dosePerBird.trim() !== '' ? num(form.dosePerBird) : 0,
         dosePerLiter: isMed && form.dosePerLiter.trim() !== '' ? num(form.dosePerLiter) : null,

@@ -8,6 +8,8 @@ import SmartSelect from '../../../shr/components/SmartSelect';
 import { toFa } from '../../../shr/utils/fa';
 import { FieldHint } from '../../../shr/intelligence';
 import { CATEGORY_DEFAULTS, UNIT_LABEL, CATEGORY_ICON, CATEGORY_LABEL, type ItemUnit, type ItemCategory } from '../store';
+import { ToggleChip } from '../../../shr/components/itemFormHelpers';
+import { VET_METHOD_OPTIONS } from '../../../shr/constants/vetMethods';
 import HerbalForm from '../../../shr/components/HerbalForm';
 
 export interface ItemsFormModalProps {
@@ -191,13 +193,20 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
                 <SectionTitle>💊 اطلاعات مصرف</SectionTitle>
                 <Grid3>
                   <Field label="نوع مصرف">
-                    <Select value={form.usageType} onChange={e => setForm({ ...form, usageType: e.target.value })}>
-                      <option value="">— انتخاب —</option>
-                      <option value="oral">🍽 خوراکی</option>
-                      <option value="injectable">💉 تزریقی</option>
-                      <option value="water">💧 محلول</option>
-                      <option value="spray">🌫 اسپری</option>
-                    </Select>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {VET_METHOD_OPTIONS.map(o => (
+                        <ToggleChip
+                          key={o.value}
+                          label={o.label}
+                          active={(form.usageTypes || []).includes(o.value)}
+                          onClick={() => {
+                            const arr: string[] = form.usageTypes || [];
+                            const next = arr.includes(o.value) ? arr.filter((v: string) => v !== o.value) : [...arr, o.value];
+                            setForm({ ...form, usageTypes: next });
+                          }}
+                        />
+                      ))}
+                    </div>
                   </Field>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
                     <Field label="دوز هر پرنده" hint="اختیاری" error={showError?.('dosePerBird')} onTouch={() => markTouched?.('dosePerBird')}>

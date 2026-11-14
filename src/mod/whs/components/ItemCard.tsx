@@ -100,7 +100,11 @@ export default function ItemCard(props: ItemCardProps) {
           ) : null}
           {it.withdrawalDays !== null && it.withdrawalDays !== undefined ? <Row l="دوره منع مصرف" v={`${toFa(it.withdrawalDays)} روز`} /> : null}
           {it.storage ? <Row l="نگهداری" v={(STORAGE_LABEL as any)[it.storage] || it.storage} /> : null}
-          {it.usageType ? <Row l="نوع مصرف" v={VET_METHOD_LABEL[it.usageType] || it.usageType} /> : null}
+          {(() => {
+    const arr: string[] = (it as any).usageTypes || ((it as any).usageType ? [(it as any).usageType] : []);
+    if (arr.length === 0) return null;
+    return <Row l="نوع مصرف" v={arr.map((t: string) => VET_METHOD_LABEL[t] || t).join(' • ')} />;
+  })()}
           {it.dosePerBird ? <Row l="دوز هر پرنده" v={`${toFa(it.dosePerBird)} ml`} /> : null}
           {it.productionDate ? <Row l="تاریخ تولید" v={toFa(it.productionDate)} /> : null}
         </>

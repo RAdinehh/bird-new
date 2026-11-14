@@ -47,7 +47,8 @@ export interface Item {
   equipmentStatus?: string;        // active | repair | scrapped
   warrantyUntil?: string;          // گارانتی تا
   // ─── فیلدهای دارو/واکسن ───
-  usageType?: string;              // oral | injectable | water | spray
+  usageType?: string;              // deprecated
+  usageTypes?: string[];           // آرایه
   productionDate?: string;         // تاریخ تولید
   dosePerBird?: number;            // دوز مصرفی هر پرنده
   dosePerLiter?: number | null;    // دوز در هر لیتر آب (آشامیدنی)

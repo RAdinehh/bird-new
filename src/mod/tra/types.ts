@@ -119,6 +119,7 @@ export interface InvoiceItem extends ItemCategoryFields {
   flockName?: string;
   storage?: string;
   usageType?: string;
+  usageTypes?: string[];
   costType?: string;
   equipmentCategory?: string;
   equipmentType?: string;
