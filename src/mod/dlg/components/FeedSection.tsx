@@ -246,7 +246,7 @@ export default function FeedSection({ form, setForm }: Props) {
       {/* Body */}
       {isExpanded && (
        <>
-        <Grid2>
+        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr', gap: 8, alignItems: 'end' }}>
          <Field label={<>انتخاب منبع <HelpIcon text="**منطق انتخاب منبع:** شما می‌توانید در یک وعده، هم از **جیره آماده** و هم از **دان تکی** (مثل ذرت یا کنجاله) استفاده کنید. اگر جیره انتخاب کنید، سیستم به‌طور خودکار مواد اولیه آن جیره را بر اساس درصدهایش از انبار کسر می‌کند. اگر دان تکی انتخاب کنید، فقط همان آیتم از انبار کم می‌شود." /></>}>
           <SmartSelect
            value={src.refId ? (src.type === 'formula' ? 'f:' : 'i:') + src.refId : ''}
@@ -266,7 +266,7 @@ export default function FeedSection({ form, setForm }: Props) {
            autoThreshold={6}
           />
          </Field>
-         <QuantityUnitInput
+         <QuantityUnitInput layout="grid"
             label="مقدار"
             value={src.displayValue !== undefined ? src.displayValue : (src.quantity > 0 ? src.quantity : '')}
             unit={src.displayUnit || 'kg'}
@@ -284,7 +284,7 @@ export default function FeedSection({ form, setForm }: Props) {
               updateSource(idx, { displayUnit: u, displayValue: factor > 0 ? qtyKg / factor : qtyKg });
             }}
           />
-        </Grid2>
+        </div>
 
         {f && (
          <div style={{ padding: 8, background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 4 }}>
