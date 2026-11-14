@@ -54,6 +54,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
       const newId = crypto.randomUUID();
       setForm(f => ({ ...f, deaths: [...f.deaths, { id: newId, count: 0, cause: '', notes: '' }] }));
       setExpandedId('d-' + newId);
+      setTimeout(() => { const el = document.getElementById(`health-death-${newId}`); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150);
      }}>
       + تلفات
      </Btn>
