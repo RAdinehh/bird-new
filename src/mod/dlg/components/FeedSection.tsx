@@ -3,6 +3,7 @@
  * IDEA-25: پشتیبانی چند منبع دان (backward-compatible)
  */
 import { useMemo, useState } from 'react';
+import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { Field, Grid2, NumField, Btn, Select, Sheet, AlertBox, Tag, SummaryCard, QuantityUnitInput, type UnitOption } from '../../../shr/components/ui';
 import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
 import SmartSelect from '../../../shr/components/SmartSelect';
@@ -131,7 +132,7 @@ export default function FeedSection({ form, setForm }: Props) {
     syncSources([...sources, { id: newId, type: 'item', refId: '', quantity: 0 }]);
     setExpandedSourceId(newId);
     setTimeout(() => {
-      const el = document.getElementById(`feed-src-${newId}`);
+      const el = document.querySelector(`[data-focus-id="feed-src-${newId}"]`);
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 150);
   };
@@ -237,21 +238,20 @@ export default function FeedSection({ form, setForm }: Props) {
     const unitLabel = UNIT_LABEL['kg'] || 'کیلوگرم';
 
     return (
-     <div key={src.id} id={'feed-src-' + src.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${isExpanded ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
+     <ExpandableCard
+       key={src.id}
+       data-focus-id={'feed-src-' + src.id}
+       variant="inner"
+       accent="accent"
+       title={title}
+       subtitle={subtitle}
+       isOpen={isExpanded}
+       onToggle={() => setExpandedSourceId(isExpanded ? null : src.id)}
+       onDelete={() => removeSource(idx)}
+      >
       
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: isExpanded ? 'default' : 'pointer' }} onClick={() => setExpandedSourceId(isExpanded ? null : src.id)}>
-       <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
-        <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</span>
-        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{subtitle}</span>
-       </div>
-       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-        {src.quantity > 0 && (
-         <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, color: `var(--${finalSummaryTone})` }}>{toFa(src.displayValue ?? src.quantity)} {src.displayUnit ? ((UNIT_LABEL as any)[src.displayUnit] || src.displayUnit) : unitLabel}</span>
-        )}
-        <button type="button" onClick={(e) => { e.stopPropagation(); removeSource(idx); }} aria-label="حذف منبع" style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit', fontWeight: 700 }}>✕</button>
-       </div>
-      </div>
+      
 
       {/* Body */}
       {isExpanded && (
@@ -359,7 +359,7 @@ export default function FeedSection({ form, setForm }: Props) {
         })()}
        </>
       )}
-     </div>
+     </ExpandableCard>
     );
    })}
 
