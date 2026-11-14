@@ -55,16 +55,7 @@ export function QuantityUnitInput({ value, onChange, unit, onUnitChange, options
         )}
       </div>
       {showPreview && (
-        <div style={{
-          padding: '4px 8px',
-          background: 'var(--warn-soft, rgba(255, 193, 7, 0.1))',
-          border: '1px solid var(--warn-border, rgba(255, 193, 7, 0.3))',
-          borderRadius: 'var(--r-sm)',
-          fontSize: 'var(--fs-xs)',
-          color: 'var(--warn-text, #b07d00)',
-          fontWeight: 600,
-          textAlign: 'center'
-        }}>
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600, paddingRight: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           💡 {toFa(numVal)} {currentUnit?.label} = {toFa(numVal * (currentUnit?.factor || 1))} {baseUnitOpt?.label}
         </div>
       )}
