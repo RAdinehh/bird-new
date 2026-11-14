@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import ExpandableCard from '../../../shr/components/ExpandableCard';
 /**
  * EggsWeightSection — تخم و وزن‌کشی
  */
@@ -114,7 +115,7 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
      setForm(f => ({ ...f, weightSamples: [...f.weightSamples, { id: newId, weight: '' }] }));
      setExpandedId(newId);
     setTimeout(() => {
-      const el = document.getElementById(`egg-weight-${newId}`);
+      const el = document.querySelector(`[data-focus-id="egg-weight-${newId}"]`);
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 150);
     }}>
@@ -122,14 +123,18 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
     </Btn>
 
    {form.weightSamples.map((w, i) => (
-     <div key={w.id} id={'egg-weight-' + w.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${expandedId === w.id ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <div onClick={() => setExpandedId(expandedId === w.id ? null : w.id)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: expandedId === w.id ? 'default' : 'pointer' }}>
-       <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
-        <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)' }}>نمونه {toFa(i + 1)}</span>
-        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{num(w.weight) ? `${toFa(Number(num(w.weight)))} گرم` : 'بدون وزن'}</span>
-       </div>
-       <button type="button" onClick={(e) => { e.stopPropagation(); setForm(f => ({ ...f, weightSamples: f.weightSamples.filter(x => x.id !== w.id) })); if (expandedId === w.id) setExpandedId(null); }} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
-      </div>
+     <ExpandableCard
+       key={w.id}
+       data-focus-id={'egg-weight-' + w.id}
+       variant="inner"
+       accent="accent"
+       title={`نمونه ${toFa(i + 1)}`}
+       subtitle={num(w.weight) ? `${toFa(Number(num(w.weight)))} گرم` : 'بدون وزن'}
+       isOpen={expandedId === w.id}
+       onToggle={() => setExpandedId(expandedId === w.id ? null : w.id)}
+       onDelete={() => { setForm(f => ({ ...f, weightSamples: f.weightSamples.filter(x => x.id !== w.id) })); if (expandedId === w.id) setExpandedId(null); }}
+      >
+      
       {expandedId === w.id && (<>
        <Grid2>
         <Field label="وزن (گرم)" error={showError(`weightSamples.${i}.weight`)}>
@@ -148,7 +153,7 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
         {renderSummary()}
        </div>
       </>)}
-     </div>
+     </ExpandableCard>
     ))}
 
     
