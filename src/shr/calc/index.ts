@@ -11,6 +11,7 @@ export { calculateEggMetrics } from './formulas/egg';
 export { calculateWeightMetrics } from './formulas/weight';
 export { calculateFeedMetrics } from './formulas/feed';
 export { calculateWaterMetrics } from './formulas/water';
+export { calculateHealthDose } from './formulas/health';
 export { calculateStockingDensity } from './formulas/stocking';
 export { calculateEPEF } from './formulas/epef';
 
