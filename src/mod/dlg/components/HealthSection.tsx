@@ -256,18 +256,17 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
          <option value="topical">موضعی</option>
         </Select>
        </Field>
+       {!isHerbal && (
+        <Field label="دوره پرهیز (روز)" hint="چند روز بعد از مصرف، گوشت و تخم قابل فروش نیست">
+         <NumField
+          placeholder="مثلاً ۷"
+          value={m.withdrawalDays !== null && m.withdrawalDays !== undefined ? String(m.withdrawalDays) : ''}
+          onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, withdrawalDays: e.target.value === '' ? null : (parseInt(toEn(e.target.value)) || null) } : x) }))}
+          unit="روز" min={0}
+         />
+        </Field>
+       )}
       </Grid2>
-
-      {!isHerbal && (
-       <Field label="دوره پرهیز (روز)" hint="چند روز بعد از مصرف، گوشت و تخم قابل فروش نیست">
-        <NumField
-         placeholder="مثلاً ۷"
-         value={m.withdrawalDays !== null && m.withdrawalDays !== undefined ? String(m.withdrawalDays) : ''}
-         onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, withdrawalDays: e.target.value === '' ? null : (parseInt(toEn(e.target.value)) || null) } : x) }))}
-         unit="روز" min={0}
-        />
-       </Field>
-      )}
       </>)}
      </div>
      );
