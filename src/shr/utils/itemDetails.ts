@@ -42,7 +42,7 @@ export const SALE_REASON_LABEL: Record<SaleReason, string> = {
 
 // ============ داروی گیاهی (طب سنتی) ============
 export type MedicineTemperament = 'moetadel' | 'garm_khoshk' | 'garm_tar' | 'sard_tar' | 'sard_khoshk';
-export type MedicineProperty = 'mohallel' | 'molattef' | 'mojaffef' | 'jali' | 'mokhaddar' | 'moshakhen' | 'moshhel' | 'moder' | 'moghvi' | 'ghabez' | 'mofatteh' | 'monzej';
+export type MedicineProperty = 'mohallel' | 'molattef' | 'mojaffef' | 'jali' | 'mokhaddar' | 'moshakhen' | 'moshhel' | 'moder' | 'moghvi' | 'ghabez' | 'mofatteh' | 'monzej' | 'mosakhkhen' | 'mobared' | 'moleyyen' | 'moqatte' | 'mofarreh' | 'hazem' | 'monaqqi' | 'morkhi';
 export type MedicineForm = 'tabikh' | 'dam_karde' | 'safuf' | 'hab' | 'sharbat' | 'roghan' | 'marham' | 'zemad' | 'zuruf' | 'qutur' | 'saut' | 'nafukh' | 'bokhur' | 'shiyaf' | 'fatileh' | 'farzjah';
 export type MedicineUseMethod = 'tanavol' | 'bal' | 'estenshaq' | 'bokhur_dadan' | 'chekandan_bini' | 'chekandan_cheshm' | 'malidan' | 'tala' | 'zemad_kardan' | 'pashidan' | 'abzan' | 'tanqieh' | 'gharar_shiyaf' | 'gharar_fatileh';
 export type MedicineTime = 'sobh' | 'zohr' | 'asr' | 'shab' | 'nAshta' | 'qabl_ghaza' | 'bad_ghaza';
@@ -59,6 +59,8 @@ export const PROPERTY_LABEL: Record<MedicineProperty, string> = {
   mohallel: 'محلل', molattef: 'ملطف', mojaffef: 'مجفف', jali: 'جالی',
   mokhaddar: 'مخدر', moshakhen: 'مشخن', moshhel: 'مسهل', moder: 'مدر',
   moghvi: 'مقوی', ghabez: 'قابض', mofatteh: 'مفتح', monzej: 'منضج',
+  mosakhkhen: 'مسخن', mobared: 'مبرد', moleyyen: 'ملین', moqatte: 'مقطع',
+  mofarreh: 'مفرح', hazem: 'هاضم', monaqqi: 'منقی', morkhi: 'مرخی',
 };
 
 export { FORM_LABEL, USE_METHOD_LABEL } from '../constants/herbal';
