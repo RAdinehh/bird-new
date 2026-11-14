@@ -57,7 +57,7 @@ export function QuantityUnitInput({ value, onChange, unit, onUnitChange, options
           </div>
         )}
         {showPreview && (
-          <div style={{ gridColumn: '2 / -1', fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600, paddingRight: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <div style={{ gridColumn: '1 / 2', fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             💡 {toFa(numVal)} {currentUnit?.label} = {toFa(numVal * (currentUnit?.factor || 1))} {baseUnitOpt?.label}
           </div>
         )}
@@ -91,7 +91,7 @@ export function QuantityUnitInput({ value, onChange, unit, onUnitChange, options
         )}
       </div>
       {showPreview && (
-        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600, paddingRight: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           💡 {toFa(numVal)} {currentUnit?.label} = {toFa(numVal * (currentUnit?.factor || 1))} {baseUnitOpt?.label}
         </div>
       )}
