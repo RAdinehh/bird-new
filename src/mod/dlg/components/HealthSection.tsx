@@ -15,6 +15,8 @@ import { useWhs } from '../../whs/store';
 import { useFlk } from '../../flk/store';
 import type { F } from '../types';
 import { FieldHint } from '../../../shr/intelligence/FieldHint';
+import { calculateHealthDose } from '../../../shr/calc/formulas/health';
+import type { HealthRoute } from '../../../shr/calc/types';
 
 interface Props {
  form: F;
@@ -168,7 +170,17 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
       {(() => {
         const opts = buildUnitOptions(v.itemId, vaccineItems);
         const hasSub = opts.length > 1;
+        const vaccineItemCalc = vaccineItems.find(w => w.id === v.itemId);
+        const vCalc = vaccineItemCalc ? calculateHealthDose({
+          route: (vaccineItemCalc.usageType || '') as HealthRoute,
+          waterAmountL: parseFloat(toEn(form.waterAmount)) || 0,
+          aliveCount: flockAliveCount || 0,
+          dosePerBirdMl: vaccineItemCalc.dosePerBird ?? null,
+          dosePerLiter: vaccineItemCalc.dosePerLiter ?? null,
+        }) : null;
         const qtyField = v.itemId ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          
           <QuantityUnitInput
             error={showError(`vaccines.${i}.quantity`)}
             onTouch={() => markTouched(`vaccines.${i}.quantity`)}
@@ -180,7 +192,27 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
               setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, unit: u, factor: fct } : x) }));
             }}
             options={opts}
-          />
+          />          {vCalc && (
+            <div style={{ fontSize: 'var(--fs-xs)', color: vCalc.hasData ? 'var(--accent)' : 'var(--muted)', fontWeight: 600, marginTop: 2, paddingRight: 4 }}>
+              {vCalc.hasData
+                ? `💡 نیاز محاسبه‌شده: ${toFa(vCalc.requiredMl ?? 0)} میلی‌لیتر (${vCalc.reason})`
+                : `ℹ️ ${vCalc.reason}`}
+            </div>
+          )}
+          {vCalc?.hasData && (
+            <FieldHint
+              fieldPath="dlg.dose"
+              value={v.quantity || ''}
+              context={{
+                expected: vCalc.requiredMl ?? undefined,
+                expectedLabel: 'نیاز محاسبه‌شده',
+                expectedSource: 'context',
+                flockSize: flockAliveCount,
+              }}
+            />
+          )}
+          </div>
+
         ) : null;
         const methodField = (
           <Field label="روش مصرف">
@@ -267,7 +299,17 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
       {(() => {
         const opts = buildUnitOptions(m.itemId, medicineItems);
         const hasSub = opts.length > 1;
+        const medItemCalc = medicineItems.find(w => w.id === m.itemId);
+        const mCalc = medItemCalc ? calculateHealthDose({
+          route: (medItemCalc.usageType || '') as HealthRoute,
+          waterAmountL: parseFloat(toEn(form.waterAmount)) || 0,
+          aliveCount: flockAliveCount || 0,
+          dosePerBirdMl: medItemCalc.dosePerBird ?? null,
+          dosePerLiter: medItemCalc.dosePerLiter ?? null,
+        }) : null;
         const qtyField = m.itemId ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          
           <QuantityUnitInput
             error={showError(`medications.${i}.quantity`)}
             onTouch={() => markTouched(`medications.${i}.quantity`)}
@@ -279,7 +321,27 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
               setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, unit: u, factor: fct } : x) }));
             }}
             options={opts}
-          />
+          />          {mCalc && (
+            <div style={{ fontSize: 'var(--fs-xs)', color: mCalc.hasData ? 'var(--accent)' : 'var(--muted)', fontWeight: 600, marginTop: 2, paddingRight: 4 }}>
+              {mCalc.hasData
+                ? `💡 نیاز محاسبه‌شده: ${toFa(mCalc.requiredMl ?? 0)} میلی‌لیتر (${mCalc.reason})`
+                : `ℹ️ ${mCalc.reason}`}
+            </div>
+          )}
+          {mCalc?.hasData && (
+            <FieldHint
+              fieldPath="dlg.dose"
+              value={m.quantity || ''}
+              context={{
+                expected: mCalc.requiredMl ?? undefined,
+                expectedLabel: 'نیاز محاسبه‌شده',
+                expectedSource: 'context',
+                flockSize: flockAliveCount,
+              }}
+            />
+          )}
+          </div>
+
         ) : null;
         const methodField = (
           <Field label="روش مصرف">
