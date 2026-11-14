@@ -83,6 +83,36 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
           </Field>
         </Grid2>
 
+        <Field label="واحدهای فرعی (اختیاری)" hint="مثلاً ۱ کیسه = ۱۰ کیلوگرم">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {(form.subUnits || []).map((su: any, idx: number) => (
+              <div key={idx} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                <div style={{ flex: 1 }}>
+                  <Input placeholder="نام (مثلاً کیسه)" value={su.name} onChange={e => {
+                    const newSubs = [...(form.subUnits || [])];
+                    newSubs[idx].name = e.target.value;
+                    setForm({ ...form, subUnits: newSubs });
+                  }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <NumField placeholder="معادل" value={String(su.factor || '')} onChange={e => {
+                    const newSubs = [...(form.subUnits || [])];
+                    newSubs[idx].factor = Number(e.target.value) || 0;
+                    setForm({ ...form, subUnits: newSubs });
+                  }} unit={(UNIT_LABEL as any)[form.unit]} min={0} />
+                </div>
+                <Btn variant="danger-outline" onClick={() => {
+                  const newSubs = (form.subUnits || []).filter((_: any, i: number) => i !== idx);
+                  setForm({ ...form, subUnits: newSubs });
+                }}>✕</Btn>
+              </div>
+            ))}
+            <Btn onClick={() => setForm({ ...form, subUnits: [...(form.subUnits || []), { name: '', factor: 1 }] })}>
+              + افزودن واحد فرعی
+            </Btn>
+          </div>
+        </Field>
+
         {!form.id ? (
           <>
             <Grid2>

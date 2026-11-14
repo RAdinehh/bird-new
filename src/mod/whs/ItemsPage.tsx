@@ -45,6 +45,7 @@ interface F {
   name: string;
   category: ItemCategory;
   unit: ItemUnit;
+  subUnits?: { name: string; factor: number }[];
   minStock: string;
   initialStock: string;
   supplierId: string;
@@ -77,7 +78,7 @@ interface F {
 }
 
 const empty = (): F => ({
-  name: '', category: 'feed', unit: 'kg',
+  name: '', category: 'feed', unit: 'kg', subUnits: [],
   minStock: '', initialStock: '',
   supplierId: '', expireDate: '',
   withdrawalDays: '', storage: 'room',
@@ -208,7 +209,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
 
   const openEdit = (it: Item) => {
     setForm({
-      id: it.id, name: it.name, category: it.category, unit: it.unit,
+      id: it.id, name: it.name, category: it.category, unit: it.unit, subUnits: it.subUnits || [],
       minStock: it.minStock ? toFa(it.minStock) : '',
       initialStock: '',
       supplierId: it.supplierId || '',
@@ -284,6 +285,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         name: form.name.trim(),
         category: form.category,
         unit: form.unit,
+        subUnits: form.subUnits || [],
         minStock: num(form.minStock),
         currentStock: num(form.initialStock),   // ← موجودی اولیه
         lastPrice: 0,                            // ← صفر (بعد از خرید پر میشه)
@@ -318,6 +320,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         name: form.name.trim(),
         category: form.category,
         unit: form.unit,
+        subUnits: form.subUnits || [],
         minStock: num(form.minStock),
         supplierId: form.supplierId,
         expireDate: hasExpiry ? form.expireDate : '',
