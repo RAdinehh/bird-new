@@ -43,7 +43,7 @@ export const SALE_REASON_LABEL: Record<SaleReason, string> = {
 // ============ داروی گیاهی (طب سنتی) ============
 export type MedicineTemperament = 'moetadel' | 'garm_khoshk' | 'garm_tar' | 'sard_tar' | 'sard_khoshk';
 export type MedicineProperty = 'mohallel' | 'molattef' | 'mojaffef' | 'jali' | 'mokhaddar' | 'moshakhen' | 'moshhel' | 'moder' | 'moghvi' | 'ghabez' | 'mofatteh' | 'monzej' | 'mosakhkhen' | 'mobared' | 'moleyyen' | 'moqatte' | 'mofarreh' | 'hazem' | 'monaqqi' | 'morkhi';
-export type MedicineForm = 'tabikh' | 'dam_karde' | 'safuf' | 'hab' | 'sharbat' | 'roghan' | 'marham' | 'zemad' | 'zuruf' | 'qutur' | 'saut' | 'nafukh' | 'bokhur' | 'shiyaf' | 'fatileh' | 'farzjah';
+export type MedicineForm = 'giyah_salem' | 'aragh' | 'safuf' | 'bazr' | 'roghan' | 'hab' | 'sharbat' | 'other';
 export type MedicineUseMethod = 'tanavol' | 'bal' | 'estenshaq' | 'bokhur_dadan' | 'chekandan_bini' | 'chekandan_cheshm' | 'malidan' | 'tala' | 'zemad_kardan' | 'pashidan' | 'abzan' | 'tanqieh' | 'gharar_shiyaf' | 'gharar_fatileh';
 export type MedicineTime = 'sobh' | 'zohr' | 'asr' | 'shab' | 'nAshta' | 'qabl_ghaza' | 'bad_ghaza';
 
@@ -75,6 +75,7 @@ export interface HerbalDetails {
   temperament: MedicineTemperament | '';
   properties: MedicineProperty[];
   form: MedicineForm | '';
+  customForm?: string;
   doseValue: number | null;
   doseUnit: string;
   useMethod: MedicineUseMethod | '';

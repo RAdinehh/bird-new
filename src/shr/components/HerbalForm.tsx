@@ -58,6 +58,15 @@ export default function HerbalForm({ item, updateItem }: { item: any; updateItem
             placeholder="— انتخاب کنید —"
             modalTitle="انتخاب نوع دوا"
           />
+          {h.form === 'other' && (
+            <div style={{ marginTop: 8 }}>
+              <Input
+                value={h.customForm || ''}
+                onChange={e => setH({ customForm: e.target.value })}
+                placeholder="نوع دارو را بنویسید (مثلاً چوب دارچین)"
+              />
+            </div>
+          )}
         </Field>
       </Grid2>
 
