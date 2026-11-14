@@ -172,6 +172,36 @@ export interface WaterResult {
 }
 
 // ═══════════════════════════════════════════════
+// Health (Vaccine / Medication / Herbal)
+// ═══════════════════════════════════════════════
+
+export type HealthRoute = 'water' | 'oral' | 'injectable' | 'feed' | 'spray' | 'other';
+
+export interface HealthParams {
+  /** روش مصرف (از انبار) */
+  route: HealthRoute | '';
+  /** مقدار آب مصرفی امروز (لیتر) — برای روش آشامیدنی */
+  waterAmountL: number;
+  /** تعداد پرنده زنده */
+  aliveCount: number;
+  /** دوز استاندارد هر پرنده (ml) — برای روش تزریقی/خوراکی/دان */
+  dosePerBirdMl?: number | null;
+  /** دوز استاندارد در هر لیتر آب (ml/L) — برای روش آشامیدنی */
+  dosePerLiter?: number | null;
+}
+
+export interface HealthResult {
+  /** نیاز واقعی محاسبه‌شده (میلی‌لیتر) — null اگر داده کافی نبود */
+  requiredMl: number | null;
+  /** روش محاسبه استفاده‌شده */
+  mode: 'water' | 'per_bird' | 'insufficient';
+  /** دلیل (برای نمایش) */
+  reason: string;
+  /** آیا داده کافی برای محاسبه وجود داشت؟ */
+  hasData: boolean;
+}
+
+// ═══════════════════════════════════════════════
 // Stocking
 // ═══════════════════════════════════════════════
 
