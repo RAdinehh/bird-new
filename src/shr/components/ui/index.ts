@@ -30,3 +30,5 @@ export * from './KpiCard';
 export * from './StatBox';
 export * from './MiniStat';
 export * from './MiniEmpty';
+
+export * from './HelpIcon';

@@ -61,16 +61,7 @@ export const PROPERTY_LABEL: Record<MedicineProperty, string> = {
   moghvi: 'مقوی', ghabez: 'قابض', mofatteh: 'مفتح', monzej: 'منضج',
 };
 
-export const FORM_LABEL: Record<MedicineForm, string> = {
-  jushande: 'جوشانده', aragh: 'عرق', ghors: 'قرص', safuf: 'سفوف',
-  sharbat: 'شربت', roghan: 'روغن', zemad: 'ضماد', bokhur: 'بخور',
-};
-
-export const USE_METHOD_LABEL: Record<MedicineUseMethod, string> = {
-  khoraki: 'خوراکی', mozei: 'موضعی', estenshaghi: 'استنشاقی',
-  mokhlut_dan: 'مخلوط در دان', mokhlut_ab: 'مخلوط در آب آشامیدنی',
-};
-
+export { FORM_LABEL, USE_METHOD_LABEL } from '../constants/herbal';
 export const TIME_LABEL: Record<MedicineTime, string> = {
   sobh: 'صبح', zohr: 'ظهر', asr: 'عصر', shab: 'شب',
   nAshta: 'ناشتا', qabl_ghaza: 'قبل غذا', bad_ghaza: 'بعد غذا',

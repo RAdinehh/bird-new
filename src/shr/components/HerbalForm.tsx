@@ -1,4 +1,5 @@
-import { Field, Grid2, Grid3, Input, Select } from './ui';
+import { Field, Grid2, Grid3, Input, Select, HelpIcon } from './ui';
+import { FORM_DESC, USE_METHOD_DESC } from '../constants/herbal';
 import { parseFaNum } from '../utils/fa';
 import {
   TEMPERAMENT_LABEL, PROPERTY_LABEL, FORM_LABEL, USE_METHOD_LABEL, TIME_LABEL, SALE_REASON_LABEL,
@@ -48,7 +49,7 @@ export default function HerbalForm({ item, updateItem }: { item: any; updateItem
             {Object.entries(TEMPERAMENT_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
           </Select>
         </Field>
-        <Field label="نوع دوا">
+        <Field label={<>نوع دوا <HelpIcon text={Object.entries(FORM_DESC).map(([k,v]) => `**${FORM_LABEL[k]}**: ${v}`).join("\n")} /></>}>
           <Select value={h.form} onChange={e => setH({ form: e.target.value as MedicineForm })}>
             <option value="">— انتخاب کنید —</option>
             {Object.entries(FORM_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
@@ -83,7 +84,7 @@ export default function HerbalForm({ item, updateItem }: { item: any; updateItem
       </Grid2>
 
       <Grid2>
-        <Field label="نحوه مصرف">
+        <Field label={<>نحوه مصرف <HelpIcon text={Object.entries(USE_METHOD_DESC).map(([k,v]) => `**${USE_METHOD_LABEL[k]}**: ${v}`).join("\n")} /></>}>
           <Select value={h.useMethod} onChange={e => setH({ useMethod: e.target.value as MedicineUseMethod })}>
             <option value="">— انتخاب کنید —</option>
             {Object.entries(USE_METHOD_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
