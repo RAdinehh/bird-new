@@ -4,24 +4,23 @@
 > آخرین آپدیت: 1405/11/14
 
 ## HEAD
-89bbc421 — feat(dlg): وزن‌کشی تخم — کارت expandable + خلاصه هوشمند CV + واحد گرم
+0282bfd5 — fix(dlg): رفع تکرار ایموجی منبع + حذف نمایش ۰ اولیه در سلامت
 ✅ sync با origin (push شد)
 
 ## 🔨 کار جاری
 **فاز ۰/۳ Design System + بهبود بخش‌های فرم ثبت روزانه (dlg).**
 
-- ✅ بازنویسی کامل EggsWeightSection:
-  - کارت‌های نمونه expandable (border accent سبز هنگام باز)
-  - خلاصه هوشمند CV داخل کارت باز (بدون تکرار)
-  - جنسیت دو ستونه کنار وزن
-  - واحد kg → گرم (رفع تناقض)
-  - رفع باگ NaN + محاسبه با نمونه خالی
-  - HelpIcon ? با راهنمای آستانه‌های ۸/۱۰/۱۲
+- ✅ بازنویسی کامل EggsWeightSection (کارت expandable + CV هوشمند + واحد گرم)
+- ✅ رفع تکرار ایموجی در FeedSection (SmartSelect)
+- ✅ رفع نمایش عدد ۰ اولیه در HealthSection (تلفات/واکسن/دارو)
+- 🆕 **قانون جدید:** استفاده از `./safe-commit.sh` برای همه کامیت‌ها (چک tsc + rollback خودکار + push)
 
 ## ✅ این جلسه (1405/11/14)
 - بازنویسی EggsWeightSection (UI + منطق + رفع باگ)
 - ثبت IDEA-32 (آستانه پویای CV بر اساس نژاد)
-- commit 89bbc421 + push
+- رفع تکرار ایموجی منبع + عدد صفر
+- ساخت `safe-commit.sh` (ابزار خودکارسازی کامیت امن)
+- commit 0282bfd5 + push
 
 ## ⚠️ هشدارها
 - tsc: ۰ خطا ✅
@@ -38,3 +37,4 @@ docs/MASTER-ROADMAP.md ← اول این
 AGENTS.md (۲۷ قانون)
 BUGS.md (۱ باگ باز)
 docs/DESIGN-CONSISTENCY.md (قانون ۳۴)
+safe-commit.sh (ابزار کامیت امن)
