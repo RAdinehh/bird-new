@@ -90,15 +90,13 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   <div style={{ flex: 1 }}>
                     <Input placeholder="نام (مثلاً کیسه)" value={su.name} onChange={e => {
-                      const newSubs = [...(form.subUnits || [])];
-                      newSubs[idx].name = e.target.value;
+                      const newSubs = (form.subUnits || []).map((s: any, i: number) => i === idx ? { ...s, name: e.target.value } : s);
                       setForm({ ...form, subUnits: newSubs });
                     }} />
                   </div>
                   <div style={{ flex: 1 }}>
                     <NumField placeholder="معادل" value={String(su.factor || '')} onChange={e => {
-                      const newSubs = [...(form.subUnits || [])];
-                      newSubs[idx].factor = Number(e.target.value) || 0;
+                      const newSubs = (form.subUnits || []).map((s: any, i: number) => i === idx ? { ...s, factor: Number(e.target.value) || 0 } : s);
                       setForm({ ...form, subUnits: newSubs });
                     }} unit={(UNIT_LABEL as any)[form.unit]} min={0} />
                   </div>
