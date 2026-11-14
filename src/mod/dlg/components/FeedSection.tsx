@@ -126,11 +126,15 @@ export default function FeedSection({ form, setForm }: Props) {
  const removeSource = (idx: number) => {
   syncSources(sources.filter((_, i) => i !== idx));
  };
- const addSource = () => {
-  const newId = crypto.randomUUID();
-  syncSources([...sources, { id: newId, type: 'item', refId: '', quantity: 0 }]);
-  setExpandedSourceId(newId);
- };
+   const addSource = () => {
+    const newId = crypto.randomUUID();
+    syncSources([...sources, { id: newId, type: 'item', refId: '', quantity: 0 }]);
+    setExpandedSourceId(newId);
+    setTimeout(() => {
+      const el = document.getElementById(`feed-src-${newId}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 150);
+  };
 
  // ─── محاسبه وضعیت کارت خلاصه ───
  let cardHasShortage = false;
