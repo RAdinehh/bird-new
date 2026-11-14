@@ -2,6 +2,7 @@
  * ItemCard — کارت نمایش قلم انبار
  */
 import { toFa } from '../../../shr/utils/fa';
+import { VET_METHOD_LABEL } from '../../../shr/constants/vetMethods';
 import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { Row, SectionTitle } from '../helpers';
@@ -12,9 +13,6 @@ import { logAction } from '../../../cor/logger/auditLog';
 import { formatQty } from '../../../shr/utils/fa';
 import { CardActions } from '../../../shr/components/ui';
 
-const USAGE_LABEL: Record<string, string> = {
-  oral: 'خوراکی', injectable: 'تزریقی', water: 'آب آشامیدنی', spray: 'اسپری',
-};
 const EQUIP_STATUS: Record<string, string> = {
   active: 'فعال', repair: 'در تعمیر', scrapped: 'اسقاط',
 };
@@ -102,7 +100,7 @@ export default function ItemCard(props: ItemCardProps) {
           ) : null}
           {it.withdrawalDays !== null && it.withdrawalDays !== undefined ? <Row l="دوره منع مصرف" v={`${toFa(it.withdrawalDays)} روز`} /> : null}
           {it.storage ? <Row l="نگهداری" v={(STORAGE_LABEL as any)[it.storage] || it.storage} /> : null}
-          {it.usageType ? <Row l="نوع مصرف" v={USAGE_LABEL[it.usageType] || it.usageType} /> : null}
+          {it.usageType ? <Row l="نوع مصرف" v={VET_METHOD_LABEL[it.usageType] || it.usageType} /> : null}
           {it.dosePerBird ? <Row l="دوز هر پرنده" v={`${toFa(it.dosePerBird)} ml`} /> : null}
           {it.productionDate ? <Row l="تاریخ تولید" v={toFa(it.productionDate)} /> : null}
         </>

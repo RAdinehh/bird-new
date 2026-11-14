@@ -19,7 +19,7 @@ import { Btn, Tag } from '../../../shr/components/ui';
 import { BadgeOverflow, type BadgeItem } from '../../../shr/components/ui/BadgeOverflow';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { LogSection, Row } from '../helpers';
-import { USE_METHOD_LABEL } from '../../../shr/constants/herbal';
+import { VET_METHOD_LABEL } from '../../../shr/constants/vetMethods';
 import { applyCorrections } from '../api/applyCorrections';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { Grid2, Grid3 } from '../../../shr/components/ui';
@@ -243,7 +243,7 @@ export default function LogCard(props: LogCardProps) {
         <LogSection title="💉 واکسن">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
             {l.vaccines.map(v => {
-              const methodLabel = v.method ? (USE_METHOD_LABEL[v.method as keyof typeof USE_METHOD_LABEL] || v.method) : null;
+              const methodLabel = v.method ? (VET_METHOD_LABEL[v.method] || v.method) : null;
               return (
                 <Row key={v.id}
                   l={v.name || 'واکسن بدون نام'}
@@ -263,7 +263,7 @@ export default function LogCard(props: LogCardProps) {
         <LogSection title="💊 دارو">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
             {l.medications.map(m => {
-              const methodLabel = m.method ? (USE_METHOD_LABEL[m.method as keyof typeof USE_METHOD_LABEL] || m.method) : null;
+              const methodLabel = m.method ? (VET_METHOD_LABEL[m.method] || m.method) : null;
               return (
                 <Row key={m.id}
                   l={m.name || 'دارو بدون نام'}

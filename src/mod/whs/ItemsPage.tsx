@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { VET_METHOD_LABEL } from '../../shr/constants/vetMethods';
 import { recordHistory } from '../../shr/intelligence';
 import ItemCard from './components/ItemCard';
 import ItemsFormModal from './components/ItemsFormModal';
@@ -93,7 +94,6 @@ const empty = (): F => ({
 });
 
 const EQUIP_STATUS: Record<string, string> = { active: 'فعال', repair: 'در تعمیر', scrapped: 'اسقاط' };
-const USAGE_LABEL: Record<string, string> = { oral: '🍽 خوراکی', injectable: '💉 تزریقی', water: '💧 محلول در آب', spray: '🌫 اسپری' };
 
 export default function ItemsPage({ active = true }: { active?: boolean } = {}) {
   const navigate = useNavigate();
