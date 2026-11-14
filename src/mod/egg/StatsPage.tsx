@@ -1,3 +1,4 @@
+import { KpiCard } from '../../shr/components/ui/KpiCard';
 /**
  * StatsPage — آمار و تحلیل تخم‌گذاری
  */
@@ -208,10 +209,10 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
           {/* خلاصه */}
           <StatsCard icon="📊" title={`خلاصه ${rangeLabel}`} />
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            <SummaryCard icon="🥚" label="کل تخم" value={toFa(stats.total.toLocaleString('fa-IR'))} sub={`در ${toFa(coverage.days)} روز`} tone="accent" />
-            <SummaryCard icon="📅" label="میانگین روزانه" value={canAvg ? toFa(stats.avgHealthy.toLocaleString('fa-IR')) : '—'} sub={canAvg ? 'تخم سالم' : 'داده کم'} tone="info" />
-            <SummaryCard icon="⚖️" label="توده تخم" value={`${toFa(eggMassKg.toLocaleString('fa-IR'))} kg`} sub="میانگین ۶۰ گرم" tone="purple" />
-            <SummaryCard icon="⭐" label="نرخ نطفه‌دار" value={`${toFa(stats.fertilePct)}٪`} sub={`${toFa(stats.fertile.toLocaleString('fa-IR'))} تخم`} tone="purple" />
+            <KpiCard size="lg" icon="🥚" label="کل تخم" value={toFa(stats.total.toLocaleString('fa-IR'))} sub={`در ${toFa(coverage.days)} روز`} tone="accent" />
+            <KpiCard size="lg" icon="📅" label="میانگین روزانه" value={canAvg ? toFa(stats.avgHealthy.toLocaleString('fa-IR')) : '—'} sub={canAvg ? 'تخم سالم' : 'داده کم'} tone="info" />
+            <KpiCard size="lg" icon="⚖️" label="توده تخم" value={`${toFa(eggMassKg.toLocaleString('fa-IR'))} kg`} sub="میانگین ۶۰ گرم" tone="purple" />
+            <KpiCard size="lg" icon="⭐" label="نرخ نطفه‌دار" value={`${toFa(stats.fertilePct)}٪`} sub={`${toFa(stats.fertile.toLocaleString('fa-IR'))} تخم`} tone="purple" />
           </div>
 
           {/* کیفیت تخم */}
@@ -366,35 +367,6 @@ function StatsCard({ icon, title, extra }: { icon: string; title: string; extra?
   );
 }
 
-function SummaryCard({ icon, label, value, sub, tone }: { icon: string; label: string; value: string; sub: string; tone: 'accent' | 'info' | 'purple' | 'warn' }) {
-  const colors = {
-    accent: { color: 'var(--accent)', border: 'var(--accent-border)', bg: 'var(--accent-soft)' },
-    info: { color: '#3b82f6', border: 'rgba(59,130,246,0.35)', bg: 'rgba(59,130,246,0.08)' },
-    purple: { color: 'var(--purple)', border: 'var(--purple)', bg: 'var(--purple-soft)' },
-    warn: { color: 'var(--warn)', border: 'var(--warn)', bg: 'var(--warn-soft)' },
-  }[tone];
-  /* cardCenterApplied */
-  return (
-    <div style={{
-      padding: '16px 10px',
-      background: colors.bg,
-      border: `1px solid ${colors.border}`,
-      borderRadius: 'var(--r-md)',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 4,
-      textAlign: 'center',
-      minHeight: 118,
-    }}>
-      <span style={{ fontSize: '1.8em', lineHeight: 1, marginBottom: 2 }}>{icon}</span>
-      <div style={{ fontSize: 'var(--fs-xs)', color: colors.color, fontWeight: 700 }}>{label}</div>
-      <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums', lineHeight: 1.15 }}>{value}</div>
-      <div style={{ fontSize: '10px', color: 'var(--muted)', lineHeight: 1.3 }}>{sub}</div>
-    </div>
-  );
-}
 function QualityBar({ icon, label, pct, count, total, color }: { icon: string; label: string; pct: number; count: number; total: number; color: string }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
