@@ -257,3 +257,29 @@ export function FormTabs({ tabs, active, onChange }: FormTabsProps) {
 }
 
 export { useFormGroups } from './hooks/useFormGroups';
+export function LogGroup({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: 12, background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)' }}>
+      <div style={{ fontSize: 'var(--fs-md)', fontWeight: 800, color: 'var(--text)', letterSpacing: '.3px', paddingBottom: 6, borderBottom: '1px solid var(--border)' }}>{title}</div>
+      {children}
+    </div>
+  );
+}
+
+export function LogSubSection({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 700 }}>{title}</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>{children}</div>
+    </div>
+  );
+}
+
+export function LogItem({ name, detail, warn }: { name: ReactNode; detail?: ReactNode; warn?: boolean }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: '5px 0', borderBottom: '1px dashed var(--border)' }}>
+      <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: warn ? 'var(--warn)' : 'var(--text)' }}>{name}</span>
+      {detail && <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{detail}</span>}
+    </div>
+  );
+}

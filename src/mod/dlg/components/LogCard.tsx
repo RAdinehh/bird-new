@@ -18,7 +18,7 @@ import { getAgeDays } from '../../flk/store';
 import { Btn, Tag } from '../../../shr/components/ui';
 import { BadgeOverflow, type BadgeItem } from '../../../shr/components/ui/BadgeOverflow';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
-import { LogSection, Row } from '../helpers';
+import { LogSection, Row, LogGroup, LogSubSection, LogItem } from '../helpers';
 import { VET_METHOD_LABEL } from '../../../shr/constants/vetMethods';
 import { GENDER_LABEL, formatWeightGrams, cvText } from '../../../shr/utils/weightHelpers';
 import { calculateWeightMetrics } from '../../../shr/calc';
@@ -252,61 +252,50 @@ export default function LogCard(props: LogCardProps) {
         );
       })()}
 
-      {l.deaths && l.deaths.length > 0 && (
-        <LogSection title="💀 تلفات">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
-            {l.deaths.map(d => (
-              <Row key={d.id} l={`${toFa(d.count)} پرنده`} v={causeLabel(d.cause) || 'نامشخص'} warn={true} />
-            ))}
-            {l.deaths.length > 1 && (
-              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, padding: '4px 8px', textAlign: 'left' }}>
-                مجموع: {toFa(l.deaths.reduce((a, x) => a + (x.count || 0), 0))} پرنده
-              </div>
+      {(() => {
+        const hasDeaths = l.deaths && l.deaths.length > 0;
+        const hasVaccines = vaccineEnabled && l.vaccines.length > 0;
+        const hasMeds = medicineEnabled && l.medications.length > 0;
+        if (!hasDeaths && !hasVaccines && !hasMeds) return null;
+        return (
+          <LogGroup title="🏥 سلامت">
+            {hasDeaths && (
+              <LogSubSection title="💀 تلفات">
+                {l.deaths.map(d => (
+                  <LogItem key={d.id} name={`${toFa(d.count)} پرنده`} detail={causeLabel(d.cause) || 'نامشخص'} warn={true} />
+                ))}
+                {l.deaths.length > 1 && (
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, paddingRight: 4 }}>
+                    مجموع: {toFa(l.deaths.reduce((a, x) => a + (x.count || 0), 0))} پرنده
+                  </div>
+                )}
+              </LogSubSection>
             )}
-          </div>
-        </LogSection>
-      )}
-
-      {vaccineEnabled && l.vaccines.length > 0 && (
-        <LogSection title="💉 واکسن">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
-            {l.vaccines.map(v => {
-              const methodLabel = v.method ? (VET_METHOD_LABEL[v.method] || v.method) : null;
-              return (
-                <Row key={v.id}
-                  l={v.name || 'واکسن بدون نام'}
-                  v={[
-                    v.dose ? `دوز: ${toFa(v.dose)}` : null,
-                    v.quantity ? `مقدار: ${toFa(v.quantity)} ${v.unit || ''}` : null,
-                    methodLabel ? `روش: ${methodLabel}` : null,
-                  ].filter(Boolean).join(' • ') || '—'}
-                />
-              );
-            })}
-          </div>
-        </LogSection>
-      )}
-
-      {medicineEnabled && l.medications.length > 0 && (
-        <LogSection title="💊 دارو">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
-            {l.medications.map(m => {
-              const methodLabel = m.method ? (VET_METHOD_LABEL[m.method] || m.method) : null;
-              return (
-                <Row key={m.id}
-                  l={m.name || 'دارو بدون نام'}
-                  v={[
-                    m.dose ? `دوز: ${toFa(m.dose)}` : null,
-                    m.quantity ? `مقدار: ${toFa(m.quantity)} ${m.unit || ''}` : null,
-                    methodLabel ? `روش: ${methodLabel}` : null,
-                    m.withdrawalDays ? `پرهیز: ${toFa(m.withdrawalDays)} روز` : null,
-                  ].filter(Boolean).join(' • ') || '—'}
-                />
-              );
-            })}
-          </div>
-        </LogSection>
-      )}
+            {hasVaccines && (
+              <LogSubSection title="💉 واکسن">
+                {l.vaccines.map(v => {
+                  const methodLabel = v.method ? (VET_METHOD_LABEL[v.method] || v.method) : null;
+                  return (
+                    <LogItem key={v.id} name={v.name || 'واکسن بدون نام'}
+                      detail={[v.dose ? `دوز: ${toFa(v.dose)}` : null, v.quantity ? `مقدار: ${toFa(v.quantity)} ${v.unit || ''}` : null, methodLabel ? `روش: ${methodLabel}` : null].filter(Boolean).join(' • ') || '—'} />
+                  );
+                })}
+              </LogSubSection>
+            )}
+            {hasMeds && (
+              <LogSubSection title="💊 دارو">
+                {l.medications.map(m => {
+                  const methodLabel = m.method ? (VET_METHOD_LABEL[m.method] || m.method) : null;
+                  return (
+                    <LogItem key={m.id} name={m.name || 'دارو بدون نام'}
+                      detail={[m.dose ? `دوز: ${toFa(m.dose)}` : null, m.quantity ? `مقدار: ${toFa(m.quantity)} ${m.unit || ''}` : null, methodLabel ? `روش: ${methodLabel}` : null, m.withdrawalDays ? `پرهیز: ${toFa(m.withdrawalDays)} روز` : null].filter(Boolean).join(' • ') || '—'} />
+                  );
+                })}
+              </LogSubSection>
+            )}
+          </LogGroup>
+        );
+      })()}
 
       {l.notes && (
         <LogSection title="📝 یادداشت">
