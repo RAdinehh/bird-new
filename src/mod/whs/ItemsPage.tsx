@@ -131,20 +131,34 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
     items: list,
     getId: (x: any) => x.id,
     onDelete: async (ids: string[]) => {
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' کالا حذف شوند؟', { danger: true });
+      // 🆕 تشخیص خودکار: کالاهای دارای تاریخچه → آرشیو، بقیه → حذف کامل
+      const withMovements = ids.filter(id => movements.some(m => m.itemId === id));
+      const withoutMovements = ids.filter(id => !movements.some(m => m.itemId === id));
+
+      const parts: string[] = [];
+      if (withoutMovements.length > 0) parts.push(`${toFa(withoutMovements.length)} کالا حذف کامل`);
+      if (withMovements.length > 0) parts.push(`${toFa(withMovements.length)} کالا آرشیو (تاریخچه حفظ می‌شود)`);
+      const msg = parts.join(' و ') + '. ادامه می‌دهید؟';
+
+      const ok = await showConfirmAsync('تأیید عملیات گروهی', msg, { danger: true });
       if (!ok) return;
+
       const backups: any[] = [];
-      for (const id of ids) {
+      for (const id of withoutMovements) {
         const it = items.find(x => x.id === id);
         if (!it) continue;
         backups.push(it);
         try { deleteItem(id); } catch {}
       }
+      for (const id of withMovements) {
+        try { archiveItem(id); } catch {}
+      }
+
       if (backups.length > 0) {
         setUndoData({ item: backups });
         setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 8000);
       }
-      toastMsg.deletedBulk(backups.length, 'کالا')
+      toastMsg.deletedBulk(withoutMovements.length + withMovements.length, 'کالا');
     },
   });
 
