@@ -259,30 +259,47 @@ export default function LogCard(props: LogCardProps) {
         if (!hasDeaths && !hasVaccines && !hasMeds) return null;
         return (
           <LogSection title="🏥 سلامت">
-            <Grid2>
-              {l.deaths.map(d => (
-                <Row
-                  key={d.id}
-                  l="تلفات"
-                  v={`${toFa(d.count)} پرنده`}
-                  warn={true}
-                />
-              ))}
-              {l.vaccines.map(v => (
-                <Row
-                  key={v.id}
-                  l={`واکسن: ${v.name || 'بدون نام'}`}
-                  v={v.quantity ? `${toFa(v.quantity)} ${v.unit || ''}` : '—'}
-                />
-              ))}
-              {l.medications.map(m => (
-                <Row
-                  key={m.id}
-                  l={`دارو: ${m.name || 'بدون نام'}`}
-                  v={m.quantity ? `${toFa(m.quantity)} ${m.unit || ''}` : '—'}
-                />
-              ))}
-            </Grid2>
+            {hasDeaths && (
+              <Grid2>
+                {l.deaths.map(d => (
+                  <Row
+                    key={d.id}
+                    l="تلفات"
+                    v={`${toFa(d.count)} پرنده${d.cause ? ` • ${causeLabel(d.cause)}` : ''}`}
+                    warn={true}
+                  />
+                ))}
+              </Grid2>
+            )}
+
+            {hasVaccines && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: hasDeaths ? 8 : 0 }}>
+                {l.vaccines.map(v => {
+                  const methodLabel = v.method ? (VET_METHOD_LABEL[v.method] || v.method) : null;
+                  const detail = [
+                    v.dose ? `دوز ${toFa(v.dose)}` : null,
+                    methodLabel,
+                    v.quantity ? `مقدار ${toFa(v.quantity)} ${v.unit || ''}` : null,
+                  ].filter(Boolean).join(' • ');
+                  return <Row key={v.id} l={`واکسن: ${v.name || 'بدون نام'}`} v={detail || '—'} />;
+                })}
+              </div>
+            )}
+
+            {hasMeds && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: (hasDeaths || hasVaccines) ? 8 : 0 }}>
+                {l.medications.map(m => {
+                  const methodLabel = m.method ? (VET_METHOD_LABEL[m.method] || m.method) : null;
+                  const detail = [
+                    m.dose ? `دوز ${toFa(m.dose)}` : null,
+                    methodLabel,
+                    m.quantity ? `مقدار ${toFa(m.quantity)} ${m.unit || ''}` : null,
+                    m.withdrawalDays ? `پرهیز ${toFa(m.withdrawalDays)} روز` : null,
+                  ].filter(Boolean).join(' • ');
+                  return <Row key={m.id} l={`دارو: ${m.name || 'بدون نام'}`} v={detail || '—'} />;
+                })}
+              </div>
+            )}
           </LogSection>
         );
       })()}
