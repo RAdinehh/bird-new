@@ -69,12 +69,12 @@ export function SummarySection({ title, meta, children, first = false }: { title
 
 export function SummaryRow({ label, value, detail }: { label: React.ReactNode; value: React.ReactNode; detail?: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
-        <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color: 'var(--text)' }}>{label}</span>
-        <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, color: 'var(--text)', textAlign: 'left' }}>{value}</span>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+      <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color: 'var(--text)' }}>{label}</span>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2, minWidth: 0 }}>
+        <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, color: 'var(--text)', textAlign: 'left', wordBreak: 'break-word' }}>{value}</span>
+        {detail && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', textAlign: 'left', wordBreak: 'break-word' }}>{detail}</span>}
       </div>
-      {detail && <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingRight: 4 }}>{detail}</span>}
     </div>
   );
 }
