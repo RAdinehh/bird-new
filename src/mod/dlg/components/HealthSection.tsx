@@ -28,6 +28,15 @@ function getDoseUnit(u: string | undefined): string {
   return u;
 }
 
+function getDoseUnitForMethod(method: string | undefined, baseUnit: string | undefined): string | undefined {
+  if (!method) return undefined;
+  const u = getDoseUnit(baseUnit);
+  if (method === 'drinking_water') return `${u}/L`;
+  if (method === 'feed') return `${u}/kg`;
+  if (method === 'injection' || method === 'oral') return `${u}/پرنده`;
+  return u;
+}
+
 interface Props {
  form: F;
  setForm: React.Dispatch<React.SetStateAction<F>>;
@@ -177,7 +186,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
             const newItem = vaccineItems.find(w => w.id === id);
             const autoDose = newItem?.usageTypes?.includes('water') ? newItem.dosePerLiter : newItem?.usageTypes?.includes('feed') ? newItem.dosePerKgFeed : newItem?.dosePerBird;
             const doseUnit = newItem?.usageTypes?.includes('water') ? `${getDoseUnit(newItem?.unit)}/L` : newItem?.usageTypes?.includes('feed') ? `${getDoseUnit(newItem?.unit)}/kg` : `${getDoseUnit(newItem?.unit)}/پرنده`;
-            return { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null, unit: newItem?.unit || x.unit, name: newItem ? newItem.name : x.name, dose: autoDose ? `${autoDose} ${doseUnit}` : x.dose };
+            return { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null, unit: newItem?.unit || x.unit, name: newItem ? newItem.name : x.name, dose: autoDose ? String(autoDose) : x.dose };
           })
         }))}
             options={vaccineItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}` }))}
@@ -192,7 +201,12 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
           <Input placeholder="مثلاً نیوکاسل" value={v.name} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, name: e.target.value } : x) }))} />
         </Field>
         <Field label={<>دوز <HelpIcon text={"**دوز چیست؟**\nدوز، نسخه یا دستور مصرف دامپزشک است (مثلاً ۵ سی‌سی در ۱ لیتر آب).\n\n**تفاوت با مقدار مصرفی:**\n«مقدار مصرفی» کل مقداری است که از انبار کسر می‌شود (مثلاً ۵۰ سی‌سی)."} /></>}>
-          <Input placeholder="مثلاً ۰.۳ ml/L یا ۰.۵ ml/پرنده" value={v.dose} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, dose: e.target.value } : x) }))} />
+          <Input
+            placeholder="مثلاً ۰.۵"
+            value={v.dose}
+            onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, dose: e.target.value } : x) }))}
+            unit={getDoseUnitForMethod(v.method, vaccineItems.find(w => w.id === v.itemId)?.unit)}
+          />
         </Field>
       </Grid2>
       {(() => {
@@ -305,7 +319,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
                   quantity: id ? (x.quantity ?? 0) : null,
                   unit: newItem?.unit || x.unit,
                   name: newItem ? newItem.name : x.name,
-                  dose: autoDose ? `${autoDose} ${doseUnit}` : x.dose,
+                  dose: autoDose ? String(autoDose) : x.dose,
                   withdrawalDays: newItem ? newItem.withdrawalDays : x.withdrawalDays
                 };
               })
