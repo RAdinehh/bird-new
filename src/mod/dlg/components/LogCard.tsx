@@ -264,7 +264,7 @@ export default function LogCard(props: LogCardProps) {
                 <Row
                   key={d.id}
                   l="تلفات"
-                  v={`${toFa(d.count)} پرنده${d.cause ? ` (${causeLabel(d.cause)})` : ''}`}
+                  v={`${toFa(d.count)} پرنده${d.cause ? ` • ${causeLabel(d.cause)}` : ''}`}
                   warn={true}
                 />
               ))}
