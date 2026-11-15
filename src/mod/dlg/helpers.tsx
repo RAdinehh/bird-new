@@ -259,18 +259,20 @@ export function FormTabs({ tabs, active, onChange }: FormTabsProps) {
 export { useFormGroups } from './hooks/useFormGroups';
 export function LogGroup({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: 12, background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)' }}>
-      <div style={{ fontSize: 'var(--fs-md)', fontWeight: 800, color: 'var(--text)', letterSpacing: '.3px', paddingBottom: 6, borderBottom: '1px solid var(--border)' }}>{title}</div>
-      {children}
-    </div>
+    <>
+      <SectionTitle first>{title}</SectionTitle>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingRight: 4 }}>
+        {children}
+      </div>
+    </>
   );
 }
 
 export function LogSubSection({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 700 }}>{title}</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>{children}</div>
+      <div style={{ display: 'flex', flexDirection: 'column' }}>{children}</div>
     </div>
   );
 }
