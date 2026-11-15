@@ -10,7 +10,7 @@ import { UNIT_LABEL, type ItemUnit } from '../../whs/store';
 import { QuantityUnitInput, type UnitOption } from '../../../shr/components/ui';
 import { formatQty } from '../../../shr/utils/fa';
 import { toFa, toEn } from '../../../shr/utils/fa';
-import { DEATH_CAUSES, causeLabel } from '../store';
+import { DEATH_CAUSES, causeLabel, getTotalFeedKg } from '../store';
 import { useWhs } from '../../whs/store';
 import { useFlk } from '../../flk/store';
 import type { F } from '../types';
@@ -194,6 +194,8 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
           aliveCount: flockAliveCount || 0,
           dosePerBirdMl: vaccineItemCalc.dosePerBird ?? null,
           dosePerLiter: vaccineItemCalc.dosePerLiter ?? null,
+          feedAmountKg: getTotalFeedKg(form),
+          dosePerKgFeed: vaccineItemCalc.dosePerKgFeed ?? null,
         }) : null;
         const qtyField = v.itemId ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -319,6 +321,8 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
           aliveCount: flockAliveCount || 0,
           dosePerBirdMl: medItemCalc.dosePerBird ?? null,
           dosePerLiter: medItemCalc.dosePerLiter ?? null,
+          feedAmountKg: getTotalFeedKg(form),
+          dosePerKgFeed: medItemCalc.dosePerKgFeed ?? null,
         }) : null;
         const qtyField = m.itemId ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
