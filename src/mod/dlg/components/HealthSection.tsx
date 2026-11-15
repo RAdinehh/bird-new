@@ -400,7 +400,6 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
     const medsTotal = form.medications.length;
     const medsHerbal = form.medications.filter(m => medicineItems.find(w => w.id === m.itemId)?.category === 'herbal').length;
     const medsChem = medsTotal - medsHerbal;
-    const tone = exceeds ? 'danger' : (totalDeaths > 0 ? 'warn' : 'accent');
 
     const medParts = [];
     if (medsChem > 0) medParts.push(`${toFa(medsChem)} 💊`);
@@ -410,19 +409,22 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
     const deathCauses = form.deaths.map(d => d.cause ? causeLabel(d.cause) : '').filter(Boolean).join('، ');
 
     return (
-      <SummaryCard tone={tone}>
+      <SummaryCard>
         <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'right', width: '100%' }} dir="rtl">
           {totalDeaths > 0 && (
             <SummarySection
               title="تلفات:"
-              meta={<>{toFa(totalDeaths)} پرنده {flockAliveCount ? `از ${toFa(flockAliveCount)}` : ''} {exceeds && '⚠️'}</>}
+              meta={
+                <>
+                  <span style={{ color: exceeds ? 'var(--danger)' : 'var(--warn)', fontWeight: 700 }}>
+                    {toFa(totalDeaths)} پرنده
+                  </span>
+                  {flockAliveCount ? ` از ${toFa(flockAliveCount)}` : ''} {exceeds && '⚠️'}
+                </>
+              }
               first={true}
             >
-              {deathCauses && (
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingRight: 4 }}>
-                  علت: {deathCauses}
-                </div>
-              )}
+              <SummaryRow label="علت" value={deathCauses || 'نامشخص'} />
             </SummarySection>
           )}
 
