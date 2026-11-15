@@ -404,58 +404,62 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
 
     return (
       <SummaryCard tone={tone}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, textAlign: 'right', width: '100%' }} dir="rtl">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, textAlign: 'right', width: '100%' }} dir="rtl">
           {totalDeaths > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>تلفات:</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
+                <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>تلفات:</span>
                 <span style={{ color: exceeds ? 'var(--danger)' : 'var(--text)', fontWeight: 600, fontSize: 'var(--fs-sm)' }}>
                   {toFa(totalDeaths)} پرنده {flockAliveCount ? `از ${toFa(flockAliveCount)}` : ''} {exceeds && '⚠️'}
                 </span>
               </div>
               {deathCauses && (
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingRight: 4 }}>
+                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
                   علت: {deathCauses}
                 </span>
               )}
             </div>
           )}
-          
+
           {vaccineCount > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px dashed var(--border)', paddingTop: 8 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>واکسن‌ها:</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
+                <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>واکسن‌ها:</span>
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(vaccineCount)} مورد</span>
               </div>
-              <ul style={{ margin: 0, paddingRight: 16, fontSize: 'var(--fs-sm)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {form.vaccines.map((v, idx) => (
-                  <li key={v.id || idx} style={{ wordBreak: 'break-word', listStyleType: 'disc' }}>
-                    <span style={{ fontWeight: 600 }}>{v.name || 'بدون نام'}</span>
-                    {v.dose && <span style={{ color: 'var(--muted)' }}> (دوز: {toFa(v.dose)})</span>}
-                    {v.quantity ? <span style={{ color: 'var(--accent)' }}> [مقدار: {toFa(v.quantity)} {v.unit || ''}]</span> : null}
-                  </li>
+                  <div key={v.id || idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, wordBreak: 'break-word' }}>
+                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: 'var(--text)' }}>{v.name || 'بدون نام'}</span>
+                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+                      {v.dose ? `دوز: ${toFa(v.dose)}` : ''}
+                      {v.dose && v.quantity ? ' • ' : ''}
+                      {v.quantity ? `مقدار: ${toFa(v.quantity)} ${v.unit || ''}` : ''}
+                    </span>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
 
           {medsTotal > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px dashed var(--border)', paddingTop: 8 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>داروها:</span>
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-                  {toFa(medsTotal)} مورد {medSummary ? `[${medSummary}]` : ''}
-                </span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
+                <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>داروها:</span>
+                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(medsTotal)} مورد</span>
               </div>
-              <ul style={{ margin: 0, paddingRight: 16, fontSize: 'var(--fs-sm)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {form.medications.map((m, idx) => (
-                  <li key={m.id || idx} style={{ wordBreak: 'break-word', listStyleType: 'disc' }}>
-                    <span style={{ fontWeight: 600 }}>{m.name || 'بدون نام'}</span>
-                    {m.dose && <span style={{ color: 'var(--muted)' }}> (دوز: {toFa(m.dose)})</span>}
-                    {m.quantity ? <span style={{ color: 'var(--accent)' }}> [مقدار: {toFa(m.quantity)} {m.unit || ''}]</span> : null}
-                  </li>
+                  <div key={m.id || idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, wordBreak: 'break-word' }}>
+                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: 'var(--text)' }}>{m.name || 'بدون نام'}</span>
+                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+                      {m.dose ? `دوز: ${toFa(m.dose)}` : ''}
+                      {m.dose && m.quantity ? ' • ' : ''}
+                      {m.quantity ? `مقدار: ${toFa(m.quantity)} ${m.unit || ''}` : ''}
+                    </span>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
         </div>

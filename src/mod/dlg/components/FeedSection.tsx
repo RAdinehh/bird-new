@@ -378,27 +378,27 @@ export default function FeedSection({ form, setForm }: Props) {
 
    {sources.length > 0 && (
     <SummaryCard tone={finalSummaryTone}>
-     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-      <span>مجموع مصرف:</span>
-      <b style={{ color: 'var(--text)' }}>{toFa(totalFeed.toFixed(1))} کیلوگرم</b>
+     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
+      <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 700 }}>مجموع مصرف:</span>
+      <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>{toFa(totalFeed.toFixed(1))} کیلوگرم</span>
      </div>
      {dailyNeedKg > 0 && (
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-       <span>نیاز روزانه:</span>
-       <b style={{ color: 'var(--text)' }}>{toFa(dailyNeedKg.toFixed(1))} کیلوگرم</b>
-      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
+      <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 700 }}>نیاز روزانه:</span>
+      <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>{toFa(dailyNeedKg.toFixed(1))} کیلوگرم</span>
+     </div>
      )}
      {daysAvailable > 0 && (
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-       <span>دوام دانخوری:</span>
-       <b style={{ color: isUnderfed ? 'var(--warn)' : 'var(--text)' }}>{isUnderfed ? `⚠️ ${formatDays(daysAvailable)}` : formatDays(daysAvailable)}</b>
-      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
+      <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 700 }}>دوام دانخوری:</span>
+      <span style={{ fontSize: 'var(--fs-sm)', color: isUnderfed ? 'var(--warn)' : 'var(--text)' }}>{isUnderfed ? `⚠️ ${formatDays(daysAvailable)}` : formatDays(daysAvailable)}</span>
+     </div>
      )}
      {expectedPerBirdG !== null && (
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-       <span>استاندارد روزانه نژاد:</span>
-       <b style={{ color: 'var(--text)' }}>{toFa(expectedPerBirdG)} گرم/پرنده</b>
-      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
+      <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 700 }}>استاندارد روزانه نژاد:</span>
+      <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>{toFa(expectedPerBirdG)} گرم/پرنده</span>
+     </div>
      )}
     </SummaryCard>
    )}
@@ -415,10 +415,10 @@ export default function FeedSection({ form, setForm }: Props) {
      </Grid2>
      {(form.waterFillCount && form.waterFillVolume) && (
       <SummaryCard tone="info">
-       <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
-        <span>مجموع آب مصرفی:</span>
-        <span>{toFa((int(form.waterFillCount) || 0) * (num(form.waterFillVolume) || 0))} لیتر</span>
-       </div>
+       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
+       <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 700 }}>مجموع آب مصرفی:</span>
+       <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>{toFa((int(form.waterFillCount) || 0) * (num(form.waterFillVolume) || 0))} لیتر</span>
+     </div>
       </SummaryCard>
      )}
     </>
@@ -435,10 +435,10 @@ export default function FeedSection({ form, setForm }: Props) {
      <FieldHint fieldPath="dlg.waterAmount" value={form.waterAmount} context={{ flockSize: flockSize || undefined }} />
      {form.waterAmount && (
       <SummaryCard tone="info">
-       <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
-        <span>مجموع آب مصرفی:</span>
-        <span>{toFa(int(form.waterAmount) || 0)} لیتر</span>
-       </div>
+       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
+       <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 700 }}>مجموع آب مصرفی:</span>
+       <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>{toFa(int(form.waterAmount) || 0)} لیتر</span>
+     </div>
       </SummaryCard>
      )}
     </>
