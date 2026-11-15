@@ -29,8 +29,8 @@ function getDoseUnit(u: string | undefined): string {
 }
 
 function getDoseUnitForMethod(method: string | undefined, baseUnit: string | undefined): string | undefined {
-  if (!method) return undefined;
   const u = getDoseUnit(baseUnit);
+  if (!method) return u;  // ← fallback: اگر روش مصرف انتخاب نشده، واحد پایه را نشان بده
   if (method === 'drinking_water') return `${u}/L`;
   if (method === 'feed') return `${u}/kg`;
   if (method === 'injection' || method === 'oral') return `${u}/پرنده`;
@@ -270,7 +270,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         );
         const vCalcMsg = vCalc ? (
           <div style={{ fontSize: 'var(--fs-xs)', color: vCalc.hasData ? 'var(--accent)' : 'var(--muted)', fontWeight: 600, marginTop: 8, textAlign: 'center' }}>
-            {vCalc.hasData ? `💡 نیاز محاسبه‌شده: ${toFa(vCalc.requiredMl ?? 0)} میلی‌لیتر (${vCalc.reason})` : `ℹ️ ${vCalc.reason}`}
+            {vCalc.hasData ? `💡 نیاز محاسبه‌شده: ${toFa(vCalc.requiredMl ?? 0)} میلی‌لیتر (${vCalc.reason})` : !v.method ? 'ℹ️ لطفاً برای محاسبه خودکار، روش مصرف را انتخاب کنید.' : `ℹ️ ${vCalc.reason}`}
           </div>
         ) : null;
 
@@ -412,7 +412,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         ) : null;
         const mCalcMsg = mCalc ? (
           <div style={{ fontSize: 'var(--fs-xs)', color: mCalc.hasData ? 'var(--accent)' : 'var(--muted)', fontWeight: 600, marginTop: 8, textAlign: 'center' }}>
-            {mCalc.hasData ? `💡 نیاز محاسبه‌شده: ${toFa(mCalc.requiredMl ?? 0)} میلی‌لیتر (${mCalc.reason})` : `ℹ️ ${mCalc.reason}`}
+            {mCalc.hasData ? `💡 نیاز محاسبه‌شده: ${toFa(mCalc.requiredMl ?? 0)} میلی‌لیتر (${mCalc.reason})` : !m.method ? 'ℹ️ لطفاً برای محاسبه خودکار، روش مصرف را انتخاب کنید.' : `ℹ️ ${mCalc.reason}`}
           </div>
         ) : null;
 
