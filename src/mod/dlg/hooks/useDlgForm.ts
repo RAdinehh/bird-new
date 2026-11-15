@@ -37,6 +37,51 @@ export interface UseDlgFormParams {
   todayStr: string;
 }
 
+export function dailyLogToForm(l: DailyLog): F {
+  return {
+      id: l.id, flockId: l.flockId, date: l.date, entryTime: l.entryTime,
+      temperature: l.temperature ? toFa(l.temperature) : '',
+      temperatureMin: l.temperatureMin ? toFa(l.temperatureMin) : '',
+      temperatureMax: l.temperatureMax ? toFa(l.temperatureMax) : '',
+      humidity: l.humidity ? toFa(l.humidity) : '',
+      humidityMin: l.humidityMin ? toFa(l.humidityMin) : '',
+      humidityMax: l.humidityMax ? toFa(l.humidityMax) : '',
+      ventilation: l.ventilation, litter: l.litter,
+      behavior: l.behavior, distribution: l.distribution,
+      appearance: l.appearance, sound: l.sound,
+      feedType: l.feedType,
+      feedDelivered: l.feedDelivered !== null ? toFa(l.feedDelivered) : '',
+      feedRemaining: l.feedRemaining !== null ? toFa(l.feedRemaining) : '',
+      feedWaste: (l.feedWaste != null) ? toFa(l.feedWaste) : '',
+      feedSourceType: l.feedSourceType || '',
+      feedSourceId: l.feedSourceId || '',
+      feedSources: l.feedSources && l.feedSources.length > 0
+        ? l.feedSources.map(s => ({ ...s }))
+        : (l.feedSourceId
+          ? [{ id: crypto.randomUUID(), type: (l.feedSourceType || 'item') as 'formula' | 'item', refId: l.feedSourceId, quantity: l.feedDelivered || 0 }]
+          : []),
+      feedMovementIds: l.feedMovementIds || [],
+      feedMethod: l.feedMethod || '',
+      waterMethod: l.waterMethod || '',
+      feedMethodSource: l.feedMethodSource,
+      waterMethodSource: l.waterMethodSource,
+      feedMethodFromHall: l.feedMethodFromHall,
+      waterMethodFromHall: l.waterMethodFromHall,
+      waterAmount: l.waterAmount !== null ? toFa(l.waterAmount) : '',
+      waterFillCount: l.waterFillCount !== null ? toFa(l.waterFillCount) : '',
+      waterFillVolume: l.waterFillVolume !== null ? toFa(l.waterFillVolume) : '',
+      weightSamples: (l.weightSamples || []).map(w => ({ id: w.id, weight: toFa(w.weight) })),
+      eatingEggs: l.eatingEggs != null ? toFa(l.eatingEggs) : '',
+      fertileEggs: (l as any).fertileEggs ? toFa((l as any).fertileEggs) : '',
+      brokenEggs: l.brokenEggs ? toFa(l.brokenEggs) : '',
+      otherEggs: l.otherEggs != null ? toFa(l.otherEggs) : '',
+      weightGender: l.weightGender || '',
+      deaths: l.deaths || [], vaccines: l.vaccines || [],
+      medications: l.medications || [],
+      notes: l.notes,
+    };
+}
+
 export function useDlgForm({ activeFlocks, halls, todayStr }: UseDlgFormParams) {
   const { formulas } = useFed();
   const dlgLogs = useDlg(s => s.logs);
@@ -88,48 +133,7 @@ export function useDlgForm({ activeFlocks, halls, todayStr }: UseDlgFormParams) 
   };
 
   const openEdit = (l: DailyLog) => {
-    setForm({
-      id: l.id, flockId: l.flockId, date: l.date, entryTime: l.entryTime,
-      temperature: l.temperature ? toFa(l.temperature) : '',
-      temperatureMin: l.temperatureMin ? toFa(l.temperatureMin) : '',
-      temperatureMax: l.temperatureMax ? toFa(l.temperatureMax) : '',
-      humidity: l.humidity ? toFa(l.humidity) : '',
-      humidityMin: l.humidityMin ? toFa(l.humidityMin) : '',
-      humidityMax: l.humidityMax ? toFa(l.humidityMax) : '',
-      ventilation: l.ventilation, litter: l.litter,
-      behavior: l.behavior, distribution: l.distribution,
-      appearance: l.appearance, sound: l.sound,
-      feedType: l.feedType,
-      feedDelivered: l.feedDelivered !== null ? toFa(l.feedDelivered) : '',
-      feedRemaining: l.feedRemaining !== null ? toFa(l.feedRemaining) : '',
-      feedWaste: (l.feedWaste != null) ? toFa(l.feedWaste) : '',
-      feedSourceType: l.feedSourceType || '',
-      feedSourceId: l.feedSourceId || '',
-      feedSources: l.feedSources && l.feedSources.length > 0
-        ? l.feedSources.map(s => ({ ...s }))
-        : (l.feedSourceId
-          ? [{ id: crypto.randomUUID(), type: (l.feedSourceType || 'item') as 'formula' | 'item', refId: l.feedSourceId, quantity: l.feedDelivered || 0 }]
-          : []),
-      feedMovementIds: l.feedMovementIds || [],
-      feedMethod: l.feedMethod || '',
-      waterMethod: l.waterMethod || '',
-      feedMethodSource: l.feedMethodSource,
-      waterMethodSource: l.waterMethodSource,
-      feedMethodFromHall: l.feedMethodFromHall,
-      waterMethodFromHall: l.waterMethodFromHall,
-      waterAmount: l.waterAmount !== null ? toFa(l.waterAmount) : '',
-      waterFillCount: l.waterFillCount !== null ? toFa(l.waterFillCount) : '',
-      waterFillVolume: l.waterFillVolume !== null ? toFa(l.waterFillVolume) : '',
-      weightSamples: (l.weightSamples || []).map(w => ({ id: w.id, weight: toFa(w.weight) })),
-      eatingEggs: l.eatingEggs != null ? toFa(l.eatingEggs) : '',
-      fertileEggs: (l as any).fertileEggs ? toFa((l as any).fertileEggs) : '',
-      brokenEggs: l.brokenEggs ? toFa(l.brokenEggs) : '',
-      otherEggs: l.otherEggs != null ? toFa(l.otherEggs) : '',
-      weightGender: l.weightGender || '',
-      deaths: l.deaths || [], vaccines: l.vaccines || [],
-      medications: l.medications || [],
-      notes: l.notes,
-    });
+    setForm(dailyLogToForm(l));
     setErr(''); setOpen(true);
   };
 

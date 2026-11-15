@@ -22,6 +22,8 @@ import { toFa } from '../../../shr/utils/fa';
 import { bus } from '../../../cor/events';
 import LogCard from './LogCard';
 import CorrectionModal from './CorrectionModal';
+import { dailyLogToForm } from '../hooks/useDlgForm';
+import type { F } from '../types';
 import DlgHistoryModal from './DlgHistoryModal';
 import type { Flock } from '../../flk/store';
 import type { Bird } from '../../brd/store';
@@ -44,13 +46,14 @@ interface Props {
   onAdd: (flockId?: string) => void;
   onDeleteLog: (l: DailyLog, opts?: { skipConfirm?: boolean }) => Promise<{ log: DailyLog; snapshot?: DeleteSnapshot } | null>;
   onRestoreLogFull: (log: DailyLog, snapshot: DeleteSnapshot) => Promise<boolean>;
+  onSaveCorrection: (opts: { overrideForm: F; reason: string }) => Promise<boolean>;
 }
 
 export default function DlgTabPanel({
   tab, active,
   logs, activeFlocks, flocks, birds, config,
   vaccineEnabled, medicineEnabled,
-  onEdit, onAdd, onDeleteLog, onRestoreLogFull,
+  onEdit, onAdd, onDeleteLog, onRestoreLogFull, onSaveCorrection,
 }: Props) {
   const { add, archive, restore, addCorrection, revokeCorrection } = useDlg();
   const [undoData, setUndoData] = useState<{ log: DailyLog | DailyLog[]; snapshot?: DeleteSnapshot } | null>(null);
@@ -258,10 +261,18 @@ export default function DlgTabPanel({
       open={!!correctingLog}
       onClose={() => setCorrectingLog(null)}
       log={correctingLog}
-      onSave={(logId, changes, reason, notes) => {
-        addCorrection(logId, changes, reason, notes);
-        toastMsg.saved('اصلاح');
-        setCorrectingLog(null);
+      onSave={async (logId, changes, reason, notes) => {
+        const targetLog = logs.find(l => l.id === logId);
+        if (!targetLog) return;
+        const updatedLog = { ...targetLog, ...changes };
+        const overrideForm = dailyLogToForm(updatedLog);
+        const fullReason = notes ? `${reason} — ${notes}` : reason;
+        const ok = await onSaveCorrection({ overrideForm, reason: fullReason });
+        if (ok) {
+          addCorrection(logId, changes, reason, notes);
+          toastMsg.saved('اصلاح');
+          setCorrectingLog(null);
+        }
       }}
     />
 

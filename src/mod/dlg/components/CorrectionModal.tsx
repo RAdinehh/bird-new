@@ -43,7 +43,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   log: DailyLog | null;
-  onSave: (logId: string, changes: Partial<DailyLog>, reason: string, notes?: string) => void;
+  onSave: (logId: string, changes: Partial<DailyLog>, reason: string, notes?: string) => void | Promise<void>;
 }
 
 export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
@@ -73,7 +73,7 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
   const oldValue = (log as any)[activeField];
   const oldDisplay = oldValue != null ? toFa(String(oldValue)) : '—';
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!log) return;
 
     // L2-guard: multi-record deathsCount — رد
