@@ -297,11 +297,15 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
               medications: f.medications.map(x => {
                 if (x.id !== m.id) return x;
                 const newItem = medicineItems.find(w => w.id === id);
+                const autoDose = newItem?.usageTypes?.includes('water') ? newItem.dosePerLiter : newItem?.usageTypes?.includes('feed') ? newItem.dosePerKgFeed : newItem?.dosePerBird;
+                const doseUnit = newItem?.usageTypes?.includes('water') ? `${getDoseUnit(newItem?.unit)}/L` : newItem?.usageTypes?.includes('feed') ? `${getDoseUnit(newItem?.unit)}/kg` : `${getDoseUnit(newItem?.unit)}/پرنده`;
                 return {
                   ...x,
                   itemId: id,
                   quantity: id ? (x.quantity ?? 0) : null,
+                  unit: newItem?.unit || x.unit,
                   name: newItem ? newItem.name : x.name,
+                  dose: autoDose ? `${autoDose} ${doseUnit}` : x.dose,
                   withdrawalDays: newItem ? newItem.withdrawalDays : x.withdrawalDays
                 };
               })
