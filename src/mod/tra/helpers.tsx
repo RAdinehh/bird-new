@@ -17,18 +17,7 @@ export function Row({ l, v }: { l: string; v: ReactNode }) {
 
 export { SectionTitle } from '../../shr/components/ui';
 
-export function chip(active: boolean): React.CSSProperties {
-  return {
-    padding: '6px 11px', fontSize: 'var(--fs-sm)',
-    background: active ? 'var(--accent-soft)' : 'var(--btn-bg)',
-    border: `1px solid ${active ? 'var(--accent-border)' : 'var(--border)'}`,
-    borderRadius: 'var(--r-sm)',
-    color: active ? 'var(--accent)' : 'var(--muted)',
-    fontWeight: active ? 600 : 500, cursor: 'pointer',
-    fontFamily: 'inherit', whiteSpace: 'nowrap',
-    flexShrink: 0
-  };
-}
+export { chipStyle as chip } from '../../shr/utils/chipStyle';
 
 export function Line({ l, v }: { l: string; v: ReactNode }) {
   return (
