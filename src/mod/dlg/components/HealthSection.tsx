@@ -19,6 +19,15 @@ import { calculateHealthDose } from '../../../shr/calc/formulas/health';
 import { VET_METHOD_OPTIONS } from '../../../shr/constants/vetMethods';
 import type { HealthRoute } from '../../../shr/calc/types';
 
+function getDoseUnit(u: string | undefined): string {
+  if (!u) return 'ml';
+  const lu = u.toLowerCase();
+  if (lu === 'vial') return 'دوز';
+  if (lu === 'ml' || lu === 'l') return 'ml';
+  if (lu === 'g' || lu === 'kg') return 'g';
+  return u;
+}
+
 interface Props {
  form: F;
  setForm: React.Dispatch<React.SetStateAction<F>>;
@@ -167,7 +176,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
             if (x.id !== v.id) return x;
             const newItem = vaccineItems.find(w => w.id === id);
             const autoDose = newItem?.usageTypes?.includes('water') ? newItem.dosePerLiter : newItem?.usageTypes?.includes('feed') ? newItem.dosePerKgFeed : newItem?.dosePerBird;
-            const doseUnit = newItem?.usageTypes?.includes('water') ? `${newItem?.unit || 'ml'}/L` : newItem?.usageTypes?.includes('feed') ? `${newItem?.unit || 'g'}/kg` : `${newItem?.unit || 'ml'}/پرنده`;
+            const doseUnit = newItem?.usageTypes?.includes('water') ? `${getDoseUnit(newItem?.unit)}/L` : newItem?.usageTypes?.includes('feed') ? `${getDoseUnit(newItem?.unit)}/kg` : `${getDoseUnit(newItem?.unit)}/پرنده`;
             return { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null, unit: newItem?.unit || x.unit, name: newItem ? newItem.name : x.name, dose: autoDose ? `${autoDose} ${doseUnit}` : x.dose };
           })
         }))}
