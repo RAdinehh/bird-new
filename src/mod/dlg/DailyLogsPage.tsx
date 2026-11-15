@@ -69,7 +69,7 @@ export default function DailyLogsPage() {
   ): Promise<{ log: DailyLog; snapshot?: any } | null> => {
     const { ok, undoData: log, snapshot } = await deleteLog(l, opts);
     if (!ok || !log) return null;
-    toastMsg.deleted('ثبت');
+    // Toast حذف شد — UndoBar در DlgTabPanel نمایش داده می‌شود (استاندارد UX)
     return { log: log as DailyLog, snapshot };
   };
 

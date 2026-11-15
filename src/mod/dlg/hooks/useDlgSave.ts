@@ -491,11 +491,9 @@ export function useDlgSave(params: UseDlgSaveParams) {
     hadCascades: boolean;
     snapshot?: DeleteSnapshot;
   }> => {
-    // D5.5/B3 — تأیید (در bulk delete skip می‌شود)
-    if (!opts.skipConfirm) {
-      const ok = await showConfirmAsync('تأیید حذف', 'این ثبت روزانه و داده‌های مرتبط حذف شوند؟', { danger: true });
-      if (!ok) return { ok: false, undoData: null, hadCascades: false };
-    }
+    // Modal تأیید حذف شد — UndoBar جایگزین است (استاندارد Nielsen Norman Group)
+    // دلیل: برای عملیات قابل بازگشت، Modal باعث «تأیید خستگی» می‌شود
+    void opts; // skipConfirm در API حفظ شده
 
     const log = logs.find(x => x.id === l.id);
     if (!log) return { ok: false, undoData: null, hadCascades: false };
