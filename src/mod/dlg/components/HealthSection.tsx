@@ -263,20 +263,15 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
             />
           </Field>
         );
-        const reactionField = (
-          <Field label="واکنش">
-            <Input placeholder="مثلاً بدون واکنش" value={v.reaction || ''} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, reaction: e.target.value } : x) }))} />
-          </Field>
-        );
         const vCalcMsg = vCalc ? (
           <div style={{ fontSize: 'var(--fs-xs)', color: vCalc.hasData ? 'var(--accent)' : 'var(--muted)', fontWeight: 600, marginTop: 8, textAlign: 'center' }}>
             {vCalc.hasData ? `💡 نیاز محاسبه‌شده: ${toFa(vCalc.requiredMl ?? 0)} میلی‌لیتر (${vCalc.reason})` : !v.method ? 'ℹ️ لطفاً برای محاسبه خودکار، روش مصرف را انتخاب کنید.' : `ℹ️ ${vCalc.reason}`}
           </div>
         ) : null;
 
-        if (!qtyField) return <><Grid2>{doseField}{reactionField}</Grid2>{vCalcMsg}</>;
-        if (hasSub) return <>{qtyField}<Grid2>{doseField}{reactionField}</Grid2>{vCalcMsg}</>;
-        return <><Grid2>{qtyField}{doseField}</Grid2>{reactionField}{vCalcMsg}</>;
+        if (!qtyField) return <><Grid2>{doseField}</Grid2>{vCalcMsg}</>;
+        if (hasSub) return <>{qtyField}<Grid2>{doseField}</Grid2>{vCalcMsg}</>;
+        return <><Grid2>{qtyField}{doseField}</Grid2>{vCalcMsg}</>;
       })()}
     </>)}
      </ExpandableCard>
