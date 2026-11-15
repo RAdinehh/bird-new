@@ -79,7 +79,7 @@ export default function FlockPickerSheet({ open, onClose, flocks, logs, todayStr
               accent={ACCENT_MAP[flock.type] || 'accent'}
               iconEmoji={typeInfo.icon}
               title={flock.name || '—'}
-              subtitle={metaParts.join(' | ')}
+              subtitle={metaParts.join(' • ')}
               badge={
                 hasLogs
                   ? <Tag tone="accent">✅ {toFa(existingLogs.length)} ثبت</Tag>

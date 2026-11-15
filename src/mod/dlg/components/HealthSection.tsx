@@ -99,7 +99,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
      variant="inner"
      accent="accent"
      title={d.count === 0 && !d.cause ? 'رکورد جدید' : 'رکورد ' + toFa(i + 1)}
-     subtitle={`${(d.count ?? 0) > 0 ? `${toFa(d.count ?? 0)} پرنده` : 'بدون داده'}${d.cause ? ' | ' + (causeOptions.find(o => o.value === d.cause)?.label || '') : ''}`}
+     subtitle={`${(d.count ?? 0) > 0 ? `${toFa(d.count ?? 0)} پرنده` : 'بدون داده'}${d.cause ? ' • ' + (causeOptions.find(o => o.value === d.cause)?.label || '') : ''}`}
      isOpen={expandedId === 'd-' + d.id}
      onToggle={() => setExpandedId(expandedId === 'd-' + d.id ? null : 'd-' + d.id)}
      onDelete={() => setForm(f => ({ ...f, deaths: f.deaths.filter(x => x.id !== d.id) }))}
@@ -150,7 +150,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
      variant="inner"
      accent="accent"
      title={v.name || 'واکسن ' + toFa(i + 1)}
-     subtitle={`${v.dose ? 'دوز: ' + toFa(v.dose) : 'بدون دوز'}${v.itemId ? ' | از انبار' : ''}`}
+     subtitle={`${v.dose ? 'دوز: ' + toFa(v.dose) : 'بدون دوز'}${v.itemId ? ' • از انبار' : ''}`}
      isOpen={expandedId === 'v-' + v.id}
      onToggle={() => setExpandedId(expandedId === 'v-' + v.id ? null : 'v-' + v.id)}
      onDelete={() => setForm(f => ({ ...f, vaccines: f.vaccines.filter(x => x.id !== v.id) }))}
@@ -269,7 +269,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
      variant="inner"
      accent="accent"
      title={m.name || 'دارو ' + toFa(i + 1)}
-     subtitle={`${m.dose ? 'دوز: ' + toFa(m.dose) : 'بدون دوز'}${isHerbal ? ' | گیاهی' : m.withdrawalDays ? ' | پرهیز: ' + m.withdrawalDays + ' روز' : ''}`}
+     subtitle={`${m.dose ? 'دوز: ' + toFa(m.dose) : 'بدون دوز'}${isHerbal ? ' • گیاهی' : m.withdrawalDays ? ' • پرهیز: ' + m.withdrawalDays + ' روز' : ''}`}
      isOpen={expandedId === 'm-' + m.id}
      onToggle={() => setExpandedId(expandedId === 'm-' + m.id ? null : 'm-' + m.id)}
      onDelete={() => setForm(f => ({ ...f, medications: f.medications.filter(x => x.id !== m.id) }))}

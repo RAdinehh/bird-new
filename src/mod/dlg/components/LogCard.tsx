@@ -136,7 +136,7 @@ export default function LogCard(props: LogCardProps) {
       id={l.id} ms={ms} accent={accent}
       index={toFa(i + 1)} iconEmoji="📋"
       title={flock?.name || '—'}
-      subtitle={`${toFa(l.date)}${l.entryTime ? ` | ${toFa(l.entryTime)}` : ''}${l.birdAgeDays !== null && l.birdAgeDays > 0 ? ` | ${toFa(l.birdAgeDays)} روز` : ''}${birdName ? ` | ${birdName}` : ''}`}
+      subtitle={`${toFa(l.date)}${l.entryTime ? ` • ${toFa(l.entryTime)}` : ''}${l.birdAgeDays !== null && l.birdAgeDays > 0 ? ` • ${toFa(l.birdAgeDays)} روز` : ''}${birdName ? ` • ${birdName}` : ''}`}
       isOpen={isOpen} onToggle={onToggle}
       badge={<BadgeOverflow badges={allBadges} max={2} modalTitle={`برچسب‌های «${flock?.name || 'لاگ'}»`} />}
       stats={<>
@@ -276,7 +276,7 @@ export default function LogCard(props: LogCardProps) {
                     v.dose ? `دوز ${toFa(v.dose)}` : null,
                     methodLabel,
                     v.quantity ? `مقدار ${toFa(v.quantity)} ${v.unit || ''}` : null,
-                  ].filter(Boolean).join(' | ');
+                  ].filter(Boolean).join(' • ');
                   return <Row key={v.id} l="واکسن" v={detail} />;
                 })}
               </div>
@@ -292,7 +292,7 @@ export default function LogCard(props: LogCardProps) {
                     methodLabel,
                     m.quantity ? `مقدار ${toFa(m.quantity)} ${m.unit || ''}` : null,
                     m.withdrawalDays ? `پرهیز ${toFa(m.withdrawalDays)} روز` : null,
-                  ].filter(Boolean).join(' | ');
+                  ].filter(Boolean).join(' • ');
                   return <Row key={m.id} l="دارو" v={detail} />;
                 })}
               </div>
@@ -335,7 +335,7 @@ export default function LogCard(props: LogCardProps) {
                   const oldVal = (rawLog as any)[k];
                   const newVal = (corr.changes as any)[k];
                   return `${FIELD_LABEL[k] || k}: ${oldVal ?? '—'} → ${newVal ?? '—'}`;
-                }).join(' | ')}
+                }).join(' • ')}
               </span>
               <span style={{ color: 'var(--muted)' }}>({corr.reason})</span>
               {corr.revoked ? (
