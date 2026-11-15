@@ -147,7 +147,7 @@ export default function ExpandableCard({
           }}
         >
           <div style={{ overflow: 'hidden', minHeight: 0 }}>
-            <div style={{ padding: '0 var(--pad-normal) var(--pad-normal)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ padding: 'var(--pad-normal)', display: 'flex', flexDirection: 'column', gap: 8, boxSizing: 'border-box', width: '100%' }}>
               {children}
             </div>
           </div>
