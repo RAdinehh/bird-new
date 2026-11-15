@@ -6,14 +6,7 @@ import type { ReactNode } from 'react';
 import { dealDaysUntilDue } from './calc';
 import type { Deal } from './types';
 
-export function Row({ l, v }: { l: string; v: ReactNode }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8, fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', minWidth: 0 }}>
-      <span style={{ color: 'var(--muted)', flex: 1, wordBreak: 'break-word' }}>{l}:</span>
-      <span style={{ fontWeight: 600, color: 'var(--text)', textAlign: 'left', whiteSpace: 'nowrap', flexShrink: 0 }}>{v}</span>
-    </div>
-  );
-}
+export { Row, RowGrid } from '../../shr/components/ui';
 
 export { SectionTitle } from '../../shr/components/ui';
 
@@ -109,17 +102,6 @@ export function dueLabel(days: number | null): string {
   return `${days} روز مانده`;
 }
 
-export function RowGrid({ children }: { children: ReactNode }) {
-  return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      gap: 'var(--sp-1)',
-    }}>
-      {children}
-    </div>
-  );
-}
 
 export const CAT_LABEL: Record<string, string> = {
   chick: 'جوجه یک‌روزه',
