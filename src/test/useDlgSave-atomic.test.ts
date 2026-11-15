@@ -190,6 +190,90 @@ describe('useDlgSave — B4 atomic', () => {
     if (origAddMovement) useWhs.setState({ addMovement: origAddMovement });
   });
 
+  it('6) second movement fails after first mutation → restore snapshots', async () => {
+    useWhs.setState({
+      items: [{
+        id: 'item-1', name: 'feed', category: 'feed',
+        currentStock: 100, lastPrice: 1000, unit: 'kg',
+        initialStock: 100, minStock: 0, supplierId: '',
+        expireDate: '', storage: 'room', notes: '',
+        withdrawalDays: null, createdAt: '', updatedAt: '',
+      } as Item],
+    });
+
+    const snapshot = () => {
+      const dlg = useDlg.getState();
+      const whs = useWhs.getState();
+      const egg = useEgg.getState();
+      const flk = useFlk.getState();
+      return JSON.parse(JSON.stringify({
+        logs: dlg.logs,
+        items: whs.items,
+        movements: whs.movements,
+        productions: egg.productions,
+        sales: egg.sales,
+        discards: egg.discards,
+        flocks: flk.flocks,
+        groups: flk.groups,
+        groupMembers: flk.groupMembers,
+        consumptionEvents: flk.consumptionEvents,
+      }));
+    };
+
+    const before = snapshot();
+    const realAddMovement = useWhs.getState().addMovement;
+    let calls = 0;
+    let firstId = '';
+    let stockAfterFirst: number | undefined;
+    let movementsAfterFirst = 0;
+
+    useWhs.setState({
+      addMovement: (...args: Parameters<WhsState['addMovement']>) => {
+        calls++;
+        if (calls === 2) return '';
+        firstId = realAddMovement(...args);
+        const state = useWhs.getState();
+        stockAfterFirst = state.items.find(x => x.id === 'item-1')?.currentStock;
+        movementsAfterFirst = state.movements.length;
+        return firstId;
+      },
+    });
+
+    let ok = true;
+    try {
+      const params = makeParams({
+        form: {
+          ...emptyForm(),
+          feedDelivered: '30',
+          feedSourceType: 'item',
+          feedSourceId: 'item-1',
+          feedSources: [
+            { type: 'item', refId: 'item-1', quantity: 10 },
+            { type: 'item', refId: 'item-1', quantity: 20 },
+          ],
+        },
+      });
+      const { result } = renderHook(() => useDlgSave(params));
+      await act(async () => {
+        ok = await result.current.save();
+      });
+    } finally {
+      useWhs.setState({ addMovement: realAddMovement });
+    }
+
+    expect(calls).toBe(2);
+    expect(firstId).toBeTruthy();
+    expect(movementsAfterFirst).toBe(1);
+    expect(stockAfterFirst).toBe(90);
+    expect(ok).toBe(false);
+    expect(snapshot()).toEqual(before);
+
+    const { outbox } = await import('../cor/outbox');
+    const { toastMsg } = await import('../cor/store/toast');
+    expect(outbox.publish).not.toHaveBeenCalled();
+    expect(toastMsg.saved).not.toHaveBeenCalled();
+  });
+
   it('4) deleteLog موفق → log حذف شد', async () => {
     const logId = useDlg.getState().add(makeLogRecord());
     const log = useDlg.getState().logs.find(l => l.id === logId)!;
