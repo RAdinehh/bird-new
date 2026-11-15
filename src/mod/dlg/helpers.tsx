@@ -1,12 +1,13 @@
 /**
  * helpers.tsx — helperهای مشترک ماژول dlg
  */
+import { SectionTitle } from '../../shr/components/ui';
 import type { ReactNode } from 'react';
 
 export function LogSection({ title, children }: { title: string; children: ReactNode }) {
   return (
     <>
-      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>{title}</div>
+      <SectionTitle first>{title}</SectionTitle>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>{children}</div>
     </>
   );
