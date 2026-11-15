@@ -4,14 +4,15 @@
  * منطق:
  *   - water:         requiredMl = dosePerLiter × waterAmountL
  *   - oral/injectable: requiredMl = dosePerBirdMl × aliveCount
- *   - feed/spray/other: insufficient (نیاز به داده اختصاصی)
+ *   - feed:           requiredMl = dosePerKgFeed × feedAmountKg
+ *   - spray/other:    insufficient (نیاز به داده اختصاصی)
  *
  * اگر داده کافی نبود، hasData=false و requiredMl=null برمی‌گردد.
  */
 import type { HealthParams, HealthResult } from '../types';
 
 export function calculateHealthDose(params: HealthParams): HealthResult {
-  const { route, waterAmountL, aliveCount, dosePerBirdMl, dosePerLiter } = params;
+  const { route, waterAmountL, aliveCount, dosePerBirdMl, dosePerLiter, feedAmountKg, dosePerKgFeed } = params;
 
   // ═══ روش آشامیدنی ═══
   if (route === 'water') {
@@ -65,7 +66,33 @@ export function calculateHealthDose(params: HealthParams): HealthResult {
     };
   }
 
-  // ═══ روش‌های دیگر (feed/spray/other) ═══
+  // ═══ روش مخلوط با دان ═══
+  if (route === 'feed') {
+    if (!dosePerKgFeed || dosePerKgFeed <= 0) {
+      return {
+        requiredMl: null,
+        mode: 'insufficient',
+        reason: 'دوز در هر کیلوگرم دان در انبار تعریف نشده است.',
+        hasData: false,
+      };
+    }
+    if (!feedAmountKg || feedAmountKg <= 0) {
+      return {
+        requiredMl: null,
+        mode: 'insufficient',
+        reason: 'مقدار دان مصرفی امروز ثبت نشده است.',
+        hasData: false,
+      };
+    }
+    return {
+      requiredMl: Math.round(dosePerKgFeed * feedAmountKg * 10) / 10,
+      mode: 'feed',
+      reason: `بر اساس ${feedAmountKg} کیلوگرم دان مصرفی امروز`,
+      hasData: true,
+    };
+  }
+
+  // ═══ روش‌های دیگر (spray/other) ═══
   return {
     requiredMl: null,
     mode: 'insufficient',
