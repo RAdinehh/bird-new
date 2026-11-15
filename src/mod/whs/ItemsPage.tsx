@@ -97,7 +97,7 @@ const EQUIP_STATUS: Record<string, string> = { active: 'فعال', repair: 'در
 
 export default function ItemsPage({ active = true }: { active?: boolean } = {}) {
   const navigate = useNavigate();
-  const { items, movements, addItem, updateItem, deleteItem } = useWhs();
+  const { items, movements, addItem, updateItem, deleteItem, archiveItem, unarchiveItem } = useWhs();
   const { contacts } = useCtc();
   const { halls } = useHal();
   const suppliers = contacts.filter(c => c.roles.includes('supplier'));
@@ -107,6 +107,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
   const [err, setErr] = useState('');
   const [undoData, setUndoData] = useState<{ item: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [showArchived, setShowArchived] = useState(false);
 
   // ─── تعریف مشترک فیلترها و مرتب‌سازی ───
   // ─── فیلتر / جستجو / مرتب‌سازی (از config مرکزی) ───
@@ -431,7 +432,26 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         </div>
       )}
 
-      {list.length === 0 ? (
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+      <button
+        type="button"
+        onClick={() => setShowArchived(s => !s)}
+        style={{
+          padding: '6px 12px',
+          background: showArchived ? 'var(--accent-soft)' : 'var(--input-bg)',
+          border: `1px solid ${showArchived ? 'var(--accent)' : 'var(--border)'}`,
+          borderRadius: 'var(--r-sm)',
+          color: showArchived ? 'var(--accent)' : 'var(--muted)',
+          fontFamily: 'inherit',
+          fontSize: 'var(--fs-xs)',
+          fontWeight: 600,
+          cursor: 'pointer',
+        }}
+      >
+        {showArchived ? '📦 مخفی کردن آرشیو' : '📦 نمایش آرشیو'}
+      </button>
+    </div>
+    {list.filter(it => showArchived || !it.archived).length === 0 ? (
         items.length === 0 ? (
           <Empty
             icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>}
@@ -449,7 +469,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         )
       ) : (
         <>
-          {list.map((it, i) => {
+          {list.filter(it => showArchived || !it.archived).map((it, i) => {
             const sup = contacts.find(c => c.id === it.supplierId);
             const hall = it.hallId ? halls.find(h => h.id === it.hallId) : null;
             const myMovements = movements.filter(m => m.itemId === it.id);
@@ -468,6 +488,8 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
                 onEdit={() => openEdit(it)}
                 onAdjust={() => adjustStock(it)}
                 onDelete={deleteItem}
+                        onArchive={() => archiveItem(it.id)}
+                        onUnarchive={() => unarchiveItem(it.id)}
                 onUndo={(item: any) => {
                   setUndoData({ item });
                   setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000);

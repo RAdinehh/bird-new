@@ -30,10 +30,12 @@ export interface ItemCardProps {
   onAdjust: () => void;
   onDelete: (id: string) => void;
   onUndo: (item: any) => void;
+  onArchive?: () => void;
+  onUnarchive?: () => void;
 }
 
 export default function ItemCard(props: ItemCardProps) {
-  const { it, i, hall, sup, myMovements, isOpen, ms, onToggle, onEdit, onAdjust, onDelete, onUndo } = props;
+  const { it, i, hall, sup, myMovements, isOpen, ms, onToggle, onEdit, onAdjust, onDelete, onUndo, onArchive, onUnarchive } = props;
 
   const stock = stockWarning(it);
   const exp = expiryWarning(it);
@@ -50,6 +52,19 @@ export default function ItemCard(props: ItemCardProps) {
     onUndo(it);
     onDelete(it.id);
     logAction('delete', 'whs', 'حذف از انبار');
+    toastMsg.deleted(it.name);
+  };
+
+  const handleArchive = async () => {
+    const movementCount = myMovements?.length || 0;
+    const ok = await showConfirmAsync(
+      '⚠️ آرشیو کالا',
+      `این کالا ${toFa(movementCount)} گردش انبار دارد و قابل حذف کامل نیست.\n\nبا آرشیو، از لیست پنهان می‌شود ولی تمام تاریخچه حفظ می‌شود.`,
+      { confirmText: 'آرشیو کن', cancelText: 'انصراف', danger: false }
+    );
+    if (!ok) return;
+    onArchive?.();
+    logAction('update', 'whs', 'آرشیو کالا');
     toastMsg.deleted(it.name);
   };
 
@@ -141,11 +156,20 @@ export default function ItemCard(props: ItemCardProps) {
       ) : null}
 
       <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-        <CardActions actions={[
-          { label: 'اصلاح', onClick: onAdjust, variant: 'primary' },
-          { label: 'ویرایش', onClick: onEdit, variant: 'outline' },
-          { label: 'حذف', onClick: handleDelete, variant: 'danger-outline' }
-        ]} />
+        <CardActions actions={(() => {
+          const hasMovements = myMovements && myMovements.length > 0;
+          const baseActions = [
+            { label: 'اصلاح', onClick: onAdjust, variant: 'primary' as const },
+            { label: 'ویرایش', onClick: onEdit, variant: 'outline' as const },
+          ];
+          if (it.archived) {
+            return [...baseActions, { label: 'بازگردانی', onClick: () => onUnarchive?.(), variant: 'primary' as const }];
+          }
+          if (hasMovements) {
+            return [...baseActions, { label: 'آرشیو', onClick: handleArchive, variant: 'danger-outline' as const }];
+          }
+          return [...baseActions, { label: 'حذف', onClick: handleDelete, variant: 'danger-outline' as const }];
+        })()} />
       </div>
     </ExpandableCard>
   );
