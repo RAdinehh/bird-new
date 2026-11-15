@@ -166,7 +166,8 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
           vaccines: f.vaccines.map(x => {
             if (x.id !== v.id) return x;
             const newItem = vaccineItems.find(w => w.id === id);
-            return { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null, name: newItem ? newItem.name : x.name };
+            const autoDose = newItem?.usageTypes?.includes('water') ? newItem.dosePerLiter : newItem?.usageTypes?.includes('feed') ? newItem.dosePerKgFeed : newItem?.dosePerBird;
+            return { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null, name: newItem ? newItem.name : x.name, dose: autoDose ? String(autoDose) : x.dose };
           })
         }))}
             options={vaccineItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}` }))}
@@ -211,13 +212,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
               setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, unit: u, factor: fct } : x) }));
             }}
             options={opts}
-          />          {vCalc && (
-            <div style={{ fontSize: 'var(--fs-xs)', color: vCalc.hasData ? 'var(--accent)' : 'var(--muted)', fontWeight: 600, marginTop: 2, paddingRight: 4 }}>
-              {vCalc.hasData
-                ? `💡 نیاز محاسبه‌شده: ${toFa(vCalc.requiredMl ?? 0)} میلی‌لیتر (${vCalc.reason})`
-                : `ℹ️ ${vCalc.reason}`}
-            </div>
-          )}
+          />
           {vCalc?.hasData && (
             <FieldHint
               fieldPath="dlg.dose"
@@ -235,12 +230,13 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         ) : null;
         const methodField = (
           <Field label="روش مصرف">
-            <Select value={v.method || ''} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, method: e.target.value } : x) }))}>
-              <option value="">— نامشخص —</option>
-              {getAllowedMethods(vaccineItems.find(w => w.id === v.itemId)).map(o => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </Select>
+            <SmartSelect
+              value={v.method || ''}
+              onChange={val => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, method: val } : x) }))}
+              options={getAllowedMethods(vaccineItems.find(w => w.id === v.itemId)).map(o => ({ value: o.value, label: o.label }))}
+              placeholder="انتخاب روش"
+              modalTitle="روش مصرف"
+            />
           </Field>
         );
         const reactionField = (
@@ -248,9 +244,15 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
             <Input placeholder="مثلاً بدون واکنش" value={v.reaction || ''} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, reaction: e.target.value } : x) }))} />
           </Field>
         );
-        if (!qtyField) return <Grid2>{methodField}{reactionField}</Grid2>;
-        if (hasSub) return <>{qtyField}<Grid2>{methodField}{reactionField}</Grid2></>;
-        return <><Grid2>{qtyField}{methodField}</Grid2>{reactionField}</>;
+        const vCalcMsg = vCalc ? (
+          <div style={{ fontSize: 'var(--fs-xs)', color: vCalc.hasData ? 'var(--accent)' : 'var(--muted)', fontWeight: 600, marginTop: 8, textAlign: 'center' }}>
+            {vCalc.hasData ? `💡 نیاز محاسبه‌شده: ${toFa(vCalc.requiredMl ?? 0)} میلی‌لیتر (${vCalc.reason})` : `ℹ️ ${vCalc.reason}`}
+          </div>
+        ) : null;
+
+        if (!qtyField) return <><Grid2>{methodField}{reactionField}</Grid2>{vCalcMsg}</>;
+        if (hasSub) return <>{qtyField}<Grid2>{methodField}{reactionField}</Grid2>{vCalcMsg}</>;
+        return <><Grid2>{qtyField}{methodField}</Grid2>{reactionField}{vCalcMsg}</>;
       })()}
     </>)}
      </ExpandableCard>
@@ -338,13 +340,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
               setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, unit: u, factor: fct } : x) }));
             }}
             options={opts}
-          />          {mCalc && (
-            <div style={{ fontSize: 'var(--fs-xs)', color: mCalc.hasData ? 'var(--accent)' : 'var(--muted)', fontWeight: 600, marginTop: 2, paddingRight: 4 }}>
-              {mCalc.hasData
-                ? `💡 نیاز محاسبه‌شده: ${toFa(mCalc.requiredMl ?? 0)} میلی‌لیتر (${mCalc.reason})`
-                : `ℹ️ ${mCalc.reason}`}
-            </div>
-          )}
+          />
           {mCalc?.hasData && (
             <FieldHint
               fieldPath="dlg.dose"
@@ -362,12 +358,13 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         ) : null;
         const methodField = (
           <Field label="روش مصرف">
-            <Select value={m.method || ''} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, method: e.target.value } : x) }))}>
-              <option value="">— نامشخص —</option>
-              {getAllowedMethods(medicineItems.find(w => w.id === m.itemId)).map(o => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </Select>
+            <SmartSelect
+              value={m.method || ''}
+              onChange={val => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, method: val } : x) }))}
+              options={getAllowedMethods(medicineItems.find(w => w.id === m.itemId)).map(o => ({ value: o.value, label: o.label }))}
+              placeholder="انتخاب روش"
+              modalTitle="روش مصرف"
+            />
           </Field>
         );
         const withdrawalField = !isHerbal ? (
@@ -380,9 +377,15 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
             />
           </Field>
         ) : null;
-        if (!qtyField) return <Grid2>{methodField}{withdrawalField}</Grid2>;
-        if (hasSub) return <>{qtyField}<Grid2>{methodField}{withdrawalField}</Grid2></>;
-        return <><Grid2>{qtyField}{methodField}</Grid2>{withdrawalField}</>;
+        const mCalcMsg = mCalc ? (
+          <div style={{ fontSize: 'var(--fs-xs)', color: mCalc.hasData ? 'var(--accent)' : 'var(--muted)', fontWeight: 600, marginTop: 8, textAlign: 'center' }}>
+            {mCalc.hasData ? `💡 نیاز محاسبه‌شده: ${toFa(mCalc.requiredMl ?? 0)} میلی‌لیتر (${mCalc.reason})` : `ℹ️ ${mCalc.reason}`}
+          </div>
+        ) : null;
+
+        if (!qtyField) return <><Grid2>{methodField}{withdrawalField}</Grid2>{mCalcMsg}</>;
+        if (hasSub) return <>{qtyField}<Grid2>{methodField}{withdrawalField}</Grid2>{mCalcMsg}</>;
+        return <><Grid2>{qtyField}{methodField}</Grid2>{withdrawalField}{mCalcMsg}</>;
       })()}
     </>)}
      </ExpandableCard>
