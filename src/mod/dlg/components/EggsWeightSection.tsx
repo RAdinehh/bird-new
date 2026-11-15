@@ -6,6 +6,7 @@ import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { Btn, Field, Grid2, NumField, Select } from '../../../shr/components/ui';
 import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
 import { toFa, toEn } from '../../../shr/utils/fa';
+import { cvText } from '../../../shr/utils/weightHelpers';
 import { avgWeight, cvWeight } from '../store';
 import { calculateWeightMetrics } from '../../../shr/calc/formulas/weight';
 import type { F } from '../types';
@@ -18,14 +19,6 @@ interface Props {
  flockAliveCount: number;
  showError: (field: string) => string | undefined;
  markTouched: (field: string) => void;
-}
-
-function cvText(cv: number): { text: string; color: string } {
- if (!isFinite(cv) || cv < 0) return { text: '—', color: 'var(--muted)' };
- if (cv <= 8) return { text: 'عالی — گله کاملاً همگن', color: 'var(--success, var(--accent))' };
- if (cv <= 10) return { text: 'خوب — در محدوده مطلوب صنعت', color: 'var(--success, var(--accent))' };
- if (cv <= 12) return { text: 'متوسط — توزیع دان و آبخوری را پایش کن', color: 'var(--warn, var(--accent))' };
- return { text: 'ضعیف — رقابت غذایی یا بیماری را فوری بررسی کن', color: 'var(--danger)' };
 }
 
 export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCount, showError, markTouched }: Props) {

@@ -20,6 +20,8 @@ import { BadgeOverflow, type BadgeItem } from '../../../shr/components/ui/BadgeO
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { LogSection, Row } from '../helpers';
 import { VET_METHOD_LABEL } from '../../../shr/constants/vetMethods';
+import { GENDER_LABEL, formatWeightGrams, cvText } from '../../../shr/utils/weightHelpers';
+import { calculateWeightMetrics } from '../../../shr/calc';
 import { applyCorrections } from '../api/applyCorrections';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { Grid2, Grid3 } from '../../../shr/components/ui';
@@ -211,18 +213,44 @@ export default function LogCard(props: LogCardProps) {
         </LogSection>
       )}
 
-      {l.weightSamples && l.weightSamples.length > 0 && (
-        <LogSection title="⚖️ وزن‌کشی">
-          <Grid2>
-            <Row l="تعداد نمونه" v={toFa(l.weightSamples.length)} />
-            <Row l="میانگین" v={`${toFa(avgWeight(l.weightSamples))} کیلوگرم`} />
-          </Grid2>
-          <Grid2>
-            <Row l="مجموع" v={`${toFa(sumWeight(l.weightSamples))} کیلوگرم`} />
-            <Row l="ضریب تغییرات" v={`${toFa(cvWeight(l.weightSamples))}٪`} />
-          </Grid2>
-        </LogSection>
-      )}
+      {l.weightSamples && l.weightSamples.length > 0 && (() => {
+        const parseW = (s: string | number): number => {
+          const str = String(s).replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace('٫', '.');
+          return parseFloat(str) || 0;
+        };
+        const weights = l.weightSamples.map(w => parseW(w.weight)).filter(w => w > 0);
+        if (weights.length === 0) return null;
+        const hasThree = weights.length >= 3;
+        const metrics = hasThree ? calculateWeightMetrics({
+          samples: weights.map((w, i) => ({ id: String(i), weight: w })),
+          previousAvgWeightG: null,
+          ageDays: l.birdAgeDays ?? 0,
+          standardWeightG: null,
+        }) : null;
+        const avg = metrics && metrics.hasData ? metrics.avgWeightG : (weights.reduce((a, b) => a + b, 0) / weights.length);
+        const cv = metrics && metrics.hasData ? metrics.cvPct : cvWeight(l.weightSamples);
+        const cvLbl = cvText(cv);
+        return (
+          <LogSection title="⚖️ وزن‌کشی">
+            <Grid2>
+              <Row l="تعداد نمونه" v={toFa(weights.length)} />
+              <Row l="میانگین" v={formatWeightGrams(avg)} />
+            </Grid2>
+            <Grid2>
+              {l.weightGender ? (
+                <Row l="جنسیت" v={GENDER_LABEL[l.weightGender] || l.weightGender} />
+              ) : <div />}
+              <Row l="ضریب تغییرات" v={`${toFa(cv)}٪`} />
+            </Grid2>
+            <div style={{ fontSize: 'var(--fs-xs)', color: cvLbl.color, fontWeight: 600, paddingRight: 4, marginTop: 2 }}>
+              {cvLbl.text}
+            </div>
+            {metrics && metrics.hasData && (
+              <Row l="یکنواختی" v={`${toFa(metrics.uniformityPct)}٪`} accent={metrics.uniformityPct >= 80} />
+            )}
+          </LogSection>
+        );
+      })()}
 
       {l.deaths && l.deaths.length > 0 && (
         <LogSection title="💀 تلفات">
