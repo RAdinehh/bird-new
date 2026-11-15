@@ -142,7 +142,7 @@ export default function DlgTabPanel({
     const result = await onDeleteLog(l);
     if (!result) return;
     setUndoData({ log: result.log, snapshot: result.snapshot });
-    setTimeout(() => setUndoData((cur) => cur && !Array.isArray(cur.log) && cur.log.id === result.log.id ? null : cur), 5000);
+    setTimeout(() => setUndoData((cur) => cur && !Array.isArray(cur.log) && cur.log.id === result.log.id ? null : cur), 6000);
   };
 
   const renderLogCard = (l: DailyLog, i: number) => {

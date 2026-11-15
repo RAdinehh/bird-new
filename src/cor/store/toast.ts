@@ -48,7 +48,7 @@ export const useToast = create<ToastState>((set) => ({
   add: (message, type = 'info', duration) => {
     const id = 'toast-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
     const dur = duration ?? DEFAULT_DURATION[type];
-    set((state) => ({ toasts: [...state.toasts.filter(t => t.message !== message), { id, message, type, duration: dur }] }));
+    set((state) => ({ toasts: [...state.toasts, { id, message, type, duration: dur }] }));
     setTimeout(() => {
       set((state) => ({ toasts: state.toasts.filter(t => t.id !== id) }));
     }, dur);
