@@ -26,12 +26,12 @@ export function Grid3({ children }: { children: React.ReactNode }) {
 export function PageContainer({ children, bottomPad }: { children: React.ReactNode; bottomPad?: number }) {
   return <div style={{ padding: 'var(--sp-3)', paddingBottom: bottomPad ? `calc(var(--sp-3) + ${bottomPad}px)` : 'var(--sp-3)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>{children}</div>;
 }
-export function SectionTitle({ children }: { children: React.ReactNode }) {
+export function SectionTitle({ children, first }: { children: React.ReactNode; first?: boolean }) {
   return (
     <div style={{
-      paddingTop: 12,
-      marginTop: 4,
-      borderTop: '1px dashed var(--border)',
+      paddingTop: first ? 0 : 12,
+      marginTop: first ? 0 : 4,
+      borderTop: first ? 'none' : '1px dashed var(--border)',
       fontSize: 'var(--fs-base)',
       fontWeight: 600,
       color: 'var(--text)',
