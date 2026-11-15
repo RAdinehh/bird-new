@@ -4,7 +4,7 @@
  */
 import { useMemo, useState } from 'react';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
-import { Field, Grid2, NumField, Btn, Select, Sheet, AlertBox, Tag, SummaryCard, QuantityUnitInput, type UnitOption } from '../../../shr/components/ui';
+import { Field, Grid2, NumField, Btn, Select, Sheet, AlertBox, Tag, SummaryCard, QuantityUnitInput, type UnitOption, SummaryRow } from '../../../shr/components/ui';
 import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { UNIT_LABEL } from '../../whs/store';
@@ -378,28 +378,10 @@ export default function FeedSection({ form, setForm }: Props) {
 
    {sources.length > 0 && (
     <SummaryCard tone={finalSummaryTone}>
-     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
-      <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 700 }}>مجموع مصرف:</span>
-      <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>{toFa(totalFeed.toFixed(1))} کیلوگرم</span>
-     </div>
-     {dailyNeedKg > 0 && (
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
-      <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 700 }}>نیاز روزانه:</span>
-      <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>{toFa(dailyNeedKg.toFixed(1))} کیلوگرم</span>
-     </div>
-     )}
-     {daysAvailable > 0 && (
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
-      <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 700 }}>دوام دانخوری:</span>
-      <span style={{ fontSize: 'var(--fs-sm)', color: isUnderfed ? 'var(--warn)' : 'var(--text)' }}>{isUnderfed ? `⚠️ ${formatDays(daysAvailable)}` : formatDays(daysAvailable)}</span>
-     </div>
-     )}
-     {expectedPerBirdG !== null && (
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
-      <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 700 }}>استاندارد روزانه نژاد:</span>
-      <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>{toFa(expectedPerBirdG)} گرم/پرنده</span>
-     </div>
-     )}
+     <SummaryRow label="مجموع مصرف:" value={`${toFa(totalFeed.toFixed(1))} کیلوگرم`} />
+     {dailyNeedKg > 0 && <SummaryRow label="نیاز روزانه:" value={`${toFa(dailyNeedKg.toFixed(1))} کیلوگرم`} />}
+     {daysAvailable > 0 && <SummaryRow label="دوام دانخوری:" value={isUnderfed ? `⚠️ ${formatDays(daysAvailable)}` : formatDays(daysAvailable)} />}
+     {expectedPerBirdG !== null && <SummaryRow label="استاندارد روزانه نژاد:" value={`${toFa(expectedPerBirdG)} گرم/پرنده`} />}
     </SummaryCard>
    )}
 

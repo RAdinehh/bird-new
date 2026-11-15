@@ -2,7 +2,7 @@
  * HealthSection — تلفات + واکسن + دارو
  */
 import { useMemo, useState } from 'react';
-import { Btn, Field, Grid2, Input, NumField, Select, Textarea, AlertBox, Tag, SummaryCard } from '../../../shr/components/ui';
+import { Btn, Field, Grid2, Input, NumField, Select, Textarea, AlertBox, Tag, SummaryCard, SummarySection, SummaryRow } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
 import SmartSelect from '../../../shr/components/SmartSelect';
@@ -404,63 +404,45 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
 
     return (
       <SummaryCard tone={tone}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, textAlign: 'right', width: '100%' }} dir="rtl">
+        <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'right', width: '100%' }} dir="rtl">
           {totalDeaths > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
-                <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>تلفات:</span>
-                <span style={{ color: exceeds ? 'var(--danger)' : 'var(--text)', fontWeight: 600, fontSize: 'var(--fs-sm)' }}>
-                  {toFa(totalDeaths)} پرنده {flockAliveCount ? `از ${toFa(flockAliveCount)}` : ''} {exceeds && '⚠️'}
-                </span>
-              </div>
+            <SummarySection
+              title="تلفات:"
+              meta={<>{toFa(totalDeaths)} پرنده {flockAliveCount ? `از ${toFa(flockAliveCount)}` : ''} {exceeds && '⚠️'}</>}
+              first={true}
+            >
               {deathCauses && (
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingRight: 4 }}>
                   علت: {deathCauses}
-                </span>
+                </div>
               )}
-            </div>
+            </SummarySection>
           )}
 
           {vaccineCount > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px dashed var(--border)', paddingTop: 8 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
-                <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>واکسن‌ها:</span>
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(vaccineCount)} مورد</span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                {form.vaccines.map((v, idx) => (
-                  <div key={v.id || idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, wordBreak: 'break-word' }}>
-                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: 'var(--text)' }}>{v.name || 'بدون نام'}</span>
-                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-                      {v.dose ? `دوز: ${toFa(v.dose)}` : ''}
-                      {v.dose && v.quantity ? ' • ' : ''}
-                      {v.quantity ? `مقدار: ${toFa(v.quantity)} ${v.unit || ''}` : ''}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <SummarySection title="واکسن‌ها:" meta={`${toFa(vaccineCount)} مورد`} first={totalDeaths === 0}>
+              {form.vaccines.map((v, idx) => (
+                <SummaryRow
+                  key={v.id || idx}
+                  label={v.name || 'بدون نام'}
+                  value={v.dose ? `دوز: ${toFa(v.dose)}` : ''}
+                  detail={v.quantity ? `مقدار: ${toFa(v.quantity)} ${v.unit || ''}` : ''}
+                />
+              ))}
+            </SummarySection>
           )}
 
           {medsTotal > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px dashed var(--border)', paddingTop: 8 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
-                <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>داروها:</span>
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(medsTotal)} مورد</span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                {form.medications.map((m, idx) => (
-                  <div key={m.id || idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, wordBreak: 'break-word' }}>
-                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: 'var(--text)' }}>{m.name || 'بدون نام'}</span>
-                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-                      {m.dose ? `دوز: ${toFa(m.dose)}` : ''}
-                      {m.dose && m.quantity ? ' • ' : ''}
-                      {m.quantity ? `مقدار: ${toFa(m.quantity)} ${m.unit || ''}` : ''}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <SummarySection title="داروها:" meta={`${toFa(medsTotal)} مورد`} first={totalDeaths === 0 && vaccineCount === 0}>
+              {form.medications.map((m, idx) => (
+                <SummaryRow
+                  key={m.id || idx}
+                  label={m.name || 'بدون نام'}
+                  value={m.dose ? `دوز: ${toFa(m.dose)}` : ''}
+                  detail={m.quantity ? `مقدار: ${toFa(m.quantity)} ${m.unit || ''}` : ''}
+                />
+              ))}
+            </SummarySection>
           )}
         </div>
       </SummaryCard>
