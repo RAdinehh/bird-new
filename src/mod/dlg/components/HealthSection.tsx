@@ -252,7 +252,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
           </div>
 
         ) : null;
-        const methodField = (
+        const doseField = (
           <Field label="روش مصرف">
             <SmartSelect
               value={v.method || ''}
@@ -274,9 +274,9 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
           </div>
         ) : null;
 
-        if (!qtyField) return <><Grid2>{methodField}{reactionField}</Grid2>{vCalcMsg}</>;
-        if (hasSub) return <>{qtyField}<Grid2>{methodField}{reactionField}</Grid2>{vCalcMsg}</>;
-        return <><Grid2>{qtyField}{methodField}</Grid2>{reactionField}{vCalcMsg}</>;
+        if (!qtyField) return <><Grid2>{doseField}{reactionField}</Grid2>{vCalcMsg}</>;
+        if (hasSub) return <>{qtyField}<Grid2>{doseField}{reactionField}</Grid2>{vCalcMsg}</>;
+        return <><Grid2>{qtyField}{doseField}</Grid2>{reactionField}{vCalcMsg}</>;
       })()}
     </>)}
      </ExpandableCard>
@@ -389,7 +389,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
           </div>
 
         ) : null;
-        const methodField = (
+        const doseField = (
           <Field label="روش مصرف">
             <SmartSelect
               value={m.method || ''}
@@ -416,9 +416,9 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
           </div>
         ) : null;
 
-        if (!qtyField) return <><Grid2>{methodField}{withdrawalField}</Grid2>{mCalcMsg}</>;
-        if (hasSub) return <>{qtyField}<Grid2>{methodField}{withdrawalField}</Grid2>{mCalcMsg}</>;
-        return <><Grid2>{qtyField}{methodField}</Grid2>{withdrawalField}{mCalcMsg}</>;
+        if (!qtyField) return <><Grid2>{doseField}{withdrawalField}</Grid2>{mCalcMsg}</>;
+        if (hasSub) return <>{qtyField}<Grid2>{doseField}{withdrawalField}</Grid2>{mCalcMsg}</>;
+        return <><Grid2>{qtyField}{doseField}</Grid2>{withdrawalField}{mCalcMsg}</>;
       })()}
     </>)}
      </ExpandableCard>
