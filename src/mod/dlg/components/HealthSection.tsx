@@ -167,7 +167,8 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
             if (x.id !== v.id) return x;
             const newItem = vaccineItems.find(w => w.id === id);
             const autoDose = newItem?.usageTypes?.includes('water') ? newItem.dosePerLiter : newItem?.usageTypes?.includes('feed') ? newItem.dosePerKgFeed : newItem?.dosePerBird;
-            return { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null, name: newItem ? newItem.name : x.name, dose: autoDose ? String(autoDose) : x.dose };
+            const doseUnit = newItem?.usageTypes?.includes('water') ? `${newItem?.unit || 'ml'}/L` : newItem?.usageTypes?.includes('feed') ? `${newItem?.unit || 'g'}/kg` : `${newItem?.unit || 'ml'}/پرنده`;
+            return { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null, unit: newItem?.unit || x.unit, name: newItem ? newItem.name : x.name, dose: autoDose ? `${autoDose} ${doseUnit}` : x.dose };
           })
         }))}
             options={vaccineItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}` }))}
@@ -182,7 +183,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
           <Input placeholder="مثلاً نیوکاسل" value={v.name} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, name: e.target.value } : x) }))} />
         </Field>
         <Field label={<>دوز <HelpIcon text={"**دوز چیست؟**\nدوز، نسخه یا دستور مصرف دامپزشک است (مثلاً ۵ سی‌سی در ۱ لیتر آب).\n\n**تفاوت با مقدار مصرفی:**\n«مقدار مصرفی» کل مقداری است که از انبار کسر می‌شود (مثلاً ۵۰ سی‌سی)."} /></>}>
-          <Input placeholder="مثلاً ۰.۲ سی‌سی" value={v.dose} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, dose: e.target.value } : x) }))} />
+          <Input placeholder="مثلاً ۰.۳ ml/L یا ۰.۵ ml/پرنده" value={v.dose} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, dose: e.target.value } : x) }))} />
         </Field>
       </Grid2>
       {(() => {
@@ -310,7 +311,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
           <Input placeholder="نام دارو" value={m.name} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, name: e.target.value } : x) }))} />
         </Field>
         <Field label={<>دوز <HelpIcon text={"**دوز چیست؟**\nدوز، نسخه یا دستور مصرف دامپزشک است (مثلاً ۵ سی‌سی در ۱ لیتر آب).\n\n**تفاوت با مقدار مصرفی:**\n«مقدار مصرفی» کل مقداری است که از انبار کسر می‌شود (مثلاً ۵۰ سی‌سی)."} /></>}>
-          <Input placeholder="دوز" value={m.dose} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, dose: e.target.value } : x) }))} />
+          <Input placeholder="مثلاً ۵ g/kg یا ۰.۵ ml/پرنده" value={m.dose} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, dose: e.target.value } : x) }))} />
         </Field>
       </Grid2>
       {(() => {
