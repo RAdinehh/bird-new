@@ -171,7 +171,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
   const { formulas, ingredients } = useFed();
   const { addProduction, updateProduction, deleteProduction, findByLogId } = useEgg();
 
-  const save = async (): Promise<boolean> => {
+  const _doSave = async (form: F, reason?: string): Promise<boolean> => {
     if (saving) return false;
 
     // 🆕 جلوگیری از ثبت لاگ خالی (برای فرم‌های جدید)
@@ -331,7 +331,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
           // 🆕 Audit Trail — ثبت رویداد ویرایش
           if (oldLog) {
             try {
-              const evts = buildCorrectionEvents(oldLog, data, 'ویرایش مستقیم');
+              const evts = buildCorrectionEvents(oldLog, data, reason || 'ویرایش مستقیم');
               for (const ev of evts) {
                 useDlg.getState().addEvent(logId, ev);
               }
@@ -615,6 +615,10 @@ export function useDlgSave(params: UseDlgSaveParams) {
       },
     });
     return result.ok;
+  };
+
+  const save = (opts?: { overrideForm?: F; reason?: string }): Promise<boolean> => {
+    return _doSave(opts?.overrideForm ?? form, opts?.reason);
   };
 
   return { save, deleteLog, restoreLogFull };
