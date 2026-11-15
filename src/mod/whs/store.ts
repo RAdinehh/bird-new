@@ -49,6 +49,7 @@ export interface Item {
   // ─── فیلدهای دارو/واکسن ───
   usageType?: string;              // deprecated
   usageTypes?: string[];           // آرایه
+  archived?: boolean;              // آرشیو شده (از لیست پنهان، تاریخچه حفظ)
   productionDate?: string;         // تاریخ تولید
   dosePerBird?: number;            // دوز مصرفی هر پرنده
   dosePerLiter?: number | null;    // دوز در هر لیتر آب (آشامیدنی)
@@ -97,6 +98,12 @@ interface State {
   addItem: (i: Omit<Item, 'id' | 'createdAt' | 'updatedAt'>) => string;
   updateItem: (id: string, patch: Partial<Item>) => void;
   deleteItem: (id: string) => void;
+  /** آرشیو کالا — از لیست پنهان، حرکات حفظ */
+  archiveItem: (id: string) => void;
+  /** بازگردانی از آرشیو */
+  unarchiveItem: (id: string) => void;
+  /** دریافت حرکات انبار مرتبط با یک کالا */
+  getItemMovements: (id: string) => Movement[];
   addMovement: (m: Omit<Movement, 'id' | 'createdAt'>) => string;
   deleteMovement: (id: string) => void;
 }
@@ -262,9 +269,16 @@ export const useWhs = create<State>()(
         set({ items: get().items.map(x => x.id === id ? { ...x, ...patch, updatedAt: now() } : x) });
       },
       deleteItem: (id) => set({
-        items: get().items.filter(x => x.id !== id),
-        movements: get().movements.filter(x => x.itemId !== id)
+        items: get().items.filter(x => x.id !== id)
+        // ⚠️ حرکات انبار حفظ می‌شوند — تاریخچه نباید پاک شود
       }),
+      archiveItem: (id) => set({
+        items: get().items.map(x => x.id === id ? { ...x, archived: true } : x),
+      }),
+      unarchiveItem: (id) => set({
+        items: get().items.map(x => x.id === id ? { ...x, archived: false } : x),
+      }),
+      getItemMovements: (id) => get().movements.filter(m => m.itemId === id),
 
       addMovement: (m) => {
         assertMovement(m);
