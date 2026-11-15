@@ -94,8 +94,9 @@ export default function DlgTabPanel({
       }
       if (backups.length > 0) {
         setUndoData({ log: backups });
-        setTimeout(() => setUndoData((cur) => cur && Array.isArray(cur.log) && cur.log.length === backups.length ? null : cur), 5000);
+        setTimeout(() => setUndoData((cur) => cur && Array.isArray(cur.log) && cur.log.length === backups.length ? null : cur), 8000);
       }
+      toastMsg.deletedBulk(deletedCount, 'ثبت');
       logAction('delete', 'dlg', 'حذف گروهی ثبت روزانه: ' + backups.length);
     },
     onArchive: async (ids) => {
