@@ -2,7 +2,7 @@
  * HealthSection — تلفات + واکسن + دارو
  */
 import { useMemo, useState } from 'react';
-import { Btn, Field, Grid2, Input, NumField, Select, Textarea, AlertBox, Tag, SummaryCard, SummarySection, SummaryRow } from '../../../shr/components/ui';
+import { Btn, Field, Grid2, Input, NumField, Select, Textarea, AlertBox, Tag, SummaryCard, SummarySection, SummaryRow, Chip } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
 import SmartSelect from '../../../shr/components/SmartSelect';
@@ -158,6 +158,35 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
       
       {expandedId === 'v-' + v.id && (<>
       {vaccineItems.length > 0 && (
+        <>
+        {vaccineItems.length <= 8 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
+              انتخاب سریع از انبار:
+            </span>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {vaccineItems.map(w => (
+                <Chip
+                  key={w.id}
+                  active={v.itemId === w.id}
+                  onClick={() => {
+                    const newItem = vaccineItems.find(x => x.id === w.id);
+                    setForm(f => ({
+                      ...f,
+                      vaccines: f.vaccines.map(x => x.id === v.id ? {
+                        ...x,
+                        itemId: w.id,
+                        name: newItem ? newItem.name : x.name
+                      } : x)
+                    }));
+                  }}
+                >
+                  {w.name} • {w.currentStock > 0 ? formatQty(w.currentStock, w.unit) : 'تمام'}
+                </Chip>
+              ))}
+            </div>
+          </div>
+        )}
         <Field label={<>از انبار <Tag tone="blue">{toFa(vaccineItems.length)} نوع</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)">
           <SmartSelect
             value={v.itemId || ''}
@@ -175,6 +204,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
             autoThreshold={6}
           />
         </Field>
+        </>
       )}
       <Grid2>
         <Field label="نام واکسن" required>
