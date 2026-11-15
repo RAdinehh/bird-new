@@ -191,33 +191,52 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
             {isMedicine && (
               <>
                 <SectionTitle>💊 اطلاعات مصرف</SectionTitle>
-                <Grid3>
-                  <Field label="نوع مصرف">
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                      {VET_METHOD_OPTIONS.map(o => (
-                        <ToggleChip
-                          key={o.value}
-                          label={o.label}
-                          active={(form.usageTypes || []).includes(o.value)}
-                          onClick={() => {
-                            const arr: string[] = form.usageTypes || [];
-                            const next = arr.includes(o.value) ? arr.filter((v: string) => v !== o.value) : [...arr, o.value];
-                            setForm({ ...form, usageTypes: next });
-                          }}
-                        />
-                      ))}
-                    </div>
-                  </Field>
+                <Field label="نوع مصرف">
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {VET_METHOD_OPTIONS.map(o => (
+                      <ToggleChip
+                        key={o.value}
+                        label={o.label}
+                        active={(form.usageTypes || []).includes(o.value)}
+                        onClick={() => {
+                          const arr: string[] = form.usageTypes || [];
+                          const next = arr.includes(o.value) ? arr.filter((v: string) => v !== o.value) : [...arr, o.value];
+                          setForm({ ...form, usageTypes: next });
+                        }}
+                      />
+                    ))}
+                  </div>
+                </Field>
+
+                {(form.usageTypes || []).some((t: string) => t === 'oral' || t === 'injection') && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-                    <Field label="دوز هر پرنده" hint="اختیاری" error={showError?.('dosePerBird')} onTouch={() => markTouched?.('dosePerBird')}>
-                    <NumField placeholder="۰.۵" value={form.dosePerBird} onChange={e => setForm({ ...form, dosePerBird: e.target.value })} unit="ml" min={0} />
-                  </Field>
+                    <Field label="دوز هر پرنده" hint="ml" error={showError?.('dosePerBird')} onTouch={() => markTouched?.('dosePerBird')}>
+                      <NumField placeholder="۰.۵" value={form.dosePerBird} onChange={e => setForm({ ...form, dosePerBird: e.target.value })} unit="ml" min={0} />
+                    </Field>
                     {!showError?.('dosePerBird') && <FieldHint fieldPath="whs.dosePerBird" value={form.dosePerBird} />}
                   </div>
-                  <Field label="تاریخ تولید" hint="اختیاری">
-                    <DatePicker value={form.productionDate} onChange={v => setForm({ ...form, productionDate: v })} />
-                  </Field>
-                </Grid3>
+                )}
+
+                {(form.usageTypes || []).includes('water') && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+                    <Field label="دوز در هر لیتر آب" hint="ml/L" error={showError?.('dosePerLiter')} onTouch={() => markTouched?.('dosePerLiter')}>
+                      <NumField placeholder="۰.۵" value={form.dosePerLiter || ''} onChange={e => setForm({ ...form, dosePerLiter: e.target.value })} unit="ml/L" min={0} />
+                    </Field>
+                    {!showError?.('dosePerLiter') && <FieldHint fieldPath="whs.dosePerLiter" value={form.dosePerLiter || ''} />}
+                  </div>
+                )}
+
+                {(form.usageTypes || []).includes('feed') && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+                    <Field label="دوز در هر کیلوگرم دان" hint="ml/kg" error={showError?.('dosePerKgFeed')} onTouch={() => markTouched?.('dosePerKgFeed')}>
+                      <NumField placeholder="۰.۵" value={form.dosePerKgFeed} onChange={e => setForm({ ...form, dosePerKgFeed: e.target.value })} unit="ml/kg" min={0} />
+                    </Field>
+                  </div>
+                )}
+
+                <Field label="تاریخ تولید" hint="اختیاری">
+                  <DatePicker value={form.productionDate} onChange={v => setForm({ ...form, productionDate: v })} />
+                </Field>
               </>
             )}
           </>
