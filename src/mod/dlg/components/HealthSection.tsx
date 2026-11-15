@@ -253,12 +253,13 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
 
         ) : null;
         const doseField = (
-          <Field label={<>دوز <HelpIcon text={"**دوز چیست؟**\\nدوز، نسخه یا دستور مصرف دامپزشک است (مثلاً ۵ سی‌سی در ۱ لیتر آب).\\n\\n**تفاوت با مقدار مصرفی:**\\n«مقدار مصرفی» کل مقداری است که از انبار کسر می‌شود (مثلاً ۵۰ سی‌سی)."} /></>}>
-            <Input
-              placeholder="مثلاً ۰.۵"
-              value={v.dose}
-              onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, dose: e.target.value } : x) }))}
-              unit={getDoseUnitForMethod(v.method, vaccineItems.find(w => w.id === v.itemId)?.unit)}
+          <Field label="روش مصرف">
+            <SmartSelect
+              value={v.method || ''}
+              onChange={val => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, method: val } : x) }))}
+              options={getAllowedMethods(vaccineItems.find(w => w.id === v.itemId)).map(o => ({ value: o.value, label: o.label }))}
+              placeholder="انتخاب روش"
+              modalTitle="روش مصرف"
             />
           </Field>
         );
@@ -389,12 +390,13 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
 
         ) : null;
         const doseField = (
-          <Field label={<>دوز <HelpIcon text={"**دوز چیست؟**\\nدوز، نسخه یا دستور مصرف دامپزشک است (مثلاً ۵ سی‌سی در ۱ لیتر آب).\\n\\n**تفاوت با مقدار مصرفی:**\\n«مقدار مصرفی» کل مقداری است که از انبار کسر می‌شود (مثلاً ۵۰ سی‌سی)."} /></>}>
-            <Input
-              placeholder="مثلاً ۰.۵"
-              value={m.dose}
-              onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, dose: e.target.value } : x) }))}
-              unit={getDoseUnitForMethod(m.method, medicineItems.find(w => w.id === m.itemId)?.unit)}
+          <Field label="روش مصرف">
+            <SmartSelect
+              value={m.method || ''}
+              onChange={val => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, method: val } : x) }))}
+              options={getAllowedMethods(medicineItems.find(w => w.id === m.itemId)).map(o => ({ value: o.value, label: o.label }))}
+              placeholder="انتخاب روش"
+              modalTitle="روش مصرف"
             />
           </Field>
         );
