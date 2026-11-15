@@ -272,11 +272,12 @@ export default function LogCard(props: LogCardProps) {
                 {l.vaccines.map(v => {
                   const methodLabel = v.method ? (VET_METHOD_LABEL[v.method] || v.method) : null;
                   const detail = [
+                    v.name || 'بدون نام',
                     v.dose ? `دوز ${toFa(v.dose)}` : null,
                     methodLabel,
                     v.quantity ? `مقدار ${toFa(v.quantity)} ${v.unit || ''}` : null,
-                  ].filter(Boolean).join(' • ') || '—';
-                  return <Row key={v.id} l={`واکسن: ${v.name || 'بدون نام'}`} v={detail} />;
+                  ].filter(Boolean).join(' • ');
+                  return <Row key={v.id} l="واکسن" v={detail} />;
                 })}
               </div>
             )}
@@ -286,12 +287,13 @@ export default function LogCard(props: LogCardProps) {
                 {l.medications.map(m => {
                   const methodLabel = m.method ? (VET_METHOD_LABEL[m.method] || m.method) : null;
                   const detail = [
+                    m.name || 'بدون نام',
                     m.dose ? `دوز ${toFa(m.dose)}` : null,
                     methodLabel,
                     m.quantity ? `مقدار ${toFa(m.quantity)} ${m.unit || ''}` : null,
                     m.withdrawalDays ? `پرهیز ${toFa(m.withdrawalDays)} روز` : null,
-                  ].filter(Boolean).join(' • ') || '—';
-                  return <Row key={m.id} l={`دارو: ${m.name || 'بدون نام'}`} v={detail} />;
+                  ].filter(Boolean).join(' • ');
+                  return <Row key={m.id} l="دارو" v={detail} />;
                 })}
               </div>
             )}
