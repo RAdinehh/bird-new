@@ -514,3 +514,11 @@ export function cvWeight(samples: WeightSample[]): number {
   return Math.round((std / mean) * 10000) / 100;
 }
 
+/** 🆕 محاسبه کل دان مصرفی (کیلوگرم) از فرم — منبع واحد (قانون ۲۶) */
+export function getTotalFeedKg(form: { feedSources?: Array<{ quantity?: number } | null | undefined>; feedSourceId?: string; feedDelivered?: string | number | null }): number {
+  if (form.feedSources && form.feedSources.length > 0) {
+    return form.feedSources.reduce((sum, s) => sum + (Number(s?.quantity) || 0), 0);
+  }
+  const legacy = parseFloat(String(form.feedDelivered ?? '').replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace('٫', '.'));
+  return Number.isFinite(legacy) && legacy > 0 ? legacy : 0;
+}

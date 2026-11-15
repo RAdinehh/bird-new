@@ -188,13 +188,17 @@ export interface HealthParams {
   dosePerBirdMl?: number | null;
   /** دوز استاندارد در هر لیتر آب (ml/L) — برای روش آشامیدنی */
   dosePerLiter?: number | null;
+  /** مقدار دان مصرفی امروز (کیلوگرم) — برای روش مخلوط با دان */
+  feedAmountKg?: number | null;
+  /** دوز در هر کیلوگرم دان (ml/kg) — برای روش مخلوط با دان */
+  dosePerKgFeed?: number | null;
 }
 
 export interface HealthResult {
   /** نیاز واقعی محاسبه‌شده (میلی‌لیتر) — null اگر داده کافی نبود */
   requiredMl: number | null;
   /** روش محاسبه استفاده‌شده */
-  mode: 'water' | 'per_bird' | 'insufficient';
+  mode: 'water' | 'per_bird' | 'feed' | 'insufficient';
   /** دلیل (برای نمایش) */
   reason: string;
   /** آیا داده کافی برای محاسبه وجود داشت؟ */

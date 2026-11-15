@@ -77,6 +77,7 @@ interface F {
   productionDate: string;
   dosePerBird: string;
   dosePerLiter: string;
+  dosePerKgFeed: string;
 }
 
 const empty = (): F => ({
@@ -88,6 +89,7 @@ const empty = (): F => ({
   purchaseDate: '', purchasePrice: '', hallId: '', equipmentStatus: 'active', warrantyUntil: '', initialPrice: '',
   usageTypes: [], productionDate: '', dosePerBird: '',
     dosePerLiter: '',
+    dosePerKgFeed: '',
     feedType: '', brand: '',
     protein: '', energy: '', fat: '', fiber: '',
     calcium: '', phosphorus: '', methionine: '', lysine: ''
@@ -244,6 +246,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
       productionDate: it.productionDate || '',
       dosePerBird: it.dosePerBird ? toFa(it.dosePerBird) : '',
       dosePerLiter: it.dosePerLiter !== null && it.dosePerLiter !== undefined ? toFa(it.dosePerLiter) : '',
+      dosePerKgFeed: it.dosePerKgFeed !== null && it.dosePerKgFeed !== undefined ? toFa(it.dosePerKgFeed) : '',
       feedType: it.feedType || '',
       brand: it.brand || '',
       protein: it.protein ? toFa(it.protein) : '',
@@ -322,6 +325,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         productionDate: isMed ? form.productionDate : '',
         dosePerBird: isMed && form.dosePerBird.trim() !== '' ? num(form.dosePerBird) : 0,
         dosePerLiter: isMed && form.dosePerLiter.trim() !== '' ? num(form.dosePerLiter) : null,
+        dosePerKgFeed: isMed && form.dosePerKgFeed.trim() !== '' ? num(form.dosePerKgFeed) : null,
         feedType: form.feedType || '',
         brand: form.brand || '',
         protein: num(form.protein),
@@ -355,6 +359,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
         productionDate: isMed ? form.productionDate : '',
         dosePerBird: isMed && form.dosePerBird.trim() !== '' ? num(form.dosePerBird) : 0,
         dosePerLiter: isMed && form.dosePerLiter.trim() !== '' ? num(form.dosePerLiter) : null,
+        dosePerKgFeed: isMed && form.dosePerKgFeed.trim() !== '' ? num(form.dosePerKgFeed) : null,
         feedType: form.feedType || '',
         brand: form.brand || '',
         protein: num(form.protein),

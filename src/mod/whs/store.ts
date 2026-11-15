@@ -53,6 +53,7 @@ export interface Item {
   productionDate?: string;         // تاریخ تولید
   dosePerBird?: number;            // دوز مصرفی هر پرنده
   dosePerLiter?: number | null;    // دوز در هر لیتر آب (آشامیدنی)
+  dosePerKgFeed?: number | null;   // دوز در هر کیلوگرم دان (مخلوط با دان)
   /** موجودی اولیه هنگام ایجاد — پایه راستی‌آزمایی */
   initialStock?: number;
   /** قیمت موجودی اولیه (برای میانگین موزون) */
