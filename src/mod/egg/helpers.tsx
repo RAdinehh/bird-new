@@ -5,11 +5,7 @@ import type { ReactNode, CSSProperties } from 'react';
 export { Row } from '../../shr/components/ui';
 
 
-export function SectionTitle({ children }: { children: ReactNode }) {
-  return (
-    <div style={{ paddingTop: 12, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 600, color: 'var(--text)', letterSpacing: '.3px' }}>{children}</div>
-  );
-}
+export { SectionTitle } from '../../shr/components/ui';
 
 export function chip(active: boolean): CSSProperties {
   return {
