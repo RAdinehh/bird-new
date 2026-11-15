@@ -396,7 +396,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
           </Field>
         );
         const withdrawalField = !isHerbal ? (
-          <Field label="دوره پرهیز (روز)" hint="چند روز بعد از مصرف، گوشت و تخم قابل فروش نیست">
+          <Field label={<>دوره پرهیز (روز) <HelpIcon text={"**دوره پرهیز:**\nچند روز بعد از مصرف، گوشت و تخم قابل فروش نیست و باید از فروش خودداری شود.\n\n**مثال:** اگر دوره پرهیز ۷ روز باشد، تخم‌های تولیدی تا ۷ روز قابل فروش نیستند."} /></>}>
             <NumField
               placeholder="مثلاً ۷"
               value={m.withdrawalDays !== null && m.withdrawalDays !== undefined ? String(m.withdrawalDays) : ''}
