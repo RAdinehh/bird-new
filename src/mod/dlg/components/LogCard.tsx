@@ -263,41 +263,29 @@ export default function LogCard(props: LogCardProps) {
               {l.deaths.map(d => (
                 <Row
                   key={d.id}
-                  l={`تلفات${d.cause ? ` (${causeLabel(d.cause)})` : ''}`}
-                  v={`${toFa(d.count)} پرنده`}
+                  l="تلفات"
+                  v={`${toFa(d.count)} پرنده${d.cause ? ` (${causeLabel(d.cause)})` : ''}`}
                   warn={true}
                 />
               ))}
               {l.vaccines.map(v => {
                 const methodLabel = v.method ? (VET_METHOD_LABEL[v.method] || v.method) : null;
                 const detail = [
-                  v.dose ? `دوز: ${toFa(v.dose)}` : null,
-                  v.quantity ? `مقدار: ${toFa(v.quantity)} ${v.unit || ''}` : null,
-                  methodLabel ? `روش: ${methodLabel}` : null,
-                ].filter(Boolean).join(' • ');
-                return (
-                  <Row
-                    key={v.id}
-                    l={`واکسن: ${v.name || 'بدون نام'}`}
-                    v={detail || '—'}
-                  />
-                );
+                  v.dose ? `دوز ${toFa(v.dose)}` : null,
+                  v.quantity ? `${toFa(v.quantity)} ${v.unit || ''}` : null,
+                  methodLabel,
+                ].filter(Boolean).join(' • ') || '—';
+                return <Row key={v.id} l={`واکسن: ${v.name || 'بدون نام'}`} v={detail} />;
               })}
               {l.medications.map(m => {
                 const methodLabel = m.method ? (VET_METHOD_LABEL[m.method] || m.method) : null;
                 const detail = [
-                  m.dose ? `دوز: ${toFa(m.dose)}` : null,
-                  m.quantity ? `مقدار: ${toFa(m.quantity)} ${m.unit || ''}` : null,
-                  methodLabel ? `روش: ${methodLabel}` : null,
-                  m.withdrawalDays ? `پرهیز: ${toFa(m.withdrawalDays)} روز` : null,
-                ].filter(Boolean).join(' • ');
-                return (
-                  <Row
-                    key={m.id}
-                    l={`دارو: ${m.name || 'بدون نام'}`}
-                    v={detail || '—'}
-                  />
-                );
+                  m.dose ? `دوز ${toFa(m.dose)}` : null,
+                  m.quantity ? `${toFa(m.quantity)} ${m.unit || ''}` : null,
+                  methodLabel,
+                  m.withdrawalDays ? `پرهیز ${toFa(m.withdrawalDays)} روز` : null,
+                ].filter(Boolean).join(' • ') || '—';
+                return <Row key={m.id} l={`دارو: ${m.name || 'بدون نام'}`} v={detail} />;
               })}
             </Grid2>
           </LogSection>
