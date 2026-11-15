@@ -188,7 +188,7 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
           return [[it.event.entryTime || it.event.createdAt, m.label, it.event.field || '', it.event.before ?? '', it.event.after ?? it.event.value ?? it.event.amount ?? it.event.count ?? '', it.event.reason || it.event.notes || '', it.event.revoked ? 'بله' : 'خیر']];
         }
         const c = it.correction;
-        const fields = Object.keys(c.changes).map(k => `${FIELD_LABEL[k] || k}: ${(log as any)[k] ?? '—'}→${(c.changes as any)[k] ?? '—'}`).join(' • ');
+        const fields = Object.keys(c.changes).map(k => `${FIELD_LABEL[k] || k}: ${(log as any)[k] ?? '—'}→${(c.changes as any)[k] ?? '—'}`).join(' | ');
         return [[c.timestamp, 'اصلاح', fields, '', '', c.reason, c.revoked ? 'بله' : 'خیر']];
       });
       const csv = [headers.join(','), ...rows.map(r => r.map(x => `"${String(x).replace(/"/g, '""')}"`).join(','))].join('\n');
@@ -212,7 +212,7 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
   if (!log) return null;
 
   return (
-    <Modal open={open} onClose={onClose} title={`تاریخچه — ${log.entryTime ? toFa(log.entryTime) + ' • ' : ''}${toFa(log.date)}`}
+    <Modal open={open} onClose={onClose} title={`تاریخچه — ${log.entryTime ? toFa(log.entryTime) + ' | ' : ''}${toFa(log.date)}`}
       footer={<BtnRow><Btn onClick={handleExport}>CSV</Btn><Btn onClick={onClose}>بستن</Btn></BtnRow>}
     >
       {/* ═══ هدر خلاصه سبز ═══ */}

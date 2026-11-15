@@ -46,7 +46,7 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
     const lbl = cvText(result.cvPct);
     return (
      <div style={{ fontSize: 'var(--fs-xs)', lineHeight: 1.7 }}>
-      <div>میانگین: <b>{toFa(avgG)} گرم</b> • یکنواختی: <b>{toFa(result.uniformityPct)}٪</b></div>
+      <div>میانگین: <b>{toFa(avgG)} گرم</b> | یکنواختی: <b>{toFa(result.uniformityPct)}٪</b></div>
       <div style={{ color: lbl.color, fontWeight: 700 }}>CV {toFa(result.cvPct)}٪ — {lbl.text}</div>
      </div>
     );
