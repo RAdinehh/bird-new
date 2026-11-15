@@ -19,13 +19,13 @@ export function SummaryCard({
   return (
     <div
       style={{
-        padding: 'var(--pad-normal)',
+        padding: '8px 12px',
         background: `var(--${tone}-soft)`,
         border: `1px solid var(--${tone}-border)`,
         borderRadius: 'var(--r-md)',
         display: 'flex',
         flexDirection: 'column',
-        gap: 6,
+        gap: 4,
         fontSize: 'var(--fs-sm)',
         color: `var(--${tone})`,
         ...style,
@@ -51,14 +51,14 @@ export function SummarySection({ title, meta, children, first = false }: { title
     <div style={{
       display: 'flex',
       flexDirection: 'column',
-      gap: 6,
+      gap: 4,
       borderTop: first ? 'none' : '1px dashed var(--border)',
-      paddingTop: first ? 0 : 8,
-      marginTop: first ? 0 : 8,
+      paddingTop: first ? 0 : 6,
+      marginTop: first ? 0 : 6,
     }}>
       {(title || meta) && (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
-          {title && <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)' }}>{title}</span>}
+          {title && <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>{title}</span>}
           {meta && <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{meta}</span>}
         </div>
       )}
@@ -69,10 +69,10 @@ export function SummarySection({ title, meta, children, first = false }: { title
 
 export function SummaryRow({ label, value, detail }: { label: React.ReactNode; value: React.ReactNode; detail?: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
-        <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>{label}</span>
-        <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>{value}</span>
+        <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color: 'var(--text)' }}>{label}</span>
+        <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, color: 'var(--text)', textAlign: 'left' }}>{value}</span>
       </div>
       {detail && <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingRight: 4 }}>{detail}</span>}
     </div>
