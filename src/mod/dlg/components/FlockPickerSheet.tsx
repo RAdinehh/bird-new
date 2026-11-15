@@ -92,6 +92,22 @@ export default function FlockPickerSheet({ open, onClose, flocks, logs, todayStr
               }}
             >
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, paddingTop: 8 }}>
+                {/* دکمه ثبت جدید در سمت راست */}
+                <button
+                  type="button"
+                  onClick={() => { onAdd(flock.id); onClose(); }}
+                  style={{
+                    flex: '1 1 calc(50% - 6px)', minWidth: 110,
+                    padding: '8px 10px', background: 'var(--accent)',
+                    border: '1px solid var(--accent)', borderRadius: 'var(--r-sm)',
+                    color: '#fff', fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
+                    fontWeight: 600, cursor: 'pointer',
+                  }}
+                >
+                  ➕ ثبت جدید
+                </button>
+
+                {/* دکمه‌های ویرایش در سمت چپ */}
                 {existingLogs.map(log => (
                   <button
                     key={log.id}
@@ -108,19 +124,6 @@ export default function FlockPickerSheet({ open, onClose, flocks, logs, todayStr
                     ✏️ {toFa(log.entryTime || '—')}
                   </button>
                 ))}
-                <button
-                  type="button"
-                  onClick={() => { onAdd(flock.id); onClose(); }}
-                  style={{
-                    flex: '1 1 calc(50% - 6px)', minWidth: 110,
-                    padding: '8px 10px', background: 'var(--accent)',
-                    border: '1px solid var(--accent)', borderRadius: 'var(--r-sm)',
-                    color: '#fff', fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
-                    fontWeight: 600, cursor: 'pointer',
-                  }}
-                >
-                  ➕ ثبت جدید
-                </button>
               </div>
             </ExpandableCard>
           );
