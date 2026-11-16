@@ -8,6 +8,8 @@ export interface CardAction {
   variant?: 'primary' | 'danger' | 'outline' | 'subtle' | 'danger-outline';
   hidden?: boolean;
   disabled?: boolean;
+  /** وزن دکمه برای مرتب‌سازی هوشمند (کمتر = جلوتر) */
+  priority?: number;
 }
 
 function getLayout(total: number): { cols: number[][]; visible: number; more: number } {
@@ -15,7 +17,7 @@ function getLayout(total: number): { cols: number[][]; visible: number; more: nu
   if (total === 1) return { cols: [[1]], visible: 1, more: 0 };
   if (total === 2) return { cols: [[2]], visible: 2, more: 0 };
   if (total === 3) return { cols: [[3]], visible: 3, more: 0 };
-  if (total === 4) return { cols: [[2], [2]], visible: 4, more: 0 };
+  if (total === 4) return { cols: [[3], [1]], visible: 4, more: 0 };
   if (total === 5) return { cols: [[3], [2]], visible: 5, more: 0 };
   if (total === 6) return { cols: [[3], [3]], visible: 6, more: 0 };
   return { cols: [[3], [3]], visible: 6, more: total - 6 };
@@ -23,7 +25,19 @@ function getLayout(total: number): { cols: number[][]; visible: number; more: nu
 
 export function CardActions({ actions }: { actions: CardAction[] }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const visibleActions = actions.filter(a => !a.hidden);
+
+  // 🆕 مرتب‌سازی هوشمند بر اساس وزن (اولویت) و نوع دکمه
+  const getPriority = (a: CardAction) => {
+    if (a.priority !== undefined) return a.priority;
+    if (a.variant === 'danger' || a.variant === 'danger-outline') return 99; // مخرب‌ها همیشه آخر
+    if (a.variant === 'primary') return 10; // اقدامات اصلی اول
+    if (a.variant === 'subtle') return 50;  // اقدامات کم‌اهمیت‌تر
+    return 20; // outline (پیش‌فرض)
+  };
+
+  const visibleActions = actions
+    .filter(a => !a.hidden)
+    .sort((a, b) => getPriority(a) - getPriority(b));
   if (visibleActions.length === 0) return null;
 
   const layout = getLayout(visibleActions.length);
