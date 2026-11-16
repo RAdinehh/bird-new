@@ -5,8 +5,8 @@ export function Row({ l, v, accent, warn, autoFrom }: { l: ReactNode; v: ReactNo
   const color = warn ? 'var(--warn)' : accent ? 'var(--accent)' : 'var(--muted)';
   const textColor = warn ? 'var(--warn)' : accent ? 'var(--accent)' : 'var(--text)';
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: autoFrom ? 'var(--sp-1)' : 0, padding: 'var(--pad-tight)', background: bg, borderRadius: 'var(--r-sm)' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', gap: 8, minWidth: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', gap: autoFrom ? 'var(--sp-1)' : 0, padding: 'var(--pad-tight)', background: bg, borderRadius: 'var(--r-sm)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-sm)', gap: 8, minWidth: 0 }}>
         <span style={{ color, display: 'flex', alignItems: 'center', gap: 'var(--sp-1)', flexShrink: 0, maxWidth: '50%' }}>
           {l}:
           {autoFrom && (

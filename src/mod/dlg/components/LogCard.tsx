@@ -458,8 +458,11 @@ export default function LogCard(props: LogCardProps) {
                               }
                               v={
                                 <span style={{ fontSize: 'var(--fs-sm)', display: 'flex', alignItems: 'center', gap: 4, textDecoration: corr.revoked ? 'line-through' : 'none', flexWrap: 'wrap' }}>
+                                  {/* مقدار جدید (سبز) سمت راست */}
                                   <span style={{ color: corr.revoked ? 'var(--muted)' : 'var(--accent)', fontWeight: 700 }}>{fmt(newVal)}</span>
-                                  <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>←</span>
+                                  {/* فلش به سمت مقدار جدید */}
+                                  <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>→</span>
+                                  {/* مقدار قبلی (قرمز) سمت چپ */}
                                   <span style={{ color: corr.revoked ? 'var(--muted)' : 'var(--danger)' }}>{fmt(oldVal)}</span>
                                 </span>
                               }
