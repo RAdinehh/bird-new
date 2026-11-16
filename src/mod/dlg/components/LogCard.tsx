@@ -288,7 +288,7 @@ export default function LogCard(props: LogCardProps) {
             {hasDeaths && (
               <Grid2>
                 {l.deaths.map(d => (
-                  <Row key={d.id} l="تلفات" v={`${toFa(d.count)} پرنده`} warn={true} />
+                  <Row key={d.id} l="تلفات" v={`${toFa(d.count)} پرنده`} warn={isMortalityHigh} />
                 ))}
               </Grid2>
             )}
@@ -335,106 +335,146 @@ export default function LogCard(props: LogCardProps) {
 
       {hasAnyCorrections && (
         <LogSection title="📝 تاریخچه اصلاحات">
-          {(rawLog.corrections || []).map(corr => (
-              <div
-                key={corr.id}
-                style={{
-                  padding: 'var(--pad-tight)',
-                  background: 'var(--card)',
-                  border: `1px solid ${corr.revoked ? 'var(--border)' : 'var(--accent-border)'}`,
-                  borderRadius: 'var(--r-sm)',
-                  opacity: corr.revoked ? 0.6 : 1,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 6,
-                  marginBottom: 8,
-                }}
-              >
-                {/* Header */}
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  gap: 8,
-                  borderBottom: '1px dashed var(--border)',
-                  paddingBottom: 6,
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, textDecoration: corr.revoked ? 'line-through' : 'none' }}>
-                    <span style={{
-                      fontFamily: 'monospace',
-                      fontWeight: 700,
-                      fontSize: 'var(--fs-xs)',
-                      color: 'var(--muted)',
-                    }}>{toFa(corr.timestamp)}</span>
-                    <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>({corr.reason})</span>
-                  </div>
-                  {corr.revoked ? (
-                    <span style={{
-                      background: 'var(--danger-soft)',
-                      color: 'var(--danger)',
-                      fontWeight: 700,
-                      padding: '2px 8px',
-                      borderRadius: 'var(--r-sm)',
-                      fontSize: 'var(--fs-2xs, 10px)',
-                    }}>لغو شده</span>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        const ok = await showConfirmAsync(
-                          'لغو اصلاح',
-                          `اصلاح ${toFa(corr.timestamp)} لغو شود؟ (مقادیر به حالت قبل برمی‌گردند)`
-                        );
-                        if (ok) onRevokeCorrection(corr.id);
-                      }}
-                      style={{
+          {(rawLog.corrections || []).map(corr => {
+              const changeKeys = Object.keys(corr.changes);
+              const pairedKeys = new Set<string>();
+              const groupedChanges: string[][] = [];
+              const PAIRS: [string, string][] = [
+                ['temperatureMin', 'temperatureMax'],
+                ['humidityMin', 'humidityMax'],
+                ['eatingEggs', 'fertileEggs'],
+                ['brokenEggs', 'otherEggs'],
+                ['feedRemaining', 'feedWaste'],
+                ['waterFillCount', 'waterFillVolume'],
+              ];
+
+              for (const [a, b] of PAIRS) {
+                const sel = [a, b].filter(k => changeKeys.includes(k));
+                if (sel.length > 0) {
+                  groupedChanges.push(sel);
+                  sel.forEach(k => pairedKeys.add(k));
+                }
+              }
+              for (const k of changeKeys) {
+                if (!pairedKeys.has(k)) groupedChanges.push([k]);
+              }
+
+              return (
+                <div
+                  key={corr.id}
+                  style={{
+                    padding: 'var(--pad-tight)',
+                    background: 'var(--card)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--r-sm)',
+                    opacity: corr.revoked ? 0.6 : 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 6,
+                    marginBottom: 8,
+                  }}
+                >
+                  {/* Header */}
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: 8,
+                    borderBottom: '1px dashed var(--border)',
+                    paddingBottom: 6,
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, textDecoration: corr.revoked ? 'line-through' : 'none' }}>
+                      <span style={{
+                        fontFamily: 'monospace',
+                        fontWeight: 700,
+                        fontSize: 'var(--fs-xs)',
+                        color: 'var(--muted)',
+                      }}>{toFa(corr.timestamp)}</span>
+                      <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>({corr.reason})</span>
+                    </div>
+                    {corr.revoked ? (
+                      <span style={{
+                        background: 'var(--danger-soft)',
+                        color: 'var(--danger)',
+                        fontWeight: 700,
                         padding: '2px 8px',
-                        background: 'transparent',
-                        border: '1px solid var(--border)',
                         borderRadius: 'var(--r-sm)',
                         fontSize: 'var(--fs-2xs, 10px)',
-                        color: 'var(--muted)',
-                        cursor: 'pointer',
-                        fontFamily: 'inherit',
-                      }}
-                    >↩️ لغو</button>
-                  )}
-                </div>
+                      }}>لغو شده</span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          const ok = await showConfirmAsync(
+                            'لغو اصلاح',
+                            `اصلاح ${toFa(corr.timestamp)} لغو شود؟ (مقادیر به حالت قبل برمی‌گردند)`
+                          );
+                          if (ok) onRevokeCorrection(corr.id);
+                        }}
+                        style={{
+                          padding: '2px 8px',
+                          background: 'transparent',
+                          border: '1px solid var(--border)',
+                          borderRadius: 'var(--r-sm)',
+                          fontSize: 'var(--fs-2xs, 10px)',
+                          color: 'var(--muted)',
+                          cursor: 'pointer',
+                          fontFamily: 'inherit',
+                        }}
+                      >↩️ لغو</button>
+                    )}
+                  </div>
 
-                {/* Body */}
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  {Object.keys(corr.changes).map(k => {
-                    const oldVal = (rawLog as any)[k];
-                    const newVal = (corr.changes as any)[k];
-                    const label = FIELD_LABEL[k] || k;
+                  {/* Body */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {groupedChanges.map((group, gIdx) => {
+                      const content = group.map(k => {
+                          const oldVal = (rawLog as any)[k];
+                          const newVal = (corr.changes as any)[k];
+                          const label = FIELD_LABEL[k] || k;
 
-                    const fmt = (v: any) => {
-                      if (v === null || v === undefined || v === '') return '—';
-                      if (k === 'weightGender') {
-                        const opts: any = { '': 'نامشخص', 'male': 'نر', 'female': 'ماده', 'mixed': 'مخلوط' };
-                        return opts[v] || v;
+                          const fmt = (v: any) => {
+                            if (v === null || v === undefined || v === '') return '—';
+                            if (k === 'weightGender') {
+                              const opts: any = { '': 'نامشخص', 'male': 'نر', 'female': 'ماده', 'mixed': 'مخلوط' };
+                              return opts[v] || v;
+                            }
+                            return toFa(String(v));
+                          };
+
+                          return (
+                            <Row
+                              key={k}
+                              l={
+                                <span style={{
+                                  fontSize: 'var(--fs-sm)',
+                                  color: corr.revoked ? 'var(--muted)' : 'var(--text)',
+                                  textDecoration: corr.revoked ? 'line-through' : 'none',
+                                  wordBreak: 'break-word',
+                                }}>
+                                  {label}
+                                </span>
+                              }
+                              v={
+                                <span style={{ fontSize: 'var(--fs-sm)', display: 'flex', alignItems: 'center', gap: 4, textDecoration: corr.revoked ? 'line-through' : 'none', flexWrap: 'wrap' }}>
+                                  <span style={{ color: corr.revoked ? 'var(--muted)' : 'var(--accent)', fontWeight: 700 }}>{fmt(newVal)}</span>
+                                  <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>←</span>
+                                  <span style={{ color: corr.revoked ? 'var(--muted)' : 'var(--danger)' }}>{fmt(oldVal)}</span>
+                                </span>
+                              }
+                            />
+                          );
+                      });
+                      if (group.length > 1) {
+                        return <Grid2 key={gIdx}>{content}</Grid2>;
                       }
-                      return toFa(String(v));
-                    };
-
-                    return (
-                      <Row
-                        key={k}
-                        l={<span style={{ fontSize: 'var(--fs-sm)', color: corr.revoked ? 'var(--muted)' : 'var(--text)', textDecoration: corr.revoked ? 'line-through' : 'none' }}>{label}</span>}
-                        v={
-                          <span style={{ fontSize: 'var(--fs-sm)', display: 'flex', alignItems: 'center', gap: 4, textDecoration: corr.revoked ? 'line-through' : 'none' }}>
-                            <span style={{ color: corr.revoked ? 'var(--muted)' : 'var(--danger)' }}>{fmt(oldVal)}</span>
-                            <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>←</span>
-                            <span style={{ color: corr.revoked ? 'var(--muted)' : 'var(--accent)', fontWeight: 700 }}>{fmt(newVal)}</span>
-                          </span>
-                        }
-                      />
-                    );
-                  })}
+                      return <div key={gIdx} style={{ display: 'flex', flexDirection: 'column' }}>{content}</div>;
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
         </LogSection>
       )}
 

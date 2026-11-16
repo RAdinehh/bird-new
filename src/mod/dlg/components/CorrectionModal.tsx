@@ -9,7 +9,7 @@
  * - چیدمان دو ستونه برای فیلدهای هم‌خانواده (مثل ثبت روزانه)
  */
 import { useEffect, useMemo, useState } from 'react';
-import { Modal, Btn, BtnRow, Field, Select, Input } from '../../../shr/components/ui';
+import { Modal, Btn, BtnRow, Field, Select, Input, Grid2 } from '../../../shr/components/ui';
 import type { DailyLog } from '../store';
 import { toEn, toFa } from '../../../shr/utils/fa';
 import { v4 as uuid } from 'uuid';
@@ -232,6 +232,134 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
     }
   }
 
+  const renderField = (key: CorrectableKey) => {
+    const field = CORRECTABLE_FIELDS.find(f => f.key === key);
+    if (!field) return null;
+    const oldVal = (effectiveLog as any)[key];
+    const isCh = isChanged(key);
+
+    return (
+      <div
+        key={key}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--sp-2)',
+          padding: 'var(--sp-1) 0',
+          minHeight: 48,
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <span style={{
+            fontSize: 'var(--fs-sm)',
+            fontWeight: 700,
+            color: 'var(--text)',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}>
+            {stripEmoji(field.label)}
+          </span>
+          {isCh && (
+            <span style={{
+              fontSize: 'var(--fs-2xs, 10px)',
+              color: 'var(--accent)',
+              background: 'var(--accent-soft, rgba(59,130,246,0.15))',
+              padding: '1px 6px',
+              borderRadius: '999px',
+              fontWeight: 700,
+              alignSelf: 'flex-start',
+              lineHeight: 1.4,
+            }}>
+              تغییر کرد
+            </span>
+          )}
+        </div>
+
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'stretch',
+            height: 36,
+            width: 180,
+            flexShrink: 0,
+            border: `1px solid ${isCh ? 'var(--accent)' : 'var(--border)'}`,
+            borderRadius: 'var(--r-sm)',
+            overflow: 'hidden',
+            background: 'var(--card)',
+          }}
+        >
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '0 6px', minWidth: 0 }}>
+            {key === 'weightGender' ? (
+              <select
+                value={values[key] || ''}
+                onChange={e => setVal(key, e.target.value)}
+                style={{ width: '100%', border: 'none', outline: 'none', background: 'transparent', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', color: 'var(--text)', textAlign: 'center', cursor: 'pointer' }}
+              >
+                {WEIGHT_GENDER_OPTS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            ) : (
+              <>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={toFa(values[key] || '')}
+                  onChange={e => setVal(key, toEn(e.target.value))}
+                  placeholder=""
+                  style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontFamily: 'monospace', fontSize: 'var(--fs-sm)', color: 'var(--text)', textAlign: 'center', minWidth: 0, fontWeight: 700 }}
+                />
+                {field.unit && (
+                  <span style={{ fontSize: 'var(--fs-2xs, 10px)', color: 'var(--muted)', fontWeight: 600, marginRight: 4, whiteSpace: 'nowrap' }}>
+                    {field.unit}
+                  </span>
+                )}
+              </>
+            )}
+          </div>
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRight: `1px solid ${isCh ? 'var(--accent)' : 'var(--border)'}`,
+              background: 'transparent',
+              color: (oldVal != null && oldVal !== '') ? 'var(--danger)' : 'transparent',
+              fontFamily: 'monospace',
+              fontSize: 'var(--fs-sm)',
+              fontWeight: 700,
+              minWidth: 0,
+              padding: '0 4px',
+            }}
+            title="مقدار قبلی"
+          >
+            {formatOldValue(key, oldVal)}
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => toggle(key)}
+          title="حذف از انتخاب"
+          style={{
+            width: 24,
+            height: 24,
+            flexShrink: 0,
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--r-sm)',
+            background: 'var(--card)',
+            color: 'var(--muted)',
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+            fontSize: 'var(--fs-2xs, 10px)',
+          }}
+        >
+          ✕
+        </button>
+      </div>
+    );
+  };
+
   return (
     <Modal
       open={open}
@@ -347,147 +475,13 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)' }}>
-              {groups.map((group, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: group.length > 1 ? '1fr 1fr' : '1fr',
-                    gap: 'var(--sp-2)',
-                  }}
-                >
-                  {group.map(key => {
-                    const field = CORRECTABLE_FIELDS.find(f => f.key === key);
-                    if (!field) return null;
-                    const oldVal = (effectiveLog as any)[key];
-                    const isCh = isChanged(key);
-
-                    return (
-                      <div
-                        key={key}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 'var(--sp-2)',
-                          padding: 'var(--sp-1) 0',
-                          minHeight: 48,
-                        }}
-                      >
-                        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                          <span style={{
-                            fontSize: 'var(--fs-sm)',
-                            fontWeight: 700,
-                            color: 'var(--text)',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                          }}>
-                            {stripEmoji(field.label)}
-                          </span>
-                          {isCh && (
-                            <span style={{
-                              fontSize: 'var(--fs-2xs, 10px)',
-                              color: 'var(--accent)',
-                              background: 'var(--accent-soft, rgba(59,130,246,0.15))',
-                              padding: '1px 6px',
-                              borderRadius: '999px',
-                              fontWeight: 700,
-                              alignSelf: 'flex-start',
-                              lineHeight: 1.4,
-                            }}>
-                              تغییر کرد
-                            </span>
-                          )}
-                        </div>
-
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'stretch',
-                            height: 36,
-                            width: group.length > 1 ? 'auto' : 200,
-                            flex: group.length > 1 ? 1 : 'none',
-                            minWidth: 100,
-                            maxWidth: group.length > 1 ? 'none' : 220,
-                            flexShrink: 0,
-                            border: `1px solid ${isCh ? 'var(--accent)' : 'var(--border)'}`,
-                            borderRadius: 'var(--r-sm)',
-                            overflow: 'hidden',
-                            background: 'var(--card)',
-                          }}
-                        >
-                          <div style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '0 6px', minWidth: 0 }}>
-                            {key === 'weightGender' ? (
-                              <select
-                                value={values[key] || ''}
-                                onChange={e => setVal(key, e.target.value)}
-                                style={{ width: '100%', border: 'none', outline: 'none', background: 'transparent', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', color: 'var(--text)', textAlign: 'center', cursor: 'pointer' }}
-                              >
-                                {WEIGHT_GENDER_OPTS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                              </select>
-                            ) : (
-                              <>
-                                <input
-                                  type="text"
-                                  inputMode="decimal"
-                                  value={toFa(values[key] || '')}
-                                  onChange={e => setVal(key, toEn(e.target.value))}
-                                  placeholder=""
-                                  style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontFamily: 'monospace', fontSize: 'var(--fs-sm)', color: 'var(--text)', textAlign: 'center', minWidth: 0, fontWeight: 700 }}
-                                />
-                                {field.unit && (
-                                  <span style={{ fontSize: 'var(--fs-2xs, 10px)', color: 'var(--muted)', fontWeight: 600, marginRight: 4, whiteSpace: 'nowrap' }}>
-                                    {field.unit}
-                                  </span>
-                                )}
-                              </>
-                            )}
-                          </div>
-                          <div
-                            style={{
-                              flex: 1,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              borderRight: `1px solid ${isCh ? 'var(--accent)' : 'var(--border)'}`,
-                              background: 'transparent',
-                              color: (oldVal != null && oldVal !== '') ? 'var(--danger)' : 'transparent',
-                              fontFamily: 'monospace',
-                              fontSize: 'var(--fs-sm)',
-                              fontWeight: 700,
-                              minWidth: 0,
-                              padding: '0 4px',
-                            }}
-                            title="مقدار قبلی"
-                          >
-                            {formatOldValue(key, oldVal)}
-                          </div>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => toggle(key)}
-                          title="حذف از انتخاب"
-                          style={{
-                            width: group.length > 1 ? 24 : 32,
-                            height: group.length > 1 ? 24 : 32,
-                            flexShrink: 0,
-                            border: '1px solid var(--border)',
-                            borderRadius: 'var(--r-sm)',
-                            background: 'var(--card)',
-                            color: 'var(--muted)',
-                            cursor: 'pointer',
-                            fontFamily: 'inherit',
-                            fontSize: group.length > 1 ? 'var(--fs-2xs, 10px)' : 'var(--fs-sm)',
-                          }}
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              ))}
+              {groups.map((group, idx) => {
+              const fields = group.map(key => renderField(key));
+              if (group.length > 1) {
+                return <Grid2 key={idx}>{fields}</Grid2>;
+              }
+              return <div key={idx}>{fields}</div>;
+            })}
             </div>
           </div>
         )}
