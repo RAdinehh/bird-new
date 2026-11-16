@@ -22,7 +22,17 @@ const CORRECTABLE_FIELDS = [
   { key: 'fertileEggs',    label: '🌱 نطفه‌دار',     unit: 'عدد' },
   { key: 'brokenEggs',     label: '💔 شکسته',        unit: 'عدد' },
   { key: 'otherEggs',      label: '📦 سایر',         unit: 'عدد' },
+  { key: 'feedWaste',      label: '🌾 هدر رفته',     unit: 'kg' },
+  { key: 'waterFillCount', label: '💧 دفعات آب',     unit: 'نوبت' },
+  { key: 'waterFillVolume',label: '💧 حجم هر نوبت',  unit: 'L' },
+  { key: 'weightGender',   label: '⚖️ جنسیت وزن',   unit: '' },
 ] as const;
+
+const FIELD_GROUPS = [
+  { title: '🌡 محیط', keys: ['temperature', 'temperatureMin', 'temperatureMax', 'humidity', 'humidityMin', 'humidityMax'] },
+  { title: '🌾 تغذیه', keys: ['feedDelivered', 'feedRemaining', 'feedWaste', 'waterAmount', 'waterFillCount', 'waterFillVolume'] },
+  { title: '🥚 تولید', keys: ['deathsCount', 'eatingEggs', 'fertileEggs', 'brokenEggs', 'otherEggs', 'weightGender'] },
+];
 
 type CorrectableKey = typeof CORRECTABLE_FIELDS[number]['key'];
 
@@ -71,13 +81,26 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
 
   const currentField = CORRECTABLE_FIELDS.find(f => f.key === activeField);
   const oldValue = (log as any)[activeField];
-  const oldDisplay = oldValue != null ? toFa(String(oldValue)) : '—';
+  const oldDisplay = (() => {
+    if (oldValue == null) return '—';
+    if (activeField === 'weightGender') {
+      const opts = [{ value: '', label: '—' }, { value: 'male', label: 'نر' }, { value: 'female', label: 'ماده' }, { value: 'mixed', label: 'مخلوط' }];
+      return opts.find(o => o.value === oldValue)?.label || String(oldValue);
+    }
+    return toFa(String(oldValue));
+  })();
 
   const handleSave = async () => {
     if (!log) return;
 
     // L2-guard: multi-record deathsCount — رد
     if (activeField === 'deathsCount' && hasMultiDeaths(log)) {
+      return;
+    }
+
+    // 🆕 جنسیت وزن (enum)
+    if (activeField === 'weightGender') {
+      await onSave(log.id, { weightGender: value as any }, reason, notes || undefined);
       return;
     }
 
@@ -169,7 +192,16 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
         )}
 
         <Field label="مقدار جدید">
-            <NumField value={value} onChange={e => setValue(e.target.value)} unit={currentField?.unit} />
+            {activeField === 'weightGender' ? (
+              <Select value={value} onChange={e => setValue(e.target.value)}>
+                <option value="">— نامشخص —</option>
+                <option value="male">نر</option>
+                <option value="female">ماده</option>
+                <option value="mixed">مخلوط</option>
+              </Select>
+            ) : (
+              <NumField value={value} onChange={e => setValue(e.target.value)} unit={currentField?.unit} />
+            )}
           </Field>
           <Field label="مقدار قبلی">
             <div style={{
