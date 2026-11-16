@@ -12,6 +12,7 @@ import { toastMsg } from '../../../cor/store/toast';
 import { logAction } from '../../../cor/logger/auditLog';
 import { formatQty } from '../../../shr/utils/fa';
 import { CardActions } from '../../../shr/components/ui';
+import { ACTION_PRESETS } from '../../../shr/constants/cardActions';
 
 const EQUIP_STATUS: Record<string, string> = {
   active: 'فعال', repair: 'در تعمیر', scrapped: 'اسقاط',
@@ -159,16 +160,16 @@ export default function ItemCard(props: ItemCardProps) {
         <CardActions actions={(() => {
           const hasMovements = myMovements && myMovements.length > 0;
           const baseActions = [
-            { label: 'اصلاح', onClick: onAdjust, variant: 'primary' as const },
-            { label: 'ویرایش', onClick: onEdit, variant: 'outline' as const },
+            { ...ACTION_PRESETS.CORRECT, onClick: onAdjust },
+            { ...ACTION_PRESETS.EDIT, onClick: onEdit },
           ];
           if (it.archived) {
-            return [...baseActions, { label: 'بازگردانی', onClick: () => onUnarchive?.(), variant: 'primary' as const }];
+            return [...baseActions, { ...ACTION_PRESETS.RESTORE, onClick: () => onUnarchive?.() }];
           }
           if (hasMovements) {
-            return [...baseActions, { label: 'آرشیو', onClick: handleArchive, variant: 'danger-outline' as const }];
+            return [...baseActions, { ...ACTION_PRESETS.ARCHIVE, onClick: handleArchive }];
           }
-          return [...baseActions, { label: 'حذف', onClick: handleDelete, variant: 'danger-outline' as const }];
+          return [...baseActions, { ...ACTION_PRESETS.DELETE, onClick: handleDelete }];
         })()} />
       </div>
     </ExpandableCard>

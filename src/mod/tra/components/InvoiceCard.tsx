@@ -1,4 +1,5 @@
 import { Tag, Btn, CardActions } from '../../../shr/components/ui';
+import { ACTION_PRESETS } from '../../../shr/constants/cardActions';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { toFa , formatQty } from '../../../shr/utils/fa';
 import {
@@ -256,8 +257,8 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
           <CardActions actions={[
             { label: nextWs === 'confirmed' ? 'ثبت نهایی' : nextWs === 'received' ? 'کالا رسید' : 'پرداخت کردم', onClick: onTransferClick, variant: 'primary', hidden: !nextWs || skipCashReceived },
             { label: 'حل شد', onClick: onResolveDispute || (() => {}), variant: 'primary', hidden: !onResolveDispute },
-            { label: 'بازگردانی', onClick: () => { if (linkedFlock) { restore(linkedFlock.id); toastMsg.success('گله با موفقیت بازیابی شد'); } }, variant: 'primary', hidden: !isFlockArchived },
-            { label: 'ویرایش', onClick: onEdit || (() => {}), variant: 'outline', hidden: !onEdit },
+            { ...ACTION_PRESETS.RESTORE, onClick: () => { if (linkedFlock) { restore(linkedFlock.id); toastMsg.success('گله با موفقیت بازیابی شد'); } }, hidden: !isFlockArchived },
+            { ...ACTION_PRESETS.EDIT, onClick: onEdit || (() => {}), hidden: !onEdit },
             { label: 'اتصال دستی', onClick: () => setFlockPickerOpen(true), variant: 'outline', hidden: !(!linkedFlock && hasBirdItems) },
             { label: 'مشاهده گله', onClick: () => { if (linkedFlock) window.location.href = '/flk?focus=' + linkedFlock.id; }, variant: 'outline', hidden: !isFlockActive },
             { label: 'اختلاف', onClick: onDispute || (() => {}), variant: 'outline', hidden: !onDispute },
