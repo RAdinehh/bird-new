@@ -26,6 +26,7 @@ import type { Hall, Zone } from '../../hal/store';
 import type { useFormat } from '../../../shr/units';
 import type { MultiSelectState } from '../../../shr/multiSelect/useMultiSelect';
 import { CardActions } from '../../../shr/components/ui';
+import { ACTION_PRESETS } from '../../../shr/constants/cardActions';
 import FlockValueSection from './FlockValueSection';
 import { useWhs } from '../../whs/store';
 import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
@@ -567,17 +568,17 @@ export default function FlockCard(props: FlockCardProps) {
 
       {isArchived ? (
         <CardActions actions={[
-          { label: 'بازگردانی', onClick: onRestore, variant: 'primary' },
-          { label: 'حذف', onClick: onDelete, variant: 'danger-outline' }
+          { ...ACTION_PRESETS.RESTORE, onClick: onRestore },
+          { ...ACTION_PRESETS.DELETE, onClick: onDelete }
         ]} />
       ) : (
         <>
           <CardActions actions={[
-            { label: 'ویرایش', onClick: handleEditGuard, variant: 'outline' },
+            { ...ACTION_PRESETS.EDIT, onClick: handleEditGuard },
             { label: 'تفکیک جنسیت', onClick: () => setSexingOpen(true), variant: 'outline', hidden: f.type === 'broiler' },
             { label: 'سابقه تفکیک', onClick: () => setSexingHistoryOpen(true), variant: 'outline', hidden: (f.sexingEvents?.length || 0) === 0 },
             { label: 'ثبت دان/آب', onClick: () => setConsumptionOpen(true), variant: 'outline' },
-            { label: 'همه رویدادها', onClick: () => setHistoryOpen(true), variant: 'outline' },
+            { ...ACTION_PRESETS.HISTORY, onClick: () => setHistoryOpen(true) },
             { label: 'گروه‌ها', onClick: onOpenGroups, variant: 'outline' },
             { label: f.hidden ? 'نمایان' : 'پنهان', onClick: onToggleHidden, variant: 'outline' },
             { label: f.paused ? 'فعال' : 'غیرفعال', onClick: onTogglePaused, variant: 'outline' }
