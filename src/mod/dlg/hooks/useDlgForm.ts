@@ -40,12 +40,12 @@ export interface UseDlgFormParams {
 export function dailyLogToForm(l: DailyLog): F {
   return {
       id: l.id, flockId: l.flockId, date: l.date, entryTime: l.entryTime,
-      temperature: l.temperature ? toFa(l.temperature) : '',
-      temperatureMin: l.temperatureMin ? toFa(l.temperatureMin) : '',
-      temperatureMax: l.temperatureMax ? toFa(l.temperatureMax) : '',
-      humidity: l.humidity ? toFa(l.humidity) : '',
-      humidityMin: l.humidityMin ? toFa(l.humidityMin) : '',
-      humidityMax: l.humidityMax ? toFa(l.humidityMax) : '',
+      temperature: l.temperature != null ? toFa(l.temperature) : '',
+      temperatureMin: l.temperatureMin != null ? toFa(l.temperatureMin) : '',
+      temperatureMax: l.temperatureMax != null ? toFa(l.temperatureMax) : '',
+      humidity: l.humidity != null ? toFa(l.humidity) : '',
+      humidityMin: l.humidityMin != null ? toFa(l.humidityMin) : '',
+      humidityMax: l.humidityMax != null ? toFa(l.humidityMax) : '',
       ventilation: l.ventilation, litter: l.litter,
       behavior: l.behavior, distribution: l.distribution,
       appearance: l.appearance, sound: l.sound,
@@ -72,8 +72,8 @@ export function dailyLogToForm(l: DailyLog): F {
       waterFillVolume: l.waterFillVolume !== null ? toFa(l.waterFillVolume) : '',
       weightSamples: (l.weightSamples || []).map(w => ({ id: w.id, weight: toFa(w.weight) })),
       eatingEggs: l.eatingEggs != null ? toFa(l.eatingEggs) : '',
-      fertileEggs: (l as any).fertileEggs ? toFa((l as any).fertileEggs) : '',
-      brokenEggs: l.brokenEggs ? toFa(l.brokenEggs) : '',
+      fertileEggs: l.fertileEggs != null ? toFa(l.fertileEggs) : '',
+      brokenEggs: l.brokenEggs != null ? toFa(l.brokenEggs) : '',
       otherEggs: l.otherEggs != null ? toFa(l.otherEggs) : '',
       weightGender: l.weightGender || '',
       deaths: l.deaths || [], vaccines: l.vaccines || [],
@@ -90,8 +90,16 @@ export function useDlgForm({ activeFlocks, halls, todayStr }: UseDlgFormParams) 
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState('');
 
-  const num = (s: string) => s ? parseFloat(toEn(s).replace('٫', '.')) || null : null;
-  const int = (s: string) => s ? parseInt(toEn(s)) || null : null;
+  const num = (s: string): number | null => {
+    if (!s.trim()) return null;
+    const value = parseFloat(toEn(s).replace('٫', '.'));
+    return Number.isFinite(value) ? value : null;
+  };
+  const int = (s: string): number | null => {
+    if (!s.trim()) return null;
+    const value = parseInt(toEn(s), 10);
+    return Number.isFinite(value) ? value : null;
+  };
 
   const detectSystems = useCallback((flockId: string) => {
     const flock = activeFlocks.find(f => f.id === flockId);

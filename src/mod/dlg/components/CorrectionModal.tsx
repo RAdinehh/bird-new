@@ -82,14 +82,23 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
     }
 
     if (value.trim() === '') {
-      onSave(log.id, { [activeField]: null } as Partial<DailyLog>, reason, notes || undefined);
+      // تعداد تلفات باید عدد صحیح باشد؛ حذف مقدار از این مسیر مجاز نیست.
+      if (activeField === 'deathsCount') return;
+      await onSave(log.id, { [activeField]: null } as Partial<DailyLog>, reason, notes || undefined);
       return;
     }
 
     const num = parseFloat(toEn(value).replace('٫', '.'));
-    if (isNaN(num)) return;
+    if (!Number.isFinite(num)) return;
+    if (activeField === 'deathsCount' && (!Number.isInteger(num) || num < 0)) return;
 
     const changes: Partial<DailyLog> = { [activeField]: num };
+
+    // buildLogData تعداد نهایی را از آرایهٔ deaths محاسبه می‌کند.
+    // رکورد موجود را همراه تعداد کل تغییر بده؛ شناسه و علت حفظ شوند.
+    if (activeField === 'deathsCount' && log.deaths?.length === 1) {
+      changes.deaths = [{ ...log.deaths[0], count: num }];
+    }
 
     // L2-synth: deathsCount با deaths=[] — synthesize record
     if (activeField === 'deathsCount' && (log.deaths?.length || 0) === 0 && num > 0) {
@@ -101,7 +110,7 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
       }];
     }
 
-    onSave(log.id, changes, reason, notes || undefined);
+    await onSave(log.id, changes, reason, notes || undefined);
   };
 
   return (

@@ -330,22 +330,20 @@ export function useDlgSave(params: UseDlgSaveParams) {
           logId = form.id;
           // 🆕 Audit Trail — ثبت رویداد ویرایش
           if (oldLog) {
-            try {
-              const evts = buildCorrectionEvents(oldLog, data, reason || 'ویرایش مستقیم');
-              for (const ev of evts) {
-                useDlg.getState().addEvent(logId, ev);
-              }
-            } catch { /* silent */ }
+            const evts = buildCorrectionEvents(oldLog, data, reason || 'ویرایش مستقیم');
+            for (const ev of evts) {
+              const eventId = useDlg.getState().addEvent(logId, ev);
+              if (!eventId) throw new Error('ثبت تاریخچهٔ ویرایش انجام نشد');
+            }
           }
         } else {
           logId = add(data);
           // 🆕 v16 — رویدادهای اولیه (الگوی FlockEvent)
-          try {
-            const initialEvents = extractEvents({ ...data, id: logId } as any);
-            for (const ev of initialEvents) {
-              useDlg.getState().addEvent(logId, ev);
-            }
-          } catch { /* silent */ }
+          const initialEvents = extractEvents({ ...data, id: logId } as any);
+          for (const ev of initialEvents) {
+            const eventId = useDlg.getState().addEvent(logId, ev);
+            if (!eventId) throw new Error('ثبت تاریخچهٔ اولیه انجام نشد');
+          }
         }
 
         // ۸) activeWithdrawal — recompute از همه لاگ‌ها (B4-Recalc)

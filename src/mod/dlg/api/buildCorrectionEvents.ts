@@ -31,7 +31,9 @@ export function buildCorrectionEvents(
   for (const field of NUMERIC_FIELDS) {
     const before = (oldLog as any)[field] ?? null;
     const after = (newData as any)[field] ?? null;
-    if (before !== after && (before !== null || after !== null)) {
+    // 🆕 skip اگر هیچ تغییری نبوده (جلوگیری از رکوردهای بی‌معنی)
+    if (before === after) continue;
+    if (before !== null || after !== null) {
       out.push({ ...base, field, before, after });
     }
   }

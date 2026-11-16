@@ -314,3 +314,102 @@ describe('useDlgSave — B4 atomic', () => {
     expect(showConfirmAsync).not.toHaveBeenCalled();
   });
 });
+
+
+// DLG_ZERO_AND_AUDIT_REGRESSION_V1
+describe('dlg — zero values and atomic audit regression', () => {
+  it('dailyLogToForm preserves zero numeric values', async () => {
+    const { dailyLogToForm } = await import('../mod/dlg/hooks/useDlgForm');
+    const { toEn } = await import('../shr/utils/fa');
+    const log = {
+      ...makeLogRecord(),
+      id: 'zero-log', status: 'active',
+      createdAt: '', updatedAt: '',
+      temperature: 0, temperatureMin: 0, temperatureMax: 0,
+      humidity: 0, humidityMin: 0, humidityMax: 0,
+      eatingEggs: 0, fertileEggs: 0, brokenEggs: 0, otherEggs: 0,
+    } as DailyLog;
+    const form = dailyLogToForm(log);
+    const fields = [
+      'temperature', 'temperatureMin', 'temperatureMax',
+      'humidity', 'humidityMin', 'humidityMax',
+      'eatingEggs', 'fertileEggs', 'brokenEggs', 'otherEggs',
+    ] as const;
+    for (const field of fields) {
+      expect(toEn(String(form[field]))).toBe('0');
+    }
+  });
+
+  it('useDlgForm numeric parsers preserve Persian and English zero', async () => {
+    const { useDlgForm } = await import('../mod/dlg/hooks/useDlgForm');
+    const { result, unmount } = renderHook(() => useDlgForm({
+      activeFlocks: [], halls: [], todayStr: '1405/08/08',
+    }));
+    try {
+      expect(result.current.num('0')).toBe(0);
+      expect(result.current.num('۰')).toBe(0);
+      expect(result.current.int('0')).toBe(0);
+      expect(result.current.int('۰')).toBe(0);
+      expect(result.current.num('')).toBeNull();
+      expect(result.current.int('')).toBeNull();
+    } finally {
+      unmount();
+    }
+  });
+
+  it('initial audit failure rolls back the newly created log', async () => {
+    const realAddEvent = useDlg.getState().addEvent;
+    const { result, unmount } = renderHook(() => useDlgSave(makeParams()));
+    let ok = true;
+    try {
+      act(() => {
+        useDlg.setState({
+          addEvent: () => { throw new Error('audit-test-failure'); },
+        });
+      });
+      await act(async () => {
+        ok = await result.current.save();
+      });
+      expect(ok).toBe(false);
+      expect(useDlg.getState().logs).toHaveLength(0);
+      const { outbox } = await import('../cor/outbox');
+      expect(outbox.publish).not.toHaveBeenCalled();
+    } finally {
+      act(() => { useDlg.setState({ addEvent: realAddEvent }); });
+      unmount();
+    }
+  });
+
+  it('edit audit failure restores the previous log value', async () => {
+    const id = useDlg.getState().add(makeLogRecord({
+      temperature: 10, temperatureMin: null, temperatureMax: null,
+    }));
+    const before = JSON.parse(JSON.stringify(useDlg.getState().logs));
+    const realAddEvent = useDlg.getState().addEvent;
+    const params = makeParams({
+      form: {
+        ...emptyForm(), id,
+        temperature: '20', temperatureMin: '', temperatureMax: '',
+      },
+    });
+    const { result, unmount } = renderHook(() => useDlgSave(params));
+    let ok = true;
+    try {
+      act(() => {
+        useDlg.setState({
+          addEvent: () => { throw new Error('audit-edit-test-failure'); },
+        });
+      });
+      await act(async () => {
+        ok = await result.current.save();
+      });
+      expect(ok).toBe(false);
+      expect(useDlg.getState().logs).toEqual(before);
+      const { outbox } = await import('../cor/outbox');
+      expect(outbox.publish).not.toHaveBeenCalled();
+    } finally {
+      act(() => { useDlg.setState({ addEvent: realAddEvent }); });
+      unmount();
+    }
+  });
+});
