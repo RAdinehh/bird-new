@@ -4,6 +4,7 @@ import { BrowserRouter, useLocation } from 'react-router-dom';
 import { useSet } from './mod/set/store';
 import { useDlg } from './mod/dlg/store';
 import { useFlk } from './mod/flk/store';
+import { useWhs } from './mod/whs/store';
 import { applyTheme } from './cor/theme/applyTheme';
 import Header from './shr/components/Header';
 import BottomNav from './shr/components/BottomNav';
@@ -94,7 +95,8 @@ export default function App() {
   const settings = useSet();
   const dlgLoading = useDlg((s) => s.isLoading);
   const flkLoading = useFlk((s) => s.isLoading);
-  const isLoading = dlgLoading || flkLoading;
+  const whsLoading = useWhs((s) => s.isLoading);
+  const isLoading = dlgLoading || flkLoading || whsLoading;
   const [showLoading, setShowLoading] = useState(false);
   const theme = settings.theme;  // single source of truth
   const [showOnb, setShowOnb] = useState(false);
@@ -150,6 +152,10 @@ export default function App() {
       if (useFlk.getState().isLoading) {
         console.warn('[App] flk hydration timeout — forcing isLoading=false');
         useFlk.setState({ isLoading: false });
+      }
+      if (useWhs.getState().isLoading) {
+        console.warn('[App] whs hydration timeout — forcing isLoading=false');
+        useWhs.setState({ isLoading: false });
       }
     }, 5000);
     return () => clearTimeout(timer);

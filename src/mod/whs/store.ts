@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { parse as parseJ, differenceInCalendarDays as diffCalDays, startOfDay } from 'date-fns-jalali';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { zustandHybridStorage } from '../../cor/storage/hybridStorage';
 import { v4 as uuid } from 'uuid';
 import { validate } from '../../shr/validation/helpers';
 import { createItemSchema, createMovementSchema } from '../../shr/validation/rules/whs';
@@ -107,6 +108,9 @@ interface State {
   getItemMovements: (id: string) => Movement[];
   addMovement: (m: Omit<Movement, 'id' | 'createdAt'>) => string;
   deleteMovement: (id: string) => void;
+
+  /** 🆕 وضعیت لود داده‌ها از IndexedDB */
+  isLoading: boolean;
 }
 
 
@@ -245,6 +249,7 @@ export function checkIntegrity(
 export const useWhs = create<State>()(
   persist(
     (set, get) => ({
+      isLoading: true,
       items: [],
       movements: [],
 
@@ -348,6 +353,19 @@ export const useWhs = create<State>()(
     }),
     {
       name: 'pm-whs',
+      storage: createJSONStorage(() => zustandHybridStorage),
+      partialize: (state) => {
+        const { isLoading, ...rest } = state;
+        return rest as any;
+      },
+      onRehydrateStorage: () => {
+        return (state, error) => {
+          if (error) {
+            console.error('[whs] Hydration failed:', error);
+          }
+          useWhs.setState({ isLoading: false });
+        };
+      },
       version: 1,
       migrate: (persisted: unknown, version: number) => {
         if (version >= 1) return persisted;
