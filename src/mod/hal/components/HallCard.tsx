@@ -14,6 +14,7 @@ import { logAction } from '../../../cor/logger/auditLog';
 import { HallEquipSection } from '../HallEquipSection';
 import EntityLink from '../../../shr/components/EntityLink';
 import { CardActions } from '../../../shr/components/ui';
+import { ACTION_PRESETS } from '../../../shr/constants/cardActions';
 import { findInRange } from '../../set/standards/resolve';
 
 export interface HallCardProps {
@@ -225,8 +226,8 @@ export default function HallCard(props: HallCardProps) {
 
       <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-1)' }}>
         <CardActions actions={[
-          { label: 'ویرایش', onClick: onEdit, variant: 'outline' },
-          { label: 'حذف', onClick: handleDelete, variant: 'danger-outline' }
+          { ...ACTION_PRESETS.EDIT, onClick: onEdit },
+          { ...ACTION_PRESETS.DELETE, onClick: handleDelete }
         ]} />
       </div>
     </ExpandableCard>

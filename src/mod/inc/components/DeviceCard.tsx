@@ -7,6 +7,7 @@ import { STATUS_FA, MODE_FA } from '../types-devices';
 import { Row } from '../helpers';
 import { warrantyInfo } from '../api/warranty';
 import { CardActions } from '../../../shr/components/ui';
+import { ACTION_PRESETS } from '../../../shr/constants/cardActions';
 
 interface Props {
   d: Device;
@@ -168,8 +169,8 @@ export default function DeviceCard({
 
                 <div style={{ display: 'flex', gap: 'var(--sp-2)' as any, paddingTop: 4 }}>
                   <CardActions actions={[
-                    { label: 'ویرایش', onClick: onEdit, variant: 'outline' },
-                    { label: 'حذف', onClick: onDelete, variant: 'danger-outline' }
+                    { ...ACTION_PRESETS.EDIT, onClick: onEdit },
+                    { ...ACTION_PRESETS.DELETE, onClick: onDelete }
                   ]} />
                 </div>
               </ExpandableCard>

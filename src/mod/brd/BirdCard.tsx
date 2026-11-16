@@ -12,6 +12,7 @@ import { showConfirmAsync } from '../../cor/store/dialog';
 import { toastMsg } from '../../cor/store/toast';
 import { logAction } from '../../cor/logger/auditLog';
 import { CardActions } from '../../shr/components/ui';
+import { ACTION_PRESETS } from '../../shr/constants/cardActions';
 
 interface Props {
   bird: Bird;
@@ -223,8 +224,8 @@ export default function BirdCard({
 
       <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
         <CardActions actions={[
-          { label: 'ویرایش', onClick: () => onEdit(b), variant: 'outline' },
-          { label: 'حذف', onClick: handleDelete, variant: 'danger-outline' }
+          { ...ACTION_PRESETS.EDIT, onClick: () => onEdit(b) },
+          { ...ACTION_PRESETS.DELETE, onClick: handleDelete }
         ]} />
       </div>
     </ExpandableCard>

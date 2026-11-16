@@ -10,6 +10,7 @@ import { calcChickYield } from '../api/needs';
 import type { Bird } from '../../brd/store';
 import type { EggEntry } from '../store';
 import { CardActions } from '../../../shr/components/ui';
+import { ACTION_PRESETS } from '../../../shr/constants/cardActions';
 
 export interface HatchCardProps {
   hatch: HatchResult;
@@ -130,8 +131,8 @@ export default function HatchCard(props: HatchCardProps) {
                 )}
 
                 <CardActions actions={[
-                  { label: 'ویرایش', onClick: onEdit, variant: 'outline' },
-                  { label: 'حذف', onClick: onDelete, variant: 'danger-outline' }
+                  { ...ACTION_PRESETS.EDIT, onClick: onEdit },
+                  { ...ACTION_PRESETS.DELETE, onClick: onDelete }
                 ]} />
               </ExpandableCard>
   );
