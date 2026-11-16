@@ -3,6 +3,7 @@ import { safeStorage } from './shr/utils/storage';
 import { BrowserRouter, useLocation } from 'react-router-dom';
 import { useSet } from './mod/set/store';
 import { useDlg } from './mod/dlg/store';
+import { useFlk } from './mod/flk/store';
 import { applyTheme } from './cor/theme/applyTheme';
 import Header from './shr/components/Header';
 import BottomNav from './shr/components/BottomNav';
@@ -91,7 +92,9 @@ function LoadingScreen() {
 
 export default function App() {
   const settings = useSet();
-  const isLoading = useDlg((s) => s.isLoading);
+  const dlgLoading = useDlg((s) => s.isLoading);
+  const flkLoading = useFlk((s) => s.isLoading);
+  const isLoading = dlgLoading || flkLoading;
   const [showLoading, setShowLoading] = useState(false);
   const theme = settings.theme;  // single source of truth
   const [showOnb, setShowOnb] = useState(false);
@@ -141,8 +144,12 @@ export default function App() {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (useDlg.getState().isLoading) {
-        console.warn('[App] Hydration timeout — forcing isLoading=false');
+        console.warn('[App] dlg hydration timeout — forcing isLoading=false');
         useDlg.setState({ isLoading: false });
+      }
+      if (useFlk.getState().isLoading) {
+        console.warn('[App] flk hydration timeout — forcing isLoading=false');
+        useFlk.setState({ isLoading: false });
       }
     }, 5000);
     return () => clearTimeout(timer);

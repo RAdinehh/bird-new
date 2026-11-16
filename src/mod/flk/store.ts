@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { zustandHybridStorage } from '../../cor/storage/hybridStorage';
 import { v4 as uuid } from 'uuid';
 import { parse, differenceInDays } from 'date-fns-jalali';
 import { todayJ } from './api/flocksCalc';
@@ -156,6 +157,9 @@ export interface State {
   getFlocksInGroup: (groupId: string, includeDescendants?: boolean) => Flock[];
   getGroupsForFlock: (flockId: string) => FlockGroup[];
   getGroupPath: (groupId: string) => FlockGroup[];
+
+  /** 🆕 وضعیت لود داده‌ها از IndexedDB (دروازه لودینگ) */
+  isLoading: boolean;
 }
 
 const now = () => new Date().toISOString();
@@ -163,6 +167,7 @@ const now = () => new Date().toISOString();
 export const useFlk = create<State>()(
   persist(
     (set, get) => ({
+      isLoading: true,
       flocks: [],
       groups: [],
       groupMembers: [],
@@ -791,6 +796,19 @@ export const useFlk = create<State>()(
     }),
     {
       name: 'pm-flk',
+      storage: createJSONStorage(() => zustandHybridStorage),
+      partialize: (state) => {
+        const { isLoading, ...rest } = state;
+        return rest as any;
+      },
+      onRehydrateStorage: () => {
+        return (state, error) => {
+          if (error) {
+            console.error('[flk] Hydration failed:', error);
+          }
+          useFlk.setState({ isLoading: false });
+        };
+      },
       version: 13,
       migrate: flkMigrate,
     }
