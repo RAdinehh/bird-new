@@ -13,6 +13,7 @@ import { toastMsg } from '../../../cor/store/toast';
 import { downloadCSV } from '../../../shr/utils/export';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import type { DailyLog as DlgLog } from '../../dlg/store';
+import { applyCorrections } from '../../dlg/api/applyCorrections';
 import { aggregateConsumptionEvents } from '../consumptionEventsCalc';
 import { useBrd } from '../../brd/store';
 import { getStandardFor } from '../../set/standards/resolve';
@@ -77,7 +78,8 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
     let cancelled = false;
     import('../../dlg/store').then((mod) => {
       if (cancelled) return;
-      const logs: DlgLog[] = mod.useDlg.getState().logs || [];
+      const rawLogs: DlgLog[] = mod.useDlg.getState().logs || [];
+      const logs: DlgLog[] = rawLogs.map(applyCorrections);
       const total = logs
         .filter((l: DlgLog) => l.flockId === flock.id)
         .reduce((sum: number, l: DlgLog) => sum + (l.deathsCount || 0), 0);

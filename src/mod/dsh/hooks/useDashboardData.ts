@@ -55,7 +55,8 @@ const [, _setTick] = useState(0);
   const { items: whsItems } = useWhs();
   const { alerts } = useAlt();
   const { birds, breeds } = useBrd();
-  const { logs } = useDlg();
+  const { logs: rawLogs } = useDlg();
+  const logs = useMemo(() => rawLogs.map(applyCorrections), [rawLogs]);
 
   useEffect(() => { runRules(); }, []);
 

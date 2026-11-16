@@ -7,6 +7,7 @@ import { useFlk, calcCosts, getAgeDays, type Flock, type FlockStatus, type Flock
 import { useTra } from '../../tra/store';
 import { useEgg } from '../../egg/store';
 import { useDlg } from '../../dlg/store';
+import { applyCorrections } from '../../dlg/api/applyCorrections';
 import { useWhs } from '../../whs/store';
 import { getFlockRevenue } from '../api/flocksCalc';
 import { sexRatio } from '../helpers-store';
@@ -80,7 +81,8 @@ export function useGroupKpi(groupId: string): GroupKpi {
   const getFlocksInGroup = useFlk(s => s.getFlocksInGroup);
   const invoices = useTra(s => s.invoices);
   const eggProductions = useEgg(s => s.productions);
-  const dlgLogs = useDlg(s => s.logs);
+  const rawDlgLogs = useDlg(s => s.logs);
+  const dlgLogs = useMemo(() => rawDlgLogs.map(applyCorrections), [rawDlgLogs]);
   const movements = useWhs(s => s.movements);
   const whsItems = useWhs(s => s.items);
 
@@ -207,7 +209,8 @@ export function useMultiGroupKpi(groupIds: string[]): Record<string, GroupKpi> {
   const getFlocksInGroup = useFlk(s => s.getFlocksInGroup);
   const invoices = useTra(s => s.invoices);
   const eggProductions = useEgg(s => s.productions);
-  const dlgLogs = useDlg(s => s.logs);
+  const rawDlgLogs = useDlg(s => s.logs);
+  const dlgLogs = useMemo(() => rawDlgLogs.map(applyCorrections), [rawDlgLogs]);
 
   return useMemo(() => {
     const result: Record<string, GroupKpi> = {};
