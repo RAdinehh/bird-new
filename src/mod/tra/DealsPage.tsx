@@ -15,7 +15,8 @@ import { getUOM, getDefaultUnit } from '../../shr/units/uom';
 import { computeGoodsCap, computeDeliveryCap, computeSaleCap, computePaymentCap } from './caps';
 import { Btn, BtnRow, CardActions, Empty, Field, Input, MoneyField, PercentField,
   Grid2, Modal, NumField,
-  PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';import SmartSelect from '../../shr/components/SmartSelect';
+  PageContainer, Select, Tag, ErrorBox , Textarea } from '../../shr/components/ui';
+import { ACTION_PRESETS } from '../../shr/constants/cardActions';import SmartSelect from '../../shr/components/SmartSelect';
 import EntityLink from '../../shr/components/EntityLink';
 import { BadgeOverflow, type BadgeItem } from '../../shr/components/ui/BadgeOverflow';
 import { FieldHint } from '../../shr/intelligence';;
@@ -669,17 +670,8 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                     variant: 'outline',
                     onClick: () => { setSettlementDeal(d); setSettlementOpen(true); },
                   },
-                  {
-                    label: 'ویرایش',
-                    variant: 'outline',
-                    hidden: d.status !== 'open',
-                    onClick: () => openEdit(d),
-                  },
-                  {
-                    label: 'حذف',
-                    variant: 'danger-outline',
-                    onClick: () => { void handleDeleteFromCard(d); },
-                  },
+                  { ...ACTION_PRESETS.EDIT, hidden: d.status !== 'open', onClick: () => openEdit(d) },
+                  { ...ACTION_PRESETS.DELETE, onClick: () => { void handleDeleteFromCard(d); } },
                 ]} />
               </ExpandableCard>
             );
