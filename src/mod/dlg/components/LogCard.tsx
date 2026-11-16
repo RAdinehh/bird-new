@@ -12,6 +12,7 @@ import {
 } from '../store';
 import { calculateEnvironmentWarnings } from '../../../shr/calc';
 import { toFa } from '../../../shr/utils/fa';
+import { format as formatJ, parse as parseJ, differenceInCalendarDays } from 'date-fns-jalali';
 import { getEffectiveEnv } from '../../set/standards/resolve';
 import { useSet } from '../../set/store';
 import { getAgeDays } from '../../flk/store';
@@ -125,6 +126,19 @@ export default function LogCard(props: LogCardProps) {
   const hIsBad = hWarn === 'warn' || hWarn === 'danger';
   const hasProblem = tIsBad || hIsBad || l.deathsCount > 0;
   const accent: any = hasProblem ? 'warn' : 'accent';
+
+  // 🆕 محاسبه روزهای گذشته از تاریخ لاگ (منطق ۳ روز)
+  const daysSinceLog = (() => {
+    try {
+      const logDate = parseJ(l.date, 'yyyy/MM/dd', new Date());
+      const today = new Date();
+      return differenceInCalendarDays(today, logDate);
+    } catch {
+      return 0;
+    }
+  })();
+  const isEditLocked = daysSinceLog > 3;
+
 
   // 🆕 BadgeOverflow badges
   const allBadges: BadgeItem[] = [];
@@ -375,7 +389,7 @@ export default function LogCard(props: LogCardProps) {
       )}
 
       <CardActions actions={[
-        { label: 'ویرایش', onClick: onEdit, variant: 'outline', hidden: (l.status || 'active') !== 'active' },
+        { label: isEditLocked ? '🔒 ویرایش قفل' : 'ویرایش', onClick: onEdit, variant: 'outline', hidden: (l.status || 'active') !== 'active', disabled: isEditLocked },
         { label: 'اصلاح', onClick: onCorrect, variant: 'outline', hidden: (l.status || 'active') !== 'active' },
         { label: 'تاریخچه', onClick: () => onHistory?.(), variant: 'outline', hidden: onHistory === undefined },
         { label: 'بازگردانی', onClick: onRestore, variant: 'outline', hidden: (l.status || 'active') === 'active' },
