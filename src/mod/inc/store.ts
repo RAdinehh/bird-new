@@ -4,7 +4,8 @@
 import { useSet } from '../set/store';
 import { getIncubation } from '../set/standards';
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { zustandHybridStorage } from '../../cor/storage/hybridStorage';
 import { v4 as uuid } from 'uuid';
 import { useFlk } from '../flk/store';
 import { useBrd } from '../brd/store';
@@ -190,6 +191,9 @@ interface State {
   addHatch: (h: Omit<HatchResult, 'id'|'createdAt'>) => void;
   updateHatch: (id: string, patch: Partial<HatchResult>) => void;
   deleteHatch: (id: string) => void;
+
+  /** 🆕 وضعیت لود داده‌ها از IndexedDB */
+  isLoading: boolean;
 }
 
 const now = () => new Date().toISOString();
@@ -197,6 +201,7 @@ const now = () => new Date().toISOString();
 export const useInc = create<State>()(
   persist(
     (set, get) => ({
+      isLoading: true,
       devices: [], hatchGroups: [], eggEntries: [], candlings: [], hatches: [],
 
       addDevice: (d) => set({ devices: [...get().devices, {...d, id: uuid(), createdAt: now(), updatedAt: now()}] }),
@@ -324,7 +329,22 @@ export const useInc = create<State>()(
         }
       }
     }),
-    { name: 'pm-inc' }
+    {
+      name: 'pm-inc',
+      storage: createJSONStorage(() => zustandHybridStorage),
+      partialize: (state) => {
+        const { isLoading, ...rest } = state;
+        return rest as any;
+      },
+      onRehydrateStorage: () => {
+        return (state, error) => {
+          if (error) {
+            console.error('[inc] Hydration failed:', error);
+          }
+          useInc.setState({ isLoading: false });
+        };
+      }
+    }
   )
 );
 

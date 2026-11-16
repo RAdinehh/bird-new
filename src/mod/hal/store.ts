@@ -2,7 +2,8 @@
  * store.ts — بخش hal
  */
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { zustandHybridStorage } from '../../cor/storage/hybridStorage';
 import { v4 as uuid } from 'uuid';
 import { ensureWhsItem, syncWhsItem, removeWhsItem } from './api/equipmentWhs';
 import { isFanLike, isLampLike } from './helpers';
@@ -218,6 +219,9 @@ interface State {
   addEquip: (e: Omit<Equipment, 'id'|'createdAt'|'updatedAt'>) => string;
   updateEquip: (id: string, patch: Partial<Equipment>) => void;
   deleteEquip: (id: string) => void;
+
+  /** 🆕 وضعیت لود داده‌ها از IndexedDB */
+  isLoading: boolean;
 }
 
 const now = () => new Date().toISOString();
@@ -225,6 +229,7 @@ const now = () => new Date().toISOString();
 export const useHal = create<State>()(
   persist(
     (set, get) => ({
+      isLoading: true,
       halls: [], zones: [], equipment: [],
       addHall: (h) => set({ halls: [...get().halls, {...h, id: uuid(), createdAt: now(), updatedAt: now()}] }),
       updateHall: (id, patch) => set({ halls: get().halls.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
@@ -292,7 +297,19 @@ export const useHal = create<State>()(
     }),
     {
       name: 'pm-hal',
-      version: 5,
+      storage: createJSONStorage(() => zustandHybridStorage),
+      partialize: (state) => {
+        const { isLoading, ...rest } = state;
+        return rest as any;
+      },
+      onRehydrateStorage: () => {
+        return (state, error) => {
+          if (error) {
+            console.error('[hal] Hydration failed:', error);
+          }
+          useHal.setState({ isLoading: false });
+        };
+      },      version: 5,
       // ═══ Migration: داده‌های نسخه‌های قدیمی ═══
       // FOUNDATION استثنا — اینجا any مجاز ئه چون:
       //   ۱. داده از localStorage نسخه‌های قبلی میاد (ساختار ناشناخته)

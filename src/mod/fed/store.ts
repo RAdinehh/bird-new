@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { zustandHybridStorage } from '../../cor/storage/hybridStorage';
 import { v4 as uuid } from 'uuid';
 import { useWhs } from '../whs/store';
 
@@ -133,6 +134,9 @@ interface State {
   addFormula: (f: Omit<Formula, 'id' | 'createdAt' | 'updatedAt' | 'version'>) => void;
   updateFormula: (id: string, patch: Partial<Formula>) => void;
   deleteFormula: (id: string) => void;
+
+  /** 🆕 وضعیت لود داده‌ها از IndexedDB */
+  isLoading: boolean;
 }
 
 const now = () => new Date().toISOString();
@@ -140,6 +144,7 @@ const now = () => new Date().toISOString();
 export const useFed = create<State>()(
   persist(
     (set, get) => ({
+      isLoading: true,
       ingredients: [],
       requirements: [],
       formulas: [],
@@ -239,7 +244,22 @@ export const useFed = create<State>()(
       }),
       deleteFormula: (id) => set({ formulas: get().formulas.filter(x => x.id !== id) })
     }),
-    { name: 'pm-fed' }
+    {
+      name: 'pm-fed',
+      storage: createJSONStorage(() => zustandHybridStorage),
+      partialize: (state) => {
+        const { isLoading, ...rest } = state;
+        return rest as any;
+      },
+      onRehydrateStorage: () => {
+        return (state, error) => {
+          if (error) {
+            console.error('[fed] Hydration failed:', error);
+          }
+          useFed.setState({ isLoading: false });
+        };
+      }
+    }
   )
 );
 

@@ -7,6 +7,11 @@ import { useFlk } from './mod/flk/store';
 import { useWhs } from './mod/whs/store';
 import { useTra } from './mod/tra/store';
 import { useEgg } from './mod/egg/store';
+import { useBrd } from './mod/brd/store';
+import { useHal } from './mod/hal/store';
+import { useCtc } from './mod/ctc/store';
+import { useFed } from './mod/fed/store';
+import { useInc } from './mod/inc/store';
 import { applyTheme } from './cor/theme/applyTheme';
 import Header from './shr/components/Header';
 import BottomNav from './shr/components/BottomNav';
@@ -100,7 +105,14 @@ export default function App() {
   const whsLoading = useWhs((s) => s.isLoading);
   const traLoading = useTra((s) => s.isLoading);
   const eggLoading = useEgg((s) => s.isLoading);
-  const isLoading = dlgLoading || flkLoading || whsLoading || traLoading || eggLoading;
+  const brdLoading = useBrd((s) => s.isLoading);
+  const halLoading = useHal((s) => s.isLoading);
+  const ctcLoading = useCtc((s) => s.isLoading);
+  const fedLoading = useFed((s) => s.isLoading);
+  const incLoading = useInc((s) => s.isLoading);
+  const isLoading =
+    dlgLoading || flkLoading || whsLoading || traLoading || eggLoading ||
+    brdLoading || halLoading || ctcLoading || fedLoading || incLoading;
   const [showLoading, setShowLoading] = useState(false);
   const theme = settings.theme;  // single source of truth
   const [showOnb, setShowOnb] = useState(false);
@@ -168,6 +180,14 @@ export default function App() {
       if (useEgg.getState().isLoading) {
         console.warn('[App] egg hydration timeout — forcing isLoading=false');
         useEgg.setState({ isLoading: false });
+      }
+      for (const [name, store] of [
+        ['brd', useBrd], ['hal', useHal], ['ctc', useCtc], ['fed', useFed], ['inc', useInc],
+      ] as const) {
+        if ((store.getState() as any).isLoading) {
+          console.warn(`[App] ${name} hydration timeout — forcing isLoading=false`);
+          (store.setState as any)({ isLoading: false });
+        }
       }
     }, 5000);
     return () => clearTimeout(timer);

@@ -1,6 +1,7 @@
 import { toEn } from '../../shr/utils/fa';
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { zustandHybridStorage } from '../../cor/storage/hybridStorage';
 import { v4 as uuid } from 'uuid';
 import { useFlk } from '../flk/store';
 import { showToast } from '../../cor/store/toast';
@@ -211,6 +212,9 @@ interface State {
   add: (c: Omit<Person, 'id'|'createdAt'|'updatedAt'>) => void;
   update: (id: string, patch: Partial<Person>) => void;
   remove: (id: string) => void;
+
+  /** 🆕 وضعیت لود داده‌ها از IndexedDB */
+  isLoading: boolean;
 }
 
 const now = () => new Date().toISOString();
@@ -218,6 +222,7 @@ const now = () => new Date().toISOString();
 export const useCtc = create<State>()(
   persist(
     (set, get) => ({
+      isLoading: true,
       contacts: [],
       add: (c) => set({ contacts: [...get().contacts, {...c, id: uuid(), createdAt: now(), updatedAt: now()}] }),
       update: (id, patch) => set({ contacts: get().contacts.map(x => x.id === id ? {...x, ...patch, updatedAt: now()} : x) }),
@@ -238,7 +243,19 @@ export const useCtc = create<State>()(
     }),
     {
       name: 'pm-ctc',
-      version: 2,
+      storage: createJSONStorage(() => zustandHybridStorage),
+      partialize: (state) => {
+        const { isLoading, ...rest } = state;
+        return rest as any;
+      },
+      onRehydrateStorage: () => {
+        return (state, error) => {
+          if (error) {
+            console.error('[ctc] Hydration failed:', error);
+          }
+          useCtc.setState({ isLoading: false });
+        };
+      },      version: 2,
       migrate: (persisted: any, version: number) => {
         if (version < 2 && persisted?.people) {
           persisted.people = persisted.people.map((p: any) => ({

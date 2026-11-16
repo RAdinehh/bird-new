@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { zustandHybridStorage } from '../../cor/storage/hybridStorage';
 import { v4 as uuid } from 'uuid';
 
 export interface Bird {
@@ -37,6 +38,9 @@ interface State {
   deleteBreed: (id: string) => void;
   dedupeBirds: () => void;
   dedupeBreeds: () => void;
+
+  /** 🆕 وضعیت لود داده‌ها از IndexedDB */
+  isLoading: boolean;
 }
 
 const now = () => new Date().toISOString();
@@ -44,6 +48,7 @@ const now = () => new Date().toISOString();
 export const useBrd = create<State>()(
   persist(
     (set, get) => ({
+      isLoading: true,
       birds: [],
       breeds: [],
 
@@ -93,7 +98,19 @@ export const useBrd = create<State>()(
     }),
     {
       name: 'pm-brd',
-      version: 5,
+      storage: createJSONStorage(() => zustandHybridStorage),
+      partialize: (state) => {
+        const { isLoading, ...rest } = state;
+        return rest as any;
+      },
+      onRehydrateStorage: () => {
+        return (state, error) => {
+          if (error) {
+            console.error('[brd] Hydration failed:', error);
+          }
+          useBrd.setState({ isLoading: false });
+        };
+      },      version: 5,
       migrate: (persisted: any, version: number) => {
         // v3: حذف purpose و categoryId از Bird (مالِ نژاد هستن)
         if (persisted && Array.isArray(persisted.birds)) {
