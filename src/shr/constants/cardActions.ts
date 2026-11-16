@@ -10,11 +10,12 @@
  */
 import type { CardAction } from '../components/ui/CardActions';
 
+// priority (وزن): عدد کوچکتر = قرارگیری در جایگاه جلوتر (راست‌تر)
 export const ACTION_PRESETS: Record<string, Omit<CardAction, 'onClick' | 'hidden' | 'disabled'>> = {
-  EDIT:    { label: 'ویرایش', variant: 'outline' },
-  CORRECT: { label: 'اصلاح', variant: 'outline' },
-  HISTORY: { label: 'همه رویدادها', variant: 'outline' },
-  ARCHIVE: { label: 'آرشیو', variant: 'outline' },
-  RESTORE: { label: 'بازگردانی', variant: 'primary' },
-  DELETE:  { label: 'حذف', variant: 'danger-outline' },
+  RESTORE: { label: 'بازگردانی', variant: 'primary', priority: 10 },
+  EDIT:    { label: 'ویرایش', variant: 'outline', priority: 20 },
+  CORRECT: { label: 'اصلاح', variant: 'outline', priority: 25 },
+  HISTORY: { label: 'همه رویدادها', variant: 'outline', priority: 30 },
+  ARCHIVE: { label: 'آرشیو', variant: 'danger-outline', priority: 90 },
+  DELETE:  { label: 'حذف', variant: 'danger-outline', priority: 100 },
 };

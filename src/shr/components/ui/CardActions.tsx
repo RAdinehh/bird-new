@@ -10,6 +10,8 @@ export interface CardAction {
   disabled?: boolean;
   /** وزن دکمه برای مرتب‌سازی هوشمند (کمتر = جلوتر) */
   priority?: number;
+  /** نام گروه: دکمه‌هایی که هم‌گروهند هرگز از هم جدا نمی‌شوند (همیشه با هم در ردیف اصلی یا با هم در «بیشتر») */
+  group?: string;
 }
 
 function getLayout(total: number): { cols: number[][]; visible: number; more: number } {
@@ -35,15 +37,53 @@ export function CardActions({ actions }: { actions: CardAction[] }) {
     return 20; // outline (پیش‌فرض)
   };
 
-  const visibleActions = actions
-    .filter(a => !a.hidden)
-    .sort((a, b) => getPriority(a) - getPriority(b));
-  if (visibleActions.length === 0) return null;
+  // ۱. فیلتر دکمه‌های مخفی
+  const visible = actions.filter(a => !a.hidden);
+  if (visible.length === 0) return null;
 
-  const layout = getLayout(visibleActions.length);
-  const mainActions = visibleActions.slice(0, layout.visible);
-  const hiddenActions = visibleActions.slice(layout.visible);
+  // ۲. گروه‌بندی
+  const groups = new Map<string, CardAction[]>();
+  const singles: CardAction[] = [];
 
+  visible.forEach(a => {
+    if (a.group) {
+      if (!groups.has(a.group)) groups.set(a.group, []);
+      groups.get(a.group)!.push(a);
+    } else {
+      singles.push(a);
+    }
+  });
+
+  // ۳. ساخت واحدهای قابل مرتب‌سازی (تک دکمه‌ها یا گروه‌ها)
+  const units = [
+    ...singles.map(a => ({ items: [a], weight: getPriority(a) })),
+    ...Array.from(groups.values()).map(grp => ({
+      items: grp,
+      weight: Math.min(...grp.map(getPriority))
+    }))
+  ];
+
+  // ۴. مرتب‌سازی واحدها
+  units.sort((a, b) => a.weight - b.weight);
+
+  // ۵. محاسبه حد مجاز دکمه‌های قابل نمایش
+  const theoreticalLayout = getLayout(visible.length);
+  const maxVisible = theoreticalLayout.visible;
+
+  // ۶. تخصیص واحدها به ردیف اصلی یا منوی بیشتر (با حفظ گروه‌ها)
+  const mainActions: CardAction[] = [];
+  const hiddenActions: CardAction[] = [];
+
+  for (const unit of units) {
+    if (mainActions.length + unit.items.length <= maxVisible) {
+      mainActions.push(...unit.items);
+    } else {
+      hiddenActions.push(...unit.items);
+    }
+  }
+
+  // ۷. چیدمان نهایی بر اساس تعداد واقعی دکمه‌های اصلی
+  const layout = getLayout(mainActions.length);
   const rows: CardAction[][] = [];
   let idx = 0;
   for (const rowCols of layout.cols) {
@@ -71,7 +111,7 @@ export function CardActions({ actions }: { actions: CardAction[] }) {
             ))}
           </div>
         ))}
-        {layout.more > 0 && (
+        {hiddenActions.length > 0 && (
           <Btn
             size="sm"
             variant="outline"
