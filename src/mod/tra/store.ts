@@ -2,7 +2,8 @@
  * store.ts — Zustand store معاملات
  */
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { zustandHybridStorage } from '../../cor/storage/hybridStorage';
 import { v4 as uuid } from 'uuid';
 import { useFlk } from '../flk/store';
 import { useEgg } from '../egg/store';
@@ -83,6 +84,7 @@ function syncAllocations(
 export const useTra = create<State>()(
   persist(
     (set, get) => ({
+      isLoading: true,
       invoices: [],
       partyPayments: [],
       deals: [], settlements: [],
@@ -1131,6 +1133,19 @@ export const useTra = create<State>()(
     }),
     {
       name: 'pm-tra',
+      storage: createJSONStorage(() => zustandHybridStorage),
+      partialize: (state) => {
+        const { isLoading, ...rest } = state;
+        return rest as any;
+      },
+      onRehydrateStorage: () => {
+        return (state, error) => {
+          if (error) {
+            console.error('[tra] Hydration failed:', error);
+          }
+          useTra.setState({ isLoading: false });
+        };
+      },
       version: 8,
       migrate: (persisted: any, version: number) => {
         if (!persisted?.invoices) return persisted;

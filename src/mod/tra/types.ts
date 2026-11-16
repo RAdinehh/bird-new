@@ -498,6 +498,8 @@ export interface State {
   bouncePartyPayment: (ppId: string) => void;
   clearPartyPayment: (ppId: string) => void;
   depositPartyPayment: (ppId: string) => void;
+  /** 🆕 وضعیت لود داده‌ها از IndexedDB */
+  isLoading: boolean;
 }
 
 
