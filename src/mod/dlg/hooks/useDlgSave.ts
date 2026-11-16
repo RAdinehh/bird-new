@@ -21,7 +21,9 @@ import { outbox } from '../../../cor/outbox';
 import { toFa } from '../../../shr/utils/fa';
 import { recordHistory } from '../../../shr/intelligence';
 import type { F } from '../types';
-import type { DailyLog } from '../store';
+import { applyCorrections } from '../api/applyCorrections';
+import { v4 as uuid } from 'uuid';
+import type { DailyLog, DailyLogCorrection } from '../store';
 import { format as formatJ, addDays, parse as parseJ } from 'date-fns-jalali';
 import type { Flock } from '../../flk/store';
 import { useFlk } from '../../flk/store';
@@ -619,5 +621,158 @@ export function useDlgSave(params: UseDlgSaveParams) {
     return _doSave(opts?.overrideForm ?? form, opts?.reason);
   };
 
-  return { save, deleteLog, restoreLogFull };
+  // ═══════════════════════════════════════════════════════════════════
+  // Correction Atomic (رویکرد ۲ — Immutable Log + Event Sourcing)
+  // استاندارد: ALCOA+ / 21 CFR Part 11 §11.10(e)
+  // - لاگ اصلی دست‌نخورده می‌ماند (فقط corrections[] + فیلدهای مشتق)
+  // - Revoke = رویداد جبرانی (revoked:true)، نه حذف
+  // - Audit Trail برای هر تغییر
+  // - event جبرانی به flk برای deathsCount
+  // ═══════════════════════════════════════════════════════════════════
+
+  /** ثبت اصلاح اتمیک — لاگ اصلی immutable */
+  const applyCorrectionAtomic = async (
+    logId: string,
+    changes: Partial<DailyLog>,
+    reason: string,
+    notes?: string,
+  ): Promise<boolean> => {
+    const log = useDlg.getState().logs.find(l => l.id === logId);
+    if (!log) {
+      toastMsg.error('لاگ پیدا نشد');
+      return false;
+    }
+
+    const now = new Date();
+    const timestamp = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const newCorr: DailyLogCorrection = {
+      id: uuid(),
+      timestamp,
+      reason,
+      changes,
+      notes,
+      revoked: false,
+      createdAt: now.toISOString(),
+    };
+
+    const effectiveBefore = applyCorrections(log);
+    const withNewCorr: DailyLog = {
+      ...log,
+      corrections: [...(log.corrections || []), newCorr],
+    };
+    const effectiveAfter = applyCorrections(withNewCorr);
+
+    const derivedPatch = {
+      temperature: effectiveAfter.temperature,
+      humidity: effectiveAfter.humidity,
+      feedConsumed: effectiveAfter.feedConsumed,
+      deaths: effectiveAfter.deaths,
+    };
+
+    const result = await atomicTransaction<string>({
+      stores: [dlgStore, whsStore, eggStore, flkStore],
+      execute: () => {
+        update(logId, {
+          corrections: withNewCorr.corrections,
+          ...derivedPatch,
+        });
+
+        const events = buildCorrectionEvents(effectiveBefore, effectiveAfter, reason);
+        for (const ev of events) {
+          const eventId = useDlg.getState().addEvent(logId, ev);
+          if (!eventId) throw new Error('ثبت تاریخچهٔ اصلاح انجام نشد');
+        }
+
+        return logId;
+      },
+      onSuccess: (id) => {
+        toastMsg.saved('اصلاح');
+
+        const beforeCount = effectiveBefore.deathsCount || 0;
+        const afterCount = effectiveAfter.deathsCount || 0;
+        if (beforeCount !== afterCount) {
+          void outbox.publish('dlg:deaths:recorded', {
+            logId: id,
+            flockId: log.flockId,
+            date: log.date,
+            count: afterCount,
+            deaths: (effectiveAfter.deaths || []).filter(d => typeof d.count === 'number' && d.count > 0) as Array<{ id: string; count: number; cause: string; notes: string }>,
+            isEdit: true,
+            prevCount: beforeCount,
+            prevFlockId: log.flockId,
+          });
+        }
+      },
+      onError: (err) => {
+        toastMsg.error('خطا در ثبت اصلاح — همه تغییرات لغو شد: ' + err.message);
+      },
+    });
+
+    return result.ok;
+  };
+
+  /** لغو اصلاح اتمیک — رویداد جبرانی */
+  const revokeCorrectionAtomic = async (logId: string, correctionId: string): Promise<boolean> => {
+    const log = useDlg.getState().logs.find(l => l.id === logId);
+    if (!log) return false;
+    const targetCorr = (log.corrections || []).find(c => c.id === correctionId);
+    if (!targetCorr || targetCorr.revoked) return false;
+
+    const effectiveBefore = applyCorrections(log);
+    const revokedCorrections = (log.corrections || []).map(c =>
+      c.id === correctionId ? { ...c, revoked: true } : c
+    );
+    const withRevoke: DailyLog = { ...log, corrections: revokedCorrections };
+    const effectiveAfter = applyCorrections(withRevoke);
+
+    const derivedPatch = {
+      temperature: effectiveAfter.temperature,
+      humidity: effectiveAfter.humidity,
+      feedConsumed: effectiveAfter.feedConsumed,
+      deaths: effectiveAfter.deaths,
+    };
+
+    const result = await atomicTransaction<string>({
+      stores: [dlgStore, whsStore, eggStore, flkStore],
+      execute: () => {
+        update(logId, {
+          corrections: revokedCorrections,
+          ...derivedPatch,
+        });
+
+        const events = buildCorrectionEvents(effectiveBefore, effectiveAfter, `لغو: ${targetCorr.reason}`);
+        for (const ev of events) {
+          const eventId = useDlg.getState().addEvent(logId, ev);
+          if (!eventId) throw new Error('ثبت تاریخچهٔ لغو انجام نشد');
+        }
+
+        return logId;
+      },
+      onSuccess: (id) => {
+        toastMsg.saved('لغو اصلاح');
+
+        const beforeCount = effectiveBefore.deathsCount || 0;
+        const afterCount = effectiveAfter.deathsCount || 0;
+        if (beforeCount !== afterCount) {
+          void outbox.publish('dlg:deaths:recorded', {
+            logId: id,
+            flockId: log.flockId,
+            date: log.date,
+            count: afterCount,
+            deaths: (effectiveAfter.deaths || []).filter(d => typeof d.count === 'number' && d.count > 0) as Array<{ id: string; count: number; cause: string; notes: string }>,
+            isEdit: true,
+            prevCount: beforeCount,
+            prevFlockId: log.flockId,
+          });
+        }
+      },
+      onError: (err) => {
+        toastMsg.error('خطا در لغو اصلاح — همه تغییرات لغو شد: ' + err.message);
+      },
+    });
+
+    return result.ok;
+  };
+
+  return { save, deleteLog, restoreLogFull, applyCorrectionAtomic, revokeCorrectionAtomic };
 }

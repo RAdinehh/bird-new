@@ -58,7 +58,7 @@ export default function DailyLogsPage() {
   } = useDlgForm({ activeFlocks, halls, todayStr });
 
   // ⭐ hook ذخیره‌سازی
-  const { save, deleteLog, restoreLogFull } = useDlgSave({
+  const { save, deleteLog, restoreLogFull, applyCorrectionAtomic, revokeCorrectionAtomic } = useDlgSave({
     form, setForm, saving, setSaving, setErr, setOpen,
     selectedFlock, flockAliveCount, isLayerFlock, num, int,
   });
@@ -202,7 +202,8 @@ export default function DailyLogsPage() {
               birds={birds}
               config={config}
               activeFlocks={activeFlocks}
-              onSaveCorrection={save}
+              onApplyCorrection={applyCorrectionAtomic}
+              onRevokeCorrection={revokeCorrectionAtomic}
               vaccineEnabled={vaccineEnabled}
               medicineEnabled={medicineEnabled}
               onEdit={openEdit}
@@ -220,7 +221,8 @@ export default function DailyLogsPage() {
               birds={birds}
               config={config}
               activeFlocks={activeFlocks}
-              onSaveCorrection={save}
+              onApplyCorrection={applyCorrectionAtomic}
+              onRevokeCorrection={revokeCorrectionAtomic}
               vaccineEnabled={vaccineEnabled}
               medicineEnabled={medicineEnabled}
               onEdit={openEdit}
@@ -238,7 +240,8 @@ export default function DailyLogsPage() {
               birds={birds}
               config={config}
               activeFlocks={activeFlocks}
-              onSaveCorrection={save}
+              onApplyCorrection={applyCorrectionAtomic}
+              onRevokeCorrection={revokeCorrectionAtomic}
               vaccineEnabled={vaccineEnabled}
               medicineEnabled={medicineEnabled}
               onEdit={openEdit}

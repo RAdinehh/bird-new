@@ -22,7 +22,6 @@ import { toFa } from '../../../shr/utils/fa';
 import { bus } from '../../../cor/events';
 import LogCard from './LogCard';
 import CorrectionModal from './CorrectionModal';
-import { dailyLogToForm } from '../hooks/useDlgForm';
 import type { F } from '../types';
 import DlgHistoryModal from './DlgHistoryModal';
 import type { Flock } from '../../flk/store';
@@ -46,16 +45,17 @@ interface Props {
   onAdd: (flockId?: string) => void;
   onDeleteLog: (l: DailyLog, opts?: { skipConfirm?: boolean }) => Promise<{ log: DailyLog; snapshot?: DeleteSnapshot } | null>;
   onRestoreLogFull: (log: DailyLog, snapshot: DeleteSnapshot) => Promise<boolean>;
-  onSaveCorrection: (opts: { overrideForm: F; reason: string }) => Promise<boolean>;
+  onApplyCorrection: (logId: string, changes: Partial<DailyLog>, reason: string, notes?: string) => Promise<boolean>;
+  onRevokeCorrection: (logId: string, correctionId: string) => Promise<boolean>;
 }
 
 export default function DlgTabPanel({
   tab, active,
   logs, activeFlocks, flocks, birds, config,
   vaccineEnabled, medicineEnabled,
-  onEdit, onAdd, onDeleteLog, onRestoreLogFull, onSaveCorrection,
+  onEdit, onAdd, onDeleteLog, onRestoreLogFull, onApplyCorrection, onRevokeCorrection,
 }: Props) {
-  const { add, archive, restore, addCorrection, revokeCorrection } = useDlg();
+  const { add, archive, restore } = useDlg();
   const [undoData, setUndoData] = useState<{ log: DailyLog | DailyLog[]; snapshot?: DeleteSnapshot } | null>(null);
   const [correctingLog, setCorrectingLog] = useState<DailyLog | null>(null);
   const [historyLog, setHistoryLog] = useState<DailyLog | null>(null);
@@ -171,7 +171,7 @@ export default function DlgTabPanel({
         onDelete={() => handleDeleteOne(l)}
         onCorrect={() => setCorrectingLog(l)}
           onHistory={() => setHistoryLog(l)}
-        onRevokeCorrection={(corrId) => revokeCorrection(l.id, corrId)}
+        onRevokeCorrection={(corrId) => { void onRevokeCorrection(l.id, corrId); }}
       />
     );
   };
@@ -262,17 +262,8 @@ export default function DlgTabPanel({
       onClose={() => setCorrectingLog(null)}
       log={correctingLog}
       onSave={async (logId, changes, reason, notes) => {
-        const targetLog = logs.find(l => l.id === logId);
-        if (!targetLog) return;
-        const updatedLog = { ...targetLog, ...changes };
-        const overrideForm = dailyLogToForm(updatedLog);
-        const fullReason = notes ? `${reason} — ${notes}` : reason;
-        const ok = await onSaveCorrection({ overrideForm, reason: fullReason });
-        if (ok) {
-          addCorrection(logId, changes, reason, notes);
-          toastMsg.saved('اصلاح');
-          setCorrectingLog(null);
-        }
+        const ok = await onApplyCorrection(logId, changes, reason, notes);
+        if (ok) setCorrectingLog(null);
       }}
     />
 

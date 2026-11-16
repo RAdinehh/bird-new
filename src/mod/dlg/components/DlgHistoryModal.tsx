@@ -28,12 +28,12 @@ const TYPE_META: Record<string, { label: string; tone: string }> = {
 const FIELD_LABEL: Record<string, string> = {
   temperature: 'دما (°C)', temperatureMin: 'حداقل دما (°C)', temperatureMax: 'حداکثر دما (°C)',
   humidity: 'رطوبت (٪)', humidityMin: 'حداقل رطوبت (٪)', humidityMax: 'حداکثر رطوبت (٪)',
-  feedDelivered: 'دان توزیع‌شده (kg)', feedRemaining: 'دان باقی‌مانده (kg)',
-  waterAmount: 'آب مصرفی (L)',
+  feedDelivered: 'دان توزیع‌شده (kg)', feedRemaining: 'دان باقی‌مانده (kg)', feedWaste: 'دان هدر رفته (kg)',
+  waterAmount: 'آب مصرفی (L)', waterFillCount: 'دفعات آب (نوبت)', waterFillVolume: 'حجم هر نوبت (L)',
   deathsCount: 'تلفات (عدد)',
   eatingEggs: 'تخم خوراکی (عدد)', fertileEggs: 'تخم نطفه‌دار (عدد)',
   brokenEggs: 'تخم شکسته (عدد)', otherEggs: 'تخم سایر (عدد)',
-  weight: 'وزن (kg)',
+  weight: 'وزن (kg)', weightGender: 'جنسیت وزن',
 };
 
 const VISIBLE_LIMIT = 10;
