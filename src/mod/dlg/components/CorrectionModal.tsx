@@ -64,7 +64,7 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
 
   useEffect(() => {
     if (open) {
-      setActiveField('temperature');
+      setActiveField('temperatureMin');
       setValue('');
       setReason(REASONS[0]);
       setNotes('');
