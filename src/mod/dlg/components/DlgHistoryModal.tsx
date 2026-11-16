@@ -53,6 +53,19 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const { revokeEvent, revokeCorrection } = useDlg();
 
+  // 🆕 محاسبه وضعیت لاگ دقیقاً قبل از هر اصلاح (برای رفع باگ ریاضی تاریخچه)
+  const corrBefores = useMemo(() => {
+    const map = new Map<string, any>();
+    if (!log) return map;
+    let current = { ...log };
+    for (const corr of log.corrections || []) {
+      map.set(corr.id, { ...current });
+      current = { ...current, ...corr.changes };
+    }
+    return map;
+  }, [log]);
+
+
   const items: TimelineItem[] = useMemo(() => {
     if (!log) return [];
     const list: TimelineItem[] = [];
@@ -220,7 +233,7 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
         padding: '4px 4px',
         background: 'var(--accent-soft)',
         border: '1px solid var(--accent-border)',
-        borderRadius: 0,
+        borderRadius: 'var(--r-md)',
         marginBottom: 10,
         display: 'flex',
         flexDirection: 'column',
@@ -241,67 +254,42 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
       {/* ═══ دکمه فیلتر فشرده ═══ */}
       {items.length > 0 && (
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10 }}>
-          <button 
-            type="button"
-            onClick={() => setFilterSheetOpen(true)}
-            style={{
-              padding: '6px 12px',
-              background: filter === 'all' ? 'var(--input-bg)' : 'var(--accent-soft)',
-              border: `1px solid ${filter === 'all' ? 'var(--border)' : 'var(--accent)'}`,
-              borderRadius: 'var(--r-sm)',
-              color: filter === 'all' ? 'var(--muted)' : 'var(--accent)',
-              cursor: 'pointer',
-              fontFamily: 'inherit',
-              fontSize: 'var(--fs-xs)',
-              fontWeight: 600,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-            }}
-          >
-            <span>فیلتر:</span>
-            <b>{filter === 'all' ? 'همه' : (TYPE_META[filter as DlgEventType]?.label || 'اصلاح')}</b>
-            <span style={{ opacity: 0.6 }}>▾</span>
-          </button>
+          <Btn
+  size="sm"
+  variant={filter === 'all' ? 'outline' : 'primary'}
+  onClick={() => setFilterSheetOpen(true)}
+>
+  <span>فیلتر:</span>
+  <b>{filter === 'all' ? 'همه' : (TYPE_META[filter as DlgEventType]?.label || 'اصلاح')}</b>
+  <span style={{ opacity: 0.6, marginRight: 4 }}>▾</span>
+</Btn>
         </div>
       )}
 
       {/* ═══ Sheet فیلتر ═══ */}
       <Sheet open={filterSheetOpen} onClose={() => setFilterSheetOpen(false)} title="فیلتر رویدادها">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <button
-            type="button"
-            onClick={() => { setFilter('all'); setFilterSheetOpen(false); }}
-            style={{
-              padding: '4px 4px', background: filter === 'all' ? 'var(--accent-soft)' : 'var(--card)',
-              border: `1px solid ${filter === 'all' ? 'var(--accent)' : 'var(--border)'}`,
-              borderRadius: 'var(--r-sm)', color: filter === 'all' ? 'var(--accent)' : 'var(--text)',
-              textAlign: 'right', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700,
-              cursor: 'pointer', display: 'flex', justifyContent: 'space-between'
-            }}
-          >
-            <span>همه</span>
-            <span>({toFa(items.length)})</span>
-          </button>
+          <Btn
+  variant={filter === 'all' ? 'primary' : 'outline'}
+  onClick={() => { setFilter('all'); setFilterSheetOpen(false); }}
+  style={{ width: '100%', justifyContent: 'space-between' }}
+>
+  <span>همه</span>
+  <span>({toFa(items.length)})</span>
+</Btn>
           {Array.from(typeCounts.entries()).map(([type, count]) => {
             const meta = TYPE_META[type as DlgEventType] || { label: 'اصلاح', tone: 'var(--warn)' };
             const isActive = filter === type;
             return (
-              <button
-                key={type}
-                type="button"
-                onClick={() => { setFilter(type); setFilterSheetOpen(false); }}
-                style={{
-                  padding: '4px 4px', background: isActive ? 'var(--accent-soft)' : 'var(--card)',
-                  border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
-                  borderRadius: 'var(--r-sm)', color: isActive ? 'var(--accent)' : 'var(--text)',
-                  textAlign: 'right', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700,
-                  cursor: 'pointer', display: 'flex', justifyContent: 'space-between'
-                }}
-              >
-                <span>{meta.label}</span>
-                <span>({toFa(count)})</span>
-              </button>
+              <Btn
+  key={type}
+  variant={isActive ? 'primary' : 'outline'}
+  onClick={() => { setFilter(type); setFilterSheetOpen(false); }}
+  style={{ width: '100%', justifyContent: 'space-between' }}
+>
+  <span>{meta.label}</span>
+  <span>({toFa(count)})</span>
+</Btn>
             );
           })}
         </div>
@@ -334,7 +322,7 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
                     return <EventRow key={it.event.id} ev={it.event} isLatest={isTrulyLatest} onRevoke={() => handleRevokeEvent(it.event)} />;
                   }
                   const isTrulyLatest = it.correction.id === latestItemId;
-                  return <CorrectionRow key={it.correction.id} corr={it.correction} log={log} isLatest={isTrulyLatest} onRevoke={() => handleRevokeCorrection(it.correction.id)} />;
+                  return <CorrectionRow key={it.correction.id} corr={it.correction} log={log} beforeLog={corrBefores.get(it.correction.id)} isLatest={isTrulyLatest} onRevoke={() => handleRevokeCorrection(it.correction.id)} />;
                 })}
               </div>
             </div>
@@ -358,10 +346,10 @@ function EventRow({ ev, isLatest, onRevoke }: { ev: DlgEvent; isLatest: boolean;
   if (ev.before !== undefined && ev.after !== undefined) {
     valueStr = (
       <span style={{ fontFamily: 'monospace' }}>
-        <span style={{ color: 'var(--danger)' }}>{toFa(String(ev.before ?? '—'))}</span>
-        <span style={{ color: 'var(--muted)', margin: '0 4px' }}>←</span>
-        <span style={{ color: 'var(--accent)' }}>{toFa(String(ev.after ?? '—'))}</span>
-      </span>
+                  <span style={{ color: 'var(--accent)' }}>{toFa(String(ev.after ?? '—'))}</span>
+                  <span style={{ color: 'var(--muted)', margin: '0 4px' }}>→</span>
+                  <span style={{ color: 'var(--danger)' }}>{toFa(String(ev.before ?? '—'))}</span>
+                </span>
     );
   } else if (ev.type === 'water' && ev.amount !== undefined) {
     valueStr = `${toFa(ev.amount)} لیتر`;
@@ -412,15 +400,7 @@ function EventRow({ ev, isLatest, onRevoke }: { ev: DlgEvent; isLatest: boolean;
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           {isRevoked && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--danger)' }}>لغو شده</span>}
           {isLatest && !isRevoked && (
-            <button
-              type="button"
-              onClick={onRevoke}
-              style={{
-                padding: '2px 8px', background: 'transparent',
-                border: '1px solid var(--border)', borderRadius: 'var(--r-sm)',
-                fontSize: 'var(--fs-2xs)', color: 'var(--danger)', cursor: 'pointer'
-              }}
-            >لغو</button>
+            <Btn size="sm" variant="danger-outline" onClick={onRevoke} style={{ padding: '2px 8px', height: 24, minHeight: 'unset', fontSize: 'var(--fs-xs)' }}>لغو</Btn>
           )}
         </div>
       </div>
@@ -428,7 +408,7 @@ function EventRow({ ev, isLatest, onRevoke }: { ev: DlgEvent; isLatest: boolean;
   );
 }
 
-function CorrectionRow({ corr, log, isLatest, onRevoke }: { corr: NonNullable<DailyLog['corrections']>[number]; log: DailyLog; isLatest: boolean; onRevoke: () => void }) {
+function CorrectionRow({ corr, log, beforeLog, isLatest, onRevoke }: { corr: NonNullable<DailyLog['corrections']>[number]; log: DailyLog; beforeLog?: DailyLog; isLatest: boolean; onRevoke: () => void }) {
   const isRevoked = corr.revoked === true;
   return (
     <div style={{
@@ -446,18 +426,18 @@ function CorrectionRow({ corr, log, isLatest, onRevoke }: { corr: NonNullable<Da
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 2 }}>
         {Object.keys(corr.changes).map(k => {
-          const before = (log as any)[k];
-          const after = (corr.changes as any)[k];
-          return (
-            <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
-              <span style={{ color: 'var(--muted)' }}>{FIELD_LABEL[k] || k}:</span>
-              <span style={{ fontFamily: 'monospace' }}>
-                <span style={{ color: 'var(--danger)' }}>{toFa(String(before ?? '—'))}</span>
-                <span style={{ color: 'var(--muted)', margin: '0 4px' }}>←</span>
-                <span style={{ color: 'var(--accent)' }}>{toFa(String(after ?? '—'))}</span>
-              </span>
-            </div>
-          );
+          const before = (beforeLog || log as any)[k];
+                    const after = (corr.changes as any)[k];
+                    return (
+                      <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
+                        <span style={{ color: 'var(--muted)' }}>{FIELD_LABEL[k] || k}:</span>
+                        <span style={{ fontFamily: 'monospace' }}>
+                          <span style={{ color: 'var(--accent)' }}>{toFa(String(after ?? '—'))}</span>
+                          <span style={{ color: 'var(--muted)', margin: '0 4px' }}>→</span>
+                          <span style={{ color: 'var(--danger)' }}>{toFa(String(before ?? '—'))}</span>
+                        </span>
+                      </div>
+                    );
         })}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }}>
@@ -467,15 +447,7 @@ function CorrectionRow({ corr, log, isLatest, onRevoke }: { corr: NonNullable<Da
         <div style={{ display: 'flex', gap: 6 }}>
           {isRevoked && <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--danger)' }}>لغو شده</span>}
           {isLatest && !isRevoked && (
-            <button
-              type="button"
-              onClick={onRevoke}
-              style={{
-                padding: '2px 8px', background: 'transparent',
-                border: '1px solid var(--border)', borderRadius: 'var(--r-sm)',
-                fontSize: 'var(--fs-2xs)', color: 'var(--danger)', cursor: 'pointer'
-              }}
-            >لغو</button>
+            <Btn size="sm" variant="danger-outline" onClick={onRevoke} style={{ padding: '2px 8px', height: 24, minHeight: 'unset', fontSize: 'var(--fs-xs)' }}>لغو</Btn>
           )}
         </div>
       </div>

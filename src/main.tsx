@@ -13,6 +13,7 @@ import { useFlk } from './mod/flk/store';
 import { safeStorage } from './shr/utils/storage';
 import { runFeedMigrationIfNeeded } from './mod/flk/migrations-feed-trigger';
 import { registerWhsHandlers, registerEggWhsHandlers } from './mod/whs/handlers';
+import { initStorageHealth } from './cor/storage/health';
 
 // ═══ اعمال تم قبل از React mount (صفر پرش) ═══
 try {
@@ -37,6 +38,9 @@ try {
 registerFlkHandlers();
 registerWhsHandlers();
 registerEggWhsHandlers();
+
+// 🆕 بررسی ماندگاری و فضای ذخیره‌سازی (async، fire-and-forget)
+void initStorageHealth();
 
 // ═══ Migration یک‌باره Feed (فاز ۹b) ═══
 try {

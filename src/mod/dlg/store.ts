@@ -2,7 +2,8 @@
  * store.ts — Zustand store ثبت روزانه
  */
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { zustandHybridStorage } from '../../cor/storage/hybridStorage';
 import { v4 as uuid } from 'uuid';
 import type { DlgEvent } from './types-events';
 
@@ -183,12 +184,15 @@ interface State {
   revokeCorrection: (logId: string, correctionId: string) => boolean;
   addEvent: (logId: string, ev: Omit<DlgEvent, 'id'|'logId'|'createdAt'>) => string;
   revokeEvent: (logId: string, eventId: string) => boolean;
+  /** 🆕 وضعیت لود داده‌ها از IndexedDB (دروازه لودینگ) */
+  isLoading: boolean;
 }
 
 export const useDlg = create<State>()(
   persist(
     (set, get) => ({
       logs: [],
+      isLoading: true,
       add: (l) => {
         const newLog = {
           ...l,
@@ -298,6 +302,21 @@ export const useDlg = create<State>()(
     }),
     {
       name: 'pm-dlg',
+      storage: createJSONStorage(() => zustandHybridStorage),
+      // 🆕 isLoading ذخیره نشود تا در هر لود، با true شروع شود
+      partialize: (state) => {
+        const { isLoading, ...rest } = state;
+        return rest as any;
+      },
+      // 🆕 پس از اتمام لود داده‌ها از IndexedDB، دروازه لودینگ باز می‌شود
+      onRehydrateStorage: () => {
+        return (state, error) => {
+          if (error) {
+            console.error('[dlg] Hydration failed:', error);
+          }
+          useDlg.setState({ isLoading: false });
+        };
+      },
       version: 16,
       migrate: (persisted: any, version: number) => {
         // ═══ v16 — events[] (الگوی FlockEvent) ═══

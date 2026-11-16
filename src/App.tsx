@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { safeStorage } from './shr/utils/storage';
 import { BrowserRouter, useLocation } from 'react-router-dom';
 import { useSet } from './mod/set/store';
+import { useDlg } from './mod/dlg/store';
 import { applyTheme } from './cor/theme/applyTheme';
 import Header from './shr/components/Header';
 import BottomNav from './shr/components/BottomNav';
@@ -66,8 +67,32 @@ function Layout() {
 }
 
 
+function LoadingScreen() {
+  return (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '100svh',
+      gap: 16,
+      padding: 24,
+    }}>
+      <div style={{ fontSize: 48 }}>🐔</div>
+      <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: 'var(--text)' }}>
+        مدیریت مرغداری
+      </div>
+      <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>
+        در حال بارگذاری...
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const settings = useSet();
+  const isLoading = useDlg((s) => s.isLoading);
+  const [showLoading, setShowLoading] = useState(false);
   const theme = settings.theme;  // single source of truth
   const [showOnb, setShowOnb] = useState(false);
   const { locked, unlock } = useAutoLock();
@@ -101,6 +126,33 @@ export default function App() {
     settings.highContrast,
     settings.density
   ]);
+
+  // 🆕 نشان دادن صفحه لودینگ فقط اگر بارگذاری > ۲۰۰ms طول بکشد (ضد فلیکر)
+  useEffect(() => {
+    if (!isLoading) {
+      setShowLoading(false);
+      return;
+    }
+    const timer = setTimeout(() => setShowLoading(true), 200);
+    return () => clearTimeout(timer);
+  }, [isLoading]);
+
+  // 🆕 شبکه ایمنی: اگر بارگذاری > ۵ ثانیه طول کشید، اجباراً خارج شو
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (useDlg.getState().isLoading) {
+        console.warn('[App] Hydration timeout — forcing isLoading=false');
+        useDlg.setState({ isLoading: false });
+      }
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // 🆕 دروازه لودینگ
+  if (isLoading) {
+    if (showLoading) return <LoadingScreen />;
+    return <div style={{ minHeight: '100svh' }} />;
+  }
 
   // قفل خودکار
   if (locked) return <LockScreen onUnlock={unlock} />;
