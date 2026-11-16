@@ -153,24 +153,37 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
       }
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--sp-1)' }}>
-          {CORRECTABLE_FIELDS.map(f => (
-            <button
-              key={f.key}
-              type="button"
-              onClick={() => setActiveField(f.key)}
-              style={{
-                padding: '6px 12px',
-                background: activeField === f.key ? 'var(--accent)' : 'var(--card)',
-                color: activeField === f.key ? 'white' : 'var(--muted)',
-                border: `1px solid ${activeField === f.key ? 'var(--accent)' : 'var(--border)'}`,
-                borderRadius: 'var(--r-sm)',
-                fontSize: 'var(--fs-sm)',
-                fontWeight: 600,
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-              }}
-            >{f.label}</button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
+          {FIELD_GROUPS.map(group => (
+            <div key={group.title} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
+              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
+                {group.title}
+              </span>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--sp-1)' }}>
+                {group.keys.map(key => {
+                  const f = CORRECTABLE_FIELDS.find(x => x.key === key);
+                  if (!f) return null;
+                  return (
+                    <button
+                      key={f.key}
+                      type="button"
+                      onClick={() => setActiveField(f.key as CorrectableKey)}
+                      style={{
+                        padding: '6px 12px',
+                        background: activeField === f.key ? 'var(--accent)' : 'var(--card)',
+                        color: activeField === f.key ? 'white' : 'var(--muted)',
+                        border: `1px solid ${activeField === f.key ? 'var(--accent)' : 'var(--border)'}`,
+                        borderRadius: 'var(--r-sm)',
+                        fontSize: 'var(--fs-sm)',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        fontFamily: 'inherit',
+                      }}
+                    >{f.label}</button>
+                  );
+                })}
+              </div>
+            </div>
           ))}
         </div>
 
