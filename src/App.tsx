@@ -6,6 +6,7 @@ import { useDlg } from './mod/dlg/store';
 import { useFlk } from './mod/flk/store';
 import { useWhs } from './mod/whs/store';
 import { useTra } from './mod/tra/store';
+import { useEgg } from './mod/egg/store';
 import { applyTheme } from './cor/theme/applyTheme';
 import Header from './shr/components/Header';
 import BottomNav from './shr/components/BottomNav';
@@ -98,7 +99,8 @@ export default function App() {
   const flkLoading = useFlk((s) => s.isLoading);
   const whsLoading = useWhs((s) => s.isLoading);
   const traLoading = useTra((s) => s.isLoading);
-  const isLoading = dlgLoading || flkLoading || whsLoading || traLoading;
+  const eggLoading = useEgg((s) => s.isLoading);
+  const isLoading = dlgLoading || flkLoading || whsLoading || traLoading || eggLoading;
   const [showLoading, setShowLoading] = useState(false);
   const theme = settings.theme;  // single source of truth
   const [showOnb, setShowOnb] = useState(false);
@@ -162,6 +164,10 @@ export default function App() {
       if (useTra.getState().isLoading) {
         console.warn('[App] tra hydration timeout — forcing isLoading=false');
         useTra.setState({ isLoading: false });
+      }
+      if (useEgg.getState().isLoading) {
+        console.warn('[App] egg hydration timeout — forcing isLoading=false');
+        useEgg.setState({ isLoading: false });
       }
     }, 5000);
     return () => clearTimeout(timer);

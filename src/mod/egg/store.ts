@@ -3,7 +3,8 @@
  */
 import { create } from 'zustand';
 import { bus } from '../../cor/events';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { zustandHybridStorage } from '../../cor/storage/hybridStorage';
 import { v4 as uuid } from 'uuid';
 import { useWhs } from '../whs/store';
 
@@ -79,6 +80,8 @@ interface State {
   deleteSale: (id: string) => void;
   addDiscard: (d: Omit<EggDiscard, 'id' | 'createdAt'>) => string;
   deleteDiscard: (id: string) => void;
+  /** 🆕 وضعیت لود داده‌ها از IndexedDB */
+  isLoading: boolean;
 }
 
 
@@ -87,6 +90,7 @@ const now = () => new Date().toISOString();
 export const useEgg = create<State>()(
   persist(
     (set, get) => ({
+      isLoading: true,
       productions: [],
       sales: [],
       discards: [],
@@ -154,6 +158,19 @@ export const useEgg = create<State>()(
     }),
     {
       name: 'pm-egg',
+      storage: createJSONStorage(() => zustandHybridStorage),
+      partialize: (state) => {
+        const { isLoading, ...rest } = state;
+        return rest as any;
+      },
+      onRehydrateStorage: () => {
+        return (state, error) => {
+          if (error) {
+            console.error('[egg] Hydration failed:', error);
+          }
+          useEgg.setState({ isLoading: false });
+        };
+      },
       version: 3,
       migrate: (persisted: any, version: number) => {
         if (version < 2 && persisted?.productions) {
