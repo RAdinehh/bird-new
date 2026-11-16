@@ -8,10 +8,8 @@ import { toEn, toFa } from '../../../shr/utils/fa';
 import { v4 as uuid } from 'uuid';
 
 const CORRECTABLE_FIELDS = [
-  { key: 'temperature',    label: '🌡 دما (میا.)',   unit: '°C' },
   { key: 'temperatureMin', label: '🌡 حداقل دما',    unit: '°C' },
   { key: 'temperatureMax', label: '🌡 حداکثر دما',   unit: '°C' },
-  { key: 'humidity',       label: '💧 رطوبت (میا.)', unit: '٪' },
   { key: 'humidityMin',    label: '💧 حداقل رطوبت',  unit: '٪' },
   { key: 'humidityMax',    label: '💧 حداکثر رطوبت', unit: '٪' },
   { key: 'feedDelivered',  label: '🌾 دان داده',     unit: 'kg' },
@@ -29,7 +27,7 @@ const CORRECTABLE_FIELDS = [
 ] as const;
 
 const FIELD_GROUPS = [
-  { title: '🌡 محیط', keys: ['temperature', 'temperatureMin', 'temperatureMax', 'humidity', 'humidityMin', 'humidityMax'] },
+  { title: '🌡 محیط', keys: ['temperatureMin', 'temperatureMax', 'humidityMin', 'humidityMax'] },
   { title: '🌾 تغذیه', keys: ['feedDelivered', 'feedRemaining', 'feedWaste', 'waterAmount', 'waterFillCount', 'waterFillVolume'] },
   { title: '🥚 تولید', keys: ['deathsCount', 'eatingEggs', 'fertileEggs', 'brokenEggs', 'otherEggs', 'weightGender'] },
 ];
@@ -57,7 +55,7 @@ interface Props {
 }
 
 export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
-  const [activeField, setActiveField] = useState<CorrectableKey>('temperature');
+  const [activeField, setActiveField] = useState<CorrectableKey>('temperatureMin');
   const [value, setValue] = useState<string>('');
   const [reason, setReason] = useState<string>(REASONS[0]);
   const [notes, setNotes] = useState<string>('');
@@ -218,11 +216,12 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
           </Field>
           <Field label="مقدار قبلی">
             <div style={{
-              height: 44, padding: '0 12px',
-              background: 'var(--input-bg)', border: '1px solid var(--border)',
+              height: 38, padding: '0 12px',
+              background: 'var(--bg-sunken, rgba(0,0,0,0.03))',
+              border: '1px dashed var(--border)',
               borderRadius: 'var(--r-sm)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: 'monospace', fontWeight: 700, color: 'var(--text)',
+              fontFamily: 'monospace', fontWeight: 700, color: 'var(--muted)',
             }}>{oldDisplay}</div>
           </Field>
         </div>
