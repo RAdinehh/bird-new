@@ -13,7 +13,7 @@ import {
 import { calculateEnvironmentWarnings } from '../../../shr/calc';
 import { toFa } from '../../../shr/utils/fa';
 import { format as formatJ, parse as parseJ, differenceInCalendarDays } from 'date-fns-jalali';
-import { getEffectiveEnv } from '../../set/standards/resolve';
+import { getEffectiveEnv, getMortalityRange } from '../../set/standards/resolve';
 import { useSet } from '../../set/store';
 import { getAgeDays } from '../../flk/store';
 import { Btn, Tag } from '../../../shr/components/ui';
@@ -59,12 +59,16 @@ const FIELD_LABEL: Record<string, string> = {
   feedDelivered: 'دان داده‌شده',
   feedRemaining: 'دان باقی‌مانده',
   feedConsumed: 'دان مصرفی',
+  feedWaste: 'دان هدر رفته',
   waterAmount: 'آب مصرفی',
+  waterFillCount: 'دفعات آب',
+  waterFillVolume: 'حجم هر نوبت',
   deathsCount: 'تلفات',
   eatingEggs: 'تخم خوراکی',
   fertileEggs: 'تخم نطفه‌دار',
   brokenEggs: 'تخم شکسته',
   otherEggs: 'تخم سایر',
+  weightGender: 'جنسیت وزن',
 };
 
 export default function LogCard(props: LogCardProps) {
@@ -87,16 +91,18 @@ export default function LogCard(props: LogCardProps) {
   let stdHumMin: number | null = null;
   let stdHumMax: number | null = null;
 
+  let mortalityStd: any = null;
   if (flock && birdName) {
-    try {
-      const age = getAgeDays(flock);
-      const env = getEffectiveEnv(birdName, age, null, { customStandards });
-      stdTempMin = env.temp?.min ?? null;
-      stdTempMax = env.temp?.max ?? null;
-      stdTempTarget = env.temp?.target ?? null;
-      stdHumMin = env.humidity?.min ?? null;
-      stdHumMax = env.humidity?.max ?? null;
-    } catch { /* silent */ }
+      try {
+        const age = getAgeDays(flock);
+        const env = getEffectiveEnv(birdName, age, null, { customStandards });
+        stdTempMin = env.temp?.min ?? null;
+        stdTempMax = env.temp?.max ?? null;
+        stdTempTarget = env.temp?.target ?? null;
+        stdHumMin = env.humidity?.min ?? null;
+        stdHumMax = env.humidity?.max ?? null;
+        mortalityStd = getMortalityRange(birdName, l.birdAgeDays ?? age, { customStandards });
+      } catch { /* silent */ }
   }
 
   // 🆕 BUG-2 fix: اولویت بازه کاربر بر استاندارد نژاد
@@ -124,7 +130,11 @@ export default function LogCard(props: LogCardProps) {
   const hWarn = envWarn.humidityTone;
   const tIsBad = tWarn === 'warn' || tWarn === 'danger';
   const hIsBad = hWarn === 'warn' || hWarn === 'danger';
-  const hasProblem = tIsBad || hIsBad || l.deathsCount > 0;
+  const baseCount = (flock?.currentCount || 0) + (l.deathsCount || 0);
+  const mortalityPct = baseCount > 0 ? ((l.deathsCount || 0) / baseCount) * 100 : 0;
+  const isMortalityHigh = l.deathsCount > 0 && mortalityStd && mortalityPct > mortalityStd.maxPct;
+
+  const hasProblem = tIsBad || hIsBad || isMortalityHigh;
   const accent: any = hasProblem ? 'warn' : 'accent';
 
   // 🆕 محاسبه روزهای گذشته از تاریخ لاگ (منطق ۳ روز)
@@ -143,7 +153,9 @@ export default function LogCard(props: LogCardProps) {
   // 🆕 BadgeOverflow badges
   const allBadges: BadgeItem[] = [];
   if (hasCorrections) allBadges.push({ key: 'corrections', node: <Tag tone="blue">اصلاح‌شده</Tag> });
-  if (l.deathsCount > 0) allBadges.push({ key: 'deaths', node: <Tag tone="amber">{toFa(l.deathsCount)} تلفات</Tag> });
+  if (l.deathsCount > 0) {
+    allBadges.push({ key: 'deaths', node: <Tag tone={isMortalityHigh ? "amber" : "blue"}>{toFa(l.deathsCount)} تلفات</Tag> });
+  }
 
   return (
     <ExpandableCard
@@ -324,67 +336,105 @@ export default function LogCard(props: LogCardProps) {
       {hasAnyCorrections && (
         <LogSection title="📝 تاریخچه اصلاحات">
           {(rawLog.corrections || []).map(corr => (
-            <div
-              key={corr.id}
-              style={{
-                fontSize: 'var(--fs-xs)',
-                padding: 'var(--pad-tight)',
-                background: corr.revoked ? 'var(--input-bg)' : 'var(--warn-soft)',
-                border: `1px solid ${corr.revoked ? 'var(--border)' : 'var(--warn)'}`,
-                borderRadius: 'var(--r-sm)',
-                opacity: corr.revoked ? 0.6 : 1,
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: 6,
-                alignItems: 'baseline',
-              }}
-            >
-              <span style={{
-                fontFamily: 'monospace',
-                fontWeight: 700,
-                color: 'var(--muted)',
-              }}>{toFa(corr.timestamp)}</span>
-              <span style={{ color: 'var(--text)', fontWeight: 600 }}>
-                {Object.keys(corr.changes).map(k => {
-                  const oldVal = (rawLog as any)[k];
-                  const newVal = (corr.changes as any)[k];
-                  return `${FIELD_LABEL[k] || k}: ${oldVal ?? '—'} → ${newVal ?? '—'}`;
-                }).join(' • ')}
-              </span>
-              <span style={{ color: 'var(--muted)' }}>({corr.reason})</span>
-              {corr.revoked ? (
-                <span style={{
-                  background: 'var(--danger-soft)',
-                  color: 'var(--danger)',
-                  fontWeight: 700,
-                  padding: '1px 6px',
-                  borderRadius: 3,
-                }}>لغو شده</span>
-              ) : (
-                <button
-                  type="button"
-                  onClick={async (e) => {
-                    e.stopPropagation();
-                    const ok = await showConfirmAsync(
-                      'لغو اصلاح',
-                      `اصلاح ${toFa(corr.timestamp)} لغو شود؟ (مقادیر به حالت قبل برمی‌گردند)`
+              <div
+                key={corr.id}
+                style={{
+                  padding: 'var(--pad-tight)',
+                  background: 'var(--card)',
+                  border: `1px solid ${corr.revoked ? 'var(--border)' : 'var(--accent-border)'}`,
+                  borderRadius: 'var(--r-sm)',
+                  opacity: corr.revoked ? 0.6 : 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 6,
+                  marginBottom: 8,
+                }}
+              >
+                {/* Header */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: 8,
+                  borderBottom: '1px dashed var(--border)',
+                  paddingBottom: 6,
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, textDecoration: corr.revoked ? 'line-through' : 'none' }}>
+                    <span style={{
+                      fontFamily: 'monospace',
+                      fontWeight: 700,
+                      fontSize: 'var(--fs-xs)',
+                      color: 'var(--muted)',
+                    }}>{toFa(corr.timestamp)}</span>
+                    <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>({corr.reason})</span>
+                  </div>
+                  {corr.revoked ? (
+                    <span style={{
+                      background: 'var(--danger-soft)',
+                      color: 'var(--danger)',
+                      fontWeight: 700,
+                      padding: '2px 8px',
+                      borderRadius: 'var(--r-sm)',
+                      fontSize: 'var(--fs-2xs, 10px)',
+                    }}>لغو شده</span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        const ok = await showConfirmAsync(
+                          'لغو اصلاح',
+                          `اصلاح ${toFa(corr.timestamp)} لغو شود؟ (مقادیر به حالت قبل برمی‌گردند)`
+                        );
+                        if (ok) onRevokeCorrection(corr.id);
+                      }}
+                      style={{
+                        padding: '2px 8px',
+                        background: 'transparent',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--r-sm)',
+                        fontSize: 'var(--fs-2xs, 10px)',
+                        color: 'var(--muted)',
+                        cursor: 'pointer',
+                        fontFamily: 'inherit',
+                      }}
+                    >↩️ لغو</button>
+                  )}
+                </div>
+
+                {/* Body */}
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  {Object.keys(corr.changes).map(k => {
+                    const oldVal = (rawLog as any)[k];
+                    const newVal = (corr.changes as any)[k];
+                    const label = FIELD_LABEL[k] || k;
+
+                    const fmt = (v: any) => {
+                      if (v === null || v === undefined || v === '') return '—';
+                      if (k === 'weightGender') {
+                        const opts: any = { '': 'نامشخص', 'male': 'نر', 'female': 'ماده', 'mixed': 'مخلوط' };
+                        return opts[v] || v;
+                      }
+                      return toFa(String(v));
+                    };
+
+                    return (
+                      <Row
+                        key={k}
+                        l={<span style={{ fontSize: 'var(--fs-sm)', color: corr.revoked ? 'var(--muted)' : 'var(--text)', textDecoration: corr.revoked ? 'line-through' : 'none' }}>{label}</span>}
+                        v={
+                          <span style={{ fontSize: 'var(--fs-sm)', display: 'flex', alignItems: 'center', gap: 4, textDecoration: corr.revoked ? 'line-through' : 'none' }}>
+                            <span style={{ color: corr.revoked ? 'var(--muted)' : 'var(--danger)' }}>{fmt(oldVal)}</span>
+                            <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>←</span>
+                            <span style={{ color: corr.revoked ? 'var(--muted)' : 'var(--accent)', fontWeight: 700 }}>{fmt(newVal)}</span>
+                          </span>
+                        }
+                      />
                     );
-                    if (ok) onRevokeCorrection(corr.id);
-                  }}
-                  style={{
-                    padding: '1px 6px',
-                    background: 'transparent',
-                    border: '1px solid var(--border)',
-                    borderRadius: 3,
-                    fontSize: 10,
-                    color: 'var(--muted)',
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                  }}
-                >↩️ لغو</button>
-              )}
-            </div>
-          ))}
+                  })}
+                </div>
+              </div>
+            ))}
         </LogSection>
       )}
 
