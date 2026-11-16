@@ -27,6 +27,7 @@ import { applyCorrections } from '../api/applyCorrections';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { Grid2, Grid3 } from '../../../shr/components/ui';
 import { CardActions } from '../../../shr/components/ui';
+import { ACTION_PRESETS } from '../../../shr/constants/cardActions';
 import type { ReactNode } from 'react';
 
 export interface LogCardProps {
@@ -482,11 +483,11 @@ export default function LogCard(props: LogCardProps) {
       )}
 
       <CardActions actions={[
-        { label: isEditLocked ? '🔒 ویرایش قفل' : 'ویرایش', onClick: onEdit, variant: 'outline', hidden: (l.status || 'active') !== 'active', disabled: isEditLocked },
-        { label: 'اصلاح', onClick: onCorrect, variant: 'outline', hidden: (l.status || 'active') !== 'active' },
-        { label: 'تاریخچه', onClick: () => onHistory?.(), variant: 'outline', hidden: onHistory === undefined },
-        { label: 'بازگردانی', onClick: onRestore, variant: 'outline', hidden: (l.status || 'active') === 'active' },
-        { label: 'حذف', onClick: onDelete, variant: 'danger-outline', hidden: (l.status || 'active') === 'active' },
+        { ...ACTION_PRESETS.EDIT, onClick: onEdit, hidden: (l.status || 'active') !== 'active', disabled: isEditLocked },
+        { ...ACTION_PRESETS.CORRECT, onClick: onCorrect, hidden: (l.status || 'active') !== 'active' },
+        { ...ACTION_PRESETS.HISTORY, onClick: () => onHistory?.(), hidden: onHistory === undefined },
+        { ...ACTION_PRESETS.RESTORE, onClick: onRestore, hidden: (l.status || 'active') === 'active' },
+        { ...ACTION_PRESETS.DELETE, onClick: onDelete, hidden: (l.status || 'active') === 'active' },
       ]} />
     </ExpandableCard>
   );
