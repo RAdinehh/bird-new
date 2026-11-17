@@ -15,6 +15,7 @@ import NotificationsTab from './NotificationsTab';
 import BackupTab from './BackupTab';
 import AboutTab from './AboutTab';
 import LogsTab from './LogsTab';
+import StorageDebugTab from './StorageDebugTab';
 import SettingsGroup from './SettingsGroup';
 
 type TabId =
@@ -94,6 +95,7 @@ const TAB_COMPONENTS: Record<TabId, TabComponent[]> = {
   system: [
     { comp: BackupTab, icon: '💾', title: 'پشتیبان‌گیری',      subtitle: 'آمار، پشتیبان، بازیابی، امنیت', tone: 'accent' },
     { comp: LogsTab,   icon: '📋', title: 'لاگ عملیات',         subtitle: 'تاریخچه فعالیت‌ها و خطاها',      tone: 'info' },
+    { comp: StorageDebugTab, icon: '🔍', title: 'دیباگ ذخیره‌سازی', subtitle: 'اندازه‌گیری حجم و تعداد لاگ‌ها (موقت)', tone: 'warn' },
     { comp: AboutTab,  icon: 'ℹ️', title: 'درباره',            subtitle: 'اطلاعات برنامه، راهنما، تماس',   tone: 'purple' },
   ],
 };

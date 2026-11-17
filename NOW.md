@@ -1,9 +1,9 @@
 # NOW.md
 > آخرین آپدیت: 1405/11/17
-> وضعیت: لایه ۱ و ۲ کامل — آماده برای لایه ۳
+> وضعیت: لایه ۱، ۲، ۶ کامل — در حال انجام لایه ۳ (آرشیو سرد)
 
 ## HEAD
-e1cb970b — feat(storage): اتصال brd,hal,ctc,fed,inc به IndexedDB + دروازه لودینگ ده‌گانه
+f5a8893f — refactor(history): مهاجرت DlgHistoryModal به HistoryModalShell
 
 ## ✅ لایه ۱ و ۲ — کامل شد (۵۰٪ نقشه راه)
 ### هسته ذخیره‌سازی (Storage Core)
@@ -33,16 +33,21 @@ e1cb970b — feat(storage): اتصال brd,hal,ctc,fed,inc به IndexedDB + در
 ### استورهای عمداً در localStorage (طبق W3C):
 - `set` (تنظیمات) — برای جلوگیری از فلیکر تم (اسکریپت `<head>` در `index.html`)
 
+
+### لایه ۶: تاریخچه مشترک (History Shell) — ✅ کامل شد
+- `src/shr/components/history/HistoryModalShell.tsx` — پوسته مشترک (Modal + footer + CSV + بستن)
+- مهاجرت ۴ کامپوننت:
+  - `FlockHistoryModal` (گله) ✅
+  - `DlgHistoryModal` (ثبت روزانه) ✅
+  - `SexingHistoryModal` (تفکیک جنسیت) ✅
+  - `DeferHistoryModal` (تعویق فاکتورها) ✅
+
 ## 🎯 کار بعدی (اولویت)
-### لایه ۳: آرشیو سرد (Cold Storage) — بعد از لایه ۶ یا مستقیماً
+### لایه ۳: آرشیو سرد (Cold Storage) — در حال انجام
 - [ ] ساخت `src/cor/storage/historyArchive.ts` با `idb`
 - [ ] انتقال داده‌های قدیمی‌تر از ۶ ماه (فقط رویدادهای عادی)
 - [ ] نگهداری دائمی اصلاحات و تلفات (21 CFR Part 11)
-
-### لایه ۶: تاریخچه مشترک (History Shell)
-- [ ] ساخت `HistoryModalShell` در `src/shr/components/history/`
-- [ ] مهاجرت ۴ کامپوننت تاریخچه به این پوسته
-- [ ] افزودن `userId` و `userName` به رویدادها (آمادگی چندکاربره)
+- [ ] UI در تنظیمات برای اجرای دستی آرشیو
 
 📌 **جزئیات کامل ۱۰ لایه:** `docs/DATA-ARCHITECTURE.md`
 
@@ -61,7 +66,7 @@ e1cb970b — feat(storage): اتصال brd,hal,ctc,fed,inc به IndexedDB + در
 - [ ] لایه ۳: آرشیو سرد
 - [ ] لایه ۴: موتور پشتیبان
 - [ ] لایه ۵: موتور بازیابی
-- [ ] لایه ۶: تاریخچه مشترک
+- [x] لایه ۶: تاریخچه مشترک
 - [ ] لایه ۷: مدیریت داده در تنظیمات
 - [ ] لایه ۸: حذف نرم یکدست
 - [ ] لایه ۹: Virtualization
