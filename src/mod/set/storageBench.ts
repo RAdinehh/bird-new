@@ -41,16 +41,17 @@ function req<T>(
   return new Promise((res, rej) => {
     const tx = db.transaction(store, op === 'put' ? 'readwrite' : 'readonly');
     const os = tx.objectStore(store);
-    const r =
-      op === 'get'
-        ? os.get(arg as IDBValidKey)
-        : os.put(arg, key as IDBValidKey);
+    const r = op === 'get' ? os.get(arg as IDBValidKey) : os.put(arg, key as IDBValidKey);
     r.onsuccess = () => res(r.result as T);
     r.onerror = () => rej(r.error ?? new Error('IDB request failed'));
   });
 }
 
-function openDb(name: string, version?: number, upgrade?: (db: IDBDatabase) => void): Promise<IDBDatabase> {
+function openDb(
+  name: string,
+  version?: number,
+  upgrade?: (db: IDBDatabase) => void,
+): Promise<IDBDatabase> {
   return new Promise((res, rej) => {
     const r = version ? indexedDB.open(name, version) : indexedDB.open(name);
     r.onupgradeneeded = () => upgrade?.(r.result);
@@ -148,7 +149,7 @@ export async function runBench(n: number): Promise<BenchResult> {
         getMs: t5 - t4,
         parseMs: t7 - t6,
         // افزودن یک لاگ = همان serialize + نوشتن کل آرایه
-        appendMs: (t1 - t0) + (t3 - t2),
+        appendMs: t1 - t0 + (t3 - t2),
       },
     };
   } catch (e) {
