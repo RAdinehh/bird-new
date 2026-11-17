@@ -1,22 +1,32 @@
+/**
+ * backup.ts — موتور پشتیبان‌گیری و بازیابی
+ * استاندارد: ALCOA+ / 21 CFR Part 11
+ * اصل: هر داده‌ای که در برنامه هست باید در پشتیبان باشد و برگردد.
+ *
+ * تغییرات:
+ *  - خواندن/نوشتن از طریق rawStore (IDB + LS) — نه فقط localStorage
+ *  - APIهای داده‌ای async شدند (IDB مسیر همگام ندارد)
+ *  - حجم بر حسب بایت واقعی (UTF-8)
+ *  - pm-recycle-tra-deals اضافه شد
+ *  - clearAllData() برای پاک‌سازی کامل (LS + IDB)
+ */
 import { safeStorage } from './storage';
-// لیست کلیدهای localStorage پروژه
+import { rawGet, rawSet, rawRemove, IDB_KEYS } from '../../cor/storage/rawStore';
+import { idbRemoveItem } from '../../cor/storage/idbStorage';
+
+/** کلیدهای پشتیبان‌گیری‌شده */
 export const PM_KEYS = [
   'pm-settings',
-  'pm-brd',
-  'pm-hal',
-  'pm-ctc',
-  'pm-flk',
-  'pm-inc',
-  'pm-egg',
-  'pm-dlg',
-  'pm-whs',
-  'pm-fed',
-  'pm-tra',
+  ...IDB_KEYS,
   'pm-recycle-tra',
+  'pm-recycle-tra-deals',
   'pm-alt',
   'pm-cal-manual',
-  'pm-theme'
+  'pm-theme',
 ] as const;
+
+/** کلید IDB برای نسخه‌های پشتیبان خودکار */
+export const AUTOBACKUP_IDB_KEY = 'pm-autobackup-list';
 
 export const MODULE_LABELS: Record<string, string> = {
   'pm-settings': 'تنظیمات',
@@ -30,9 +40,11 @@ export const MODULE_LABELS: Record<string, string> = {
   'pm-whs': 'انبار',
   'pm-fed': 'جیره‌نویسی',
   'pm-tra': 'معاملات',
+  'pm-recycle-tra': 'سطل بازیافت معاملات',
+  'pm-recycle-tra-deals': 'سطل بازیافت معاملات (جزئیات)',
   'pm-alt': 'هشدارها',
   'pm-cal-manual': 'تقویم دستی',
-  'pm-theme': 'تم'
+  'pm-theme': 'تم',
 };
 
 export interface BackupFile {
@@ -49,18 +61,32 @@ export interface BackupStats {
   byModule: { key: string; label: string; size: number; records: number }[];
 }
 
+/** حجم واقعی رشته بر حسب بایت (UTF-8) — متن فارسی ۲ بایت است */
+export function byteSize(s: string): number {
+  try {
+    return new TextEncoder().encode(s).length;
+  } catch {
+    return s.length;
+  }
+}
+
+export function formatSize(bytes: number): string {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+}
+
 /** خروجی گرفتن از همه‌ی داده‌ها */
-export function exportAll(): string {
+export async function exportAll(): Promise<string> {
   const data: Record<string, any> = {};
 
   for (const k of PM_KEYS) {
-    const raw = safeStorage.get(k);
-    if (raw) {
-      try {
-        data[k] = JSON.parse(raw);
-      } catch {
-        data[k] = null;
-      }
+    const raw = await rawGet(k);
+    if (!raw) continue;
+    try {
+      data[k] = JSON.parse(raw);
+    } catch {
+      data[k] = null;
     }
   }
 
@@ -69,16 +95,20 @@ export function exportAll(): string {
     schemaVersion: 2,
     exportedAt: new Date().toISOString(),
     checksum: '',
-    data
+    data,
   };
 
-  const json = JSON.stringify(payload, null, 2);
-  payload.checksum = simpleChecksum(json);
+  const body = JSON.stringify(payload, null, 2);
+  payload.checksum = simpleChecksum(body);
   return JSON.stringify(payload, null, 2);
 }
 
-/** اعتبارسنجی فایل پشتیبان */
-export function validateBackup(jsonText: string): { valid: boolean; error: string; data: BackupFile | null } {
+/** اعتبارسنجی فایل پشتیبان (همگام — فقط JSON) */
+export function validateBackup(jsonText: string): {
+  valid: boolean;
+  error: string;
+  data: BackupFile | null;
+} {
   try {
     const parsed = JSON.parse(jsonText);
     if (typeof parsed !== 'object' || parsed === null) {
@@ -91,50 +121,84 @@ export function validateBackup(jsonText: string): { valid: boolean; error: strin
       return { valid: false, error: 'داده‌ها در فایل نیست', data: null };
     }
     return { valid: true, error: '', data: parsed };
-  } catch (e: any) {
+  } catch {
     return { valid: false, error: 'فایل JSON معتبر نیست', data: null };
   }
 }
 
+/** کلیدهای فایل + کلیدهای شناخته‌شده (سازگاری با پشتیبان قدیمی) */
+function collectKeys(backup: BackupFile): string[] {
+  const set = new Set<string>(PM_KEYS as readonly string[]);
+  for (const k of Object.keys(backup.data || {})) {
+    if (k.startsWith('pm-')) set.add(k);
+  }
+  return Array.from(set);
+}
+
 /** وارد کردن داده‌ها */
-export function importAll(backup: BackupFile, mode: 'replace' | 'merge'): { success: boolean; message: string } {
+export async function importAll(
+  backup: BackupFile,
+  mode: 'replace' | 'merge',
+): Promise<{ success: boolean; message: string }> {
   try {
-    for (const k of PM_KEYS) {
+    const keys = collectKeys(backup);
+    let written = 0;
+    const failed: string[] = [];
+
+    for (const k of keys) {
       const incoming = backup.data[k];
-      if (!incoming) continue;
+      if (incoming === undefined || incoming === null) continue;
 
       if (mode === 'replace') {
-        safeStorage.setJSON(k, incoming);
+        const ok = await rawSet(k, JSON.stringify(incoming));
+        if (ok) written++;
+        else failed.push(k);
       } else {
-        const existingRaw = safeStorage.get(k);
+        const existingRaw = await rawGet(k);
         if (!existingRaw) {
-          safeStorage.setJSON(k, incoming);
+          const ok = await rawSet(k, JSON.stringify(incoming));
+          if (ok) written++;
+          else failed.push(k);
         } else {
-          const existing = safeStorage.getJSON(k, {});
+          let existing: any = {};
+          try {
+            existing = JSON.parse(existingRaw);
+          } catch {
+            existing = {};
+          }
           const merged = mergeZustand(existing, incoming);
-          safeStorage.setJSON(k, merged);
+          const ok = await rawSet(k, JSON.stringify(merged));
+          if (ok) written++;
+          else failed.push(k);
         }
       }
     }
-    return { success: true, message: mode === 'replace' ? 'همه‌ی داده‌ها جایگزین شد' : 'داده‌ها ادغام شد' };
+
+    const base = mode === 'replace' ? 'همه‌ی داده‌ها جایگزین شد' : 'داده‌ها ادغام شد';
+    if (failed.length) {
+      return {
+        success: false,
+        message: base + ' — اما ' + failed.length + ' بخش ذخیره نشد (' + failed.join(', ') + ')',
+      };
+    }
+    return { success: true, message: base + ' (' + written + ' بخش)' };
   } catch (e: any) {
-    return { success: false, message: e.message || 'خطا در بازیابی' };
+    return { success: false, message: (e && e.message) || 'خطا در بازیابی' };
   }
 }
 
-/** ادغام دو state زوستند */
+/** ادغام دو state زوستند — بر اساس id، بدون تکرار */
 function mergeZustand(a: any, b: any): any {
-  const result = { ...a, state: { ...(a.state || {}) } };
-  if (b.state) {
+  const result = { ...a, state: { ...((a && a.state) || {}) } };
+  if (b && b.state) {
     for (const key of Object.keys(b.state)) {
-      const av = a.state?.[key];
+      const av = a && a.state ? a.state[key] : undefined;
       const bv = b.state[key];
       if (Array.isArray(av) && Array.isArray(bv)) {
-        // ادغام بر اساس id — بدون تکرار
         const byId: Record<string, any> = {};
-        [...av, ...bv].forEach(item => {
+        av.concat(bv).forEach((item: any) => {
           if (item && item.id) byId[item.id] = item;
-          else byId[Math.random().toString()] = item;
+          else byId['tmp-' + Math.random().toString(36).slice(2)] = item;
         });
         result.state[key] = Object.values(byId);
       } else {
@@ -145,15 +209,15 @@ function mergeZustand(a: any, b: any): any {
   return result;
 }
 
-/** آمار حجم و رکوردها */
-export function getStats(): BackupStats {
+/** آمار حجم و رکوردها (حجم = بایت واقعی) */
+export async function getStats(): Promise<BackupStats> {
   const byModule: BackupStats['byModule'] = [];
   let totalSize = 0;
   let totalKeys = 0;
 
   for (const k of PM_KEYS) {
-    const raw = safeStorage.get(k);
-    const size = raw ? raw.length : 0;
+    const raw = await rawGet(k);
+    const size = raw ? byteSize(raw) : 0;
     totalSize += size;
     if (raw) totalKeys++;
 
@@ -161,20 +225,17 @@ export function getStats(): BackupStats {
     if (raw) {
       try {
         const parsed = JSON.parse(raw);
-        if (parsed.state) {
+        if (parsed && parsed.state) {
           for (const v of Object.values(parsed.state)) {
             if (Array.isArray(v)) records += v.length;
           }
         }
-      } catch {}
+      } catch {
+        /* silent */
+      }
     }
 
-    byModule.push({
-      key: k,
-      label: MODULE_LABELS[k] || k,
-      size,
-      records
-    });
+    byModule.push({ key: k, label: MODULE_LABELS[k] || k, size, records });
   }
 
   return { totalKeys, totalSize, byModule };
@@ -184,7 +245,7 @@ export function getStats(): BackupStats {
 function simpleChecksum(s: string): string {
   let hash = 0;
   for (let i = 0; i < s.length; i++) {
-    hash = ((hash << 5) - hash) + s.charCodeAt(i);
+    hash = (hash << 5) - hash + s.charCodeAt(i);
     hash |= 0;
   }
   return Math.abs(hash).toString(36);
@@ -196,9 +257,13 @@ export function downloadBackup(jsonText: string): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   const now = new Date();
-  const stamp = now.getFullYear() + '-' +
-    String(now.getMonth() + 1).padStart(2, '0') + '-' +
-    String(now.getDate()).padStart(2, '0') + '-' +
+  const stamp =
+    now.getFullYear() +
+    '-' +
+    String(now.getMonth() + 1).padStart(2, '0') +
+    '-' +
+    String(now.getDate()).padStart(2, '0') +
+    '-' +
     String(now.getHours()).padStart(2, '0') +
     String(now.getMinutes()).padStart(2, '0');
   a.href = url;
@@ -217,9 +282,31 @@ export function readFile(file: File): Promise<string> {
   });
 }
 
-/** فرمت حجم */
-export function formatSize(bytes: number): string {
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-  return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+/**
+ * پاک‌سازی کامل داده‌ها — LS و IDB با هم.
+ * قبلاً فقط کلیدهای pm- در localStorage حذف می‌شد و داده‌های IDB
+ * بعد از reload برمی‌گشتند (باگ ۶).
+ */
+export async function clearAllData(): Promise<void> {
+  for (const k of PM_KEYS) {
+    await rawRemove(k);
+  }
+
+  // هر کلید pm- باقی‌مانده در localStorage (درفت فرم، پشتیبان قدیمی و ...)
+  try {
+    const lsKeys: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('pm-')) lsKeys.push(k);
+    }
+    for (const k of lsKeys) safeStorage.remove(k);
+  } catch {
+    /* silent */
+  }
+
+  try {
+    await idbRemoveItem(AUTOBACKUP_IDB_KEY);
+  } catch {
+    /* silent */
+  }
 }

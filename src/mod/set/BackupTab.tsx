@@ -1,6 +1,5 @@
-import { useState, useMemo, useRef } from 'react';
-import { safeStorage } from '../../shr/utils/storage';
-import { exportAll, validateBackup, importAll, getStats, downloadBackup, readFile, formatSize, type BackupFile } from '../../shr/utils/backup';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { exportAll, validateBackup, importAll, getStats, downloadBackup, readFile, formatSize, byteSize, clearAllData, type BackupFile, type BackupStats } from '../../shr/utils/backup';
 import { useSet } from './store';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { Btn, BtnRow, Field, Grid2, Select, Modal } from '../../shr/components/ui';
@@ -14,7 +13,7 @@ import { ToggleRow } from './helpers';
 export default function BackupTab() {
   const s = useSet();
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
-  const [stats, setStats] = useState(() => getStats());
+  const [stats, setStats] = useState<BackupStats>({ totalKeys: 0, totalSize: 0, byModule: [] });
   const [preview, setPreview] = useState<BackupFile | null>(null);
   const [mergeMode, setMergeMode] = useState<'replace' | 'merge'>('merge');
   const [showRestore, setShowRestore] = useState(false);
@@ -22,18 +21,20 @@ export default function BackupTab() {
   const [showReset, setShowReset] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const refresh = () => setStats(getStats());
+  const refresh = async () => setStats(await getStats());
+
+  useEffect(() => { void refresh(); }, []);
 
   const showMsg = (text: string, ok: boolean) => {
     setMsg({ text, ok });
     setTimeout(() => setMsg(null), 4000);
   };
 
-  const handleExport = () => {
+  const handleExport = async () => {
     try {
-      const json = exportAll();
+      const json = await exportAll();
       downloadBackup(json);
-      showMsg('✓ پشتیبان دانلود شد — ' + formatSize(json.length), true);
+      showMsg('✓ پشتیبان دانلود شد — ' + formatSize(byteSize(json)), true);
       refresh();
     } catch (e: any) {
       showMsg('✕ ' + (e.message || 'خطا'), false);
@@ -81,12 +82,12 @@ export default function BackupTab() {
       const ok = await showConfirmAsync('تأیید بازیابی', '⚠ تمام داده‌های فعلی پاک می‌شود و با فایل پشتیبان جایگزین می‌شود. مطمئن هستید؟', { danger: true, confirmText: 'بازیابی کن' });
       if (!ok) return;
     }
-    const result = importAll(preview, mergeMode);
+    const result = await importAll(preview, mergeMode);
     if (result.success) {
       showMsg('✓ ' + result.message, true);
       setShowRestore(false);
       setPreview(null);
-      setTimeout(() => location.reload(), 1200);
+      setTimeout(() => location.reload(), 400);
     } else {
       showMsg('✕ ' + result.message, false);
     }
@@ -95,9 +96,7 @@ export default function BackupTab() {
   const clearAll = async () => {
     if (!(await showConfirmAsync('تأیید', '⚠ پاک کردن همه‌ی داده‌ها — قابل بازگشت نیست. مطمئن هستید؟', { danger: true, confirmText: 'بله، ادامه' }))) return;
     if (!(await showConfirmAsync('تأیید', 'این آخرین تأیید است. تمام گله‌ها، معاملات، و تنظیمات پاک می‌شوند.', { danger: true, confirmText: 'بله، ادامه' }))) return;
-    for (const k of Object.keys(localStorage)) {
-      if (k.startsWith('pm-')) safeStorage.remove(k);
-    }
+    await clearAllData();
     location.reload();
   };
 

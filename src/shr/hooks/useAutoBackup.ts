@@ -1,31 +1,71 @@
+/**
+ * useAutoBackup — پشتیبان خودکار
+ *
+ * نسخه‌های پشتیبان دیگر در localStorage ذخیره نمی‌شوند.
+ * قبلاً هر نسخه یک رشته‌ی کامل JSON بود و بعد از ۲–۳ نسخه سهمیه‌ی ۵MB
+ * پر می‌شد. حالا در IndexedDB ذخیره می‌شود.
+ */
 import { useEffect } from 'react';
 import { safeStorage } from '../utils/storage';
 import { useSet } from '../../mod/set/store';
-import { exportAll } from '../utils/backup';
+import { exportAll, AUTOBACKUP_IDB_KEY } from '../utils/backup';
+import { idbGetItem, idbSetItem } from '../../cor/storage/idbStorage';
 
-const KEY = 'pm-autobackup-last';
-const LIST_KEY = 'pm-autobackup-list';
+const LAST_KEY = 'pm-autobackup-last';
+
+interface Snapshot {
+  at: number;
+  data: string;
+}
+
+async function readList(): Promise<Snapshot[]> {
+  try {
+    const raw = await idbGetItem(AUTOBACKUP_IDB_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(String(raw));
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
 
 export function useAutoBackup() {
   const { autoBackup } = useSet();
+  const cfg: any = autoBackup || {};
+  const enabled = !!cfg.enabled;
+  const intervalHours = Number(cfg.intervalHours) || 24;
+  const maxVersions = Number(cfg.maxVersions) || 5;
+
   useEffect(() => {
-    if (!autoBackup?.enabled) return;
-    const check = () => {
-      const last = parseInt(safeStorage.get(KEY) || '0', 10);
-      const interval = (autoBackup.intervalHours || 24) * 3600 * 1000;
-      if (Date.now() - last < interval) return;
+    if (!enabled) return;
+
+    let cancelled = false;
+
+    const check = async () => {
+      const last = parseInt(safeStorage.get(LAST_KEY) || '0', 10);
+      if (Date.now() - last < intervalHours * 3600 * 1000) return;
+
       try {
-        const data = exportAll();
-        const list = JSON.parse(localStorage.getItem(LIST_KEY) || '[]');
+        const data = await exportAll();
+        if (cancelled) return;
+
+        const list = await readList();
         list.unshift({ at: Date.now(), data });
-        while (list.length > (autoBackup.maxVersions || 5)) list.pop();
-        safeStorage.setJSON(LIST_KEY, list);
-        safeStorage.set(KEY, String(Date.now()));
-        console.log('[AutoBackup] ذخیره شد');
-      } catch (e) { /* silent */ }
+        while (list.length > maxVersions) list.pop();
+
+        await idbSetItem(AUTOBACKUP_IDB_KEY, JSON.stringify(list));
+        safeStorage.set(LAST_KEY, String(Date.now()));
+        console.log('[AutoBackup] نسخه‌ی خودکار ذخیره شد');
+      } catch (e) {
+        console.warn('[AutoBackup] ذخیره‌سازی ناموفق:', e);
+      }
     };
-    check();
-    const t = setInterval(check, 30 * 60 * 1000);
-    return () => clearInterval(t);
-  }, [autoBackup?.enabled, autoBackup?.intervalHours, autoBackup?.maxVersions]);
+
+    void check();
+    const t = setInterval(() => void check(), 30 * 60 * 1000);
+    return () => {
+      cancelled = true;
+      clearInterval(t);
+    };
+  }, [enabled, intervalHours, maxVersions]);
 }
