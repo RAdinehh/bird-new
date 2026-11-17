@@ -6,15 +6,16 @@
 
 ## 🗺️ نقشه راه ۱۰ لایه‌ای (10-Layer Plan)
 
-### لایه ۱: هسته ذخیره‌سازی (Storage Core) — [در حال انجام]
-- [ ] ارتقای `StorageAdapter` در `src/cor/storage` برای پشتیبانی از `IndexedDB`.
-- [ ] مکانیزم مهاجرت (Migration) از `localStorage` به `IndexedDB` برای همه استورها.
-- [ ] اتصال `navigator.storage.persist` برای جلوگیری از پاک‌شدن خودکار.
+### لایه ۱: هسته ذخیره‌سازی (Storage Core) — [✅ کامل شد]
+- [x] `idbStorage.ts` — موتور IndexedDB برای Zustand.
+- [x] `hybridStorage.ts` — مهاجرت تنبل (اول IndexedDB، بعد localStorage).
+- [x] `migrate.ts` — اسکریپت مهاجرت یک‌باره.
+- [x] اتصال ۱۰ استور (`dlg`, `flk`, `whs`, `tra`, `egg`, `brd`, `hal`, `ctc`, `fed`, `inc`) به IndexedDB.
 
-### لایه ۲: مدیریت ظرفیت (Storage Health) — [در حال انجام]
-- [ ] ساخت `health.ts` برای بررسی مداوم فضای مصرفی.
-- [ ] نمایش بنر هشدار در ۸۰٪ ظرفیت.
-- [ ] دکمه «ارتقا به حالت حرفه‌ای».
+### لایه ۲: مدیریت ظرفیت (Storage Health) — [✅ کامل شد]
+- [x] `health.ts` — `navigator.storage.persist` + `estimate`.
+- [x] هشدار در ۸۰٪ ظرفیت (toast).
+- [x] دروازه لودینگ (`LoadingScreen`) با تایمر ۲۰۰ms + شبکه ایمنی ۵ ثانیه.
 
 ### لایه ۳: آرشیو سرد (Cold Storage) — [در انتظار]
 - [ ] ساخت `historyArchive.ts` با استفاده از `idb`.
@@ -51,6 +52,7 @@
 
 ### لایه ۱۰: مستندسازی و آمادگی سرور (Documentation & Server-Ready) — [در حال انجام]
 - [x] ساخت این فایل (`DATA-ARCHITECTURE.md`).
+- [x] آپدیت `NOW.md` با وضعیت لایه‌های ۱ و ۲.
 - [ ] ساخت `ServerStorageAdapter` (اسکلت).
 - [ ] آپدیت نهایی `NOW.md`.
 
