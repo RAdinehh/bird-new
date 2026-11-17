@@ -3,7 +3,8 @@
  * استاندارد: FlockHistoryModal (گروه‌بندی تاریخ، Chip فیلتر، لغو فقط آخرین)
  */
 import { useMemo, useState } from 'react';
-import { Modal, Btn, BtnRow, ShowMoreButton, Sheet, Row } from '../../../shr/components/ui';
+import { Btn, ShowMoreButton, Sheet, Row } from '../../../shr/components/ui';
+import { HistoryModalShell } from '../../../shr/components/history/HistoryModalShell';
 import { toFa } from '../../../shr/utils/fa';
 import { downloadCSV } from '../../../shr/utils/export';
 import { showConfirmAsync } from '../../../cor/store/dialog';
@@ -225,8 +226,11 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
   if (!log) return null;
 
   return (
-    <Modal open={open} onClose={onClose} title={`تاریخچه — ${log.entryTime ? toFa(log.entryTime) + ' • ' : ''}${toFa(log.date)}`}
-      footer={<BtnRow><Btn onClick={handleExport}>CSV</Btn><Btn onClick={onClose}>بستن</Btn></BtnRow>}
+    <HistoryModalShell
+      open={open}
+      onClose={onClose}
+      title={`تاریخچه — ${log.entryTime ? toFa(log.entryTime) + ' • ' : ''}${toFa(log.date)}`}
+      onExport={handleExport}
     >
       {/* ═══ هدر خلاصه سبز ═══ */}
       <div style={{
@@ -330,7 +334,7 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
           {visibleData.hidden > 0 && <div style={{ marginTop: 10 }}><ShowMoreButton count={visibleData.hidden} onClick={() => setShowAll(true)} /></div>}
         </>
       )}
-    </Modal>
+    </HistoryModalShell>
   );
 }
 
