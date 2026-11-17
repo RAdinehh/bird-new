@@ -1,7 +1,8 @@
 /**
  * DeferHistoryModal — تاریخچه تعویق‌ها (UI Final)
  */
-import { Modal, Btn, BtnRow, Empty } from '../../../shr/components/ui';
+import { Empty } from '../../../shr/components/ui';
+import { HistoryModalShell } from '../../../shr/components/history/HistoryModalShell';
 import { toFa } from '../../../shr/utils/fa';
 import type { Deferral } from '../types';
 import { format as formatJ, parse as parseJ, differenceInCalendarDays } from 'date-fns-jalali';
@@ -40,8 +41,11 @@ export default function DeferHistoryModal({ open, onClose, deferrals, invoiceNum
   const label = kind === 'deal' ? 'معامله' : 'فاکتور';
 
   return (
-    <Modal open={open} onClose={onClose} title="📋 تاریخچه تعویق‌ها" size="md"
-      footer={<BtnRow><Btn onClick={onClose}>بستن</Btn></BtnRow>}
+    <HistoryModalShell
+      open={open}
+      onClose={onClose}
+      title="📋 تاریخچه تعویق‌ها"
+      size="md"
     >
       <div style={{
         marginBottom: 12,
@@ -97,6 +101,6 @@ export default function DeferHistoryModal({ open, onClose, deferrals, invoiceNum
           })}
         </div>
       )}
-    </Modal>
+    </HistoryModalShell>
   );
 }

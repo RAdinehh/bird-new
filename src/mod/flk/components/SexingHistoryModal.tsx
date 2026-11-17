@@ -3,7 +3,8 @@
  * تاریخ سمت راست (بدون کادر) + یک wrapper برای کل گروه + جداکننده بین کارت‌ها
  */
 import { useMemo, useState } from 'react';
-import { Modal, Btn, BtnRow, Tag } from '../../../shr/components/ui';
+import { Tag } from '../../../shr/components/ui';
+import { HistoryModalShell } from '../../../shr/components/history/HistoryModalShell';
 import { useFlk, type Flock } from '../store';
 import { toFa, formatNumWhileTyping } from '../../../shr/utils/fa';
 import { todayJ } from '../api/flocksCalc';
@@ -85,12 +86,11 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
   if (!flock) return null;
 
   return (
-    <Modal
+    <HistoryModalShell
       open={open}
       onClose={onClose}
       title="📅 تاریخچه تفکیک جنسیت"
       size="md"
-      footer={<BtnRow><Btn onClick={onClose}>بستن</Btn></BtnRow>}
     >
       {groups.length === 0 ? (
         <div style={{ padding: 'var(--pad-normal)', textAlign: 'center', color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>
@@ -213,6 +213,6 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
           )}
         </div>
       )}
-    </Modal>
+    </HistoryModalShell>
   );
 }
