@@ -3,7 +3,8 @@
  * ۳ تب با سلسله‌مراتب منطقی + موجودی تفکیک‌شده
  */
 import { useEffect, useState, useMemo, type ReactNode } from 'react';
-import { Modal, Btn, BtnRow, Select } from '../../../shr/components/ui';
+import { Btn, Select } from '../../../shr/components/ui';
+import { HistoryModalShell } from '../../../shr/components/history/HistoryModalShell';
 import type { Flock, FlockEvent, FlockEventType, FlockEventReasonCode, FlockSexBalanceEvent } from '../store';
 import { SEX_AUDIT_META, formatSexDelta, aggregateDeathsBySex, toneFromRate, eventsToCSV, auditToCSV, calculateFCR, weightBySexFromLogs, consumptionToCSV } from '../helpers-audit';
 import { useFlk } from '../store';
@@ -380,16 +381,11 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   };
 
   return (
-    <Modal
+    <HistoryModalShell
       open={open}
       onClose={onClose}
       title={'📜 رویدادها • ' + flock.name}
-      footer={
-        <BtnRow>
-          <Btn onClick={handleExport}>CSV</Btn>
-          <Btn onClick={onClose}>بستن</Btn>
-        </BtnRow>
-      }
+      onExport={handleExport}
     >
 
       {/* ═══ موجودی با breakdown ═══ */}
@@ -831,7 +827,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
         )
       )}
 
-    </Modal>
+    </HistoryModalShell>
   );
 }
 
