@@ -13,9 +13,7 @@ interface PersistedShape<T> {
   [key: string]: T[] | Record<string, T[]> | undefined;
 }
 
-export function todayJ(): string {
-  try { return format(new Date(), 'yyyy/MM/dd'); } catch { return ''; }
-}
+export { todayJalali as todayJ } from '../../../shr/date/jalali';
 
 export function jalaliBounds(monthsBack: number, daysForward = 60): { min: string; max: string } {
   try {

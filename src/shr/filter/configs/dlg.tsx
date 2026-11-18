@@ -9,6 +9,12 @@ export function getDlgLogsConfig(ctx: {
   return {
     filterDefs: [
       {
+        key: 'dateRange', label: 'بازه تاریخ', kind: 'dateRange',
+        icon: <IconCalendar size={18} />,
+        // تاریخ‌ها جلالی و با صفر پیشوندی‌اند (مثل 1405/08/27) → مقایسه رشته‌ای درست است
+        getValue: (l: DailyLog) => l.date || '',
+      },
+      {
         key: 'flockId', label: 'گله', kind: 'enum',
         icon: <IconUser size={18} />,
         options: ctx.flocks.map(f => ({ value: f.id, label: f.name })),

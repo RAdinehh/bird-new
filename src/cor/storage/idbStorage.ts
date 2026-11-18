@@ -6,19 +6,26 @@
 import { openDB, type IDBPDatabase } from 'idb';
 
 const DB_NAME = 'pm-state';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = 'zustand';
+const RECORDS_STORE = 'records';
 
 let dbPromise: Promise<IDBPDatabase> | null = null;
 
 function getDB() {
   if (!dbPromise) {
     dbPromise = openDB(DB_NAME, DB_VERSION, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains(STORE_NAME)) {
-          db.createObjectStore(STORE_NAME);
-        }
-      },
+        upgrade(db) {
+          if (!db.objectStoreNames.contains(STORE_NAME)) {
+            db.createObjectStore(STORE_NAME);
+          }
+          // ═══ ۴-ب — store رکورد-محور ═══
+          if (!db.objectStoreNames.contains(RECORDS_STORE)) {
+            const st = db.createObjectStore(RECORDS_STORE, { keyPath: ['store', 'id'] });
+            st.createIndex('by_store', 'store');
+            st.createIndex('by_store_date', ['store', 'date']);
+          }
+        },
     });
   }
   return dbPromise;
@@ -52,3 +59,28 @@ export const zustandIdbStorage = {
   setItem: idbSetItem,
   removeItem: idbRemoveItem,
 };
+
+// ═══ ۴-ب — API رکورد-محور ═══
+export async function idbPutRecord(store: string, rec: any): Promise<void> {
+  const db = await getDB();
+  await db.put(RECORDS_STORE, { store, ...rec });
+}
+
+export async function idbDeleteRecord(store: string, id: string): Promise<void> {
+  const db = await getDB();
+  await db.delete(RECORDS_STORE, [store, id]);
+}
+
+export async function idbGetAllRecords<T = any>(store: string): Promise<T[]> {
+  const db = await getDB();
+  const rows = await db.getAllFromIndex(RECORDS_STORE, 'by_store', store);
+  return rows.map((r: any) => {
+    const { store: _s, ...rest } = r;
+    return rest as T;
+  });
+}
+
+export async function idbCountRecords(store: string): Promise<number> {
+  const db = await getDB();
+  return db.countFromIndex(RECORDS_STORE, 'by_store', store);
+}

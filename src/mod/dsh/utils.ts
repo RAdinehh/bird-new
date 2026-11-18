@@ -14,14 +14,12 @@ export function monthKey(date: string): string {
 }
 
 
-export function currentMonth(): string {
-  return formatJ(new Date(), 'yyyy/MM');
-}
+import { currentMonth as _cm } from '../../shr/date/jalali';
+export const currentMonth = _cm;
 
 
-export function todayJalali(): string {
-  return formatJ(new Date(), 'yyyy/MM/dd');
-}
+import { todayJalali as _tj } from '../../shr/date/jalali';
+export const todayJalali = _tj;
 
 
 export function dateDiffDays(jalaliDate: string): number {

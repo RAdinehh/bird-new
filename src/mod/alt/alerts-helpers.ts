@@ -29,7 +29,5 @@ export function jalaliDate(s: string): Date | null {
   } catch { return null; }
 }
 
-export const todayJalali = () => {
-  const d = new Date();
-  return formatJ(d, 'yyyy/MM/dd');
-};
+import { todayJalali as _tj } from '../../shr/date/jalali';
+export const todayJalali = _tj;

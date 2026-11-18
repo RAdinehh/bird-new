@@ -1,5 +1,6 @@
 import type { ReactNode, CSSProperties } from 'react';
 import { Input } from '../components/ui';
+import DatePicker from '../components/DatePicker';
 import { RowItem } from './RowItem';
 import type { FilterDef, FilterState } from './types';
 import { parseFaNum } from '../utils/fa';
@@ -181,12 +182,12 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter, filterS
     if (def.kind === 'dateRange') {
       const [a, b] = (v as [string, string]) || ['', ''];
       return (
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <Input placeholder="از" value={a || ''}
-            onChange={e => setFilter(def.key, [e.target.value, b || ''])} />
-          <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', flexShrink: 0 }}>—</span>
-          <Input placeholder="تا" value={b || ''}
-            onChange={e => setFilter(def.key, [a || '', e.target.value])} />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 6, alignItems: 'center', width: '100%' }}>
+          <DatePicker value={a || ''} placeholder="از تاریخ"
+            onChange={v2 => setFilter(def.key, [v2, b || ''])} />
+          <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>—</span>
+          <DatePicker value={b || ''} placeholder="تا تاریخ"
+            onChange={v2 => setFilter(def.key, [a || '', v2])} />
         </div>
       );
     }

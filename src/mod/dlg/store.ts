@@ -186,7 +186,26 @@ interface State {
   revokeEvent: (logId: string, eventId: string) => boolean;
   /** 🆕 وضعیت لود داده‌ها از IndexedDB (دروازه لودینگ) */
   isLoading: boolean;
+  /** 🆕 لایه ۳ — آرشیو سرد: لاگ‌های قدیمی‌تر از آستانه را جابه‌جا می‌کند (حذف نمی‌کند) */
+  archiveOldLogs: (months?: number) => Promise<number>;
+  /** 🆕 بازگردانی یک لاگ از آرشیو سرد به hot */
+  restoreArchived: (id: string) => Promise<boolean>;
+  /** 🆕 تعداد رکوردهای آرشیو */
+  countArchivedLogs: () => Promise<number>;
 }
+
+// ═══ ۴-ب — آینه‌سازی IDB (منبع حقیقت) ═══
+// RAM کش خواندن است؛ IDB مرجع. هر نوشتن در RAM، رکورد را در IDB هم می‌نویسد.
+const _idb = () => import('../../cor/storage/idbStorage');
+
+const syncOne = (log: DailyLog | undefined) => {
+  if (!log) return;
+  _idb().then(m => m.idbPutRecord('pm-dlg', log)).catch(() => {});
+};
+
+const syncRemove = (id: string) => {
+  _idb().then(m => m.idbDeleteRecord('pm-dlg', id)).catch(() => {});
+};
 
 export const useDlg = create<State>()(
   persist(
@@ -211,11 +230,14 @@ export const useDlg = create<State>()(
         set({ logs: [...get().logs, newLog] });
         return newLog.id;
       },
-      update: (id, patch) => set({
+      update: (id, patch) => {
+      set({
         logs: get().logs.map(x => x.id === id
           ? { ...x, ...patch, updatedAt: new Date().toISOString() }
           : x)
-      }),
+      });
+      syncOne(get().logs.find(x => x.id === id));
+    },
       addCorrection: (logId, changes, reason, notes) => {
         const target = get().logs.find(x => x.id === logId);
         if (!target) return null;
@@ -239,6 +261,7 @@ export const useDlg = create<State>()(
               }
             : x)
         });
+        syncOne(get().logs.find(x => x.id === logId));
         return correction.id;
       },
       revokeCorrection: (logId, correctionId) => {
@@ -258,6 +281,7 @@ export const useDlg = create<State>()(
               }
             : x)
         });
+        syncOne(get().logs.find(x => x.id === logId));
         return true;
       },
       addEvent: (logId, ev) => {
@@ -267,6 +291,7 @@ export const useDlg = create<State>()(
             ? { ...x, events: [...(x.events || []), event], updatedAt: new Date().toISOString() }
             : x)
         });
+        syncOne(get().logs.find(x => x.id === logId));
         return event.id;
       },
       revokeEvent: (logId, eventId) => {
@@ -286,19 +311,54 @@ export const useDlg = create<State>()(
               }
             : x)
         });
+        syncOne(get().logs.find(x => x.id === logId));
         return true;
       },
-      remove: (id) => set({ logs: get().logs.filter(x => x.id !== id) }),
-      archive: (id) => set({
-        logs: get().logs.map(x => x.id === id
-          ? { ...x, status: 'archived' as LogStatus, updatedAt: new Date().toISOString() }
-          : x)
-      }),
-      restore: (id) => set({
-        logs: get().logs.map(x => x.id === id
-          ? { ...x, status: 'active' as LogStatus, updatedAt: new Date().toISOString() }
-          : x)
-      })
+      remove: (id) => {
+        set({ logs: get().logs.filter(x => x.id !== id) });
+        syncRemove(id);
+      },
+      archive: (id) => {
+        set({
+          logs: get().logs.map(x => x.id === id
+            ? { ...x, status: 'archived' as LogStatus, updatedAt: new Date().toISOString() }
+            : x)
+        });
+        syncOne(get().logs.find(x => x.id === id));
+      },
+      restore: (id) => {
+        set({
+          logs: get().logs.map(x => x.id === id
+            ? { ...x, status: 'active' as LogStatus, updatedAt: new Date().toISOString() }
+            : x)
+        });
+        syncOne(get().logs.find(x => x.id === id));
+      },
+
+      // ═══ لایه ۳ — آرشیو سرد ═══
+      archiveOldLogs: async (months) => {
+        const mod = await import('../../cor/storage/historyArchive');
+        const hot = get().logs;
+        const res = await mod.archiveLogs(hot, { months });
+        if (res.archivedCount === 0) return 0;
+        const moved = new Set(res.archivedIds);
+        set({ logs: hot.filter(l => !moved.has(l.id)) });
+        for (const id of res.archivedIds) syncRemove(id);
+        return res.archivedCount;
+      },
+      restoreArchived: async (id) => {
+        const mod = await import('../../cor/storage/historyArchive');
+        const log = await mod.restoreFromArchive(id);
+        if (!log) return false;
+        set({ logs: [...get().logs, log] });
+        syncOne(log);
+        return true;
+      },
+      countArchivedLogs: async () => {
+        const mod = await import('../../cor/storage/historyArchive');
+        return mod.countArchived();
+      },
+
     }),
     {
       name: 'pm-dlg',
@@ -314,7 +374,20 @@ export const useDlg = create<State>()(
           if (error) {
             console.error('[dlg] Hydration failed:', error);
           }
-          useDlg.setState({ isLoading: false });
+          // ═══ ۴-ب — IDB رکورد-محور = منبع حقیقت ═══
+          // اگر IDB داده دارد، آرایه RAM از آن پر می‌شود (نه از snapshot قدیمی key-value).
+          _idb()
+            .then(async m => {
+              const rows = await m.idbGetAllRecords<DailyLog>('pm-dlg');
+              if (rows.length > 0) {
+                useDlg.setState({ logs: rows });
+              } else if (state?.logs?.length) {
+                // اولین بار پس از ارتقا: snapshot موجود را به IDB منتقل کن
+                await Promise.all(state.logs.map(l => m.idbPutRecord('pm-dlg', l)));
+              }
+            })
+            .catch(e => console.error('[dlg] IDB load failed:', e))
+            .finally(() => useDlg.setState({ isLoading: false }));
         };
       },
       version: 16,

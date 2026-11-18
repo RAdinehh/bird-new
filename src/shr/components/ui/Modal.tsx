@@ -14,6 +14,10 @@ interface ModalProps {
   headerAction?: React.ReactNode;
   /** اگه true، وسط صفحه باز می‌شه (نه از پایین) */
   center?: boolean;
+  /** لایهٔ سفارشی (برای باز شدن روی Sheet) */
+  z?: number;
+  /** تمام‌عرض (بدون محدودیت maxWidth) */
+  fullWidth?: boolean;
 }
 const MODAL_SIZES: Record<'sm' | 'md' | 'lg', number> = {
   sm: 320,
@@ -24,6 +28,8 @@ export function Modal({
   open, onClose, title, children, footer,
   size = 'md', preventClose = false, contentGap, headerAction,
   center = false,
+  z,
+  fullWidth = false,
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
@@ -219,7 +225,7 @@ export function Modal({
 
   if (!open) return null;
 
-  const maxWidth = MODAL_SIZES[size] || MODAL_SIZES.md;
+  const maxWidth = fullWidth ? '100%' : (MODAL_SIZES[size] || MODAL_SIZES.md);
   const isFull = snap === 'full';
 
   return createPortal(
@@ -232,7 +238,7 @@ export function Modal({
         position: 'fixed',
         inset: 0,
         background: 'var(--overlay)',
-        zIndex: 100 + zDepth * 100,
+        zIndex: z ?? (100 + zDepth * 100),
         display: 'flex',
         alignItems: center ? 'center' : 'flex-end',
         justifyContent: 'center',

@@ -24,9 +24,8 @@ export interface CalEvent {
 }
 
 /** تاریخ امروز شمسی */
-export function todayJalali(): string {
-  return format(new Date(), 'yyyy/MM/dd');
-}
+import { todayJalali as _tj } from '../../shr/date/jalali';
+export const todayJalali = _tj;
 
 /** تبدیل شمسی به Date */
 export function jalaliToDate(s: string): Date | null {

@@ -374,7 +374,11 @@ export function computeCashDiscount(inv: Invoice): number {
 
 
 /** تاریخ امروز شمسی (YYYY/MM/DD) */
-export function getTodayJalali(): string {
+import { todayJalali as _todayJ } from '../../shr/date/jalali';
+const getTodayJalali = _todayJ;
+export { getTodayJalali };
+
+function _unusedGetTodayJalali(): string {
   try {
     const d = new Date();
     const fmt = new Intl.DateTimeFormat('en-u-ca-persian-nu-latn', {

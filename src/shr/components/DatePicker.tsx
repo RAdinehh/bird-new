@@ -166,7 +166,9 @@ export default function DatePicker({
         open={open}
         onClose={() => setOpen(false)}
         title="انتخاب تاریخ"
-        size="sm"
+        size="md"
+        fullWidth
+        z={10050}
         footer={
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             <Btn
@@ -221,7 +223,7 @@ export default function DatePicker({
         </div>
 
         {/* ═══ روزهای هفته ═══ */}
-        <div role="row" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, marginTop: 4 }}>
+        <div role="row" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, marginTop: 2 }}>
           {WEEKDAYS.map((w, i) => (
             <div key={i} role="columnheader" style={{ textAlign: 'center', fontSize: 10, color: i === 6 ? 'var(--danger)' : 'var(--dim)', padding: '2px 0', fontWeight: 700 }}>
               {w}
@@ -253,7 +255,7 @@ export default function DatePicker({
                 aria-selected={isSelected}
                 aria-current={isToday ? 'date' : undefined}
                 style={{
-                  height: 42,
+                  height: 34,
                   padding: 0,
                   background: isSelected ? 'var(--accent)' : 'transparent',
                   border: isToday && !isSelected ? '1.5px solid var(--accent)' : '1px solid transparent',
@@ -261,7 +263,7 @@ export default function DatePicker({
                   cursor: isDisabled ? 'not-allowed' : 'pointer',
                   color: isDisabled ? 'var(--dim)' : isSelected ? 'var(--avatar-text)' : isFriday ? 'var(--danger)' : 'var(--text)',
                   fontFamily: 'inherit',
-                  fontSize: 'var(--fs-base)',
+                  fontSize: 'var(--fs-sm)',
                   fontWeight: isSelected || isToday ? 700 : 500,
                   opacity: isDisabled ? 0.35 : 1,
                   transition: noAnim ? 'none' : 'background var(--dur-fast)',
