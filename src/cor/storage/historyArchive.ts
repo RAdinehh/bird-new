@@ -13,19 +13,43 @@ import type { DailyLog } from '../../mod/dlg/store';
 import { jalaliToDate } from '../../mod/flk/helpers-store';
 
 const DB_NAME = 'pm-archive';
-const DB_VERSION = 1;
-const STORE_LOGS = 'logs';
+const DB_VERSION = 2;
+export const DEFAULT_STORE = 'dlg_logs';
+export const ARCHIVE_STORES = {
+  dlg: 'dlg_logs',
+  tra: 'tra_invoices',
+  flk: 'flk_closed',
+  whs: 'whs_moves',
+} as const;
+export type ArchiveStoreName = typeof ARCHIVE_STORES[keyof typeof ARCHIVE_STORES];
+
+const STORE_SUMMARIES = 'summaries';
+const ALL_STORES = Object.values(ARCHIVE_STORES);
 
 /** پیش‌فرض آستانه — قابل تغییر از طریق opts.months (بعد از اندازه‌گیری لایه ۰) */
 export const ARCHIVE_AFTER_MONTHS = 6;
 
+/**
+ * آستانهٔ دوگانه — مبنا: اندازه‌گیری لایه ۰ (StorageBenchTab)
+ *   0.125 ms/لاگ → ۱۰۰ms ≈ ۸۰۰ لاگ؛ ۶ ماه ≈ ۱۸۳ لاگ ≈ ۲۳ms
+ * الگو: Elastic ILM / S3 Lifecycle / Azure Blob → هرکدام اول رسید (OR)
+ * trimTo: هیسترزیس — بعد از آرشیو تا ۶۰۰ پایین بیا تا هر روز آرشیو نشود
+ */
+export const ARCHIVE_POLICY = {
+  maxAgeMonths: 6,
+  maxHotLogs: 800,
+  trimTo: 600,
+} as const;
+
 /** یک رکورد آرشیو = لاگ اصلی + متادیتای جابه‌جایی (برای ممیزی ALCOA+) */
+export type ArchiveReason = 'age' | 'flock-closed' | 'count-threshold' | 'ancient';
+
 export interface ArchiveRecord {
   id: string;
   flockId: string;
   date: string;
   archivedAt: number;
-  reason: 'age';
+  reason: ArchiveReason;
   log: DailyLog;
 }
 
@@ -39,6 +63,7 @@ export interface ArchiveOptions {
   now?: Date;
   months?: number;
   dryRun?: boolean;
+  reason?: ArchiveReason;
 }
 
 export interface ArchiveResult {
@@ -60,11 +85,16 @@ function getDB(): Promise<IDBPDatabase> {
   if (!dbPromise) {
     dbPromise = openDB(DB_NAME, DB_VERSION, {
       upgrade(db) {
-        if (!db.objectStoreNames.contains(STORE_LOGS)) {
-          const store = db.createObjectStore(STORE_LOGS, { keyPath: 'id' });
-          store.createIndex('flockId', 'flockId');
-          store.createIndex('date', 'date');
-          store.createIndex('archivedAt', 'archivedAt');
+        for (const name of ALL_STORES) {
+          if (!db.objectStoreNames.contains(name)) {
+            const store = db.createObjectStore(name, { keyPath: 'id' });
+            store.createIndex('flockId', 'flockId');
+            store.createIndex('date', 'date');
+            store.createIndex('archivedAt', 'archivedAt');
+          }
+        }
+        if (!db.objectStoreNames.contains(STORE_SUMMARIES)) {
+          db.createObjectStore(STORE_SUMMARIES, { keyPath: 'flockId' });
         }
       },
     });
@@ -106,6 +136,11 @@ export function splitForArchive(logs: DailyLog[], cutoff: Date): SplitResult {
       skipped.push(log);
       continue;
     }
+    // ممیزی (ALCOA+ / 21 CFR Part 11): لاگ دارای اصلاحات یا تلفات هرگز آرشیو نمی‌شود
+    const audit = ((log as any).corrections?.length ?? 0) > 0
+               || ((log as any).deaths?.length ?? 0) > 0;
+    if (audit) { keep.push(log); continue; }
+
     if (d.getTime() < cutoff.getTime()) toArchive.push(log);
     else keep.push(log);
   }
@@ -119,10 +154,11 @@ export function splitForArchive(logs: DailyLog[], cutoff: Date): SplitResult {
  */
 export async function archiveLogs(
   logs: DailyLog[],
-  opts: ArchiveOptions = {}
+  opts: ArchiveOptions = {},
+  storeName: string = DEFAULT_STORE
 ): Promise<ArchiveResult> {
   const now = opts.now ?? new Date();
-  const months = opts.months ?? ARCHIVE_AFTER_MONTHS;
+  const months = opts.months ?? ARCHIVE_POLICY.maxAgeMonths;
   const cutoff = monthsAgo(now, months);
   const { toArchive, keep, skipped } = splitForArchive(logs, cutoff);
 
@@ -141,8 +177,8 @@ export async function archiveLogs(
 
   const archivedAt = now.getTime();
   const db = await getDB();
-  const tx = db.transaction(STORE_LOGS, 'readwrite');
-  const store = tx.objectStore(STORE_LOGS);
+  const tx = db.transaction(storeName, 'readwrite');
+  const store = tx.objectStore(storeName);
 
   for (const log of toArchive) {
     const record: ArchiveRecord = {
@@ -150,7 +186,7 @@ export async function archiveLogs(
       flockId: log.flockId,
       date: log.date,
       archivedAt,
-      reason: 'age',
+      reason: opts.reason ?? 'age',
       log,
     };
     await store.put(record);
@@ -163,10 +199,10 @@ export async function archiveLogs(
 }
 
 /** خواندن یک رکورد آرشیو با شناسه. */
-export async function getArchived(id: string): Promise<ArchiveRecord | null> {
+export async function getArchived(id: string, storeName: string = DEFAULT_STORE): Promise<ArchiveRecord | null> {
   if (!id) return null;
   const db = await getDB();
-  const rec = await db.get(STORE_LOGS, id);
+  const rec = await db.get(storeName, id);
   return rec || null;
 }
 
@@ -182,13 +218,13 @@ export interface ListOptions {
  * فهرست رکوردهای آرشیو، مرتب نزولی بر اساس تاریخ.
  * فیلتر بازه روی رشتهٔ شمسی انجام می‌شود (مقایسهٔ لغوی معتبر است چون yyyy/MM/dd).
  */
-export async function listArchived(opts: ListOptions = {}): Promise<ArchiveRecord[]> {
+export async function listArchived(opts: ListOptions = {}, storeName: string = DEFAULT_STORE): Promise<ArchiveRecord[]> {
   const db = await getDB();
   let rows: ArchiveRecord[];
   if (opts.flockId) {
-    rows = (await db.getAllFromIndex(STORE_LOGS, 'flockId', opts.flockId)) as ArchiveRecord[];
+    rows = (await db.getAllFromIndex(storeName, 'flockId', opts.flockId)) as ArchiveRecord[];
   } else {
-    rows = (await db.getAll(STORE_LOGS)) as ArchiveRecord[];
+    rows = (await db.getAll(storeName)) as ArchiveRecord[];
   }
 
   if (opts.fromDate) rows = rows.filter(r => r.date >= opts.fromDate!);
@@ -202,12 +238,12 @@ export async function listArchived(opts: ListOptions = {}): Promise<ArchiveRecor
 }
 
 /** آمار آرشیو: تعداد و قدیمی‌ترین/جدیدترین تاریخ. */
-export async function getArchiveStats(): Promise<ArchiveStats> {
+export async function getArchiveStats(storeName: string = DEFAULT_STORE): Promise<ArchiveStats> {
   const db = await getDB();
-  const count = await db.count(STORE_LOGS);
+  const count = await db.count(storeName);
   if (count === 0) return { count: 0, oldestDate: null, newestDate: null };
 
-  const keys = (await db.getAllKeysFromIndex(STORE_LOGS, 'date')) as string[];
+  const keys = (await db.getAllKeysFromIndex(storeName, 'date')) as string[];
   const sorted = keys.slice().sort();
   return {
     count,
@@ -220,8 +256,8 @@ export async function getArchiveStats(): Promise<ArchiveStats> {
  * بازگردانی یک رکورد از آرشیو — فقط خواندن و برگرداندن، بدون حذف.
  * حذف از آرشیو تصمیم جداگانه است (هرگز خودکار).
  */
-export async function restoreFromArchive(id: string): Promise<DailyLog | null> {
-  const rec = await getArchived(id);
+export async function restoreFromArchive(id: string, storeName: string = DEFAULT_STORE): Promise<DailyLog | null> {
+  const rec = await getArchived(id, storeName);
   return rec ? rec.log : null;
 }
 
@@ -229,22 +265,51 @@ export async function restoreFromArchive(id: string): Promise<DailyLog | null> {
  * حذف دائمی از آرشیو — فقط برای سیاست نگهداشت قانونی.
  * پیش‌فرض: هیچ‌وقت صدا زده نمی‌شود. اگر صدا زده شد، صریح و آگاهانه است.
  */
-export async function purgeArchive(beforeDate: string): Promise<number> {
+export async function purgeArchive(beforeDate: string, storeName: string = DEFAULT_STORE): Promise<number> {
   if (!beforeDate) return 0;
   const db = await getDB();
-  const all = (await db.getAll(STORE_LOGS)) as ArchiveRecord[];
+  const all = (await db.getAll(storeName)) as ArchiveRecord[];
   const victims = all.filter(r => r.date < beforeDate);
   if (victims.length === 0) return 0;
 
-  const tx = db.transaction(STORE_LOGS, 'readwrite');
-  const store = tx.objectStore(STORE_LOGS);
+  const tx = db.transaction(storeName, 'readwrite');
+  const store = tx.objectStore(storeName);
   for (const r of victims) await store.delete(r.id);
   await tx.done;
   return victims.length;
 }
 
 /** تعداد رکوردهای آرشیو — برای معیار پذیرش (hot + archive = کل). */
-export async function countArchived(): Promise<number> {
+export async function countArchived(storeName: string = DEFAULT_STORE): Promise<number> {
   const db = await getDB();
-  return db.count(STORE_LOGS);
+  return db.count(storeName);
 }
+
+// ═══════════════════════════════════════════════════════════════
+// لایه ۳ — آرشیو سه‌سطحی (سطح ۱: گله بسته)
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * سطح ۱ — آرشیو فوری گله بسته.
+ * تمام لاگ‌های گله‌ای که به status=archived/sold رفته را آرشیو می‌کند.
+ * (بدون توجه به تاریخ — چون گله بسته شده)
+ */
+export async function archiveClosedFlock(logs: DailyLog[], storeName: string = DEFAULT_STORE): Promise<ArchiveResult> {
+  return archiveLogs(logs, { months: 0, reason: 'flock-closed' }, storeName);
+}
+
+/**
+ * حذف چند شناسه از آرشیو — برای بازگردانی (انتقال، نه کپی).
+ * وقتی لاگ از آرشیو به hot برمی‌گردد، دیگر نباید در آرشیو بماند
+ * (تا در مقایسه‌ها دوبار شمرده نشود).
+ */
+export async function purgeArchiveIds(ids: string[], storeName: string = DEFAULT_STORE): Promise<number> {
+  if (ids.length === 0) return 0;
+  const db = await getDB();
+  const tx = db.transaction(storeName, 'readwrite');
+  const store = tx.objectStore(storeName);
+  for (const id of ids) await store.delete(id);
+  await tx.done;
+  return ids.length;
+}
+
