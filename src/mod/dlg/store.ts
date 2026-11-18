@@ -339,12 +339,37 @@ export const useDlg = create<State>()(
       archiveOldLogs: async (months) => {
         const mod = await import('../../cor/storage/historyArchive');
         const hot = get().logs;
-        const res = await mod.archiveLogs(hot, { months });
-        if (res.archivedCount === 0) return 0;
-        const moved = new Set(res.archivedIds);
-        set({ logs: hot.filter(l => !moved.has(l.id)) });
-        for (const id of res.archivedIds) syncRemove(id);
-        return res.archivedCount;
+        if (hot.length === 0) return 0;
+
+        // ── سطح ۲: آستانهٔ دوگانه (OR) — Elastic ILM / S3 Lifecycle / Azure Blob
+        // ۱) سنّی: قدیمی‌تر از maxAgeMonths
+        // ۲) شمارشی: بیش از maxHotLogs → تا trimTo پایین بیا (هیسترزیس)
+        const overCount = hot.length > mod.ARCHIVE_POLICY.maxHotLogs;
+        const effMonths = overCount ? 0 : (months ?? mod.ARCHIVE_POLICY.maxAgeMonths);
+
+        const res = await mod.archiveLogs(hot, {
+          months: effMonths,
+          reason: overCount ? 'count-threshold' : 'age',
+        });
+
+        const movedIds = new Set(res.archivedIds);
+        let next = hot.filter(l => !movedIds.has(l.id));
+
+        // هیسترزیس: اگر پس از برش هنوز بالای trimTo است، قدیمی‌ترین‌ها را هم بفرست
+        if (next.length > mod.ARCHIVE_POLICY.trimTo) {
+          const sorted = [...next].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+          const extra = sorted.slice(0, next.length - mod.ARCHIVE_POLICY.trimTo);
+          const res2 = await mod.archiveLogs(extra, { months: 0, reason: 'count-threshold' });
+          const moved2 = new Set(res2.archivedIds);
+          next = next.filter(l => !moved2.has(l.id));
+          for (const id of res2.archivedIds) movedIds.add(id);
+        }
+
+        if (movedIds.size === 0) return 0;
+
+        set({ logs: next });
+        for (const id of movedIds) syncRemove(id);
+        return movedIds.size;
       },
       restoreArchived: async (id) => {
         const mod = await import('../../cor/storage/historyArchive');
