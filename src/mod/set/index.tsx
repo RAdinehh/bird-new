@@ -17,6 +17,7 @@ import AboutTab from './AboutTab';
 import LogsTab from './LogsTab';
 import StorageDebugTab from './StorageDebugTab';
 import StorageBenchTab from './StorageBenchTab';
+import ArchiveSeedTab from './ArchiveSeedTab';
 import SettingsGroup from './SettingsGroup';
 
 type TabId =
@@ -97,6 +98,7 @@ const TAB_COMPONENTS: Record<TabId, TabComponent[]> = {
     { comp: BackupTab, icon: '💾', title: 'پشتیبان‌گیری',      subtitle: 'آمار، پشتیبان، بازیابی، امنیت', tone: 'accent' },
     { comp: LogsTab,   icon: '📋', title: 'لاگ عملیات',         subtitle: 'تاریخچه فعالیت‌ها و خطاها',      tone: 'info' },
     { comp: StorageDebugTab, icon: '🔍', title: 'دیباگ ذخیره‌سازی', subtitle: 'اندازه‌گیری حجم و تعداد لاگ‌ها (موقت)', tone: 'warn' },
+    { comp: ArchiveSeedTab, icon: '🧪', title: 'داده تستی آرشیو', subtitle: 'پر کردن آرشیو با لاگ مصنوعی (موقت)', tone: 'warn' },
     { comp: StorageBenchTab, icon: '⏱', title: 'بنچمارک ذخیره‌سازی', subtitle: 'زمان serialize و نوشتن با لاگ‌های واقعی (موقت)', tone: 'warn' },
     { comp: AboutTab,  icon: 'ℹ️', title: 'درباره',            subtitle: 'اطلاعات برنامه، راهنما، تماس',   tone: 'purple' },
   ],

@@ -8,9 +8,13 @@ import { toFa } from '../../shr/utils/fa';
 import { toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { useFilterSort, FilterBar, getArcArchiveConfig } from '../../shr/filter';
+import { useDlg, type DailyLog } from '../dlg/store';
+import { listArchived, ARCHIVE_STORES, type ArchiveRecord } from '../../cor/storage/historyArchive';
+import { TabButton } from '../../shr/components/ui';
+import { useEffect } from 'react';
 import { Row } from '../../shr/components/ui';
 
-type Kind = 'flocks';
+type Kind = 'flocks' | 'logs';
 
 export default function ArchivePage() {
   const { flocks, restore, remove } = useFlk();
@@ -19,6 +23,23 @@ export default function ArchivePage() {
 
   const [kind, setKind] = useState<Kind>('flocks');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // ── تب لاگ‌ها: بارگذاری از pm-archive
+  const { restoreArchived, restoreFlockLogs, logs: hotLogs } = useDlg();
+  const [arcLogs, setArcLogs] = useState<ArchiveRecord[]>([]);
+  const [arcLoading, setArcLoading] = useState(false);
+  const [arcTick, setArcTick] = useState(0);
+
+  useEffect(() => {
+    if (kind !== 'logs') return;
+    let alive = true;
+    setArcLoading(true);
+    listArchived({ limit: 500 }, ARCHIVE_STORES.dlg)
+      .then(rows => { if (alive) setArcLogs(rows); })
+      .catch(e => console.error('[ArchivePage] listArchived failed:', e))
+      .finally(() => { if (alive) setArcLoading(false); });
+    return () => { alive = false; };
+  }, [kind, arcTick]);
 
   // مرحله ۱: pre-filter آرشیو
   const archivedRaw = useMemo(
@@ -45,6 +66,19 @@ export default function ArchivePage() {
 
   return (
     <PageContainer>
+      <div style={{
+        display: 'flex', gap: 4, padding: 4,
+        background: 'var(--input-bg)', borderRadius: 'var(--r-md)',
+        border: '1px solid var(--border)',
+      }}>
+        <TabButton active={kind === 'flocks'} onClick={() => { setKind('flocks'); setExpandedId(null); }}>
+          🗄 گله‌ها
+        </TabButton>
+        <TabButton active={kind === 'logs'} onClick={() => { setKind('logs'); setExpandedId(null); }}>
+          📒 دفتر روزانه
+        </TabButton>
+      </div>
+
       {/* آمار کلی */}
       <div style={{
         padding: '14px 16px',
@@ -54,15 +88,17 @@ export default function ArchivePage() {
         display: 'flex', justifyContent: 'space-between', alignItems: 'center'
       }}>
         <div>
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>آیتم آرشیو‌شده</div>
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+            {kind === 'flocks' ? 'گلهٔ آرشیو‌شده' : 'لاگ آرشیو‌شده'}
+          </div>
           <div style={{ fontSize: 'var(--fs-2xl)', fontWeight: 700, color: 'var(--text)', marginTop: 4 }}>
-            {toFa(archivedFlocks.length)}
+            {kind === 'flocks' ? toFa(archivedFlocks.length) : toFa(arcLogs.length)}
           </div>
         </div>
         <div style={{ fontSize: 40 }}>🗄</div>
       </div>
 
-      <FilterBar
+      {kind === 'flocks' && <FilterBar
         filterDefs={config.filterDefs}
         sortDefs={config.sortDefs}
         filterState={filters}
@@ -75,9 +111,23 @@ export default function ArchivePage() {
         hasActiveFilters={hasActiveFilters}
         total={totalFiltered}
         count={count}
-      />
+      />}
 
-      {archivedFlocks.length === 0 ? (
+      {kind === 'logs' ? (
+        <LogsArchiveTab
+          rows={arcLogs}
+          loading={arcLoading}
+          hotLogs={hotLogs}
+          onRestoreOne={async (id) => {
+            await restoreArchived(id);
+            setArcTick(t => t + 1);
+          }}
+          onRestoreFlock={async (flockId) => {
+            await restoreFlockLogs(flockId);
+            setArcTick(t => t + 1);
+          }}
+        />
+      ) : archivedFlocks.length === 0 ? (
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>}
           title="آرشیو خالی است"
@@ -162,6 +212,123 @@ export default function ArchivePage() {
   );
 }
 
+
+// ═══ تب لاگ‌های آرشیو‌شده ═══
+const REASON_LABEL: Record<string, string> = {
+  age: 'قدیمی',
+  'flock-closed': 'بستن گله',
+  'count-threshold': 'حد تعداد',
+};
+
+function LogsArchiveTab({
+  rows, loading, hotLogs, onRestoreOne, onRestoreFlock,
+}: {
+  rows: ArchiveRecord[];
+  loading: boolean;
+  hotLogs: DailyLog[];
+  onRestoreOne: (id: string) => Promise<void>;
+  onRestoreFlock: (flockId: string) => Promise<void>;
+}) {
+  const { flocks } = useFlk();
+  const [busy, setBusy] = useState<string | null>(null);
+
+  // گروه‌بندی بر اساس گله
+  const groups = useMemo(() => {
+    const m = new Map<string, ArchiveRecord[]>();
+    for (const r of rows) {
+      const k = r.flockId || '—';
+      if (!m.has(k)) m.set(k, []);
+      m.get(k)!.push(r);
+    }
+    return Array.from(m.entries()).sort((a, b) => b[1].length - a[1].length);
+  }, [rows]);
+
+  if (loading) {
+    return <div style={{ padding: 24, textAlign: 'center', color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>در حال بارگذاری…</div>;
+  }
+
+  if (rows.length === 0) {
+    return (
+      <Empty
+        icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>}
+        title="آرشیو لاگ خالی است"
+        desc="لاگ‌های قدیمی یا گله‌های بسته‌شده این‌جا نگهداری می‌شوند."
+      />
+    );
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {groups.map(([flockId, items]) => {
+        const flock = flocks.find(f => f.id === flockId);
+        const hotCount = hotLogs.filter(l => l.flockId === flockId).length;
+        const dates = items.map(r => r.date).sort();
+        const isBusy = busy === flockId;
+
+        return (
+          <div key={flockId} style={{
+            background: 'var(--card)', border: '1px solid var(--border)',
+            borderRadius: 'var(--r-lg)', padding: '12px 14px',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: 'var(--text)' }}>
+                  {flock?.name || ('گلهٔ ' + flockId)}
+                </div>
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
+                  {toFa(items.length)} لاگ • {toFa(dates[0] || '—')} تا {toFa(dates[dates.length - 1] || '—')}
+                  {hotCount > 0 ? ' • ' + toFa(hotCount) + ' لاگ فعال' : ''}
+                </div>
+              </div>
+              <Btn
+                size="sm"
+                disabled={isBusy}
+                onClick={async () => {
+                  setBusy(flockId);
+                  try { await onRestoreFlock(flockId); }
+                  finally { setBusy(null); }
+                }}
+              >
+                {isBusy ? '…' : '🔄 بازگردانی همه'}
+              </Btn>
+            </div>
+
+            <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {items.slice(0, 5).map(r => (
+                <div key={r.id} style={{
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  fontSize: 'var(--fs-xs)', color: 'var(--muted)',
+                  padding: '4px 0', borderTop: '1px dashed var(--border)',
+                }}>
+                  <span>
+                    {toFa(r.date)}
+                    <span style={{ marginRight: 6 }}><Tag tone="gray">{REASON_LABEL[r.reason] || r.reason}</Tag></span>
+                  </span>
+                  <Btn
+                    size="sm"
+                    disabled={busy === r.id}
+                    onClick={async () => {
+                      setBusy(r.id);
+                      try { await onRestoreOne(r.id); }
+                      finally { setBusy(null); }
+                    }}
+                  >
+                    {busy === r.id ? '…' : 'بازگردانی'}
+                  </Btn>
+                </div>
+              ))}
+              {items.length > 5 ? (
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingTop: 4 }}>
+                  و {toFa(items.length - 5)} لاگ دیگر…
+                </div>
+              ) : null}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
