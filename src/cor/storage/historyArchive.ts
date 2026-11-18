@@ -303,6 +303,34 @@ export async function archiveClosedFlock(logs: DailyLog[], storeName: string = D
  * وقتی لاگ از آرشیو به hot برمی‌گردد، دیگر نباید در آرشیو بماند
  * (تا در مقایسه‌ها دوبار شمرده نشود).
  */
+/**
+ * بازگردانی اتمیک چند لاگ — خواندن + حذف از آرشیو در یک تراکنش.
+ * اگر خطایی رخ دهد، IDBTransaction.abort() همه را برمی‌گرداند (MDN):
+ * هیچ لاگی نیمه‌کاره نه از آرشیو حذف می‌شود نه گم می‌شود.
+ */
+export async function restoreManyFromArchive(
+  ids: string[],
+  storeName: string = DEFAULT_STORE
+): Promise<DailyLog[]> {
+  if (ids.length === 0) return [];
+  const db = await getDB();
+  const tx = db.transaction(storeName, 'readwrite');
+  const store = tx.objectStore(storeName);
+  const out: DailyLog[] = [];
+  try {
+    for (const id of ids) {
+      const rec = (await store.get(id)) as ArchiveRecord | undefined;
+      if (rec?.log) out.push(rec.log);
+    }
+    for (const id of ids) await store.delete(id);
+    await tx.done;
+    return out;
+  } catch (e) {
+    try { tx.abort(); } catch { /* already done */ }
+    throw e;
+  }
+}
+
 export async function purgeArchiveIds(ids: string[], storeName: string = DEFAULT_STORE): Promise<number> {
   if (ids.length === 0) return 0;
   const db = await getDB();

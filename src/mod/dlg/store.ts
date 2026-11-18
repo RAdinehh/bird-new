@@ -192,6 +192,10 @@ interface State {
   restoreArchived: (id: string) => Promise<boolean>;
   /** 🆕 تعداد رکوردهای آرشیو */
   countArchivedLogs: () => Promise<number>;
+  /** 🆕 سطح ۱ — آرشیو فوری همهٔ لاگ‌های یک گلهٔ بسته‌شده */
+  archiveFlockLogs: (flockId: string) => Promise<number>;
+  /** 🆕 بازگردانی آبشاری — لاگ‌های گله در یک تراکنش برمی‌گردند */
+  restoreFlockLogs: (flockId: string) => Promise<number>;
 }
 
 // ═══ ۴-ب — آینه‌سازی IDB (منبع حقیقت) ═══
@@ -370,6 +374,38 @@ export const useDlg = create<State>()(
         set({ logs: next });
         for (const id of movedIds) syncRemove(id);
         return movedIds.size;
+      },
+      archiveFlockLogs: async (flockId) => {
+        const mod = await import('../../cor/storage/historyArchive');
+        const hot = get().logs.filter(l => l.flockId === flockId);
+        if (hot.length === 0) return 0;
+        const res = await mod.archiveLogs(
+          hot,
+          { months: 0, reason: 'flock-closed' },
+          mod.ARCHIVE_STORES.dlg,
+        );
+        if (res.archivedCount === 0) return 0;
+        const moved = new Set(res.archivedIds);
+        set({ logs: get().logs.filter(l => !moved.has(l.id)) });
+        for (const id of res.archivedIds) syncRemove(id);
+        return res.archivedCount;
+      },
+      restoreFlockLogs: async (flockId) => {
+        const mod = await import('../../cor/storage/historyArchive');
+        const rows = await mod.listArchived(
+          { flockId, limit: 100000 },
+          mod.ARCHIVE_STORES.dlg,
+        );
+        if (rows.length === 0) return 0;
+        // اتمیک: خواندن + حذف از آرشیو در یک تراکنش
+        const restored = await mod.restoreManyFromArchive(
+          rows.map(r => r.id),
+          mod.ARCHIVE_STORES.dlg,
+        );
+        if (restored.length === 0) return 0;
+        set({ logs: [...get().logs, ...restored] });
+        for (const l of restored) syncOne(l);
+        return restored.length;
       },
       restoreArchived: async (id) => {
         const mod = await import('../../cor/storage/historyArchive');

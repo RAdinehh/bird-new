@@ -138,8 +138,8 @@ export interface State {
   add: (f: Omit<Flock, 'id'|'createdAt'|'updatedAt'>) => string;
   update: (id: string, patch: Partial<Flock>) => void;
   remove: (id: string) => void;
-  archive: (id: string, reason?: string) => void;
-  restore: (id: string) => void;
+  archive: (id: string, reason?: string) => Promise<number>;
+  restore: (id: string) => Promise<number>;
   toggleHidden: (id: string) => void;
   togglePaused: (id: string) => void;
 
@@ -209,8 +209,16 @@ export const useFlk = create<State>()(
         // 🆕 حذف مستقیم — تأیید و هشدار لینک‌ها در UI گرفته می‌شه
         set({ flocks: get().flocks.filter(x => x.id !== id) });
       },
-      archive: (id, reason) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'archived', endDate: x.endDate || now(), archivedReason: reason || '', updatedAt: now()} : x) }),
-      restore: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'active', endDate: '', archivedReason: '', updatedAt: now()} : x) }),
+      archive: async (id, reason) => {
+        set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'archived', endDate: x.endDate || now(), archivedReason: reason || '', updatedAt: now()} : x) });
+        const { useDlg } = await import('../dlg/store');
+        return useDlg.getState().archiveFlockLogs(id);
+      },
+      restore: async (id) => {
+        set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'active', endDate: '', archivedReason: '', updatedAt: now()} : x) });
+        const { useDlg } = await import('../dlg/store');
+        return useDlg.getState().restoreFlockLogs(id);
+      },
       toggleHidden: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, hidden: !x.hidden, updatedAt: now()} : x) }),
       togglePaused: (id) => set({ flocks: get().flocks.map(x => x.id === id ? {...x, paused: !x.paused, updatedAt: now()} : x) }),
 
