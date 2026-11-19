@@ -1,34 +1,46 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useFlk, getAgeDays, calcCosts, formatAge, SOURCE_LABEL, type Flock } from '../flk/store';
 import { useBrd } from '../brd/store';
 import { useHal } from '../hal/store';
-import { Btn, Empty, PageContainer, Tag } from '../../shr/components/ui';
+import { Btn, Empty, PageContainer, Tag, Row, TabButton } from '../../shr/components/ui';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa } from '../../shr/utils/fa';
 import { toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { useFilterSort, FilterBar, getArcArchiveConfig } from '../../shr/filter';
 import { useDlg, type DailyLog } from '../dlg/store';
+import { useWhs } from '../whs/store';
+import { restoreTraInvoices } from '../tra/store';
+import { restoreIncBatches } from '../inc/store';
 import { listArchived, ARCHIVE_STORES, type ArchiveRecord } from '../../cor/storage/historyArchive';
-import { TabButton } from '../../shr/components/ui';
-import { useEffect } from 'react';
-import { Row } from '../../shr/components/ui';
 
-type Kind = 'flocks' | 'logs';
+type Kind = 'flocks' | 'logs' | 'stores';
+
+interface StoreArchiveEntry {
+  storeKey: 'tra' | 'whs' | 'inc';
+  storeLabel: string;
+  record: ArchiveRecord;
+}
 
 export default function ArchivePage() {
   const { flocks, restore, remove } = useFlk();
   const { birds, breeds } = useBrd();
   const { halls } = useHal();
+  const { restoreMovements } = useWhs();
 
   const [kind, setKind] = useState<Kind>('flocks');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [arcTick, setArcTick] = useState(0);
 
   // ── تب دفتر روزانه: بارگذاری از pm-archive
   const { restoreArchived, restoreFlockLogs, logs: hotLogs } = useDlg();
   const [arcLogs, setArcLogs] = useState<ArchiveRecord[]>([]);
   const [arcLoading, setArcLoading] = useState(false);
-  const [arcTick, setArcTick] = useState(0);
+
+  // ── تب سایر مخازن: tra_invoices / whs_moves / inc_batches
+  const [storeEntries, setStoreEntries] = useState<StoreArchiveEntry[]>([]);
+  const [storesLoading, setStoresLoading] = useState(false);
+  const [restoringId, setRestoringId] = useState<string | null>(null);
 
   useEffect(() => {
     if (kind !== 'logs') return;
@@ -38,6 +50,33 @@ export default function ArchivePage() {
       .then(rows => { if (alive) setArcLogs(rows); })
       .catch(e => console.error('[ArchivePage] listArchived failed:', e))
       .finally(() => { if (alive) setArcLoading(false); });
+    return () => { alive = false; };
+  }, [kind, arcTick]);
+
+  useEffect(() => {
+    if (kind !== 'stores') return;
+    let alive = true;
+    setStoresLoading(true);
+    Promise.all([
+      listArchived(undefined, ARCHIVE_STORES.tra).then(rows =>
+        rows.map(record => ({ storeKey: 'tra' as const, storeLabel: 'معاملات', record }))
+      ),
+      listArchived(undefined, ARCHIVE_STORES.whs).then(rows =>
+        rows.map(record => ({ storeKey: 'whs' as const, storeLabel: 'انبار', record }))
+      ),
+      listArchived(undefined, ARCHIVE_STORES.inc).then(rows =>
+        rows.map(record => ({ storeKey: 'inc' as const, storeLabel: 'جوجه‌کشی', record }))
+      ),
+    ])
+      .then(([traRows, whsRows, incRows]) => {
+        if (!alive) return;
+        const combined = [...traRows, ...whsRows, ...incRows].sort(
+          (a, b) => (b.record.archivedAt || 0) - (a.record.archivedAt || 0)
+        );
+        setStoreEntries(combined);
+      })
+      .catch(e => console.error('[ArchivePage] store archives load failed:', e))
+      .finally(() => { if (alive) setStoresLoading(false); });
     return () => { alive = false; };
   }, [kind, arcTick]);
 
@@ -64,6 +103,40 @@ export default function ArchivePage() {
     initialSort: config.initialSort,
   });
 
+  const handleRestoreStoreEntry = async (entry: StoreArchiveEntry) => {
+    setRestoringId(entry.record.id);
+    try {
+      let countRestored = 0;
+      if (entry.storeKey === 'tra') {
+        countRestored = await restoreTraInvoices([entry.record.id]);
+      } else if (entry.storeKey === 'whs') {
+        countRestored = await restoreMovements([entry.record.id]);
+      } else if (entry.storeKey === 'inc') {
+        countRestored = await restoreIncBatches([entry.record.id]);
+      }
+      if (countRestored > 0) {
+        toastMsg.saved(`آیتم «${entry.storeLabel}» بازیابی شد`);
+        setArcTick(t => t + 1);
+      }
+    } finally {
+      setRestoringId(null);
+    }
+  };
+
+  const statLabel =
+    kind === 'flocks'
+      ? 'گلهٔ آرشیو‌شده'
+      : kind === 'logs'
+      ? 'ثبت آرشیو‌شده'
+      : 'رکورد سایر مخازن';
+
+  const statValue =
+    kind === 'flocks'
+      ? archivedFlocks.length
+      : kind === 'logs'
+      ? arcLogs.length
+      : storeEntries.length;
+
   return (
     <PageContainer>
       <div style={{
@@ -77,6 +150,9 @@ export default function ArchivePage() {
         <TabButton active={kind === 'logs'} onClick={() => { setKind('logs'); setExpandedId(null); }}>
           📒 دفتر روزانه
         </TabButton>
+        <TabButton active={kind === 'stores'} onClick={() => { setKind('stores'); setExpandedId(null); }}>
+          📦 سایر مخازن
+        </TabButton>
       </div>
 
       {/* آمار کلی */}
@@ -89,10 +165,10 @@ export default function ArchivePage() {
       }}>
         <div>
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-            {kind === 'flocks' ? 'گلهٔ آرشیو‌شده' : 'ثبت آرشیو‌شده'}
+            {statLabel}
           </div>
           <div style={{ fontSize: 'var(--fs-2xl)', fontWeight: 700, color: 'var(--text)', marginTop: 4 }}>
-            {kind === 'flocks' ? toFa(archivedFlocks.length) : toFa(arcLogs.length)}
+            {toFa(statValue)}
           </div>
         </div>
         <div style={{ fontSize: 40 }}>🗄</div>
@@ -127,6 +203,55 @@ export default function ArchivePage() {
             setArcTick(t => t + 1);
           }}
         />
+      ) : kind === 'stores' ? (
+        storesLoading ? (
+          <div style={{ padding: 24, textAlign: 'center', color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>در حال بارگذاری…</div>
+        ) : storeEntries.length === 0 ? (
+          <Empty
+            icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>}
+            title="مخزن سرد دیگری خالی است"
+            desc="رکوردهای آرشیو‌شدهٔ معاملات، انبار و جوجه‌کشی این‌جا نمایش داده می‌شوند."
+          />
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {storeEntries.map(({ storeKey, storeLabel, record }) => {
+              const isBusy = restoringId === record.id;
+              return (
+                <div
+                  key={`${storeKey}-${record.id}`}
+                  style={{
+                    background: 'var(--card)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--r-lg)',
+                    padding: '12px 14px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}
+                >
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <Tag tone="gray">{storeLabel}</Tag>
+                      <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>
+                        {toFa(record.id)}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 4 }}>
+                      مرجع: {toFa(record.flockId || '—')} • تاریخ: {toFa(record.date || '—')}
+                    </div>
+                  </div>
+                  <Btn
+                    disabled={isBusy}
+                    onClick={() => handleRestoreStoreEntry({ storeKey, storeLabel, record })}
+                  >
+                    {isBusy ? '…' : 'بازگردانی'}
+                  </Btn>
+                </div>
+              );
+            })}
+          </div>
+        )
       ) : archivedFlocks.length === 0 ? (
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>}
@@ -210,7 +335,6 @@ export default function ArchivePage() {
     </PageContainer>
   );
 }
-
 
 // ═══ تب دفتر روزانهٔ آرشیو‌شده ═══
 const REASON_LABEL: Record<string, string> = {

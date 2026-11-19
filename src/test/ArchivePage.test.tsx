@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+import { fireEvent } from '@testing-library/react';
 import { renderWithRouter } from './helpers';
 import ArchivePage from '../mod/arc/ArchivePage';
 
@@ -21,8 +22,11 @@ vi.mock('../cor/store/toast', () => ({
 vi.mock('../cor/logger/auditLog', () => ({ logAction: vi.fn() }));
 
 describe('ArchivePage', () => {
-  it('رندر بدون خطا', () => {
-    const { container } = renderWithRouter(<ArchivePage />);
+  it('رندر بدون خطا و نمایش تب سایر مخازن', () => {
+    const { container, getByText } = renderWithRouter(<ArchivePage />);
     expect(container).toBeTruthy();
+    const storesTab = getByText(/سایر مخازن/);
+    fireEvent.click(storesTab);
+    expect(getByText(/رکورد سایر مخازن/)).toBeTruthy();
   });
 });
