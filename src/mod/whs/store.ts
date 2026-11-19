@@ -359,12 +359,11 @@ export const useWhs = create<State>()(
         const toArc = state.movements.filter(m => idSet.has(m.id));
         if (!toArc.length) return 0;
 
-        const { ARCHIVE_STORES } = await import('../../cor/storage/historyArchive');
-        const { idbPutRecord } = await import('../../cor/storage/idbStorage');
+        const { ARCHIVE_STORES, putArchiveRecord } = await import('../../cor/storage/historyArchive');
         const { applyMovementCheckpoint } = await import('./archivePolicy');
 
         for (const mv of toArc) {
-          await idbPutRecord(ARCHIVE_STORES.whs, {
+          await putArchiveRecord({
             id: mv.id,
             flockId: mv.flockId || mv.itemId,
             date: mv.date || mv.createdAt,

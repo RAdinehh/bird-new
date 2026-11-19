@@ -17,7 +17,7 @@ import { listArchived, ARCHIVE_STORES, type ArchiveRecord } from '../../cor/stor
 type Kind = 'flocks' | 'logs' | 'stores';
 
 interface StoreArchiveEntry {
-  storeKey: 'tra' | 'whs' | 'inc';
+  storeKey: 'flk' | 'tra' | 'whs' | 'inc';
   storeLabel: string;
   record: ArchiveRecord;
 }
@@ -58,6 +58,9 @@ export default function ArchivePage() {
     let alive = true;
     setStoresLoading(true);
     Promise.all([
+      listArchived(undefined, ARCHIVE_STORES.flk).then(rows =>
+        rows.map(record => ({ storeKey: 'flk' as const, storeLabel: 'گله‌های بسته', record }))
+      ),
       listArchived(undefined, ARCHIVE_STORES.tra).then(rows =>
         rows.map(record => ({ storeKey: 'tra' as const, storeLabel: 'معاملات', record }))
       ),
@@ -68,9 +71,9 @@ export default function ArchivePage() {
         rows.map(record => ({ storeKey: 'inc' as const, storeLabel: 'جوجه‌کشی', record }))
       ),
     ])
-      .then(([traRows, whsRows, incRows]) => {
+      .then(([flkRows, traRows, whsRows, incRows]) => {
         if (!alive) return;
-        const combined = [...traRows, ...whsRows, ...incRows].sort(
+        const combined = [...flkRows, ...traRows, ...whsRows, ...incRows].sort(
           (a, b) => (b.record.archivedAt || 0) - (a.record.archivedAt || 0)
         );
         setStoreEntries(combined);

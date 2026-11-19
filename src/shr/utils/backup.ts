@@ -14,11 +14,17 @@ import { safeStorage } from './storage';
 import { rawGet, rawSet, rawRemove, IDB_KEYS } from '../../cor/storage/rawStore';
 import { idbRemoveItem } from '../../cor/storage/idbStorage';
 import {
+  ARCHIVE_STORES,
   exportArchiveRecords,
   importArchiveRecords,
   clearArchive,
   countArchived,
+  listFlockSummaries,
+  saveFlockSummary,
+  clearFlockSummaries,
+  migrateFlockSummary,
   type ArchiveRecord,
+  type FlockArchiveSummary,
 } from '../../cor/storage/historyArchive';
 
 /** کلیدهای پشتیبان‌گیری‌شده */
@@ -101,11 +107,23 @@ export async function exportAll(): Promise<string> {
     }
   }
 
-  // 🆕 آرشیو سرد — استور جداگانه در pm-archive
+  // 🆕 آرشیو سرد — همه مخازن ARCHIVE_STORES
   try {
-    const archiveLogs = await exportArchiveRecords();
-    if (archiveLogs.length > 0) {
-      data[BACKUP_KEY_ARCHIVE_LOGS] = archiveLogs;
+    const archiveByStore: Record<string, ArchiveRecord[]> = {};
+    let hasAny = false;
+    for (const [, storeName] of Object.entries(ARCHIVE_STORES)) {
+      const rows = await exportArchiveRecords(storeName);
+      if (rows.length > 0) {
+        archiveByStore[storeName] = rows;
+        hasAny = true;
+      }
+    }
+    if (hasAny) {
+      data[BACKUP_KEY_ARCHIVE_LOGS] = archiveByStore;
+    }
+    const summaries = await listFlockSummaries();
+    if (summaries.length > 0) {
+      data[BACKUP_KEY_ARCHIVE_SUMMARIES] = summaries;
     }
   } catch (e) {
     console.warn('[Backup] Failed to export archive:', e);
@@ -195,15 +213,25 @@ export async function importAll(
       }
     }
 
-    // 🆕 بازیابی آرشیو سرد
-    const archivedLogsRaw = backup.data[BACKUP_KEY_ARCHIVE_LOGS];
-    if (Array.isArray(archivedLogsRaw) && archivedLogsRaw.length > 0) {
+    // 🆕 بازیابی آرشیو سرد (همه مخازن + سازگاری با فرمت قدیمی)
+    const archiveRaw = backup.data[BACKUP_KEY_ARCHIVE_LOGS];
+    if (archiveRaw) {
       try {
-        if (mode === 'replace') {
-          await clearArchive();
+        let importedTotal = 0;
+        if (Array.isArray(archiveRaw) && archiveRaw.length > 0) {
+          if (mode === 'replace') await clearArchive();
+          importedTotal += await importArchiveRecords(archiveRaw as ArchiveRecord[], mode);
+        } else if (typeof archiveRaw === 'object') {
+          for (const [, storeName] of Object.entries(ARCHIVE_STORES)) {
+            const rows = (archiveRaw as Record<string, unknown>)[storeName];
+            if (!Array.isArray(rows) || rows.length === 0) continue;
+            if (mode === 'replace') await clearArchive(storeName);
+            importedTotal += await importArchiveRecords(rows as ArchiveRecord[], mode, storeName);
+          }
         }
-        const n = await importArchiveRecords(archivedLogsRaw as ArchiveRecord[], mode);
-        console.info(`[Backup] Imported ${n} archive records`);
+        if (importedTotal > 0) {
+          console.info(`[Backup] Imported ${importedTotal} archive records`);
+        }
       } catch (e) {
         console.error('[Backup] Failed to import archive:', e);
         failed.push('آرشیو سرد');
@@ -274,9 +302,12 @@ export async function getStats(): Promise<BackupStats> {
     byModule.push({ key: k, label: MODULE_LABELS[k] || k, size, records });
   }
 
-  // 🆕 آمار آرشیو سرد (تخمین حجم — برای جلوگیری از load همه رکوردها)
+  // 🆕 آمار آرشیو سرد (همه مخازن ARCHIVE_STORES)
   try {
-    const archiveCount = await countArchived();
+    let archiveCount = 0;
+    for (const [, storeName] of Object.entries(ARCHIVE_STORES)) {
+      archiveCount += await countArchived(storeName);
+    }
     if (archiveCount > 0) {
       // تخمین: هر رکورد آرشیو ~2KB (میانگین بر اساس bench: 4.3KB در RAM با wrapper)
       const estimatedSize = archiveCount * 2000;
@@ -361,6 +392,19 @@ export async function clearAllData(): Promise<void> {
 
   try {
     await idbRemoveItem(AUTOBACKUP_IDB_KEY);
+  } catch {
+    /* silent */
+  }
+
+  for (const [, storeName] of Object.entries(ARCHIVE_STORES)) {
+    try {
+      await clearArchive(storeName);
+    } catch {
+      /* silent */
+    }
+  }
+  try {
+    await clearFlockSummaries();
   } catch {
     /* silent */
   }

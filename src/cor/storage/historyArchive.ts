@@ -42,10 +42,28 @@ export const ARCHIVE_POLICY = {
   trimTo: 600,
 } as const;
 
-/** یک رکورد آرشیو = لاگ اصلی + متادیتای جابه‌جایی (برای ممیزی ALCOA+) */
-export type ArchiveReason = 'age' | 'flock-closed' | 'count-threshold' | 'ancient';
+/** نسخهٔ قرارداد رکورد آرشیو سرد برای مهاجرت اسکیما و همگام‌سازی آینده */
+export const ARCHIVE_SCHEMA_VERSION = 1;
 
-export interface ArchiveRecord {
+/** وضعیت همگام‌سازی رکورد با سرور/ابر (آماده برای فاز آنلاین و چندکاربره) */
+export type ArchiveSyncStatus = 'local' | 'pending' | 'synced' | 'conflict';
+
+/** متادیتای اختیاری عامل و مجموعه برای ردپای ALCOA+ و چندکاربره شدن */
+export interface ArchiveAuditMeta {
+  actorId?: string;
+  actorRole?: string;
+  farmId?: string;
+  tenantId?: string;
+  revision?: number;
+  updatedAt?: number;
+  syncStatus?: ArchiveSyncStatus;
+}
+
+/** یک رکورد آرشیو = لاگ اصلی + متادیتای جابه‌جایی (برای ممیزی ALCOA+) */
+export type ArchiveReason = 'age' | 'flock-closed' | 'count-threshold' | 'ancient' | 'manual';
+
+export interface ArchiveRecord extends ArchiveAuditMeta {
+  schemaVersion?: number;
   id: string;
   flockId: string;
   date: string;
@@ -197,6 +215,44 @@ export async function archiveLogs(
   await tx.done;
   result.archivedCount = result.archivedIds.length;
   return result;
+}
+
+
+/** نوشتن یک رکورد در استور مشخص‌شدهٔ دیتابیس pm-archive (یکپارچه با backup و listArchived). */
+export async function putArchiveRecord(
+  record: ArchiveRecord,
+  storeName: string = DEFAULT_STORE,
+): Promise<void> {
+  if (!record || !record.id) return;
+  const db = await getDB();
+  const normalized: ArchiveRecord = {
+    schemaVersion: ARCHIVE_SCHEMA_VERSION,
+    syncStatus: 'local',
+    revision: 1,
+    updatedAt: record.archivedAt || Date.now(),
+    ...record,
+  };
+  await db.put(storeName, normalized);
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// سیاست نگهداشت و حفاظت از رکوردهای حساس (Retention & Guard)
+// ═══════════════════════════════════════════════════════════════
+
+/** حداقل دوره نگهداشت پیشنهادی برای سوابق آرشیوی (روز) */
+export const ARCHIVE_RETENTION_DAYS = 90;
+
+/**
+ * تشخیص رکوردهایی که به دلیل داشتن تلفات یا اصلاحات ممیزی
+ * در کار مرغداری باید در برابر حذف شتاب‌زده محافظت شوند.
+ */
+export function isProtectedArchiveRecord(rec: ArchiveRecord): boolean {
+  const log = rec?.log as any;
+  if (!log || typeof log !== 'object') return false;
+  const mortality = Number(log.mortality ?? log.deathsCount ?? 0) || 0;
+  const hasCorrections = Array.isArray(log.corrections) && log.corrections.length > 0;
+  return mortality > 0 || hasCorrections || rec.reason === 'flock-closed';
 }
 
 /** خواندن یک رکورد آرشیو با شناسه. */
@@ -368,20 +424,81 @@ export async function exportArchiveRecords(storeName: string = DEFAULT_STORE): P
  *
  * @returns تعداد رکوردهای نوشته‌شده
  */
+
+// ═══════════════════════════════════════════════════════════════
+// مهاجرت نسخه (Schema Migration) و صحت‌سنجی رکوردهای سرد
+// ═══════════════════════════════════════════════════════════════
+
+export function isValidArchiveRecord(rec: unknown): rec is ArchiveRecord {
+  if (!rec || typeof rec !== 'object') return false;
+  const r = rec as Partial<ArchiveRecord>;
+  return typeof r.id === 'string' && r.id.trim().length > 0 && Boolean(r.log && typeof r.log === 'object');
+}
+
+export function migrateArchiveRecord(raw: unknown): ArchiveRecord | null {
+  if (!isValidArchiveRecord(raw)) return null;
+  const r = raw as ArchiveRecord;
+  const archivedAt = typeof r.archivedAt === 'number' && Number.isFinite(r.archivedAt) ? r.archivedAt : Date.now();
+  return {
+    ...r,
+    schemaVersion: typeof r.schemaVersion === 'number' && r.schemaVersion > 0 ? r.schemaVersion : ARCHIVE_SCHEMA_VERSION,
+    flockId: r.flockId || (r.log as any)?.flockId || '',
+    date: r.date || (r.log as any)?.date || '',
+    archivedAt,
+    reason: r.reason || 'age',
+    revision: typeof r.revision === 'number' && r.revision > 0 ? r.revision : 1,
+    updatedAt: typeof r.updatedAt === 'number' && Number.isFinite(r.updatedAt) ? r.updatedAt : archivedAt,
+    syncStatus: r.syncStatus || 'local',
+  };
+}
+
+export function isValidFlockSummary(row: unknown): row is FlockArchiveSummary {
+  if (!row || typeof row !== 'object') return false;
+  const s = row as Partial<FlockArchiveSummary>;
+  return typeof s.flockId === 'string' && s.flockId.trim().length > 0;
+}
+
+export function migrateFlockSummary(raw: unknown): FlockArchiveSummary | null {
+  if (!isValidFlockSummary(raw)) return null;
+  const s = raw as FlockArchiveSummary;
+  const archivedAt = typeof s.archivedAt === 'number' && Number.isFinite(s.archivedAt) ? s.archivedAt : Date.now();
+  return {
+    ...s,
+    schemaVersion: typeof s.schemaVersion === 'number' && s.schemaVersion > 0 ? s.schemaVersion : SUMMARY_SCHEMA_VERSION,
+    archivedAt,
+    logCount: typeof s.logCount === 'number' && Number.isFinite(s.logCount) ? s.logCount : 0,
+    firstDate: s.firstDate ?? null,
+    lastDate: s.lastDate ?? null,
+    totalMortality: Number(s.totalMortality) || 0,
+    totalFeedKg: Number(s.totalFeedKg) || 0,
+    totalEggs: Number(s.totalEggs) || 0,
+    totalBrokenEggs: Number(s.totalBrokenEggs) || 0,
+  };
+}
+
 export async function importArchiveRecords(
   records: ArchiveRecord[],
   mode: 'replace' | 'merge',
   storeName: string = DEFAULT_STORE,
 ): Promise<number> {
-  if (!Array.isArray(records) || records.length === 0) return 0;
+  const validRecords = Array.isArray(records)
+    ? records
+        .map((rec) => migrateArchiveRecord(rec))
+        .filter((rec): rec is ArchiveRecord => rec !== null)
+    : [];
+
+  if (mode !== 'replace' && validRecords.length === 0) return 0;
 
   const db = await getDB();
   const tx = db.transaction(storeName, 'readwrite');
   const store = tx.objectStore(storeName);
-  let written = 0;
 
-  for (const rec of records) {
-    if (!rec || typeof rec !== 'object' || !rec.id) continue;
+  if (mode === 'replace') {
+    await store.clear();
+  }
+
+  let written = 0;
+  for (const rec of validRecords) {
     if (mode === 'merge') {
       const existing = await store.get(rec.id);
       if (existing) continue;
@@ -399,4 +516,210 @@ export async function clearArchive(storeName: string = DEFAULT_STORE): Promise<v
   const db = await getDB();
   await db.clear(storeName);
 }
+// ═══════════════════════════════════════════════════════════════
+// لایه ۴ — خلاصه گله برای مقایسه و BI (استور summaries)
+// ═══════════════════════════════════════════════════════════════
 
+export const SUMMARY_SCHEMA_VERSION = 1;
+
+export type FlockProductionType = 'layer' | 'broiler' | 'breeder' | 'hatchery' | 'other';
+
+export interface FlockArchiveSummary {
+  schemaVersion: number;
+  flockId: string;
+  flockName?: string;
+  breedName?: string;
+  productionType?: FlockProductionType;
+  archivedAt: number;
+
+  logCount: number;
+  firstDate: string | null;
+  lastDate: string | null;
+  durationDays?: number | null;
+
+  totalMortality: number;
+  totalFeedKg: number;
+  totalEggs: number;
+  totalBrokenEggs: number;
+  livabilityPct?: number | null;
+  fcr?: number | null;
+  epef?: number | null;
+
+  hatcheryMetrics?: {
+    totalSetEggs?: number;
+    fertilePct?: number | null;
+    hatchabilityPct?: number | null;
+  };
+  financialMetrics?: {
+    recordedCost?: number;
+    recordedRevenue?: number;
+    recordedNet?: number;
+    isComplete?: boolean;
+  };
+}
+
+export function computeFlockSummary(
+  flockId: string,
+  logs: DailyLog[],
+  meta?: {
+    flockName?: string;
+    breedName?: string;
+    productionType?: FlockProductionType;
+    durationDays?: number | null;
+    livabilityPct?: number | null;
+    avgWeightKg?: number | null;
+    ageDays?: number | null;
+    recordedCost?: number;
+    recordedRevenue?: number;
+    financialComplete?: boolean;
+  },
+  archivedAt: number = Date.now()
+): FlockArchiveSummary {
+  const validDates = logs
+    .map((l) => l.date)
+    .filter((d): d is string => Boolean(d))
+    .sort();
+
+  let totalMortality = 0;
+  let totalFeedKg = 0;
+  let totalEggs = 0;
+  let totalBrokenEggs = 0;
+  let latestWeightKgFromLogs: number | null = null;
+  let maxBirdAgeDays = 0;
+
+  for (const log of logs) {
+    const anyLog = log as any;
+    const deaths =
+      typeof anyLog.deathsCount === 'number' && Number.isFinite(anyLog.deathsCount)
+        ? anyLog.deathsCount
+        : Array.isArray(anyLog.deaths)
+          ? anyLog.deaths.reduce((acc: number, d: any) => acc + (Number(d?.count) || 0), 0)
+          : Number(anyLog.mortality) || 0;
+    totalMortality += Math.max(0, deaths);
+
+    const feed =
+      typeof anyLog.feedConsumed === 'number' && Number.isFinite(anyLog.feedConsumed)
+        ? anyLog.feedConsumed
+        : Number(anyLog.feedKg ?? anyLog.feedAmount ?? 0) || 0;
+    totalFeedKg += Math.max(0, feed);
+
+    const broken = Number(anyLog.brokenEggs) || 0;
+    totalBrokenEggs += Math.max(0, broken);
+
+    const splitEggs =
+      (Number(anyLog.eatingEggs) || 0) +
+      (Number(anyLog.fertileEggs) || 0) +
+      (Number(anyLog.otherEggs) || 0);
+    const eggs =
+      splitEggs > 0
+        ? splitEggs
+        : Number(anyLog.eggTotal ?? anyLog.totalEggs ?? 0) || 0;
+    totalEggs += Math.max(0, eggs);
+
+    if (typeof anyLog.birdAgeDays === 'number' && anyLog.birdAgeDays > maxBirdAgeDays) {
+      maxBirdAgeDays = anyLog.birdAgeDays;
+    }
+
+    if (Array.isArray(anyLog.weightSamples) && anyLog.weightSamples.length > 0) {
+      const lastSample = anyLog.weightSamples[anyLog.weightSamples.length - 1];
+      const rawW = Number(lastSample?.avgWeightKg ?? lastSample?.weightKg ?? lastSample?.weight ?? 0);
+      if (rawW > 0) {
+        // اگر وزن بر حسب گرم ثبت شده باشد (مثلاً 1850 به جای 1.85)، به کیلوگرم تبدیل می‌شود
+        latestWeightKgFromLogs = rawW > 20 ? Number((rawW / 1000).toFixed(3)) : rawW;
+      }
+    }
+  }
+
+  const avgWeightKg =
+    meta?.avgWeightKg && meta.avgWeightKg > 0
+      ? meta.avgWeightKg
+      : latestWeightKgFromLogs;
+  const fcr =
+    avgWeightKg && totalFeedKg > 0
+      ? Number((totalFeedKg / avgWeightKg).toFixed(3))
+      : null;
+
+  const livabilityPct =
+    typeof meta?.livabilityPct === 'number' && Number.isFinite(meta.livabilityPct)
+      ? meta.livabilityPct
+      : null;
+  const ageDays =
+    typeof meta?.ageDays === 'number' && meta.ageDays > 0
+      ? meta.ageDays
+      : maxBirdAgeDays > 0
+        ? maxBirdAgeDays
+        : null;
+
+  const epef =
+    livabilityPct !== null && avgWeightKg && ageDays && fcr && fcr > 0
+      ? Number(((livabilityPct * avgWeightKg * 100) / (ageDays * fcr)).toFixed(1))
+      : null;
+
+  const hasFinancial =
+    typeof meta?.recordedCost === 'number' || typeof meta?.recordedRevenue === 'number';
+  const recordedCost = typeof meta?.recordedCost === 'number' ? meta.recordedCost : 0;
+  const recordedRevenue = typeof meta?.recordedRevenue === 'number' ? meta.recordedRevenue : 0;
+
+  return {
+    schemaVersion: SUMMARY_SCHEMA_VERSION,
+    flockId,
+    flockName: meta?.flockName,
+    breedName: meta?.breedName,
+    productionType: meta?.productionType,
+    archivedAt,
+    logCount: logs.length,
+    firstDate: validDates[0] ?? null,
+    lastDate: validDates[validDates.length - 1] ?? null,
+    durationDays: meta?.durationDays ?? ageDays ?? (logs.length > 0 ? logs.length : null),
+    totalMortality,
+    totalFeedKg,
+    totalEggs,
+    totalBrokenEggs,
+    livabilityPct,
+    fcr,
+    epef,
+    ...(hasFinancial
+      ? {
+          financialMetrics: {
+            recordedCost,
+            recordedRevenue,
+            recordedNet: recordedRevenue - recordedCost,
+            isComplete: Boolean(meta?.financialComplete),
+          },
+        }
+      : {}),
+  };
+}
+
+export async function saveFlockSummary(summary: FlockArchiveSummary): Promise<void> {
+  if (!summary || !summary.flockId) return;
+  const db = await getDB();
+  await db.put(STORE_SUMMARIES, {
+    ...summary,
+    schemaVersion: summary.schemaVersion || SUMMARY_SCHEMA_VERSION,
+  });
+}
+
+export async function getFlockSummary(flockId: string): Promise<FlockArchiveSummary | null> {
+  if (!flockId) return null;
+  const db = await getDB();
+  const row = await db.get(STORE_SUMMARIES, flockId);
+  return (row as FlockArchiveSummary) || null;
+}
+
+export async function listFlockSummaries(): Promise<FlockArchiveSummary[]> {
+  const db = await getDB();
+  const rows = (await db.getAll(STORE_SUMMARIES)) as FlockArchiveSummary[];
+  return rows.sort((a, b) => (b.archivedAt || 0) - (a.archivedAt || 0));
+}
+
+export async function deleteFlockSummary(flockId: string): Promise<void> {
+  if (!flockId) return;
+  const db = await getDB();
+  await db.delete(STORE_SUMMARIES, flockId);
+}
+
+export async function clearFlockSummaries(): Promise<void> {
+  const db = await getDB();
+  await db.clear(STORE_SUMMARIES);
+}

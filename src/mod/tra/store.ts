@@ -1348,11 +1348,10 @@ export async function archiveTraInvoices(invoiceIds: string[]): Promise<number> 
   const toArc = st.invoices.filter(inv => idSet.has(inv.id));
   if (!toArc.length) return 0;
 
-  const { ARCHIVE_STORES } = await import('../../cor/storage/historyArchive');
-  const { idbPutRecord } = await import('../../cor/storage/idbStorage');
+  const { ARCHIVE_STORES, putArchiveRecord } = await import('../../cor/storage/historyArchive');
 
   for (const inv of toArc) {
-    await idbPutRecord(ARCHIVE_STORES.tra, {
+    await putArchiveRecord({
       id: inv.id,
       flockId: inv.relatedFlockId || inv.partyId || inv.id,
       date: inv.date || inv.createdAt,

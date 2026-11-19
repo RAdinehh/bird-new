@@ -480,11 +480,10 @@ export async function archiveIncBatches(entryIds: string[]): Promise<number> {
   const toArc = (st.eggEntries || []).filter(e => idSet.has(e.id));
   if (!toArc.length) return 0;
 
-  const { ARCHIVE_STORES } = await import('../../cor/storage/historyArchive');
-  const { idbPutRecord } = await import('../../cor/storage/idbStorage');
+  const { ARCHIVE_STORES, putArchiveRecord } = await import('../../cor/storage/historyArchive');
 
   for (const entry of toArc) {
-    await idbPutRecord(ARCHIVE_STORES.inc, {
+    await putArchiveRecord({
       id: entry.id,
       flockId: entry.deviceId || entry.hatchGroupId || entry.id,
       date: entry.expectedHatchDate || entry.entryDate || entry.createdAt,

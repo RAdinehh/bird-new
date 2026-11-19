@@ -222,9 +222,8 @@ export const useFlk = create<State>()(
           archivedReason: reason || '',
           updatedAt: now(),
         };
-        const { ARCHIVE_STORES } = await import('../../cor/storage/historyArchive');
-        const { idbPutRecord } = await import('../../cor/storage/idbStorage');
-        await idbPutRecord(ARCHIVE_STORES.flk, {
+        const { ARCHIVE_STORES, putArchiveRecord } = await import('../../cor/storage/historyArchive');
+        await putArchiveRecord({
           id: closedFlock.id,
           flockId: closedFlock.id,
           date: closedFlock.endDate || closedFlock.updatedAt,
@@ -234,7 +233,40 @@ export const useFlk = create<State>()(
         });
         set({ flocks: get().flocks.map(x => x.id === id ? closedFlock : x) });
         const { useDlg } = await import('../dlg/store');
-        return useDlg.getState().archiveFlockLogs(id);
+        const archivedLogsCount = await useDlg.getState().archiveFlockLogs(id);
+        try {
+          const { computeFlockSummary, saveFlockSummary } = await import('../../cor/storage/historyArchive');
+          const { useBrd } = await import('../brd/store');
+          const flockLogs = useDlg.getState().logs.filter((l) => l.flockId === id);
+          const brdState = useBrd.getState();
+          const breedName = brdState.breeds.find((b) => b.id === closedFlock.breedId)?.name;
+          const initCount = Number(closedFlock.initialCount) || 0;
+          const currCount =
+            typeof closedFlock.currentCount === 'number'
+              ? closedFlock.currentCount
+              : initCount;
+          const livabilityPct =
+            initCount > 0 && currCount >= 0
+              ? Number(Math.min(100, Math.max(0, (currCount / initCount) * 100)).toFixed(2))
+              : null;
+
+          const summary = computeFlockSummary(
+            closedFlock.id,
+            flockLogs,
+            {
+              flockName: closedFlock.name,
+              breedName,
+              productionType: (closedFlock.type as any) || undefined,
+              livabilityPct,
+              recordedCost: (closedFlock as any).totalCost,
+              recordedRevenue: (closedFlock as any).totalRevenue,
+            },
+          );
+          await saveFlockSummary(summary);
+        } catch (e) {
+          console.warn('[flk] Failed to save flock archive summary:', e);
+        }
+        return archivedLogsCount;
       },
       restore: async (id) => {
         const { ARCHIVE_STORES, getArchived, purgeArchiveIds } = await import('../../cor/storage/historyArchive');
@@ -256,6 +288,12 @@ export const useFlk = create<State>()(
           });
           if (archivedFlock) {
             await purgeArchiveIds([id], ARCHIVE_STORES.flk);
+          }
+          try {
+            const { deleteFlockSummary } = await import('../../cor/storage/historyArchive');
+            await deleteFlockSummary(id);
+          } catch (e) {
+            console.warn('[flk] Failed to delete flock archive summary on restore:', e);
           }
         }
         const { useDlg } = await import('../dlg/store');
