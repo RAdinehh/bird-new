@@ -409,7 +409,8 @@ export const useDlg = create<State>()(
       },
       restoreArchived: async (id) => {
         const mod = await import('../../cor/storage/historyArchive');
-        const log = await mod.restoreFromArchive(id);
+        const restored = await mod.restoreManyFromArchive([id], mod.ARCHIVE_STORES.dlg);
+        const log = restored[0];
         if (!log) return false;
         set({ logs: [...get().logs, log] });
         syncOne(log);

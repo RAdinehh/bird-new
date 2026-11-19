@@ -313,16 +313,22 @@ export async function restoreManyFromArchive(
   storeName: string = DEFAULT_STORE
 ): Promise<DailyLog[]> {
   if (ids.length === 0) return [];
+  const uniqueIds = Array.from(new Set(ids.filter(Boolean)));
+  if (uniqueIds.length === 0) return [];
   const db = await getDB();
   const tx = db.transaction(storeName, 'readwrite');
   const store = tx.objectStore(storeName);
   const out: DailyLog[] = [];
+  const foundIds: string[] = [];
   try {
-    for (const id of ids) {
+    for (const id of uniqueIds) {
       const rec = (await store.get(id)) as ArchiveRecord | undefined;
-      if (rec?.log) out.push(rec.log);
+      if (rec?.log) {
+        out.push(rec.log);
+        foundIds.push(id);
+      }
     }
-    for (const id of ids) await store.delete(id);
+    for (const id of foundIds) await store.delete(id);
     await tx.done;
     return out;
   } catch (e) {
