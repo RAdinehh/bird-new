@@ -13,13 +13,14 @@ import type { DailyLog } from '../../mod/dlg/store';
 import { jalaliToDate } from '../../mod/flk/helpers-store';
 
 const DB_NAME = 'pm-archive';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 export const DEFAULT_STORE = 'dlg_logs';
 export const ARCHIVE_STORES = {
   dlg: 'dlg_logs',
   tra: 'tra_invoices',
   flk: 'flk_closed',
   whs: 'whs_moves',
+  inc: 'inc_batches',
 } as const;
 export type ArchiveStoreName = typeof ARCHIVE_STORES[keyof typeof ARCHIVE_STORES];
 

@@ -472,3 +472,54 @@ export function fillCapacityFromProfile(birdName: string): Partial<DeviceCapacit
     };
   } catch { return null; }
 }
+
+export async function archiveIncBatches(entryIds: string[]): Promise<number> {
+  if (!entryIds.length) return 0;
+  const idSet = new Set(entryIds);
+  const st = useInc.getState();
+  const toArc = (st.eggEntries || []).filter(e => idSet.has(e.id));
+  if (!toArc.length) return 0;
+
+  const { ARCHIVE_STORES } = await import('../../cor/storage/historyArchive');
+  const { idbPutRecord } = await import('../../cor/storage/idbStorage');
+
+  for (const entry of toArc) {
+    await idbPutRecord(ARCHIVE_STORES.inc, {
+      id: entry.id,
+      flockId: entry.deviceId || entry.hatchGroupId || entry.id,
+      date: entry.expectedHatchDate || entry.entryDate || entry.createdAt,
+      archivedAt: Date.now(),
+      reason: 'manual' as const,
+      log: entry as any,
+    });
+  }
+
+  useInc.setState({
+    eggEntries: (st.eggEntries || []).filter(e => !idSet.has(e.id)),
+  });
+  return toArc.length;
+}
+
+export async function restoreIncBatches(entryIds: string[]): Promise<number> {
+  if (!entryIds.length) return 0;
+  const { ARCHIVE_STORES, getArchived, purgeArchiveIds } = await import('../../cor/storage/historyArchive');
+  const restored: EggEntry[] = [];
+  const restoredIds: string[] = [];
+
+  for (const id of entryIds) {
+    const rec = await getArchived(id, ARCHIVE_STORES.inc) as { log?: EggEntry } | null;
+    if (rec?.log) {
+      restored.push(rec.log);
+      restoredIds.push(id);
+    }
+  }
+  if (!restored.length) return 0;
+
+  const st = useInc.getState();
+  const existing = new Set((st.eggEntries || []).map(e => e.id));
+  useInc.setState({
+    eggEntries: [...(st.eggEntries || []), ...restored.filter(e => !existing.has(e.id))],
+  });
+  await purgeArchiveIds(restoredIds, ARCHIVE_STORES.inc);
+  return restored.length;
+}
