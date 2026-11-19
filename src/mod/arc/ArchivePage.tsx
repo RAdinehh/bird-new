@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useFlk, getAgeDays, getLifecycle, calcCosts, formatAge, SOURCE_LABEL, type Flock } from '../flk/store';
+import { useFlk, getAgeDays, calcCosts, formatAge, SOURCE_LABEL, type Flock } from '../flk/store';
 import { useBrd } from '../brd/store';
 import { useHal } from '../hal/store';
 import { Btn, Empty, PageContainer, Tag } from '../../shr/components/ui';
@@ -34,7 +34,7 @@ export default function ArchivePage() {
     if (kind !== 'logs') return;
     let alive = true;
     setArcLoading(true);
-    listArchived({ limit: 500 }, ARCHIVE_STORES.dlg)
+    listArchived(undefined, ARCHIVE_STORES.dlg)
       .then(rows => { if (alive) setArcLogs(rows); })
       .catch(e => console.error('[ArchivePage] listArchived failed:', e))
       .finally(() => { if (alive) setArcLoading(false); });
@@ -140,7 +140,6 @@ export default function ArchivePage() {
             const breed = breeds.find(b => b.id === f.breedId);
             const hall = halls.find(h => h.id === f.hallId);
             const ageDays = getAgeDays(f);
-            const lc = getLifecycle(f.type, ageDays, f.endOfCycleDay ?? null, null);
             const costs = calcCosts(f);
             const isOpen = expandedId === f.id;
             const statusLabel = f.status === 'sold' ? 'فروخته‌شده' : 'آرشیو';
@@ -195,7 +194,7 @@ export default function ArchivePage() {
                 ) : null}
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-                  <Btn size="sm" onClick={() => { restore(f.id); setExpandedId(null); }} style={{ flex: 1 }}>🔄 بازیابی</Btn>
+                  <Btn size="sm" onClick={async () => { await restore(f.id); setExpandedId(null); setArcTick(t => t + 1); toastMsg.saved('گله بازیابی شد'); }} style={{ flex: 1 }}>🔄 بازیابی</Btn>
                   <Btn size="sm" onClick={async () => {
                           const ok = await showConfirmAsync('حذف نهایی گله', 'حذف کامل «' + f.name + '»؟\n\nاین عمل قابل بازگشت نیست. برای همیشه پاک می‌شود.', { danger: true, confirmText: 'حذف کن' });
                           if (!ok) return;
@@ -218,6 +217,7 @@ const REASON_LABEL: Record<string, string> = {
   age: 'قدیمی',
   'flock-closed': 'بستن گله',
   'count-threshold': 'حد تعداد',
+  ancient: 'قدیمی',
 };
 
 function LogsArchiveTab({
@@ -231,6 +231,7 @@ function LogsArchiveTab({
 }) {
   const { flocks } = useFlk();
   const [busy, setBusy] = useState<string | null>(null);
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
 
   // گروه‌بندی بر اساس گله
   const groups = useMemo(() => {
@@ -293,7 +294,7 @@ function LogsArchiveTab({
             </div>
 
             <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
-              {items.slice(0, 5).map(r => (
+              {(expandedGroups[flockId] ? items : items.slice(0, 5)).map(r => (
                 <div key={r.id} style={{
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                   fontSize: 'var(--fs-xs)', color: 'var(--muted)',
@@ -316,8 +317,13 @@ function LogsArchiveTab({
                 </div>
               ))}
               {items.length > 5 ? (
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingTop: 4 }}>
-                  و {toFa(items.length - 5)} ثبت دیگر…
+                <div style={{ paddingTop: 4 }}>
+                  <Btn
+                    size="sm"
+                    onClick={() => setExpandedGroups(prev => ({ ...prev, [flockId]: !prev[flockId] }))}
+                  >
+                    {expandedGroups[flockId] ? 'بستن لیست' : 'نمایش همه (' + toFa(items.length - 5) + ' مورد دیگر)'}
+                  </Btn>
                 </div>
               ) : null}
             </div>
