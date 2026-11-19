@@ -84,6 +84,8 @@ function syncAllocations(
 export const useTra = create<State>()(
   persist(
     (set, get) => ({
+      archiveInvoices: (invoiceIds) => archiveTraInvoices(invoiceIds),
+      restoreInvoices: (invoiceIds) => restoreTraInvoices(invoiceIds),
       isLoading: true,
       invoices: [],
       partyPayments: [],
@@ -1338,3 +1340,71 @@ export function computePartyCredit(partyId: string, invoices: Invoice[], allocat
 
   return base + unapplied;
 }
+
+export async function archiveTraInvoices(invoiceIds: string[]): Promise<number> {
+  if (!invoiceIds.length) return 0;
+  const idSet = new Set(invoiceIds);
+  const st = useTra.getState();
+  const toArc = st.invoices.filter(inv => idSet.has(inv.id));
+  if (!toArc.length) return 0;
+
+  const { ARCHIVE_STORES } = await import('../../cor/storage/historyArchive');
+  const { idbPutRecord } = await import('../../cor/storage/idbStorage');
+
+  for (const inv of toArc) {
+    await idbPutRecord(ARCHIVE_STORES.tra, {
+      id: inv.id,
+      flockId: inv.relatedFlockId || inv.partyId || inv.id,
+      date: inv.date || inv.createdAt,
+      archivedAt: Date.now(),
+      reason: 'manual' as const,
+      log: inv as any,
+    });
+  }
+
+  const remaining = st.invoices.filter(inv => !idSet.has(inv.id));
+  useTra.setState({ invoices: remaining });
+
+  const affectedParties = new Set(toArc.map(inv => inv.partyId).filter(Boolean));
+  const allocs = useTra.getState().allocations;
+  for (const pid of affectedParties) {
+    try {
+      setPartyCredit(pid, computePartyCredit(pid, remaining, allocs));
+    } catch {}
+  }
+
+  return toArc.length;
+}
+
+export async function restoreTraInvoices(invoiceIds: string[]): Promise<number> {
+  if (!invoiceIds.length) return 0;
+  const { ARCHIVE_STORES, getArchived, purgeArchiveIds } = await import('../../cor/storage/historyArchive');
+  const restored: Invoice[] = [];
+  const restoredIds: string[] = [];
+
+  for (const id of invoiceIds) {
+    const rec = await getArchived(id, ARCHIVE_STORES.tra) as { log?: Invoice } | null;
+    if (rec?.log) {
+      restored.push(rec.log);
+      restoredIds.push(id);
+    }
+  }
+  if (!restored.length) return 0;
+
+  const st = useTra.getState();
+  const existing = new Set(st.invoices.map(inv => inv.id));
+  const merged = [...st.invoices, ...restored.filter(inv => !existing.has(inv.id))];
+  useTra.setState({ invoices: merged });
+  await purgeArchiveIds(restoredIds, ARCHIVE_STORES.tra);
+
+  const affectedParties = new Set(restored.map(inv => inv.partyId).filter(Boolean));
+  const allocs = useTra.getState().allocations;
+  for (const pid of affectedParties) {
+    try {
+      setPartyCredit(pid, computePartyCredit(pid, merged, allocs));
+    } catch {}
+  }
+
+  return restored.length;
+}
+

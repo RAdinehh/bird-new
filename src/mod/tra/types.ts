@@ -499,6 +499,8 @@ export interface State {
   clearPartyPayment: (ppId: string) => void;
   depositPartyPayment: (ppId: string) => void;
   /** 🆕 وضعیت لود داده‌ها از IndexedDB */
+  archiveInvoices: (invoiceIds: string[]) => Promise<number>;
+  restoreInvoices: (invoiceIds: string[]) => Promise<number>;
   isLoading: boolean;
 }
 
