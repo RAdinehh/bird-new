@@ -24,7 +24,7 @@ export default function ArchivePage() {
   const [kind, setKind] = useState<Kind>('flocks');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  // ── تب لاگ‌ها: بارگذاری از pm-archive
+  // ── تب دفتر روزانه: بارگذاری از pm-archive
   const { restoreArchived, restoreFlockLogs, logs: hotLogs } = useDlg();
   const [arcLogs, setArcLogs] = useState<ArchiveRecord[]>([]);
   const [arcLoading, setArcLoading] = useState(false);
@@ -89,7 +89,7 @@ export default function ArchivePage() {
       }}>
         <div>
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-            {kind === 'flocks' ? 'گلهٔ آرشیو‌شده' : 'لاگ آرشیو‌شده'}
+            {kind === 'flocks' ? 'گلهٔ آرشیو‌شده' : 'ثبت آرشیو‌شده'}
           </div>
           <div style={{ fontSize: 'var(--fs-2xl)', fontWeight: 700, color: 'var(--text)', marginTop: 4 }}>
             {kind === 'flocks' ? toFa(archivedFlocks.length) : toFa(arcLogs.length)}
@@ -213,7 +213,7 @@ export default function ArchivePage() {
 }
 
 
-// ═══ تب لاگ‌های آرشیو‌شده ═══
+// ═══ تب دفتر روزانهٔ آرشیو‌شده ═══
 const REASON_LABEL: Record<string, string> = {
   age: 'قدیمی',
   'flock-closed': 'بستن گله',
@@ -251,8 +251,8 @@ function LogsArchiveTab({
     return (
       <Empty
         icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>}
-        title="آرشیو لاگ خالی است"
-        desc="لاگ‌های قدیمی یا گله‌های بسته‌شده این‌جا نگهداری می‌شوند."
+        title="آرشیو دفتر روزانه خالی است"
+        desc="ثبت‌های قدیمی یا دفتر روزانهٔ گله‌های بسته‌شده این‌جا نگهداری می‌شوند."
       />
     );
   }
@@ -276,12 +276,11 @@ function LogsArchiveTab({
                   {flock?.name || ('گلهٔ ' + flockId)}
                 </div>
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                  {toFa(items.length)} لاگ • {toFa(dates[0] || '—')} تا {toFa(dates[dates.length - 1] || '—')}
-                  {hotCount > 0 ? ' • ' + toFa(hotCount) + ' لاگ فعال' : ''}
+                  {toFa(items.length)} ثبت • {toFa(dates[0] || '—')} تا {toFa(dates[dates.length - 1] || '—')}
+                  {hotCount > 0 ? ' • ' + toFa(hotCount) + ' ثبت فعال' : ''}
                 </div>
               </div>
               <Btn
-                size="sm"
                 disabled={isBusy}
                 onClick={async () => {
                   setBusy(flockId);
@@ -305,7 +304,6 @@ function LogsArchiveTab({
                     <span style={{ marginRight: 6 }}><Tag tone="gray">{REASON_LABEL[r.reason] || r.reason}</Tag></span>
                   </span>
                   <Btn
-                    size="sm"
                     disabled={busy === r.id}
                     onClick={async () => {
                       setBusy(r.id);
@@ -319,7 +317,7 @@ function LogsArchiveTab({
               ))}
               {items.length > 5 ? (
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingTop: 4 }}>
-                  و {toFa(items.length - 5)} لاگ دیگر…
+                  و {toFa(items.length - 5)} ثبت دیگر…
                 </div>
               ) : null}
             </div>
