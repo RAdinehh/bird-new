@@ -108,6 +108,8 @@ interface State {
   getItemMovements: (id: string) => Movement[];
   addMovement: (m: Omit<Movement, 'id' | 'createdAt'>) => string;
   deleteMovement: (id: string) => void;
+  archiveMovements: (movementIds: string[]) => Promise<number>;
+  restoreMovements: (movementIds: string[]) => Promise<number>;
 
   /** 🆕 وضعیت لود داده‌ها از IndexedDB */
   isLoading: boolean;
@@ -349,6 +351,87 @@ export const useWhs = create<State>()(
             updatedAt: now()
           } : x)
         });
+      } ,
+      archiveMovements: async (movementIds) => {
+        if (!movementIds.length) return 0;
+        const idSet = new Set(movementIds);
+        const state = get();
+        const toArc = state.movements.filter(m => idSet.has(m.id));
+        if (!toArc.length) return 0;
+
+        const { ARCHIVE_STORES } = await import('../../cor/storage/historyArchive');
+        const { idbPutRecord } = await import('../../cor/storage/idbStorage');
+        const { applyMovementCheckpoint } = await import('./archivePolicy');
+
+        for (const mv of toArc) {
+          await idbPutRecord(ARCHIVE_STORES.whs, {
+            id: mv.id,
+            flockId: mv.flockId || mv.itemId,
+            date: mv.date || mv.createdAt,
+            archivedAt: Date.now(),
+            reason: 'age' as const,
+            log: mv as any,
+          });
+        }
+
+        const remaining = state.movements.filter(m => !idSet.has(m.id));
+        const nextItems = state.items.map(it => {
+          const itemArc = toArc.filter(m => m.itemId === it.id);
+          if (!itemArc.length) return it;
+          const checkpointed = applyMovementCheckpoint(it, itemArc);
+          const recalc = recalcStockByLocation(checkpointed, remaining);
+          const recalcAvg = recalcAvgPrice({ ...checkpointed, currentStock: recalc.total }, remaining);
+          return {
+            ...checkpointed,
+            stockByLocation: recalc.byLoc,
+            currentStock: recalc.total,
+            avgPrice: recalcAvg.avg,
+            updatedAt: now(),
+          };
+        });
+
+        set({ movements: remaining, items: nextItems });
+        return toArc.length;
+      },
+      restoreMovements: async (movementIds) => {
+        if (!movementIds.length) return 0;
+        const { ARCHIVE_STORES, getArchived, purgeArchiveIds } = await import('../../cor/storage/historyArchive');
+        const restoredMoves: Movement[] = [];
+        const restoredIds: string[] = [];
+
+        for (const id of movementIds) {
+          const rec = await getArchived(id, ARCHIVE_STORES.whs) as { log?: Movement } | null;
+          if (rec?.log) {
+            restoredMoves.push(rec.log);
+            restoredIds.push(id);
+          }
+        }
+        if (!restoredMoves.length) return 0;
+
+        const state = get();
+        const existingIds = new Set(state.movements.map(m => m.id));
+        const mergedMoves = [
+          ...state.movements,
+          ...restoredMoves.filter(m => !existingIds.has(m.id)),
+        ];
+
+        const nextItems = state.items.map(it => {
+          const itemMoves = restoredMoves.filter(m => m.itemId === it.id);
+          if (!itemMoves.length) return it;
+          const recalc = recalcStockByLocation(it, mergedMoves);
+          const recalcAvg = recalcAvgPrice({ ...it, currentStock: recalc.total }, mergedMoves);
+          return {
+            ...it,
+            stockByLocation: recalc.byLoc,
+            currentStock: recalc.total,
+            avgPrice: recalcAvg.avg,
+            updatedAt: now(),
+          };
+        });
+
+        set({ movements: mergedMoves, items: nextItems });
+        await purgeArchiveIds(restoredIds, ARCHIVE_STORES.whs);
+        return restoredMoves.length;
       }
     }),
     {

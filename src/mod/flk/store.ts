@@ -210,12 +210,54 @@ export const useFlk = create<State>()(
         set({ flocks: get().flocks.filter(x => x.id !== id) });
       },
       archive: async (id, reason) => {
-        set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'archived', endDate: x.endDate || now(), archivedReason: reason || '', updatedAt: now()} : x) });
+        const prevFlock = get().flocks.find(x => x.id === id);
+        if (!prevFlock || prevFlock.status === 'merged' || prevFlock.mergedInto) {
+          const { useDlg } = await import('../dlg/store');
+          return useDlg.getState().archiveFlockLogs(id);
+        }
+        const closedFlock: Flock = {
+          ...prevFlock,
+          status: 'archived',
+          endDate: prevFlock.endDate || now(),
+          archivedReason: reason || '',
+          updatedAt: now(),
+        };
+        const { ARCHIVE_STORES } = await import('../../cor/storage/historyArchive');
+        const { idbPutRecord } = await import('../../cor/storage/idbStorage');
+        await idbPutRecord(ARCHIVE_STORES.flk, {
+          id: closedFlock.id,
+          flockId: closedFlock.id,
+          date: closedFlock.endDate || closedFlock.updatedAt,
+          archivedAt: Date.now(),
+          reason: 'flock-closed' as const,
+          log: closedFlock as any,
+        });
+        set({ flocks: get().flocks.map(x => x.id === id ? closedFlock : x) });
         const { useDlg } = await import('../dlg/store');
         return useDlg.getState().archiveFlockLogs(id);
       },
       restore: async (id) => {
-        set({ flocks: get().flocks.map(x => x.id === id ? {...x, status: 'active', endDate: '', archivedReason: '', updatedAt: now()} : x) });
+        const { ARCHIVE_STORES, getArchived, purgeArchiveIds } = await import('../../cor/storage/historyArchive');
+        const rec = await getArchived(id, ARCHIVE_STORES.flk) as { log?: Flock } | null;
+        const archivedFlock = rec?.log;
+        const current = get().flocks.find(x => x.id === id);
+        if (archivedFlock || current) {
+          const restoredFlock: Flock = {
+            ...(archivedFlock ?? current!),
+            status: 'active',
+            endDate: '',
+            archivedReason: '',
+            updatedAt: now(),
+          };
+          set({
+            flocks: current
+              ? get().flocks.map(x => x.id === id ? restoredFlock : x)
+              : [...get().flocks, restoredFlock],
+          });
+          if (archivedFlock) {
+            await purgeArchiveIds([id], ARCHIVE_STORES.flk);
+          }
+        }
         const { useDlg } = await import('../dlg/store');
         return useDlg.getState().restoreFlockLogs(id);
       },
