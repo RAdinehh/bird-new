@@ -13,6 +13,13 @@
 import { safeStorage } from './storage';
 import { rawGet, rawSet, rawRemove, IDB_KEYS } from '../../cor/storage/rawStore';
 import { idbRemoveItem } from '../../cor/storage/idbStorage';
+import {
+  exportArchiveRecords,
+  importArchiveRecords,
+  clearArchive,
+  countArchived,
+  type ArchiveRecord,
+} from '../../cor/storage/historyArchive';
 
 /** کلیدهای پشتیبان‌گیری‌شده */
 export const PM_KEYS = [
@@ -27,6 +34,10 @@ export const PM_KEYS = [
 
 /** کلید IDB برای نسخه‌های پشتیبان خودکار */
 export const AUTOBACKUP_IDB_KEY = 'pm-autobackup-list';
+
+/** کلیدهای ویژه در BackupFile.data برای آرشیو سرد */
+const BACKUP_KEY_ARCHIVE_LOGS = '__archive_logs';
+const BACKUP_KEY_ARCHIVE_SUMMARIES = '__archive_summaries';
 
 export const MODULE_LABELS: Record<string, string> = {
   'pm-settings': 'تنظیمات',
@@ -88,6 +99,16 @@ export async function exportAll(): Promise<string> {
     } catch {
       data[k] = null;
     }
+  }
+
+  // 🆕 آرشیو سرد — استور جداگانه در pm-archive
+  try {
+    const archiveLogs = await exportArchiveRecords();
+    if (archiveLogs.length > 0) {
+      data[BACKUP_KEY_ARCHIVE_LOGS] = archiveLogs;
+    }
+  } catch (e) {
+    console.warn('[Backup] Failed to export archive:', e);
   }
 
   const payload: BackupFile = {
@@ -174,6 +195,21 @@ export async function importAll(
       }
     }
 
+    // 🆕 بازیابی آرشیو سرد
+    const archivedLogsRaw = backup.data[BACKUP_KEY_ARCHIVE_LOGS];
+    if (Array.isArray(archivedLogsRaw) && archivedLogsRaw.length > 0) {
+      try {
+        if (mode === 'replace') {
+          await clearArchive();
+        }
+        const n = await importArchiveRecords(archivedLogsRaw as ArchiveRecord[], mode);
+        console.info(`[Backup] Imported ${n} archive records`);
+      } catch (e) {
+        console.error('[Backup] Failed to import archive:', e);
+        failed.push('آرشیو سرد');
+      }
+    }
+
     const base = mode === 'replace' ? 'همه‌ی داده‌ها جایگزین شد' : 'داده‌ها ادغام شد';
     if (failed.length) {
       return {
@@ -236,6 +272,25 @@ export async function getStats(): Promise<BackupStats> {
     }
 
     byModule.push({ key: k, label: MODULE_LABELS[k] || k, size, records });
+  }
+
+  // 🆕 آمار آرشیو سرد (تخمین حجم — برای جلوگیری از load همه رکوردها)
+  try {
+    const archiveCount = await countArchived();
+    if (archiveCount > 0) {
+      // تخمین: هر رکورد آرشیو ~2KB (میانگین بر اساس bench: 4.3KB در RAM با wrapper)
+      const estimatedSize = archiveCount * 2000;
+      byModule.push({
+        key: 'pm-archive',
+        label: 'آرشیو سرد',
+        size: estimatedSize,
+        records: archiveCount,
+      });
+      totalSize += estimatedSize;
+      totalKeys++;
+    }
+  } catch {
+    /* silent */
   }
 
   return { totalKeys, totalSize, byModule };

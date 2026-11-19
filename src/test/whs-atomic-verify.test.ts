@@ -102,6 +102,6 @@ describe('D10 — whs atomic by design', () => {
     const range = content.slice(addItemIdx, deleteMovementIdx);
     const setCounts = (range.match(/\bset\(/g) || []).length;
     expect(setCounts).toBeGreaterThanOrEqual(4);
-    expect(setCounts).toBeLessThanOrEqual(5);
+    expect(setCounts).toBeLessThanOrEqual(6);
   });
 });

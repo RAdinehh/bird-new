@@ -1,4 +1,45 @@
 import { describe, it, expect, beforeEach } from 'vitest';
+import { vi } from 'vitest';
+
+const { archiveMem, mockGetArchived, mockPurgeArchiveIds, mockIdbPutRecord } = vi.hoisted(() => {
+  const mem = new Map<string, any>();
+  return {
+    archiveMem: mem,
+    mockGetArchived: vi.fn(async (id: string, store: string) => mem.get(`${store}:${id}`) ?? null),
+    mockPurgeArchiveIds: vi.fn(async (ids: string[], store: string) => {
+      for (const id of ids) mem.delete(`${store}:${id}`);
+    }),
+    mockIdbPutRecord: vi.fn(async (store: string, rec: { id: string }) => {
+      mem.set(`${store}:${rec.id}`, rec);
+    }),
+  };
+});
+
+vi.mock('../cor/storage/historyArchive', () => ({
+  ARCHIVE_STORES: {
+    flk: 'flk_closed',
+    dlg: 'dlg_logs',
+    tra: 'tra_invoices',
+    whs: 'whs_moves',
+    inc: 'inc_batches',
+  },
+  getArchived: mockGetArchived,
+  purgeArchiveIds: mockPurgeArchiveIds,
+}));
+
+vi.mock('../cor/storage/idbStorage', () => ({
+  idbPutRecord: mockIdbPutRecord,
+}));
+
+vi.mock('../mod/dlg/store', () => ({
+  useDlg: {
+    getState: () => ({
+      archiveFlockLogs: vi.fn(async () => ({ archivedCount: 0, skippedCount: 0 })),
+      restoreFlockLogs: vi.fn(async () => 0),
+    }),
+  },
+}));
+
 import { useFlk } from '../mod/flk/store';
 
 const makeFlock = (o: any = {}) => ({
@@ -50,20 +91,22 @@ describe('useFlk — CRUD', () => {
 
 // ═══ archive / restore / toggle ═══
 describe('useFlk — archive/restore/toggle', () => {
-  it('archive → status archived + endDate', () => {
+  it('archive → status archived + endDate', async () => {
+    archiveMem.clear();
     const f = makeFlock({ status: 'active' });
     useFlk.setState({ flocks: [f] } as any);
-    useFlk.getState().archive(f.id, 'sold');
+    await useFlk.getState().archive(f.id, 'sold');
     const saved = useFlk.getState().flocks[0];
     expect(saved.status).toBe('archived');
     expect(saved.endDate).toBeTruthy();
     expect(saved.archivedReason).toBe('sold');
   });
 
-  it('restore → status active + endDate پاک', () => {
+  it('restore → status active + endDate پاک', async () => {
     const f = makeFlock({ status: 'archived', endDate: '1405/05/01' });
+    archiveMem.set('flk_closed:' + f.id, { id: f.id, log: f });
     useFlk.setState({ flocks: [f] } as any);
-    useFlk.getState().restore(f.id);
+    await useFlk.getState().restore(f.id);
     const saved = useFlk.getState().flocks[0];
     expect(saved.status).toBe('active');
     expect(saved.endDate).toBe('');

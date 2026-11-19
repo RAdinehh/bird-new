@@ -348,3 +348,55 @@ export async function purgeArchiveIds(ids: string[], storeName: string = DEFAULT
   return ids.length;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// API پشتیبان‌گیری — برای backup.ts
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * خروجی همه رکوردهای آرشیو (برای پشتیبان کامل).
+ * بدون فیلتر، بدون صفحه‌بندی — تمام رکوردها.
+ */
+export async function exportArchiveRecords(storeName: string = DEFAULT_STORE): Promise<ArchiveRecord[]> {
+  const db = await getDB();
+  return (await db.getAll(storeName)) as ArchiveRecord[];
+}
+
+/**
+ * وارد کردن دسته‌ای رکورد به آرشیو (برای بازیابی از پشتیبان).
+ * - mode='replace': ابتدا پاک‌سازی کامل، بعد نوشتن همه
+ * - mode='merge': فقط رکوردهای جدید (بر اساس id)
+ *
+ * @returns تعداد رکوردهای نوشته‌شده
+ */
+export async function importArchiveRecords(
+  records: ArchiveRecord[],
+  mode: 'replace' | 'merge',
+  storeName: string = DEFAULT_STORE,
+): Promise<number> {
+  if (!Array.isArray(records) || records.length === 0) return 0;
+
+  const db = await getDB();
+  const tx = db.transaction(storeName, 'readwrite');
+  const store = tx.objectStore(storeName);
+  let written = 0;
+
+  for (const rec of records) {
+    if (!rec || typeof rec !== 'object' || !rec.id) continue;
+    if (mode === 'merge') {
+      const existing = await store.get(rec.id);
+      if (existing) continue;
+    }
+    await store.put(rec);
+    written++;
+  }
+
+  await tx.done;
+  return written;
+}
+
+/** پاک‌سازی کامل استور آرشیو (برای حالت replace) */
+export async function clearArchive(storeName: string = DEFAULT_STORE): Promise<void> {
+  const db = await getDB();
+  await db.clear(storeName);
+}
+
