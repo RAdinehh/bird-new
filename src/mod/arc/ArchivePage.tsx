@@ -6,6 +6,7 @@ import { Btn, Empty, PageContainer, Tag, Row, TabButton } from '../../shr/compon
 import FlockComparisonPanel, { type ComparisonCandidate } from './FlockComparisonPanel';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { toFa } from '../../shr/utils/fa';
+import { formatJalali } from '../../shr/date/jalali';
 import { toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { useFilterSort, FilterBar, getArcArchiveConfig } from '../../shr/filter';
@@ -33,6 +34,19 @@ interface StoreArchiveEntry {
   storeKey: 'flk' | 'tra' | 'whs' | 'inc';
   storeLabel: string;
   record: ArchiveRecord;
+}
+
+function formatArchiveIsoLabel(val: unknown): string {
+  if (typeof val !== 'string' || !val.trim()) return '';
+  const d = new Date(val);
+  if (Number.isNaN(d.getTime())) return val;
+  try {
+    const datePart = d.toLocaleDateString('fa-IR');
+    const timePart = d.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+    return `${formatArchiveIsoLabel(datePart) || toFa(datePart)} • ${toFa(timePart)}`;
+  } catch {
+    return val.slice(0, 10);
+  }
 }
 
 export default function ArchivePage() {
@@ -625,7 +639,7 @@ export default function ArchivePage() {
                       </span>
                     </div>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 4 }}>
-                      مرجع: {toFa(record.flockId || '—')} • تاریخ: {toFa(record.date || '—')}
+                      مرجع: {toFa(record.flockId || '—')} • تاریخ: {formatArchiveIsoLabel(record.date || '—') || toFa(record.date || '—')}
                     </div>
                   </div>
                   <Btn
@@ -708,7 +722,7 @@ export default function ArchivePage() {
                   <>
                     <span>سن نهایی: <b style={{ color: 'var(--text)' }}>{toFa(ageDays)} روز</b></span>
                     {f.currentCount ? <span>تعداد: <b style={{ color: 'var(--text)' }}>{toFa(f.currentCount)}</b></span> : null}
-                    {f.updatedAt ? <span>آرشیو: <b style={{ color: 'var(--text)' }}>{toFa(f.updatedAt.slice(0, 10))}</b></span> : null}
+                    {f.updatedAt ? <span>آرشیو: <b style={{ color: 'var(--text)' }}>{formatArchiveIsoLabel(f.updatedAt.slice(0, 10)) || toFa(f.updatedAt.slice(0, 10))}</b></span> : null}
                   </>
                 }
               >
@@ -825,7 +839,7 @@ function LogsArchiveTab({
                   {flock?.name || ('گلهٔ ' + flockId)}
                 </div>
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                  {toFa(items.length)} ثبت • {toFa(dates[0] || '—')} تا {toFa(dates[dates.length - 1] || '—')}
+                  {toFa(items.length)} ثبت • {formatArchiveIsoLabel(dates[0] || '—') || toFa(dates[0] || '—')} تا {formatArchiveIsoLabel(dates[dates.length - 1] || '—') || toFa(dates[dates.length - 1] || '—')}
                   {hotCount > 0 ? ' • ' + toFa(hotCount) + ' ثبت فعال' : ''}
                 </div>
               </div>
@@ -849,7 +863,7 @@ function LogsArchiveTab({
                   padding: '4px 0', borderTop: '1px dashed var(--border)',
                 }}>
                   <span>
-                    {toFa(r.date)}
+                    {formatArchiveIsoLabel(r.date) || toFa(r.date)}
                     <span style={{ marginRight: 6 }}><Tag tone="gray">{REASON_LABEL[r.reason] || r.reason}</Tag></span>
                   </span>
                   <Btn

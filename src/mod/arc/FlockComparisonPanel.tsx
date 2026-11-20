@@ -2,19 +2,18 @@ import { useState, useMemo, useEffect } from 'react';
 import {
   Btn,
   Tag,
-  Select,
   TabButton,
   SummaryCard,
-  SummarySection,
-  SummaryRow,
-  AlertBox,
   Empty,
-  Modal,
+  HelpIcon,
+  CardSection,
 } from '../../shr/components/ui';
-import SelectSheetShell from '../../shr/components/SelectSheetShell';
+import SelectSheetShell, { SheetGroup } from '../../shr/components/SelectSheetShell';
 import { toFa } from '../../shr/utils/fa';
+import { normalizeDigits, formatJalali } from '../../shr/date/jalali';
 import { exportTableToCSV, printHTML, printTemplate } from '../../shr/utils/export';
 import { toastMsg } from '../../cor/store/toast';
+import { HELP } from '../../shr/help/helpTexts';
 import type { ComparableFlockMetric } from '../../cor/storage/historyArchive';
 
 export interface ComparisonCandidate {
@@ -35,8 +34,20 @@ interface FlockComparisonPanelProps {
 }
 
 type CandidateFilter = 'all' | 'archived' | 'active';
+type PickerMode = 'compare' | 'baseline' | null;
 type BetterRule = 'higher' | 'lower';
-type TagTone = 'blue' | 'gray' | 'green' | 'purple' | 'red' | 'warn' | 'info' | 'accent' | 'danger' | 'amber' | 'dim';
+type TagTone =
+  | 'blue'
+  | 'gray'
+  | 'green'
+  | 'purple'
+  | 'red'
+  | 'warn'
+  | 'info'
+  | 'accent'
+  | 'danger'
+  | 'amber'
+  | 'dim';
 
 interface SavedComparisonPreset {
   id: string;
@@ -57,20 +68,58 @@ interface MetricSpec {
 const PRESETS_KEY = 'pm-arc-saved-comparisons-v1';
 const MIN_FLOCKS = 2;
 const MAX_FLOCKS = 4;
+const MAX_OTHER_FLOCKS = MAX_FLOCKS - 1;
 const ARCHIVE_FILTER_THRESHOLD = 5;
+
+const DEFAULT_COMPARISON_HELP =
+  '**مقایسه گله‌ها (۲ تا ۴ گله):** ابتدا **گله مرجع** را انتخاب کنید و سپس حداکثر **۳ گله** دیگر را برای مقایسه با آن برگزینید.\n**امتیازدهی:** در هزینه، تلفات و ضریب تبدیل **کمتر بهتر** و در درآمد، زنده‌مانی و تخم **بیشتر بهتر** است. شاخص‌های ثبت‌نشده به پایین جدول منتقل می‌شوند.';
+
+const COMPARISON_HELP_TEXT =
+  (HELP as unknown as { arc?: { comparison?: { overview?: string } } }).arc?.comparison?.overview ??
+  DEFAULT_COMPARISON_HELP;
 
 const COMPARISON_METRICS: MetricSpec[] = [
   { key: 'epef', label: 'شاخص تولید', ruleText: 'بیشتر بهتر', better: 'higher', unit: '', decimals: 0 },
   { key: 'fcr', label: 'ضریب تبدیل', ruleText: 'کمتر بهتر', better: 'lower', unit: '', decimals: 2 },
   { key: 'livabilityPct', label: 'زنده‌مانی', ruleText: 'بیشتر بهتر', better: 'higher', unit: '٪', decimals: 1 },
   { key: 'brokenEggRatePct', label: 'تخم شکسته', ruleText: 'کمتر بهتر', better: 'lower', unit: '٪', decimals: 1 },
-  { key: 'initialCost', label: 'هزینه اولیه گله', ruleText: 'کمتر بهتر', better: 'lower', unit: '', decimals: 0 },
-  { key: 'recordedCost', label: 'هزینه تمام‌شده گله', ruleText: 'کمتر بهتر', better: 'lower', unit: '', decimals: 0 },
+  { key: 'initialCost', label: 'هزینه اولیه', ruleText: 'کمتر بهتر', better: 'lower', unit: '', decimals: 0 },
+  { key: 'recordedCost', label: 'هزینه تمام‌شده', ruleText: 'کمتر بهتر', better: 'lower', unit: '', decimals: 0 },
   { key: 'recordedRevenue', label: 'درآمد ثبت‌شده', ruleText: 'بیشتر بهتر', better: 'higher', unit: '', decimals: 0 },
   { key: 'totalMortality', label: 'کل تلفات', ruleText: 'کمتر بهتر', better: 'lower', unit: '', decimals: 0 },
   { key: 'totalFeedKg', label: 'کل دان', ruleText: 'کمتر بهتر', better: 'lower', unit: 'kg', decimals: 0 },
   { key: 'totalEggs', label: 'کل تخم', ruleText: 'بیشتر بهتر', better: 'higher', unit: '', decimals: 0 },
 ];
+
+function cleanCandidateTitle(rawLabel: string, fallbackName: string): string {
+  const withoutParens = rawLabel
+    .replace(/\s*\[(?:فعال|آرشیو)\]\s*/g, ' ')
+    .replace(/\s*\([^)]*\)\s*/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return withoutParens || fallbackName || rawLabel;
+}
+
+function extractCandidateYear(metric: ComparableFlockMetric): string {
+  const dateStr = metric.lastDate || metric.firstDate || '';
+  if (dateStr) {
+    const norm = normalizeDigits(dateStr).trim();
+    const match = norm.match(/^(1[34]\d{2})[/-]/);
+    if (match) return match[1];
+    const parsed = new Date(dateStr);
+    if (!Number.isNaN(parsed.getTime())) {
+      const j = formatJalali(parsed);
+      const jMatch = normalizeDigits(j).match(/^(1[34]\d{2})[/-]/);
+      if (jMatch) return jMatch[1];
+    }
+  }
+  if (typeof metric.archivedAt === 'number' && metric.archivedAt > 0) {
+    const j = formatJalali(new Date(metric.archivedAt));
+    const jMatch = normalizeDigits(j).match(/^(1[34]\d{2})[/-]/);
+    if (jMatch) return jMatch[1];
+  }
+  return 'نامشخص';
+}
 
 function extractNumericMetric(metric: ComparableFlockMetric, key: string): number | null {
   const rec = metric as unknown as Record<string, unknown>;
@@ -130,8 +179,7 @@ export default function FlockComparisonPanel({
   activeFlockIds,
 }: FlockComparisonPanelProps) {
   const [panelOpen, setPanelOpen] = useState(false);
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const [helpOpen, setHelpOpen] = useState(false);
+  const [pickerMode, setPickerMode] = useState<PickerMode>(null);
   const [filter, setFilter] = useState<CandidateFilter>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [presets, setPresets] = useState<SavedComparisonPreset[]>(() => readPresets());
@@ -142,17 +190,28 @@ export default function FlockComparisonPanel({
 
   const showArchiveFilterControls = candidates.length > ARCHIVE_FILTER_THRESHOLD;
 
+  const getTitle = (c: ComparisonCandidate) => cleanCandidateTitle(c.label, c.metric.flockName);
+  const getIsActive = (c: ComparisonCandidate) => activeFlockIds.has(c.id) || c.isActive;
+  const getDays = (c: ComparisonCandidate) => c.metric.durationDays ?? c.metric.logCount;
+
   const filteredCandidates = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return candidates.filter((c) => {
-      if (filter === 'active' && !c.isActive) return false;
-      if (filter === 'archived' && c.isActive) return false;
-      if (q && !c.label.toLowerCase().includes(q) && !c.metric.flockName.toLowerCase().includes(q)) {
+      const active = getIsActive(c);
+      if (filter === 'active' && !active) return false;
+      if (filter === 'archived' && active) return false;
+      const title = getTitle(c).toLowerCase();
+      if (
+        q &&
+        !title.includes(q) &&
+        !c.label.toLowerCase().includes(q) &&
+        !c.metric.flockName.toLowerCase().includes(q)
+      ) {
         return false;
       }
       return true;
     });
-  }, [candidates, filter, searchQuery]);
+  }, [candidates, filter, searchQuery, activeFlockIds]);
 
   const selectedCandidates = useMemo(() => {
     const cappedIds = selectedIds.slice(0, MAX_FLOCKS);
@@ -172,18 +231,50 @@ export default function FlockComparisonPanel({
   }, [selectedCandidates, effectiveBaselineId]);
 
   const refCandidate = orderedCandidates[0] ?? null;
+  const otherCandidates = useMemo(
+    () => orderedCandidates.filter((c) => c.id !== refCandidate?.id),
+    [orderedCandidates, refCandidate]
+  );
+
   const selectedCount = orderedCandidates.length;
   const canCompare = selectedCount >= MIN_FLOCKS && selectedCount <= MAX_FLOCKS;
 
-  const hasMixedProduction = useMemo(() => {
-    if (!canCompare) return false;
-    const types = new Set(
-      orderedCandidates
-        .map((c) => c.metric.productionType)
-        .filter((pt): pt is NonNullable<ComparableFlockMetric['productionType']> => Boolean(pt))
-    );
-    return types.size > 1;
-  }, [canCompare, orderedCandidates]);
+  const sortedMetrics = useMemo(() => {
+    return COMPARISON_METRICS.map((spec, idx) => {
+      const hasAnyValue = orderedCandidates.some(
+        (c) => extractNumericMetric(c.metric, spec.key) !== null
+      );
+      return { spec, idx, hasAnyValue };
+    })
+      .sort((a, b) => {
+        if (a.hasAnyValue === b.hasAnyValue) return a.idx - b.idx;
+        return a.hasAnyValue ? -1 : 1;
+      })
+      .map((item) => item.spec);
+  }, [orderedCandidates]);
+
+  const groupedByYear = useMemo(() => {
+    const map = new Map<string, ComparisonCandidate[]>();
+    for (const c of filteredCandidates) {
+      const yr = extractCandidateYear(c.metric);
+      const list = map.get(yr) ?? [];
+      list.push(c);
+      map.set(yr, list);
+    }
+    const entries = Array.from(map.entries());
+    entries.sort(([a], [b]) => {
+      if (a === 'نامشخص') return 1;
+      if (b === 'نامشخص') return -1;
+      return Number(b) - Number(a);
+    });
+    return entries;
+  }, [filteredCandidates]);
+
+  const handleOpenPicker = (mode: Exclude<PickerMode, null>) => {
+    setSearchQuery('');
+    setFilter('all');
+    setPickerMode(mode);
+  };
 
   const handleSetReference = (nextRefId: string) => {
     if (!candidates.some((c) => c.id === nextRefId)) return;
@@ -194,28 +285,31 @@ export default function FlockComparisonPanel({
           ? [...selectedIds.filter((id) => id !== removable), nextRefId]
           : [nextRefId, ...selectedIds.slice(0, MAX_FLOCKS - 1)];
         onSelectPreset(nextIds, nextRefId);
+        setPickerMode(null);
         return;
       }
       onSelectPreset([...selectedIds, nextRefId], nextRefId);
+      setPickerMode(null);
       return;
     }
     onChangeBaseline(nextRefId);
+    setPickerMode(null);
   };
 
   const handleToggleInPicker = (targetId: string) => {
     if (targetId === effectiveBaselineId) {
-      toastMsg.info('این گله هم‌اکنون مرجع است؛ برای تغییر، «مرجع» را بزنید');
+      toastMsg.info('این گله مرجع است');
       return;
     }
     const isAlreadySelected = selectedIds.includes(targetId);
-    if (!isAlreadySelected && selectedIds.length >= MAX_FLOCKS) {
-      toastMsg.warn(`حداکثر ${toFa(MAX_FLOCKS)} گله در کل قابل مقایسه است`);
+    if (!isAlreadySelected && otherCandidates.length >= MAX_OTHER_FLOCKS) {
+      toastMsg.warn(`علاوه بر گله مرجع، حداکثر ${toFa(MAX_OTHER_FLOCKS)} گله قابل انتخاب است`);
       return;
     }
     onToggleFlock(targetId);
   };
 
-  const summaryInfo = useMemo(() => {
+  const bestFlockInfo = useMemo(() => {
     if (!canCompare || !refCandidate) return null;
     const comparables = orderedCandidates.slice(1);
 
@@ -224,9 +318,8 @@ export default function FlockComparisonPanel({
       let betterCount = 0;
       let worseCount = 0;
       let netAdvantagePct = 0;
-      const betterLabels: string[] = [];
 
-      for (const spec of COMPARISON_METRICS) {
+      for (const spec of sortedMetrics) {
         const val = extractNumericMetric(item.metric, spec.key);
         const refVal = extractNumericMetric(refCandidate.metric, spec.key);
         if (val === null || refVal === null) continue;
@@ -241,35 +334,45 @@ export default function FlockComparisonPanel({
 
         if (isBetter) {
           betterCount += 1;
-          betterLabels.push(spec.label);
         } else {
           worseCount += 1;
         }
       }
 
-      const passPct = comparableCount > 0 ? Math.round((betterCount / comparableCount) * 100) : 0;
       return {
         candidate: item,
         comparableCount,
         betterCount,
         worseCount,
-        passPct,
         netAdvantagePct,
-        betterLabels,
       };
     });
 
     const sorted = [...scored].sort((a, b) => {
       if (b.betterCount !== a.betterCount) return b.betterCount - a.betterCount;
-      if (b.passPct !== a.passPct) return b.passPct - a.passPct;
       if (b.netAdvantagePct !== a.netAdvantagePct) return b.netAdvantagePct - a.netAdvantagePct;
       return a.worseCount - b.worseCount;
     });
 
     const winner = sorted[0] ?? null;
-    const hasBetter = Boolean(winner && winner.betterCount > 0);
-    return { scored, winner, hasBetter };
-  }, [canCompare, refCandidate, orderedCandidates]);
+    if (!winner || winner.betterCount <= 0) {
+      return {
+        title: getTitle(refCandidate),
+        badge: 'مرجع',
+        tone: 'info' as TagTone,
+        summary: 'هیچ گله مقایسه‌ای در شاخص‌های ثبت‌شده عملکرد بهتری نسبت به مرجع نداشته است.',
+        ruleNote: 'معیار انتخاب: در هزینه، تلفات و ضریب تبدیل مقدار کمتر و در درآمد، زنده‌مانی و تخم مقدار بیشتر امتیاز مثبت می‌گیرد.',
+      };
+    }
+
+    return {
+      title: getTitle(winner.candidate),
+      badge: 'برتر',
+      tone: 'green' as TagTone,
+      summary: `این گله در ${toFa(winner.betterCount)} شاخص از ${toFa(winner.comparableCount)} شاخص قابل مقایسه، نتیجه بهتری نسبت به گله مرجع (${getTitle(refCandidate)}) ثبت کرده است.`,
+      ruleNote: 'معیار انتخاب: در هزینه، تلفات و ضریب تبدیل مقدار کمتر و در درآمد، زنده‌مانی و تخم مقدار بیشتر امتیاز مثبت می‌گیرد.',
+    };
+  }, [canCompare, refCandidate, orderedCandidates, sortedMetrics]);
 
   const handleSavePreset = () => {
     if (!canCompare || !refCandidate) {
@@ -279,7 +382,7 @@ export default function FlockComparisonPanel({
     const ids = orderedCandidates.map((c) => c.id);
     const next: SavedComparisonPreset = {
       id: String(Date.now()),
-      title: `مقایسه ${toFa(ids.length)} گله (${refCandidate.label})`,
+      title: `مقایسه ${toFa(ids.length)} گله (${getTitle(refCandidate)})`,
       flockIds: ids,
       baselineId: refCandidate.id,
     };
@@ -294,8 +397,8 @@ export default function FlockComparisonPanel({
 
   const handleExportCSV = () => {
     if (!canCompare || !refCandidate) return;
-    const headers = ['شاخص', ...orderedCandidates.map((c) => c.label)];
-    const rows = COMPARISON_METRICS.map((spec) => [
+    const headers = ['شاخص', ...orderedCandidates.map((c) => getTitle(c))];
+    const rows = sortedMetrics.map((spec) => [
       spec.label,
       ...orderedCandidates.map((c) => {
         const v = extractNumericMetric(c.metric, spec.key);
@@ -308,9 +411,9 @@ export default function FlockComparisonPanel({
   const handleExportPDF = () => {
     if (!canCompare || !refCandidate) return;
     const headCells = orderedCandidates
-      .map((c, idx) => `<th>${c.label}${idx === 0 ? ' (مرجع)' : ''}</th>`)
+      .map((c, idx) => `<th>${getTitle(c)}${idx === 0 ? ' (مرجع)' : ''}</th>`)
       .join('');
-    const bodyRows = COMPARISON_METRICS.map((spec) => {
+    const bodyRows = sortedMetrics.map((spec) => {
       const cells = orderedCandidates
         .map((c) => {
           const v = extractNumericMetric(c.metric, spec.key);
@@ -324,7 +427,7 @@ export default function FlockComparisonPanel({
       <div class="header">
         <div>
           <h1>گزارش مقایسه گله‌ها (${toFa(orderedCandidates.length)} گله)</h1>
-          <div class="farm-info">مرجع: ${refCandidate.label} • ${toFa(new Date().toLocaleDateString('fa-IR'))}</div>
+          <div class="farm-info">مرجع: ${getTitle(refCandidate)} • ${toFa(new Date().toLocaleDateString('fa-IR'))}</div>
         </div>
       </div>
       <table>
@@ -334,6 +437,11 @@ export default function FlockComparisonPanel({
     `;
     printHTML(printTemplate('گزارش مقایسه گله‌ها', htmlBody));
   };
+
+  const otherSummaryText = useMemo(() => {
+    if (otherCandidates.length === 0) return 'انتخاب گله‌های مقایسه';
+    return otherCandidates.map((c) => getTitle(c)).join('، ');
+  }, [otherCandidates]);
 
   return (
     <div
@@ -347,557 +455,547 @@ export default function FlockComparisonPanel({
         gap: 'var(--gap-sm)',
       }}
     >
-      <div className="flex-between" style={{ flexWrap: 'wrap', gap: 8 }}>
-        <div>
-          <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: 'var(--text)' }}>
-            مقایسه گله‌ها ({toFa(MIN_FLOCKS)} تا {toFa(MAX_FLOCKS)} گله)
+      <div className="flex-between" style={{ gap: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              fontWeight: 700,
+              fontSize: 'var(--fs-base)',
+              color: 'var(--text)',
+            }}
+          >
+            <span>مقایسه گله‌ها</span>
+            <HelpIcon text={COMPARISON_HELP_TEXT} />
           </div>
           {refCandidate && (
-            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-              مرجع: {refCandidate.label} • {toFa(orderedCandidates.length)} گله
+            <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+              مرجع: {getTitle(refCandidate)} • {toFa(orderedCandidates.length)} از {toFa(MAX_FLOCKS)} گله
             </div>
           )}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Btn size="sm" onClick={() => setHelpOpen(true)}>
-            راهنما
-          </Btn>
-          <Btn
-            size="sm"
-            variant={panelOpen ? 'primary' : undefined}
-            onClick={() => setPanelOpen((v) => !v)}
-          >
-            {panelOpen ? 'بستن مقایسه' : 'نمایش مقایسه'}
-          </Btn>
-        </div>
+        <Btn
+          size="sm"
+          variant={panelOpen ? 'primary' : undefined}
+          onClick={() => setPanelOpen((v) => !v)}
+        >
+          {panelOpen ? 'بستن مقایسه' : 'نمایش مقایسه'}
+        </Btn>
       </div>
 
       {panelOpen && (
         <div className="stack" style={{ gap: 'var(--gap-md)' }}>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-              gap: 8,
-            }}
-          >
-            <div
-              style={{
-                background: 'var(--input-bg, var(--card-solid))',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--r-md)',
-                padding: 8,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 6,
-              }}
-            >
-              <div className="flex-between" style={{ fontSize: 'var(--fs-xs)', fontWeight: 700 }}>
-                <span>گله‌های انتخاب‌شده</span>
-                <span style={{ color: 'var(--muted)' }}>
-                  {toFa(selectedCount)} از {toFa(MAX_FLOCKS)}
-                </span>
-              </div>
-              <div className="flex-between" style={{ gap: 8 }}>
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-                  {toFa(candidates.length)} گله فعال و آرشیو
-                </span>
-                <Btn size="sm" variant="primary" onClick={() => setPickerOpen(true)}>
-                  انتخاب گله‌ها
-                </Btn>
-              </div>
-            </div>
-
-            {candidates.length > 0 && (
-              <div
-                style={{
-                  background: 'var(--input-bg, var(--card-solid))',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--r-md)',
-                  padding: 8,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 6,
-                }}
-              >
-                <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 700 }}>
-                  گله مرجع (فعال یا آرشیو)
-                </span>
-                <Select
-                  value={effectiveBaselineId}
-                  onChange={(e) => handleSetReference(e.target.value)}
-                >
-                  {candidates.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.label} ({c.isActive ? 'فعال' : 'آرشیو'})
-                    </option>
-                  ))}
-                </Select>
-              </div>
-            )}
-          </div>
-
-          {orderedCandidates.length > 0 && (
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              {orderedCandidates.map((item, idx) => {
-                const isRef = idx === 0;
-                return (
-                  <span
-                    key={item.id}
+          <CardSection title="انتخاب گله‌ها" first>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {candidates.length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <label style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, color: 'var(--text)' }}>
+                    انتخاب گله مرجع
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenPicker('baseline')}
                     style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      padding: '4px 8px',
-                      borderRadius: 'var(--r-sm)',
-                      border: `1px solid ${isRef ? 'var(--accent-border)' : 'var(--border)'}`,
-                      background: isRef ? 'var(--accent-soft)' : 'var(--card-solid)',
+                      width: '100%',
+                      padding: '8px 10px',
+                      borderRadius: 'var(--r-md)',
+                      border: '1px solid var(--border)',
+                      background: 'var(--card-solid)',
+                      color: 'var(--text)',
                       fontSize: 'var(--fs-xs)',
                       fontWeight: 600,
+                      fontFamily: 'inherit',
+                      textAlign: 'right',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 8,
                     }}
                   >
-                    <span>{item.label}</span>
-                    {isRef ? (
-                      <span style={{ color: 'var(--accent)', fontSize: 10 }}>مرجع</span>
-                    ) : (
-                      orderedCandidates.length > MIN_FLOCKS && (
-                        <button
-                          type="button"
-                          aria-label={`حذف ${item.label}`}
-                          onClick={() => onToggleFlock(item.id)}
-                          style={{
-                            border: 'none',
-                            background: 'transparent',
-                            color: 'var(--muted)',
-                            fontWeight: 700,
-                            cursor: 'pointer',
-                            padding: '0 2px',
-                          }}
-                        >
-                          ×
-                        </button>
-                      )
-                    )}
-                  </span>
-                );
-              })}
-            </div>
-          )}
-
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            <Btn size="sm" disabled={!canCompare} onClick={handleSavePreset}>
-              ذخیره مقایسه
-            </Btn>
-            <Btn size="sm" disabled={!canCompare} onClick={handleExportCSV}>
-              خروجی CSV
-            </Btn>
-            <Btn size="sm" disabled={!canCompare} onClick={handleExportPDF}>
-              خروجی PDF
-            </Btn>
-          </div>
-
-          {presets.length > 0 && (
-            <SummaryCard tone="info" title="مقایسه‌های ذخیره‌شده">
-              {presets.map((p) => (
-                <div
-                  key={p.id}
-                  className="flex-between"
-                  style={{ paddingTop: 4, borderTop: '1px dashed var(--info-border)', gap: 8 }}
-                >
-                  <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--text)', fontWeight: 600 }}>
-                    {p.title}
-                  </span>
-                  <div style={{ display: 'flex', gap: 4 }}>
-                    <Btn size="sm" onClick={() => onSelectPreset(p.flockIds, p.baselineId)}>
-                      باز کردن
-                    </Btn>
-                    <Btn size="sm" onClick={() => handleDeletePreset(p.id)}>
-                      حذف
-                    </Btn>
-                  </div>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {refCandidate ? getTitle(refCandidate) : 'انتخاب نشده'}
+                    </span>
+                    <span style={{ color: 'var(--muted)', flexShrink: 0 }}>▾</span>
+                  </button>
                 </div>
-              ))}
-            </SummaryCard>
-          )}
+              )}
 
-          {!canCompare ? (
-            <AlertBox tone="info" variant="flat" size="xs">
-              برای نمایش مقایسه، حداقل {toFa(MIN_FLOCKS)} و حداکثر {toFa(MAX_FLOCKS)} گله انتخاب کنید.
-            </AlertBox>
-          ) : (
-            <div className="stack" style={{ gap: 'var(--gap-sm)' }}>
-              {summaryInfo && refCandidate && (
-                <div
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <label style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, color: 'var(--text)' }}>
+                  انتخاب گله‌های مقایسه ({toFa(otherCandidates.length)} از {toFa(MAX_OTHER_FLOCKS)})
+                </label>
+                <button
+                  type="button"
+                  onClick={() => handleOpenPicker('compare')}
                   style={{
-                    background: 'var(--input-bg, var(--card-solid))',
-                    border: '1px solid var(--border)',
+                    width: '100%',
+                    padding: '8px 10px',
                     borderRadius: 'var(--r-md)',
-                    padding: '9px 11px',
+                    border: '1px solid var(--border)',
+                    background: 'var(--card-solid)',
+                    color: 'var(--text)',
+                    fontSize: 'var(--fs-xs)',
+                    fontWeight: 600,
+                    fontFamily: 'inherit',
+                    textAlign: 'right',
+                    cursor: 'pointer',
                     display: 'flex',
-                    flexDirection: 'column',
-                    gap: 6,
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 8,
                   }}
                 >
-                  <div className="flex-between" style={{ fontSize: 'var(--fs-xs)', fontWeight: 700 }}>
-                    <span>
-                      بهترین عملکرد:{' '}
-                      {summaryInfo.hasBetter && summaryInfo.winner
-                        ? summaryInfo.winner.candidate.label
-                        : refCandidate.label}
-                    </span>
-                    <Tag tone={summaryInfo.hasBetter ? 'green' : 'info'}>
-                      {summaryInfo.hasBetter ? 'برتر' : 'مرجع'}
-                    </Tag>
-                  </div>
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {otherSummaryText}
+                  </span>
+                  <span style={{ color: 'var(--muted)', flexShrink: 0 }}>▾</span>
+                </button>
+              </div>
 
-                  <p style={{ margin: 0, fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-                    {summaryInfo.hasBetter && summaryInfo.winner
-                      ? `بهتر در ${toFa(summaryInfo.winner.betterCount)} از ${toFa(
-                          summaryInfo.winner.comparableCount
-                        )} شاخص (${summaryInfo.winner.betterLabels.slice(0, 3).join('، ')}).`
-                      : 'هیچ گله‌ای شاخص بهتری نسبت به مرجع ثبت نکرد.'}
-                  </p>
-
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                    {summaryInfo.scored.map((entry) => (
+              {orderedCandidates.length > 0 && (
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  {orderedCandidates.map((item, idx) => {
+                    const isRef = idx === 0;
+                    return (
                       <span
-                        key={entry.candidate.id}
+                        key={item.id}
                         style={{
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: 6,
                           padding: '4px 8px',
                           borderRadius: 'var(--r-sm)',
-                          border: '1px solid var(--border)',
-                          background: 'var(--card-solid)',
+                          border: `1px solid ${isRef ? 'var(--accent-border)' : 'var(--border)'}`,
+                          background: isRef ? 'var(--accent-soft)' : 'var(--card-solid)',
                           fontSize: 'var(--fs-xs)',
+                          fontWeight: 600,
                         }}
                       >
-                        <span>{entry.candidate.label}:</span>
-                        <strong style={{ direction: 'ltr', unicodeBidi: 'isolate' }}>
-                          {toFa(entry.betterCount)}/{toFa(entry.comparableCount)}
-                        </strong>
-                        <span style={{ color: 'var(--muted)' }}>({toFa(entry.passPct)}٪)</span>
+                        <span>{getTitle(item)}</span>
+                        {isRef ? (
+                          <span style={{ color: 'var(--accent)', fontSize: 10 }}>مرجع</span>
+                        ) : (
+                          orderedCandidates.length > MIN_FLOCKS && (
+                            <button
+                              type="button"
+                              aria-label={`حذف ${getTitle(item)}`}
+                              onClick={() => onToggleFlock(item.id)}
+                              style={{
+                                border: 'none',
+                                background: 'transparent',
+                                color: 'var(--muted)',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                padding: '0 2px',
+                              }}
+                            >
+                              ×
+                            </button>
+                          )
+                        )}
                       </span>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
               )}
+            </div>
+          </CardSection>
 
-              {hasMixedProduction && (
-                <AlertBox tone="warn" variant="flat" size="xs">
-                  نوع تولید گله‌ها متفاوت است؛ شاخص‌های نامرتبط «ثبت نشده» نمایش داده می‌شوند.
-                </AlertBox>
-              )}
+          <CardSection title="عملکرد و جدول مقایسه">
+            {!canCompare ? (
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+                گله مرجع و حداقل {toFa(MIN_FLOCKS - 1)} تا حداکثر {toFa(MAX_OTHER_FLOCKS)} گله دیگر برای مقایسه انتخاب کنید.
+              </div>
+            ) : (
+              <div className="stack" style={{ gap: 'var(--gap-sm)' }}>
+                {bestFlockInfo && (
+                  <div
+                    style={{
+                      background: 'var(--card-solid)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--r-md)',
+                      padding: '8px 10px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 4,
+                    }}
+                  >
+                    <div className="flex-between" style={{ fontSize: 'var(--fs-xs)', fontWeight: 700 }}>
+                      <span>بهترین عملکرد: {bestFlockInfo.title}</span>
+                      <Tag tone={bestFlockInfo.tone}>{bestFlockInfo.badge}</Tag>
+                    </div>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text)' }}>
+                      {bestFlockInfo.summary}
+                    </div>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+                      {bestFlockInfo.ruleNote}
+                    </div>
+                  </div>
+                )}
 
-              <div
-                style={{
-                  width: '100%',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--r-md)',
-                  overflowX: 'auto',
-                  background: 'var(--card-solid)',
-                }}
-              >
-                <table
+                <div
                   style={{
                     width: '100%',
-                    borderCollapse: 'collapse',
-                    minWidth: orderedCandidates.length > 3 ? 520 : '100%',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--r-md)',
+                    overflowX: 'auto',
+                    background: 'var(--card-solid)',
                   }}
                 >
-                  <thead>
-                    <tr style={{ background: 'var(--input-bg, var(--card-solid))' }}>
-                      <th
-                        style={{
-                          padding: '6px 5px',
-                          borderBottom: '1px solid var(--border)',
-                          borderLeft: '1px solid var(--border)',
-                          textAlign: 'center',
-                          fontSize: 'var(--fs-xs)',
-                        }}
-                      >
-                        <div>شاخص</div>
-                        <div style={{ fontSize: 10, color: 'var(--muted)', fontWeight: 400 }}>قاعده</div>
-                      </th>
-                      {orderedCandidates.map((c, idx) => {
-                        const isRef = idx === 0;
-                        return (
-                          <th
-                            key={c.id}
-                            style={{
-                              padding: '6px 5px',
-                              borderBottom: '1px solid var(--border)',
-                              borderLeft: '1px solid var(--border)',
-                              textAlign: 'center',
-                              fontSize: 'var(--fs-xs)',
-                            }}
-                          >
-                            <div style={{ fontWeight: 700 }}>{c.label}</div>
-                            {isRef && (
-                              <div style={{ marginTop: 3 }}>
-                                <Tag tone="info">مرجع</Tag>
-                              </div>
-                            )}
-                          </th>
-                        );
-                      })}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {COMPARISON_METRICS.map((spec, rIdx) => {
-                      const refVal = refCandidate ? extractNumericMetric(refCandidate.metric, spec.key) : null;
-                      return (
-                        <tr
-                          key={spec.key}
+                  <table
+                    style={{
+                      width: '100%',
+                      borderCollapse: 'collapse',
+                      tableLayout: 'fixed',
+                    }}
+                  >
+                    <thead>
+                      <tr style={{ background: 'var(--card)' }}>
+                        <th
                           style={{
-                            background: rIdx % 2 === 1 ? 'var(--input-bg, transparent)' : 'transparent',
+                            width: 82,
+                            padding: '5px 4px',
+                            borderBottom: '1px solid var(--border)',
+                            borderLeft: '1px solid var(--border)',
+                            textAlign: 'center',
+                            fontSize: 11,
                           }}
                         >
-                          <td
+                          <div>شاخص</div>
+                          <div style={{ fontSize: 9.5, color: 'var(--muted)', fontWeight: 400 }}>قاعده</div>
+                        </th>
+                        {orderedCandidates.map((c, idx) => {
+                          const isRef = idx === 0;
+                          return (
+                            <th
+                              key={c.id}
+                              style={{
+                                minWidth: 72,
+                                padding: '5px 4px',
+                                borderBottom: '1px solid var(--border)',
+                                borderLeft: '1px solid var(--border)',
+                                textAlign: 'center',
+                                fontSize: 11,
+                              }}
+                            >
+                              <div style={{ fontWeight: 700, wordBreak: 'break-word' }}>{getTitle(c)}</div>
+                              {isRef && (
+                                <div style={{ marginTop: 2 }}>
+                                  <Tag tone="info">مرجع</Tag>
+                                </div>
+                              )}
+                            </th>
+                          );
+                        })}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sortedMetrics.map((spec, rIdx) => {
+                        const refVal = refCandidate ? extractNumericMetric(refCandidate.metric, spec.key) : null;
+                        return (
+                          <tr
+                            key={spec.key}
                             style={{
-                              padding: '6px 5px',
-                              borderBottom: '1px solid var(--border)',
-                              borderLeft: '1px solid var(--border)',
-                              textAlign: 'center',
+                              background: rIdx % 2 === 1 ? 'var(--card)' : 'transparent',
                             }}
                           >
-                            <div style={{ fontSize: 'var(--fs-xs)', fontWeight: 700 }}>{spec.label}</div>
-                            <div style={{ fontSize: 10, color: 'var(--muted)' }}>{spec.ruleText}</div>
-                          </td>
+                            <td
+                              style={{
+                                padding: '5px 4px',
+                                borderBottom: '1px solid var(--border)',
+                                borderLeft: '1px solid var(--border)',
+                                textAlign: 'center',
+                              }}
+                            >
+                              <div style={{ fontSize: 11, fontWeight: 700 }}>{spec.label}</div>
+                              <div style={{ fontSize: 9.5, color: 'var(--muted)' }}>{spec.ruleText}</div>
+                            </td>
 
-                          {orderedCandidates.map((c, idx) => {
-                            const isRef = idx === 0;
-                            const val = extractNumericMetric(c.metric, spec.key);
+                            {orderedCandidates.map((c, idx) => {
+                              const isRef = idx === 0;
+                              const val = extractNumericMetric(c.metric, spec.key);
 
-                            if (val === null) {
+                              if (val === null) {
+                                return (
+                                  <td
+                                    key={c.id}
+                                    style={{
+                                      padding: '5px 4px',
+                                      borderBottom: '1px solid var(--border)',
+                                      borderLeft: '1px solid var(--border)',
+                                      textAlign: 'center',
+                                      fontSize: 11,
+                                      color: 'var(--muted)',
+                                    }}
+                                  >
+                                    ثبت نشده
+                                  </td>
+                                );
+                              }
+
+                              if (isRef) {
+                                return (
+                                  <td
+                                    key={c.id}
+                                    style={{
+                                      padding: '5px 4px',
+                                      borderBottom: '1px solid var(--border)',
+                                      borderLeft: '1px solid var(--border)',
+                                      textAlign: 'center',
+                                    }}
+                                  >
+                                    <div style={{ fontWeight: 700, fontSize: 11 }}>
+                                      {formatNumFa(val, spec.decimals, spec.unit)}
+                                    </div>
+                                    <div style={{ fontSize: 9.5, color: 'var(--muted)' }}>—</div>
+                                  </td>
+                                );
+                              }
+
+                              if (refVal === null || refVal === 0) {
+                                return (
+                                  <td
+                                    key={c.id}
+                                    style={{
+                                      padding: '5px 4px',
+                                      borderBottom: '1px solid var(--border)',
+                                      borderLeft: '1px solid var(--border)',
+                                      textAlign: 'center',
+                                    }}
+                                  >
+                                    <div style={{ fontWeight: 700, fontSize: 11 }}>
+                                      {formatNumFa(val, spec.decimals, spec.unit)}
+                                    </div>
+                                    <div style={{ fontSize: 9.5, color: 'var(--muted)' }}>بدون مبنا</div>
+                                  </td>
+                                );
+                              }
+
+                              const diff = val - refVal;
+                              const pct = (diff / Math.abs(refVal)) * 100;
+                              const isEqual = Math.abs(diff) < 1e-9;
+                              const isBetter = isEqual ? null : spec.better === 'lower' ? diff < 0 : diff > 0;
+                              const tone: TagTone = isEqual ? 'gray' : isBetter ? 'green' : 'red';
+                              const statusLabel = isEqual ? 'برابر' : isBetter ? 'بهتر' : 'ضعیف‌تر';
+
                               return (
                                 <td
                                   key={c.id}
                                   style={{
-                                    padding: '6px 5px',
-                                    borderBottom: '1px solid var(--border)',
-                                    borderLeft: '1px solid var(--border)',
-                                    textAlign: 'center',
-                                    fontSize: 'var(--fs-xs)',
-                                    color: 'var(--muted)',
-                                  }}
-                                >
-                                  ثبت نشده
-                                </td>
-                              );
-                            }
-
-                            if (isRef) {
-                              return (
-                                <td
-                                  key={c.id}
-                                  style={{
-                                    padding: '6px 5px',
+                                    padding: '5px 4px',
                                     borderBottom: '1px solid var(--border)',
                                     borderLeft: '1px solid var(--border)',
                                     textAlign: 'center',
                                   }}
                                 >
-                                  <div style={{ fontWeight: 700, fontSize: 'var(--fs-xs)' }}>
+                                  <div style={{ fontWeight: 700, fontSize: 11 }}>
                                     {formatNumFa(val, spec.decimals, spec.unit)}
                                   </div>
-                                  <div style={{ fontSize: 10, color: 'var(--muted)' }}>—</div>
-                                </td>
-                              );
-                            }
-
-                            if (refVal === null || refVal === 0) {
-                              return (
-                                <td
-                                  key={c.id}
-                                  style={{
-                                    padding: '6px 5px',
-                                    borderBottom: '1px solid var(--border)',
-                                    borderLeft: '1px solid var(--border)',
-                                    textAlign: 'center',
-                                  }}
-                                >
-                                  <div style={{ fontWeight: 700, fontSize: 'var(--fs-xs)' }}>
-                                    {formatNumFa(val, spec.decimals, spec.unit)}
+                                  <div style={{ fontSize: 9.5, color: 'var(--muted)' }}>
+                                    {formatPctFa(pct)}
                                   </div>
-                                  <div style={{ fontSize: 10, color: 'var(--muted)' }}>بدون مبنا</div>
+                                  <div style={{ marginTop: 2 }}>
+                                    <Tag tone={tone}>{statusLabel}</Tag>
+                                  </div>
                                 </td>
                               );
-                            }
+                            })}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
 
-                            const diff = val - refVal;
-                            const pct = (diff / Math.abs(refVal)) * 100;
-                            const isEqual = Math.abs(diff) < 1e-9;
-                            const isBetter = isEqual ? null : spec.better === 'lower' ? diff < 0 : diff > 0;
-                            const tone: TagTone = isEqual
-                              ? 'gray'
-                              : isBetter
-                              ? 'green'
-                              : 'red';
-                            const statusLabel = isEqual ? 'برابر' : isBetter ? 'بهتر' : 'ضعیف‌تر';
-
-                            return (
-                              <td
-                                key={c.id}
-                                style={{
-                                  padding: '6px 5px',
-                                  borderBottom: '1px solid var(--border)',
-                                  borderLeft: '1px solid var(--border)',
-                                  textAlign: 'center',
-                                }}
-                              >
-                                <div style={{ fontWeight: 700, fontSize: 'var(--fs-xs)' }}>
-                                  {formatNumFa(val, spec.decimals, spec.unit)}
-                                </div>
-                                <div style={{ fontSize: 10, color: 'var(--muted)' }}>
-                                  {formatPctFa(pct)}
-                                </div>
-                                <div style={{ marginTop: 2 }}>
-                                  <Tag tone={tone}>{statusLabel}</Tag>
-                                </div>
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+                  شاخص‌های فاقد مقدار به‌صورت خودکار در پایین جدول قرار می‌گیرند.
+                </div>
               </div>
+            )}
+          </CardSection>
+
+          <CardSection
+            title="ذخیره و خروجی گزارش"
+            meta={`${toFa(orderedCandidates.length)} از ${toFa(MAX_FLOCKS)} گله`}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                <Btn size="sm" disabled={!canCompare} onClick={handleSavePreset}>
+                  ذخیره مقایسه
+                </Btn>
+                <Btn size="sm" disabled={!canCompare} onClick={handleExportCSV}>
+                  خروجی CSV
+                </Btn>
+                <Btn size="sm" disabled={!canCompare} onClick={handleExportPDF}>
+                  خروجی PDF
+                </Btn>
+              </div>
+
+              {presets.length > 0 && (
+                <SummaryCard tone="info" title="مقایسه‌های ذخیره‌شده">
+                  {presets.map((p) => (
+                    <div
+                      key={p.id}
+                      className="flex-between"
+                      style={{ paddingTop: 4, borderTop: '1px dashed var(--info-border)', gap: 8 }}
+                    >
+                      <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--text)', fontWeight: 600 }}>
+                        {p.title}
+                      </span>
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        <Btn size="sm" onClick={() => onSelectPreset(p.flockIds, p.baselineId)}>
+                          باز کردن
+                        </Btn>
+                        <Btn size="sm" onClick={() => handleDeletePreset(p.id)}>
+                          حذف
+                        </Btn>
+                      </div>
+                    </div>
+                  ))}
+                </SummaryCard>
+              )}
             </div>
-          )}
+          </CardSection>
         </div>
       )}
 
       <SelectSheetShell
-        open={pickerOpen}
-        onClose={() => setPickerOpen(false)}
-        title="انتخاب مرجع و گله‌های مقایسه"
-        subtitle={`${toFa(filteredCandidates.length)} گله • ${toFa(MIN_FLOCKS)} تا ${toFa(MAX_FLOCKS)} گله`}
+        open={pickerMode !== null}
+        onClose={() => setPickerMode(null)}
+        title={pickerMode === 'baseline' ? 'انتخاب گله مرجع' : 'انتخاب گله‌های مقایسه'}
+        subtitle={
+          pickerMode === 'baseline'
+            ? `${toFa(filteredCandidates.length)} گله`
+            : `${toFa(otherCandidates.length)} از ${toFa(MAX_OTHER_FLOCKS)} گله دیگر`
+        }
         searchable={candidates.length > ARCHIVE_FILTER_THRESHOLD}
         searchNode={
-          <input
-            type="search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="جستجوی نام گله..."
-            style={{
-              width: '100%',
-              padding: '6px 10px',
-              borderRadius: 'var(--r-md)',
-              border: '1px solid var(--border)',
-              background: 'var(--input-bg, var(--card-solid))',
-              color: 'var(--text)',
-              fontSize: 'var(--fs-xs)',
-              fontFamily: 'inherit',
-            }}
-          />
+          <div style={{ padding: '4px 2px' }}>
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="جستجوی نام گله..."
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                borderRadius: 'var(--r-md)',
+                border: '1px solid var(--border)',
+                background: 'var(--card-solid)',
+                color: 'var(--text)',
+                fontSize: 'var(--fs-sm)',
+                fontFamily: 'inherit',
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+        }
+        footer={
+          <Btn size="sm" full onClick={() => setPickerMode(null)}>
+            بستن
+          </Btn>
         }
       >
         {showArchiveFilterControls && (
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <div
+            style={{
+              display: 'flex',
+              gap: 6,
+              flexWrap: 'wrap',
+              padding: '6px 8px',
+              borderRadius: 'var(--r-md)',
+              border: '1px solid var(--border)',
+              background: 'var(--card)',
+            }}
+          >
             <TabButton active={filter === 'all'} onClick={() => setFilter('all')}>
               همه ({toFa(candidates.length)})
             </TabButton>
             <TabButton active={filter === 'active'} onClick={() => setFilter('active')}>
-              فعال ({toFa(candidates.filter((c) => c.isActive).length)})
+              فعال ({toFa(candidates.filter((c) => getIsActive(c)).length)})
             </TabButton>
             <TabButton active={filter === 'archived'} onClick={() => setFilter('archived')}>
-              آرشیو ({toFa(candidates.filter((c) => !c.isActive).length)})
+              آرشیو ({toFa(candidates.filter((c) => !getIsActive(c)).length)})
             </TabButton>
           </div>
         )}
 
-        {filteredCandidates.length === 0 ? (
-          <Empty
-            icon="🐔"
-            title="گله‌ای یافت نشد"
-            desc="فیلتر یا عبارت جستجو را تغییر دهید."
-          />
+        {groupedByYear.length === 0 ? (
+          <Empty icon="🐔" title="گله‌ای یافت نشد" desc="فیلتر یا جستجو را تغییر دهید." />
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {filteredCandidates.map((c) => {
-              const isRef = c.id === effectiveBaselineId;
-              const isCompared = selectedIds.includes(c.id) && !isRef;
-              const isActiveFlock = activeFlockIds.has(c.id) || c.isActive;
-              return (
-                <div
-                  key={c.id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 8,
-                    padding: '8px 10px',
-                    borderRadius: 'var(--r-md)',
-                    border: `1px solid ${isRef ? 'var(--accent-border)' : 'var(--border)'}`,
-                    background: isRef ? 'var(--accent-soft)' : 'var(--card-solid)',
-                  }}
-                >
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 'var(--fs-xs)', fontWeight: 700 }}>{c.label}</div>
-                    <div style={{ fontSize: 10, color: 'var(--muted)' }}>
-                      {isActiveFlock ? 'فعال' : 'آرشیو'}
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-                    <Btn
-                      size="sm"
-                      variant={isRef ? 'primary' : undefined}
-                      onClick={() => handleSetReference(c.id)}
-                    >
-                      مرجع
-                    </Btn>
-                    {!isRef && (
-                      <Btn
-                        size="sm"
-                        variant={isCompared ? 'primary' : undefined}
-                        onClick={() => handleToggleInPicker(c.id)}
+          groupedByYear.map(([yearLabel, yearItems]) => (
+            <SheetGroup
+              key={yearLabel}
+              title={yearLabel === 'نامشخص' ? 'سال نامشخص' : `سال ${toFa(yearLabel)}`}
+              count={yearItems.length}
+            >
+              {yearItems.map((c) => {
+                const isRef = c.id === effectiveBaselineId;
+                const isSelected = selectedIds.includes(c.id);
+                const isActiveFlock = getIsActive(c);
+                const statusText = isActiveFlock ? 'گله فعال' : 'آرشیو شده است';
+                const daysText = `${toFa(getDays(c))} روز`;
+                const checked = pickerMode === 'baseline' ? isRef : isSelected;
+
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    aria-selected={checked}
+                    onClick={() =>
+                      pickerMode === 'baseline'
+                        ? handleSetReference(c.id)
+                        : handleToggleInPicker(c.id)
+                    }
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 10,
+                      width: '100%',
+                      padding: '10px 12px',
+                      background: checked ? 'var(--accent-soft)' : 'var(--card-solid)',
+                      border: 'none',
+                      borderBottom: '1px solid var(--border)',
+                      fontFamily: 'inherit',
+                      textAlign: 'right',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0, flex: 1 }}>
+                      <span
+                        style={{
+                          fontSize: 'var(--fs-base)',
+                          fontWeight: 700,
+                          color: checked ? 'var(--accent)' : 'var(--text)',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
                       >
-                        {isCompared ? 'در مقایسه' : '+ مقایسه'}
-                      </Btn>
+                        {getTitle(c)}
+                      </span>
+                      <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+                        {statusText} • {daysText}
+                      </span>
+                    </div>
+
+                    {checked && (
+                      <span style={{ color: 'var(--accent)', fontSize: 15, fontWeight: 800, flexShrink: 0 }}>
+                        ✓
+                      </span>
                     )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                  </button>
+                );
+              })}
+            </SheetGroup>
+          ))
         )}
       </SelectSheetShell>
-
-      <Modal
-        open={helpOpen}
-        onClose={() => setHelpOpen(false)}
-        title="راهنمای مقایسه گله‌ها"
-        footer={
-          <Btn variant="primary" onClick={() => setHelpOpen(false)}>
-            متوجه شدم
-          </Btn>
-        }
-      >
-        <SummarySection first title="مرجع و گله‌های مقایسه">
-          <SummaryRow
-            label="حداقل و حداکثر"
-            value={`${toFa(MIN_FLOCKS)} تا ${toFa(MAX_FLOCKS)} گله (فعال یا آرشیو)`}
-          />
-          <SummaryRow
-            label="ستون مرجع"
-            value="همیشه اول می‌آید و هم‌زمان در لیست مقایسه تکرار نمی‌شود"
-          />
-        </SummarySection>
-        <SummarySection title="امتیازدهی و بهترین عملکرد">
-          <SummaryRow
-            label="قاعده شاخص‌ها"
-            value="در هزینه، تلفات و ضریب تبدیل کمتر بهتر است؛ در درآمد، زنده‌مانی و تخم بیشتر بهتر است"
-          />
-          <SummaryRow
-            label="بهترین عملکرد"
-            value="گله‌ای با بیشترین تعداد شاخص برتر نسبت به مرجع انتخاب می‌شود"
-          />
-        </SummarySection>
-      </Modal>
     </div>
   );
 }
