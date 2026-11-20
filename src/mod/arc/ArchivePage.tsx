@@ -9,7 +9,7 @@ import { toFa } from '../../shr/utils/fa';
 import { formatJalali } from '../../shr/date/jalali';
 import { toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
-import { useFilterSort, FilterBar, getArcArchiveConfig } from '../../shr/filter';
+import { useFilterSort, FilterBar, getArcArchiveConfig, getArcLogsConfig, getArcStoresConfig, type ArcStoreEntry } from '../../shr/filter';
 import { useDlg, type DailyLog } from '../dlg/store';
 import { useWhs } from '../whs/store';
 import { restoreTraInvoices } from '../tra/store';
@@ -505,6 +505,27 @@ export default function ArchivePage() {
     initialSort: config.initialSort,
   });
 
+  const logsConfig = useMemo(
+    () => getArcLogsConfig({ flocks: flocks.map(f => ({ id: f.id, name: f.name })) }),
+    [flocks]
+  );
+  const logsFilterSort = useFilterSort<ArchiveRecord>({
+    items: arcLogs,
+    filters: logsConfig.filterDefs,
+    sorts: logsConfig.sortDefs,
+    persistKey: logsConfig.persistKey,
+    initialSort: logsConfig.initialSort,
+  });
+
+  const storesConfig = useMemo(() => getArcStoresConfig(), []);
+  const storesFilterSort = useFilterSort<ArcStoreEntry>({
+    items: storeEntries,
+    filters: storesConfig.filterDefs,
+    sorts: storesConfig.sortDefs,
+    persistKey: storesConfig.persistKey,
+    initialSort: storesConfig.initialSort,
+  });
+
   const handleRestoreStoreEntry = async (entry: StoreArchiveEntry) => {
     setRestoringId(entry.record.id);
     try {
@@ -539,8 +560,8 @@ export default function ArchivePage() {
     kind === 'flocks'
       ? archivedFlocks.length
       : kind === 'logs'
-      ? arcLogs.length
-      : storeEntries.length;
+      ? logsFilterSort.filtered.length
+      : storesFilterSort.filtered.length;
 
   return (
     <PageContainer>
@@ -608,9 +629,43 @@ export default function ArchivePage() {
         count={count}
       />}
 
+      {kind === 'logs' && (
+        <FilterBar
+          filterDefs={logsConfig.filterDefs}
+          sortDefs={logsConfig.sortDefs}
+          filterState={logsFilterSort.filters}
+          sortState={logsFilterSort.sort}
+          setFilter={logsFilterSort.setFilter}
+          clearFilter={logsFilterSort.clearFilter}
+          setSort={logsFilterSort.setSort}
+          toggleSort={logsFilterSort.toggleSort}
+          resetAll={logsFilterSort.resetAll}
+          hasActiveFilters={logsFilterSort.hasActiveFilters}
+          total={logsFilterSort.total}
+          count={logsFilterSort.count}
+        />
+      )}
+
+      {kind === 'stores' && (
+        <FilterBar
+          filterDefs={storesConfig.filterDefs}
+          sortDefs={storesConfig.sortDefs}
+          filterState={storesFilterSort.filters}
+          sortState={storesFilterSort.sort}
+          setFilter={storesFilterSort.setFilter}
+          clearFilter={storesFilterSort.clearFilter}
+          setSort={storesFilterSort.setSort}
+          toggleSort={storesFilterSort.toggleSort}
+          resetAll={storesFilterSort.resetAll}
+          hasActiveFilters={storesFilterSort.hasActiveFilters}
+          total={storesFilterSort.total}
+          count={storesFilterSort.count}
+        />
+      )}
+
       {kind === 'logs' ? (
         <LogsArchiveTab
-          rows={arcLogs}
+          rows={logsFilterSort.filtered}
           loading={arcLoading}
           hotLogs={hotLogs}
           onRestoreOne={async (id) => {
@@ -638,9 +693,10 @@ export default function ArchivePage() {
                   }, {});
                   const availableStoreKeys = (['flk', 'tra', 'whs', 'inc'] as const).filter(k => (countsByStore[k] || 0) > 0);
                   const activeStoreKey = storeFilter !== 'all' && availableStoreKeys.includes(storeFilter) ? storeFilter : 'all';
+                  const baseStoreEntries = storesFilterSort.filtered;
                   const visibleEntries = activeStoreKey === 'all'
-                    ? storeEntries
-                    : storeEntries.filter(item => item.storeKey === activeStoreKey);
+                    ? baseStoreEntries
+                    : baseStoreEntries.filter(item => item.storeKey === activeStoreKey);
 
                   const describeEntry = (entry: StoreArchiveEntry): string => {
                     const raw = (entry.record?.log || {}) as unknown as Record<string, unknown>;
@@ -875,7 +931,7 @@ const REASON_LABEL: Record<string, string> = {
   age: 'قدیمی',
   'flock-closed': 'بستن گله',
   'count-threshold': 'حد تعداد',
-  ancient: 'قدیمی',
+  ancient: 'خیلی قدیمی',
 };
 
 function LogsArchiveTab({
