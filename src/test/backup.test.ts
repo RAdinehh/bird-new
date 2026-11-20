@@ -25,6 +25,10 @@ const {
 });
 
 vi.mock('../cor/storage/historyArchive', () => ({
+      listFlockSummaries: vi.fn().mockResolvedValue([]),
+      saveFlockSummary: vi.fn().mockResolvedValue(undefined),
+      deleteFlockSummary: vi.fn().mockResolvedValue(undefined),
+      getFlockSummary: vi.fn().mockResolvedValue(null),
   ARCHIVE_STORES: {
     dlg: 'dlg_logs',
     tra: 'tra_invoices',

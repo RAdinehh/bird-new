@@ -255,6 +255,402 @@ export function isProtectedArchiveRecord(rec: ArchiveRecord): boolean {
   return mortality > 0 || hasCorrections || rec.reason === 'flock-closed';
 }
 
+
+// ═══════════════════════════════════════════════════════════════
+// شاخص‌های نرمال‌شده برای مقایسه گله‌ها در طول دوره‌های متفاوت
+// ═══════════════════════════════════════════════════════════════
+
+export type FlockDurationBucket =
+  | 'short-cycle'
+  | 'medium-cycle'
+  | 'long-cycle'
+  | 'unknown';
+
+export interface ComparableFinancialSnapshot {
+  recordedCost: number;
+  recordedRevenue: number;
+  recordedNet: number;
+  dailyNet: number | null;
+  isComplete: boolean;
+}
+
+export interface ComparableDataAvailability {
+  hasMortality: boolean;
+  hasFeed: boolean;
+  hasEggs: boolean;
+  hasFinancial: boolean;
+  hasPerformanceIndices: boolean;
+}
+
+export interface ComparableFlockMetric {
+  flockId: string;
+  flockName: string;
+  breedName?: string;
+  productionType?: FlockProductionType;
+  source: 'cold-summary';
+  firstDate: string | null;
+  lastDate: string | null;
+  archivedAt: number;
+  durationDays: number | null;
+  durationBucket: FlockDurationBucket;
+  logCount: number;
+  logCoveragePct: number | null;
+  totalMortality: number;
+  totalFeedKg: number;
+  totalEggs: number;
+  totalBrokenEggs: number;
+  livabilityPct: number | null;
+  fcr: number | null;
+  epef: number | null;
+  dailyMortalityRate: number | null;
+  dailyFeedKg: number | null;
+  dailyEggs: number | null;
+  brokenEggRatePct: number | null;
+  feedKgPerEgg: number | null;
+  financial: ComparableFinancialSnapshot | null;
+  dataAvailability: ComparableDataAvailability;
+}
+
+export function classifyDurationBucket(durationDays: number | null): FlockDurationBucket {
+  if (typeof durationDays !== 'number' || !Number.isFinite(durationDays) || durationDays <= 0) {
+    return 'unknown';
+  }
+  if (durationDays <= 45) return 'short-cycle';
+  if (durationDays <= 120) return 'medium-cycle';
+  return 'long-cycle';
+}
+
+export function toComparableFlockMetric(
+  summary: FlockArchiveSummary
+): ComparableFlockMetric {
+  const days =
+    typeof summary.durationDays === 'number' &&
+    Number.isFinite(summary.durationDays) &&
+    summary.durationDays > 0
+      ? summary.durationDays
+      : summary.logCount > 0
+        ? summary.logCount
+        : null;
+
+  const logCoveragePct =
+    days && days > 0 && summary.logCount >= 0
+      ? Number(Math.min(100, (summary.logCount / days) * 100).toFixed(1))
+      : null;
+
+  const dailyMortalityRate =
+    days && days > 0 ? Number((summary.totalMortality / days).toFixed(3)) : null;
+
+  const dailyFeedKg =
+    days && days > 0 ? Number((summary.totalFeedKg / days).toFixed(3)) : null;
+
+  const dailyEggs =
+    days && days > 0 && summary.totalEggs > 0
+      ? Number((summary.totalEggs / days).toFixed(2))
+      : null;
+
+  const brokenEggRatePct =
+    summary.totalEggs > 0
+      ? Number(
+          Math.min(100, Math.max(0, (summary.totalBrokenEggs / summary.totalEggs) * 100)).toFixed(2)
+        )
+      : null;
+
+  const feedKgPerEgg =
+    summary.totalEggs > 0 && summary.totalFeedKg > 0
+      ? Number((summary.totalFeedKg / summary.totalEggs).toFixed(4))
+      : null;
+
+  const fm = summary.financialMetrics;
+  const financial: ComparableFinancialSnapshot | null = fm
+    ? {
+        recordedCost: Number(fm.recordedCost) || 0,
+        recordedRevenue: Number(fm.recordedRevenue) || 0,
+        recordedNet: Number(fm.recordedNet) || 0,
+        dailyNet:
+          days && days > 0 ? Number(((Number(fm.recordedNet) || 0) / days).toFixed(2)) : null,
+        isComplete: Boolean(fm.isComplete),
+      }
+    : null;
+
+  const hasMortality = summary.totalMortality > 0;
+  const hasFeed = summary.totalFeedKg > 0;
+  const hasEggs = summary.totalEggs > 0;
+  const hasFinancial = financial !== null;
+  const hasPerformanceIndices =
+    summary.livabilityPct !== null || summary.fcr !== null || summary.epef !== null;
+
+  return {
+    flockId: summary.flockId,
+    flockName: summary.flockName || summary.flockId,
+    breedName: summary.breedName,
+    productionType: summary.productionType,
+    source: 'cold-summary',
+    firstDate: summary.firstDate ?? null,
+    lastDate: summary.lastDate ?? null,
+    archivedAt: summary.archivedAt,
+    durationDays: days,
+    durationBucket: classifyDurationBucket(days),
+    logCount: summary.logCount,
+    logCoveragePct,
+    totalMortality: summary.totalMortality,
+    totalFeedKg: summary.totalFeedKg,
+    totalEggs: summary.totalEggs,
+    totalBrokenEggs: summary.totalBrokenEggs,
+    livabilityPct: summary.livabilityPct ?? null,
+    fcr: summary.fcr ?? null,
+    epef: summary.epef ?? null,
+    dailyMortalityRate,
+    dailyFeedKg,
+    dailyEggs,
+    brokenEggRatePct,
+    feedKgPerEgg,
+    financial,
+    dataAvailability: {
+      hasMortality,
+      hasFeed,
+      hasEggs,
+      hasFinancial,
+      hasPerformanceIndices,
+    },
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// مقایسه چندگله جامع (اختلاف شاخص‌ها، کامل بودن داده و هشدارها)
+// ═══════════════════════════════════════════════════════════════
+
+export type ComparisonDataCompletenessLevel =
+  | 'complete'
+  | 'partial'
+  | 'minimal';
+
+export interface FlockComparisonDataCompleteness {
+  level: ComparisonDataCompletenessLevel;
+  hasCoreOperationalData: boolean;
+  hasFinancialData: boolean;
+  isFinancialComplete: boolean;
+  hasAdequateLogCoverage: boolean;
+  missingOrLimitingFactors: string[];
+}
+
+export interface FlockComparisonItem {
+  metric: ComparableFlockMetric;
+  isBaseline: boolean;
+  deltaDailyMortalityRate: number | null;
+  deltaDailyFeedKg: number | null;
+  deltaDailyEggs: number | null;
+  deltaDailyNet: number | null;
+  deltaFeedKgPerEgg: number | null;
+  deltaLivabilityPct: number | null;
+  deltaFcr: number | null;
+  dataCompleteness: FlockComparisonDataCompleteness;
+  warnings: string[];
+  hasWarnings: boolean;
+}
+
+export interface FlockComparisonReport {
+  baselineFlockId: string;
+  totalFlocks: number;
+  itemsWithWarningsCount: number;
+  durationBucketsPresent: FlockDurationBucket[];
+  items: FlockComparisonItem[];
+}
+
+function diffOrNull(
+  a: number | null | undefined,
+  b: number | null | undefined,
+  decimals = 3
+): number | null {
+  if (typeof a !== 'number' || !Number.isFinite(a)) return null;
+  if (typeof b !== 'number' || !Number.isFinite(b)) return null;
+  return Number((a - b).toFixed(decimals));
+}
+
+function evaluateComparisonCompleteness(
+  metric: ComparableFlockMetric
+): FlockComparisonDataCompleteness {
+  const missingOrLimitingFactors: string[] = [];
+
+  const hasCoreOperationalData =
+    metric.dataAvailability.hasMortality ||
+    metric.dataAvailability.hasFeed ||
+    metric.dataAvailability.hasEggs ||
+    metric.dataAvailability.hasPerformanceIndices;
+
+  const hasFinancialData = Boolean(metric.financial);
+  const isFinancialComplete = Boolean(metric.financial?.isComplete);
+
+  const hasAdequateLogCoverage =
+    typeof metric.logCoveragePct === 'number'
+      ? metric.logCoveragePct >= 80
+      : metric.logCount > 0;
+
+  if (metric.logCount === 0) {
+    missingOrLimitingFactors.push('هیچ لاگ روزانه‌ای ثبت نشده است.');
+  } else if (typeof metric.logCoveragePct === 'number' && metric.logCoveragePct < 80) {
+    missingOrLimitingFactors.push(
+      `پوشش ثبت لاگ ${metric.logCoveragePct}% است (کمتر از ۸۰٪ دوره).`
+    );
+  }
+
+  if (!hasCoreOperationalData) {
+    missingOrLimitingFactors.push(
+      'داده‌های شاخص عملیاتی (تلفات، دان، تخم یا شاخص‌های عملکرد) ثبت نشده است.'
+    );
+  }
+
+  if (!hasFinancialData) {
+    missingOrLimitingFactors.push('اطلاعات مالی برای این گله ثبت نشده است.');
+  } else if (!isFinancialComplete) {
+    missingOrLimitingFactors.push('اطلاعات مالی ثبت‌شده به‌عنوان کامل علامت نخورده است.');
+  }
+
+  let level: ComparisonDataCompletenessLevel = 'complete';
+  if (!hasCoreOperationalData && !hasFinancialData) {
+    level = 'minimal';
+  } else if (missingOrLimitingFactors.length > 0) {
+    level = 'partial';
+  }
+
+  return {
+    level,
+    hasCoreOperationalData,
+    hasFinancialData,
+    isFinancialComplete,
+    hasAdequateLogCoverage,
+    missingOrLimitingFactors,
+  };
+}
+
+/**
+ * مقایسه ساختاریافته چند گله (با طول دوره‌های متفاوت مانند ۳۰ روزه، ۸۰ روزه یا طولانی‌تر)
+ * بر اساس شاخص‌های نرمال‌شده روزانه و نرخ‌ها همراه با اختلاف‌های تکمیلی،
+ * وضعیت کامل بودن داده‌ها و هشدارهای مقایسه‌ای.
+ */
+export function compareFlockMetrics(
+  metrics: ComparableFlockMetric[],
+  baselineFlockId?: string
+): FlockComparisonReport {
+  if (!Array.isArray(metrics) || metrics.length === 0) {
+    return {
+      baselineFlockId: '',
+      totalFlocks: 0,
+      itemsWithWarningsCount: 0,
+      durationBucketsPresent: [],
+      items: [],
+    };
+  }
+
+  const baseline =
+    (baselineFlockId ? metrics.find((m) => m.flockId === baselineFlockId) : undefined) ??
+    metrics[0];
+
+  const baselineDailyNet = baseline.financial?.dailyNet ?? null;
+
+  const items: FlockComparisonItem[] = metrics.map((m) => {
+    const isBaseline = m.flockId === baseline.flockId;
+    const warnings: string[] = [];
+    const dataCompleteness = evaluateComparisonCompleteness(m);
+
+    if (!isBaseline) {
+      if (
+        baseline.durationBucket !== 'unknown' &&
+        m.durationBucket !== 'unknown' &&
+        baseline.durationBucket !== m.durationBucket
+      ) {
+        warnings.push(
+          `تفاوت رده طول دوره (${baseline.durationDays ?? '?'} روز در برابر ${m.durationDays ?? '?'} روز)؛ مقایسه بر پایه نرخ روزانه انجام شده است.`
+        );
+      } else if (
+        typeof baseline.durationDays === 'number' &&
+        typeof m.durationDays === 'number' &&
+        baseline.durationDays > 0 &&
+        m.durationDays > 0 &&
+        Math.abs(baseline.durationDays - m.durationDays) >= 15
+      ) {
+        warnings.push(
+          `اختلاف قابل‌توجه طول دوره (${baseline.durationDays} روز در برابر ${m.durationDays} روز)؛ در تفسیر اعداد کل دقت کنید.`
+        );
+      }
+
+      if (
+        baseline.productionType &&
+        m.productionType &&
+        baseline.productionType !== m.productionType
+      ) {
+        warnings.push(
+          `تفاوت نوع بهره‌برداری گله (${baseline.productionType} در برابر ${m.productionType}).`
+        );
+      }
+
+      if (!dataCompleteness.hasAdequateLogCoverage && m.logCount > 0) {
+        warnings.push(
+          `پوشش لاگ گله ${m.flockName} (${m.logCoveragePct ?? 0}%) پایین‌تر از حد مطلوب است.`
+        );
+      }
+
+      if (m.financial && !m.financial.isComplete) {
+        warnings.push(
+          `اطلاعات مالی گله ${m.flockName} ناقص است؛ مقایسه خالص روزانه ممکن است قطعی نباشد.`
+        );
+      }
+
+      if (
+        baselineDailyNet !== null &&
+        baselineDailyNet !== undefined &&
+        (m.financial?.dailyNet === null || m.financial?.dailyNet === undefined)
+      ) {
+        warnings.push(
+          `گله مرجع دارای خالص روزانه است اما برای ${m.flockName} داده مالی ثبت نشده است.`
+        );
+      }
+    } else {
+      if (!dataCompleteness.hasAdequateLogCoverage && m.logCount > 0) {
+        warnings.push(
+          `گله مرجع (${m.flockName}) دارای پوشش لاگ ${m.logCoveragePct ?? 0}% است.`
+        );
+      }
+      if (m.financial && !m.financial.isComplete) {
+        warnings.push(
+          `اطلاعات مالی گله مرجع (${m.flockName}) به‌عنوان کامل ثبت نشده است.`
+        );
+      }
+    }
+
+    const itemDailyNet = m.financial?.dailyNet ?? null;
+
+    return {
+      metric: m,
+      isBaseline,
+      deltaDailyMortalityRate: diffOrNull(m.dailyMortalityRate, baseline.dailyMortalityRate, 3),
+      deltaDailyFeedKg: diffOrNull(m.dailyFeedKg, baseline.dailyFeedKg, 3),
+      deltaDailyEggs: diffOrNull(m.dailyEggs, baseline.dailyEggs, 2),
+      deltaDailyNet: diffOrNull(itemDailyNet, baselineDailyNet, 2),
+      deltaFeedKgPerEgg: diffOrNull(m.feedKgPerEgg, baseline.feedKgPerEgg, 4),
+      deltaLivabilityPct: diffOrNull(m.livabilityPct, baseline.livabilityPct, 2),
+      deltaFcr: diffOrNull(m.fcr, baseline.fcr, 3),
+      dataCompleteness,
+      warnings,
+      hasWarnings: warnings.length > 0,
+    };
+  });
+
+  const durationBucketsPresent = Array.from(
+    new Set(metrics.map((m) => m.durationBucket))
+  );
+
+  const itemsWithWarningsCount = items.filter((item) => item.hasWarnings).length;
+
+  return {
+    baselineFlockId: baseline.flockId,
+    totalFlocks: items.length,
+    itemsWithWarningsCount,
+    durationBucketsPresent,
+    items,
+  };
+}
+
+
 /** خواندن یک رکورد آرشیو با شناسه. */
 export async function getArchived(id: string, storeName: string = DEFAULT_STORE): Promise<ArchiveRecord | null> {
   if (!id) return null;
