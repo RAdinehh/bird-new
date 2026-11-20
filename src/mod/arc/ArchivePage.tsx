@@ -68,6 +68,7 @@ export default function ArchivePage() {
   const [storeEntries, setStoreEntries] = useState<StoreArchiveEntry[]>([]);
   const [storesLoading, setStoresLoading] = useState(false);
   const [restoringId, setRestoringId] = useState<string | null>(null);
+  const [storeFilter, setStoreFilter] = useState<'all' | StoreArchiveEntry['storeKey']>('all');
 
   // ── خلاصه‌های سرد و گزارش مقایسه چندگله
   const [flockSummaries, setFlockSummaries] = useState<FlockArchiveSummary[]>([]);
@@ -508,13 +509,16 @@ export default function ArchivePage() {
     setRestoringId(entry.record.id);
     try {
       let countRestored = 0;
-      if (entry.storeKey === 'tra') {
-        countRestored = await restoreTraInvoices([entry.record.id]);
-      } else if (entry.storeKey === 'whs') {
-        countRestored = await restoreMovements([entry.record.id]);
-      } else if (entry.storeKey === 'inc') {
-        countRestored = await restoreIncBatches([entry.record.id]);
-      }
+      if (entry.storeKey === 'flk') {
+                    await restore(entry.record.id);
+                    countRestored = 1;
+                  } else if (entry.storeKey === 'tra') {
+                    countRestored = await restoreTraInvoices([entry.record.id]);
+                  } else if (entry.storeKey === 'whs') {
+                    countRestored = await restoreMovements([entry.record.id]);
+                  } else if (entry.storeKey === 'inc') {
+                    countRestored = await restoreIncBatches([entry.record.id]);
+                  }
       if (countRestored > 0) {
         toastMsg.saved(`آیتم «${entry.storeLabel}» بازیابی شد`);
         setArcTick(t => t + 1);
@@ -556,23 +560,37 @@ export default function ArchivePage() {
         </TabButton>
       </div>
 
-      {/* آمار کلی */}
+      {/* آمار کلی جمع‌وجور */}
       <div style={{
-        padding: '14px 16px',
+        padding: '10px 14px',
         background: 'var(--card)',
         border: '1px solid var(--border)',
-        borderRadius: 'var(--r-lg)',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+        borderRadius: 'var(--r-md)',
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10,
       }}>
-        <div>
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+          <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>
+            {kind === 'flocks' ? '🗄' : kind === 'logs' ? '📒' : '📦'}
+          </span>
+          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
             {statLabel}
-          </div>
-          <div style={{ fontSize: 'var(--fs-2xl)', fontWeight: 700, color: 'var(--text)', marginTop: 4 }}>
-            {toFa(statValue)}
-          </div>
+          </span>
         </div>
-        <div style={{ fontSize: 40 }}>🗄</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+          {kind === 'logs' && arcLogs.length > 0 && (
+            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+              در {toFa(new Set(arcLogs.map(r => r.flockId || '—')).size)} گله
+            </span>
+          )}
+          {kind === 'stores' && storeEntries.length > 0 && (
+            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+              {toFa(new Set(storeEntries.map(e => e.storeKey)).size)} مخزن فعال
+            </span>
+          )}
+          <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 800, color: 'var(--text)' }}>
+            {toFa(statValue)}
+          </span>
+        </div>
       </div>
 
       {kind === 'flocks' && <FilterBar
@@ -605,54 +623,127 @@ export default function ArchivePage() {
           }}
         />
       ) : kind === 'stores' ? (
-        storesLoading ? (
-          <div style={{ padding: 24, textAlign: 'center', color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>در حال بارگذاری…</div>
-        ) : storeEntries.length === 0 ? (
-          <Empty
-            icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>}
-            title="مخزن سرد دیگری خالی است"
-            desc="رکوردهای آرشیو‌شدهٔ معاملات، انبار و جوجه‌کشی این‌جا نمایش داده می‌شوند."
-          />
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {storeEntries.map(({ storeKey, storeLabel, record }) => {
-              const isBusy = restoringId === record.id;
-              return (
-                <div
-                  key={`${storeKey}-${record.id}`}
-                  style={{
-                    background: 'var(--card)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--r-lg)',
-                    padding: '12px 14px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    gap: 8,
-                  }}
-                >
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <Tag tone="gray">{storeLabel}</Tag>
-                      <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>
-                        {toFa(record.id)}
-                      </span>
+                storesLoading ? (
+                  <div style={{ padding: 24, textAlign: 'center', color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>در حال بارگذاری…</div>
+                ) : storeEntries.length === 0 ? (
+                  <Empty
+                    icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>}
+                    title="مخزن سرد دیگری خالی است"
+                    desc="رکوردهای آرشیو‌شدهٔ معاملات، انبار، جوجه‌کشی و گله‌های بسته این‌جا نمایش داده می‌شوند."
+                  />
+                ) : (() => {
+                  const countsByStore = storeEntries.reduce<Record<string, number>>((acc, item) => {
+                    acc[item.storeKey] = (acc[item.storeKey] || 0) + 1;
+                    return acc;
+                  }, {});
+                  const availableStoreKeys = (['flk', 'tra', 'whs', 'inc'] as const).filter(k => (countsByStore[k] || 0) > 0);
+                  const activeStoreKey = storeFilter !== 'all' && availableStoreKeys.includes(storeFilter) ? storeFilter : 'all';
+                  const visibleEntries = activeStoreKey === 'all'
+                    ? storeEntries
+                    : storeEntries.filter(item => item.storeKey === activeStoreKey);
+
+                  const describeEntry = (entry: StoreArchiveEntry): string => {
+                    const raw = (entry.record?.log || {}) as unknown as Record<string, unknown>;
+                    if (entry.storeKey === 'flk') {
+                      const name = typeof raw.name === 'string' && raw.name.trim() ? raw.name.trim() : entry.record.id;
+                      const count = Number(raw.currentCount ?? raw.initialCount ?? 0);
+                      return count > 0 ? `${name} • ${toFa(count)} قطعه` : name;
+                    }
+                    if (entry.storeKey === 'tra') {
+                      const title = typeof raw.title === 'string' && raw.title.trim()
+                        ? raw.title.trim()
+                        : typeof raw.description === 'string' && raw.description.trim()
+                          ? raw.description.trim()
+                          : entry.record.id;
+                      const amt = Number(raw.amount ?? raw.total ?? 0);
+                      return amt > 0 ? `${title} • ${toFa(Math.round(amt).toLocaleString('fa-IR'))} ت` : title;
+                    }
+                    if (entry.storeKey === 'whs') {
+                      const itemName = typeof raw.itemName === 'string' && raw.itemName.trim()
+                        ? raw.itemName.trim()
+                        : typeof raw.name === 'string' && raw.name.trim()
+                          ? raw.name.trim()
+                          : entry.record.id;
+                      const qty = Number(raw.qty ?? raw.quantity ?? raw.weightKg ?? 0);
+                      return qty > 0 ? `${itemName} • ${toFa(qty)}` : itemName;
+                    }
+                    const batchTitle = typeof raw.title === 'string' && raw.title.trim()
+                      ? raw.title.trim()
+                      : typeof raw.batchCode === 'string' && raw.batchCode.trim()
+                        ? `دسته ${raw.batchCode.trim()}`
+                        : entry.record.id;
+                    const eggs = Number(raw.eggsCount ?? raw.count ?? 0);
+                    return eggs > 0 ? `${batchTitle} • ${toFa(eggs)} تخم` : batchTitle;
+                  };
+
+                  return (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      {availableStoreKeys.length > 1 && (
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                          <Btn
+                            size="sm"
+                            variant={activeStoreKey === 'all' ? 'primary' : 'ghost'}
+                            onClick={() => setStoreFilter('all')}
+                          >
+                            همه ({toFa(storeEntries.length)})
+                          </Btn>
+                          {availableStoreKeys.map(k => {
+                            const label = storeEntries.find(x => x.storeKey === k)?.storeLabel || k;
+                            return (
+                              <Btn
+                                key={k}
+                                size="sm"
+                                variant={activeStoreKey === k ? 'primary' : 'ghost'}
+                                onClick={() => setStoreFilter(k)}
+                              >
+                                {label} ({toFa(countsByStore[k] || 0)})
+                              </Btn>
+                            );
+                          })}
+                        </div>
+                      )}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        {visibleEntries.map((entry) => {
+                          const { storeKey, storeLabel, record } = entry;
+                          const isBusy = restoringId === record.id;
+                          return (
+                            <div
+                              key={`${storeKey}-${record.id}`}
+                              style={{
+                                background: 'var(--card)',
+                                border: '1px solid var(--border)',
+                                borderRadius: 'var(--r-lg)',
+                                padding: '12px 14px',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                gap: 8,
+                              }}
+                            >
+                              <div style={{ minWidth: 0 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                                  <Tag tone="gray">{storeLabel}</Tag>
+                                  <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>
+                                    {toFa(describeEntry(entry))}
+                                  </span>
+                                </div>
+                                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 4 }}>
+                                  شناسه: {toFa(record.id)} • مرجع: {toFa(record.flockId || '—')} • تاریخ: {formatArchiveIsoLabel(record.date || '—') || toFa(record.date || '—')}
+                                </div>
+                              </div>
+                              <Btn
+                                disabled={isBusy}
+                                onClick={() => handleRestoreStoreEntry(entry)}
+                              >
+                                {isBusy ? '…' : 'بازگردانی'}
+                              </Btn>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 4 }}>
-                      مرجع: {toFa(record.flockId || '—')} • تاریخ: {formatArchiveIsoLabel(record.date || '—') || toFa(record.date || '—')}
-                    </div>
-                  </div>
-                  <Btn
-                    disabled={isBusy}
-                    onClick={() => handleRestoreStoreEntry({ storeKey, storeLabel, record })}
-                  >
-                    {isBusy ? '…' : 'بازگردانی'}
-                  </Btn>
-                </div>
-              );
-            })}
-          </div>
-        )
+                  );
+                })()
       ) : (
         <>
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginBottom: 12, alignItems: 'center' }}>
@@ -800,7 +891,6 @@ function LogsArchiveTab({
   const [busy, setBusy] = useState<string | null>(null);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
 
-  // گروه‌بندی بر اساس گله
   const groups = useMemo(() => {
     const m = new Map<string, ArchiveRecord[]>();
     for (const r of rows) {
@@ -830,7 +920,13 @@ function LogsArchiveTab({
       {groups.map(([flockId, items]) => {
         const flock = flocks.find(f => f.id === flockId);
         const hotCount = hotLogs.filter(l => l.flockId === flockId).length;
-        const dates = items.map(r => r.date).sort();
+        const sortedDates = items.map(r => r.date).filter(Boolean).sort();
+        const firstDate = sortedDates[0]
+          ? (formatArchiveIsoLabel(sortedDates[0]) || toFa(sortedDates[0]))
+          : '—';
+        const lastDate = sortedDates[sortedDates.length - 1]
+          ? (formatArchiveIsoLabel(sortedDates[sortedDates.length - 1]) || toFa(sortedDates[sortedDates.length - 1]))
+          : '—';
         const isBusy = busy === flockId;
 
         return (
@@ -838,18 +934,28 @@ function LogsArchiveTab({
             background: 'var(--card)', border: '1px solid var(--border)',
             borderRadius: 'var(--r-lg)', padding: '12px 14px',
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-              <div style={{ minWidth: 0 }}>
+            <div style={{
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              gap: 10, flexWrap: 'wrap',
+            }}>
+              <div style={{ minWidth: 0, flex: '1 1 180px' }}>
                 <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: 'var(--text)' }}>
-                  {flock?.name || ('گلهٔ ' + flockId)}
+                  {flock?.name || ('گلهٔ ' + toFa(flockId))}
                 </div>
-                <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                  {toFa(items.length)} ثبت • {formatArchiveIsoLabel(dates[0] || '—') || toFa(dates[0] || '—')} تا {formatArchiveIsoLabel(dates[dates.length - 1] || '—') || toFa(dates[dates.length - 1] || '—')}
-                  {hotCount > 0 ? ' • ' + toFa(hotCount) + ' ثبت فعال' : ''}
+                <div style={{
+                  fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 3,
+                  display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center',
+                }}>
+                  <span><b style={{ color: 'var(--text)' }}>{toFa(items.length)}</b> ثبت</span>
+                  <span>•</span>
+                  <span>بازه: {firstDate === lastDate ? firstDate : `${firstDate} تا ${lastDate}`}</span>
+                  {hotCount > 0 ? <span>• {toFa(hotCount)} ثبت فعال</span> : null}
                 </div>
               </div>
               <Btn
+                size="sm"
                 disabled={isBusy}
+                style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
                 onClick={async () => {
                   setBusy(flockId);
                   try { await onRestoreFlock(flockId); }
@@ -860,19 +966,26 @@ function LogsArchiveTab({
               </Btn>
             </div>
 
-            <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 4 }}>
               {(expandedGroups[flockId] ? items : items.slice(0, 5)).map(r => (
                 <div key={r.id} style={{
-                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8,
                   fontSize: 'var(--fs-xs)', color: 'var(--muted)',
-                  padding: '4px 0', borderTop: '1px dashed var(--border)',
+                  padding: '6px 0', borderTop: '1px dashed var(--border)',
                 }}>
-                  <span>
-                    {formatArchiveIsoLabel(r.date) || toFa(r.date)}
-                    <span style={{ marginRight: 6 }}><Tag tone="gray">{REASON_LABEL[r.reason] || r.reason}</Tag></span>
-                  </span>
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
+                    minWidth: 0, flex: 1,
+                  }}>
+                    <span style={{ color: 'var(--text)', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                      {formatArchiveIsoLabel(r.date) || toFa(r.date)}
+                    </span>
+                    <Tag tone="gray">{REASON_LABEL[r.reason] || r.reason}</Tag>
+                  </div>
                   <Btn
+                    size="sm"
                     disabled={busy === r.id}
+                    style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
                     onClick={async () => {
                       setBusy(r.id);
                       try { await onRestoreOne(r.id); }
@@ -884,9 +997,10 @@ function LogsArchiveTab({
                 </div>
               ))}
               {items.length > 5 ? (
-                <div style={{ paddingTop: 4 }}>
+                <div style={{ paddingTop: 6 }}>
                   <Btn
                     size="sm"
+                    variant="ghost"
                     onClick={() => setExpandedGroups(prev => ({ ...prev, [flockId]: !prev[flockId] }))}
                   >
                     {expandedGroups[flockId] ? 'بستن لیست' : 'نمایش همه (' + toFa(items.length - 5) + ' مورد دیگر)'}
