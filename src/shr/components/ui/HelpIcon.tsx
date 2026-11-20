@@ -33,10 +33,10 @@ export function HelpIcon({ text }: Props) {
       const popH = popRect.height || 120;
       const margin = 8;
 
-      let left = btnRect.left - popW + btnRect.width;
+      let left = (window.innerWidth - popW) / 2;
       let top = btnRect.bottom + 6;
 
-      // جلوگیری از بیرون‌زدگی راست/چپ
+      // وسط‌چین افقی در صفحه با رعایت حاشیه ایمن
       if (left + popW > window.innerWidth - margin) left = window.innerWidth - popW - margin;
       if (left < margin) left = margin;
 
@@ -119,27 +119,25 @@ export function HelpIcon({ text }: Props) {
         aria-label="راهنما"
         aria-expanded={open}
         style={{
-          width: 16, height: 16,
-          background: 'transparent',
-          border: 'none',
-          outline: 'none',
-          padding: 0,
-          marginRight: 4,
-          color: open ? 'var(--accent)' : 'var(--muted)',
-          fontSize: 14, fontWeight: 700,
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: 18,
+          height: 18,
+          borderRadius: '999px',
+          border: '1px solid var(--border)',
+          background: open ? 'var(--accent)' : 'var(--card-solid, var(--surface))',
+          color: open ? '#fff' : 'var(--text)',
+          fontSize: 11,
+          fontWeight: 700,
           lineHeight: 1,
-          cursor: 'help',
-          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'inherit',
-          flexShrink: 0,
-          opacity: open ? 1 : 0.65,
-          transition: 'opacity 150ms',
+          cursor: 'pointer',
           userSelect: 'none',
-          WebkitUserSelect: 'none',
-          WebkitTapHighlightColor: 'transparent',
-          touchAction: 'manipulation',
+          verticalAlign: 'middle',
         }}
-      >?</span>
+      >
+        ؟
+      </span>
       {open && createPortal(
         <div
           ref={popoverRef}
@@ -148,28 +146,24 @@ export function HelpIcon({ text }: Props) {
           onMouseLeave={handleMouseLeave}
           style={{
             position: 'fixed',
-            top: coords?.top ?? 0,
-            left: coords?.left ?? 0,
-            visibility: coords ? 'visible' : 'hidden',
+            top: coords ? coords.top : 64,
+            left: coords ? coords.left : 16,
+            width: 'min(90vw, 340px)',
+            maxWidth: 'calc(100vw - 16px)',
             zIndex: 9999,
-            background: 'var(--card-solid)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--r-md)',
-            padding: '10px 12px',
-            fontSize: 'var(--fs-sm)',
+            background: 'var(--card-solid, var(--surface))',
             color: 'var(--text)',
-            lineHeight: 1.6,
-            maxWidth: 240,
-            minWidth: 160,
-            maxHeight: 'min(320px, 55dvh)',
-            overflowY: 'auto',
-            boxShadow: '0 6px 20px rgba(0,0,0,0.18)',
-            textAlign: 'right',
-            direction: 'rtl',
-            whiteSpace: 'pre-line',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--r-md, 10px)',
+            padding: '10px 12px',
+            fontSize: 'var(--fs-xs, 12px)',
+            lineHeight: 1.7,
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.18)',
           }}
-        >{renderBold(text)}</div>,
-        document.body
+        >
+          {renderBold(text)}
+        </div>,
+        document.body,
       )}
     </>
   );
