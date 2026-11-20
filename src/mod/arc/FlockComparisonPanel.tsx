@@ -49,13 +49,6 @@ type TagTone =
   | 'amber'
   | 'dim';
 
-interface SavedComparisonPreset {
-  id: string;
-  title: string;
-  flockIds: string[];
-  baselineId: string;
-}
-
 interface MetricSpec {
   key: string;
   label: string;
@@ -65,7 +58,6 @@ interface MetricSpec {
   decimals: number;
 }
 
-const PRESETS_KEY = 'pm-arc-saved-comparisons-v1';
 const MIN_FLOCKS = 2;
 const MAX_FLOCKS = 4;
 const MAX_OTHER_FLOCKS = MAX_FLOCKS - 1;
@@ -150,25 +142,6 @@ function formatPctFa(pct: number): string {
   return `${sign}${toFa(formatted)}٪`;
 }
 
-function readPresets(): SavedComparisonPreset[] {
-  try {
-    const raw = localStorage.getItem(PRESETS_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function writePresets(presets: SavedComparisonPreset[]): void {
-  try {
-    localStorage.setItem(PRESETS_KEY, JSON.stringify(presets));
-  } catch {
-    // ignore storage errors
-  }
-}
-
 export default function FlockComparisonPanel({
   candidates,
   selectedIds,
@@ -182,15 +155,6 @@ export default function FlockComparisonPanel({
   const [pickerMode, setPickerMode] = useState<PickerMode>(null);
   const [filter, setFilter] = useState<CandidateFilter>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [presets, setPresets] = useState<SavedComparisonPreset[]>(() => readPresets());
-  const [activePresetId, setActivePresetId] = useState<string | null>(null);
-  const [showPresetHelp, setShowPresetHelp] = useState(false);
-  const SAVED_PRESETS_HELP = "هر ترکیب ۲، ۳ یا ۴ گله را یک بار ذخیره کنید تا هر زمان خواستید بدون انتخاب مجدد گله‌ها، با زدن روی نام آن سریع در جدول مقایسه بالا بیاید. ترکیب‌های تکراری دوباره ذخیره نمی‌شوند و با دکمه‌ی × می‌توانید هر مورد را حذف کنید.";
-
-  useEffect(() => {
-    writePresets(presets);
-  }, [presets]);
-
   const showArchiveFilterControls = candidates.length > ARCHIVE_FILTER_THRESHOLD;
 
   const getTitle = (c: ComparisonCandidate) => cleanCandidateTitle(c.label, c.metric.flockName);
@@ -376,58 +340,6 @@ export default function FlockComparisonPanel({
       ruleNote: 'معیار انتخاب: در هزینه، تلفات و ضریب تبدیل مقدار کمتر و در درآمد، زنده‌مانی و تخم مقدار بیشتر امتیاز مثبت می‌گیرد.',
     };
   }, [canCompare, refCandidate, orderedCandidates, sortedMetrics]);
-
-  const handleSavePreset = () => {
-    if (!canCompare) {
-      toastMsg.warn(`حداقل ${toFa(MIN_FLOCKS)} گله برای ذخیره مقایسه لازم است`);
-      return;
-    }
-    const normalizedIds = Array.from(new Set(orderedCandidates.map((c) => c.id))).slice(0, MAX_FLOCKS);
-    const targetSet = new Set(normalizedIds);
-    const duplicate = presets.find(
-      (item) =>
-        item.flockIds.length === normalizedIds.length &&
-        item.flockIds.every((id) => targetSet.has(id)),
-    );
-    if (duplicate) {
-      setActivePresetId(duplicate.id);
-      toastMsg.warn(`این ترکیب گله قبلاً با عنوان «${duplicate.title}» ذخیره شده است`);
-      return;
-    }
-    const title = orderedCandidates.map((c) => c.label).join(' · ');
-    const nextPreset: SavedComparisonPreset = {
-      id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-      title,
-      flockIds: normalizedIds,
-      baselineId: effectiveBaselineId,
-    };
-    setPresets((prev) => [nextPreset, ...prev]);
-    setActivePresetId(nextPreset.id);
-    toastMsg.info('مقایسه ذخیره شد');
-  };
-
-  const handleOpenPreset = (preset: SavedComparisonPreset) => {
-    const validIds = Array.from(new Set(preset.flockIds))
-      .filter((id) => candidates.some((c) => c.id === id))
-      .slice(0, MAX_FLOCKS);
-    if (validIds.length < MIN_FLOCKS) {
-      toastMsg.warn('گله‌های این مقایسه در فهرست فعلی موجود نیستند');
-      return;
-    }
-    const nextBase =
-      preset.baselineId && validIds.includes(preset.baselineId)
-        ? preset.baselineId
-        : validIds[0];
-    onSelectPreset(validIds, nextBase);
-    setActivePresetId(preset.id);
-    setPanelOpen(true);
-    toastMsg.info(`«${preset.title}» بارگذاری شد`);
-  };
-
-  const handleDeletePreset = (id: string) => {
-    setPresets((prev) => prev.filter((p) => p.id !== id));
-    toastMsg.deleted('از لیست ذخیره‌شده‌ها');
-  };
 
   const handleExportCSV = () => {
     if (!canCompare || !refCandidate) return;
@@ -853,14 +765,11 @@ export default function FlockComparisonPanel({
           </CardSection>
 
           <CardSection
-            title="ذخیره و خروجی گزارش"
+            title="خروجی گزارش"
             meta={`${toFa(orderedCandidates.length)} از ${toFa(MAX_FLOCKS)} گله`}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                <Btn size="sm" variant="primary" disabled={!canCompare} onClick={handleSavePreset}>
-                  ذخیره مقایسه
-                </Btn>
                 <Btn size="sm" variant="primary" disabled={!canCompare} onClick={handleExportCSV}>
                   خروجی CSV
                 </Btn>
@@ -868,65 +777,6 @@ export default function FlockComparisonPanel({
                   خروجی PDF
                 </Btn>
               </div>
-
-              {presets.length > 0 && (
-                <div
-                  style={{
-                    padding: '10px 12px',
-                    borderRadius: 'var(--r-md)',
-                    border: '1px solid var(--info-border, var(--border))',
-                    background: 'var(--info-soft, var(--surface-2))',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 8,
-                  }}
-                >
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
-                      مقایسه‌های ذخیره‌شده
-                    </span>
-                    <HelpIcon text={SAVED_PRESETS_HELP} />
-                  </div>
-                  {showPresetHelp && (
-                    <SummaryCard tone="info" title="راهنمای مقایسه‌های ذخیره‌شده">
-                      <span style={{ fontSize: 'var(--fs-xs)', lineHeight: 1.7, color: 'var(--text)' }}>
-                        {SAVED_PRESETS_HELP}
-                      </span>
-                    </SummaryCard>
-                  )}
-                  {presets.map((p) => (
-                    <div
-                      key={p.id}
-                      className="flex-between"
-                      style={{ paddingTop: 4, borderTop: '1px dashed var(--info-border)', gap: 8 }}
-                    >
-                      <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--text)', fontWeight: 600 }}>
-                        {p.title}
-                      </span>
-                      <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-                        <Btn size="sm" onClick={() => handleOpenPreset(p)}>
-                          باز کردن
-                        </Btn>
-                        <Btn
-                          size="sm"
-                          variant="ghost"
-                          aria-label={`حذف ${p.title}`}
-                          title="حذف مقایسه ذخیره‌شده"
-                          onClick={() => handleDeletePreset(p.id)}
-                          style={{
-                            minWidth: 28,
-                            padding: '2px 6px',
-                            color: 'var(--danger, var(--text))',
-                            fontWeight: 700,
-                          }}
-                        >
-                          ×
-                        </Btn>
-                      </div>
-                    </div>
-                  ))}
-                                </div>
-              )}
             </div>
           </CardSection>
         </div>

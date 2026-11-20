@@ -8,7 +8,7 @@ import { parseFaNum } from '../utils/fa';
 function chipIn(active: boolean): CSSProperties {
   return {
     display: 'inline-flex', alignItems: 'center', gap: 5,
-    height: 32, padding: '0 10px',
+    height: 28, padding: '0 8px',
     background: active ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
     border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
     borderRadius: 'var(--r-md)',
@@ -39,15 +39,15 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter, filterS
         const arr = isMulti ? (Array.isArray(v) ? (v as string[]) : []) : [];
         const noneActive = isMulti ? arr.length === 0 : !v;
         return (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 5 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4 }}>
             <button type="button"
               onClick={() => { isMulti ? setFilter(def.key, []) : clearFilter(def.key); }}
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                minHeight: 40, padding: '6px 8px',
+                minHeight: 38, padding: '6px 8px',
                 background: noneActive ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                 border: '1px solid ' + (noneActive ? 'var(--accent-border)' : 'var(--border)'),
-                borderRadius: 12,
+                borderRadius: 9,
                 color: noneActive ? 'var(--accent)' : 'var(--text)',
                 fontFamily: 'inherit', fontSize: 'var(--fs-xs)',
                 fontWeight: noneActive ? 700 : 600, cursor: 'pointer',
@@ -70,10 +70,10 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter, filterS
                   }}
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-                    minHeight: 40, padding: '6px 8px',
+                    minHeight: 38, padding: '6px 8px',
                     background: active ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                     border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
-                    borderRadius: 12,
+                    borderRadius: 9,
                     color: active ? 'var(--accent)' : 'var(--text)',
                     fontFamily: 'inherit', fontSize: 'var(--fs-xs)',
                     fontWeight: active ? 700 : 600, cursor: 'pointer',
@@ -103,7 +103,7 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter, filterS
         const arr = isMulti ? (Array.isArray(v) ? (v as string[]) : []) : [];
         const noneActive = isMulti ? arr.length === 0 : !v;
         return (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             <RowItem
               active={noneActive}
               multi={isMulti}
@@ -137,7 +137,7 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter, filterS
       const arr = isMulti ? (Array.isArray(v) ? (v as string[]) : []) : [];
       const noneActive = isMulti ? arr.length === 0 : !v;
       return (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
           <button type="button"
             onClick={() => { isMulti ? setFilter(def.key, []) : clearFilter(def.key); }}
             style={chipIn(noneActive)}>همه</button>
@@ -168,7 +168,7 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter, filterS
 
     if (def.kind === 'boolean') {
       return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           <RowItem active={v === undefined || v === null} multi={false}
             label="همه" onClick={() => clearFilter(def.key)} />
           <RowItem active={v === true} multi={false}
@@ -183,11 +183,23 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter, filterS
       const [a, b] = (v as [string, string]) || ['', ''];
       return (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 6, alignItems: 'center', width: '100%' }}>
-          <DatePicker value={a || ''} placeholder="از تاریخ"
-            onChange={v2 => setFilter(def.key, [v2, b || ''])} />
+          <DatePicker
+            value={a || ''}
+            placeholder="از تاریخ"
+            onChange={v2 => {
+              const nextEnd = b && v2 && v2 > b ? v2 : (b || '');
+              setFilter(def.key, [v2, nextEnd]);
+            }}
+          />
           <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>—</span>
-          <DatePicker value={b || ''} placeholder="تا تاریخ"
-            onChange={v2 => setFilter(def.key, [a || '', v2])} />
+          <DatePicker
+            value={b || ''}
+            placeholder="تا تاریخ"
+            onChange={v2 => {
+              const nextStart = a && v2 && v2 < a ? v2 : (a || '');
+              setFilter(def.key, [nextStart, v2]);
+            }}
+          />
         </div>
       );
     }

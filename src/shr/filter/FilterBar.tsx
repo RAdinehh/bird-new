@@ -155,7 +155,7 @@ export function FilterBar<T>({
               background: 'rgba(255,255,255,0.28)',
               borderRadius: 'var(--r-md)', fontSize: 'var(--fs-2xs)', fontWeight: 800,
               marginRight: -2,
-            }}>{activeCount}</span>
+            }}>{toFa(activeCount)}</span>
           )}
         </button>
 
@@ -239,7 +239,7 @@ export function FilterBar<T>({
             fontWeight: 700, whiteSpace: 'nowrap',
             fontVariantNumeric: 'tabular-nums',
           }}>
-            {count === total ? `${total} مورد` : `${count} از ${total}`}
+            {count === total ? `${toFa(total)} مورد` : `${toFa(count)} از ${toFa(total)}`}
           </span>
         </div>
       </div>
@@ -290,7 +290,7 @@ export function FilterBar<T>({
         {chips.length > 0 && (
           <div style={{
             display: 'flex', gap: 4, flexWrap: 'wrap',
-            padding: '6px 8px', marginBottom: 6,
+            padding: '4px 6px', marginBottom: 4,
             background: 'var(--accent-soft)',
             border: '1px solid var(--accent-border)',
             borderRadius: 'var(--r-md)',
@@ -335,7 +335,7 @@ export function FilterBar<T>({
                 {/* تیتر گروه */}
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 8,
-                  padding: '8px 4px',
+                  padding: '5px 2px',
                 }}>
                   {def.icon && (
                     <span style={{
@@ -355,11 +355,11 @@ export function FilterBar<T>({
                       minWidth: 18, height: 18, padding: '0 5px',
                       background: 'var(--accent)', color: 'var(--avatar-text)',
                       borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-2xs)', fontWeight: 800,
-                    }}>{cnt}</span>
+                    }}>{toFa(cnt)}</span>
                   )}
                 </div>
                 {/* محتوا — همیشه باز */}
-                <div style={{ paddingBottom: 10, paddingTop: 2 }}>
+                <div style={{ paddingBottom: 6, paddingTop: 1 }}>
                   <FilterGroupBody def={def} value={filterState[def.key]} setFilter={setFilter} clearFilter={clearFilter} filterState={filterState} />
                 </div>
               </div>
@@ -368,11 +368,11 @@ export function FilterBar<T>({
         </div>
         {/* دکمه‌های پایین — sticky */}
         <div style={{
-          display: 'flex', gap: 8,
-          paddingTop: 12,
-          paddingBottom: 4,
+          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8,
+          paddingTop: 8,
+          paddingBottom: 2,
           borderTop: '1px solid var(--border)',
-          marginTop: 8,
+          marginTop: 4,
           position: 'sticky',
           bottom: 0,
           background: 'var(--card-solid, #fff)',
@@ -385,13 +385,12 @@ export function FilterBar<T>({
           </Btn>
           <button type="button" onClick={resetAll} style={{
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            gap: 6, height: 40, padding: '0 14px',
+            gap: 6, width: '100%', height: 36, padding: '0 12px',
             background: 'var(--danger-soft)',
             border: '1px solid var(--danger)',
             borderRadius: 'var(--r-md)',
             color: 'var(--danger)', fontFamily: 'inherit',
             fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer',
-            flexShrink: 0,
           }}>پاک‌سازی</button>
         </div>
       </Sheet>
@@ -415,7 +414,7 @@ export function FilterBar<T>({
                 onClick={() => { setGroupBy(opt.val); setOpenGroup(false); }}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 'var(--sp-2)',
-                  width: '100%', padding: '8px 10px', minHeight: 42,
+                  width: '100%', padding: '6px 8px', minHeight: 36,
                   background: groupBy === opt.val ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                   border: '1px solid ' + (groupBy === opt.val ? 'var(--accent-border)' : 'var(--border)'),
                   borderRadius: 'var(--r-lg)', color: 'var(--text)', fontFamily: 'inherit', cursor: 'pointer',
@@ -446,7 +445,7 @@ export function FilterBar<T>({
                 <button type="button" onClick={() => toggleSort(def.key)}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 'var(--sp-2)',
-                    width: '100%', padding: '8px 10px', minHeight: 42,
+                    width: '100%', padding: '6px 8px', minHeight: 36,
                     background: isActive ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                     border: '1px solid ' + (isActive ? 'var(--accent-border)' : 'var(--border)'),
                     borderRadius: 'var(--r-lg)',

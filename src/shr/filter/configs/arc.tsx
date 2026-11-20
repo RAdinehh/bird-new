@@ -2,6 +2,21 @@
 import { IconFolder, IconActivity, IconTag, IconChart, IconClock, IconUser, IconCalendar } from '../../icons';
 import { type Flock, getAgeDays as flkGetAgeDays } from '../../../mod/flk/store';
 import type { FilterConfig } from './_types';
+import { format as formatJalali } from 'date-fns-jalali';
+
+function toComparableJalaliDate(raw?: string): string {
+  if (!raw) return '';
+  const trimmed = raw.trim();
+  if (/^1[34]\d{2}\/\d{2}\/\d{2}/.test(trimmed)) {
+    return trimmed.slice(0, 10);
+  }
+  const d = new Date(trimmed);
+  if (!Number.isNaN(d.getTime())) {
+    return formatJalali(d, 'yyyy/MM/dd');
+  }
+  return trimmed.slice(0, 10);
+}
+
 
 export function getArcArchiveConfig(ctx: {
   birds: Array<{ id: string; name: string }>;
@@ -9,6 +24,11 @@ export function getArcArchiveConfig(ctx: {
 }): FilterConfig<Flock> {
   return {
     filterDefs: [
+      {
+        key: 'period', label: 'دوره زمانی', kind: 'dateRange',
+        icon: <IconCalendar size={18} />,
+        getValue: (f: Flock) => toComparableJalaliDate(f.updatedAt || f.startDate || ''),
+      },
       {
         key: 'status', label: 'وضعیت', kind: 'enum',
         icon: <IconActivity size={18} />,
@@ -42,7 +62,6 @@ export function getArcArchiveConfig(ctx: {
         icon: <IconFolder size={18} />,
         options: ctx.halls.map(h => ({ value: h.id, label: h.name })),
         getValue: (f: Flock) => f.hallId || '',
-        layout: 'chips',
       },
     ],
     sortDefs: [

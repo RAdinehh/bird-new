@@ -20,13 +20,6 @@ export interface ComparisonCandidate {
   isActive: boolean;
 }
 
-export interface SavedComparisonPreset {
-  id: string;
-  title: string;
-  flockIds: string[];
-  baselineId: string;
-}
-
 export interface MetricSpec {
   key: string;
   label: string;
@@ -36,7 +29,6 @@ export interface MetricSpec {
   decimals: number;
 }
 
-export const PRESETS_KEY = 'pm-arc-saved-comparisons-v1';
 export const MIN_FLOCKS = 2;
 export const MAX_FLOCKS = 4;
 export const ARCHIVE_FILTER_THRESHOLD = 5;
@@ -100,21 +92,31 @@ export function formatPctFa(pct: number): string {
   return `${sign}${formatted}٪`;
 }
 
-export function readPresets(): SavedComparisonPreset[] {
-  try {
-    const raw = safeStorage.get(PRESETS_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
+export interface PeriodAlignmentInfo {
+  durationDays: number | null;
+  coveragePct: number | null;
+  lowCoverage: boolean;
+  isActive: boolean;
 }
 
-export function writePresets(presets: SavedComparisonPreset[]): void {
-  try {
-    safeStorage.set(PRESETS_KEY, JSON.stringify(presets));
-  } catch {
-    /* ignore storage errors */
-  }
+export function getPeriodAlignmentInfo(candidate: ComparisonCandidate): PeriodAlignmentInfo {
+  const m = candidate.metric as unknown as Record<string, unknown>;
+  const rawDays =
+    typeof m.durationDays === 'number' && !Number.isNaN(m.durationDays)
+      ? m.durationDays
+      : typeof m.ageDays === 'number' && !Number.isNaN(m.ageDays)
+      ? m.ageDays
+      : null;
+
+  const rawCov =
+    typeof m.logCoveragePct === 'number' && !Number.isNaN(m.logCoveragePct)
+      ? m.logCoveragePct
+      : null;
+
+  return {
+    durationDays: rawDays,
+    coveragePct: rawCov,
+    lowCoverage: rawCov !== null && rawCov < 80,
+    isActive: candidate.isActive,
+  };
 }

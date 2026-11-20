@@ -16,6 +16,7 @@ import {
   extractNumericMetric,
   formatNumFa,
   formatPctFa,
+  getPeriodAlignmentInfo,
 } from './comparisonHelpers';
 
 interface Props {
@@ -109,6 +110,48 @@ export default function ComparisonTable({ orderedCandidates, refCandidate }: Pro
     };
   }, [canCompare, refCandidate, orderedCandidates, sortedMetrics, hasMixedProduction]);
 
+  // ─── سناریوهای پیچیده: اختلاف طول دوره، گله فعال در برابر آرشیو سرد، پوشش لاگ ───
+  const scenarioWarnings = useMemo(() => {
+    if (!canCompare || !refCandidate) return [] as string[];
+    const warnings: string[] = [];
+    const refInfo = getPeriodAlignmentInfo(refCandidate);
+
+    for (const c of orderedCandidates.slice(1)) {
+      const info = getPeriodAlignmentInfo(c);
+      const name = getTitle(c);
+
+      if (refCandidate.isActive !== c.isActive) {
+        warnings.push(
+          `مقایسه ترکیبی (${refCandidate.isActive ? 'مرجع فعال' : 'مرجع آرشیو سرد'} در برابر «${name}» ${c.isActive ? 'فعال' : 'آرشیو سرد'}): در ارزیابی اعداد تجمعی دقت کنید.`
+        );
+      }
+
+      if (
+        refInfo.durationDays !== null &&
+        info.durationDays !== null &&
+        Math.abs(refInfo.durationDays - info.durationDays) >= 7
+      ) {
+        warnings.push(
+          `اختلاف طول دوره بین مرجع (${toFa(refInfo.durationDays)} روز) و «${name}» (${toFa(info.durationDays)} روز).`
+        );
+      }
+
+      if (info.lowCoverage && info.coveragePct !== null) {
+        warnings.push(
+          `پوشش ثبت لاگ «${name}» (${toFa(info.coveragePct)}٪) کمتر از حد استاندارد ۸۰٪ است.`
+        );
+      }
+    }
+
+    if (refInfo.lowCoverage && refInfo.coveragePct !== null) {
+      warnings.push(
+        `پوشش ثبت لاگ گله مرجع «${getTitle(refCandidate)}» (${toFa(refInfo.coveragePct)}٪) کمتر از حد استاندارد ۸۰٪ است.`
+      );
+    }
+
+    return Array.from(new Set(warnings));
+  }, [canCompare, refCandidate, orderedCandidates]);
+
   // ─── حالت انتخاب نشده ───
   if (!canCompare) {
     return (
@@ -129,6 +172,27 @@ export default function ComparisonTable({ orderedCandidates, refCandidate }: Pro
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-sm)' }}>
+      {scenarioWarnings.length > 0 && (
+        <div
+          style={{
+            marginBottom: 10,
+            padding: '8px 12px',
+            borderRadius: 'var(--r-md)',
+            background: 'var(--warn-soft, rgba(245, 158, 11, 0.12))',
+            border: '1px solid var(--warn, #d97706)',
+            fontSize: 'var(--fs-xs)',
+            lineHeight: 1.7,
+          }}
+        >
+          <div style={{ fontWeight: 700, marginBottom: 4 }}>
+            توجه به شرایط مقایسه و داده‌های آرشیو سرد:
+          </div>
+          {scenarioWarnings.map((w, idx) => (
+            <div key={idx}>• {w}</div>
+          ))}
+        </div>
+      )}
+
       {bestFlockInfo && (
         <div
           style={{
