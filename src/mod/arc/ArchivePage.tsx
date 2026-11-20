@@ -680,8 +680,13 @@ export default function ArchivePage() {
                 selectedIds={selectedCompareIds}
                 onToggleFlock={toggleCompareFlock}
                 onSelectPreset={(ids, baseId) => {
-                  setSelectedCompareIds(ids.slice(0, 4));
-                  if (baseId) setBaselineFlockId(baseId);
+                  const nextIds = Array.from(new Set(ids)).slice(0, 4);
+                  setSelectedCompareIds(nextIds);
+                  if (baseId && nextIds.includes(baseId)) {
+                    setBaselineFlockId(baseId);
+                  } else if (nextIds[0]) {
+                    setBaselineFlockId(nextIds[0]);
+                  }
                 }}
                 baselineId={baselineFlockId}
                 onChangeBaseline={setBaselineFlockId}

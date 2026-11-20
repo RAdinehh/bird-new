@@ -390,9 +390,26 @@ export default function FlockComparisonPanel({
     toastMsg.saved('مقایسه ذخیره شد');
   };
 
+  const handleOpenPreset = (preset: SavedComparisonPreset) => {
+    const validIds = Array.from(new Set(preset.flockIds))
+      .filter((id) => candidates.some((c) => c.id === id))
+      .slice(0, MAX_FLOCKS);
+    if (validIds.length < MIN_FLOCKS) {
+      toastMsg.warn('گله‌های این مقایسه در فهرست فعلی موجود نیستند');
+      return;
+    }
+    const nextBase =
+      preset.baselineId && validIds.includes(preset.baselineId)
+        ? preset.baselineId
+        : validIds[0];
+    onSelectPreset(validIds, nextBase);
+    setPanelOpen(true);
+    toastMsg.info('مقایسه بارگذاری شد');
+  };
+
   const handleDeletePreset = (id: string) => {
     setPresets((prev) => prev.filter((p) => p.id !== id));
-    toastMsg.deleted('مقایسه ذخیره‌شده');
+    toastMsg.deleted('از لیست ذخیره‌شده‌ها');
   };
 
   const handleExportCSV = () => {
@@ -847,7 +864,7 @@ export default function FlockComparisonPanel({
                         {p.title}
                       </span>
                       <div style={{ display: 'flex', gap: 4 }}>
-                        <Btn size="sm" onClick={() => onSelectPreset(p.flockIds, p.baselineId)}>
+                        <Btn size="sm" onClick={() => handleOpenPreset(p)}>
                           باز کردن
                         </Btn>
                         <Btn size="sm" onClick={() => handleDeletePreset(p.id)}>
