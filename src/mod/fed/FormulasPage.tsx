@@ -17,6 +17,7 @@ import UndoBar from '../../cor/ui/UndoBar';
 import { toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
+import HelpBanner from '../../shr/components/HelpBanner';
 
 export default function FormulasPage() {
   const { ingredients, requirements, formulas, addFormula, updateFormula, deleteFormula } = useFed();
@@ -197,6 +198,13 @@ export default function FormulasPage() {
 
   return (
     <PageContainer>
+      <HelpBanner
+        id="fed-formulas-guide"
+        icon="🧪"
+        title="راهنمای فرمول‌های جیره"
+        description="ترکیب اقلام خوراکی و نسبت‌های جیره را بسازید و ارزش غذایی نهایی را با نیازهای دوره مقایسه کنید."
+        tone="info"
+      />
       {undoData && (
         <UndoBar
           label="حذف شد"

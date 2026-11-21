@@ -8,6 +8,7 @@ import { PageContainer, Btn } from '../../shr/components/ui';
 import { exportTableToCSV } from '../../shr/utils/export';
 import { toFa } from '../../shr/utils/fa';
 import { StatCard, Section } from './helpers';
+import HelpBanner from '../../shr/components/HelpBanner';
 
 export default function ProductionPage() {
   const { productions } = useEgg();
@@ -88,6 +89,13 @@ export default function ProductionPage() {
 
   return (
     <PageContainer>
+      <HelpBanner
+        id="rep-production-guide"
+        icon="📈"
+        title="راهنمای گزارش تولید"
+        description="آمار ماهانهٔ تولید تخم، مصرف خوراک و تلفات را کنار هم ببینید و جدول یا گزارش تحلیلی دریافت کنید."
+        tone="info"
+      />
       {/* ۳ کارت اصلی */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
         <StatCard label="🥚 تخم کل" value={totalEggs} unit="عدد" color="accent" />

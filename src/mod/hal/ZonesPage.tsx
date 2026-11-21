@@ -298,8 +298,8 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
       <HelpBanner
         id="hal-zones-intro"
         icon="🗂"
-        title="بخش‌های سالن"
-        description="هر بخش داخل یک سالن تعریف می‌شود. برای انتخاب چندتایی، روی یک کارت نگه دارید."
+        title="راهنمای بخش‌های سالن"
+        description="هر بخش یا سالنک را در زیرمجموعهٔ سالن مربوط تعریف کنید تا ظرفیت، تجهیزات و عملیات هر قسمت به‌صورت مستقل قابل پیگیری باشد."
         tone="info"
       />
 

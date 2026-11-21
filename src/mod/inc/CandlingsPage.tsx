@@ -16,6 +16,7 @@ import { useCandlingForm, type EntryData, emptyData } from './hooks/useCandlingF
 import CandlingCard from './components/CandlingCard';
 import CandlingFormModal from './components/CandlingFormModal';
 import { useMemo as _useMemoV } from 'react';
+import HelpBanner from '../../shr/components/HelpBanner';
 
 const INFERTILE_REASONS: [string, string][] = [
   ['', '—'], ['season', 'فصل'], ['rooster_age', 'سن خروس'], ['nutrition', 'تغذیه'], ['genetics', 'ژنتیک'], ['storage', 'نگهداری تخم']
@@ -207,6 +208,13 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
 
   return (
     <PageContainer>
+      <HelpBanner
+        id="inc-candlings-guide"
+        icon="🔦"
+        title="راهنمای کندلینگ"
+        description="تعداد تخم‌های بارور، بی‌نطفه و حذف‌شده یا تلفات جنینی را در هر مرحلهٔ کندلینگ ثبت کنید تا درصد باروری و هچ به‌روز بماند."
+        tone="info"
+      />
       {undoData && (
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',

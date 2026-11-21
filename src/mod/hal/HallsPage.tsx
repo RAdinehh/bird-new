@@ -298,8 +298,8 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       <HelpBanner
         id="hal-halls-intro"
         icon="🏭"
-        title="سالن‌ها"
-        description="سالن‌های مرغداری را اینجا تعریف کنید. برای هر سالن ابعاد، ظرفیت، شرایط محیطی و تجهیزات ثبت کنید. برای انتخاب چندتایی، روی یک کارت نگه دارید."
+        title="راهنمای سالن‌ها"
+        description="سالن‌های مرغداری را تعریف و مدیریت کنید؛ برای هر سالن ظرفیت، ابعاد، شرایط محیطی، بخش‌ها و تجهیزات مربوط را ثبت کنید."
         tone="info"
       />
       <FilterBar

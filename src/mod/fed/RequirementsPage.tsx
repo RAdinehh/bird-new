@@ -14,6 +14,7 @@ import UndoBar from '../../cor/ui/UndoBar';
 import { toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
+import HelpBanner from '../../shr/components/HelpBanner';
 
 interface F {
   id?: string;
@@ -200,6 +201,13 @@ export default function RequirementsPage() {
 
   return (
     <PageContainer>
+      <HelpBanner
+        id="fed-requirements-guide"
+        icon="📋"
+        title="راهنمای نیازهای غذایی"
+        description="استانداردهای پروتئین، انرژی و مواد مغذی هر دوره و نوع پرنده را اینجا تعریف کنید تا در فرمول‌نویسی جیره ملاک محاسبه باشند."
+        tone="info"
+      />
       {undoData && (
         <UndoBar
           label="حذف شد"

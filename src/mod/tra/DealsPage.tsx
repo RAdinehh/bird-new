@@ -43,6 +43,7 @@ import { useValidation } from '../../shr/validation/useValidation';
 import { useFormErrors } from '../../shr/hooks/useFormErrors';
 import { DealSchema } from '../../shr/validation/rules/tra';
 import { HELP } from '../../shr/help/helpTexts';
+import HelpBanner from '../../shr/components/HelpBanner';
 
 import { useDealCalc, useDealStats } from './deals/useDealCalc';
 import { type F, empty, STATUS_LABEL, isSameIdentity } from './deals/types';
@@ -445,6 +446,13 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
 
   return (
     <PageContainer>
+      <HelpBanner
+        id="tra-deals-guide"
+        icon="🤝"
+        title="راهنمای معاملات و شراکت‌ها"
+        description="معاملات مشارکتی یا قراردادی را با طرف‌های حساب ثبت کنید، سهم هر طرف و وضعیت تسویه را دنبال کنید و در صورت نیاز به مانده‌حساب منتقل شوید."
+        tone="info"
+      />
       {undoData && (
         <UndoBar
           label="حذف شد"

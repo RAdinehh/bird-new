@@ -142,7 +142,7 @@ export default function ContactTabPanel({ tab, active, onEdit, onAdd }: Props) {
         id="ctc-intro"
         icon="👥"
         title="مخاطبین"
-        description="مشتریان، تأمین‌کنندگان و کارگران را اینجا ثبت کنید. هر مخاطب می‌تواند نقش‌های مختلف داشته باشد. برای انتخاب چندتایی، روی یک کارت نگه دارید."
+        description="مشتریان، تأمین‌کنندگان و کارگران را اینجا ثبت کنید. هر مخاطب می‌تواند نقش‌های مختلف داشته باشد."
         tone="info"
       />
       {undoData && (

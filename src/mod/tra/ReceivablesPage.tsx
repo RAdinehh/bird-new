@@ -28,6 +28,7 @@ import AgingBuckets from './components/AgingBuckets';
 import ChecksModal from './components/ChecksModal';
 import { agingBucketFromDue } from './formulas';
 import { agingBucketFromDeal, computeOverpayment , getTodayJalali} from './calc';
+import HelpBanner from '../../shr/components/HelpBanner';
 
 
 export default function ReceivablesPage({ active = true }: { active?: boolean } = {}) {

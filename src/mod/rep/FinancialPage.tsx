@@ -7,6 +7,7 @@ import { toFa } from '../../shr/utils/fa';
 import { pareto } from '../../shr/utils/pareto';
 import ExportButtons from './ExportButtons';
 import { StatCard, Section } from './helpers';
+import HelpBanner from '../../shr/components/HelpBanner';
 
 
 function ParetoCard({ invoices }: { invoices: any[] }) {
@@ -95,6 +96,13 @@ export default function FinancialPage() {
   if (invoices.length === 0) {
     return (
       <PageContainer>
+      <HelpBanner
+        id="rep-financial-guide"
+        icon="💰"
+        title="راهنمای گزارش مالی"
+        description="جمع فروش و خرید، جریان نقدی، مطالبات و بدهی‌ها و سهم اقلام پرهزینه را در بازه‌های زمانی مختلف مشاهده و خروجی بگیرید."
+        tone="info"
+      />
       <ParetoCard invoices={invoices} />
         <div style={{ padding: 60, textAlign: 'center', fontSize: 'var(--fs-sm)', color: 'var(--muted)', lineHeight: 1.8 }}>
           هنوز معامله‌ای ثبت نشده

@@ -7,6 +7,7 @@ import { runRules } from './rules';
 import { useCarousel } from '../../shr/hooks/useCarousel';
 import { toFa } from '../../shr/utils/fa';
 import AlertTabPanel from './components/AlertTabPanel';
+import HelpBanner from '../../shr/components/HelpBanner';
 
 type TabId = 'active' | 'history';
 

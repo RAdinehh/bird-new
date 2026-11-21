@@ -25,6 +25,7 @@ import DlgTabPanel from './components/DlgTabPanel';
 import AggregateTabPanel from './components/AggregateTabPanel';
 import { useDlgForm } from './hooks/useDlgForm';
 import { useDlgSave } from './hooks/useDlgSave';
+import HelpBanner from '../../shr/components/HelpBanner';
 
 type TabId = 'today' | 'history' | 'archive' | 'aggregate';
 

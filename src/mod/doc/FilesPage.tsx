@@ -13,6 +13,7 @@ import { showConfirmAsync } from '../../cor/store/dialog';
 import { toastMsg } from '../../cor/store/toast';
 import { ListCard, GridCard } from './helpers';
 import { useFilterSort, FilterBar, getDocFilesConfig } from '../../shr/filter';
+import HelpBanner from '../../shr/components/HelpBanner';
 
 type ViewMode = 'grid' | 'list';
 
@@ -67,6 +68,13 @@ export default function FilesPage() {
 
   return (
     <PageContainer>
+      <HelpBanner
+        id="doc-files-guide"
+        icon="📁"
+        title="راهنمای اسناد و فایل‌ها"
+        description="رسیدها، برگه‌های آزمایش، مجوزها و فایل‌های مرتبط با گله‌ها، معاملات و انبار را دسته‌بندی، پیش‌نمایش و مدیریت کنید."
+        tone="info"
+      />
       {/* آمار */}
       <div style={{
         background: 'var(--card)',

@@ -13,6 +13,7 @@ import type { Flock } from '../../flk/store';
 import { Empty, Btn } from '../../../shr/components/ui';
 import { toFa } from '../../../shr/utils/fa';
 import { toCSV } from '../../../shr/utils/export';
+import HelpBanner from '../../../shr/components/HelpBanner';
 
 type Period = 'week' | 'month';
 
@@ -163,6 +164,13 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <HelpBanner
+        id="dlg-aggregate-guide"
+        icon="🧮"
+        title="راهنمای نمای تجمیعی دفتر روزانه"
+        description="مجموع مصرف دان و آب، تلفات، وزن میانگین و تولید تخم گله‌های فعال را در بازه یا نمای انتخاب‌شده به صورت یکجا ببینید."
+        tone="info"
+      />
       {/* Controls */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
         <div style={{

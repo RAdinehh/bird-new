@@ -263,8 +263,8 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
       <HelpBanner
         id="inc-hatch-intro"
         icon="🐣"
-        title="هچ — نتیجه نهایی"
-        description="نتیجه نهایی تخم‌ها را اینجا ثبت کنید: هچ، تلفات جنینی، تفکیک جنسیت، ساخت گله و فروش جوجه. برای انتخاب چندتایی، روی یک کارت نگه دارید."
+        title="راهنمای هچ و نتیجه نهایی"
+        description="نتیجهٔ پایانی هر دوره شامل تعداد جوجه‌های هچ‌شده، تلفات جنینی، تفکیک جنسیت و انتقال جوجه به گله یا فروش را ثبت کنید."
         tone="info"
       />
 

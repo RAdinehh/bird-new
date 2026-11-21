@@ -276,8 +276,8 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
       <HelpBanner
         id="inc-devices-intro"
         icon="🏭"
-        title="دستگاه‌های جوجه‌کشی"
-        description="دستگاه‌های انکوباسیون و هچر را اینجا تعریف کنید. برای انتخاب چندتایی، روی یک کارت نگه دارید."
+        title="راهنمای دستگاه‌های جوجه‌کشی"
+        description="دستگاه‌های ستر (انکوباسیون) و هچر را با ظرفیت، مشخصات و وضعیت کاری ثبت کنید تا برنامه‌ریزی چیدمان تخم و هچ دقیق انجام شود."
         tone="info"
       />
       <FilterBar

@@ -9,6 +9,7 @@ import { exportTableToCSV } from '../../shr/utils/export';
 import { toFa } from '../../shr/utils/fa';
 import { StatCard, Section } from './helpers';
 import { applyCorrections } from '../dlg/api/applyCorrections';
+import HelpBanner from '../../shr/components/HelpBanner';
 
 export default function FlockReportPage() {
   const { flocks } = useFlk();
@@ -21,6 +22,13 @@ export default function FlockReportPage() {
   if (activeFlocks.length === 0) {
     return (
       <PageContainer>
+      <HelpBanner
+        id="rep-flock-guide"
+        icon="🐔"
+        title="راهنمای گزارش گله"
+        description="شاخص‌های عملکرد، مصرف خوراک، تلفات، درآمد و هزینه‌های هر گله را به‌صورت یکجا بررسی و گزارش تهیه کنید."
+        tone="info"
+      />
         <div style={{ padding: 60, textAlign: 'center', fontSize: 'var(--fs-sm)', color: 'var(--muted)', lineHeight: 1.8 }}>
           هنوز گله فعالی وجود ندارد
         </div>

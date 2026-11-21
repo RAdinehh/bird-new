@@ -17,6 +17,7 @@ import { toastMsg } from '../../../cor/store/toast';
 import { logAction } from '../../../cor/logger/auditLog';
 import { toFa } from '../../../shr/utils/fa';
 import { TYPE_LABEL, TYPE_DESC, TYPE_OPTIONS, TYPE_ICON_MAP, NAME_PLACEHOLDER } from '../api/groupsConstants';
+import HelpBanner from '../../../shr/components/HelpBanner';
 
 interface Props {
   open: boolean;

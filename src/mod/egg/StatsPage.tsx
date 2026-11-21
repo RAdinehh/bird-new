@@ -1,5 +1,6 @@
 import { MiniStat } from '../../shr/components/ui/MiniStat';
 import { KpiCard } from '../../shr/components/ui/KpiCard';
+import HelpBanner from '../../shr/components/HelpBanner';
 /**
  * StatsPage — آمار و تحلیل تخم‌گذاری
  */
@@ -171,6 +172,13 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
 
   return (
     <PageContainer>
+      <HelpBanner
+        id="egg-stats-guide"
+        icon="📊"
+        title="راهنمای آمار تولید تخم"
+        description="روند تولید روزانه و تفکیک تخم‌های خوراکی، نطفه‌دار و مصرفی را در بازه‌های زمانی مختلف بررسی و مقایسه کنید."
+        tone="info"
+      />
       {/* فیلترها */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
         <Select value={range} onChange={e => setRange(e.target.value as Range)}>

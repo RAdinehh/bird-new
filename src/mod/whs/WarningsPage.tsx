@@ -5,6 +5,7 @@ import { Empty, PageContainer } from '../../shr/components/ui';
 import { StatBox, Dot } from '../../shr/components/ExpandableCard';
 import { toFa } from '../../shr/utils/fa';
 import { WarningGroup } from './helpers';
+import HelpBanner from '../../shr/components/HelpBanner';
 
 export default function WarningsPage() {
   const { items } = useWhs();
@@ -32,6 +33,13 @@ export default function WarningsPage() {
   if (noRawWarnings) {
     return (
       <PageContainer>
+      <HelpBanner
+        id="whs-warnings-guide"
+        icon="⚠️"
+        title="راهنمای هشدارهای انبار"
+        description="اقلامی که موجودی‌شان به حد هشدار رسیده یا تاریخ انقضایشان نزدیک است اینجا نمایش داده می‌شوند تا پیش از کمبود یا فاسد شدن اقدام کنید."
+        tone="info"
+      />
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M20 6 9 17l-5-5"/></svg>}
           title="همه‌چیز مرتب است"

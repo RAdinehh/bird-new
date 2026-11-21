@@ -11,6 +11,7 @@ import { showConfirmAsync } from '../../../cor/store/dialog';
 import { logAction } from '../../../cor/logger/auditLog';
 import { toFa } from '../../../shr/utils/fa';
 import { TabButton } from '../../../shr/components/ui';
+import HelpBanner from '../../../shr/components/HelpBanner';
 
 type Seg = 'halls' | 'zones' | 'equip';
 
@@ -90,6 +91,13 @@ export default function ArchivePage({ active = true }: Props = {}) {
 
   return (
     <PageContainer>
+      <HelpBanner
+        id="hal-archive-guide"
+        icon="🗄"
+        title="راهنمای آرشیو سالن‌ها و تجهیزات"
+        description="سالن‌ها، بخش‌ها و تجهیزات بایگانی‌شده را بر اساس تب انتخابی مرور و در صورت نیاز بازیابی یا مدیریت کنید."
+        tone="info"
+      />
       {total === 0 ? (
         <Empty
           icon={<span style={{ fontSize: 32 }}>📦</span>}

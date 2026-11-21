@@ -22,6 +22,7 @@ import { nowTime } from './api/eggEntriesCalc';
 import EggEntryCard from './components/EggEntryCard';
 import { useEggEntriesForm } from './hooks/useEggEntriesForm';
 import { useSet } from '../set/store';
+import HelpBanner from '../../shr/components/HelpBanner';
 
 
 export default function EggEntriesPage({ initialDevice = '', onGoTo, active = true }: { initialDevice?: string; onGoTo?: (t: any, payload?: { entry?: string }) => void; active?: boolean } = {}) {
@@ -207,6 +208,13 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
 
   return (
     <PageContainer>
+      <HelpBanner
+        id="inc-entries-guide"
+        icon="🥚"
+        title="راهنمای ورود تخم به دستگاه"
+        description="تعداد و مشخصات تخم‌های چیده‌شده در دستگاه‌های جوجه‌کشی را ثبت کنید تا زمان کندلینگ و هچ دقیق محاسبه شود."
+        tone="info"
+      />
       {undoRow && (
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',

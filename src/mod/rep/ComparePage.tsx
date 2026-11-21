@@ -6,6 +6,7 @@ import { DualBarChart, BarChart } from '../../shr/components/Charts';
 import { PageContainer } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
 import { Section } from './helpers';
+import HelpBanner from '../../shr/components/HelpBanner';
 
 type Mode = 'month' | 'quarter' | 'year';
 
@@ -62,6 +63,13 @@ export default function ComparePage() {
 
   return (
     <PageContainer>
+      <HelpBanner
+        id="rep-compare-guide"
+        icon="⚖️"
+        title="راهنمای مقایسه"
+        description="عملکرد چند گله یا دورهٔ زمانی را از نظر تولید، مصرف، تلفات و شاخص‌های کلیدی با هم مقایسه کنید."
+        tone="info"
+      />
       {/* انتخاب حالت */}
       <div style={{ display: 'flex', gap: 6 }}>
         <button onClick={() => setMode('month')} style={chip(mode === 'month')}>

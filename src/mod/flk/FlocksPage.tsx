@@ -27,6 +27,7 @@ import GroupsPage from './components/GroupsPage';
 import WithdrawalModal from './components/WithdrawalModal';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { showToast, toastMsg } from '../../cor/store/toast';
+import HelpBanner from '../../shr/components/HelpBanner';
 
 export default function FlocksPage() {
   const fmt = useFormat();

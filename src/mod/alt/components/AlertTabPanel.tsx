@@ -14,6 +14,7 @@ import { toastMsg } from '../../../cor/store/toast';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { logAction } from '../../../cor/logger/auditLog';
 import { Row } from '../../../shr/components/ui';
+import HelpBanner from '../../../shr/components/HelpBanner';
 
 type TabId = 'active' | 'history';
 
@@ -80,6 +81,13 @@ export default function AlertTabPanel({ tab, active: isActive }: Props) {
 
   return (
     <PageContainer>
+      <HelpBanner
+        id="alt-tab-guide"
+        icon="🔔"
+        title="راهنمای هشدارها"
+        description="هشدارهای این دسته را بر اساس اولویت بررسی کنید، موارد انجام‌شده را ببندید یا یادآور ثبت کنید."
+        tone="info"
+      />
       {undoData && (
         <UndoBar label="هشدار حذف شد" onUndo={undoDelete} onDismiss={() => setUndoData(null)} />
       )}

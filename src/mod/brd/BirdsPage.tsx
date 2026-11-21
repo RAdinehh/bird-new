@@ -200,7 +200,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
         id="brd-birds-intro"
         icon="🐔"
         title="پرنده‌ها"
-        description="پرنده‌های اصلی (مرغ، بوقلمون، اردک، بلدرچین، غاز و...) را اینجا تعریف کنید. برای انتخاب چندتایی، روی یک کارت نگه دارید."
+        description="پرنده‌های اصلی (مرغ، بوقلمون، اردک، بلدرچین، غاز و...) را اینجا تعریف کنید."
         tone="info"
       />
       <FilterBar

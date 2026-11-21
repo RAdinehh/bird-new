@@ -112,7 +112,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
       <PageContainer>
         <MasterRedirectModal />
         <HelpBanner id="brd-breeds-intro" icon="🧬" title="نژادها"
-          description="نژادهای هر پرنده را اینجا تعریف کنید. هر نژاد می‌تواند به استانداردهای علمی وصل شود. برای انتخاب چندتایی، روی یک کارت نگه دارید."
+          description="نژادهای هر پرنده را اینجا تعریف کنید. هر نژاد می‌تواند به استانداردهای علمی وصل شود."
           tone="info" />
         {undoData && <UndoBar label="حذف شد" onUndo={undoDelete} onDismiss={() => setUndoData(null)} />}
         <Empty

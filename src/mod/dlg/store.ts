@@ -403,7 +403,9 @@ export const useDlg = create<State>()(
           mod.ARCHIVE_STORES.dlg,
         );
         if (restored.length === 0) return 0;
-        set({ logs: [...get().logs, ...restored] });
+        const existingIds = new Set(get().logs.map(x => x.id));
+        const uniqueRestored = restored.filter(x => !existingIds.has(x.id));
+        set({ logs: [...get().logs, ...uniqueRestored] });
         for (const l of restored) syncOne(l);
         return restored.length;
       },
@@ -412,7 +414,8 @@ export const useDlg = create<State>()(
         const restored = await mod.restoreManyFromArchive([id], mod.ARCHIVE_STORES.dlg);
         const log = restored[0];
         if (!log) return false;
-        set({ logs: [...get().logs, log] });
+        const exists = get().logs.some(x => x.id === log.id);
+        if (!exists) set({ logs: [...get().logs, log] });
         syncOne(log);
         return true;
       },

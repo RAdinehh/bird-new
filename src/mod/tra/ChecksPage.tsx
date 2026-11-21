@@ -13,6 +13,7 @@ import { daysUntilJalali } from './helpers';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { toastMsg } from '../../cor/store/toast';
 import { Btn, Empty, PageContainer } from '../../shr/components/ui';
+import HelpBanner from '../../shr/components/HelpBanner';
 
 const CAT_LABEL: Record<string, string> = {
   chick: 'جوجه', egg: 'تخم', fertile_egg: 'تخم نطفه‌دار',
@@ -226,6 +227,13 @@ export default function ChecksPage({ active = true }: { active?: boolean } = {})
 
   return (
     <PageContainer>
+      <HelpBanner
+        id="tra-checks-guide"
+        icon="🧾"
+        title="راهنمای چک‌ها"
+        description="چک‌های ثبت‌شده در فاکتورها و تسویه‌ها را بر اساس وضعیت (در دست، در جریان، وصول‌شده، برگشتی) و تاریخ سررسید بررسی و مدیریت کنید."
+        tone="info"
+      />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
         <div>
           <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 800 }}>مدیریت چک‌ها</div>

@@ -8,6 +8,7 @@ import { toFa, toEn } from '../../shr/utils/fa';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import ContactFormModal from './components/ContactFormModal';
 import ContactTabPanel from './components/ContactTabPanel';
+import HelpBanner from '../../shr/components/HelpBanner';
 
 interface F {
   id?: string; name: string; phone: string; phone2: string; email: string;

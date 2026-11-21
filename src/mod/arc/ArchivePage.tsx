@@ -1,10 +1,11 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useFlk, getAgeDays, calcCosts, formatAge, SOURCE_LABEL, type Flock } from '../flk/store';
 import { useBrd } from '../brd/store';
 import { useHal } from '../hal/store';
 import { Btn, Empty, PageContainer, Tag, Row, TabButton } from '../../shr/components/ui';
 import FlockComparisonPanel, { type ComparisonCandidate } from './FlockComparisonPanel';
 import ExpandableCard from '../../shr/components/ExpandableCard';
+import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa } from '../../shr/utils/fa';
 import { formatJalali } from '../../shr/date/jalali';
 import { toastMsg } from '../../cor/store/toast';
@@ -581,6 +582,35 @@ export default function ArchivePage() {
         </TabButton>
       </div>
 
+      {/* بنر راهنمای تب فعال زیر نوار تب‌ها */}
+      {kind === 'flocks' && (
+        <HelpBanner
+          id="arc-flocks-guide"
+          icon="🗄"
+          title="راهنمای آرشیو گله‌ها"
+          description="گله‌های بسته‌شده یا فروخته‌شده و خلاصه‌های مقایسه‌ای این‌جا قرار می‌گیرند. می‌توانید دوره‌ها را بررسی، مقایسه یا در صورت امکان بازیابی کنید."
+          tone="info"
+        />
+      )}
+      {kind === 'logs' && (
+        <HelpBanner
+          id="arc-logs-guide"
+          icon="📒"
+          title="راهنمای آرشیو دفتر روزانه"
+          description="ثبت‌های روزانهٔ آرشیوشده یا مربوط به گله‌های بسته‌شده این‌جا نگهداری می‌شوند. با بازیابی، موارد به مخزن فعال دفتر روزانه بازمی‌گردند."
+          tone="info"
+        />
+      )}
+      {kind === 'stores' && (
+        <HelpBanner
+          id="arc-stores-guide"
+          icon="📦"
+          title="راهنمای سایر مخازن آرشیو"
+          description="نمای تجمیعیِ رکوردهای آرشیوشده در معاملات، انبار، جوجه‌کشی و گله‌های بسته است؛ با فیلتر مخزن می‌توانید موارد موجود را تفکیک کنید."
+          tone="info"
+        />
+      )}
+
       {/* آمار کلی جمع‌وجور */}
       <div style={{
         padding: '10px 14px',
@@ -681,7 +711,7 @@ export default function ArchivePage() {
                 storesLoading ? (
                   <div style={{ padding: 24, textAlign: 'center', color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>در حال بارگذاری…</div>
                 ) : storeEntries.length === 0 ? (
-                  <Empty
+<Empty
                     icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>}
                     title="مخزن سرد دیگری خالی است"
                     desc="رکوردهای آرشیو‌شدهٔ معاملات، انبار، جوجه‌کشی و گله‌های بسته این‌جا نمایش داده می‌شوند."
@@ -844,7 +874,7 @@ export default function ArchivePage() {
               />
           )}
           {archivedFlocks.length === 0 && sampleCompareFlocks.length === 0 && (
-            <Empty
+<Empty
               icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>}
               title="آرشیو خالی است"
               desc="آیتم‌هایی که آرشیو می‌کنید این‌جا نمایش داده می‌شوند یا با دکمهٔ بالا ۴ گلهٔ نمونه بسازید."
@@ -963,7 +993,7 @@ function LogsArchiveTab({
 
   if (rows.length === 0) {
     return (
-      <Empty
+<Empty
         icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>}
         title="آرشیو دفتر روزانه خالی است"
         desc="ثبت‌های قدیمی یا دفتر روزانهٔ گله‌های بسته‌شده این‌جا نگهداری می‌شوند."
