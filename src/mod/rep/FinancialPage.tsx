@@ -115,6 +115,13 @@ export default function FinancialPage() {
 
   return (
     <PageContainer>
+      <HelpBanner
+        id="rep-financial-guide"
+        icon="💰"
+        title="راهنمای گزارش مالی"
+        description="جمع فروش و خرید، جریان نقدی، مطالبات و بدهی‌ها و سهم اقلام پرهزینه را در بازه‌های زمانی مختلف مشاهده و خروجی بگیرید."
+        tone="info"
+      />
       {/* ۳ کارت اصلی */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
         <StatCard label="فروش کل" value={totalSales} color="accent" />
