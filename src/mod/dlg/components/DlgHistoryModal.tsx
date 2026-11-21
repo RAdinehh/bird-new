@@ -161,18 +161,28 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
   }, [groups, showAll]);
 
   // شناسه آخرین رویداد — فقط این قابل لغو است
-  const latestItemId = (() => {
-    let latest: { time: string; id: string } | null = null;
+  const latestItemId = useMemo(() => {
+    let latest: { ts: number; id: string } | null = null;
+    const toTs = (val?: string) => {
+      if (!val) return 0;
+      const parsed = Date.parse(val);
+      if (Number.isFinite(parsed)) return parsed;
+      const parts = val.split(":").map(Number);
+      if (parts.length >= 2 && Number.isFinite(parts[0]) && Number.isFinite(parts[1])) {
+        return (parts[0] * 3600 + parts[1] * 60 + (parts[2] || 0)) * 1000;
+      }
+      return 0;
+    };
     for (const ev of log?.events || []) {
-      const t = ev.createdAt || '';
-      if (!latest || t > latest.time) latest = { time: t, id: ev.id };
+      const ts = toTs(ev.createdAt || ev.entryTime);
+      if (!latest || ts >= latest.ts) latest = { ts, id: ev.id };
     }
     for (const corr of log?.corrections || []) {
-      const t = corr.timestamp || '';
-      if (!latest || t > latest.time) latest = { time: t, id: corr.id };
+      const ts = toTs(corr.createdAt || corr.timestamp);
+      if (!latest || ts >= latest.ts) latest = { ts, id: corr.id };
     }
     return latest?.id || null;
-  })();
+  }, [log]);
 
   const handleExport = () => {
     if (!log) return;
@@ -181,24 +191,24 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
       const rows = items.flatMap(it => {
         if (it.kind === 'merged-reading') {
           return it.events.map(ev => {
-            const m = TYPE_META[ev.type];
+            const m = TYPE_META[ev.type] || { label: ev.type || 'رویداد', tone: 'var(--muted)' };
             return [ev.entryTime || ev.createdAt, m.label, ev.field || '', ev.value ?? '', '', ev.reason || ev.notes || '', ev.revoked ? 'بله' : 'خیر'];
           });
         }
         if (it.kind === 'merged-nutrition') {
           return it.events.map(ev => {
-            const m = TYPE_META[ev.type];
+            const m = TYPE_META[ev.type] || { label: ev.type || 'رویداد', tone: 'var(--muted)' };
             return [ev.entryTime || ev.createdAt, m.label, '', ev.amount ?? '', '', '', ev.revoked ? 'بله' : 'خیر'];
           });
         }
         if (it.kind === 'merged-health') {
           return it.events.map(ev => {
-            const m = TYPE_META[ev.type];
+            const m = TYPE_META[ev.type] || { label: ev.type || 'رویداد', tone: 'var(--muted)' };
             return [ev.entryTime || ev.createdAt, m.label, ev.notes || '', '', '', ev.reason || '', ev.revoked ? 'بله' : 'خیر'];
           });
         }
         if (it.kind === 'event') {
-          const m = TYPE_META[it.event.type];
+          const m = TYPE_META[it.event.type] || { label: it.event.type || 'رویداد', tone: 'var(--muted)' };
           return [[it.event.entryTime || it.event.createdAt, m.label, it.event.field || '', it.event.before ?? '', it.event.after ?? it.event.value ?? it.event.amount ?? it.event.count ?? '', it.event.reason || it.event.notes || '', it.event.revoked ? 'بله' : 'خیر']];
         }
         const c = it.correction;

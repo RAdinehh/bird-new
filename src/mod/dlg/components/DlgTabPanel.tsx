@@ -1,7 +1,7 @@
 /**
  * DlgTabPanel — محتوای یک تب از ثبت روزانه (carousel)
  */
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { format as formatJ } from 'date-fns-jalali';
 import { useFab } from '../../../shr/hooks/useFab';
 import FlockPickerSheet from './FlockPickerSheet';
@@ -55,12 +55,169 @@ export default function DlgTabPanel({
   vaccineEnabled, medicineEnabled,
   onEdit, onAdd, onDeleteLog, onRestoreLogFull, onApplyCorrection, onRevokeCorrection,
 }: Props) {
-  const { add, archive, restore } = useDlg();
+  const { add, archive, restore, restoreArchived, countArchivedLogs } = useDlg();
+  const [coldCount, setColdCount] = useState<number>(0);
+  const [coldOpen, setColdOpen] = useState<boolean>(false);
+  const [coldLoading, setColdLoading] = useState<boolean>(false);
+  const [coldRestoringId, setColdRestoringId] = useState<string | null>(null);
+  const [coldItems, setColdItems] = useState<Array<{ id: string; flockId: string; date: string; reason: string; log: DailyLog }>>([]);
   const [undoData, setUndoData] = useState<{ log: DailyLog | DailyLog[]; snapshot?: DeleteSnapshot } | null>(null);
+  const loadColdArchive = async () => {
+    setColdLoading(true);
+    try {
+      const mod = await import("../../../cor/storage/historyArchive");
+      const rows = await mod.listArchived({ limit: 50 }, mod.ARCHIVE_STORES.dlg);
+      setColdItems(rows.map(r => ({ id: r.id, flockId: r.flockId, date: r.date, reason: r.reason, log: r.log })));
+    } catch {
+      setColdItems([]);
+    } finally {
+      setColdLoading(false);
+    }
+  };
+
+  const handleToggleColdArchive = async () => {
+    const next = !coldOpen;
+    setColdOpen(next);
+    if (next) await loadColdArchive();
+  };
+
+  const handleRestoreColdItem = async (id: string) => {
+    setColdRestoringId(id);
+    try {
+      const ok = await restoreArchived(id);
+      if (ok) {
+        toastMsg.restored("ثبت");
+        setColdItems(prev => prev.filter(x => x.id !== id));
+        const nextCount = await countArchivedLogs().catch(() => 0);
+        setColdCount(nextCount);
+      } else {
+        toastMsg.error("بازگردانی ناموفق");
+      }
+    } finally {
+      setColdRestoringId(null);
+    }
+  };
+
+  const undoTimerRef = useRef<number | null>(null);
+  const scheduleUndoClear = (ms: number) => {
+    if (undoTimerRef.current !== null) window.clearTimeout(undoTimerRef.current);
+    undoTimerRef.current = window.setTimeout(() => {
+      setUndoData(null);
+      undoTimerRef.current = null;
+    }, ms);
+  };
+  useEffect(() => () => {
+    if (undoTimerRef.current !== null) window.clearTimeout(undoTimerRef.current);
+  }, []);
   const [correctingLog, setCorrectingLog] = useState<DailyLog | null>(null);
   const [historyLog, setHistoryLog] = useState<DailyLog | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [showAllHistory, setShowAllHistory] = useState(false);
   const allLogs = useDlg(s => s.logs);
+const formatColdDateFa = (rawDate?: string): string => {
+  if (!rawDate) return "—";
+  const trimmed = rawDate.trim();
+  if (/^1[34]\d{2}\/\d{2}\/\d{2}$/.test(trimmed)) {
+    return toFa(trimmed);
+  }
+  const parsed = new Date(trimmed);
+  if (!Number.isNaN(parsed.getTime())) {
+    return toFa(formatJ(parsed, "yyyy/MM/dd"));
+  }
+  return toFa(trimmed);
+};
+
+const summarizeColdLogFa = (log?: DailyLog): string => {
+  if (!log) return "";
+  const parts: string[] = [];
+  const anyLog = log as unknown as Record<string, unknown>;
+
+  const feed = anyLog.feedKg ?? anyLog.feedConsumed ?? anyLog.feed;
+  const water = anyLog.waterL ?? anyLog.waterConsumed ?? anyLog.water;
+  const deaths = anyLog.deaths ?? anyLog.deathsCount ?? anyLog.mortality;
+  const eggs = anyLog.eggs ?? anyLog.eggCount;
+  const temp = anyLog.temp ?? anyLog.temperature;
+  const humidity = anyLog.humidity;
+
+  if (typeof feed === "number" && feed > 0) parts.push(`دان: ${toFa(feed)} کیلوگرم`);
+  if (typeof water === "number" && water > 0) parts.push(`آب: ${toFa(water)} لیتر`);
+  if (typeof deaths === "number" && deaths > 0) parts.push(`تلفات: ${toFa(deaths)}`);
+  if (typeof eggs === "number" && eggs > 0) parts.push(`تخم: ${toFa(eggs)}`);
+  if (typeof temp === "number" && temp > 0) parts.push(`دما: ${toFa(temp)}°`);
+  if (typeof humidity === "number" && humidity > 0) parts.push(`رطوبت: ${toFa(humidity)}٪`);
+
+  return parts.join(" • ");
+};
+
+const getMonthKeyFa = (dateStr?: string): string => {
+  if (!dateStr) return "نامشخص";
+  const match = dateStr.trim().match(/^(1[34]\d{2})\/(\d{2})/);
+  if (!match) return "نامشخص";
+  return `${toFa(match[1])}/${toFa(match[2])}`;
+};
+
+const getMonthLabelFa = (dateStr?: string): string => {
+  if (!dateStr) return "تاریخ نامشخص";
+  const match = dateStr.trim().match(/^(1[34]\d{2})\/(\d{2})/);
+  if (!match) return toFa(dateStr);
+  return `${toFa(match[1])}/${toFa(match[2])}`;
+};
+
+function sliceUpToDayBoundary<T extends { date?: string }>(
+  sortedLogs: T[],
+  minLimit = 100
+): T[] {
+  if (sortedLogs.length <= minLimit) return sortedLogs;
+
+  const result: T[] = [];
+  let boundaryDate: string | undefined;
+
+  for (let i = 0; i < sortedLogs.length; i++) {
+    const item = sortedLogs[i];
+    if (i < minLimit) {
+      result.push(item);
+      boundaryDate = item.date;
+    } else if (item.date && item.date === boundaryDate) {
+      result.push(item);
+    } else {
+      break;
+    }
+  }
+
+  return result;
+}
+
+function groupLogsByMonth<T extends { date?: string }>(logs: T[]) {
+  const map = new Map<
+    string,
+    { key: string; label: string; items: T[] }
+  >();
+
+  for (const item of logs) {
+    const key = getMonthKeyFa(item.date);
+    const label = getMonthLabelFa(item.date);
+    const existing = map.get(key);
+    if (existing) {
+      existing.items.push(item);
+    } else {
+      map.set(key, {
+        key,
+        label,
+        items: [item],
+      });
+    }
+  }
+
+  return Array.from(map.values());
+}
+useEffect(() => {
+    if (tab !== "history" || !active) return;
+    let alive = true;
+    countArchivedLogs()
+      .then(n => { if (alive) setColdCount(n); })
+      .catch(() => { if (alive) setColdCount(0); });
+    return () => { alive = false; };
+  }, [tab, active, allLogs.length, countArchivedLogs]);
   const todayStr = formatJ(new Date(), 'yyyy/MM/dd');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [groupBy, setGroupBy] = useState<string>(tab === 'history' ? 'flockId' : 'none');
@@ -77,7 +234,13 @@ export default function DlgTabPanel({
     initialSort: config.initialSort,
   });
 
-  const grouped = useGroupedList({ list, groupDefs: config.groupDefs, groupBy, ctx: { flocks: activeFlocks } });
+  const isHistoryLimited = tab === "history" && !showAllHistory && !hasActiveFilters && list.length > 100;
+  const visibleList = useMemo(
+    () => (isHistoryLimited ? sliceUpToDayBoundary(list, 100) : list),
+    [isHistoryLimited, list]
+  );
+
+  const grouped = useGroupedList({ list: visibleList, groupDefs: config.groupDefs, groupBy, ctx: { flocks: activeFlocks } });
 
   const ms = useMultiSelect({
     items: logs,
@@ -97,7 +260,7 @@ export default function DlgTabPanel({
       }
       if (backups.length > 0) {
         setUndoData({ log: backups });
-        setTimeout(() => setUndoData((cur) => cur && Array.isArray(cur.log) && cur.log.length === backups.length ? null : cur), 8000);
+        scheduleUndoClear(8000);
       }
       toastMsg.deletedBulk(deletedCount, 'ثبت');
       logAction('delete', 'dlg', 'حذف گروهی ثبت روزانه: ' + backups.length);
@@ -146,7 +309,7 @@ export default function DlgTabPanel({
     const result = await onDeleteLog(l);
     if (!result) return;
     setUndoData({ log: result.log, snapshot: result.snapshot });
-    setTimeout(() => setUndoData((cur) => cur && !Array.isArray(cur.log) && cur.log.id === result.log.id ? null : cur), 6000);
+    scheduleUndoClear(6000);
   };
 
   const renderLogCard = (l: DailyLog, i: number) => {
@@ -231,7 +394,7 @@ export default function DlgTabPanel({
 
       <MultiSelectBar ms={ms} deleteLabel="حذف" archiveLabel="آرشیو" />
 
-      {list.length === 0 ? (
+      {visibleList.length === 0 ? (
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>}
           title={tab === 'today' ? 'امروز ثبتی ندارید' : tab === 'archive' ? 'آرشیو خالی است' : 'تاریخچه خالی است'}
@@ -253,11 +416,104 @@ export default function DlgTabPanel({
               </AccordionSection>
             ))
           ) : (
-            list.map((l, i) => renderLogCard(l, i))
+            visibleList.map((l, i) => renderLogCard(l, i))
+          )}
+          {isHistoryLimited && (
+            <div style={{ display: "flex", justifyContent: "center", paddingTop: 6 }}>
+              <Btn variant="ghost" onClick={() => setShowAllHistory(true)}>
+                {toFa(`نمایش روزهای بیشتر (${list.length - visibleList.length} ثبت دیگر)`)}
+              </Btn>
+            </div>
           )}
         </>
       )}
-    <CorrectionModal
+    {tab === "history" && coldCount > 0 && (
+        <div
+          style={{
+            marginTop: 8,
+            padding: "10px 12px",
+            background: "var(--card)",
+            border: "1px solid var(--border)",
+            borderRadius: "var(--r-md)",
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+            paddingBottom: 72,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+            <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)" }}>
+              آرشیو سرد: <b style={{ color: "var(--text)" }}>{toFa(coldCount)}</b> ثبت قدیمی
+            </span>
+            <Btn size="sm" variant="outline" onClick={handleToggleColdArchive}>
+              {coldOpen ? "بستن آرشیو سرد" : "مشاهده آرشیو سرد"}
+            </Btn>
+          </div>
+          {coldOpen && (
+            coldLoading ? (
+              <div style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", padding: "6px 0" }}>در حال بارگذاری...</div>
+            ) : coldItems.length === 0 ? (
+              <div style={{ fontSize: "var(--fs-xs)", color: "var(--muted)", padding: "6px 0" }}>موردی برای نمایش نیست.</div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {coldItems.map(item => {
+                  const fl = flocks.find(f => f.id === item.flockId);
+                  const alreadyInHot = allLogs.some(x => x.id === item.id);
+                  const flockTitle =
+                    fl?.name ||
+                    (item.flockId?.startsWith("cmp-seed") ? "گله آرشیوی" : "گله ثبت‌نشده");
+                  const dateFa = formatColdDateFa(item.log?.date || item.date);
+                  const summaryFa = summarizeColdLogFa(item.log);
+
+                  return (
+                    <div
+                      key={item.id}
+                      style={{
+                        padding: "10px 12px",
+                        background: "var(--input-bg)",
+                        borderRadius: "var(--r-sm)",
+                        border: "1px solid var(--border)",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 6,
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: 8,
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "var(--fs-xs)" }}>
+                          <b style={{ color: "var(--text)" }}>{flockTitle}</b>
+                          <span style={{ color: "var(--muted)" }}>{dateFa}</span>
+                        </div>
+                        <Btn
+                          size="sm"
+                          variant="outline"
+                          disabled={alreadyInHot || coldRestoringId === item.id}
+                          onClick={() => handleRestoreColdItem(item.id)}
+                        >
+                          {alreadyInHot ? "موجود در ثبت‌های فعال" : coldRestoringId === item.id ? "در حال بازگردانی..." : "بازگردانی"}
+                        </Btn>
+                      </div>
+                      {summaryFa && (
+                        <div style={{ fontSize: "var(--fs-2xs, 11px)", color: "var(--muted)" }}>
+                          {summaryFa}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )
+          )}
+        </div>
+      )}
+      <CorrectionModal
       open={!!correctingLog}
       onClose={() => setCorrectingLog(null)}
       log={correctingLog}

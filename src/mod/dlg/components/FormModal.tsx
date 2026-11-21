@@ -64,7 +64,13 @@ export default function FormModal(props: FormModalProps) {
         </Field>
       </Grid2>
 
-      <Field label="گله" required error={showError('flockId')} onTouch={() => markTouched('flockId')}>
+      <Field
+          label={form.id ? <span>گله <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'گله'}
+          hint={form.id ? 'در حالت ویرایش امکان تغییر گله نیست' : undefined}
+          required
+          error={showError('flockId')}
+          onTouch={() => markTouched('flockId')}
+        >
         <SmartSelect
           value={form.flockId}
           onChange={onFlockChange}
@@ -74,6 +80,7 @@ export default function FormModal(props: FormModalProps) {
           }))}
           placeholder="— انتخاب گله —"
           modalTitle="انتخاب گله"
+            disabled={Boolean(form.id)}
         />
       </Field>
 

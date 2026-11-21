@@ -13,6 +13,7 @@ import { useCtc } from './mod/ctc/store';
 import { useFed } from './mod/fed/store';
 import { useInc } from './mod/inc/store';
 import { applyTheme } from './cor/theme/applyTheme';
+import { useUI } from './cor/store/ui';
 import Header from './shr/components/Header';
 import BottomNav from './shr/components/BottomNav';
 import MenuDrawer from './shr/components/MenuDrawer';
@@ -115,12 +116,28 @@ export default function App() {
     brdLoading || halLoading || ctcLoading || fedLoading || incLoading;
   const [showLoading, setShowLoading] = useState(false);
   const theme = settings.theme;  // single source of truth
-  const [showOnb, setShowOnb] = useState(false);
   const { locked, unlock } = useAutoLock();
 
+  const openHelp = useUI((s) => s.openHelp);
+  const flocksCount = useFlk((s) => s.flocks?.length || 0);
+  const birdsCount = useBrd((s) => s.birds?.length || 0);
+  const hallsCount = useHal((s) => s.halls?.length || 0);
+  const contactsCount = useCtc((s) => s.contacts?.length || 0);
+  const invoicesCount = useTra((s) => s.invoices?.length || 0);
+
   useEffect(() => {
-    if (!safeStorage.get('pm-onboarding-v2-done')) setShowOnb(true);
-  }, []);
+    if (isLoading) return;
+    const isFreshApp =
+      flocksCount === 0 &&
+      birdsCount === 0 &&
+      hallsCount === 0 &&
+      contactsCount === 0 &&
+      invoicesCount === 0;
+    const dontShow = safeStorage.get("pm-help-dont-show") === "1";
+    if (isFreshApp && !dontShow) {
+      openHelp();
+    }
+  }, [isLoading, flocksCount, birdsCount, hallsCount, contactsCount, invoicesCount, openHelp]);
 
   // اعمال تم
   useEffect(() => {
@@ -201,7 +218,6 @@ export default function App() {
 
   // قفل خودکار
   if (locked) return <LockScreen onUnlock={unlock} />;
-
   return (
     <BrowserRouter>
       <Layout />

@@ -146,6 +146,7 @@ export function useDlgForm({ activeFlocks, halls, todayStr }: UseDlgFormParams) 
   };
 
   const onFlockChange = (flockId: string) => {
+    if (form.id) return;
     const sys = detectSystems(flockId);
     setForm(f => ({
       ...f,

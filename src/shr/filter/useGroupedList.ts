@@ -1,3 +1,4 @@
+import { toFa } from "../utils/fa";
 import { useMemo, useRef } from 'react';
 import type { GroupDef } from './configs/_types';
 
@@ -35,7 +36,7 @@ export function useGroupedList<T>(opts: {
     }
     return Object.entries(groups).map(([key, items]) => ({
       key,
-      title: gDef.getLabel(key, ctxRef.current),
+      title: toFa(gDef.getLabel(key, ctxRef.current)),
       items,
     }));
   }, [list, groupDefs, groupBy]);

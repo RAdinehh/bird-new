@@ -1,59 +1,112 @@
 import { useState, useEffect } from 'react';
 import { useUI } from '../../cor/store/ui';
+const readStorage = (k: string): string | null => {
+  try {
+    return window.localStorage.getItem(k);
+  } catch {
+    return null;
+  }
+};
+const writeStorage = (k: string, v: string): void => {
+  try {
+    window.localStorage.setItem(k, v);
+  } catch {}
+};
+const removeStorage = (k: string): void => {
+  try {
+    window.localStorage.removeItem(k);
+  } catch {}
+};
 import { Btn, Modal } from './ui';
+
+const DONT_SHOW_KEY = 'pm-help-dont-show';
 
 const STEPS = [
   {
     icon: '👋',
     title: 'خوش آمدید',
-    desc: 'این نرم‌افزار برای مدیریت کامل مرغداری شما طراحی شده است.\n\nداده‌ها فقط روی گوشی خودتان ذخیره می‌شوند — بدون اینترنت و بدون سرور.',
+    desc: 'به برنامه مدیریت پرورش پرندگان خوش آمدید.\n\nاین نرم‌افزار برای مدیریت گله‌ها، سالن‌ها، ثبت روزانه، جوجه‌کشی، جیره‌نویسی، انبار، معاملات و گزارش‌ها طراحی شده است تا همه امور پرورش را یک‌جا و دقیق پیش ببرید.',
     accent: 'accent'
   },
   {
-    icon: '🐔',
-    title: 'شروع کار',
-    desc: 'برای شروع:\n\n۱. از منو، «پرنده‌ها» را باز کنید\n۲. یک پرنده بسازید (مثلاً مرغ)\n۳. یک نژاد برایش بسازید (مثلاً لگهورن)\n۴. یک «سالن» بسازید\n۵. یک «گله» بسازید',
+    icon: '🐦',
+    title: 'ترتیب شروع کار و پیش‌نیازها',
+    desc: 'برای اینکه در ثبت اطلاعات دچار خطا یا دوباره‌کاری نشوید، این ترتیب را رعایت کنید:\n\n۱. از منو وارد «پرنده‌ها و نژادها» شوید و نوع پرنده (مانند مرغ، بوقلمون، کبک، بلدرچین و...) و نژاد آن را تعریف کنید\n۲. در «سالن‌ها»، سالن‌ها و بخش‌های پرورش را بسازید\n۳. در «مخاطبین»، فروشنده، مشتری یا کارگر را با نقش مشخص ثبت کنید\n۴. در «معاملات» فاکتور خرید ثبت کنید یا در «گله‌ها» گله جدید را بسازید',
     accent: 'info'
   },
   {
     icon: '📋',
     title: 'ثبت روزانه',
-    desc: 'هر روز از ماژول «ثبت روزانه» استفاده کنید:\n\n• دما و رطوبت سالن\n• مقدار دان و آب مصرفی\n• تلفات با علت\n• واکسن و دارو\n• یادداشت‌ها',
+    desc: 'هر روز از بخش «ثبت روزانه» برای پایش دقیق گله‌ها استفاده کنید:\n\n• ثبت دما و رطوبت محیط پرورش\n• ثبت مقدار دان و آب مصرفی\n• ثبت تلفات همراه با علت آن\n• ثبت واکسن، دارو و داروگیاهی\n• ثبت وزن‌کشی و یادداشت‌های روزانه',
+    accent: 'warn'
+  },
+  {
+    icon: '🌾',
+    title: 'جیره‌نویسی و تغذیه',
+    desc: 'در بخش «جیره‌نویسی» برنامه تغذیه را متناسب با نوع پرنده، سن و دوره رشد یا تولید تنظیم کنید:\n\n• تعریف جیره برای دوره‌های مختلف پرورش\n• ترکیب دان، کنسانتره، مکمل‌ها و افزودنی‌های مجاز\n• مقایسه مصرف واقعی با برنامه تغذیه برای کاهش هزینه‌ها',
+    accent: 'accent'
+  },
+  {
+    icon: '📦',
+    title: 'انبار و مدیریت موجودی',
+    desc: 'در بخش «انبار» موجودی اقلام را به صورت دقیق و منظم پیگیری کنید:\n\n• تفکیک اقلام انبار مانند دان، دارو و داروگیاهی، واکسن و تجهیزات\n• ثبت ورود و خروج اقلام و بررسی موجودی باقیمانده\n• توجه به تاریخ انقضا و حداقل موجودی برای جلوگیری از کمبود ناگهانی',
+    accent: 'info'
+  },
+  {
+    icon: '🌿',
+    title: 'بهداشت، دارو و داروگیاهی',
+    desc: 'در بخش سلامت و پیشگیری گله می‌توانید هم از روش‌های دارویی و واکسیناسیون و هم از داروگیاهی بهره ببرید:\n\n• ثبت برنامه‌های واکسیناسیون و دوره‌های درمان\n• استفاده از داروگیاهی و عصاره‌های گیاهی برای تقویت بنیه، بهبود گوارش یا کاهش تنش‌های محیطی\n• بررسی وضعیت سلامت و تلفات پس از هر اقدام در سوابق و گزارش‌ها',
     accent: 'warn'
   },
   {
     icon: '🥚',
-    title: 'جوجه‌کشی و تخم',
-    desc: 'اگر جوجه‌کشی می‌کنید:\n\n• «جوجه‌کشی» برای مدیریت دستگاه‌ها، ورودی تخم، کندلینگ و هچ\n• «تخم‌ها» برای ثبت تخم‌گذاری روزانه و فروش تخم',
+    title: 'جوجه‌کشی و تولید تخم',
+    desc: 'متناسب با نوع فعالیت خود از این بخش‌ها استفاده کنید:\n\n• «جوجه‌کشی» برای مدیریت دستگاه‌ها، ورود تخم، کندلینگ، انتقال به ستر یا هچر و ثبت نتیجه هچ\n• «تخم‌ها» برای ثبت تولید روزانه، درجه‌بندی یا شکستگی و فروش تخم',
     accent: 'purple'
   },
   {
     icon: '💰',
     title: 'مالی و معاملات',
-    desc: 'همه‌ی خرید و فروش را در «معاملات» ثبت کنید.\n\nدر «گزارش‌ها» می‌توانید نمودارها، سود و زیان و تحلیل‌ها را ببینید.',
+    desc: 'همه خریدها (مانند دان، پرنده، دارو، داروگیاهی و تجهیزات) و فروش‌ها را در «معاملات» ثبت کنید.\n\nدر «گزارش‌ها» روند رشد، میزان مصرف، سود و زیان و مقایسه گله‌ها را به صورت شفاف ببینید.',
     accent: 'accent'
   },
   {
     icon: '🔔',
     title: 'هشدارهای هوشمند',
-    desc: 'سیستم خودکار:\n\n• افت تخم‌گذاری\n• تلفات بالا\n• موجودی کم\n• سرسید معوق\n• نزدیک انقضا\n\nرا تشخیص می‌دهد و اعلان می‌کند.',
+    desc: 'بخش هشدارها موارد حساس را به صورت خودکار بررسی و اعلام می‌کند:\n\n• افت تولید یا کاهش عملکرد گله\n• افزایش غیرعادی تلفات\n• کاهش موجودی انبار یا دان\n• سررسیدهای مالی نزدیک یا معوق\n• نزدیک شدن به تاریخ انقضای اقلام',
     accent: 'danger'
   },
   {
     icon: '💾',
-    title: 'پشتیبان‌گیری',
-    desc: 'از «تنظیمات» → «پشتیبان» می‌توانید:\n\n• فایل پشتیبان کامل بگیرید\n• داده‌ها را بازیابی کنید\n\nحتی می‌توانید فایل را در ایمیل یا تلگرام برای خودتان ذخیره کنید.',
+    title: 'پشتیبان‌گیری و امنیت',
+    desc: 'از مسیر «تنظیمات» ← «پشتیبان» می‌توانید:\n\n• فایل پشتیبان کامل از اطلاعات تهیه کنید\n• در صورت نیاز اطلاعات را بازیابی کنید\n\nبهتر است به صورت منظم یک نسخه پشتیبان در محل امن، ایمیل یا پیام‌رسان شخصی خود نگه دارید.',
     accent: 'info'
   }
 ];
 
+const FA_DIGITS = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+const toFaStep = (n: number) => String(n).replace(/[0-9]/g, d => FA_DIGITS[+d]);
+
 export default function HelpModal() {
   const { helpOpen, closeHelp } = useUI();
   const [step, setStep] = useState(0);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
 
   useEffect(() => {
-    if (helpOpen) setStep(0);
+    if (helpOpen) {
+      setStep(0);
+      setDontShowAgain(readStorage(DONT_SHOW_KEY) === '1');
+    }
   }, [helpOpen]);
+
+  const handleClose = () => {
+    if (dontShowAgain) {
+      writeStorage(DONT_SHOW_KEY, '1');
+    } else {
+      removeStorage(DONT_SHOW_KEY);
+    }
+    closeHelp();
+  };
 
   const current = STEPS[step];
   const isLast = step === STEPS.length - 1;
@@ -62,12 +115,35 @@ export default function HelpModal() {
   return (
     <Modal
       open={helpOpen}
-      onClose={closeHelp}
+      onClose={handleClose}
       title="راهنمای سریع"
       footer={
-        <div style={{ display: 'flex', flexDirection: 'row-reverse', gap: 8 }}>
+        <div
+          className="help-modal-footer"
+          onMouseDown={(e) => e.preventDefault()}
+          onFocus={(e) => {
+            const el = e.target as HTMLElement | null;
+            if (el && el.tagName === 'BUTTON') {
+              el.blur();
+            }
+          }}
+          style={{ display: 'flex', flexDirection: 'row-reverse', gap: 8, width: '100%' }}
+        >
+          <style>{`
+            .help-modal-footer button,
+            .help-modal-footer button:focus,
+            .help-modal-footer button:focus-visible,
+            .help-modal-footer button:active {
+              outline: none !important;
+              box-shadow: none !important;
+            }
+            .help-modal-footer button {
+              flex: 1 1 0 !important;
+              min-width: 0 !important;
+            }
+          `}</style>
           {isLast ? (
-            <Btn variant="primary" onClick={closeHelp}>شروع کار</Btn>
+            <Btn variant="primary" onClick={handleClose}>شروع کار</Btn>
           ) : (
             <Btn variant="primary" onClick={() => setStep(s => s + 1)}>بعدی</Btn>
           )}
@@ -75,7 +151,7 @@ export default function HelpModal() {
             <Btn onClick={() => setStep(s => s - 1)}>قبلی</Btn>
           ) : null}
           {!isLast ? (
-            <Btn onClick={closeHelp}>رد کردن</Btn>
+            <Btn onClick={handleClose}>رد کردن</Btn>
           ) : null}
         </div>
       }
@@ -114,12 +190,12 @@ export default function HelpModal() {
 
       {/* متن */}
       <div style={{
-        fontSize: 'var(--fs-sm)',
-        lineHeight: 2,
+        fontSize: '13px',
+        lineHeight: 2.05,
         color: 'var(--text)',
         textAlign: 'right',
         whiteSpace: 'pre-line',
-        padding: '12px 14px',
+        padding: '14px 16px',
         background: 'var(--input-bg)',
         borderRadius: 'var(--r-md)'
       }}>
@@ -130,7 +206,30 @@ export default function HelpModal() {
       <div style={{
         textAlign: 'center', fontSize: 'var(--fs-xs)', color: 'var(--muted)'
       }}>
-        مرحله {(step + 1).toString().replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[+d])} از {'۷'}
+        مرحله {toFaStep(step + 1)} از {toFaStep(STEPS.length)}
+      </div>
+
+      {/* تیک عدم نمایش مجدد - پایین و سمت راست بدون کادر */}
+      <div dir="rtl" style={{ display: "flex", justifyContent: "flex-start", marginTop: 4 }}>
+        <label
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            cursor: "pointer",
+            userSelect: "none",
+            fontSize: "var(--fs-sm)",
+            color: "var(--text)",
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={dontShowAgain}
+            onChange={(e) => setDontShowAgain(e.target.checked)}
+            style={{ width: 16, height: 16, accentColor: "var(--accent)", cursor: "pointer", margin: 0 }}
+          />
+          <span>دیگر نمایش داده نشود</span>
+        </label>
       </div>
     </Modal>
   );

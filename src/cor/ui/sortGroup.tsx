@@ -1,3 +1,4 @@
+import { toFa } from "../../shr/utils/fa";
 /**
  * sortGroup.tsx — کامپوننت‌های مشترک مرتب‌سازی و گروه‌بندی
  * الگوی استاندارد Google/Apple: dropdown کوچیک، آیکون‌دار
@@ -114,14 +115,14 @@ export function GroupHeader({ label, count }: GroupHeaderProps) {
       color: 'var(--muted)',
       marginTop: 4,
     }}>
-      <span>{label}</span>
+      <span>{toFa(label)}</span>
       <span style={{
         padding: '1px 8px',
         background: 'var(--accent-soft)',
         color: 'var(--accent)',
         borderRadius: 'var(--r-sm)',
         fontSize: 'var(--fs-xs)',
-      }}>{count}</span>
+      }}>{toFa(count)}</span>
     </div>
   );
 }

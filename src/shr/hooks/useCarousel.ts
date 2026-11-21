@@ -165,16 +165,15 @@ export function useCarousel(
       if (document.querySelector('[data-sheet-open="true"]')) return;
       if (document.querySelector('[role="dialog"]')) return;
       if (tgt.closest('[role="dialog"]')) return;
-      // اگه روی یه اسکرول مستقل افقی/عمودی هستیم، swipe نکن — فقط تا ۳ سطح بالا
+      // اگه روی یه اسکرول مستقل افقی/عمودی داخل کانتینر هستیم، swipe نکن
+      const root = containerRef.current || document.body;
+      if (hasHorizontalScroller(tgt, root)) return;
       let cur: HTMLElement | null = tgt;
-      let depth = 0;
-      while (cur && cur !== document.body && depth < 3) {
+      while (cur && cur !== root && cur !== document.body) {
         const st = window.getComputedStyle(cur);
-        const isH = (st.overflowX === 'auto' || st.overflowX === 'scroll') && cur.scrollWidth > cur.clientWidth + 4;
         const isV = (st.overflowY === 'auto' || st.overflowY === 'scroll') && cur.scrollHeight > cur.clientHeight + 4;
-        if (isH || isV) return;
+        if (isV) return;
         cur = cur.parentElement;
-        depth++;
       }
       const t = e.touches[0];
       dragging = true;
@@ -244,7 +243,8 @@ export function useCarousel(
       const dx = t.clientX - startX;
       const dt = Math.max(1, Date.now() - startT);
       const v = dx / dt;
-      const startIdx = Math.round(-startTx / w);
+      const activeIdx = idsRef.current.indexOf(activeRef.current);
+        const startIdx = activeIdx >= 0 ? activeIdx : Math.round(-startTx / w);
       let idx = startIdx;
       if (v < -0.35) idx = startIdx + 1;
       else if (v > 0.35) idx = startIdx - 1;

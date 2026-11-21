@@ -80,7 +80,13 @@ export default function DailyLogsPage() {
     [logs, todayStr],
   );
   const historicalLogs = useMemo(
-    () => logs.filter(l => l.date !== todayStr && (l.status || 'active') === 'active').sort((a, b) => b.date.localeCompare(a.date)),
+    () => logs.filter(l => l.date !== todayStr && (l.status || 'active') === 'active').sort((a, b) => {
+      const byDate = b.date.localeCompare(a.date);
+      if (byDate !== 0) return byDate;
+      const byTime = (b.entryTime || '').localeCompare(a.entryTime || '');
+      if (byTime !== 0) return byTime;
+      return b.id.localeCompare(a.id);
+    }),
     [logs, todayStr],
   );
   const archivedLogs = useMemo(
@@ -142,7 +148,12 @@ export default function DailyLogsPage() {
   const { showError, markTouched, attemptSave } = useFormErrors(vErrors);
 
   // ─── carousel ───
-  const tabIds: TabId[] = ['today', 'history', 'archive', 'aggregate'];
+  const tabIds: TabId[] = [
+    'today',
+    'history',
+    ...(archivedLogs.length > 0 ? ['archive' as TabId] : []),
+    'aggregate',
+  ];
   const { containerRef, trackRef, setInstant } = useCarousel(
     tabIds,
     tab,
@@ -163,7 +174,7 @@ export default function DailyLogsPage() {
     { id: 'today', label: 'امروز' },
     { id: 'history', label: 'تاریخچه' },
     ...(archivedLogs.length > 0 ? [{ id: 'archive' as TabId, label: 'آرشیو' }] : []),
-    { id: 'aggregate', label: '📊 جمع‌بندی' },
+    { id: 'aggregate', label: 'جمع‌بندی' },
   ];
 
   // اگه در تب آرشیو بودیم و خالی شد، برگرد به «امروز»
@@ -190,7 +201,7 @@ export default function DailyLogsPage() {
         <div
           ref={trackRef}
           style={{
-            display: 'flex', direction: 'ltr', willChange: 'transform',
+            display: 'flex', direction: 'ltr',
             touchAction: 'pan-y', width: '100%', minWidth: 0,
           }}
         >
@@ -232,25 +243,27 @@ export default function DailyLogsPage() {
               onRestoreLogFull={restoreLogFull}
             />
           </div>
-          <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
-            <DlgTabPanel
-              tab="archive"
-              active={tab === 'archive'}
-              logs={archivedLogs}
-              flocks={flocks}
-              birds={birds}
-              config={config}
-              activeFlocks={activeFlocks}
-              onApplyCorrection={applyCorrectionAtomic}
-              onRevokeCorrection={revokeCorrectionAtomic}
-              vaccineEnabled={vaccineEnabled}
-              medicineEnabled={medicineEnabled}
-              onEdit={openEdit}
-              onAdd={openNew}
-              onDeleteLog={handleDeleteLog}
-              onRestoreLogFull={restoreLogFull}
-            />
-          </div>
+          {archivedLogs.length > 0 && (
+            <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
+              <DlgTabPanel
+                tab="archive"
+                active={tab === 'archive'}
+                logs={archivedLogs}
+                flocks={flocks}
+                birds={birds}
+                config={config}
+                activeFlocks={activeFlocks}
+                onApplyCorrection={applyCorrectionAtomic}
+                onRevokeCorrection={revokeCorrectionAtomic}
+                vaccineEnabled={vaccineEnabled}
+                medicineEnabled={medicineEnabled}
+                onEdit={openEdit}
+                onAdd={openNew}
+                onDeleteLog={handleDeleteLog}
+                onRestoreLogFull={restoreLogFull}
+              />
+            </div>
+          )}
           <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <AggregateTabPanel
               active={tab === 'aggregate'}
