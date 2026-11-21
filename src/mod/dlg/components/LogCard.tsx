@@ -23,7 +23,7 @@ import { LogSection, Row, LogGroup, LogSubSection, LogItem } from '../helpers';
 import { VET_METHOD_LABEL } from '../../../shr/constants/vetMethods';
 import { GENDER_LABEL, formatWeightGrams, cvText } from '../../../shr/utils/weightHelpers';
 import { calculateWeightMetrics } from '../../../shr/calc';
-import { applyCorrections } from '../api/applyCorrections';
+import { applyCorrections, getSafeHealthArrays } from '../api/applyCorrections';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { Grid2, Grid3 } from '../../../shr/components/ui';
 import { CardActions } from '../../../shr/components/ui';
@@ -280,15 +280,16 @@ export default function LogCard(props: LogCardProps) {
       })()}
 
       {(() => {
-        const hasDeaths = l.deaths && l.deaths.length > 0;
-        const hasVaccines = vaccineEnabled && l.vaccines.length > 0;
-        const hasMeds = medicineEnabled && l.medications.length > 0;
+        const { deaths, vaccines, medications } = getSafeHealthArrays(l);
+        const hasDeaths = deaths.length > 0;
+        const hasVaccines = vaccineEnabled && vaccines.length > 0;
+        const hasMeds = medicineEnabled && medications.length > 0;
         if (!hasDeaths && !hasVaccines && !hasMeds) return null;
         return (
           <LogSection title="🏥 سلامت">
             {hasDeaths && (
               <Grid2>
-                {l.deaths.map(d => (
+                {deaths.map(d => (
                   <Row key={d.id} l="تلفات" v={`${toFa(d.count)} پرنده`} warn={isMortalityHigh} />
                 ))}
               </Grid2>
@@ -296,7 +297,7 @@ export default function LogCard(props: LogCardProps) {
 
             {hasVaccines && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: hasDeaths ? 8 : 0 }}>
-                {l.vaccines.map(v => {
+                {vaccines.map(v => {
                   const methodLabel = v.method ? (VET_METHOD_LABEL[v.method] || v.method) : null;
                   const detail = [
                     v.name || 'بدون نام',
@@ -311,7 +312,7 @@ export default function LogCard(props: LogCardProps) {
 
             {hasMeds && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: (hasDeaths || hasVaccines) ? 8 : 0 }}>
-                {l.medications.map(m => {
+                {medications.map(m => {
                   const methodLabel = m.method ? (VET_METHOD_LABEL[m.method] || m.method) : null;
                   const detail = [
                     m.name || 'بدون نام',

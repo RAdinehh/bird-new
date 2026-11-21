@@ -23,6 +23,32 @@ export function getLogs(): LogEntry[] {
   } catch { return []; }
 }
 
+
+const DEDUPE_WINDOW_MS = 5000;
+const recentErrorTimestamps = new Map<string, number>();
+
+function makeErrorSignature(entry: { type: string; message: string; stack: string; componentStack: string }): string {
+  const topFrame = (entry.stack || entry.componentStack || "")
+    .split("\n")
+    .map(line => line.trim())
+    .find(Boolean) || "";
+  return `${entry.type}|${entry.message}|${topFrame}`;
+}
+
+function isDuplicateWithinWindow(sig: string, now: number): boolean {
+  const prev = recentErrorTimestamps.get(sig);
+  if (prev !== undefined && now - prev < DEDUPE_WINDOW_MS) {
+    return true;
+  }
+  recentErrorTimestamps.set(sig, now);
+  if (recentErrorTimestamps.size > 200) {
+    for (const [k, ts] of recentErrorTimestamps) {
+      if (now - ts >= DEDUPE_WINDOW_MS) recentErrorTimestamps.delete(k);
+    }
+  }
+  return false;
+}
+
 /** افزودن لاگ */
 export function logError(entry: Omit<LogEntry, 'id' | 'time' | 'url' | 'userAgent'>): void {
   try {

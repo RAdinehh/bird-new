@@ -8,6 +8,7 @@
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { logError } from '../logger/logger';
 import type {
   OutboxEvent,
   OutboxProcessor,

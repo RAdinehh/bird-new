@@ -49,8 +49,71 @@ function sumDeathsCount(deaths: DailyLog['deaths']): number {
   return (deaths || []).reduce((a, x) => a + (x.count || 0), 0);
 }
 
+
+/** نرمال‌سازی ایمن آرایه‌های مصرفی DailyLog بدون تغییر در داده خام یا محاسبات */
+export function normalizeDailyLog(log: DailyLog): DailyLog {
+  const deaths = Array.isArray(log.deaths) ? log.deaths : [];
+  const vaccines = Array.isArray(log.vaccines) ? log.vaccines : [];
+  const medications = Array.isArray(log.medications) ? log.medications : [];
+  const feedMovementIds = Array.isArray(log.feedMovementIds) ? log.feedMovementIds : [];
+  const weightSamples = Array.isArray(log.weightSamples) ? log.weightSamples : [];
+
+  if (
+    log.deaths === deaths &&
+    log.vaccines === vaccines &&
+    log.medications === medications &&
+    log.feedMovementIds === feedMovementIds &&
+    log.weightSamples === weightSamples
+  ) {
+    return log;
+  }
+
+  return {
+    ...log,
+    deaths,
+    vaccines,
+    medications,
+    feedMovementIds,
+    weightSamples,
+  };
+}
+
+
+const warnedMissingArrays = new Set<string>();
+
+function warnMissingArrayOnce(logId: string, field: string): void {
+  if (!import.meta.env.DEV) return;
+  const key = `${logId || "unknown"}:${field}`;
+  if (warnedMissingArrays.has(key)) return;
+  warnedMissingArrays.add(key);
+  console.warn(`[dlg:normalize] Non-array "${field}" on log "${logId || "unknown"}"`);
+}
+
+/**
+ * خواندن ایمن آرایه‌های سلامت در لایه مصرف بدون دست‌زدن به داده خام یا محاسبات.
+ */
+export function getSafeHealthArrays(log: DailyLog): {
+  deaths: DailyLog["deaths"];
+  vaccines: DailyLog["vaccines"];
+  medications: DailyLog["medications"];
+} {
+  const deaths = Array.isArray(log.deaths)
+    ? log.deaths
+    : (warnMissingArrayOnce(log.id, "deaths"), []);
+
+  const vaccines = Array.isArray(log.vaccines)
+    ? log.vaccines
+    : (warnMissingArrayOnce(log.id, "vaccines"), []);
+
+  const medications = Array.isArray(log.medications)
+    ? log.medications
+    : (warnMissingArrayOnce(log.id, "medications"), []);
+
+  return { deaths, vaccines, medications };
+}
+
 export function applyCorrections(log: DailyLog): DailyLog {
-  if (!log.corrections || log.corrections.length === 0) return log;
+  if (!log.corrections || log.corrections.length === 0) return normalizeDailyLog(log);
 
   let effective: DailyLog = { ...log };
   for (const corr of log.corrections) {

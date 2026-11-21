@@ -27,6 +27,9 @@ async function forwardToBus<K extends AppEventName>(
   type: K,
   payload: Record<string, unknown>,
 ): Promise<void> {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    throw new Error(`Invalid outbox payload for event "${String(type)}"`);
+  }
   await bus.emit(type, payload as unknown as AppEvents[K], {
     source: 'outbox',
   });
