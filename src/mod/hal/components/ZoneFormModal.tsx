@@ -59,7 +59,6 @@ export default function ZoneFormModal({
           options={halls.map(c => ({ value: c.id, label: c.name }))}
           placeholder="— انتخاب کنید —"
           modalTitle="انتخاب سالن"
-          autoThreshold={6}
         />
       </Field>
 

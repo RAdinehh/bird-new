@@ -94,7 +94,6 @@ export default function IngredientFormModal(props: Props) {
               }))}
               placeholder="— انتخاب کنید —"
               modalTitle="انتخاب کالا"
-              autoThreshold={6}
             />
         </Field>
 

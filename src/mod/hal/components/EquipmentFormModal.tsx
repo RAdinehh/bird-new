@@ -56,7 +56,6 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               options={halls.map(c => ({ value: c.id, label: c.name }))}
               placeholder="— انتخاب کنید —"
               modalTitle="انتخاب سالن"
-              autoThreshold={6}
             />
           </Field>
           <Field label="بخش (اختیاری)">
@@ -70,7 +69,6 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               emptyMode="select"
               placeholder="— بدون بخش —"
               modalTitle="انتخاب بخش"
-              autoThreshold={6}
             />
           </Field>
 
@@ -94,7 +92,6 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               }))}
               placeholder="— انتخاب دسته —"
               modalTitle="انتخاب دسته"
-              autoThreshold={6}
             />
           </Field>
           <EditableSelect
@@ -148,7 +145,6 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               options={suppliers.map((s: Person) => ({ value: s.id, label: s.name, subtitle: s.phone }))}
               placeholder="— انتخاب کنید —"
               modalTitle="انتخاب تأمین‌کننده"
-              autoThreshold={6}
             />
           </Field>
         )}

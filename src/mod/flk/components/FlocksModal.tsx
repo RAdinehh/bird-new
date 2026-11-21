@@ -219,7 +219,6 @@ export default function FlocksModal(props: FlocksModalProps) {
             options={birds.map(c => ({ value: c.id, label: c.name }))}
             placeholder="— انتخاب کنید —"
             modalTitle="انتخاب پرنده"
-            autoThreshold={6}
             disabled={isSourceLinked}
           />
         </Field>
@@ -289,7 +288,6 @@ export default function FlocksModal(props: FlocksModalProps) {
             options={halls.map(c => ({ value: c.id, label: c.name }))}
             placeholder="— انتخاب کنید —"
             modalTitle="انتخاب سالن"
-            autoThreshold={6}
           />
         </Field>
         <Field label="بخش">
@@ -304,7 +302,6 @@ export default function FlocksModal(props: FlocksModalProps) {
             emptyMode="select"
             placeholder="— بدون بخش —"
             modalTitle="انتخاب بخش"
-            autoThreshold={6}
           />
         </Field>
       </Grid2>

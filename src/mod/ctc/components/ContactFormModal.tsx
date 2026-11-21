@@ -208,7 +208,6 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
                 groupIcons={{ gov: '🏛', private: '🏦', other: '📋' }}
                 placeholder="— انتخاب بانک —"
                 modalTitle="انتخاب بانک"
-                autoThreshold={6}
               />
             </Field>
             <Field label="نام صاحب حساب" hint="اگر با نام مخاطب فرق دارد">

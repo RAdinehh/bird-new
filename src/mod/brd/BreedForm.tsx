@@ -197,7 +197,6 @@ export default function BreedForm({
                 options={birds.map(c => ({ value: c.id, label: c.name }))}
                 placeholder="— انتخاب کنید —"
                 modalTitle="انتخاب پرنده"
-                autoThreshold={6}
               />
             )}
           />

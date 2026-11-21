@@ -97,7 +97,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
           <span>📦</span><span>انتخاب دستگاه</span>
         </div>
-        <SmartSelect value={multiDeviceId} onChange={v => setMultiDeviceId(v)} options={devices.map(c => ({ value: c.id, label: c.name }))} placeholder="— انتخاب —" modalTitle="انتخاب دستگاه" autoThreshold={6} />
+        <SmartSelect value={multiDeviceId} onChange={v => setMultiDeviceId(v)} options={devices.map(c => ({ value: c.id, label: c.name }))} placeholder="— انتخاب —" modalTitle="انتخاب دستگاه" />
         {liveUsage && liveUsage.total > 0 && (
           <div style={{
             padding: 'var(--pad-normal)',
@@ -328,7 +328,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginBottom: 8 }}>🥚 مشخصات تخم</div>
           <Grid2>
             <Field label="پرنده" required>
-              <SmartSelect value={currentRow.birdId} onChange={v => setCurrentRow(f => ({ ...f, birdId: v, breedId: '' }))} options={birds.map(c => ({ value: c.id, label: c.name }))} placeholder="—" modalTitle="انتخاب پرنده" autoThreshold={6} />
+              <SmartSelect value={currentRow.birdId} onChange={v => setCurrentRow(f => ({ ...f, birdId: v, breedId: '' }))} options={birds.map(c => ({ value: c.id, label: c.name }))} placeholder="—" modalTitle="انتخاب پرنده" />
             </Field>
             <Field label="نژاد">
               <Select value={currentRow.breedId} onChange={e => setCurrentRow(f => ({ ...f, breedId: e.target.value }))}>

@@ -192,7 +192,6 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
             options={vaccineItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}` }))}
             placeholder="— متصل نکن —"
             modalTitle="انتخاب از انبار"
-            autoThreshold={6}
           />
         </Field>
       )}
@@ -324,7 +323,6 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
             groupIcons={{ chemical: '💊', herbal: '🌿' }}
             placeholder="— متصل نکن —"
             modalTitle="انتخاب از انبار"
-            autoThreshold={6}
           />
         </Field>
       )}

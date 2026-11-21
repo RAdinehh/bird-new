@@ -27,15 +27,15 @@ export default function QuickActions() {
   const nav = useNavigate();
   return (
     <>
-            <SectionTitle>⚡ دسترسی سریع</SectionTitle>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4 }}>
-              <QuickAction icon="📋" label="ثبت روزانه" onClick={() => nav('/dlg')} />
-              <QuickAction icon="🥚" label="جوجه‌کشی" onClick={() => nav('/inc')} />
-              <QuickAction icon="🛒" label="معاملات" onClick={() => nav('/tra')} />
-              <QuickAction icon="🥚" label="تخم" onClick={() => nav('/egg')} />
-              <QuickAction icon="🌾" label="جیره" onClick={() => nav('/fed')} />
-              <QuickAction icon="📊" label="گزارش" onClick={() => nav('/rep')} />
-            </div>
+      <SectionTitle>⚡ دسترسی سریع</SectionTitle>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4 }}>
+        <QuickAction icon="🐦" label="پرنده و نژاد" onClick={() => nav('/brd')} />
+        <QuickAction icon="🏠" label="سالن‌ها" onClick={() => nav('/hal')} />
+        <QuickAction icon="🐔" label="گله‌ها" onClick={() => nav('/flk')} />
+        <QuickAction icon="📦" label="انبار" onClick={() => nav('/whs')} />
+        <QuickAction icon="📋" label="ثبت روزانه" onClick={() => nav('/dlg')} />
+        <QuickAction icon="🛒" label="معاملات" onClick={() => nav('/tra')} />
+      </div>
     </>
   );
 }

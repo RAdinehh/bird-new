@@ -165,7 +165,7 @@ export default function TopAlerts({
                 <div style={{ fontSize: 'var(--fs-hero)', marginBottom: 12 }}>🐔</div>
                 <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, marginBottom: 8 }}>خوش آمدید</div>
                 <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', lineHeight: 1.8, maxWidth: 300, margin: '0 auto' }}>
-                  برای شروع، از منوی بالا اولین پرنده یا سالن خود را بسازید.
+                  برای شروع، ابتدا پرنده و نژاد را تعریف کنید، سپس سالن و گله را بسازید و از انبار و ثبت روزانه استفاده کنید.
                 </div>
               </div>
             ) : null}

@@ -192,7 +192,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M12 2v20M5 8h14M5 16h14"/></svg>}
           title="نژادی ثبت نشده"
-          desc="برای هر پرنده می‌توانید چند نژاد بسازید — مثلاً لگهورن، بلاک استار."
+          desc="برای هر نوع پرنده می‌توانید چند نژاد انتخاب کنید؛ مثلاً مرغ مرندی، بوقلمون برنز، اردک پکنی و بلدرچین ژاپنی."
           action={<Btn variant="primary" onClick={openNew}>+ افزودن نژاد</Btn>} />
       ) : (
         <>

@@ -228,7 +228,6 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
               .map(c => ({ value: c.id, label: c.name }))}
             placeholder="— انتخاب —"
             modalTitle="انتخاب طرف حساب"
-            autoThreshold={6}
           />
         </Field>
         <Field label="تاریخ" required>

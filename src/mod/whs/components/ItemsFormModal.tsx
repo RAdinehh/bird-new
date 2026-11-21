@@ -54,7 +54,6 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
               }))}
               placeholder="— انتخاب —"
               modalTitle="انتخاب فروشنده"
-              autoThreshold={6}
             />
           </Field>
         </Grid2>

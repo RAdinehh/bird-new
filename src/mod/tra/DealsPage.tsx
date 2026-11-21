@@ -809,7 +809,6 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
               options={contacts.filter(c => c.roles?.includes('customer')).map(c => ({ value: c.id, label: c.name, subtitle: c.phone || undefined }))}
               placeholder="— انتخاب کنید —"
               modalTitle="انتخاب طرف معامله"
-              autoThreshold={6}
             />
           </Field>
         </Grid2>

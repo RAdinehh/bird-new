@@ -208,7 +208,6 @@ export default function HallsFormModal(props: HallsFormModalProps) {
               options={workers.map((w: Person) => ({ value: w.id, label: w.name, subtitle: w.phone }))}
               placeholder="— انتخاب کنید —"
               modalTitle="انتخاب مسئول"
-              autoThreshold={6}
             />
           </Field>
         )}
@@ -220,7 +219,6 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 options={birds.map((b: Bird) => ({ value: b.id, label: b.name }))}
                 placeholder="— انتخاب پرنده —"
                 modalTitle="انتخاب پرنده"
-                autoThreshold={6}
               />
             </Field>
             <Field label="نژاد پرنده" required error={vErrors.breedId}>

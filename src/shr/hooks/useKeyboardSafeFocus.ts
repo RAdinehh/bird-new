@@ -15,7 +15,7 @@ import { useEffect } from 'react';
 
 export function useKeyboardSafeFocus() {
   useEffect(() => {
-    const SELECTOR = 'input:not([type="checkbox"]):not([type="radio"]), textarea, select';
+    const SELECTOR = 'input:not([type="checkbox"]):not([type="radio"]), textarea';
 
     const handleFocus = (e: FocusEvent) => {
       const el = e.target as HTMLElement;

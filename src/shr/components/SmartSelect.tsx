@@ -2,7 +2,7 @@
  * SmartSelect.tsx — انتخاب‌گر ساده با SelectSheetShell
  *
  * دو حالت خودکار:
- *   - options ≤ autoThreshold (پیش‌فرض ۸) → Select بومی
+ *   - options ≤ autoThreshold (پیش‌فرض ۴) → Select بومی
  *   - options > autoThreshold → SelectSheetShell (لیست بلند)
  *
  * API ثابت (سازگاری با ۱۵ ماژول):
@@ -48,7 +48,7 @@ export default function SmartSelect({
   placeholder = '— انتخاب کنید —',
   groupLabels = {}, groupIcons = {},
   hierarchical = false,
-  autoThreshold = 8,
+  autoThreshold = 4,
   disabled = false,
   modalTitle = 'انتخاب',
   required = false,
@@ -95,8 +95,8 @@ export default function SmartSelect({
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
         <Select
-          value={value}
-          onChange={e => onChange(e.target.value)}
+          value={value ?? ''}
+          onChange={e => onChange(e.currentTarget.value)}
           disabled={disabled}
           error={error}
           warn={warn}

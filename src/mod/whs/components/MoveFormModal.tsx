@@ -88,7 +88,6 @@ export default function MoveFormModal(props: Props) {
             ) as Record<string, string>}
             placeholder="— انتخاب کالا —"
             modalTitle="انتخاب کالای انبار"
-            autoThreshold={6}
           />
         </Field>
 
@@ -145,7 +144,6 @@ export default function MoveFormModal(props: Props) {
                   }))}
                   placeholder={partyRequired ? `— انتخاب ${partyLabel} —` : '— بدون مخاطب —'}
                   modalTitle={`انتخاب ${partyLabel}`}
-                  autoThreshold={6}
                 />
               )}
             </Field>

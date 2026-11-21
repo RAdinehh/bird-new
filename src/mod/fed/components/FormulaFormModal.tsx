@@ -60,7 +60,6 @@ export default function FormulaFormModal(props: Props) {
        }))}
        placeholder="— انتخاب کنید —"
        modalTitle="انتخاب نیاز"
-       autoThreshold={6}
       />
      </Field>
      <Field label="تاریخ">

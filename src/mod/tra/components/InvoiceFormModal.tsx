@@ -214,8 +214,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                 onChange={v => setForm(f => ({ ...f, partyId: v}))}
                 options={parties.map(cc => ({ value: cc.id, label: cc.name, subtitle: cc.phone || undefined }))} 
                 placeholder="— انتخاب کنید —" 
-                modalTitle={isPurchase ? 'انتخاب فروشنده' : 'انتخاب مشتری'} 
-                autoThreshold={6}
+                modalTitle={isPurchase ? 'انتخاب فروشنده' : 'انتخاب مشتری'}
                 disabled={isPartyLocked}
               />
             </Field>

@@ -40,7 +40,7 @@ export default function DependentSelect({
   emptyListMessage,
   placeholder = '— انتخاب کنید —',
   modalTitle,
-  autoThreshold = 8,
+  autoThreshold = 4,
   disabled = false,
   required = false,
   error,

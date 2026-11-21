@@ -273,7 +273,6 @@ export default function FeedSection({ form, setForm }: Props) {
            groupIcons={{ formula: '📋', item: '🌾' }}
            placeholder="انتخاب..."
            modalTitle="انتخاب منبع"
-           autoThreshold={6}
           />
          </Field>
          <QuantityUnitInput layout="grid"

@@ -232,7 +232,7 @@ export function Modal({
 
     <div
       onClick={(e) => {
-        if (e.target === e.currentTarget && !preventClose) onClose();
+        if (e.target === e.currentTarget && !preventClose && document.activeElement?.tagName !== "SELECT") onClose();
       }}
       style={{
         position: 'fixed',
@@ -251,6 +251,7 @@ export function Modal({
         aria-modal="true"
         aria-labelledby={titleId.current}
         onKeyDown={handleKeyDown}
+        onClick={(e) => e.stopPropagation()}
         style={{
           background: 'var(--card-solid)',
           borderTopLeftRadius: isFull ? 0 : 'var(--r-2xl)',
