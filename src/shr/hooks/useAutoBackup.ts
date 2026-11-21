@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import { safeStorage } from '../utils/storage';
 import { useSet } from '../../mod/set/store';
 import { exportAll, AUTOBACKUP_IDB_KEY } from '../utils/backup';
+import { getGoogleDriveConfig, uploadBackupToGoogleDrive } from '../utils/googleDriveBackup';
 import { idbGetItem, idbSetItem } from '../../cor/storage/idbStorage';
 
 const LAST_KEY = 'pm-autobackup-last';
@@ -55,6 +56,10 @@ export function useAutoBackup() {
 
         await idbSetItem(AUTOBACKUP_IDB_KEY, JSON.stringify(list));
         safeStorage.set(LAST_KEY, String(Date.now()));
+          const driveCfg = getGoogleDriveConfig();
+          if (driveCfg.autoSync && driveCfg.clientId) {
+            uploadBackupToGoogleDrive(data, false).catch(() => {});
+          }
         console.log('[AutoBackup] نسخه‌ی خودکار ذخیره شد');
       } catch (e) {
         console.warn('[AutoBackup] ذخیره‌سازی ناموفق:', e);

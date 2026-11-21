@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { exportAll, validateBackup, importAll, getStats, downloadBackup, readFile, formatSize, byteSize, clearAllData, type BackupFile, type BackupStats } from '../../shr/utils/backup';
+import { exportAll, validateBackup, importAll, getStats, downloadBackup, shareBackup, readFile, formatSize, byteSize, clearAllData, type BackupFile, type BackupStats } from '../../shr/utils/backup';
 import { useSet } from './store';
 import { showConfirmAsync } from '../../cor/store/dialog';
-import { Btn, BtnRow, Field, Grid2, Select, Modal } from '../../shr/components/ui';
+import { Btn, BtnRow, Field, Grid2, Select, Modal, Input } from '../../shr/components/ui';
+import { getGoogleDriveConfig, saveGoogleDriveConfig, uploadBackupToGoogleDrive, downloadBackupFromGoogleDrive, type GoogleDriveConfig } from '../../shr/utils/googleDriveBackup';
 import { toFa, parseFaNum } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
 import StatsModal from './components/StatsModal';
@@ -20,6 +21,9 @@ export default function BackupTab() {
   const [showStats, setShowStats] = useState(false);
   const [showReset, setShowReset] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const [driveCfg, setDriveCfg] = useState<GoogleDriveConfig>(() => getGoogleDriveConfig());
+  const [driveBusy, setDriveBusy] = useState(false);
+  const [showDriveSetup, setShowDriveSetup] = useState(false);
 
   const refresh = async () => setStats(await getStats());
 
@@ -38,6 +42,61 @@ export default function BackupTab() {
       refresh();
     } catch (e: any) {
       showMsg('✕ ' + (e.message || 'خطا'), false);
+    }
+  };
+
+  
+  const handleShareExport = async () => {
+    try {
+      const json = await exportAll();
+      const mode = await shareBackup(json);
+      showMsg(
+        mode === 'shared'
+          ? '✓ آماده ارسال به Google Drive / OneDrive — ' + formatSize(byteSize(json))
+          : '✓ پشتیبان دانلود شد — ' + formatSize(byteSize(json)),
+        true
+      );
+      refresh();
+    } catch (e: any) {
+      if (e?.name === 'AbortError') return;
+      showMsg('✕ ' + (e.message || 'خطا در اشتراک‌گذاری'), false);
+    }
+  };
+
+  const updateDriveCfg = (patch: Partial<GoogleDriveConfig>) => {
+    const next = saveGoogleDriveConfig(patch);
+    setDriveCfg(next);
+  };
+
+  const handleDriveUpload = async () => {
+    setDriveBusy(true);
+    try {
+      const json = await exportAll();
+      await uploadBackupToGoogleDrive(json, true);
+      setDriveCfg(getGoogleDriveConfig());
+      showMsg('✓ پشتیبان با موفقیت در Google Drive ذخیره شد', true);
+    } catch (e: any) {
+      showMsg('✕ ' + (e.message || 'خطا در اتصال به Google Drive'), false);
+    } finally {
+      setDriveBusy(false);
+    }
+  };
+
+  const handleDriveRestore = async () => {
+    setDriveBusy(true);
+    try {
+      const text = await downloadBackupFromGoogleDrive(true);
+      const result = validateBackup(text);
+      if (!result.valid) {
+        showMsg('✕ ' + result.error, false);
+        return;
+      }
+      setPreview(result.data);
+      setShowRestore(true);
+    } catch (e: any) {
+      showMsg('✕ ' + (e.message || 'خطا در بازیابی از Google Drive'), false);
+    } finally {
+      setDriveBusy(false);
     }
   };
 
@@ -138,9 +197,14 @@ export default function BackupTab() {
         subtitle={`حجم کل: ${formatSize(stats.totalSize)}`}
         tone="accent"
       >
-        <Btn variant="primary" full onClick={handleExport}>
-          📥 دریافت پشتیبان کامل (JSON)
-        </Btn>
+        <Grid2>
+          <Btn variant="primary" full onClick={handleExport}>
+            📥 دانلود JSON
+          </Btn>
+          <Btn full onClick={handleShareExport}>
+            ☁️ ارسال به Drive / OneDrive
+          </Btn>
+        </Grid2>
 
         <Grid2>
           <Btn full onClick={handleExportSettings}>
@@ -200,6 +264,57 @@ export default function BackupTab() {
               </Select>
             </Field>
           </Grid2>
+        ) : null}
+      </SettingsGroup>
+
+      
+      {/* ═══ ۲.۵ پشتیبان ابری Google Drive ═══ */}
+      <SettingsGroup
+        icon="☁️"
+        title="پشتیبان ابری (Google Drive)"
+        subtitle={
+          driveCfg.lastSyncedAt
+            ? `آخرین همگام‌سازی: ${new Date(driveCfg.lastSyncedAt).toLocaleDateString('fa-IR')}`
+            : driveCfg.clientId
+              ? 'آماده اتصال'
+              : 'نیاز به تنظیم Client ID'
+        }
+        tone="accent"
+      >
+        <Grid2>
+          <Btn variant="primary" full disabled={driveBusy || !driveCfg.clientId} onClick={handleDriveUpload}>
+            {driveBusy ? '⏳ در حال ارتباط...' : '⬆ ذخیره در Google Drive'}
+          </Btn>
+          <Btn full disabled={driveBusy || !driveCfg.clientId} onClick={handleDriveRestore}>
+            ⬇ بازیابی از Google Drive
+          </Btn>
+        </Grid2>
+
+        <ToggleRow
+          label="همگام‌سازی خودکار با پشتیبان دوره‌ای"
+          sub="ذخیره بی‌صدا در پوشه امن برنامه در Google Drive"
+          value={driveCfg.autoSync}
+          onChange={() => updateDriveCfg({ autoSync: !driveCfg.autoSync })}
+        />
+
+        <Btn full onClick={() => setShowDriveSetup(v => !v)}>
+          {showDriveSetup ? '▲ بستن تنظیمات اتصال Google Drive' : '🔑 تنظیم Google Client ID'}
+        </Btn>
+
+        {showDriveSetup ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <Field
+              label="Google OAuth Client ID"
+              hint="از Google Cloud Console (بخش Credentials > OAuth 2.0 Web Client ID) بگیرید"
+            >
+              <Input
+                dir="ltr"
+                placeholder="123456789-xxxx.apps.googleusercontent.com"
+                value={driveCfg.clientId}
+                onChange={e => updateDriveCfg({ clientId: e.target.value })}
+              />
+            </Field>
+          </div>
         ) : null}
       </SettingsGroup>
 

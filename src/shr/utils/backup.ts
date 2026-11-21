@@ -338,6 +338,22 @@ function simpleChecksum(s: string): string {
 }
 
 /** دانلود فایل */
+
+export async function shareBackup(jsonText: string): Promise<'shared' | 'downloaded'> {
+  const fileName = 'PM-Backup-' + new Date().toISOString().slice(0, 10) + '.json';
+  const file = new File([jsonText], fileName, { type: 'application/json' });
+  const nav = typeof navigator !== 'undefined' ? (navigator as any) : null;
+  if (nav && typeof nav.share === 'function' && (!nav.canShare || nav.canShare({ files: [file] }))) {
+    await nav.share({
+      title: 'پشتیبان نرم‌افزار مرغداری',
+      files: [file],
+    });
+    return 'shared';
+  }
+  downloadBackup(jsonText);
+  return 'downloaded';
+}
+
 export function downloadBackup(jsonText: string): void {
   const blob = new Blob([jsonText], { type: 'application/json;charset=utf-8' });
   const url = URL.createObjectURL(blob);
