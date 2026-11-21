@@ -5,15 +5,14 @@
  * خواندن-فقط — بدون ویرایش.
  * applyCorrections روی هر لاگ اعمال می‌شود.
  */
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { CSSProperties } from 'react';
 import { applyCorrections } from '../api/applyCorrections';
 import type { DailyLog } from '../store';
 import type { Flock } from '../../flk/store';
-import { Empty, Btn } from '../../../shr/components/ui';
+import { Empty } from '../../../shr/components/ui';
 import { toFa } from '../../../shr/utils/fa';
 import { toCSV } from '../../../shr/utils/export';
-import HelpBanner from '../../../shr/components/HelpBanner';
 
 type Period = 'week' | 'month';
 
@@ -33,50 +32,125 @@ interface Bucket {
   feed: number;
   water: number;
   eggsTotal: number;
+  tempSum: number;
+  tempCount: number;
+  humSum: number;
+  humCount: number;
   avgTemp: number | null;
   avgHumidity: number | null;
+  waterToFeed: number | null;
 }
 
-function bucketKey(date: string, period: Period): string | null {
-  const parts = date.split('/');
+function toEnDigits(str: string): string {
+  return str
+    .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 1776))
+    .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 1632));
+}
+
+function jalaliMonthDays(year: number, month: number): number {
+  if (month <= 6) return 31;
+  if (month <= 11) return 30;
+  const leapRemainders = [1, 5, 9, 13, 17, 22, 26, 30];
+  return leapRemainders.includes(year % 33) ? 30 : 29;
+}
+
+function parseJalaliDate(date: unknown): { y: number; m: number; d: number } | null {
+  if (typeof date !== 'string' || !date.trim()) return null;
+  const parts = toEnDigits(date.trim()).split('/');
   if (parts.length !== 3) return null;
-  const y = parts[0];
-  const m = parts[1];
-  const d = parseInt(parts[2], 10);
-  if (isNaN(d) || d < 1) return null;
-  if (period === 'month') return `${y}/${m}`;
-  const w = Math.ceil(d / 7);
-  return `${y}/${m}/W${w}`;
+  const y = parseInt(parts[0] ?? '', 10);
+  const m = parseInt(parts[1] ?? '', 10);
+  const d = parseInt(parts[2] ?? '', 10);
+  if (Number.isNaN(y) || Number.isNaN(m) || Number.isNaN(d)) return null;
+  if (y < 1 || m < 1 || m > 12 || d < 1 || d > 31) return null;
+  return { y, m, d };
+}
+
+function bucketKey(date: unknown, period: Period): string | null {
+  const parsed = parseJalaliDate(date);
+  if (!parsed) return null;
+  const yStr = String(parsed.y).padStart(4, '0');
+  const mStr = String(parsed.m).padStart(2, '0');
+  if (period === 'month') return `${yStr}/${mStr}`;
+  const w = Math.ceil(parsed.d / 7);
+  return `${yStr}/${mStr}/W${w}`;
 }
 
 function bucketLabel(key: string, period: Period): string {
+  const parts = key.split('/');
+  const y = parts[0] ?? '';
+  const m = parts[1] ?? '';
   if (period === 'month') {
-    const [y, m] = key.split('/');
     return `${toFa(y)}/${toFa(m)}`;
   }
-  const [y, m, w] = key.split('/');
-  return `${toFa(y)}/${toFa(m)} هفته ${toFa(w.replace('W', ''))}`;
+  const w = (parts[2] ?? 'W1').replace('W', '');
+  return `${toFa(y)}/${toFa(m)} · هفته ${toFa(w)}`;
 }
 
 function bucketRange(date: string, period: Period): { start: string; end: string } {
-  const parts = date.split('/');
-  if (parts.length !== 3) return { start: date, end: date };
+  const parsed = parseJalaliDate(date);
+  if (!parsed) return { start: date, end: date };
+  const yStr = String(parsed.y).padStart(4, '0');
+  const mStr = String(parsed.m).padStart(2, '0');
+  const maxDays = jalaliMonthDays(parsed.y, parsed.m);
   if (period === 'month') {
-    return { start: `${parts[0]}/${parts[1]}/01`, end: `${parts[0]}/${parts[1]}/31` };
+    return {
+      start: `${yStr}/${mStr}/01`,
+      end: `${yStr}/${mStr}/${String(maxDays).padStart(2, '0')}`,
+    };
   }
-  const d = parseInt(parts[2], 10);
-  const w = Math.ceil(d / 7);
+  const w = Math.ceil(parsed.d / 7);
   const startDay = (w - 1) * 7 + 1;
-  const endDay = Math.min(w * 7, 31);
+  const endDay = Math.min(w * 7, maxDays);
   return {
-    start: `${parts[0]}/${parts[1]}/${String(startDay).padStart(2, '0')}`,
-    end: `${parts[0]}/${parts[1]}/${String(endDay).padStart(2, '0')}`,
+    start: `${yStr}/${mStr}/${String(startDay).padStart(2, '0')}`,
+    end: `${yStr}/${mStr}/${String(endDay).padStart(2, '0')}`,
   };
+}
+
+function fmtNum(val: number, decimals = 1): string {
+  if (typeof val !== 'number' || !Number.isFinite(val)) return toFa(0);
+  const factor = Math.pow(10, decimals);
+  const rounded = Math.round(val * factor) / factor;
+  return toFa(rounded);
+}
+
+function fmtFixed(val: number, decimals = 1): string {
+  if (typeof val !== 'number' || !Number.isFinite(val)) return toFa(0);
+  return toFa(val.toFixed(decimals));
+}
+
+function renderPeriodCell(label: string) {
+  const parts = label.split('·').map((x) => x.trim()).filter(Boolean);
+  if (parts.length >= 2) {
+    return (
+      <span
+        style={{
+          display: 'inline-flex',
+          flexDirection: 'column',
+          alignItems: 'center', textAlign: 'center',
+          gap: 2,
+          lineHeight: 1.25,
+        }}
+      >
+        <bdi style={{ fontWeight: 700, color: 'var(--text)' }}>{parts[0]}</bdi>
+        <span style={{ fontSize: 'calc(var(--fs-xs) - 1px)', color: 'var(--muted)', fontWeight: 500 }}>
+          {parts.slice(1).join(' · ')}
+        </span>
+      </span>
+    );
+  }
+  return <bdi style={{ fontWeight: 700, color: 'var(--text)' }}>{label}</bdi>;
 }
 
 export default function AggregateTabPanel({ active, logs, flocks }: Props) {
   const [period, setPeriod] = useState<Period>('week');
   const [flockFilter, setFlockFilter] = useState<string>('');
+  const [showAllCols, setShowAllCols] = useState<boolean>(false);
+  const [selectedPeriodKeys, setSelectedPeriodKeys] = useState<string[]>([]);
+  const [periodPickerOpen, setPeriodPickerOpen] = useState<boolean>(false);
+  const [pickerYearFilter, setPickerYearFilter] = useState<string>("");
+  const [pickerQuery, setPickerQuery] = useState<string>("");
 
   const buckets: Bucket[] = useMemo(() => {
     const map = new Map<string, Bucket>();
@@ -102,51 +176,123 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
           feed: 0,
           water: 0,
           eggsTotal: 0,
+          tempSum: 0,
+          tempCount: 0,
+          humSum: 0,
+          humCount: 0,
           avgTemp: null,
           avgHumidity: null,
+          waterToFeed: null,
         };
         map.set(key, b);
       }
 
-      const prevTemp = b.avgTemp;
-      const prevHum = b.avgHumidity;
       b.logCount++;
-      b.deaths += log.deathsCount || 0;
-      b.feed += log.feedConsumed ?? log.feedDelivered ?? 0;
-      b.water += log.waterAmount || 0;
+      b.deaths += Number(log.deathsCount) || 0;
+      b.feed += Number(log.feedConsumed ?? log.feedDelivered ?? 0) || 0;
+      b.water += Number(log.waterAmount) || 0;
       b.eggsTotal +=
-        (log.eatingEggs || 0) +
-        (log.fertileEggs || 0) +
-        (log.brokenEggs || 0) +
-        (log.otherEggs || 0);
+        (Number(log.eatingEggs) || 0) +
+        (Number(log.fertileEggs) || 0) +
+        (Number(log.brokenEggs) || 0) +
+        (Number(log.otherEggs) || 0);
 
-      if (log.temperature !== null && log.temperature !== undefined) {
-        const n = b.logCount;
-        b.avgTemp = ((prevTemp ?? 0) * (n - 1) + log.temperature) / n;
+      if (typeof log.temperature === 'number' && Number.isFinite(log.temperature)) {
+        b.tempSum += log.temperature;
+        b.tempCount++;
       }
-      if (log.humidity !== null && log.humidity !== undefined) {
-        const n = b.logCount;
-        b.avgHumidity = ((prevHum ?? 0) * (n - 1) + log.humidity) / n;
+      if (typeof log.humidity === 'number' && Number.isFinite(log.humidity)) {
+        b.humSum += log.humidity;
+        b.humCount++;
       }
     }
 
-    return Array.from(map.values()).sort((a, b) => b.key.localeCompare(a.key));
+    const list = Array.from(map.values()).map((b) => ({
+      ...b,
+      avgTemp: b.tempCount > 0 ? b.tempSum / b.tempCount : null,
+      avgHumidity: b.humCount > 0 ? b.humSum / b.humCount : null,
+      waterToFeed: b.feed > 0 && b.water > 0 ? b.water / b.feed : null,
+    }));
+
+    // مرتب‌سازی دقیق زمانی (جدیدترین دوره در بالا)
+    return list.sort((a, b) => b.key.localeCompare(a.key));
   }, [logs, period, flockFilter]);
 
+  useEffect(() => {
+    const years = Array.from(new Set(buckets.map((b) => b.key.split("/")[0]).filter(Boolean)));
+    if (pickerYearFilter && !years.includes(pickerYearFilter)) {
+      setPickerYearFilter("");
+    }
+    const validSet = new Set(buckets.map((b) => b.key));
+    setSelectedPeriodKeys((prev) => {
+      const next = prev.filter((k) => validSet.has(k));
+      return next.length === prev.length ? prev : next;
+    });
+  }, [buckets, pickerYearFilter]);
+
+  const visibleBuckets = useMemo(() => {
+    if (selectedPeriodKeys.length === 0) return buckets;
+    const picked = new Set(selectedPeriodKeys);
+    const filtered = buckets.filter((b) => picked.has(b.key));
+    return filtered.length > 0 ? filtered : buckets;
+  }, [buckets, selectedPeriodKeys]);
+
+  const totals = useMemo(() => {
+    let logCount = 0;
+    let deaths = 0;
+    let feed = 0;
+    let water = 0;
+    let eggsTotal = 0;
+    let tempSum = 0;
+    let tempCount = 0;
+    let humSum = 0;
+    let humCount = 0;
+
+    for (const b of visibleBuckets) {
+      logCount += b.logCount;
+      deaths += b.deaths;
+      feed += b.feed;
+      water += b.water;
+      eggsTotal += b.eggsTotal;
+      tempSum += b.tempSum;
+      tempCount += b.tempCount;
+      humSum += b.humSum;
+      humCount += b.humCount;
+    }
+
+    return {
+      logCount,
+      deaths,
+      feed,
+      water,
+      eggsTotal,
+      avgTemp: tempCount > 0 ? tempSum / tempCount : null,
+      avgHumidity: humCount > 0 ? humSum / humCount : null,
+      waterToFeed: feed > 0 && water > 0 ? water / feed : null,
+    };
+  }, [buckets]);
+
   const handleExportCSV = () => {
+    if (buckets.length === 0) return;
     const headers = [
       'دوره', 'از', 'تا', 'تعداد لاگ', 'تلفات',
-      'دان (kg)', 'آب (L)', 'تخم', 'دما °C', 'رطوبت ٪',
+      'دان (kg)', 'آب (L)', 'نسبت آب/دان', 'تخم', 'دما °C', 'رطوبت ٪',
     ];
     const rows = buckets.map((b) => [
-      b.label, b.rangeStart, b.rangeEnd, b.logCount, b.deaths,
+      b.label,
+      b.rangeStart,
+      b.rangeEnd,
+      b.logCount,
+      b.deaths,
       Math.round(b.feed * 10) / 10,
       Math.round(b.water * 10) / 10,
+      b.waterToFeed !== null ? b.waterToFeed.toFixed(2) : '',
       b.eggsTotal,
-      b.avgTemp !== null ? Math.round(b.avgTemp * 10) / 10 : '',
-      b.avgHumidity !== null ? Math.round(b.avgHumidity * 10) / 10 : '',
+      b.avgTemp !== null ? b.avgTemp.toFixed(1) : '',
+      b.avgHumidity !== null ? b.avgHumidity.toFixed(1) : '',
     ]);
-    const csv = toCSV(headers, rows);
+    const rawCsv = toCSV(headers, rows);
+    const csv = rawCsv.startsWith('\uFEFF') ? rawCsv : `\uFEFF${rawCsv}`;
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -161,112 +307,822 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
   if (!active) return null;
 
   const activeFlocks = flocks.filter((f) => f.status === 'active' && !f.paused);
+  const showFlockSelect = activeFlocks.length > 1;
+  const stickyDivider = showAllCols ? '1px solid var(--border)' : undefined;
+  const opaqueSurfaceBg = 'linear-gradient(var(--surface-2, var(--input-bg)), var(--surface-2, var(--input-bg))), var(--card-solid, var(--card))';
+  const opaqueCardBg = 'var(--card-solid, var(--card))';
+  const activePickedCount = selectedPeriodKeys.filter((k) =>
+    buckets.some((b) => b.key === k)
+  ).length;
+  const availableYears = Array.from(
+    new Set(buckets.map((b) => b.key.split("/")[0]).filter(Boolean))
+  ).sort((a, b) => b.localeCompare(a));
+  const normalizedQuery = toEnDigits(pickerQuery.trim()).toLowerCase();
+  const filteredPickerBuckets = buckets.filter((b) => {
+    if (pickerYearFilter && !b.key.startsWith(`${pickerYearFilter}/`)) return false;
+    if (!normalizedQuery) return true;
+    const hay = `${toEnDigits(b.label).toLowerCase()} ${b.key.toLowerCase()} ${b.rangeStart} ${b.rangeEnd}`;
+    return hay.includes(normalizedQuery);
+  });
+  const togglePeriodKey = (key: string) => {
+    setSelectedPeriodKeys((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
+  };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <HelpBanner
-        id="dlg-aggregate-guide"
-        icon="🧮"
-        title="راهنمای نمای تجمیعی دفتر روزانه"
-        description="مجموع مصرف دان و آب، تلفات، وزن میانگین و تولید تخم گله‌های فعال را در بازه یا نمای انتخاب‌شده به صورت یکجا ببینید."
-        tone="info"
-      />
-      {/* Controls */}
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-        <div style={{
-          display: 'flex', gap: 0, background: 'var(--input-bg)',
-          borderRadius: 'var(--r-md)', padding: 3,
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {/* هدر کنترل‌ها: تک‌ردیفه، غیرفشرده و قابل اسکرول افقی */}
+      <div
+        style={{
+          width: '100%',
+          boxSizing: 'border-box',
+          background: 'var(--card)',
           border: '1px solid var(--border)',
-        }}>
-          <button
-            type="button"
-            onClick={() => setPeriod('week')}
-            style={periodBtn(period === 'week')}
-          >هفتگی</button>
-          <button
-            type="button"
-            onClick={() => setPeriod('month')}
-            style={periodBtn(period === 'month')}
-          >ماهانه</button>
-        </div>
-
-        {activeFlocks.length > 1 && (
-          <select
-            value={flockFilter}
-            onChange={(e) => setFlockFilter(e.target.value)}
-            aria-label="فیلتر گله"
+          borderRadius: 'var(--r-lg, 12px)',
+          padding: 6,
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+          overflowX: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            minWidth: 'max-content',
+          }}
+        >
+          {/* ۱. سوییچ هفتگی / ماهانه */}
+          <div
+            role="group"
+            aria-label="بازه جمع‌بندی"
             style={{
-              padding: '6px 10px', background: 'var(--input-bg)',
-              border: '1px solid var(--border)', borderRadius: 'var(--r-sm)',
-              fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
-              color: 'var(--text)', cursor: 'pointer',
+              ...CTRL_BASE,
+              width: 'auto',
+              minWidth: 108,
+              flexShrink: 0,
+              padding: 2,
+              gap: 2,
+              display: 'inline-flex',
+              alignItems: 'stretch',
             }}
           >
-            <option value="">همه گله‌ها</option>
-            {activeFlocks.map((f) => (
-              <option key={f.id} value={f.id}>{f.name}</option>
-            ))}
-          </select>
-        )}
+            <button
+              type="button"
+              aria-pressed={period === 'week'}
+              onClick={() => setPeriod('week')}
+              style={{ ...periodBtn(period === 'week'), padding: '0 10px' }}
+            >
+              هفتگی
+            </button>
+            <button
+              type="button"
+              aria-pressed={period === 'month'}
+              onClick={() => setPeriod('month')}
+              style={{ ...periodBtn(period === 'month'), padding: '0 10px' }}
+            >
+              ماهانه
+            </button>
+          </div>
 
-        <div style={{ marginInlineStart: 'auto' }}>
-          <Btn variant="outline" onClick={handleExportCSV}>📤 CSV</Btn>
+          {/* ۲. فیلتر گله */}
+          {showFlockSelect && (
+            <div style={{ position: 'relative', flexShrink: 0, height: 36 }}>
+              <select
+                value={flockFilter}
+                onChange={(e) => setFlockFilter(e.target.value)}
+                aria-label="فیلتر گله"
+                style={{
+                  ...CTRL_BASE,
+                  width: 'auto',
+                  minWidth: 96,
+                  maxWidth: 145,
+                  paddingInlineStart: 10,
+                  paddingInlineEnd: 24,
+                  appearance: 'none',
+                  WebkitAppearance: 'none',
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                }}
+              >
+                <option value="">همه گله‌ها</option>
+                {activeFlocks.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.name}
+                  </option>
+                ))}
+              </select>
+              <svg
+                aria-hidden="true"
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--muted)"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{
+                  position: 'absolute',
+                  insetInlineEnd: 8,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  pointerEvents: 'none',
+                }}
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </div>
+          )}
+
+          {/* ۳. انتخاب چند ماه یا هفته */}
+          <button
+            type="button"
+            aria-expanded={periodPickerOpen}
+            disabled={buckets.length === 0}
+            onClick={() => setPeriodPickerOpen((o) => !o)}
+            style={{
+              ...CTRL_BASE,
+              width: 'auto',
+              flexShrink: 0,
+              padding: '0 11px',
+              opacity: buckets.length === 0 ? 0.45 : 1,
+              cursor: buckets.length === 0 ? 'not-allowed' : 'pointer',
+              background:
+                activePickedCount > 0 || periodPickerOpen
+                  ? 'var(--accent-soft, rgba(22, 163, 74, 0.10))'
+                  : 'var(--card)',
+              color:
+                activePickedCount > 0 || periodPickerOpen
+                  ? 'var(--accent)'
+                  : 'var(--text)',
+              border:
+                activePickedCount > 0 || periodPickerOpen
+                  ? '1px solid var(--accent)'
+                  : '1px solid var(--border)',
+            }}
+          >
+            {activePickedCount > 0 ? `${toFa(activePickedCount)} دوره` : 'انتخاب دوره'}
+          </button>
+
+          {/* ۴. تغییر تعداد ستون‌ها */}
+          <button
+            type="button"
+            aria-pressed={showAllCols}
+            onClick={() => setShowAllCols((v) => !v)}
+            style={{
+              ...CTRL_BASE,
+              width: 'auto',
+              flexShrink: 0,
+              padding: '0 11px',
+              background: showAllCols
+                ? 'var(--accent-soft, rgba(22, 163, 74, 0.10))'
+                : 'var(--card)',
+              color: showAllCols ? 'var(--accent)' : 'var(--text)',
+              border: showAllCols
+                ? '1px solid var(--accent)'
+                : '1px solid var(--border)',
+            }}
+          >
+            {showAllCols ? 'ستون‌های کمتر' : 'همه ستون‌ها'}
+          </button>
+
+          {/* ۵. خروجی CSV */}
+          <button
+            type="button"
+            disabled={visibleBuckets.length === 0}
+            onClick={handleExportCSV}
+            style={{
+              ...CTRL_BASE,
+              width: 'auto',
+              flexShrink: 0,
+              padding: '0 11px',
+              opacity: visibleBuckets.length === 0 ? 0.45 : 1,
+              cursor: visibleBuckets.length === 0 ? 'not-allowed' : 'pointer',
+            }}
+          >
+            خروجی CSV
+          </button>
         </div>
       </div>
 
-      {/* Empty */}
+      {/* پنل انتخاب چند ماه یا هفته دلخواه (سازگار با داده‌های کم و چندساله) */}
+      {periodPickerOpen && buckets.length > 0 && (
+        <div
+          style={{
+            background: 'var(--card)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--r-lg, 12px)',
+            padding: '8px 10px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.05)',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 8,
+              fontSize: 'var(--fs-xs)',
+            }}
+          >
+            <span style={{ color: 'var(--muted)', fontWeight: 600 }}>
+              {activePickedCount > 0
+                ? `${toFa(activePickedCount)} دوره از ${toFa(buckets.length)} انتخاب شده`
+                : `همه دوره‌ها نمایش داده می‌شوند (${toFa(buckets.length)} دوره)`}
+            </span>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              {filteredPickerBuckets.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const targetKeys = filteredPickerBuckets.map((b) => b.key);
+                    setSelectedPeriodKeys((prev) =>
+                      Array.from(new Set([...prev, ...targetKeys]))
+                    );
+                  }}
+                  style={{
+                    padding: '3px 8px',
+                    fontSize: 'calc(var(--fs-xs) - 0.5px)',
+                    fontWeight: 600,
+                    fontFamily: 'inherit',
+                    borderRadius: 'var(--r-md)',
+                    border: '1px solid var(--border)',
+                    background: 'var(--card)',
+                    color: 'var(--text)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  انتخاب نمایش‌داده‌شده‌ها
+                </button>
+              )}
+              {activePickedCount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedPeriodKeys([])}
+                  style={{
+                    padding: '3px 8px',
+                    fontSize: 'calc(var(--fs-xs) - 0.5px)',
+                    fontWeight: 600,
+                    fontFamily: 'inherit',
+                    borderRadius: 'var(--r-md)',
+                    border: '1px solid var(--accent)',
+                    background: 'var(--accent-soft, rgba(22, 163, 74, 0.10))',
+                    color: 'var(--accent)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  همه دوره‌ها
+                </button>
+              )}
+              <button
+                type="button"
+                aria-label="بستن انتخاب دوره"
+                onClick={() => setPeriodPickerOpen(false)}
+                style={{
+                  width: 22,
+                  height: 22,
+                  padding: 0,
+                  fontSize: '13px',
+                  lineHeight: 1,
+                  fontFamily: 'inherit',
+                  borderRadius: 'var(--r-md)',
+                  border: '1px solid var(--border)',
+                  background: 'var(--card)',
+                  color: 'var(--muted)',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                ×
+              </button>
+            </div>
+          </div>
+
+          {(availableYears.length > 1 || buckets.length > 10) && (
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
+              {availableYears.length > 1 && (
+                <div style={{ display: 'inline-flex', flexWrap: 'wrap', gap: 4 }}>
+                  <button
+                    type="button"
+                    onClick={() => setPickerYearFilter("")}
+                    style={{
+                      padding: '2px 7px',
+                      fontSize: 'calc(var(--fs-xs) - 0.5px)',
+                      fontWeight: pickerYearFilter === "" ? 700 : 500,
+                      fontFamily: 'inherit',
+                      borderRadius: 'var(--r-md)',
+                      border: pickerYearFilter === "" ? '1px solid var(--accent)' : '1px solid var(--border)',
+                      background: pickerYearFilter === "" ? 'var(--accent-soft, rgba(22, 163, 74, 0.10))' : 'var(--card)',
+                      color: pickerYearFilter === "" ? 'var(--accent)' : 'var(--text)',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    همه سال‌ها
+                  </button>
+                  {availableYears.map((yr) => {
+                    const activeYr = pickerYearFilter === yr;
+                    return (
+                      <button
+                        key={yr}
+                        type="button"
+                        onClick={() => setPickerYearFilter(activeYr ? "" : yr)}
+                        style={{
+                          padding: '2px 7px',
+                          fontSize: 'calc(var(--fs-xs) - 0.5px)',
+                          fontWeight: activeYr ? 700 : 500,
+                          fontFamily: 'inherit',
+                          borderRadius: 'var(--r-md)',
+                          border: activeYr ? '1px solid var(--accent)' : '1px solid var(--border)',
+                          background: activeYr ? 'var(--accent-soft, rgba(22, 163, 74, 0.10))' : 'var(--card)',
+                          color: activeYr ? 'var(--accent)' : 'var(--text)',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {toFa(yr)}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {buckets.length > 10 && (
+                <input
+                  type="search"
+                  value={pickerQuery}
+                  onChange={(e) => setPickerQuery(e.target.value)}
+                  placeholder="جستجوی ماه یا هفته..."
+                  aria-label="جستجوی ماه یا هفته"
+                  style={{
+                    flex: '1 1 130px',
+                    minWidth: 110,
+                    height: 24,
+                    padding: '0 8px',
+                    fontSize: 'var(--fs-xs)',
+                    fontFamily: 'inherit',
+                    color: 'var(--text)',
+                    background: 'var(--input-bg, var(--card))',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--r-md)',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              )}
+            </div>
+          )}
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+              gap: 6,
+              maxHeight: 168,
+              overflowY: 'auto',
+              paddingInlineEnd: 2,
+            }}
+          >
+            {filteredPickerBuckets.length === 0 ? (
+              <div
+                style={{
+                  gridColumn: '1 / -1',
+                  padding: '10px 6px',
+                  textAlign: 'center',
+                  fontSize: 'var(--fs-xs)',
+                  color: 'var(--muted)',
+                }}
+              >
+                دوره‌ای با این فیلتر پیدا نشد.
+              </div>
+            ) : (
+              filteredPickerBuckets.map((b) => {
+                const isSelected =
+                  activePickedCount === 0 ? false : selectedPeriodKeys.includes(b.key);
+                return (
+                  <button
+                    key={b.key}
+                    type="button"
+                    aria-pressed={isSelected}
+                    onClick={() => togglePeriodKey(b.key)}
+                    style={{
+                      padding: '5px 6px',
+                      fontSize: 'calc(var(--fs-xs) - 0.5px)',
+                      fontWeight: isSelected ? 700 : 500,
+                      fontFamily: 'inherit',
+                      borderRadius: 'var(--r-md)',
+                      border: isSelected ? '1px solid var(--accent)' : '1px solid var(--border)',
+                      background: isSelected ? 'var(--accent)' : 'var(--card)',
+                      color: isSelected ? 'white' : 'var(--text)',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      textAlign: 'center',
+                    }}
+                  >
+                    {b.label}
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* حالت خالی */}
       {buckets.length === 0 && (
         <Empty
           icon={
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
+            <svg
+              width="30"
+              height="30"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+            >
               <path d="M3 3v18h18" />
               <path d="m7 12 4-4 4 4 4-4" />
             </svg>
           }
           title="داده‌ای برای جمع‌بندی نیست"
-          desc="پس از ثبت اولین لاگ روزانه، خلاصه هفتگی/ماهانه اینجا نمایش داده می‌شود."
+          desc="پس از ثبت اولین لاگ روزانه، خلاصه هفتگی یا ماهانه اینجا نمایش داده می‌شود."
         />
       )}
 
-      {/* Table */}
+      {/* جدول داده‌ها */}
       {buckets.length > 0 && (
-        <div style={{
-          background: 'var(--card)', border: '1px solid var(--border)',
-          borderRadius: 'var(--r-md)', overflow: 'hidden',
-        }}>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--fs-sm)' }}>
+        <div
+          style={{
+            background: 'var(--card)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--r-lg, 12px)',
+            overflow: 'hidden',
+            boxShadow: '0 6px 20px rgba(0, 0, 0, 0.06)',
+          }}
+        >
+          <div style={{ width: '100%', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <table
+              style={{
+                width: '100%',
+                minWidth: showAllCols ? 420 : '100%',
+                tableLayout: showAllCols ? 'auto' : 'fixed',
+                borderCollapse: 'separate',
+                borderSpacing: 0,
+                fontSize: 'var(--fs-sm)',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {!showAllCols && (
+                <colgroup>
+                  <col style={{ width: '15%' }} />
+                  <col style={{ width: '9%' }} />
+                  <col style={{ width: '11%' }} />
+                  <col style={{ width: '19%' }} />
+                  <col style={{ width: '18%' }} />
+                  <col style={{ width: '14%' }} />
+                  <col style={{ width: '14%' }} />
+                </colgroup>
+              )}
+
               <thead>
-                <tr style={{ borderBottom: '2px solid var(--border)' }}>
-                  <th style={TH}>دوره</th>
-                  <th style={TH}>#</th>
+                <tr style={{ background: 'var(--surface-2, var(--input-bg))' }}>
+                  <th
+                    style={{
+                      ...TH,
+                      textAlign: 'center',
+                      paddingInline: 4,
+                      width: showAllCols ? '1%' : undefined,
+                      position: 'sticky',
+                      insetInlineStart: 0,
+                      zIndex: 4,
+                      background: opaqueSurfaceBg,
+                      borderInlineEnd: stickyDivider,
+                    }}
+                  >
+                    دوره
+                  </th>
+                  <th style={TH}>ثبت</th>
                   <th style={TH}>تلفات</th>
                   <th style={TH}>دان</th>
                   <th style={TH}>آب</th>
+                  {showAllCols && <th style={TH}>آب/دان</th>}
                   <th style={TH}>تخم</th>
-                  <th style={TH}>دما</th>
-                  <th style={TH}>رطوبت</th>
+                  <th style={{ ...TH, paddingInlineEnd: showAllCols ? 6 : 10 }}>دما</th>
+                  {showAllCols && (
+                    <th style={{ ...TH, paddingInlineEnd: 12 }}>رطوبت</th>
+                  )}
                 </tr>
               </thead>
+
               <tbody>
-                {buckets.map((b) => (
-                  <tr key={b.key} style={{ borderBottom: '1px solid var(--border)' }}>
-                    <td style={TD}>{b.label}</td>
-                    <td style={TD}>{toFa(b.logCount)}</td>
-                    <td style={{
-                      ...TD,
-                      color: b.deaths > 0 ? 'var(--danger)' : 'var(--muted)',
-                      fontWeight: b.deaths > 0 ? 700 : 400,
-                    }}>{toFa(b.deaths)}</td>
-                    <td style={TD}>{toFa(Math.round(b.feed * 10) / 10)} kg</td>
-                    <td style={TD}>{toFa(Math.round(b.water * 10) / 10)} L</td>
-                    <td style={TD}>{toFa(b.eggsTotal)}</td>
-                    <td style={TD}>{b.avgTemp !== null ? `${toFa(Math.round(b.avgTemp * 10) / 10)}°` : '—'}</td>
-                    <td style={TD}>{b.avgHumidity !== null ? `${toFa(Math.round(b.avgHumidity * 10) / 10)}٪` : '—'}</td>
+                {visibleBuckets.map((b) => (
+                  <tr key={b.key} style={{ background: 'var(--card)' }}>
+                    <td
+                      style={{
+                        ...TD,
+                        textAlign: 'center',
+                        paddingInline: 4,
+                      width: showAllCols ? '1%' : undefined,
+                      position: 'sticky',
+                        insetInlineStart: 0,
+                        zIndex: 3,
+                        background: opaqueCardBg,
+                        borderInlineEnd: stickyDivider,
+                        borderBottom: '1px solid var(--border)',
+                      }}
+                    >
+                      {renderPeriodCell(b.label)}
+                    </td>
+
+                    <td
+                      style={{
+                        ...TD,
+                        borderBottom: '1px solid var(--border)',
+                        color: b.logCount > 0 ? 'var(--text)' : 'var(--muted)',
+                        fontWeight: b.logCount > 0 ? 600 : 400,
+                      }}
+                    >
+                      {toFa(b.logCount)}
+                    </td>
+
+                    <td
+                      style={{
+                        ...TD,
+                        borderBottom: '1px solid var(--border)',
+                        color: b.deaths > 0 ? 'var(--danger)' : 'var(--muted)',
+                        fontWeight: b.deaths > 0 ? 700 : 400,
+                      }}
+                    >
+                      {toFa(b.deaths)}
+                    </td>
+
+                    <td style={{ ...TD, borderBottom: '1px solid var(--border)' }}>
+                      <span
+                        dir="ltr"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'baseline',
+                          gap: 3,
+                          whiteSpace: 'nowrap',
+                          color: b.feed > 0 ? 'var(--text)' : 'var(--muted)',
+                          fontWeight: b.feed > 0 ? 600 : 400,
+                        }}
+                      >
+                        <bdi style={unitCell}>{fmtNum(b.feed)}</bdi>
+                        <span style={unitTag}>kg</span>
+                      </span>
+                    </td>
+
+                    <td style={{ ...TD, borderBottom: '1px solid var(--border)' }}>
+                      <span
+                        dir="ltr"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'baseline',
+                          gap: 3,
+                          whiteSpace: 'nowrap',
+                          color: b.water > 0 ? 'var(--text)' : 'var(--muted)',
+                          fontWeight: b.water > 0 ? 600 : 400,
+                        }}
+                      >
+                        <bdi style={unitCell}>{fmtNum(b.water)}</bdi>
+                        <span style={unitTag}>L</span>
+                      </span>
+                    </td>
+
+                    {showAllCols && (
+                      <td
+                        style={{
+                          ...TD,
+                          borderBottom: '1px solid var(--border)',
+                          color: b.waterToFeed !== null ? 'var(--text)' : 'var(--muted)',
+                          fontWeight: b.waterToFeed !== null ? 600 : 400,
+                        }}
+                      >
+                        {b.waterToFeed !== null ? (
+                          <bdi>{fmtFixed(b.waterToFeed, 2)}</bdi>
+                        ) : (
+                          '—'
+                        )}
+                      </td>
+                    )}
+
+                    <td
+                      style={{
+                        ...TD,
+                        borderBottom: '1px solid var(--border)',
+                        color: b.eggsTotal > 0 ? 'var(--text)' : 'var(--muted)',
+                        fontWeight: b.eggsTotal > 0 ? 600 : 400,
+                      }}
+                    >
+                      {toFa(b.eggsTotal)}
+                    </td>
+
+                    <td
+                      style={{
+                        ...TD,
+                        paddingInlineEnd: showAllCols ? 6 : 10,
+                        borderBottom: '1px solid var(--border)',
+                        color: b.avgTemp !== null ? 'var(--text)' : 'var(--muted)',
+                        fontWeight: b.avgTemp !== null ? 600 : 400,
+                      }}
+                    >
+                      {b.avgTemp !== null ? (
+                        <bdi>{fmtFixed(b.avgTemp, 1)}°</bdi>
+                      ) : (
+                        '—'
+                      )}
+                    </td>
+
+                    {showAllCols && (
+                      <td
+                        style={{
+                          ...TD,
+                          paddingInlineEnd: 8,
+                          borderBottom: '1px solid var(--border)',
+                          color: b.avgHumidity !== null ? 'var(--text)' : 'var(--muted)',
+                          fontWeight: b.avgHumidity !== null ? 600 : 400,
+                        }}
+                      >
+                        {b.avgHumidity !== null ? (
+                          <bdi>{fmtFixed(b.avgHumidity, 1)}٪</bdi>
+                        ) : (
+                          '—'
+                        )}
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
+
+              <tfoot>
+                <tr
+                  style={{
+                    background: 'var(--surface-2, var(--input-bg))',
+                    fontWeight: 700,
+                  }}
+                >
+                  <td
+                    style={{
+                      ...TD,
+                      textAlign: 'center',
+                      paddingInline: 4,
+                      width: showAllCols ? '1%' : undefined,
+                      position: 'sticky',
+                      insetInlineStart: 0,
+                      zIndex: 4,
+                      background: opaqueSurfaceBg,
+                      borderInlineEnd: stickyDivider,
+                      borderTop: '2px solid var(--border)',
+                      color: 'var(--text)',
+                      fontWeight: 700,
+                    }}
+                  >
+                    {showAllCols ? (
+                      <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1.2, fontSize: 'calc(var(--fs-xs) - 1px)' }}>
+                        <span>جمع /</span>
+                        <span>میانگین</span>
+                      </span>
+                    ) : (
+                      'جمع کل'
+                    )}
+                  </td>
+
+                  <td
+                    style={{
+                      ...TD,
+                      borderTop: '2px solid var(--border)',
+                      color: totals.logCount > 0 ? 'var(--text)' : 'var(--muted)',
+                      fontWeight: 700,
+                    }}
+                  >
+                    {toFa(totals.logCount)}
+                  </td>
+
+                  <td
+                    style={{
+                      ...TD,
+                      borderTop: '2px solid var(--border)',
+                      color: totals.deaths > 0 ? 'var(--danger)' : 'var(--muted)',
+                      fontWeight: 700,
+                    }}
+                  >
+                    {toFa(totals.deaths)}
+                  </td>
+
+                  <td style={{ ...TD, borderTop: '2px solid var(--border)' }}>
+                    <span
+                      dir="ltr"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'baseline',
+                        gap: 3,
+                        whiteSpace: 'nowrap',
+                        color: totals.feed > 0 ? 'var(--text)' : 'var(--muted)',
+                        fontWeight: totals.feed > 0 ? 700 : 400,
+                      }}
+                    >
+                      <bdi style={unitCell}>{fmtNum(totals.feed)}</bdi>
+                      <span style={unitTag}>kg</span>
+                    </span>
+                  </td>
+
+                  <td style={{ ...TD, borderTop: '2px solid var(--border)' }}>
+                    <span
+                      dir="ltr"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'baseline',
+                        gap: 3,
+                        whiteSpace: 'nowrap',
+                        color: totals.water > 0 ? 'var(--text)' : 'var(--muted)',
+                        fontWeight: totals.water > 0 ? 700 : 400,
+                      }}
+                    >
+                      <bdi style={unitCell}>{fmtNum(totals.water)}</bdi>
+                      <span style={unitTag}>L</span>
+                    </span>
+                  </td>
+
+                  {showAllCols && (
+                    <td
+                      style={{
+                        ...TD,
+                        borderTop: '2px solid var(--border)',
+                        color: totals.waterToFeed !== null ? 'var(--text)' : 'var(--muted)',
+                        fontWeight: totals.waterToFeed !== null ? 700 : 400,
+                      }}
+                    >
+                      {totals.waterToFeed !== null ? (
+                        <bdi>{fmtFixed(totals.waterToFeed, 2)}</bdi>
+                      ) : (
+                        '—'
+                      )}
+                    </td>
+                  )}
+
+                  <td
+                    style={{
+                      ...TD,
+                      borderTop: '2px solid var(--border)',
+                      color: totals.eggsTotal > 0 ? 'var(--text)' : 'var(--muted)',
+                      fontWeight: totals.eggsTotal > 0 ? 700 : 400,
+                    }}
+                  >
+                    {toFa(totals.eggsTotal)}
+                  </td>
+
+                  <td
+                    style={{
+                      ...TD,
+                      paddingInlineEnd: showAllCols ? 6 : 10,
+                      borderTop: '2px solid var(--border)',
+                      color: totals.avgTemp !== null ? 'var(--text)' : 'var(--muted)',
+                      fontWeight: totals.avgTemp !== null ? 700 : 400,
+                    }}
+                  >
+                    {totals.avgTemp !== null ? (
+                      <bdi>{fmtFixed(totals.avgTemp, 1)}°</bdi>
+                    ) : (
+                      '—'
+                    )}
+                  </td>
+
+                  {showAllCols && (
+                    <td
+                      style={{
+                        ...TD,
+                        paddingInlineEnd: 8,
+                        borderTop: '2px solid var(--border)',
+                        color: totals.avgHumidity !== null ? 'var(--text)' : 'var(--muted)',
+                        fontWeight: totals.avgHumidity !== null ? 700 : 400,
+                      }}
+                    >
+                      {totals.avgHumidity !== null ? (
+                        <bdi>{fmtFixed(totals.avgHumidity, 1)}٪</bdi>
+                      ) : (
+                        '—'
+                      )}
+                    </td>
+                  )}
+                </tr>
+              </tfoot>
             </table>
           </div>
         </div>
@@ -275,22 +1131,79 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
   );
 }
 
+const CTRL_BASE: CSSProperties = {
+  height: 36,
+  minHeight: 36,
+  width: '100%',
+  minWidth: 0,
+  boxSizing: 'border-box',
+  background: 'var(--card-solid, var(--card))',
+  border: '1px solid var(--border)',
+  borderRadius: 'var(--r-md)',
+  fontFamily: 'inherit',
+  fontSize: 'var(--fs-xs)',
+  fontWeight: 600,
+  lineHeight: 1.2,
+  color: 'var(--text)',
+  whiteSpace: 'nowrap',
+  cursor: 'pointer',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  transition: 'background 0.15s ease, color 0.15s ease, border-color 0.15s ease',
+};
+
 function periodBtn(active: boolean): CSSProperties {
   return {
-    padding: '6px 12px',
+    flex: 1,
+    minWidth: 0,
+    height: '100%',
+    padding: '0 8px',
     background: active ? 'var(--accent)' : 'transparent',
-    color: active ? 'white' : 'var(--muted)',
-    border: 'none', borderRadius: 'var(--r-sm)',
-    cursor: 'pointer', fontFamily: 'inherit',
-    fontSize: 'var(--fs-sm)', fontWeight: 600,
+    color: active ? '#fff' : 'var(--text)',
+    border: 'none',
+    borderRadius: 'calc(var(--r-md) - 3px)',
+    cursor: 'pointer',
+    fontFamily: 'inherit',
+    fontSize: 'var(--fs-xs)',
+    fontWeight: 600,
+    lineHeight: 1.2,
+    whiteSpace: 'nowrap',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: active ? '0 1px 2px rgba(0, 0, 0, 0.14)' : 'none',
+    transition: 'background 0.15s ease, color 0.15s ease',
   };
 }
 
+const unitCell: CSSProperties = {
+  fontVariantNumeric: 'tabular-nums',
+  whiteSpace: 'nowrap',
+};
+
+const unitTag: CSSProperties = {
+  fontSize: 'calc(var(--fs-xs) - 1px)',
+  color: 'var(--muted)',
+  fontWeight: 500,
+  whiteSpace: 'nowrap',
+};
+
 const TH: CSSProperties = {
-  padding: '8px 6px', textAlign: 'start', fontWeight: 700,
-  color: 'var(--muted)', fontSize: 'var(--fs-xs)',
+  padding: '8px 4px',
+  fontSize: 'var(--fs-xs)',
+  fontWeight: 700,
+  color: 'var(--muted)',
+  textAlign: 'center',
+  whiteSpace: 'nowrap',
+  borderBottom: '2px solid var(--border)',
 };
 
 const TD: CSSProperties = {
-  padding: '8px 6px', fontFamily: 'monospace', fontWeight: 600,
+  padding: '8px 4px',
+  fontSize: 'var(--fs-sm)',
+  textAlign: 'center',
+  verticalAlign: 'middle',
+  whiteSpace: 'nowrap',
+  fontVariantNumeric: 'tabular-nums',
 };
