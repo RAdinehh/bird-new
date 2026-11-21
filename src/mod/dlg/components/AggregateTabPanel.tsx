@@ -66,45 +66,105 @@ function parseJalaliDate(date: unknown): { y: number; m: number; d: number } | n
   return { y, m, d };
 }
 
+function jalaliToJdn(y: number, m: number, d: number): number {
+  const epbase = y - (y >= 0 ? 474 : 473);
+  const epyear = 474 + (epbase % 2820);
+  return (
+    d +
+    (m <= 7 ? (m - 1) * 31 : (m - 1) * 30 + 6) +
+    Math.floor((epyear * 682 - 110) / 2816) +
+    (epyear - 1) * 365 +
+    Math.floor(epbase / 2820) * 1029983 +
+    1948320
+  );
+}
+
+function jdnToJalali(jdn: number): { y: number; m: number; d: number } {
+  const depoch = jdn - jalaliToJdn(475, 1, 1);
+  const cycle = Math.floor(depoch / 1029983);
+  const cyear = depoch % 1029983;
+  let ycycle = 0;
+  if (cyear === 1029982) {
+    ycycle = 2820;
+  } else {
+    const aux1 = Math.floor(cyear / 366);
+    const aux2 = cyear % 366;
+    ycycle = Math.floor(((2134 * aux1) + (2816 * aux2) + 2815) / 1028522) + aux1 + 1;
+  }
+  const y = ycycle + cycle * 2820 + 474;
+  const yf = y >= 0 ? y : y + 1;
+  const yearStart = jalaliToJdn(yf, 1, 1);
+  const dayOfYear = jdn - yearStart + 1;
+  const m = dayOfYear <= 186 ? Math.ceil(dayOfYear / 31) : Math.ceil((dayOfYear - 186) / 30) + 6;
+  const monthStart = jalaliToJdn(yf, m, 1);
+  const d = jdn - monthStart + 1;
+  return { y: yf, m, d };
+}
+
+function pad2(n: number): string {
+  return String(n).padStart(2, "0");
+}
+
+function fmtJalali(y: number, m: number, d: number): string {
+  return `${String(y).padStart(4, "0")}/${pad2(m)}/${pad2(d)}`;
+}
+
+// در تقویم ایرانی JDN % 7 === 2 برابر با شنبه است؛ شروع هفته 7 روزه را روی شنبه قرار می‌دهیم
+function weekStartJdn(jdn: number): number {
+  const saturdayOffset = (((jdn - 2) % 7) + 7) % 7;
+  return jdn - saturdayOffset;
+}
+
 function bucketKey(date: unknown, period: Period): string | null {
   const parsed = parseJalaliDate(date);
   if (!parsed) return null;
-  const yStr = String(parsed.y).padStart(4, '0');
-  const mStr = String(parsed.m).padStart(2, '0');
-  if (period === 'month') return `${yStr}/${mStr}`;
-  const w = Math.ceil(parsed.d / 7);
-  return `${yStr}/${mStr}/W${w}`;
+  const yStr = String(parsed.y).padStart(4, "0");
+  const mStr = pad2(parsed.m);
+  if (period === "month") return `${yStr}/${mStr}`;
+  const jdn = jalaliToJdn(parsed.y, parsed.m, parsed.d);
+  const startJdn = weekStartJdn(jdn);
+  const start = jdnToJalali(startJdn);
+  // کلید شامل سال/ماه شروع هفته + شمارنده روز پیوسته برای مرتب‌سازی و یکتایی بدون تداخل ماه
+  return `${String(start.y).padStart(4, "0")}/${pad2(start.m)}/W${startJdn}`;
 }
 
 function bucketLabel(key: string, period: Period): string {
-  const parts = key.split('/');
-  const y = parts[0] ?? '';
-  const m = parts[1] ?? '';
-  if (period === 'month') {
+  const parts = key.split("/");
+  const y = parts[0] ?? "";
+  const m = parts[1] ?? "";
+  if (period === "month") {
     return `${toFa(y)}/${toFa(m)}`;
   }
-  const w = (parts[2] ?? 'W1').replace('W', '');
-  return `${toFa(y)}/${toFa(m)} · هفته ${toFa(w)}`;
+  const wToken = parts[2] ?? "";
+  const startJdn = parseInt(wToken.replace(/^W/, ""), 10);
+  if (Number.isFinite(startJdn)) {
+    const start = jdnToJalali(startJdn);
+    const yearStartJdn = jalaliToJdn(start.y, 1, 1);
+    const weekOfYear = Math.max(1, Math.floor((startJdn - yearStartJdn) / 7) + 1);
+    return `${toFa(String(start.y).padStart(4, "0"))}/${toFa(pad2(start.m))} · هفتهٔ ${toFa(weekOfYear)}`;
+  }
+  return `${toFa(y)}/${toFa(m)} · هفته`;
 }
 
 function bucketRange(date: string, period: Period): { start: string; end: string } {
   const parsed = parseJalaliDate(date);
   if (!parsed) return { start: date, end: date };
-  const yStr = String(parsed.y).padStart(4, '0');
-  const mStr = String(parsed.m).padStart(2, '0');
+  const yStr = String(parsed.y).padStart(4, "0");
+  const mStr = pad2(parsed.m);
   const maxDays = jalaliMonthDays(parsed.y, parsed.m);
-  if (period === 'month') {
+  if (period === "month") {
     return {
       start: `${yStr}/${mStr}/01`,
-      end: `${yStr}/${mStr}/${String(maxDays).padStart(2, '0')}`,
+      end: `${yStr}/${mStr}/${pad2(maxDays)}`,
     };
   }
-  const w = Math.ceil(parsed.d / 7);
-  const startDay = (w - 1) * 7 + 1;
-  const endDay = Math.min(w * 7, maxDays);
+  const jdn = jalaliToJdn(parsed.y, parsed.m, parsed.d);
+  const startJdn = weekStartJdn(jdn);
+  const sDate = jdnToJalali(startJdn);
+  const eDate = jdnToJalali(startJdn + 6);
   return {
-    start: `${yStr}/${mStr}/${String(startDay).padStart(2, '0')}`,
-    end: `${yStr}/${mStr}/${String(endDay).padStart(2, '0')}`,
+    start: fmtJalali(sDate.y, sDate.m, sDate.d),
+    end: fmtJalali(eDate.y, eDate.m, eDate.d),
   };
 }
 
@@ -147,6 +207,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
   const [period, setPeriod] = useState<Period>('week');
   const [flockFilter, setFlockFilter] = useState<string>('');
   const [showAllCols, setShowAllCols] = useState<boolean>(false);
+  const [visibleCount, setVisibleCount] = useState<number>(12);
   const [selectedPeriodKeys, setSelectedPeriodKeys] = useState<string[]>([]);
   const [periodPickerOpen, setPeriodPickerOpen] = useState<boolean>(false);
   const [pickerYearFilter, setPickerYearFilter] = useState<string>("");
@@ -207,12 +268,20 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
       }
     }
 
-    const list = Array.from(map.values()).map((b) => ({
-      ...b,
-      avgTemp: b.tempCount > 0 ? b.tempSum / b.tempCount : null,
-      avgHumidity: b.humCount > 0 ? b.humSum / b.humCount : null,
-      waterToFeed: b.feed > 0 && b.water > 0 ? b.water / b.feed : null,
-    }));
+    const list = Array.from(map.values())
+        .map((b) => ({
+          ...b,
+          avgTemp: b.tempCount > 0 ? b.tempSum / b.tempCount : null,
+          avgHumidity: b.humCount > 0 ? b.humSum / b.humCount : null,
+          waterToFeed: b.feed > 0 && b.water > 0 ? b.water / b.feed : null,
+        }))
+        .sort((a, b) => {
+          const byStart = (b.rangeStart || "").localeCompare(a.rangeStart || "", "en", { numeric: true });
+          if (byStart !== 0) return byStart;
+          const byEnd = (b.rangeEnd || "").localeCompare(a.rangeEnd || "", "en", { numeric: true });
+          if (byEnd !== 0) return byEnd;
+          return (b.key || "").localeCompare(a.key || "", "en", { numeric: true });
+        });
 
     // مرتب‌سازی دقیق زمانی (جدیدترین دوره در بالا)
     return list.sort((a, b) => b.key.localeCompare(a.key));
@@ -308,9 +377,9 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
 
   const activeFlocks = flocks.filter((f) => f.status === 'active' && !f.paused);
   const showFlockSelect = activeFlocks.length > 1;
-  const stickyDivider = showAllCols ? '1px solid var(--border)' : undefined;
-  const opaqueSurfaceBg = 'linear-gradient(var(--surface-2, var(--input-bg)), var(--surface-2, var(--input-bg))), var(--card-solid, var(--card))';
-  const opaqueCardBg = 'var(--card-solid, var(--card))';
+  const stickyDivider = '1px solid var(--border)';
+  const opaqueSurfaceBg = 'var(--surface-2, var(--card-solid, #fff))';
+  const opaqueCardBg = 'var(--card-solid, #fff)';
   const activePickedCount = selectedPeriodKeys.filter((k) =>
     buckets.some((b) => b.key === k)
   ).length;
@@ -776,11 +845,11 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
             boxShadow: '0 6px 20px rgba(0, 0, 0, 0.06)',
           }}
         >
-          <div style={{ width: '100%', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <div style={{ width: '100%', maxHeight: 460, overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
             <table
               style={{
                 width: '100%',
-                minWidth: showAllCols ? 420 : '100%',
+                minWidth: showAllCols ? 540 : '100%',
                 tableLayout: showAllCols ? 'auto' : 'fixed',
                 borderCollapse: 'separate',
                 borderSpacing: 0,
@@ -790,29 +859,28 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
             >
               {!showAllCols && (
                 <colgroup>
+                  <col style={{ width: '20%' }} />
+                  <col style={{ width: '10%' }} />
+                  <col style={{ width: '12%' }} />
+                  <col style={{ width: '17%' }} />
                   <col style={{ width: '15%' }} />
-                  <col style={{ width: '9%' }} />
-                  <col style={{ width: '11%' }} />
-                  <col style={{ width: '19%' }} />
-                  <col style={{ width: '18%' }} />
-                  <col style={{ width: '14%' }} />
-                  <col style={{ width: '14%' }} />
+                  <col style={{ width: '13%' }} />
+                  <col style={{ width: '13%' }} />
                 </colgroup>
               )}
 
-              <thead>
-                <tr style={{ background: 'var(--surface-2, var(--input-bg))' }}>
+              <thead style={{ position: 'sticky', top: 0, zIndex: 5 }}>
+                <tr style={{ background: 'var(--surface-2, var(--input-bg, var(--card-solid, #fff)))' }}>
                   <th
                     style={{
                       ...TH,
                       textAlign: 'center',
-                      paddingInline: 4,
-                      width: showAllCols ? '1%' : undefined,
+                                            width: showAllCols ? '1%' : undefined, minWidth: showAllCols ? 64 : 74, whiteSpace: 'nowrap',
                       position: 'sticky',
                       insetInlineStart: 0,
                       zIndex: 4,
-                      background: opaqueSurfaceBg,
-                      borderInlineEnd: stickyDivider,
+                      background: 'var(--surface-2, var(--input-bg, var(--card-solid, #fff)))',
+                      paddingInline: showAllCols ? 4 : 6, borderInlineEnd: stickyDivider,
                     }}
                   >
                     دوره
@@ -823,28 +891,27 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                   <th style={TH}>آب</th>
                   {showAllCols && <th style={TH}>آب/دان</th>}
                   <th style={TH}>تخم</th>
-                  <th style={{ ...TH, paddingInlineEnd: showAllCols ? 6 : 10 }}>دما</th>
+                  <th style={{ ...TH, paddingInlineEnd: 8 }}>دما</th>
                   {showAllCols && (
-                    <th style={{ ...TH, paddingInlineEnd: 12 }}>رطوبت</th>
+                    <th style={{ ...TH, paddingInlineEnd: 8 }}>رطوبت</th>
                   )}
                 </tr>
               </thead>
 
               <tbody>
-                {visibleBuckets.map((b) => (
-                  <tr key={b.key} style={{ background: 'var(--card)' }}>
+                {visibleBuckets.slice(0, visibleCount).map((b) => (
+                  <tr key={b.key} style={{ background: 'var(--card-solid, #fff)' }}>
                     <td
                       style={{
                         ...TD,
                         textAlign: 'center',
-                        paddingInline: 4,
-                      width: showAllCols ? '1%' : undefined,
+                                              width: showAllCols ? '1%' : undefined, minWidth: showAllCols ? 64 : 74, whiteSpace: 'nowrap',
                       position: 'sticky',
                         insetInlineStart: 0,
                         zIndex: 3,
                         background: opaqueCardBg,
-                        borderInlineEnd: stickyDivider,
-                        borderBottom: '1px solid var(--border)',
+                        paddingInline: showAllCols ? 4 : 6, borderInlineEnd: stickyDivider,
+                        borderBottom: '1px solid var(--border-strong, rgba(15, 23, 42, 0.18))',
                       }}
                     >
                       {renderPeriodCell(b.label)}
@@ -853,7 +920,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                     <td
                       style={{
                         ...TD,
-                        borderBottom: '1px solid var(--border)',
+                        borderBottom: '1px solid var(--border-strong, rgba(15, 23, 42, 0.18))',
                         color: b.logCount > 0 ? 'var(--text)' : 'var(--muted)',
                         fontWeight: b.logCount > 0 ? 600 : 400,
                       }}
@@ -864,7 +931,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                     <td
                       style={{
                         ...TD,
-                        borderBottom: '1px solid var(--border)',
+                        borderBottom: '1px solid var(--border-strong, rgba(15, 23, 42, 0.18))',
                         color: b.deaths > 0 ? 'var(--danger)' : 'var(--muted)',
                         fontWeight: b.deaths > 0 ? 700 : 400,
                       }}
@@ -872,7 +939,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                       {toFa(b.deaths)}
                     </td>
 
-                    <td style={{ ...TD, borderBottom: '1px solid var(--border)' }}>
+                    <td style={{ ...TD, borderBottom: '1px solid var(--border-strong, rgba(15, 23, 42, 0.18))' }}>
                       <span
                         dir="ltr"
                         style={{
@@ -889,7 +956,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                       </span>
                     </td>
 
-                    <td style={{ ...TD, borderBottom: '1px solid var(--border)' }}>
+                    <td style={{ ...TD, borderBottom: '1px solid var(--border-strong, rgba(15, 23, 42, 0.18))' }}>
                       <span
                         dir="ltr"
                         style={{
@@ -910,7 +977,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                       <td
                         style={{
                           ...TD,
-                          borderBottom: '1px solid var(--border)',
+                          borderBottom: '1px solid var(--border-strong, rgba(15, 23, 42, 0.18))',
                           color: b.waterToFeed !== null ? 'var(--text)' : 'var(--muted)',
                           fontWeight: b.waterToFeed !== null ? 600 : 400,
                         }}
@@ -926,7 +993,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                     <td
                       style={{
                         ...TD,
-                        borderBottom: '1px solid var(--border)',
+                        borderBottom: '1px solid var(--border-strong, rgba(15, 23, 42, 0.18))',
                         color: b.eggsTotal > 0 ? 'var(--text)' : 'var(--muted)',
                         fontWeight: b.eggsTotal > 0 ? 600 : 400,
                       }}
@@ -937,8 +1004,8 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                     <td
                       style={{
                         ...TD,
-                        paddingInlineEnd: showAllCols ? 6 : 10,
-                        borderBottom: '1px solid var(--border)',
+                        paddingInlineEnd: 8,
+                        borderBottom: '1px solid var(--border-strong, rgba(15, 23, 42, 0.18))',
                         color: b.avgTemp !== null ? 'var(--text)' : 'var(--muted)',
                         fontWeight: b.avgTemp !== null ? 600 : 400,
                       }}
@@ -955,7 +1022,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                         style={{
                           ...TD,
                           paddingInlineEnd: 8,
-                          borderBottom: '1px solid var(--border)',
+                          borderBottom: '1px solid var(--border-strong, rgba(15, 23, 42, 0.18))',
                           color: b.avgHumidity !== null ? 'var(--text)' : 'var(--muted)',
                           fontWeight: b.avgHumidity !== null ? 600 : 400,
                         }}
@@ -971,10 +1038,10 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                 ))}
               </tbody>
 
-              <tfoot>
+              <tfoot style={{ position: 'sticky', bottom: 0, zIndex: 5 }}>
                 <tr
                   style={{
-                    background: 'var(--surface-2, var(--input-bg))',
+                    background: 'var(--surface-2, var(--input-bg, var(--card-solid, #fff)))',
                     fontWeight: 700,
                   }}
                 >
@@ -982,14 +1049,13 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                     style={{
                       ...TD,
                       textAlign: 'center',
-                      paddingInline: 4,
-                      width: showAllCols ? '1%' : undefined,
+                                            width: showAllCols ? '1%' : undefined, minWidth: showAllCols ? 64 : 74, whiteSpace: 'nowrap',
                       position: 'sticky',
                       insetInlineStart: 0,
                       zIndex: 4,
-                      background: opaqueSurfaceBg,
-                      borderInlineEnd: stickyDivider,
-                      borderTop: '2px solid var(--border)',
+                      background: 'var(--surface-2, var(--input-bg, var(--card-solid, #fff)))',
+                      paddingInline: showAllCols ? 4 : 6, borderInlineEnd: stickyDivider,
+                      borderTop: '1px solid var(--border)',
                       color: 'var(--text)',
                       fontWeight: 700,
                     }}
@@ -1007,7 +1073,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                   <td
                     style={{
                       ...TD,
-                      borderTop: '2px solid var(--border)',
+                      borderTop: '1px solid var(--border)',
                       color: totals.logCount > 0 ? 'var(--text)' : 'var(--muted)',
                       fontWeight: 700,
                     }}
@@ -1018,7 +1084,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                   <td
                     style={{
                       ...TD,
-                      borderTop: '2px solid var(--border)',
+                      borderTop: '1px solid var(--border)',
                       color: totals.deaths > 0 ? 'var(--danger)' : 'var(--muted)',
                       fontWeight: 700,
                     }}
@@ -1026,7 +1092,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                     {toFa(totals.deaths)}
                   </td>
 
-                  <td style={{ ...TD, borderTop: '2px solid var(--border)' }}>
+                  <td style={{ ...TD, borderTop: '1px solid var(--border)' }}>
                     <span
                       dir="ltr"
                       style={{
@@ -1043,7 +1109,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                     </span>
                   </td>
 
-                  <td style={{ ...TD, borderTop: '2px solid var(--border)' }}>
+                  <td style={{ ...TD, borderTop: '1px solid var(--border)' }}>
                     <span
                       dir="ltr"
                       style={{
@@ -1064,7 +1130,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                     <td
                       style={{
                         ...TD,
-                        borderTop: '2px solid var(--border)',
+                        borderTop: '1px solid var(--border)',
                         color: totals.waterToFeed !== null ? 'var(--text)' : 'var(--muted)',
                         fontWeight: totals.waterToFeed !== null ? 700 : 400,
                       }}
@@ -1080,7 +1146,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                   <td
                     style={{
                       ...TD,
-                      borderTop: '2px solid var(--border)',
+                      borderTop: '1px solid var(--border)',
                       color: totals.eggsTotal > 0 ? 'var(--text)' : 'var(--muted)',
                       fontWeight: totals.eggsTotal > 0 ? 700 : 400,
                     }}
@@ -1091,8 +1157,8 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                   <td
                     style={{
                       ...TD,
-                      paddingInlineEnd: showAllCols ? 6 : 10,
-                      borderTop: '2px solid var(--border)',
+                      paddingInlineEnd: 8,
+                      borderTop: '1px solid var(--border)',
                       color: totals.avgTemp !== null ? 'var(--text)' : 'var(--muted)',
                       fontWeight: totals.avgTemp !== null ? 700 : 400,
                     }}
@@ -1109,7 +1175,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                       style={{
                         ...TD,
                         paddingInlineEnd: 8,
-                        borderTop: '2px solid var(--border)',
+                        borderTop: '1px solid var(--border)',
                         color: totals.avgHumidity !== null ? 'var(--text)' : 'var(--muted)',
                         fontWeight: totals.avgHumidity !== null ? 700 : 400,
                       }}
@@ -1183,25 +1249,27 @@ const unitCell: CSSProperties = {
 };
 
 const unitTag: CSSProperties = {
-  fontSize: 'calc(var(--fs-xs) - 1px)',
+  fontSize: 'var(--fs-xs)',
   color: 'var(--muted)',
   fontWeight: 500,
   whiteSpace: 'nowrap',
 };
 
 const TH: CSSProperties = {
-  padding: '8px 4px',
+  padding: '8px 6px',
   fontSize: 'var(--fs-xs)',
   fontWeight: 700,
   color: 'var(--muted)',
   textAlign: 'center',
   whiteSpace: 'nowrap',
-  borderBottom: '2px solid var(--border)',
+  borderBottom: '1px solid var(--border)',
 };
 
 const TD: CSSProperties = {
-  padding: '8px 4px',
+  padding: '8px 6px',
   fontSize: 'var(--fs-sm)',
+  fontWeight: 500,
+  color: 'var(--text)',
   textAlign: 'center',
   verticalAlign: 'middle',
   whiteSpace: 'nowrap',
