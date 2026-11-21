@@ -110,10 +110,14 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
   if (birds.length === 0) {
     return (
       <PageContainer>
+      <HelpBanner
+        id="brd-breeds-intro"
+        icon="🧬"
+        title="راهنمای نژادها"
+        description="نژادهای هر پرنده را ثبت کنید و در صورت نیاز به استانداردهای علمی وزن، خوراک و تولید متصل کنید تا در پایش گله مبنای مقایسه باشند."
+        tone="info"
+      />
         <MasterRedirectModal />
-        <HelpBanner id="brd-breeds-intro" icon="🧬" title="نژادها"
-          description="نژادهای هر پرنده را اینجا تعریف کنید. هر نژاد می‌تواند به استانداردهای علمی وصل شود."
-          tone="info" />
         {undoData && <UndoBar label="حذف شد" onUndo={undoDelete} onDismiss={() => setUndoData(null)} />}
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M12 2v20M5 8h14M5 16h14"/></svg>}
@@ -149,6 +153,13 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
 
   return (
     <PageContainer>
+      <HelpBanner
+        id="brd-breeds-intro"
+        icon="🧬"
+        title="راهنمای نژادها"
+        description="نژادهای هر پرنده را ثبت کنید و در صورت نیاز به استانداردهای علمی وزن، خوراک و تولید متصل کنید تا در پایش گله مبنای مقایسه باشند."
+        tone="info"
+      />
       <MasterRedirectModal />
       <FilterBar
         filterDefs={config.filterDefs} sortDefs={config.sortDefs}

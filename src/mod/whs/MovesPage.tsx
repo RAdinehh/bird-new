@@ -234,8 +234,6 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
           title="این صفحه فقط برای اصلاح دستی است"
           description="موارد استفاده — ضایعات (دان خراب شد)، شمارش دستی، هدیه، مرجوعی. برای خرید از فروشنده یا فروش به مشتری، از بخش «معاملات» استفاده کنید."
           tone="info"
-        actionLabel="برو به معاملات ←"
-        onAction={() => navigate('/tra/purchases')}
         />
         <FilterBar
           filterDefs={config.filterDefs}
