@@ -29,7 +29,7 @@ export default function UndoBar({ label, onUndo, onDismiss, duration = 5000 }: U
         bottom: 'calc(80px + env(safe-area-inset-bottom, 0px))',
         left: '50%',
         transform: 'translateX(-50%)',
-        zIndex: 90,
+        zIndex: 950,
         maxWidth: 460,
         width: 'calc(100% - 32px)',
         background: 'var(--accent)',

@@ -6,6 +6,7 @@ import { getBreedFcr, resolveStandard } from './_display-values';
 import EntityLink from '../../shr/components/EntityLink';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { Btn, Tag } from '../../shr/components/ui';
+import { getBreedDeleteWarning } from './_deps';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { toastMsg } from '../../cor/store/toast';
 import { logAction } from '../../cor/logger/auditLog';
@@ -100,7 +101,8 @@ export default function BreedCard({
   const relevantFields = getRelevantFields(stdData, breedPurposes);
 
   const handleDelete = async () => {
-    const ok = await showConfirmAsync('تأیید حذف', 'این نژاد حذف شود؟', { danger: true });
+    const warn = getBreedDeleteWarning([b.id]);
+    const ok = await showConfirmAsync('تأیید حذف', `این نژاد حذف شود؟${warn}`, { danger: true });
     if (!ok) return;
     onDelete(b.id, b);
     logAction('delete', 'brd', 'حذف از پرنده و نژاد');

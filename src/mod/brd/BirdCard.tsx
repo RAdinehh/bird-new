@@ -8,6 +8,7 @@ import { getStandardFor } from '../set/standards/resolve';
 import EntityLink from '../../shr/components/EntityLink';
 import ExpandableCard from '../../shr/components/ExpandableCard';
 import { Btn, Tag } from '../../shr/components/ui';
+import { getBirdDeleteWarning } from './_deps';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { toastMsg } from '../../cor/store/toast';
 import { logAction } from '../../cor/logger/auditLog';
@@ -104,7 +105,8 @@ export default function BirdCard({
   }, [birdBreeds, customStandards, customOverrides]);
 
   const handleDelete = async () => {
-    const ok = await showConfirmAsync('تأیید حذف', 'این پرنده حذف شود؟', { danger: true });
+    const warn = getBirdDeleteWarning([b.id]);
+    const ok = await showConfirmAsync('تأیید حذف', `این پرنده حذف شود؟${warn}`, { danger: true });
     if (!ok) return;
     onDelete(b.id, b);
     logAction('delete', 'brd', 'حذف از پرنده و نژاد');

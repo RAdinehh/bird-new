@@ -15,6 +15,7 @@ import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
 import UndoBar from '../../cor/ui/UndoBar';
 import { toastMsg } from '../../cor/store/toast';
+import { getBreedDeleteWarning } from './_deps';
 import { showConfirmAsync } from '../../cor/store/dialog';
 
 export default function BreedsPage({ active = true }: { active?: boolean } = {}) {
@@ -58,7 +59,9 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
     if (!item) return;
     try {
       const arr = Array.isArray(item.item) ? item.item : [item.item];
-      arr.forEach((it: any) => addBreed(it));
+      useBrd.setState((st) => ({
+        breeds: [...st.breeds, ...arr.filter((br: any) => !st.breeds.some(x => x.id === br.id))],
+      }));
       toastMsg.restored(arr.length === 1 ? 'نژاد' : `${arr.length} نژاد`);
     } catch {
       toastMsg.error('بازگردانی ناموفق');
@@ -80,7 +83,8 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
     items: list,
     getId: (x: any) => x.id,
     onDelete: async (ids: string[]) => {
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' مورد حذف شوند؟', { danger: true });
+      const warn = getBreedDeleteWarning(ids);
+      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' مورد حذف شوند؟' + warn, { danger: true });
       if (!ok) return;
       const backups: any[] = [];
       for (const id of ids) {
@@ -153,6 +157,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
 
   return (
     <PageContainer>
+      {undoData && <UndoBar label="حذف شد" onUndo={undoDelete} onDismiss={() => setUndoData(null)} />}
       <HelpBanner
         id="brd-breeds-intro"
         icon="🧬"

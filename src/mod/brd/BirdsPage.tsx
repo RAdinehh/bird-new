@@ -21,6 +21,7 @@ import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa } from '../../shr/utils/fa';
 import UndoBar from '../../cor/ui/UndoBar';
 import { toastMsg } from '../../cor/store/toast';
+import { getBirdDeleteWarning } from './_deps';
 import { showConfirmAsync } from '../../cor/store/dialog';
 
 
@@ -87,7 +88,8 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
     items: list,
     getId: (b: any) => b.id,
     onDelete: async (ids: string[]) => {
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' پرنده حذف شوند؟', { danger: true });
+      const warn = getBirdDeleteWarning(ids);
+      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' پرنده حذف شوند؟' + warn, { danger: true });
       if (!ok) return;
       const backups: any[] = [];
       for (const id of ids) {
@@ -97,7 +99,8 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
         deleteBird(id);
       }
       if (backups.length > 0) {
-        setUndoData({ item: backups });
+        const removedBreeds = breeds.filter(br => ids.includes(br.birdId));
+        setUndoData({ item: backups, breeds: removedBreeds } as any);
         setTimeout(() => setUndoData((cur: any) => cur && Array.isArray(cur.item) && cur.item.length === backups.length ? null : cur), 6000);
       }
       toastMsg.deletedBulk(backups.length, 'پرنده')
@@ -177,7 +180,12 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
     const item = undoData;
     if (!item) return;
     try {
-      addBird(item.item);
+      const arr = Array.isArray(item.item) ? item.item : [item.item];
+      const brArr = Array.isArray((item as any).breeds) ? (item as any).breeds : [];
+      useBrd.setState((st) => ({
+        birds: [...st.birds, ...arr.filter((b: any) => !st.birds.some(x => x.id === b.id))],
+        breeds: [...st.breeds, ...brArr.filter((br: any) => !st.breeds.some(x => x.id === br.id))],
+      }));
       toastMsg.restored('پرنده')
     } catch (err) {
       toastMsg.error('بازگردانی ناموفق')
@@ -260,8 +268,9 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
                 customOverrides={customOverrides}
                 onEdit={openEdit}
                 onDelete={(id, item) => {
-                  setUndoData({ item });
-                  setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === item.id ? null : cur), 6000);
+                  const removedBreeds = breeds.filter(br => br.birdId === id);
+                  setUndoData({ item, breeds: removedBreeds } as any);
+                  setTimeout(() => setUndoData((cur: any) => cur && cur.item?.id === item.id ? null : cur), 6000);
                   deleteBird(id);
                 }}
               />
