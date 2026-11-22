@@ -11,6 +11,7 @@ import { PageContainer, Select, Empty, Btn } from '../../shr/components/ui';
 import { exportTableToCSV } from '../../shr/utils/export';
 import { toFa } from '../../shr/utils/fa';
 import { BarChart, LineChart, DualBarChart, PieChart } from '../../shr/components/Charts';
+import SmartSelect from '../../shr/components/SmartSelect';
 
 type Range = '7' | '30' | '90' | 'all';
 type ChartType = 'bar' | 'line' | 'dual' | 'pie';
@@ -187,10 +188,13 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
           <option value="90">۹۰ روز اخیر</option>
           <option value="all">همه</option>
         </Select>
-        <Select value={filterFlock} onChange={e => setFilterFlock(e.target.value)}>
-          <option value="">همه گله‌ها</option>
-          {activeFlocks.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
-        </Select>
+        <SmartSelect
+          value={filterFlock}
+          placeholder="همه گله‌ها"
+          modalTitle="انتخاب گله"
+          options={activeFlocks.map((f) => ({ value: String(f.id), label: String(f.name) }))}
+          onChange={(val: string) => setFilterFlock(val)}
+        />
       </div>
 
       {stats.total === 0 ? (

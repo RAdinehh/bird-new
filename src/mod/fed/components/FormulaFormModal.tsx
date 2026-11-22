@@ -105,9 +105,13 @@ export default function FormulaFormModal(props: Props) {
         </div>
         {expandedId === line.id && (
          <>
-         <Select value={line.ingredientId} onChange={e => updateLine(line.id, { ingredientId: e.target.value })}>
-          {available.map(i => <option key={i.id} value={i.id}>{i.name} ({toFa(i.protein)}٪ پروتئین)</option>)}
-         </Select>
+         <SmartSelect
+         value={line.ingredientId}
+         placeholder="— انتخاب ماده —"
+         modalTitle="انتخاب ماده اولیه"
+         options={available.map((i) => ({ value: String(i.id), label: String(i.name), subtitle: toFa(i.protein) + "٪ پروتئین" }))}
+         onChange={(val: string) => updateLine(line.id, { ingredientId: val })}
+       />
          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
           <div style={{ flex: 1 }}>
            <Field label="درصد در جیره">

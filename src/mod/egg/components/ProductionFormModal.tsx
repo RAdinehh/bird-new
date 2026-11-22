@@ -6,6 +6,7 @@ import { SectionTitle } from '../helpers';
 import { FieldHint } from '../../../shr/intelligence';
 import DatePicker from '../../../shr/components/DatePicker';
 import { toFa, toEn } from '../../../shr/utils/fa';
+import SmartSelect from '../../../shr/components/SmartSelect';
 
 interface Props {
   open: boolean;
@@ -54,9 +55,13 @@ export default function ProductionFormModal(props: Props) {
       >
         <Grid2>
           <Field label="گله" required>
-            <Select value={form.flockId} onChange={(e: any) => setForm({ ...form, flockId: e.target.value })}>
-              {activeFlocks.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
-            </Select>
+            <SmartSelect
+              value={form.flockId}
+              placeholder="— انتخاب گله —"
+              modalTitle="انتخاب گله"
+              options={activeFlocks.map((f) => ({ value: String(f.id), label: String(f.name) }))}
+              onChange={(val: string) => setForm({ ...form, flockId: val })}
+            />
           </Field>
           <Field label="تاریخ" required>
             <DatePicker value={form.date} onChange={v => setForm({ ...form, date: v })}  autoToday />

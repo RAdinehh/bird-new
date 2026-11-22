@@ -336,10 +336,13 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
             </Grid2>
             <Grid2>
               <Field label="سالن استقرار" hint="اختیاری">
-                <Select value={form.hallId} onChange={e => setForm({ ...form, hallId: e.target.value })}>
-                  <option value="">— بدون سالن —</option>
-                  {halls.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
-                </Select>
+                <SmartSelect
+                  value={form.hallId}
+                  placeholder="— بدون سالن —"
+                  modalTitle="انتخاب سالن استقرار"
+                  options={halls.map((h) => ({ value: String(h.id), label: String(h.name) }))}
+                  onChange={(val: string) => setForm({ ...form, hallId: val })}
+                />
               </Field>
               <Field label="وضعیت">
                 <Select value={form.equipmentStatus} onChange={e => setForm({ ...form, equipmentStatus: e.target.value })}>

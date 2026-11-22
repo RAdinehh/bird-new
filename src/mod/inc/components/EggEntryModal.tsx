@@ -213,18 +213,20 @@ export default function EggEntryModal(props: EggEntryModalProps) {
               if (activeFlocks.length === 0) return <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: 10, textAlign: 'center' }}>گله فعالی نیست</div>;
               if (readyFlocks.length === 0) return <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', padding: 10, background: 'var(--warn-soft)', borderRadius: 'var(--r-md)', textAlign: 'center' }}>⛔ هیچ گله آماده‌ای نیست</div>;
               return (
-                <Select value={currentRow.flockId} onChange={e => {
-                  const fid = e.target.value;
-                  const fl = flocks.find((x) => x.id === fid);
-                  setCurrentRow(f => ({ ...f, flockId: fid, birdId: fl?.birdId || f.birdId, breedId: fl?.breedId || f.breedId }));
-                }}>
-                  <option value="">— انتخاب گله —</option>
-                  {readyFlocks.map((fl) => {
-                    const brd = birds.find(b => b.id === fl.birdId);
+                <SmartSelect
+                  value={currentRow.flockId}
+                  placeholder="— انتخاب گله —"
+                  modalTitle="انتخاب گله"
+                  options={readyFlocks.map((fl) => {
+                    const brd = birds.find((b) => b.id === fl.birdId);
                     const r = flockReadyForEggs(fl, brd);
-                    return <option key={fl.id} value={fl.id}>{fl.name} ({toFa(r.ageDays)} روز)</option>;
+                    return { value: String(fl.id), label: String(fl.name), subtitle: toFa(r.ageDays) + " روز" };
                   })}
-                </Select>
+                  onChange={(val: string) => {
+                    const fl = flocks.find((x) => x.id === val);
+                    setCurrentRow((f) => ({ ...f, flockId: val, birdId: fl?.birdId || f.birdId, breedId: fl?.breedId || f.breedId }));
+                  }}
+                />
               );
             })()}
           </Field>
@@ -235,10 +237,13 @@ export default function EggEntryModal(props: EggEntryModalProps) {
             {suppliers.length === 0 ? (
               <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: 10, textAlign: 'center' }}>فروشنده‌ای نیست</div>
             ) : (
-              <Select value={currentRow.dealData.sellerId || ''} onChange={e => setD('sellerId', e.target.value)}>
-                <option value="">— انتخاب —</option>
-                {suppliers.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-              </Select>
+              <SmartSelect
+                  value={currentRow.dealData.sellerId || ''}
+                  placeholder="— انتخاب —"
+                  modalTitle="انتخاب فروشنده"
+                  options={suppliers.map((p) => ({ value: String(p.id), label: String(p.name) }))}
+                  onChange={(val: string) => setD("sellerId", val)}
+                />
             )}
           </Field>
         )}

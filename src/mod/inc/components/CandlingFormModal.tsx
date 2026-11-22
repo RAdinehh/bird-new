@@ -11,6 +11,7 @@ import {
 import DatePicker from '../../../shr/components/DatePicker';
 import CandlingEntryRow, { type EntryData } from './CandlingEntryRow';
 import type { CandlingLike, AvailableBase } from '../api/calc';
+import SmartSelect from '../../../shr/components/SmartSelect';
 
 export interface AvailableEntry {
   id: string;
@@ -132,17 +133,17 @@ export default function CandlingFormModal(props: CandlingFormModalProps) {
       </SectionTitle>
 
       <Field label="فیلتر دستگاه">
-        <Select
+        <SmartSelect
           value={modalDevice}
-          onChange={e => {
-            setModalDevice(e.target.value);
+          placeholder="— همه دستگاه‌ها —"
+          modalTitle="انتخاب دستگاه"
+          options={devices.map((d) => ({ value: String(d.id), label: String(d.name) }))}
+          onChange={(val: string) => {
+            setModalDevice(val);
             setSelectedIds(new Set());
             setEntriesData(() => ({}));
           }}
-        >
-          <option value="">— همه دستگاه‌ها —</option>
-          {devices.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-        </Select>
+        />
       </Field>
 
       {availableEntries.length === 0 ? (
