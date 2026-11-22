@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useState, useMemo, useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
@@ -21,6 +22,7 @@ import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
 export default function IngredientsPage() {
+  const fmt = useFormat();
   const { ingredients, addIngredient, updateIngredient, deleteIngredient } = useFed();
   const { items } = useWhs();
 
@@ -90,11 +92,11 @@ export default function IngredientsPage() {
     if (!s) return;
     setForm({
       name: s.name, category: s.category,
-      protein: toFa(s.protein), energy: toFa(s.energy),
-      fat: toFa(s.fat), fiber: toFa(s.fiber),
-      calcium: toFa(s.calcium), phosphorus: toFa(s.phosphorus),
-      methionine: toFa(s.methionine), lysine: toFa(s.lysine),
-      minPercent: toFa(s.minPercent), maxPercent: toFa(s.maxPercent),
+      protein: fmt.num(s.protein), energy: fmt.num(s.energy),
+      fat: fmt.num(s.fat), fiber: fmt.num(s.fiber),
+      calcium: fmt.num(s.calcium), phosphorus: fmt.num(s.phosphorus),
+      methionine: fmt.num(s.methionine), lysine: fmt.num(s.lysine),
+      minPercent: fmt.num(s.minPercent), maxPercent: fmt.num(s.maxPercent),
       price: '', stockItemId: '', standardKey: s.key, notes: s.notes || ''
     });
   };
@@ -102,17 +104,17 @@ export default function IngredientsPage() {
   const openEdit = (it: Ingredient) => {
     setForm({
       id: it.id, name: it.name, category: it.category,
-      protein: it.protein ? toFa(it.protein) : '',
-      energy: it.energy ? toFa(it.energy) : '',
-      fat: it.fat ? toFa(it.fat) : '',
-      fiber: it.fiber ? toFa(it.fiber) : '',
-      calcium: it.calcium ? toFa(it.calcium) : '',
-      phosphorus: it.phosphorus ? toFa(it.phosphorus) : '',
-      methionine: it.methionine ? toFa(it.methionine) : '',
-      lysine: it.lysine ? toFa(it.lysine) : '',
-      minPercent: it.minPercent ? toFa(it.minPercent) : '',
-      maxPercent: it.maxPercent ? toFa(it.maxPercent) : '',
-      price: it.price ? toFa(it.price) : '',
+      protein: it.protein ? fmt.num(it.protein) : '',
+      energy: it.energy ? fmt.num(it.energy) : '',
+      fat: it.fat ? fmt.num(it.fat) : '',
+      fiber: it.fiber ? fmt.num(it.fiber) : '',
+      calcium: it.calcium ? fmt.num(it.calcium) : '',
+      phosphorus: it.phosphorus ? fmt.num(it.phosphorus) : '',
+      methionine: it.methionine ? fmt.num(it.methionine) : '',
+      lysine: it.lysine ? fmt.num(it.lysine) : '',
+      minPercent: it.minPercent ? fmt.num(it.minPercent) : '',
+      maxPercent: it.maxPercent ? fmt.num(it.maxPercent) : '',
+      price: it.price ? fmt.num(it.price) : '',
       stockItemId: it.stockItemId || '',
       standardKey: it.standardKey || '',
       notes: it.notes || ''
@@ -156,7 +158,7 @@ export default function IngredientsPage() {
     items: list,
     getId: (x: any) => x.id,
     onDelete: async (ids: string[]) => {
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' ماده اولیه حذف شوند؟', { danger: true });
+      const ok = await showConfirmAsync('حذف گروهی', fmt.count(ids.length) + ' ماده اولیه حذف شوند؟', { danger: true });
       if (!ok) return;
       const backups: any[] = [];
       for (const id of ids) {
@@ -263,7 +265,7 @@ export default function IngredientsPage() {
             marginTop: 4
           }}
         >
-          👁️ {showHidden ? 'مخفی کردن' : 'نمایش'} پنهان‌شده‌ها ({toFa(hiddenCount)})
+          👁️ {showHidden ? 'مخفی کردن' : 'نمایش'} پنهان‌شده‌ها ({fmt.count(hiddenCount)})
         </button>
       )}
 
@@ -304,10 +306,10 @@ export default function IngredientsPage() {
                 id={it.id}
                 ms={ms}
                 accent={it.isHidden ? 'dim' : (it.isCore ? 'blue' : 'accent')}
-                index={toFa(i + 1)}
+                index={fmt.count(i + 1)}
                 iconEmoji={CATEGORY_ICON[it.category]}
                 title={it.name}
-                subtitle={`${CATEGORY_LABEL[it.category]} • پروتئین ${toFa(it.protein)}٪`}
+                subtitle={`${CATEGORY_LABEL[it.category]} • پروتئین ${fmt.num(it.protein)}٪`}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : it.id)}
                 badge={
@@ -315,47 +317,47 @@ export default function IngredientsPage() {
                     ? <Tag tone="gray">پنهان</Tag>
                     : it.isCore
                     ? <Tag tone="blue">پیش‌فرض</Tag>
-                    : (displayPrice > 0 ? <Tag tone="green">{toFa(displayPrice.toLocaleString('fa-IR'))} ت</Tag> : undefined)
+                    : (displayPrice > 0 ? <Tag tone="green">{fmt.money(displayPrice)} ت</Tag> : undefined)
                 }
                 stats={
                   <>
-                    <span>پروتئین: <b>{toFa(it.protein)}٪</b></span>
-                    <span>انرژی: <b>{toFa(it.energy)}</b></span>
-                    {displayPrice > 0 && <span>قیمت: <b>{toFa(displayPrice.toLocaleString('fa-IR'))}</b></span>}
+                    <span>پروتئین: <b>{fmt.num(it.protein)}٪</b></span>
+                    <span>انرژی: <b>{fmt.num(it.energy)}</b></span>
+                    {displayPrice > 0 && <span>قیمت: <b>{fmt.money(displayPrice)}</b></span>}
                   </>
                 }
               >
                 <SectionTitle>🥗 ترکیبات</SectionTitle>
                 <Grid2>
-                  <Row l="پروتئین" v={`${toFa(it.protein)} ٪`} />
-                  <Row l="انرژی" v={`${toFa(it.energy)} kcal`} />
+                  <Row l="پروتئین" v={`${fmt.num(it.protein)} ٪`} />
+                  <Row l="انرژی" v={`${fmt.num(it.energy)} kcal`} />
                 </Grid2>
                 <Grid2>
-                  <Row l="چربی" v={`${toFa(it.fat)} ٪`} />
-                  <Row l="فیبر" v={`${toFa(it.fiber)} ٪`} />
+                  <Row l="چربی" v={`${fmt.num(it.fat)} ٪`} />
+                  <Row l="فیبر" v={`${fmt.num(it.fiber)} ٪`} />
                 </Grid2>
                 <Grid2>
-                  <Row l="کلسیم" v={`${toFa(it.calcium)} ٪`} />
-                  <Row l="فسفر" v={`${toFa(it.phosphorus)} ٪`} />
+                  <Row l="کلسیم" v={`${fmt.num(it.calcium)} ٪`} />
+                  <Row l="فسفر" v={`${fmt.num(it.phosphorus)} ٪`} />
                 </Grid2>
                 <Grid2>
-                  <Row l="متیونین" v={`${toFa(it.methionine)} ٪`} />
-                  <Row l="لیزین" v={`${toFa(it.lysine)} ٪`} />
+                  <Row l="متیونین" v={`${fmt.num(it.methionine)} ٪`} />
+                  <Row l="لیزین" v={`${fmt.num(it.lysine)} ٪`} />
                 </Grid2>
 
                 {(it.minPercent > 0 || it.maxPercent > 0) && (
                   <>
                     <SectionTitle>⚖ محدوده استفاده</SectionTitle>
-                    {it.minPercent > 0 && <Row l="حداقل" v={`${toFa(it.minPercent)} ٪`} />}
-                    {it.maxPercent > 0 && <Row l="حداکثر" v={`${toFa(it.maxPercent)} ٪`} />}
+                    {it.minPercent > 0 && <Row l="حداقل" v={`${fmt.num(it.minPercent)} ٪`} />}
+                    {it.maxPercent > 0 && <Row l="حداکثر" v={`${fmt.num(it.maxPercent)} ٪`} />}
                   </>
                 )}
 
                 <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی و انبار</SectionTitle>
-                {livePrice > 0 && <Row l="قیمت انبار" v={`${toFa(livePrice.toLocaleString('fa-IR'))} ت/kg`} />}
-                {!livePrice && it.price > 0 && <Row l="قیمت دستی" v={`${toFa(it.price.toLocaleString('fa-IR'))} ت/kg`} />}
+                {livePrice > 0 && <Row l="قیمت انبار" v={`${fmt.money(livePrice)} ت/kg`} />}
+                {!livePrice && it.price > 0 && <Row l="قیمت دستی" v={`${fmt.money(it.price)} ت/kg`} />}
                 {stockItem ? (
-                  <Row l="کالای انبار" v={`${stockItem.name} (${toFa(stockItem.currentStock)} ${UNIT_LABEL[stockItem.unit]})`} />
+                  <Row l="کالای انبار" v={`${stockItem.name} (${fmt.num(stockItem.currentStock)} ${UNIT_LABEL[stockItem.unit]})`} />
                 ) : (
                   <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)',
                      padding: 'var(--pad-tight)', background: 'var(--warn-soft)',

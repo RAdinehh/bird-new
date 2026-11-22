@@ -1,3 +1,4 @@
+import { useFormat } from '../../../shr/units/useFormat';
 import { useState } from 'react';
 /**
  * FormulaFormModal — فرم ساخت/ویرایش جیره
@@ -30,6 +31,7 @@ interface Props {
 }
 
 export default function FormulaFormModal(props: Props) {
+  const fmt = useFormat();
  const [expandedId, setExpandedId] = useState<string | null>(null);
  const {
   open, setOpen, form, setForm, err, vErrors,
@@ -68,7 +70,7 @@ export default function FormulaFormModal(props: Props) {
     </Grid2>
 
     <SectionTitle>
-     🌾 مواد تشکیل‌دهنده — مجموع: {toFa(total.toFixed(2))}٪
+     🌾 مواد تشکیل‌دهنده — مجموع: {fmt.num(total)}٪
     </SectionTitle>
 
     {total !== 100 && form.lines.length > 0 ? (
@@ -98,8 +100,8 @@ export default function FormulaFormModal(props: Props) {
        <div key={line.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${expandedId === line.id ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
         <div onClick={() => setExpandedId(expandedId === line.id ? null : line.id)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: expandedId === line.id ? 'default' : 'pointer' }}>
          <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
-          <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)' }}>{ing.name || 'ماده ' + toFa(idx + 1)}</span>
-          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{line.percent ? `${toFa(line.percent)}٪` : 'بدون درصد'}</span>
+          <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)' }}>{ing.name || 'ماده ' + fmt.count(idx + 1)}</span>
+          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{line.percent ? `${fmt.num(line.percent)}٪` : 'بدون درصد'}</span>
          </div>
          <button type="button" onClick={(e) => { e.stopPropagation(); removeLine(line.id); }} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
         </div>
@@ -109,7 +111,7 @@ export default function FormulaFormModal(props: Props) {
          value={line.ingredientId}
          placeholder="— انتخاب ماده —"
          modalTitle="انتخاب ماده اولیه"
-         options={available.map((i) => ({ value: String(i.id), label: String(i.name), subtitle: toFa(i.protein) + "٪ پروتئین" }))}
+         options={available.map((i) => ({ value: String(i.id), label: String(i.name), subtitle: fmt.num(i.protein) + "٪ پروتئین" }))}
          onChange={(val: string) => updateLine(line.id, { ingredientId: val })}
        />
          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
@@ -131,14 +133,14 @@ export default function FormulaFormModal(props: Props) {
            color: (100 - total) < 0 ? 'var(--danger)' : 'var(--muted)',
            whiteSpace: 'nowrap'
           }}>
-           {toFa((100 - total).toFixed(2))}٪ مانده
+           {fmt.num(100 - total)}٪ مانده
           </div>
          </div>
          {ing.maxPercent > 0 && line.percent > ing.maxPercent ? (
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>⚠ حداکثر {toFa(ing.maxPercent)}٪ برای این ماده</div>
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)' }}>⚠ حداکثر {fmt.num(ing.maxPercent)}٪ برای این ماده</div>
          ) : null}
          {ing.minPercent > 0 && line.percent < ing.minPercent && line.percent > 0 ? (
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)' }}>⚠ حداقل {toFa(ing.minPercent)}٪ برای این ماده</div>
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)' }}>⚠ حداقل {fmt.num(ing.minPercent)}٪ برای این ماده</div>
          ) : null}
          </>
         )}
@@ -167,7 +169,7 @@ export default function FormulaFormModal(props: Props) {
        fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)',
        color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
       <span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> هزینه هر کیلوگرم:</span>
-      <span>{toFa(nutrients.price.toLocaleString('fa-IR'))} ت</span>
+      <span>{fmt.money(nutrients.price)} ت</span>
      </div>
     ) : null}
 

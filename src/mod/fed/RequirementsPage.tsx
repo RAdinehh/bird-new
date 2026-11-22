@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useState, useMemo , useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
@@ -52,6 +53,7 @@ const PRESETS: Record<string, Partial<F>> = {
 };
 
 export default function RequirementsPage() {
+  const fmt = useFormat();
   const { requirements, addRequirement, updateRequirement, deleteRequirement } = useFed();
 
   const [open, setOpen] = useState(false);
@@ -82,7 +84,7 @@ export default function RequirementsPage() {
     items: list,
     getId: (x: any) => x.id,
     onDelete: async (ids: string[]) => {
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' نیاز حذف شوند؟', { danger: true });
+      const ok = await showConfirmAsync('حذف گروهی', fmt.count(ids.length) + ' نیاز حذف شوند؟', { danger: true });
       if (!ok) return;
       const backups: any[] = [];
       for (const id of ids) {
@@ -112,12 +114,12 @@ export default function RequirementsPage() {
   const openEdit = (r: Requirement) => {
     setForm({
       id: r.id, name: r.name, birdType: r.birdType, stage: r.stage,
-      protein: r.protein ? toFa(r.protein) : '',
-      energy: r.energy ? toFa(r.energy) : '',
-      calcium: r.calcium ? toFa(r.calcium) : '',
-      phosphorus: r.phosphorus ? toFa(r.phosphorus) : '',
-      methionine: r.methionine ? toFa(r.methionine) : '',
-      lysine: r.lysine ? toFa(r.lysine) : '',
+      protein: r.protein ? fmt.num(r.protein) : '',
+      energy: r.energy ? fmt.num(r.energy) : '',
+      calcium: r.calcium ? fmt.num(r.calcium) : '',
+      phosphorus: r.phosphorus ? fmt.num(r.phosphorus) : '',
+      methionine: r.methionine ? fmt.num(r.methionine) : '',
+      lysine: r.lysine ? fmt.num(r.lysine) : '',
       notes: r.notes || ''
     });
     setErr(''); setOpen(true);
@@ -263,18 +265,18 @@ export default function RequirementsPage() {
                 id={r.id}
                 ms={ms}
                 accent="info"
-                index={toFa(i + 1)}
+                index={fmt.count(i + 1)}
                 iconEmoji="📊"
                 title={r.name}
                 subtitle={`${r.birdType} • ${stageLabel}`}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : r.id)}
-                badge={<Tag tone="blue">{toFa(r.protein)}٪ پروتئین</Tag>}
+                badge={<Tag tone="blue">{fmt.num(r.protein)}٪ پروتئین</Tag>}
                 stats={
                   <>
-                    <span>پروتئین: <b style={{ color: 'var(--text)' }}>{toFa(r.protein)}٪</b></span>
-                    <span>انرژی: <b style={{ color: 'var(--text)' }}>{toFa(r.energy)}</b></span>
-                    <span>کلسیم: <b style={{ color: 'var(--text)' }}>{toFa(r.calcium)}٪</b></span>
+                    <span>پروتئین: <b style={{ color: 'var(--text)' }}>{fmt.num(r.protein)}٪</b></span>
+                    <span>انرژی: <b style={{ color: 'var(--text)' }}>{fmt.num(r.energy)}</b></span>
+                    <span>کلسیم: <b style={{ color: 'var(--text)' }}>{fmt.num(r.calcium)}٪</b></span>
                   </>
                 }
               >
@@ -284,16 +286,16 @@ export default function RequirementsPage() {
 
                 <SectionTitle>🥗 نیازهای مغذی</SectionTitle>
                 <Grid2>
-                  <Row l="پروتئین خام" v={`${toFa(r.protein)} ٪`} />
-                  <Row l="انرژی" v={`${toFa(r.energy)} kcal/kg`} />
+                  <Row l="پروتئین خام" v={`${fmt.num(r.protein)} ٪`} />
+                  <Row l="انرژی" v={`${fmt.num(r.energy)} kcal/kg`} />
                 </Grid2>
                 <Grid2>
-                  <Row l="کلسیم" v={`${toFa(r.calcium)} ٪`} />
-                  <Row l="فسفر" v={`${toFa(r.phosphorus)} ٪`} />
+                  <Row l="کلسیم" v={`${fmt.num(r.calcium)} ٪`} />
+                  <Row l="فسفر" v={`${fmt.num(r.phosphorus)} ٪`} />
                 </Grid2>
                 <Grid2>
-                  <Row l="متیونین" v={`${toFa(r.methionine)} ٪`} />
-                  <Row l="لیزین" v={`${toFa(r.lysine)} ٪`} />
+                  <Row l="متیونین" v={`${fmt.num(r.methionine)} ٪`} />
+                  <Row l="لیزین" v={`${fmt.num(r.lysine)} ٪`} />
                 </Grid2>
 
                 {r.notes ? (

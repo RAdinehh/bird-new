@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useState, useMemo , useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useValidation } from '../../shr/validation/useValidation';
@@ -20,6 +21,7 @@ import { logAction } from '../../cor/logger/auditLog';
 import HelpBanner from '../../shr/components/HelpBanner';
 
 export default function FormulasPage() {
+  const fmt = useFormat();
   const { ingredients, requirements, formulas, addFormula, updateFormula, deleteFormula } = useFed();
 
   const [open, setOpen] = useState(false);
@@ -49,7 +51,7 @@ export default function FormulasPage() {
     items: list,
     getId: (x: any) => x.id,
     onDelete: async (ids: string[]) => {
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' فرمول حذف شوند؟', { danger: true });
+      const ok = await showConfirmAsync('حذف گروهی', fmt.count(ids.length) + ' فرمول حذف شوند؟', { danger: true });
       if (!ok) return;
       const backups: any[] = [];
       for (const id of ids) {
@@ -264,18 +266,18 @@ export default function FormulasPage() {
                 id={f.id}
                 ms={ms}
                 accent={f.status === 'active' ? 'accent' : f.status === 'archived' ? 'dim' : 'warn'}
-                index={toFa(i + 1)}
+                index={fmt.count(i + 1)}
                 iconEmoji="🌾"
                 title={f.name}
-                subtitle={`${req ? req.name : '—'} • ${toFa(f.date)}`}
+                subtitle={`${req ? req.name : '—'} • ${fmt.date(f.date)}`}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : f.id)}
                 badge={<Tag tone={statusTone}>{statusLabel}</Tag>}
                 stats={
                   <>
-                    <span>پروتئین: <b style={{ color: 'var(--text)' }}>{toFa(n.protein)}٪</b></span>
-                    <span>انرژی: <b style={{ color: 'var(--text)' }}>{toFa(n.energy)}</b></span>
-                    {n.price > 0 ? <span>قیمت: <b style={{ color: 'var(--text)' }}>{toFa(n.price.toLocaleString('fa-IR'))} ت/kg</b></span> : null}
+                    <span>پروتئین: <b style={{ color: 'var(--text)' }}>{fmt.num(n.protein)}٪</b></span>
+                    <span>انرژی: <b style={{ color: 'var(--text)' }}>{fmt.num(n.energy)}</b></span>
+                    {n.price > 0 ? <span>قیمت: <b style={{ color: 'var(--text)' }}>{fmt.money(n.price)} ت/kg</b></span> : null}
                   </>
                 }
               >
@@ -288,7 +290,7 @@ export default function FormulasPage() {
                        fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
                        borderRadius: 'var(--r-sm)' }}>
                       <span>{ing.name}</span>
-                      <span style={{ fontWeight: 600 }}>{toFa(line.percent)}٪</span>
+                      <span style={{ fontWeight: 600 }}>{fmt.num(line.percent)}٪</span>
                     </div>
                   );
                 })}
@@ -298,21 +300,21 @@ export default function FormulasPage() {
                    color: 'var(--accent)', borderRadius: 'var(--r-sm)',
                    fontWeight: 700 }}>
                   <span>مجموع:</span>
-                  <span>{toFa(total.toFixed(2))}٪</span>
+                  <span>{fmt.num(total)}٪</span>
                 </div>
 
                 <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> مواد مغذی</SectionTitle>
                 <Grid2>
-                  <Row l="پروتئین" v={`${toFa(n.protein)} ٪`} />
-                  <Row l="انرژی" v={`${toFa(n.energy)} kcal`} />
+                  <Row l="پروتئین" v={`${fmt.num(n.protein)} ٪`} />
+                  <Row l="انرژی" v={`${fmt.num(n.energy)} kcal`} />
                 </Grid2>
                 <Grid2>
-                  <Row l="کلسیم" v={`${toFa(n.calcium)} ٪`} />
-                  <Row l="فسفر" v={`${toFa(n.phosphorus)} ٪`} />
+                  <Row l="کلسیم" v={`${fmt.num(n.calcium)} ٪`} />
+                  <Row l="فسفر" v={`${fmt.num(n.phosphorus)} ٪`} />
                 </Grid2>
                 <Grid2>
-                  <Row l="متیونین" v={`${toFa(n.methionine)} ٪`} />
-                  <Row l="لیزین" v={`${toFa(n.lysine)} ٪`} />
+                  <Row l="متیونین" v={`${fmt.num(n.methionine)} ٪`} />
+                  <Row l="لیزین" v={`${fmt.num(n.lysine)} ٪`} />
                 </Grid2>
 
                 {n.price > 0 ? (
@@ -323,7 +325,7 @@ export default function FormulasPage() {
                        color: 'var(--accent)', borderRadius: 'var(--r-sm)',
                        fontWeight: 700 }}>
                       <span>هزینه هر کیلوگرم:</span>
-                      <span>{toFa(n.price.toLocaleString('fa-IR'))} ت</span>
+                      <span>{fmt.money(n.price)} ت</span>
                     </div>
                   </>
                 ) : null}
