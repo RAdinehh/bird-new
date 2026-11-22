@@ -1,3 +1,4 @@
+import { useAutoCenterTab } from '../../shr/hooks/useAutoCenterTab';
 /**
  * index.tsx — بخش inc
  */
@@ -25,7 +26,8 @@ export default function Inc() {
   const validTabs: TabId[] = ['devices', 'eggs', 'candlings', 'hatches'];
   const tab: TabId = validTabs.includes(tabParam) ? tabParam : 'devices';
 
-  const [pendingEntry, setPendingEntry] = useState('');
+  const [entryId, setEntryId] = useState('');
+  const tabsBarRef = useAutoCenterTab(tab);
 
   const setTab = (t: TabId) => {
     setParams(prev => {
@@ -39,7 +41,7 @@ export default function Inc() {
 
   const goTo = (t: any, payload?: { entry?: string }) => {
     if (payload?.entry) {
-      setPendingEntry(payload.entry);
+      setEntryId(payload.entry);
       try {
         const url = new URL(window.location.href);
         url.searchParams.set('entry', payload.entry);
@@ -57,9 +59,7 @@ export default function Inc() {
 
   return (
     <div>
-      <div style={{
-        display: 'flex', gap: 0,
-        borderBottom: '1px solid var(--border)',
+      <div ref={tabsBarRef} style={{ display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
         padding: '0 8px',
         background: 'var(--header-bg)',
         position: 'sticky', top: 52, zIndex: 11,
@@ -68,6 +68,7 @@ export default function Inc() {
         {tabs.map(t => (
           <div
             key={t.id}
+            data-tab-id={t.id}
             onClick={() => { setInstant(); setTab(t.id); }}
             style={{
               padding: '11px 12px',
@@ -120,7 +121,7 @@ export default function Inc() {
             <EggEntriesPage initialDevice={params.get('device') || ''} onGoTo={goTo} />
           </div>
           <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
-            <CandlingsPage initialEntry={pendingEntry || params.get('entry') || ''} onGoTo={goTo} />
+            <CandlingsPage initialEntry={tab || params.get('entry') || ''} onGoTo={goTo} />
           </div>
           <div style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
             <HatchesPage initialEntry={params.get('entry') || ''} onGoTo={goTo} />

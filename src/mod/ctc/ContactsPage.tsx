@@ -1,3 +1,4 @@
+import { useAutoCenterTab } from '../../shr/hooks/useAutoCenterTab';
 /**
  * ContactsPage — مخاطبین (carousel tabs مثل hal)
  */
@@ -38,6 +39,7 @@ export default function ContactsPage() {
   const fmt = useFormat();
   const { contacts, add, update } = useCtc();
   const [tab, setTab] = useState<TabId>('all');
+  const tabsBarRef = useAutoCenterTab(tab);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty);
   const [err, setErr] = useState('');
@@ -145,14 +147,14 @@ export default function ContactsPage() {
   return (
     <div>
       {/* Tab Bar */}
-      <div style={{
-        display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
+      <div ref={tabsBarRef} style={{ display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
         padding: '0 12px', background: 'var(--header-bg)', position: 'sticky',
         top: 52, zIndex: 11, overflowX: 'auto', scrollbarWidth: 'none',
       }}>
         {tabs.map(t => (
           <div
             key={t.id}
+            data-tab-id={t.id}
             onClick={() => { setInstant(); setTab(t.id); }}
             style={{
               padding: '11px 12px',

@@ -1,3 +1,4 @@
+import { useAutoCenterTab } from '../../shr/hooks/useAutoCenterTab';
 /**
  * index.tsx — بخش whs
  */
@@ -23,6 +24,7 @@ const TAB_IDS = ['items', 'moves', 'warnings'];
 
 export default function Whs() {
   const [tab, setTab] = useState<TabId>('items');
+  const tabsBarRef = useAutoCenterTab(tab);
   const { items } = useWhs();
   const warnCount = items.filter(i =>
     stockWarning(i) !== 'ok' || expiryWarning(i) !== 'ok'
@@ -36,9 +38,7 @@ export default function Whs() {
 
   return (
     <div>
-      <div style={{
-        display: 'flex', gap: 0,
-        borderBottom: '1px solid var(--border)',
+      <div ref={tabsBarRef} style={{ display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
         padding: '0 8px',
         background: 'var(--header-bg)',
         position: 'sticky', top: 52, zIndex: 11,
@@ -47,6 +47,7 @@ export default function Whs() {
         {tabs.map(t => (
           <div
             key={t.id}
+            data-tab-id={t.id}
             onClick={() => { setInstant(); setTab(t.id); }}
             style={{
               padding: '11px 12px',

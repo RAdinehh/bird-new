@@ -1,3 +1,4 @@
+import { useAutoCenterTab } from '../../shr/hooks/useAutoCenterTab';
 import { useEffect } from 'react';
 import { useUrlFilter } from '../../shr/hooks/useUrlFilter';
 import { useCarousel } from '../../shr/hooks/useCarousel';
@@ -16,6 +17,7 @@ const TAB_IDS = ['birds', 'breeds'];
 export default function Brd() {
   const [tabParam, setTabParam] = useUrlFilter('tab', 'birds');
   const tab = (TAB_IDS.includes(tabParam) ? tabParam : 'birds') as TabId;
+  const tabsBarRef = useAutoCenterTab(tab);
 
   useEffect(() => {
     if (!tabParam || !TAB_IDS.includes(tabParam)) setTabParam('birds');
@@ -28,9 +30,7 @@ export default function Brd() {
 
   return (
     <div>
-      <div style={{
-        display: 'flex', gap: 0,
-        borderBottom: '1px solid var(--border)',
+      <div ref={tabsBarRef} style={{ display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
         padding: '0 12px',
         background: 'var(--header-bg)',
         position: 'sticky', top: 52, zIndex: 11,
@@ -38,6 +38,7 @@ export default function Brd() {
         {tabs.map(t => (
           <div
             key={t.id}
+            data-tab-id={t.id}
             onClick={() => { setInstant(); setTabParam(t.id); }}
             style={{
               padding: '11px 14px',

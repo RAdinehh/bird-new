@@ -5,6 +5,7 @@
  */
 import { getGlobalFormat } from '../../units/useFormat';
 
+import { useEffect, useRef } from 'react';
 import type React from 'react';
 import { toFa } from '../../utils/fa';
 
@@ -25,6 +26,20 @@ interface Props<T extends string> {
 export function Tabs<T extends string = string>({
   tabs, activeTab, onTabChange, newTabBadge, rightAction,
 }: Props<T>) {
+  const barRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const bar = barRef.current;
+    if (!bar) return;
+    const el = bar.querySelector(`[data-tab-id="${activeTab}"]`) as HTMLElement | null;
+    if (!el) return;
+    const barRect = bar.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
+    const offset = (elRect.left + elRect.width / 2) - (barRect.left + barRect.width / 2);
+    if (Math.abs(offset) > 2) {
+      bar.scrollBy({ left: offset, behavior: 'smooth' });
+    }
+  }, [activeTab, tabs.length]);
   return (
     <>
       <style>{`
@@ -39,7 +54,9 @@ export function Tabs<T extends string = string>({
         background: 'var(--header-bg)',
         position: 'sticky', top: 52, zIndex: 11,
       }}>
-        <div style={{
+        <div
+          ref={barRef}
+          style={{
           flex: 1, minWidth: 0,
           display: 'flex', gap: 0,
           padding: '0 12px',
@@ -48,6 +65,7 @@ export function Tabs<T extends string = string>({
           {tabs.map(t => (
             <div
               key={t.id}
+              data-tab-id={t.id}
               onClick={() => onTabChange(t.id)}
               style={{
                 padding: '11px 14px',

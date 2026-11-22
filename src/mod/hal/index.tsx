@@ -1,3 +1,4 @@
+import { useAutoCenterTab } from '../../shr/hooks/useAutoCenterTab';
 /**
  * index.tsx — بخش hal
  */
@@ -32,6 +33,7 @@ export default function Hal() {
 
   const [tabParam, setTabParam] = useUrlFilter('tab', 'halls');
   const tab = (['halls', 'zones', 'equip', 'archive'].includes(tabParam) ? tabParam : 'halls') as TabId;
+  const tabsBarRef = useAutoCenterTab(tab);
 
   useEffect(() => {
     if (!tabParam || !['halls', 'zones', 'equip', 'archive'].includes(tabParam)) setTabParam('halls');
@@ -52,9 +54,7 @@ export default function Hal() {
 
   return (
     <div>
-      <div style={{
-        display: 'flex', gap: 0,
-        borderBottom: '1px solid var(--border)',
+      <div ref={tabsBarRef} style={{ display: 'flex', gap: 0, borderBottom: '1px solid var(--border)',
         padding: '0 12px',
         background: 'var(--header-bg)',
         position: 'sticky', top: 52, zIndex: 11,
@@ -63,6 +63,7 @@ export default function Hal() {
         {visibleTabs.map((t: { id: string; label: string }) => (
           <div
             key={t.id}
+            data-tab-id={t.id}
             onClick={() => { setInstant(); setTabParam(t.id); }}
             style={{
               padding: '11px 14px',
