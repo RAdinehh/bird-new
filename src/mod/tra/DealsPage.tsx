@@ -48,6 +48,13 @@ import HelpBanner from '../../shr/components/HelpBanner';
 
 import { useDealCalc, useDealStats } from './deals/useDealCalc';
 import { type F, empty, STATUS_LABEL, isSameIdentity } from './deals/types';
+function resolveUnitLabel(unit: unknown): string {
+  if (typeof unit !== "string") return "";
+  const validKeys = Object.keys(UNIT_LABEL) as Array<keyof typeof UNIT_LABEL>;
+  const matched = validKeys.find((k) => k === unit);
+  return matched ? UNIT_LABEL[matched] : unit;
+}
+
 export default function DealsPage({ active = true }: { active?: boolean } = {}) {
   const fmt = useFormat();
   const navigate = useNavigate();
@@ -95,7 +102,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
           available: Number(it.currentStock || 0),
           label: 'انبار ' + it.name,
           rows: [
-            ['واحد', (UNIT_LABEL as any)[it.unit] || it.unit],
+            ['واحد', resolveUnitLabel(it.unit) || it.unit],
             ['قیمت آخرین', (it.lastPrice || 0) > 0 ? getGlobalFormat().money(Number(it.lastPrice)) : '—'],
           ] as Array<[string, string]>,
         };
@@ -108,7 +115,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
           available: Number(it.currentStock || 0),
           label: 'انبار ' + it.name,
           rows: [
-            ['واحد', (UNIT_LABEL as any)[it.unit] || it.unit],
+            ['واحد', resolveUnitLabel(it.unit) || it.unit],
           ] as Array<[string, string]>,
         };
       }
@@ -241,8 +248,8 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     setForm({
       id: d.id, type: d.type, date: d.date, partyId: d.partyId,
       description: d.description,
-      value: d.value ? toFa(d.value) : '',
-      percent: d.percent === null || d.percent === undefined ? '' : toFa(d.percent),
+      value: d.value ? fmt.raw.digits(String(d.value), fmt.units.numberFormat) : '',
+      percent: d.percent === null || d.percent === undefined ? '' : fmt.raw.digits(String(d.percent), fmt.units.numberFormat),
       dueDate: d.dueDate || '',
       status: d.status,
       notes: d.notes || '',
@@ -250,7 +257,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       startDate: d.startDate || '',
       endDate: d.endDate || '',
       settlementType: (d.settlementType || '') as SettlementType | '',
-      settlementValue: d.settlementValue ? toFa(d.settlementValue) : '',
+      settlementValue: d.settlementValue ? fmt.raw.digits(String(d.settlementValue), fmt.units.numberFormat) : '',
       cancelReason: d.cancelReason || '',
       goods: d.goods || [],
       deliveries: d.deliveries || [],
@@ -561,7 +568,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                 stats={
                   <>
                     {d.value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{fmt.money(d.value)}</b></span>}
-                    {d.percent !== null && d.percent !== undefined && <span>درصد: <b style={{ color: 'var(--text)' }}>{toFa(d.percent)}٪</b></span>}
+                    {d.percent !== null && d.percent !== undefined && <span>درصد: <b style={{ color: 'var(--text)' }}>{fmt.num(d.percent)}٪</b></span>}
                     {(() => {
                       const salesTotal = (d.sales || []).reduce((s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)), 0);
                       return salesTotal > 0 ? <span>🏷 فروش: <b style={{ color: 'var(--text)' }}>{fmt.money(salesTotal)}</b></span> : null;
@@ -577,7 +584,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                       {d.dealNumber ? <Row l="شماره قرارداد" v={fmt.code(d.dealNumber)} /> : null}
                       {d.startDate ? <Row l="دوره" v={d.endDate ? `${fmt.date(d.startDate)} تا ${fmt.date(d.endDate)}` : fmt.date(d.startDate)} /> : null}
                       {d.settlementType ? <Row l="نوع تسویه" v={d.settlementType === 'percent' ? 'کمیسیون درصدی' : d.settlementType === 'barter' ? 'تهاتر مستقیم' : d.settlementType} /> : null}
-                      {d.settlementValue ? <Row l="مقدار تسویه" v={toFa(d.settlementValue)} /> : null}
+                      {d.settlementValue ? <Row l="مقدار تسویه" v={fmt.num(d.settlementValue)} /> : null}
                     </Grid2>
                   </>
                 )}
@@ -594,7 +601,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                         const sold = (d.sales || []).filter(s => s.goodId === g.id).reduce((s, x) => s + (Number(x.quantity) || 0), 0);
                         const inHand = delivered - sold;
                         return (
-                          <Row key={g.id} l={g.name} v={`تحویل: ${toFa(delivered)} | فروش: ${toFa(sold)} | مانده: ${toFa(inHand)}`} />
+                          <Row key={g.id} l={g.name} v={`تحویل: ${fmt.count(delivered)} | فروش: ${fmt.count(sold)} | مانده: ${fmt.count(inHand)}`} />
                         );
                       })}
                     </div>
@@ -880,11 +887,11 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
           <div style={{ padding: '8px 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', display: 'flex', flexDirection: 'column', gap: 4, marginTop: 4 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: 'var(--muted)' }}>📊 کمیسیون طرف:</span>
-              <span style={{ fontWeight: 700, color: 'var(--warn)' }}>{toFa(Math.round(calc.totalSales * Number(form.settlementValue) / 100).toLocaleString('fa-IR'))} ت</span>
+              <span style={{ fontWeight: 700, color: 'var(--warn)' }}>{fmt.money(Math.round(calc.totalSales * Number(form.settlementValue) / 100))}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: 'var(--muted)' }}>💰 سهم شما:</span>
-              <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(Math.round(calc.totalSales * (100 - Number(form.settlementValue)) / 100).toLocaleString('fa-IR'))} ت</span>
+              <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{fmt.money(Math.round(calc.totalSales * (100 - Number(form.settlementValue)) / 100))}</span>
             </div>
           </div>
         )}
@@ -996,7 +1003,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                     const age = getAgeDays(f);
                     const lc = getLifecycle(f.type, age, f.endOfCycleDay ?? null, null, f.layingStartDay ?? null);
                     const fType = f.type === 'layer' ? 'تخم‌گذار' : f.type === 'broiler' ? 'گوشتی' : 'مادر';
-                    return '📊 موجودی: ' + toFa(f.currentCount || 0) + ' | سن: ' + toFa(age) + ' روز | ' + fType + ' | ' + lc.label;
+                    return '📊 موجودی: ' + getGlobalFormat().count(f.currentCount || 0) + ' | سن: ' + toFa(age) + ' روز | ' + fType + ' | ' + lc.label;
                   })() : undefined}>
                     <SmartSelect
                       value={g.existingFlockId || ''}
@@ -1007,7 +1014,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                         return {
                           value: f.id,
                           label: f.name,
-                          subtitle: `${toFa(f.currentCount || 0)} قطعه${!hasStock ? ' (بدون موجودی)' : ''}`,
+                          subtitle: `${getGlobalFormat().count(f.currentCount || 0)} قطعه${!hasStock ? ' (بدون موجودی)' : ''}`,
                           disabled: !hasStock,
                         };
                       })}
@@ -1020,7 +1027,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   <Field label="هچ مبدأ" required hint={g.hatchId ? (() => {
                     const h = hatches.find(x => x.id === g.hatchId);
                     if (!h) return undefined;
-                    return '📊 هچ موفق: ' + toFa(h.hatched || 0) + ' جوجه | نطفه‌داری نشده: ' + getGlobalFormat().count(h.unhatched || 0);
+                    return '📊 هچ موفق: ' + getGlobalFormat().count(h.hatched || 0) + ' جوجه | نطفه‌داری نشده: ' + getGlobalFormat().count(h.unhatched || 0);
                   })() : undefined}>
                     <SmartSelect
                       value={g.hatchId || ''}
@@ -1032,7 +1039,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                         return {
                           value: h.id,
                           label: (h as any).batchCode || (h as any).code || (h as any).title || h.id.slice(0, 6),
-                          subtitle: `${toFa(h.hatched || 0)} جوجه${!hasStock ? ' (بدون موجودی)' : ''}`,
+                          subtitle: `${getGlobalFormat().count(h.hatched || 0)} جوجه${!hasStock ? ' (بدون موجودی)' : ''}`,
                           disabled: !hasStock,
                         };
                       })}
@@ -1065,7 +1072,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                         return {
                           value: f.id,
                           label: f.name,
-                          subtitle: `${toFa(f.currentCount || 0)} قطعه${!hasStock ? ' (بدون موجودی)' : ''}`,
+                          subtitle: `${getGlobalFormat().count(f.currentCount || 0)} قطعه${!hasStock ? ' (بدون موجودی)' : ''}`,
                           disabled: !hasStock,
                         };
                       })}
@@ -1098,7 +1105,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                       options={eggItems.map((it: any) => ({
                         value: it.id,
                         label: it.name,
-                        subtitle: `${toFa(it.currentStock)} ${(UNIT_LABEL as any)[it.unit] || ''}${Number(it.currentStock) <= 0 ? ' (ناموجود)' : ''}`,
+                        subtitle: `${getGlobalFormat().num(it.currentStock)} ${resolveUnitLabel(it.unit) || ''}${Number(it.currentStock) <= 0 ? ' (ناموجود)' : ''}`,
                         disabled: Number(it.currentStock) <= 0,
                       }))}
                       onChange={val => { const v = val || undefined; handleSourceChange(g.id, { stockItemId: v, linkedItemId: v }); }}
@@ -1141,7 +1148,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                       options={filteredItems.map((it: any) => ({
                         value: it.id,
                         label: it.name,
-                        subtitle: `${toFa(it.currentStock)} ${(UNIT_LABEL as any)[it.unit] || ''}${Number(it.currentStock) <= 0 ? ' (ناموجود)' : ''}`,
+                        subtitle: `${getGlobalFormat().num(it.currentStock)} ${resolveUnitLabel(it.unit) || ''}${Number(it.currentStock) <= 0 ? ' (ناموجود)' : ''}`,
                         disabled: Number(it.currentStock) <= 0,
                       }))}
                       onChange={val => { const v = val || undefined; handleSourceChange(g.id, { stockItemId: v, linkedItemId: v }); }}
@@ -1159,7 +1166,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   options={whsItems.map((it: any) => ({
                     value: it.id,
                     label: it.name,
-                    subtitle: `${toFa(it.currentStock)} ${(UNIT_LABEL as any)[it.unit] || ''}`,
+                    subtitle: `${getGlobalFormat().num(it.currentStock)} ${resolveUnitLabel(it.unit) || ''}`,
                   }))}
                   onChange={val => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, linkedItemId: val || undefined } : x) }))}
                 />
@@ -1183,8 +1190,8 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                     {isEmpty
                       ? '🔴 ' + srcInfo.label + ' ناموجود است'
                       : over
-                        ? '🔴 بیش از موجودی ' + srcInfo.label + ': ' + toFa(srcInfo.available)
-                        : '📊 موجودی ' + srcInfo.label + ': ' + toFa(srcInfo.available)}
+                        ? '🔴 بیش از موجودی ' + srcInfo.label + ': ' + getGlobalFormat().num(srcInfo.available)
+                        : '📊 موجودی ' + srcInfo.label + ': ' + getGlobalFormat().num(srcInfo.available)}
                   </div>
                 );
               })()}
@@ -1224,7 +1231,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
               const rets = form.deliveries.filter(d => d.type === 'return').reduce((s, d) => s + (Number(d.quantity) || 0), 0);
               const loss = form.deliveries.filter(d => d.type === 'loss').reduce((s, d) => s + (Number(d.quantity) || 0), 0);
               const net = outs - rets - loss;
-              return net !== 0 ? <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>خالص: {toFa(net.toLocaleString('fa-IR'))}</span> : null;
+              return net !== 0 ? <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>خالص: {fmt.money(net)}</span> : null;
             })()}
           </div>
 
@@ -1275,7 +1282,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   const cap = computeDeliveryCap(good, form.deliveries, dv.id);
                   return (
                     <div style={{ fontSize: 'var(--fs-xs)', color: cap === 0 ? 'var(--danger)' : 'var(--muted)', marginTop: 4, fontWeight: 600 }}>
-                      {cap === 0 ? '🔴 ظرفیت تکمیل — تحویل بیشتری ممکن نیست' : '📊 باقیمانده: ' + toFa(cap) + ' از ' + toFa(good.quantity || 0)}
+                      {cap === 0 ? '🔴 ظرفیت تکمیل — تحویل بیشتری ممکن نیست' : '📊 باقیمانده: ' + fmt.count(cap) + ' از ' + fmt.count(good.quantity || 0)}
                     </div>
                   );
                 })()}
@@ -1292,7 +1299,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                       const linkedGoodName = form.goods.find(g => g.id === x.goodId)?.name || '—';
                       return {
                         value: x.id,
-                        label: `تحویل #${toFa(idx + 1)} — ${linkedGoodName} (${toFa(x.quantity || 0)})`,
+                        label: `تحویل #${fmt.count(idx + 1)} — ${linkedGoodName} (${fmt.count(x.quantity || 0)})`,
                       };
                     })}
                     onChange={val => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, linkedDeliveryId: val || undefined } : x) }))}
@@ -1329,7 +1336,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
           </div>
             {(() => {
               const tot = form.sales.reduce((s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)), 0);
-              return tot > 0 ? <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>{toFa(tot.toLocaleString('fa-IR'))} ت</span> : null;
+              return tot > 0 ? <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>{fmt.money(tot)}</span> : null;
             })()}
           </div>
 
@@ -1338,7 +1345,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
             return (
               <div key={s.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>فروش {toFa(si + 1)} — {toFa(total.toLocaleString('fa-IR'))} تومان</span>
+                  <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>فروش {fmt.count(si + 1)} — {fmt.money(total)}</span>
                   <button type="button" onClick={() => setForm(f => ({ ...f, sales: f.sales.filter(x => x.id !== s.id) }))} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700 }}>✕</button>
                 </div>
                 <Grid2>
@@ -1367,7 +1374,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                       const cap = computeSaleCap(s.goodId, form.deliveries, form.sales, s.id);
                       return (
                         <div style={{ fontSize: 'var(--fs-xs)', color: cap === 0 ? 'var(--danger)' : 'var(--muted)', marginTop: 4, fontWeight: 600 }}>
-                          {cap === 0 ? '🔴 فروش بیشتری ممکن نیست' : '📊 حداکثر فروش: ' + toFa(cap)}
+                          {cap === 0 ? '🔴 فروش بیشتری ممکن نیست' : '📊 حداکثر فروش: ' + fmt.count(cap)}
                         </div>
                       );
                     })()}
@@ -1396,8 +1403,8 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
           if (pin === 0 && pout === 0) return null;
           return (
             <span style={{ display: 'flex', gap: 8, fontSize: 'var(--fs-xs)', fontWeight: 700 }}>
-              {pin > 0 && <span style={{ color: 'var(--accent)' }}>↑ {toFa(pin.toLocaleString('fa-IR'))}</span>}
-              {pout > 0 && <span style={{ color: 'var(--warn)' }}>↓ {toFa(pout.toLocaleString('fa-IR'))}</span>}
+              {pin > 0 && <span style={{ color: 'var(--accent)' }}>↑ {fmt.money(pin)}</span>}
+              {pout > 0 && <span style={{ color: 'var(--warn)' }}>↓ {fmt.money(pout)}</span>}
             </span>
           );
         })()}
@@ -1407,7 +1414,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
         <div key={p.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: 'var(--fs-xs)', color: p.direction === 'in' ? 'var(--accent)' : 'var(--warn)', fontWeight: 700 }}>
-              {p.direction === 'in' ? '↑ دریافت' : '↓ پرداخت'} {toFa(pi + 1)}
+              {p.direction === 'in' ? '↑ دریافت' : '↓ پرداخت'} {fmt.count(pi + 1)}
             </span>
             <button type="button" onClick={() => setForm(f => ({ ...f, payments: f.payments.filter(x => x.id !== p.id) }))} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700 }}>✕</button>
           </div>
@@ -1416,7 +1423,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
               <DatePicker value={p.date} onChange={v => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, date: v } : x) }))} autoToday />
             </Field>
             <Field label="مبلغ" required error={showError?.(`payments.${pi}.amount`)} onTouch={() => markTouched?.(`payments.${pi}.amount`)}>
-              <MoneyField showWords={false} placeholder="مبلغ" value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => { 
+              <MoneyField showWords={false} placeholder="مبلغ" value={p.amount > 0 ? fmt.raw.digits(String(p.amount), fmt.units.numberFormat) : ''} onChange={e => { 
                 const raw = parseFloat(toEn(e.target.value).replace('٫', '.')) || 0; 
                 const cap = computePaymentCap(calc.myShare, form.payments, p.id);
                 const val = (p.direction === 'in') ? Math.min(raw, cap) : raw;
@@ -1426,7 +1433,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   const cap = computePaymentCap(calc.myShare, form.payments, p.id);
                   return (
                     <div style={{ fontSize: 'var(--fs-xs)', color: cap <= 0 ? 'var(--danger)' : 'var(--muted)', marginTop: 4, fontWeight: 600 }}>
-                      {cap <= 0 ? '🔴 ظرفیت پرداخت تکمیل' : '📊 حداکثر: ' + toFa(cap.toLocaleString('fa-IR')) + ' ت'}
+                      {cap <= 0 ? '🔴 ظرفیت پرداخت تکمیل' : `📊 حداکثر: ${fmt.money(cap)}`}
                     </div>
                   );
                 })()}
@@ -1440,7 +1447,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   if (Number(p.amount) >= rem - 0.5) return null;
                 return (
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
-                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>باقی‌مانده: {toFa(rem.toLocaleString('fa-IR'))} تومان</span>
+                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>باقی‌مانده: {fmt.money(rem)}</span>
                     <button type="button" onClick={() => {
                       setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, amount: rem } : x) }));
                     }} style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-xs)', fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline', whiteSpace: 'nowrap' }}>تسویه کل</button>
@@ -1505,15 +1512,15 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, paddingBottom: 6, borderBottom: '1px dashed var(--accent-border)' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
               <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>کل تحویلی</span>
-              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{toFa(calc.totalDelivered.toLocaleString('fa-IR'))}</span>
+              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{fmt.count(calc.totalDelivered)}</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, borderRight: '1px dashed var(--accent-border)', borderLeft: '1px dashed var(--accent-border)' }}>
               <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>فروش کل</span>
-              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{toFa(calc.totalSold.toLocaleString('fa-IR'))}</span>
+              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{fmt.count(calc.totalSold)}</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
               <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>در دست طرف</span>
-              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: calc.inHand < 0 ? 'var(--danger)' : 'inherit' }}>{toFa(calc.inHand.toLocaleString('fa-IR'))}</span>
+              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: calc.inHand < 0 ? 'var(--danger)' : 'inherit' }}>{fmt.count(calc.inHand)}</span>
             </div>
           </div>
 
@@ -1531,9 +1538,9 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                     <div key={g.id} style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%' }}>
                       <span style={{ fontWeight: 600, fontSize: 'var(--fs-sm)', color: 'var(--text)', flexShrink: 0, maxWidth: '40%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{pg.name}</span>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flex: 1 }}>
-                        <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>تحویل {toFa(pg.delivered)}</span>
-                        <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>فروش {toFa(pg.sold)}</span>
-                        <span style={{ fontWeight: 700, fontSize: 'var(--fs-xs)', color: pg.inHand < 0 ? 'var(--danger)' : 'var(--accent)' }}>مانده {toFa(pg.inHand)}</span>
+                        <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>تحویل {fmt.count(pg.delivered)}</span>
+                        <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>فروش {fmt.count(pg.sold)}</span>
+                        <span style={{ fontWeight: 700, fontSize: 'var(--fs-xs)', color: pg.inHand < 0 ? 'var(--danger)' : 'var(--accent)' }}>مانده {fmt.count(pg.inHand)}</span>
                       </div>
                     </div>
                   );
@@ -1546,19 +1553,19 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 12px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>فروش (مبلغ):</span>
-              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{toFa(calc.totalSales.toLocaleString('fa-IR'))}</span>
+              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{fmt.money(calc.totalSales, { withUnit: false })}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>سهم من:</span>
-              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{toFa(calc.myShare.toLocaleString('fa-IR'))}</span>
+              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{fmt.money(calc.myShare, { withUnit: false })}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>دریافتی:</span>
-              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--accent)' }}>{toFa(calc.paidIn.toLocaleString('fa-IR'))}</span>
+              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--accent)' }}>{fmt.money(calc.paidIn, { withUnit: false })}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>مانده:</span>
-              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: Math.abs(calc.balance) < 0.01 ? 'var(--accent)' : calc.balance > 0 ? 'var(--warn)' : 'var(--danger)' }}>{toFa(Math.abs(calc.balance).toLocaleString('fa-IR'))}</span>
+              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: Math.abs(calc.balance) < 0.01 ? 'var(--accent)' : calc.balance > 0 ? 'var(--warn)' : 'var(--danger)' }}>{fmt.money(Math.abs(calc.balance), { withUnit: false })}</span>
             </div>
           </div>
 
