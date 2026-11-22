@@ -2,6 +2,8 @@
  * HallEquipCatCard — کارت KPI دسته‌ی تجهیز (۲ ستونه، فشرده)
  * الگو: Big Dutchman BigFarmNet + Material 3 KPI Cards
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { CategoryIcon, CATEGORY_COLORS } from '../../../shr/icons/equipment';
 import { getCategoryLabel, getCategorySoft } from '../_typedLabels';
 import { toFa } from '../../../shr/utils/fa';
@@ -27,6 +29,7 @@ interface Props {
 }
 
 export default function HallEquipCatCard({ cat, count, tone, pct, onClick }: Props) {
+  const fmt = useFormat();
   const label = getCategoryLabel(cat)?.name || cat;
   const color = CATEGORY_COLORS[cat] || 'var(--cat-auxiliary)';
   const soft = getCategorySoft(cat);
@@ -103,12 +106,12 @@ export default function HallEquipCatCard({ cat, count, tone, pct, onClick }: Pro
         }}>
           {pct !== null ? (
             pct <= 100
-              ? `${toFa(Math.round(pct))}٪`
-              : `${toFa(Math.round((pct / 100) * 10) / 10)}×`
+              ? `${fmt.count(Math.round(pct))}٪`
+              : `${fmt.num(Math.round((pct / 100) * 10) / 10)}×`
           ) : '—'}
         </span>
         <span style={{ color: 'var(--muted)' }}>
-          {toFa(count)} مورد
+          {fmt.count(count)} مورد
         </span>
       </div>
     </button>

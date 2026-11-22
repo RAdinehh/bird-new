@@ -1,6 +1,8 @@
 /**
  * HallsFormModal — فرم افزودن/ویرایش سالن
  */
+import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useState } from 'react';
 import { type HallFormData } from '../_hallsHelpers';
 import type { Bird, Breed } from '../../brd/store';
@@ -39,11 +41,11 @@ function TempFormField({ value, onChange, label, placeholder, autoFrom, error, n
 
   const displayVal = celsius == null ? '' : (
     tempUnit === 'c'
-      ? toFa(String(celsius))
-      : toFa(String(Math.round((celsius * 9 / 5 + 32) * 10) / 10))
+      ? getGlobalFormat().raw.digits(String(celsius), getGlobalFormat().units.numberFormat)
+      : getGlobalFormat().raw.digits(String(Math.round((celsius * 9 / 5 + 32) * 10) / 10), getGlobalFormat().units.numberFormat)
   );
 
-  const shown = editing ? toFa(local) : displayVal;
+  const shown = editing ? getGlobalFormat().raw.digits(local, getGlobalFormat().units.numberFormat) : displayVal;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let v = e.target.value;
@@ -157,6 +159,7 @@ export interface HallsFormModalProps {
 }
 
 export default function HallsFormModal(props: HallsFormModalProps) {
+  const fmt = useFormat();
   const breedsForBird = (props.breeds || []).filter((b: Breed) => b.birdId === props.form.birdId);
   const currentBreedName = breedsForBird.find((b: Breed) => b.id === props.form.breedId)?.name || '';
   const { open, setOpen, form, setForm, err, vErrors, birds, breeds, breedStd, autoFields, clearAuto, save, stdCapacity, stdTemp, stdHumidity, workers, onErrorClear } = props;
@@ -264,7 +267,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
           const area = L * W;
           const suggested = area > 0 && density ? Math.floor(area * density) : null;
           const warnMsg = cap && suggested && cap > suggested
-            ? `ظرفیت ${toFa(cap)} بیشتر از پیشنهاد ${toFa(suggested)} است`
+            ? `ظرفیت ${fmt.count(cap)} بیشتر از پیشنهاد ${fmt.count(suggested)} است`
             : undefined;
           const calcCap = suggested;
           return (
@@ -275,7 +278,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
               <Field label={<span style={{ visibility: 'hidden' }}>محاسبه</span>}>
                 {calcCap != null ? (
                   <div dir="ltr" style={{ width: '100%', padding: '0 10px', height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--input-bg)', border: '1px dashed var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontVariantNumeric: 'tabular-nums', fontWeight: 600, whiteSpace: 'nowrap' }}>
-                    {toFa(area)} × {toFa(density)} = {toFa(calcCap)}
+                    {fmt.num(area)} × {fmt.num(density)} = {fmt.count(calcCap)}
                   </div>
                 ) : <div style={{ height: 38 }} />}
               </Field>
@@ -297,10 +300,10 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 const nextHum = stdHumidity ?? env?.humidity?.target ?? env?.humidity?.min ?? null;
                 const patch: Partial<HallFormData> = {};
                 const filledKeys: string[] = [];
-                if (cap != null && cap > 0) { patch.capacity = toFa(cap); filledKeys.push('capacity'); }
-                if (nextTemp != null) { patch.targetTemp = toFa(nextTemp); filledKeys.push('targetTemp'); }
-                if (nextHum != null) { patch.targetHumidity = toFa(nextHum); filledKeys.push('targetHumidity'); }
-                if (env?.light?.lux != null) { patch.light = toFa(env.light.lux); filledKeys.push('light'); }
+                if (cap != null && cap > 0) { patch.capacity = fmt.raw.digits(String(cap), fmt.units.numberFormat); filledKeys.push('capacity'); }
+                if (nextTemp != null) { patch.targetTemp = fmt.raw.digits(String(nextTemp), fmt.units.numberFormat); filledKeys.push('targetTemp'); }
+                if (nextHum != null) { patch.targetHumidity = fmt.raw.digits(String(nextHum), fmt.units.numberFormat); filledKeys.push('targetHumidity'); }
+                if (env?.light?.lux != null) { patch.light = fmt.raw.digits(String(env.light.lux), fmt.units.numberFormat); filledKeys.push('light'); }
                 setForm((f: HallFormData) => ({ ...f, ...patch }));
                 markAuto?.(filledKeys);
                 toastMsg.info('مقادیر از استاندارد پر شد');

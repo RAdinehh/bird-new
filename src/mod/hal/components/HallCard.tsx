@@ -102,7 +102,7 @@ export default function HallCard(props: HallCardProps) {
   return (
     <ExpandableCard key={h.id} id={h.id} ms={ms} accent="accent" index={fmt.int(i + 1)} iconEmoji="🏭"
       title={h.name + (h.code ? ` • ${h.code}` : '')}
-      subtitle={h.length ? `${toFa(h.length)}×${toFa(h.width || 0)}×${toFa(h.height || 0)} متر` : 'ابعاد وارد نشده'}
+      subtitle={h.length ? `${fmt.num(h.length)}×${fmt.num(h.width || 0)}×${fmt.num(h.height || 0)} متر` : 'ابعاد وارد نشده'}
       isOpen={isOpen} onToggle={onToggle}
       badge={<>
         {(() => {
@@ -122,7 +122,7 @@ export default function HallCard(props: HallCardProps) {
         {hallFlocks.length > 0 ? <Tag tone="green">{fmt.int(hallFlocks.length)} گله</Tag> : null}
       </>}
       stats={<>
-        {area > 0 && <span>مساحت: <b style={{ color: 'var(--text)' }}>{toFa(area.toFixed(1))} م²</b></span>}
+        {area > 0 && <span>مساحت: <b style={{ color: 'var(--text)' }}>{fmt.num(area)} م²</b></span>}
         {h.capacity && <span>ظرفیت: <b style={{ color: 'var(--text)' }}>{fmt.int(h.capacity)}</b></span>}
         {equipCount > 0 && <span>تجهیز: <b style={{ color: 'var(--text)' }}>{fmt.int(equipCount)}</b></span>}
         {totalBirds > 0 && <span>پرنده: <b style={{ color: 'var(--text)' }}>{fmt.int(totalBirds)}</b></span>}
@@ -130,7 +130,7 @@ export default function HallCard(props: HallCardProps) {
     >
       <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📐 ابعاد و ظرفیت</div>
       <RowGrid>
-        <Row l="مساحت" v={`${toFa(area.toFixed(1))} م²`} />
+        <Row l="مساحت" v={`${fmt.num(area)} م²`} />
         <Row l="حجم" v={`${toFa(volume.toFixed(1))} م³`} />
         <Row l="ظرفیت" v={h.capacity ? `${fmt.int(h.capacity)} پرنده` : '—'} />
         {realCapacity && !h.capacity && (
@@ -198,8 +198,8 @@ export default function HallCard(props: HallCardProps) {
         <>
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📅 زمان‌ها و ارزش</div>
           <RowGrid>
-            {h.builtAt && <Row l="تاریخ ساخت" v={toFa(h.builtAt)} />}
-            {h.lastSanitizedAt && <Row l="آخرین ضدعفونی" v={toFa(h.lastSanitizedAt)} />}
+            {h.builtAt && <Row l="تاریخ ساخت" v={fmt.date(h.builtAt)} />}
+            {h.lastSanitizedAt && <Row l="آخرین ضدعفونی" v={fmt.date(h.lastSanitizedAt)} />}
           </RowGrid>
           {h.sanitizeNotes && <Row l="روش ضدعفونی" v={h.sanitizeNotes} />}
           {equipValue > 0 && <Row l="ارزش تجهیزات" v={fmt.money(equipValue)} accent />}

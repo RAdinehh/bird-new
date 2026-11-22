@@ -2,6 +2,8 @@
  * EquipmentKpiCards — ۳ کارت KPI بالای لیست تجهیزات
  * الگو: FOUNDATION-PATTERNS ب۲۲ (KPI Cards)
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { toFa } from '../../../shr/utils/fa';
 
 interface Props {
@@ -65,13 +67,14 @@ function KpiCard({ icon, label, value, tone }: KpiCardProps) {
 }
 
 export default function EquipmentKpiCards({ total, categories, totalValue, needRepair }: Props) {
+  const fmt = useFormat();
   if (total === 0) return null;
 
   const valueText = totalValue >= 1_000_000_000
-    ? `${toFa((totalValue / 1_000_000_000).toFixed(1))} میلیارد ت`
+    ? `${fmt.money(totalValue)}`
     : totalValue >= 1_000_000
-      ? `${toFa((totalValue / 1_000_000).toFixed(1))} میلیون ت`
-      : `${toFa(totalValue.toLocaleString('fa-IR'))} ت`;
+      ? `${fmt.money(totalValue)}`
+      : `${fmt.money(totalValue)}`;
 
   return (
     <div style={{
@@ -82,7 +85,7 @@ export default function EquipmentKpiCards({ total, categories, totalValue, needR
       <KpiCard
         icon="🔧"
         label="کل تجهیزات"
-        value={`${toFa(total)} مورد در ${toFa(categories)} دسته`}
+        value={`${fmt.count(total)} مورد در ${fmt.count(categories)} دسته`}
         tone="accent"
       />
       <KpiCard
@@ -94,7 +97,7 @@ export default function EquipmentKpiCards({ total, categories, totalValue, needR
       <KpiCard
         icon={needRepair > 0 ? '🔴' : '🟢'}
         label="نیاز به سرویس"
-        value={toFa(needRepair)}
+        value={fmt.count(needRepair)}
         tone={needRepair > 0 ? 'danger' : 'accent'}
       />
     </div>

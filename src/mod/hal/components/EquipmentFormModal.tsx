@@ -1,6 +1,8 @@
 /**
  * EquipmentFormModal — فرم افزودن/ویرایش تجهیز
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { Btn, ErrorBox, Field, Grid2, Input, Modal, MoneyField, NumField, Select } from '../../../shr/components/ui';
 import { getUnitLabel, getEquipLabel } from '../_typedLabels';
 import { getPlaceholderForType } from '../_equipHelpers';
@@ -44,6 +46,7 @@ export interface EquipmentFormModalProps {
 }
 
 export default function EquipmentFormModal(props: EquipmentFormModalProps) {
+  const fmt = useFormat();
   const { open, setOpen, form, setForm, err, vErrors, halls, zones, equipment, autoFields, clearAuto, markAuto, typesForCategory, equipNeed, save, suppliers, stdForDefaults, activeBirdCount = 0, activeFlockCount = 0, onErrorClear } = props;
 
   const mapPrimaryUnit = (u?: string): EquipmentFormData['unit'] => {
@@ -258,8 +261,8 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                     const hasFlock = activeBirdCount > 0;
                     const targetBirds = hasFlock ? activeBirdCount : hallCap;
                     const basisLabel = hasFlock
-                      ? (activeFlockCount > 1 ? `${toFa(activeFlockCount)} گله فعال (${toFa(activeBirdCount)} راس)` : `گله فعال (${toFa(activeBirdCount)} راس)`)
-                      : (hallCap > 0 ? `ظرفیت سالن (${toFa(hallCap)} راس)` : "");
+                      ? (activeFlockCount > 1 ? `${fmt.count(activeFlockCount)} گله فعال (${fmt.count(activeBirdCount)} راس)` : `گله فعال (${fmt.count(activeBirdCount)} راس)`)
+                      : (hallCap > 0 ? `ظرفیت سالن (${fmt.count(hallCap)} راس)` : "");
                     const l = selHall?.length || 0;
                     const w = selHall?.width || 0;
                     const h = selHall?.height || 0;
@@ -269,7 +272,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                     const bg = "var(--accent-soft)";
                     const fg = "var(--accent)";
                     const dividerColor = "var(--accent-border)";
-                    const fmtInt = (n: number) => toFa(Math.round(n));
+                    const fmtInt = (n: number) => fmt.count(Math.round(n));
 
                     const rowStyle: React.CSSProperties = {
                       display: "flex",
@@ -306,7 +309,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                         minLabel = cpm >= 1
                           ? `${fmtInt(cpm)} بار در دقیقه`
                           : cpm > 0
-                            ? `هر ${toFa(Math.max(1, Math.round(1 / cpm)))} دقیقه ۱ بار`
+                            ? `هر ${fmt.count(Math.max(1, Math.round(1 / cpm)))} دقیقه ۱ بار`
                             : "";
                         rows.push({
                           label: "تعویض هوای سالن:",
@@ -322,10 +325,10 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                           const needM3h = Math.ceil(((targetBirds * targetW) / 1000) * stdCoef);
                           const diff = Math.round(totalVal - needM3h);
                           statusText = diff > 0
-                            ? `کافی (مازاد ${toFa(diff)} m³/h)`
+                            ? `کافی (مازاد ${fmt.num(diff)} m³/h)`
                             : diff === 0
                             ? `کافی (مطابق نیاز)`
-                            : `کمبود ${toFa(Math.abs(diff))} m³/h (نیاز ${fmtInt(needM3h)})`;
+                            : `کمبود ${fmt.num(Math.abs(diff))} m³/h (نیاز ${fmtInt(needM3h)})`;
                         } else {
                           statusText = `${totStr} m³/h ثبت شد`;
                         }
@@ -343,10 +346,10 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                         if (basisLabel) rows.push({ label: "معیار سنجش:", value: basisLabel });
                         const diff = Math.round(totalVal - targetBirds);
                         statusText = diff > 0
-                          ? `کافی (مازاد ${toFa(diff)} راس)`
+                          ? `کافی (مازاد ${fmt.num(diff)} راس)`
                           : diff === 0
                           ? `کافی (مطابق نیاز)`
-                          : `کمبود ${toFa(Math.abs(diff))} راس (نیاز ${toFa(targetBirds)} راس)`;
+                          : `کمبود ${fmt.num(Math.abs(diff))} راس (نیاز ${fmt.count(targetBirds)} راس)`;
                       } else {
                         statusText = `${totStr} راس پوشش`;
                       }
@@ -359,8 +362,8 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                         const wPerM2 = Math.round(totalVal / hallArea);
                         const stdW = stdForDefaults?.equipment?.lampWattPerM2 || 3;
                         statusText = wPerM2 >= stdW
-                          ? `کافی (${toFa(wPerM2)} W/m²)`
-                          : `کمبود نور (${toFa(wPerM2)} از ${toFa(stdW)} W/m²)`;
+                          ? `کافی (${fmt.num(wPerM2)} W/m²)`
+                          : `کمبود نور (${fmt.num(wPerM2)} از ${fmt.num(stdW)} W/m²)`;
                       } else {
                         statusText = `${totStr} W کل توان`;
                       }
@@ -371,11 +374,11 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                       });
                       if (hallArea > 0) {
                         const wPerM2 = Math.round((totalVal * 1000) / hallArea);
-                        statusText = `${toFa(wPerM2)} W به ازای هر مترمربع`;
+                        statusText = `${fmt.num(wPerM2)} W به ازای هر مترمربع`;
                       } else if (targetBirds > 0) {
                         if (basisLabel) rows.push({ label: "معیار سنجش:", value: basisLabel });
                         const wPerBird = Math.round((totalVal * 1000) / targetBirds);
-                        statusText = `${toFa(wPerBird)} W به ازای هر راس`;
+                        statusText = `${fmt.num(wPerBird)} W به ازای هر راس`;
                       } else {
                         statusText = `${totStr} kW کل توان`;
                       }

@@ -1,6 +1,8 @@
 /**
  * RetireEquipModal — فروش یا اسقاط تجهیز (SAP standard + اتصال به معاملات)
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { useEffect, useState } from 'react';
 import { Btn, Field, Grid2, Input, Modal, NumField, Select } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
@@ -19,6 +21,7 @@ interface Props {
 }
 
 export default function RetireEquipModal({ open, onClose, equipment, onConfirm }: Props) {
+  const fmt = useFormat();
   const contacts = useCtc(s => s.contacts);
   const [reason, setReason] = useState<'sale' | 'scrap'>('sale');
   const [qtyStr, setQtyStr] = useState('1');
@@ -116,7 +119,7 @@ export default function RetireEquipModal({ open, onClose, equipment, onConfirm }
           </Field>
 
           {maxQty > 1 && (
-            <Field label={`تعداد خروج (از ${toFa(maxQty)} ${getUnitLabel(equipment.unit)})`} required>
+            <Field label={`تعداد خروج (از ${fmt.count(maxQty)} ${getUnitLabel(equipment.unit)})`} required>
               <NumField
                 value={qtyStr}
                 onChange={e => setQtyStr(e.target.value)}
@@ -207,11 +210,11 @@ export default function RetireEquipModal({ open, onClose, equipment, onConfirm }
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span style={{ color: 'var(--muted)' }}>قیمت خرید ({toFa(validQty ? qtyNum : maxQty)} {getUnitLabel(equipment.unit)}):</span>
-            <b>{toFa(totalCost.toLocaleString('fa-IR'))} تومان</b>
+            <b>{fmt.money(totalCost)}</b>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span style={{ color: 'var(--muted)' }}>مبلغ فروش:</span>
-            <b>{toFa(salePriceNum.toLocaleString('fa-IR'))} تومان</b>
+            <b>{fmt.money(salePriceNum)}</b>
           </div>
           <div style={{
             display: 'flex',
@@ -225,7 +228,7 @@ export default function RetireEquipModal({ open, onClose, equipment, onConfirm }
               color: isProfit ? 'var(--accent)' : isLoss ? 'var(--danger)' : 'var(--muted)',
               fontSize: 'var(--fs-md)',
             }}>
-              {toFa(Math.abs(profit).toLocaleString('fa-IR'))} تومان
+              {fmt.money(Math.abs(profit))}
             </b>
           </div>
         </div>

@@ -1,6 +1,8 @@
 /**
  * HallEquipModals — سه Modal (جزئیات، افزودن، ویرایش)
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { Btn, Field, Input, Modal, NumField } from '../../../shr/components/ui';
 import { getCategoryLabel, getEquipLabel, getCategoryColor } from '../_typedLabels';
 import type { Equipment } from '../store';
@@ -54,6 +56,7 @@ export interface HallEquipModalsProps {
 }
 
 export default function HallEquipModals(props: HallEquipModalsProps) {
+  const fmt = useFormat();
   const {
     detailCat, setDetailCat, detailCatLabel, detailInstalled, detailNeed, detailTone, detailPct,
     detailUnit, detailNeedUnit, detailList, detailColor,
@@ -111,13 +114,13 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
             }}>
               <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>نصب‌شده:</span>
               <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-                {toFa(detailInstalled.toLocaleString('fa-IR'))} {detailUnit}
+                {fmt.num(detailInstalled)} {detailUnit}
               </span>
               {detailNeed > 0 && (
                 <>
                   <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>نیاز:</span>
                   <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-                    {toFa(detailNeed.toLocaleString('fa-IR'))} {detailNeedUnit}
+                    {fmt.num(detailNeed)} {detailNeedUnit}
                   </span>
                 </>
               )}
@@ -146,8 +149,8 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.name}</div>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 1, display: 'flex', gap: 8 }}>
-                      {e.count != null && <span>× {toFa(e.count)}</span>}
-                      {e.capacity != null && <span>{toFa(e.capacity)}{detailUnit === 'm³/h' ? ' m³/h' : detailUnit === 'W' ? ' W' : ''}</span>}
+                      {e.count != null && <span>× {fmt.count(e.count)}</span>}
+                      {e.capacity != null && <span>{fmt.num(e.capacity)}{detailUnit === 'm³/h' ? ' m³/h' : detailUnit === 'W' ? ' W' : ''}</span>}
                     </div>
                   </div>
                   <button type="button" onClick={() => openEdit(e)} aria-label="ویرایش" style={{
