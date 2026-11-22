@@ -48,7 +48,7 @@ export default function SmartSelect({
   placeholder = '— انتخاب کنید —',
   groupLabels = {}, groupIcons = {},
   hierarchical = false,
-  autoThreshold = 4,
+  autoThreshold = 5,
   disabled = false,
   modalTitle = 'انتخاب',
   required = false,

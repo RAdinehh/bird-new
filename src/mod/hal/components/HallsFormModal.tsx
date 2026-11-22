@@ -89,8 +89,7 @@ function TempFormField({ value, onChange, label, placeholder, autoFrom, error, n
             flex: '1 1 0%', width: '100%', minWidth: 0,
             background: 'none', border: 'none', outline: 'none',
             color: 'var(--text)', fontFamily: 'inherit',
-            fontSize: 'var(--fs-base)', fontWeight: 600,
-            textAlign: 'right',
+            fontSize: 'var(--fs-sm)', fontWeight: 500, textAlign: 'right',
           }}
         />
         <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--dim)', flexShrink: 0 }}>
@@ -153,31 +152,33 @@ export interface HallsFormModalProps {
   workers?: Person[];
   /** 🆕 پاک کردن خطا هنگام تایپ */
   onErrorClear?: () => void;
+  markAuto?: (keys: string[]) => void;
 }
 
 export default function HallsFormModal(props: HallsFormModalProps) {
   const breedsForBird = (props.breeds || []).filter((b: Breed) => b.birdId === props.form.birdId);
   const currentBreedName = breedsForBird.find((b: Breed) => b.id === props.form.breedId)?.name || '';
   const { open, setOpen, form, setForm, err, vErrors, birds, breeds, breedStd, autoFields, clearAuto, save, stdCapacity, stdTemp, stdHumidity, workers, onErrorClear } = props;
+  const markAuto = (props as HallsFormModalProps).markAuto;
 
   const capCurrent = form.capacity ? parseInt(toEn(form.capacity)) || null : null;
   const { hint: capHint } = useOverride({
     current: capCurrent, stdValue: stdCapacity ?? null,
-    onReset: () => setForm((f) => ({ ...f, capacity: stdCapacity != null ? String(stdCapacity) : '' })),
+    onReset: () => setForm((f: HallFormData) => ({ ...f, capacity: stdCapacity != null ? String(stdCapacity) : '' })),
     unit: 'پرنده', decimals: 0,
   });
 
   const tempCurrent = form.targetTemp ? parseFloat(toEn(form.targetTemp)) || null : null;
   const { hint: tempHint } = useOverride({
     current: tempCurrent, stdValue: stdTemp ?? null,
-    onReset: () => setForm((f) => ({ ...f, targetTemp: stdTemp != null ? String(stdTemp) : '' })),
+    onReset: () => setForm((f: HallFormData) => ({ ...f, targetTemp: stdTemp != null ? String(stdTemp) : '' })),
     unit: '°C', decimals: 1,
   });
 
   const humCurrent = form.targetHumidity ? parseFloat(toEn(form.targetHumidity)) || null : null;
   const { hint: humHint } = useOverride({
     current: humCurrent, stdValue: stdHumidity ?? null,
-    onReset: () => setForm((f) => ({ ...f, targetHumidity: stdHumidity != null ? String(stdHumidity) : '' })),
+    onReset: () => setForm((f: HallFormData) => ({ ...f, targetHumidity: stdHumidity != null ? String(stdHumidity) : '' })),
     unit: '٪', decimals: 0,
   });
   const tempAtStandard = stdTemp != null && tempCurrent != null && tempCurrent === stdTemp;
@@ -229,10 +230,10 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 parentLabel="پرنده"
                 options={breedsForBird.map((b: Breed) => {
                   const purposeMap: Record<string, string> = {
-                    layer: '🥚 تخم‌گذار',
-                    breeder: '🐣 مادر',
-                    broiler: '🍗 گوشتی',
-                    ornamental: '🌸 زینتی',
+                    layer: 'تخم‌گذار',
+                    breeder: 'مادر',
+                    broiler: 'گوشتی',
+                    ornamental: 'زینتی',
                   };
                   const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
                   return {
@@ -289,19 +290,19 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 if (!std) return;
                 const area = (parseFloat(toEn(form.length)) || 0) * (parseFloat(toEn(form.width)) || 0);
                 const density = std.space?.densityMax;
-                const cap = area > 0 && density ? Math.floor(area * density) : null;
+                const cap = stdCapacity ?? (area > 0 && density ? Math.floor(area * density) : null);
                 const env = std.env?.[0];
+                const nextTemp = stdTemp ?? env?.temp?.target ?? null;
+                const nextHum = stdHumidity ?? env?.humidity?.target ?? env?.humidity?.min ?? null;
                 const patch: Partial<HallFormData> = {};
-                if (cap) patch.capacity = toFa(cap);
-                if (env?.temp?.target != null) patch.targetTemp = toFa(env.temp.target);
-                if (env?.humidity?.target != null) patch.targetHumidity = toFa(env.humidity.target);
-                else if (env?.humidity?.min != null) patch.targetHumidity = toFa(env.humidity.min);
-                // 🆕 شدت نور (lux) از استاندارد نژاد
-                if (env?.light?.lux != null) patch.light = toFa(env.light.lux);
-
-
-                setForm((f) => ({ ...f, ...patch }));
-                toastMsg.info('مقادیر از استاندارد پر شد')
+                const filledKeys: string[] = [];
+                if (cap != null && cap > 0) { patch.capacity = toFa(cap); filledKeys.push('capacity'); }
+                if (nextTemp != null) { patch.targetTemp = toFa(nextTemp); filledKeys.push('targetTemp'); }
+                if (nextHum != null) { patch.targetHumidity = toFa(nextHum); filledKeys.push('targetHumidity'); }
+                if (env?.light?.lux != null) { patch.light = toFa(env.light.lux); filledKeys.push('light'); }
+                setForm((f: HallFormData) => ({ ...f, ...patch }));
+                markAuto?.(filledKeys);
+                toastMsg.info('مقادیر از استاندارد پر شد');
               }}
               style={{
                 marginTop: 6,

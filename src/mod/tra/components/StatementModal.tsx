@@ -12,6 +12,7 @@ import { useSet } from '../../set/store';
 import { toFa, numberToWords } from '../../../shr/utils/fa';
 import { printHTML } from '../../../shr/utils/export';
 import { getTodayJalali } from '../calc';
+import SmartSelect from '../../../shr/components/SmartSelect';
 
 interface Props {
   open: boolean;
@@ -432,16 +433,20 @@ export default function StatementModal({ open, onClose, kind }: Props) {
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 8, paddingTop: 12 }}>
         <Field label="طرف حساب" required>
-          <Select value={partyId} onChange={e => setPartyId(e.target.value)}>
-            <option value="">— انتخاب —</option>
-            {parties.map(c => {
+          <SmartSelect
+            value={partyId}
+            placeholder="— انتخاب —"
+            modalTitle="انتخاب طرف حساب"
+            options={parties.map(c => {
               const rolesStr = (c.roles || []).map((r: any) => ROLE_LABEL[r as keyof typeof ROLE_LABEL] || r).join('، ');
-              const suffix = rolesStr ? ` — ${rolesStr}` : '';
-              return (
-                <option key={c.id} value={c.id}>{c.name}{suffix}</option>
-              );
+              return {
+                value: c.id,
+                label: c.name,
+                subtitle: rolesStr || undefined,
+              };
             })}
-          </Select>
+            onChange={val => setPartyId(val)}
+          />
         </Field>
         
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, direction: 'rtl' }}>

@@ -6,6 +6,7 @@ import { Btn, Field, Grid2, Input, Modal, Select } from '../../../shr/components
 import DatePicker from '../../../shr/components/DatePicker';
 import { todayJ } from '../../flk/api/flocksCalc';
 import type { Equipment, TransferLog, Hall, Zone } from '../store';
+import SmartSelect from '../../../shr/components/SmartSelect';
 
 interface Props {
   open: boolean;
@@ -73,22 +74,29 @@ export default function TransferEquipModal({ open, onClose, equipment, halls, zo
         </Field>
 
         <Field label="به سالن" required>
-          <Select value={toHallId} onChange={e => { setToHallId(e.target.value); setToZoneId(''); }}>
-            <option value="">— انتخاب کنید —</option>
-            {halls.filter(h => h.id !== equipment.hallId).map(h => (
-              <option key={h.id} value={h.id}>{h.name}</option>
-            ))}
-          </Select>
+          <SmartSelect
+            value={toHallId}
+            placeholder="— انتخاب کنید —"
+            modalTitle="انتخاب سالن مقصد"
+            options={halls
+              .filter((h) => h.id !== equipment.hallId)
+              .map((h) => ({ value: String(h.id), label: String(h.name) }))}
+            onChange={(val: string) => {
+              setToHallId(val);
+              setToZoneId("");
+            }}
+          />
         </Field>
 
         {toHallId && (
           <Field label="به بخش (اختیاری)">
-            <Select value={toZoneId} onChange={e => setToZoneId(e.target.value)}>
-              <option value="">— بدون بخش —</option>
-              {zonesForTarget.map(z => (
-                <option key={z.id} value={z.id}>{z.name}</option>
-              ))}
-            </Select>
+            <SmartSelect
+            value={toZoneId}
+            placeholder="— بدون بخش —"
+            modalTitle="انتخاب بخش مقصد"
+            options={zonesForTarget.map((z) => ({ value: String(z.id), label: String(z.name) }))}
+            onChange={(val: string) => setToZoneId(val)}
+          />
           </Field>
         )}
 

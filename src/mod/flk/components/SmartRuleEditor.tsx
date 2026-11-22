@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Select, Field, Input, Grid2 } from '../../../shr/components/ui';
 import type { FlockGroupRule, FlockGroupType, FlockStatus } from '../store';
 import { toEn, toFa } from '../../../shr/utils/fa';
+import SmartSelect from '../../../shr/components/SmartSelect';
 
 export interface SmartRuleEditorProps {
   rule: FlockGroupRule;
@@ -107,24 +108,41 @@ export function SmartRuleEditor({ rule, onChange, breeds, halls }: SmartRuleEdit
           </Select>
         </Field>
         <Field label="نژاد" hint={!rule.breedId ? 'نژاد خاص — خالی = همه' : undefined}>
-          <Select value={rule.breedId || ''} onChange={e => update({ breedId: e.target.value || undefined })}>
-            <option value="">همه</option>
-            {breeds.map(b => {
-              const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
-              const purposeLabels = ((b as any).purposes || []).map((p: string) => purposeMap[p] || p);
-              const label = purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name;
-              return <option key={b.id} value={b.id}>{label}</option>;
+          <SmartSelect
+            value={rule.breedId || ''}
+            placeholder="همه"
+            modalTitle="انتخاب نژاد"
+            options={breeds.map((b) => {
+              const purposeMap: Record<string, string> = {
+                layer: "🥚 تخم‌گذار",
+                breeder: "🐣 مادر",
+                broiler: "🍗 گوشتی",
+                ornamental: "🌸 زینتی",
+              };
+              const rawPurposes = Array.isArray(Reflect.get(b, "purposes"))
+                ? (Reflect.get(b, "purposes") as unknown[]).filter((x): x is string => typeof x === "string")
+                : [];
+              const purposeLabels = rawPurposes.map((p) => purposeMap[p] || p);
+              return {
+                value: String(b.id),
+                label: String(b.name),
+                subtitle: purposeLabels.length > 0 ? purposeLabels.join("، ") : undefined,
+              };
             })}
-          </Select>
+            onChange={(val: string) => update({ breedId: val || undefined })}
+          />
         </Field>
       </Grid2>
 
       <Grid2>
         <Field label="سالن" hint={!rule.hallId ? 'محل نگهداری — خالی = همه' : undefined}>
-          <Select value={rule.hallId || ''} onChange={e => update({ hallId: e.target.value || undefined })}>
-            <option value="">همه</option>
-            {halls.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
-          </Select>
+          <SmartSelect
+            value={rule.hallId || ''}
+            placeholder="همه"
+            modalTitle="انتخاب سالن"
+            options={halls.map((h) => ({ value: String(h.id), label: String(h.name) }))}
+            onChange={(val: string) => update({ hallId: val || undefined })}
+          />
         </Field>
         <Field label="وضعیت" hint={!rule.status ? 'وضعیت گله — خالی = همه' : undefined}>
           <Select value={rule.status || ''} onChange={e => update({ status: e.target.value as FlockGroupRule['status'] || undefined })}>

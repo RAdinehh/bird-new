@@ -996,17 +996,21 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                     const fType = f.type === 'layer' ? 'تخم‌گذار' : f.type === 'broiler' ? 'گوشتی' : 'مادر';
                     return '📊 موجودی: ' + toFa(f.currentCount || 0) + ' | سن: ' + toFa(age) + ' روز | ' + fType + ' | ' + lc.label;
                   })() : undefined}>
-                    <Select value={g.existingFlockId || ''} onChange={e => handleSourceChange(g.id, { existingFlockId: e.target.value || undefined })}>
-                      <option value="">— انتخاب —</option>
-                      {flocks.filter(f => f.status === 'active').map(f => {
+                    <SmartSelect
+                      value={g.existingFlockId || ''}
+                      placeholder="— انتخاب —"
+                      modalTitle="انتخاب گله مبدأ"
+                      options={flocks.filter(f => f.status === 'active').map(f => {
                         const hasStock = (f.currentCount || 0) > 0;
-                        return (
-                          <option key={f.id} value={f.id} disabled={!hasStock}>
-                            {f.name} — {toFa(f.currentCount || 0)} پرنده{!hasStock ? ' (ناموجود)' : ''}
-                          </option>
-                        );
+                        return {
+                          value: f.id,
+                          label: f.name,
+                          subtitle: `${toFa(f.currentCount || 0)} قطعه${!hasStock ? ' (بدون موجودی)' : ''}`,
+                          disabled: !hasStock,
+                        };
                       })}
-                    </Select>
+                      onChange={val => handleSourceChange(g.id, { existingFlockId: val || undefined })}
+                    />
                   </Field>
                 )}
                 {g.source === 'hatch' && (
@@ -1016,17 +1020,22 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                     if (!h) return undefined;
                     return '📊 هچ موفق: ' + toFa(h.hatched || 0) + ' جوجه | نطفه‌داری نشده: ' + toFa(h.unhatched || 0);
                   })() : undefined}>
-                    <Select value={g.hatchId || ''} onChange={e => handleSourceChange(g.id, { hatchId: e.target.value || undefined })} disabled={hatches.length === 0}>
-                      <option value="">— انتخاب —</option>
-                      {hatches.map(h => {
+                    <SmartSelect
+                      value={g.hatchId || ''}
+                      placeholder="— انتخاب —"
+                      modalTitle="انتخاب هچ مبدأ"
+                      disabled={hatches.length === 0}
+                      options={hatches.map(h => {
                         const hasStock = (h.hatched || 0) > 0;
-                        return (
-                          <option key={h.id} value={h.id} disabled={!hasStock}>
-                            {toFa(h.date)} — {toFa(h.hatched || 0)} جوجه{!hasStock ? ' (ناموجود)' : ''}
-                          </option>
-                        );
+                        return {
+                          value: h.id,
+                          label: (h as any).batchCode || (h as any).code || (h as any).title || h.id.slice(0, 6),
+                          subtitle: `${toFa(h.hatched || 0)} جوجه${!hasStock ? ' (بدون موجودی)' : ''}`,
+                          disabled: !hasStock,
+                        };
                       })}
-                    </Select>
+                      onChange={val => handleSourceChange(g.id, { hatchId: val || undefined })}
+                    />
                   </Field>
                   </>
                 )}
@@ -1045,17 +1054,21 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
             )}
             {g.category === 'adult' && (
               <Field label="گله مبدأ" required>
-                <Select value={g.existingFlockId || ''} onChange={e => handleSourceChange(g.id, { existingFlockId: e.target.value || undefined })}>
-                  <option value="">— انتخاب —</option>
-                  {flocks.filter(f => f.status === 'active').map(f => {
+                <SmartSelect
+                      value={g.existingFlockId || ''}
+                      placeholder="— انتخاب —"
+                      modalTitle="انتخاب گله مبدأ"
+                      options={flocks.filter(f => f.status === 'active').map(f => {
                         const hasStock = (f.currentCount || 0) > 0;
-                        return (
-                          <option key={f.id} value={f.id} disabled={!hasStock}>
-                            {f.name} — {toFa(f.currentCount || 0)} پرنده{!hasStock ? ' (ناموجود)' : ''}
-                          </option>
-                        );
+                        return {
+                          value: f.id,
+                          label: f.name,
+                          subtitle: `${toFa(f.currentCount || 0)} قطعه${!hasStock ? ' (بدون موجودی)' : ''}`,
+                          disabled: !hasStock,
+                        };
                       })}
-                </Select>
+                      onChange={val => handleSourceChange(g.id, { existingFlockId: val || undefined })}
+                    />
               </Field>
             )}
             {(g.category === 'egg' || g.category === 'fertile_egg') && (() => {
@@ -1075,14 +1088,19 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                     </div>
                   )}
                   <Field label="کالای تخم (انبار)" required hint={g.stockItemId ? '📊 تخم تولیدشده از گله — کاهش از انبار' : undefined}>
-                    <Select value={g.stockItemId || ''} onChange={e => { const v = e.target.value || undefined; handleSourceChange(g.id, { stockItemId: v, linkedItemId: v }) }} disabled={noEgg}>
-                      <option value="">{noEgg ? '— هیچ تخمی موجود نیست —' : '— انتخاب —'}</option>
-                      {eggItems.map((it: any) => (
-                        <option key={it.id} value={it.id} disabled={Number(it.currentStock) <= 0}>
-                          {it.name} — {toFa(it.currentStock)} {(UNIT_LABEL as any)[it.unit] || ''}{Number(it.currentStock) <= 0 ? ' (ناموجود)' : ''}
-                        </option>
-                      ))}
-                    </Select>
+                    <SmartSelect
+                      value={g.stockItemId || ''}
+                      placeholder={noEgg ? '— هیچ تخمی موجود نیست —' : '— انتخاب —'}
+                      modalTitle="انتخاب کالای تخم"
+                      disabled={noEgg}
+                      options={eggItems.map((it: any) => ({
+                        value: it.id,
+                        label: it.name,
+                        subtitle: `${toFa(it.currentStock)} ${(UNIT_LABEL as any)[it.unit] || ''}${Number(it.currentStock) <= 0 ? ' (ناموجود)' : ''}`,
+                        disabled: Number(it.currentStock) <= 0,
+                      }))}
+                      onChange={val => { const v = val || undefined; handleSourceChange(g.id, { stockItemId: v, linkedItemId: v }); }}
+                    />
                   </Field>
                 </>
               );
@@ -1113,26 +1131,36 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                     </div>
                   )}
                   <Field label="کالای انبار" required>
-                    <Select value={g.stockItemId || ''} onChange={e => { const v = e.target.value || undefined; handleSourceChange(g.id, { stockItemId: v, linkedItemId: v }) }} disabled={showEmptyWarning}>
-                      <option value="">{showEmptyWarning ? '— هیچ کالایی موجود نیست —' : '— انتخاب —'}</option>
-                      {filteredItems.map((it: any) => (
-                        <option key={it.id} value={it.id} disabled={Number(it.currentStock) <= 0}>
-                          {it.name} — {toFa(it.currentStock)} {(UNIT_LABEL as any)[it.unit] || ''}{Number(it.currentStock) <= 0 ? ' (ناموجود)' : ''}
-                        </option>
-                      ))}
-                    </Select>
+                    <SmartSelect
+                      value={g.stockItemId || ''}
+                      placeholder={showEmptyWarning ? '— هیچ کالایی موجود نیست —' : '— انتخاب —'}
+                      modalTitle="انتخاب کالای انبار"
+                      disabled={showEmptyWarning}
+                      options={filteredItems.map((it: any) => ({
+                        value: it.id,
+                        label: it.name,
+                        subtitle: `${toFa(it.currentStock)} ${(UNIT_LABEL as any)[it.unit] || ''}${Number(it.currentStock) <= 0 ? ' (ناموجود)' : ''}`,
+                        disabled: Number(it.currentStock) <= 0,
+                      }))}
+                      onChange={val => { const v = val || undefined; handleSourceChange(g.id, { stockItemId: v, linkedItemId: v }); }}
+                    />
                   </Field>
                 </>
               );
             })()}
             {!g.category && (
               <Field label="کالای انبار" hint="برای کاهش از موجودی">
-                <Select value={g.linkedItemId || ''} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, linkedItemId: e.target.value || undefined } : x) }))}>
-                  <option value="">— بدون اتصال —</option>
-                  {whsItems.map((it: any) => (
-                    <option key={it.id} value={it.id}>{it.name} — {toFa(it.currentStock)} {(UNIT_LABEL as any)[it.unit] || ''}</option>
-                  ))}
-                </Select>
+                <SmartSelect
+                  value={g.linkedItemId || ''}
+                  placeholder="— بدون اتصال —"
+                  modalTitle="انتخاب کالای انبار"
+                  options={whsItems.map((it: any) => ({
+                    value: it.id,
+                    label: it.name,
+                    subtitle: `${toFa(it.currentStock)} ${(UNIT_LABEL as any)[it.unit] || ''}`,
+                  }))}
+                  onChange={val => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, linkedItemId: val || undefined } : x) }))}
+                />
               </Field>
             )}
 
@@ -1167,11 +1195,12 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   return <Input value={units[0].label} disabled />;
                 }
                 return (
-                  <Select value={g.unit || getDefaultUnit(g.category)} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, unit: e.target.value as any } : x) }))}>
-                    {units.map(u => (
-                      <option key={u.value} value={u.value}>{u.label}</option>
-                    ))}
-                  </Select>
+                  <SmartSelect
+                    value={g.unit || getDefaultUnit(g.category)}
+                    modalTitle="انتخاب واحد"
+                    options={units.map(u => ({ value: u.value, label: u.label }))}
+                    onChange={val => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, unit: val as any } : x) }))}
+                  />
                 );
               })()}
             </Field>
@@ -1221,10 +1250,13 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   </Select>
                 </Field>
                 <Field label="کالا" required error={showError?.(`deliveries.${di}.goodId`)} onTouch={() => markTouched?.(`deliveries.${di}.goodId`)}>
-                  <Select value={dv.goodId} onChange={e => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, goodId: e.target.value } : x) }))}>
-                    <option value="">— انتخاب —</option>
-                    {form.goods.map(g => <option key={g.id} value={g.id}>{g.name || '—'}</option>)}
-                  </Select>
+                  <SmartSelect
+                    value={dv.goodId}
+                    placeholder="— انتخاب —"
+                    modalTitle="انتخاب کالا"
+                    options={form.goods.map(g => ({ value: g.id, label: g.name || '—' }))}
+                    onChange={val => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, goodId: val } : x) }))}
+                  />
                 </Field>
               </Grid2>
               <Field label="مقدار" required error={showError?.(`deliveries.${di}.quantity`)} onTouch={() => markTouched?.(`deliveries.${di}.quantity`)}>
@@ -1249,18 +1281,20 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
               </Field>
               {dv.type === 'in' && (
                 <Field label="در عوض تحویل" hint="این دریافت، در عوض کدام تحویل است؟ (تهاتر)">
-                  <Select value={dv.linkedDeliveryId || ''} onChange={e => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, linkedDeliveryId: e.target.value || undefined } : x) }))}>
-                    <option value="">— بدون لینک —</option>
-                    {form.deliveries.filter(x => x.id !== dv.id && x.type === 'out').map(x => {
+                  <SmartSelect
+                    value={dv.linkedDeliveryId || ''}
+                    placeholder="— بدون لینک —"
+                    modalTitle="انتخاب تحویل مرتبط"
+                    options={form.deliveries.filter(x => x.id !== dv.id && x.type === 'out').map(x => {
                       const idx = form.deliveries.findIndex(y => y.id === x.id);
                       const linkedGoodName = form.goods.find(g => g.id === x.goodId)?.name || '—';
-                      return (
-                        <option key={x.id} value={x.id}>
-                          تحویل {toFa(idx + 1)} — {linkedGoodName} ({toFa(x.quantity)})
-                        </option>
-                      );
+                      return {
+                        value: x.id,
+                        label: `تحویل #${toFa(idx + 1)} — ${linkedGoodName} (${toFa(x.quantity || 0)})`,
+                      };
                     })}
-                  </Select>
+                    onChange={val => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, linkedDeliveryId: val || undefined } : x) }))}
+                  />
                 </Field>
               )}
               {(() => {
@@ -1310,10 +1344,13 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                     <DatePicker value={s.date} onChange={v => setForm(f => ({ ...f, sales: f.sales.map(x => x.id === s.id ? { ...x, date: v } : x) }))} autoToday />
                   </Field>
                   <Field label="کالا" required error={showError?.(`sales.${si}.goodId`)} onTouch={() => markTouched?.(`sales.${si}.goodId`)}>
-                    <Select value={s.goodId} onChange={e => setForm(f => ({ ...f, sales: f.sales.map(x => x.id === s.id ? { ...x, goodId: e.target.value } : x) }))}>
-                      <option value="">— انتخاب —</option>
-                      {form.goods.map(g => <option key={g.id} value={g.id}>{g.name || '—'}</option>)}
-                    </Select>
+                    <SmartSelect
+                      value={s.goodId}
+                      placeholder="— انتخاب —"
+                      modalTitle="انتخاب کالا"
+                      options={form.goods.map(g => ({ value: g.id, label: g.name || '—' }))}
+                      onChange={val => setForm(f => ({ ...f, sales: f.sales.map(x => x.id === s.id ? { ...x, goodId: val } : x) }))}
+                    />
                   </Field>
                 </Grid2>
                 <Grid2>

@@ -6,6 +6,7 @@ import { Modal, Btn, BtnRow, Select } from '../../../shr/components/ui';
 import { useFlk, type FlockGroupType } from '../store';
 import { useMultiGroupKpi } from '../hooks/useGroupKpi';
 import { toFa } from '../../../shr/utils/fa';
+import SmartSelect from '../../../shr/components/SmartSelect';
 
 interface Props {
   open: boolean;
@@ -110,12 +111,17 @@ export default function GroupComparisonModal({ open, onClose }: Props) {
           );
         })}
         {ids.length < 3 && (
-          <Select value="" onChange={e => addGroup(e.target.value)} style={{ minWidth: 160, height: 32 }}>
-            <option value="">+ افزودن گروه...</option>
-            {availableGroups.filter(g => !ids.includes(g.id)).map(g => (
-              <option key={g.id} value={g.id}>{g.name}</option>
-            ))}
-          </Select>
+          <SmartSelect
+            value=""
+            placeholder="+ افزودن گروه..."
+            modalTitle="انتخاب گروه برای مقایسه"
+            options={availableGroups
+              .filter((g) => !ids.includes(g.id))
+              .map((g) => ({ value: String(g.id), label: String(g.name) }))}
+            onChange={(val: string) => {
+              if (val) addGroup(val);
+            }}
+          />
         )}
       </div>
 

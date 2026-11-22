@@ -8,6 +8,7 @@ import { jalaliBounds, checkDateBounds } from '../api/flocksCalc';
 import { schedulesByType, getSchedule } from '../../cal/vaccineSchedules';
 import type { F } from '../types-flocks';
 import { FieldHint } from '../../../shr/intelligence';
+import SmartSelect from '../../../shr/components/SmartSelect';
 
 interface Props {
   form: F;
@@ -113,12 +114,16 @@ export default function FlockDetailsSection({ form, setForm, showError, markTouc
             return sch ? `تقویم • ${sch.items.length} مرحله` : 'تقویم';
           })() : undefined}
         >
-          <Select value={form.vaccineScheduleId} onChange={e => setForm({ ...form, vaccineScheduleId: e.target.value })}>
-            <option value="">— بدون برنامه —</option>
-            {schedulesByType(form.type as 'layer' | 'broiler' | 'breeder').map(sch => (
-              <option key={sch.id} value={sch.id}>{sch.label}</option>
-            ))}
-          </Select>
+          <SmartSelect
+            value={form.vaccineScheduleId}
+            placeholder="— بدون برنامه —"
+            modalTitle="انتخاب برنامه واکسیناسیون"
+            options={schedulesByType(form.type as 'layer' | 'broiler' | 'breeder').map((sch) => ({
+              value: String(sch.id),
+              label: String(sch.label),
+            }))}
+            onChange={(val: string) => setForm({ ...form, vaccineScheduleId: val })}
+          />
         </Field>
       )}
 

@@ -165,25 +165,32 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           <DatePicker value={form.date} onChange={v => setForm(f => ({ ...f, date: v}))} disabled={!!form.relatedSettlementId} autoToday />
         </Field>
         <Field label={form.relatedSettlementId ? '🔒 دسته' : 'دسته'} hint={form.relatedSettlementId ? '🔒 از تسویه — برای تغییر، تسویه را ویرایش کنید' : undefined} required error={showError('category')} onTouch={() => markTouched('category')}>
-          <Select value={form.category} disabled={!!form.relatedSettlementId} onChange={e => {
-            const newCat = e.target.value;
-            const newUnit = getUnitForCategory(newCat);
-            const newItems = form.items.map(it => {
-              if (!it.category) return { ...it, unit: newUnit };
-              return it;
-            });
-            const isOther = newCat === 'other';
-            setForm({
-              ...form,
-              category: newCat,
-              items: newItems,
-              isPreorder: isOther ? false : form.isPreorder,
-              deliveryDate: isOther ? '' : form.deliveryDate,
-              advanceValue: isOther ? '' : form.advanceValue,
-            });
-          }}>
-            {(isPurchase ? CATEGORIES.purchase : CATEGORIES.sale).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-          </Select>
+          <SmartSelect
+            value={form.category}
+            disabled={!!form.relatedSettlementId}
+            modalTitle="انتخاب دسته"
+            placeholder="— انتخاب دسته —"
+            options={(isPurchase ? CATEGORIES.purchase : CATEGORIES.sale).map(([v, l]: [string, string]) => ({
+              value: v,
+              label: l,
+            }))}
+            onChange={newCat => {
+              const newUnit = getUnitForCategory(newCat);
+              const newItems = form.items.map(it => {
+                if (!it.category) return { ...it, unit: newUnit };
+                return it;
+              });
+              const isOther = newCat === 'other';
+              setForm({
+                ...form,
+                category: newCat,
+                items: newItems,
+                isPreorder: isOther ? false : form.isPreorder,
+                deliveryDate: isOther ? '' : form.deliveryDate,
+                advanceValue: isOther ? '' : form.advanceValue,
+              });
+            }}
+          />
         </Field>
       </Grid2>
       
@@ -225,17 +232,16 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       
       {/* قرارداد مرتبط */}
       <Field label="قرارداد مرتبط" hint="اختیاری — اتصال به معامله خاص (قابل تغییر)">
-        <Select
+        <SmartSelect
           value={form.relatedDealId || ''}
-          onChange={e => setForm(f => ({ ...f, relatedDealId: e.target.value }))}
-        >
-          <option value="">— بدون اتصال —</option>
-          {(props.deals || []).map((d: any) => (
-            <option key={d.id} value={d.id}>
-              {d.dealNumber ? `#${d.dealNumber}` : `#${d.id.slice(0, 6)}`} — {d.description || '—'}
-            </option>
-          ))}
-        </Select>
+          placeholder="— بدون اتصال —"
+          modalTitle="انتخاب قرارداد مرتبط"
+          options={(props.deals || []).map((d: any) => ({
+            value: d.id,
+            label: `${d.dealNumber ? `#${d.dealNumber}` : `#${d.id.slice(0, 6)}`} — ${d.description || '—'}`,
+          }))}
+          onChange={val => setForm(f => ({ ...f, relatedDealId: val }))}
+        />
       </Field>
 
       {form.isPreorder && (
@@ -406,9 +412,13 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                               </Field>
                               )}
                               <Field label="واحد" error={showError(`items.${idx}.unit`)} onTouch={() => markTouched(`items.${idx}.unit`)}>
-                                <Select value={currentUnit} onChange={e => updateItem(it.id, { unit: e.target.value, unitWeight: null })}>
-                                  {uom.units.map((u: UOMUnit) => <option key={u.value} value={u.value}>{u.label}</option>)}
-                                </Select>
+                                <SmartSelect
+                                  value={currentUnit}
+                                  modalTitle="انتخاب واحد"
+                                  placeholder="— انتخاب واحد —"
+                                  options={uom.units.map((u: UOMUnit) => ({ value: u.value, label: u.label }))}
+                                  onChange={val => updateItem(it.id, { unit: val, unitWeight: null })}
+                                />
                               </Field>
                             </Grid2>
                           </>

@@ -399,6 +399,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
         breedStd={breedStd}
         autoFields={autoFields}
         clearAuto={clearAuto}
+        markAuto={(keys: string[]) => setAutoFields((prev) => { const next = new Set(prev); keys.forEach((k) => next.add(k)); return next; })}
         save={save}
       />
     </PageContainer>

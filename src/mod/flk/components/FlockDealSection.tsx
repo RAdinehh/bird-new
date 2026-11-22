@@ -11,6 +11,7 @@ import DatePicker from '../../../shr/components/DatePicker';
 import { FieldHint } from '../../../shr/intelligence';
 import { parse as parseJ, addDays, format as formatJ } from 'date-fns-jalali';
 import { todayJ } from '../api/flocksCalc';
+import SmartSelect from '../../../shr/components/SmartSelect';
 
 interface Props {
   form: F;
@@ -140,10 +141,13 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
       {form.dealType === 'partnership' && (
         <>
           <Field label="شریک" error={showError?.('partnerId')} onTouch={() => markTouched?.('partnerId')} required help={HELP.flk.ownership.partner}>
-            <Select value={form.partnerId || ''} onChange={e => setForm({ ...form, partnerId: e.target.value })}>
-              <option value="">— انتخاب —</option>
-              {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </Select>
+            <SmartSelect
+              value={form.partnerId || ''}
+              placeholder="— انتخاب —"
+              modalTitle="انتخاب شریک"
+              options={contacts.map((c) => ({ value: String(c.id), label: String(c.name) }))}
+              onChange={(val: string) => setForm({ ...form, partnerId: val })}
+            />
           </Field>
           <Grid2>
             <Field label="سهم شریک" error={showError?.('partnerShare')} onTouch={() => markTouched?.('partnerShare')} help={HELP.flk.ownership.partnerShare}>
@@ -158,10 +162,13 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
 
       {form.dealType === 'consignment' && (
         <Field label="امانت‌دهنده" error={showError?.('consignorId')} onTouch={() => markTouched?.('consignorId')} required help={HELP.flk.ownership.consignor}>
-          <Select value={form.consignorId || ''} onChange={e => setForm({ ...form, consignorId: e.target.value })}>
-            <option value="">— انتخاب —</option>
-            {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </Select>
+          <SmartSelect
+              value={form.consignorId || ''}
+              placeholder="— انتخاب —"
+              modalTitle="انتخاب امانت‌دهنده"
+              options={contacts.map((c) => ({ value: String(c.id), label: String(c.name) }))}
+              onChange={(val: string) => setForm({ ...form, consignorId: val })}
+            />
         </Field>
       )}
 
@@ -169,10 +176,13 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
         <>
           <Grid2>
             <Field label="طرف تهاتر" error={showError?.('barterPartyId')} onTouch={() => markTouched?.('barterPartyId')} required>
-              <Select value={form.barterPartyId || ''} onChange={e => setForm({ ...form, barterPartyId: e.target.value })}>
-                <option value="">— انتخاب —</option>
-                {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </Select>
+              <SmartSelect
+              value={form.barterPartyId || ''}
+              placeholder="— انتخاب —"
+              modalTitle="انتخاب طرف تهاتر"
+              options={contacts.map((c) => ({ value: String(c.id), label: String(c.name) }))}
+              onChange={(val: string) => setForm({ ...form, barterPartyId: val })}
+            />
             </Field>
             <Field label="ارزش ریالی تهاتر" error={showError?.('barterValue')} onTouch={() => markTouched?.('barterValue')}>
               <MoneyField placeholder="مبلغ معادل" value={form.barterValue || ''} onChange={e => setForm({ ...form, barterValue: e.target.value })} />
@@ -196,10 +206,13 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
         <>
           <Grid2>
             <Field label="موجر (اجاره‌دهنده)" error={showError?.('lessorId')} onTouch={() => markTouched?.('lessorId')} required help={HELP.flk.ownership.lessor}>
-              <Select value={form.lessorId || ''} onChange={e => setForm({ ...form, lessorId: e.target.value })}>
-                <option value="">— انتخاب —</option>
-                {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </Select>
+              <SmartSelect
+              value={form.lessorId || ''}
+              placeholder="— انتخاب —"
+              modalTitle="انتخاب موجر"
+              options={contacts.map((c) => ({ value: String(c.id), label: String(c.name) }))}
+              onChange={(val: string) => setForm({ ...form, lessorId: val })}
+            />
             </Field>
             <Field label="مبلغ اجاره" required help={HELP.flk.ownership.rentAmount} error={showError?.('rentAmount')} onTouch={() => markTouched?.('rentAmount')}>
               <MoneyField placeholder={form.rentPeriod === 'total' ? 'مبلغ کل دوره' : 'مبلغ هر دوره'} value={form.rentAmount || ''} onChange={e => setForm({ ...form, rentAmount: e.target.value })} />
@@ -305,10 +318,16 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
 
       {relevantDeals.length > 0 && (
         <Field label="لینک به قرارداد (اختیاری)" hint="قرارداد مالی موجود در tra">
-          <Select value={form.dealId || ''} onChange={e => setForm({ ...form, dealId: e.target.value })}>
-            <option value="">— بدون لینک —</option>
-            {relevantDeals.map(d => <option key={d.id} value={d.id}>#{d.id.slice(0, 6)} · {d.date || ''}</option>)}
-          </Select>
+          <SmartSelect
+            value={form.dealId || ''}
+            placeholder="— بدون لینک —"
+            modalTitle="انتخاب قرارداد"
+            options={relevantDeals.map((d) => ({
+              value: String(d.id),
+              label: `#${String(d.id).slice(0, 6)} · ${d.date || ''}`,
+            }))}
+            onChange={(val: string) => setForm({ ...form, dealId: val })}
+          />
         </Field>
       )}
     </>

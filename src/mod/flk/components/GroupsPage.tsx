@@ -18,6 +18,7 @@ import { logAction } from '../../../cor/logger/auditLog';
 import { toFa } from '../../../shr/utils/fa';
 import { TYPE_LABEL, TYPE_DESC, TYPE_OPTIONS, TYPE_ICON_MAP, NAME_PLACEHOLDER } from '../api/groupsConstants';
 import HelpBanner from '../../../shr/components/HelpBanner';
+import SmartSelect from '../../../shr/components/SmartSelect';
 
 interface Props {
   open: boolean;
@@ -404,28 +405,15 @@ export default function GroupsPage({ open, onClose }: Props) {
           </Field>
 
 <Field label="گروه والد (اختیاری)" hint="برای ساختار تودرتو">
-            <Select value={form.parentGroupId} onChange={e => setForm({ ...form, parentGroupId: e.target.value })}>
-              <option value="">— بدون والد —</option>
-              {groups.filter(g => {
-                if (g.id === editingId) return false;
-                if (g.archived) return false;
-                if (!editingId) return true;
-                // حذف زیرگروه‌های خود editingId (جلوگیری از loop)
-                let cur: string | undefined = g.parentGroupId;
-                const seen = new Set<string>();
-                while (cur) {
-                  if (seen.has(cur)) break;
-                  seen.add(cur);
-                  if (cur === editingId) return false;
-                  const gg = groups.find(x => x.id === cur);
-                  if (!gg) break;
-                  cur = gg.parentGroupId;
-                }
-                return true;
-              }).map(g => (
-                <option key={g.id} value={g.id}>{g.name}</option>
-              ))}
-            </Select>
+            <SmartSelect
+              value={form.parentGroupId}
+              placeholder="— بدون والد —"
+              modalTitle="انتخاب گروه والد"
+              options={groups
+                .filter((g) => g.id !== editingId && !g.archived)
+                .map((g) => ({ value: String(g.id), label: String(g.name) }))}
+              onChange={(val: string) => setForm({ ...form, parentGroupId: val })}
+            />
           </Field>
           </Grid2>
 
