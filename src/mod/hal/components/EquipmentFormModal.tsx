@@ -211,9 +211,9 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                     if (capPerFan <= 0) return null;
 
                     const isEnough = needM3h > 0 ? totalAirM3h >= needM3h : true;
-                    const bg = isEnough ? "var(--accent-soft)" : "var(--danger-soft)";
-                    const fg = isEnough ? "var(--accent)" : "var(--danger)";
-                    const dividerColor = isEnough ? "var(--accent-border)" : "var(--danger)";
+                    const bg = "var(--accent-soft)";
+                    const fg = "var(--accent)";
+                    const dividerColor = "var(--accent-border)";
 
                     const fmtRate = (n: number) => toFa(
                       n >= 1 ? n.toFixed(1).replace(".", "٫") : n.toFixed(2).replace(".", "٫")
