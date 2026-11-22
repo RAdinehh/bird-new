@@ -1,6 +1,8 @@
 /**
  * useInvoiceSelection — مدیریت Multi-Select فاکتورها
  */
+import { getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useMultiSelect } from '../../../shr/multiSelect/useMultiSelect';
 import { toFa } from '../../../shr/utils/fa';
 import { showConfirmAsync } from '../../../cor/store/dialog';
@@ -39,7 +41,7 @@ export function useInvoiceSelection({ list, invoices, deleteInvoice, setUndoData
         );
         if (!linkedOk) return;
       }
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' فاکتور حذف شوند؟', { danger: true });
+      const ok = await showConfirmAsync('حذف گروهی', getGlobalFormat().count(ids.length) + ' فاکتور حذف شوند؟', { danger: true });
       if (!ok) return;
       const backups: any[] = [];
       for (const id of ids) {

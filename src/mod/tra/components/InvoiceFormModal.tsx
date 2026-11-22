@@ -1,6 +1,8 @@
 /**
  * InvoiceFormModal — فرم ثبت/ویرایش فاکتور (طراحی تمیز و استاندارد)
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import React, { useState, useEffect } from 'react';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import {
@@ -97,6 +99,7 @@ const getQuantityMax = (cat: string): number | undefined => {
 };
 
 export default function InvoiceFormModal(props: InvoiceFormModalProps) {
+  const fmt = useFormat();
   const {
     open, setOpen, form, setForm, isPurchase,
     parties, flocks, whsItems, vErrors, err, onNewFlock,
@@ -262,7 +265,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       }}>
       {/* ====== اقلام ====== */}
       <SectionTitle>
-        <span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام {total > 0 && `— جمع: ${toFa(total.toLocaleString('fa-IR'))} تومان`}
+        <span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام {total > 0 && `— جمع: ${fmt.money(total, { withUnit: false })} تومان`}
       </SectionTitle>
       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 'var(--sp-1)', marginBottom: 'var(--sp-2)', paddingRight: 4, lineHeight: 1.4 }}>کالا یا خدمت اضافه کنید</div>
       
@@ -299,14 +302,14 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                   </span>
                   <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>
                     {it.quantity > 0 || it.unitPrice > 0
-                      ? `${toFa(it.quantity)} ${(UNIT_LABEL as any)[it.unit || 'pcs'] || 'عدد'} × ${toFa((it.unitPrice || 0).toLocaleString('fa-IR'))} تومان`
+                      ? `${fmt.num(it.quantity)} ${(UNIT_LABEL as any)[it.unit || 'pcs'] || 'عدد'} × ${fmt.money(it.unitPrice || 0, { withUnit: false })} تومان`
                       : ''}
                   </span>
                 </div>
                 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
                   <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: it.total > 0 ? 'var(--accent)' : 'var(--muted)' }}>
-                    {it.total > 0 ? `${toFa(it.total.toLocaleString('fa-IR'))} تومان` : ''}
+                    {it.total > 0 ? `${fmt.money(it.total, { withUnit: false })} تومان` : ''}
                   </span>
                   <button 
                     type="button" 
@@ -352,7 +355,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                     quantityField={
                       cat === 'chick' && (UOM_CATEGORIES[cat] || UOM_CATEGORIES.other).units.length === 1 ? (
                         <Field label="تعداد" required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
-                          <NumField placeholder="تعداد" value={it.quantity > 0 ? toFa(String(it.quantity)) : ''} onChange={e => {
+                          <NumField placeholder="تعداد" value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
                             let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
                             const max = getQuantityMax(cat);
                             if (max && val > max) val = max;
@@ -382,7 +385,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                           <Grid2>
                                                         {cat !== 'chick' && (
                                                         <Field label="تعداد" required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
-                              <NumField placeholder="تعداد" value={it.quantity > 0 ? toFa(String(it.quantity)) : ''} onChange={e => {
+                              <NumField placeholder="تعداد" value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
                                   let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
                                   const max = getQuantityMax(cat);
                                   if (max && val > max) val = max;
@@ -393,7 +396,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                             )}
                                                         {(cat === 'chick' || cat === 'adult') && isPurchase && (
                                                           <Field label="تعداد سالم" error={showError(`items.${idx}.healthyCount`)} onTouch={() => markTouched(`items.${idx}.healthyCount`)}>
-                                                            <NumField placeholder="تعداد" unit="پرنده" value={it.healthyCount != null && it.healthyCount > 0 ? toFa(String(it.healthyCount)) : ''} onChange={e => { const v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || 0; const clamped = v > 0 ? Math.min(v, it.quantity || 0) : null; updateItem(it.id, { healthyCount: clamped }); }} min={0} />
+                                                            <NumField placeholder="تعداد" unit="پرنده" value={it.healthyCount != null && it.healthyCount > 0 ? fmt.code(String(it.healthyCount)) : ''} onChange={e => { const v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || 0; const clamped = v > 0 ? Math.min(v, it.quantity || 0) : null; updateItem(it.id, { healthyCount: clamped }); }} min={0} />
                                                           </Field>
                                                         )}
                           </Grid2>
@@ -402,7 +405,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                                                         <Grid2>
                               {cat !== 'chick' && (
                               <Field label="تعداد" required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
-                                <NumField placeholder="تعداد" value={it.quantity > 0 ? toFa(String(it.quantity)) : ''} onChange={e => {
+                                <NumField placeholder="تعداد" value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
                                   let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
                                   const max = getQuantityMax(cat);
                                   if (max && val > max) val = max;
@@ -428,7 +431,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
   <div style={{ display: (it.quantity || 0) > 0 ? 'contents' : 'none' }}>
     <Grid3>
       <Field label="نر" error={showError(`items.${idx}.maleCount`)} onTouch={() => markTouched(`items.${idx}.maleCount`)}>
-        <NumField placeholder="نر" value={it.maleCount != null && it.maleCount > 0 ? toFa(String(it.maleCount)) : ''} onChange={e => {
+        <NumField placeholder="نر" value={it.maleCount != null && it.maleCount > 0 ? fmt.code(String(it.maleCount)) : ''} onChange={e => {
           let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
           if (v !== null && v < 0) v = 0;
           if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
@@ -443,7 +446,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         }} min={0} max={it.quantity || undefined} />
       </Field>
       <Field label="ماده" error={showError(`items.${idx}.femaleCount`)} onTouch={() => markTouched(`items.${idx}.femaleCount`)}>
-        <NumField placeholder="ماده" value={it.femaleCount != null && it.femaleCount > 0 ? toFa(String(it.femaleCount)) : ''} onChange={e => {
+        <NumField placeholder="ماده" value={it.femaleCount != null && it.femaleCount > 0 ? fmt.code(String(it.femaleCount)) : ''} onChange={e => {
           let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
           if (v !== null && v < 0) v = 0;
           if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
@@ -458,7 +461,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         }} min={0} max={it.quantity || undefined} />
       </Field>
       <Field label="نامشخص" hint="برای جنسیت مخلوط" error={showError(`items.${idx}.unknownCount`)} onTouch={() => markTouched(`items.${idx}.unknownCount`)}>
-        <NumField placeholder="نامشخص" value={it.unknownCount != null && it.unknownCount > 0 ? toFa(String(it.unknownCount)) : ''} onChange={e => {
+        <NumField placeholder="نامشخص" value={it.unknownCount != null && it.unknownCount > 0 ? fmt.code(String(it.unknownCount)) : ''} onChange={e => {
           let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
           if (v !== null && v < 0) v = 0;
           if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
@@ -473,7 +476,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       const isMatch = total === qty;
       return (
         <div style={{ fontSize: 'var(--fs-xs)', marginTop: 6, textAlign: 'center', fontWeight: 600, color: isMatch ? 'var(--accent)' : 'var(--warn)' }}>
-          {isMatch ? '✅' : '⚠️'} مجموع: {toFa(total)} از {toFa(qty)}
+          {isMatch ? '✅' : '⚠️'} مجموع: {fmt.count(total)} از {fmt.count(qty)}
         </div>
       );
     })()}
@@ -484,7 +487,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                           <Field label={weightLabel} hint="لازم برای تبدیل به واحد پایه انبار و محاسبه قیمت">
                             <NumField
                               placeholder="مثلاً ۵۰۰"
-                              value={it.unitWeight != null && it.unitWeight > 0 ? toFa(String(it.unitWeight)) : ''}
+                              value={it.unitWeight != null && it.unitWeight > 0 ? fmt.code(String(it.unitWeight)) : ''}
                               onChange={e => updateItem(it.id, { unitWeight: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })}
                               min={0}
                             />
@@ -502,7 +505,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                             <>
                               <Grid2>
                                 <Field label={`قیمت هر ${baseUnitLabel}`} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
-                                  <MoneyField placeholder={getPricePlaceholder(cat)} value={it.unitPrice > 0 ? toFa(String(it.unitPrice)) : ''} onChange={e => {
+                                  <MoneyField placeholder={getPricePlaceholder(cat)} value={it.unitPrice > 0 ? fmt.code(String(it.unitPrice)) : ''} onChange={e => {
                                     let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
                                     if (maxPrice && val > maxPrice) val = maxPrice;
                                     if (val < 0) val = 0;
@@ -528,10 +531,10 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                                 }}>
                                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 600 }}>
                                     <span>
-                                      {toFa(it.quantity)} {currentUnitLabel}
-                                      {factor !== 1 && !currentUnitLabel.includes(baseUnitLabel) ? ` (${toFa(baseQty)} ${baseUnitLabel})` : ''}
+                                      {fmt.num(it.quantity)} {currentUnitLabel}
+                                      {factor !== 1 && !currentUnitLabel.includes(baseUnitLabel) ? ` (${fmt.num(baseQty)} ${baseUnitLabel})` : ''}
                                     </span>
-                                    <span>× {toFa(it.unitPrice.toLocaleString('fa-IR'))} تومان</span>
+                                    <span>× {fmt.money(it.unitPrice, { withUnit: false })} تومان</span>
                                   </div>
                                   <div style={{
                                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -539,7 +542,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                                   }}>
                                     <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)' }}>جمع محاسبه‌شده:</span>
                                     <span style={{ fontSize: 'var(--fs-md)', fontWeight: 800, color: 'var(--accent)' }}>
-                                      {toFa(liveTotal.toLocaleString('fa-IR'))} تومان
+                                      {fmt.money(liveTotal, { withUnit: false })} تومان
                                     </span>
                                   </div>
                                 </div>
@@ -557,7 +560,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                     </Field>
                     <Field label="مبلغ کل این قلم">
                       <div style={{ height: 38, display: 'flex', alignItems: 'center', fontWeight: 800, color: 'var(--accent)', direction: 'rtl', background: 'var(--input-bg)', border: '1.5px solid var(--accent-border)', borderRadius: 'var(--r-md)', padding: '0 12px', justifyContent: 'flex-end' }}>
-                        {it.total > 0 ? `${toFa(it.total.toLocaleString('fa-IR'))} تومان` : ''}
+                        {it.total > 0 ? `${fmt.money(it.total, { withUnit: false })} تومان` : ''}
                       </div>
                     </Field>
                   </Grid2>
@@ -613,7 +616,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               flexWrap: 'wrap',
             }}>
               <div style={{ fontSize: 'var(--fs-sm)' }}>
-                ⚡ <b>پیش‌پرداخت موجود:</b> {toFa(_unapplied.toLocaleString('fa-IR'))} ت
+                ⚡ <b>پیش‌پرداخت موجود:</b> {fmt.money(_unapplied)}
               </div>
               <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 'var(--fs-sm)', fontWeight: 600 }}>
                 <input

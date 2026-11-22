@@ -2,6 +2,8 @@
  * InvoicePayModal — ثبت سریع پرداخت/دریافت برای یک فاکتور
  * استاندارد Odoo/SAP: quick amounts + partial hint + check details
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { useState, useEffect, useMemo } from 'react';
 import { Modal, Btn, BtnRow, Field, Grid2, MoneyField, Select, Textarea } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
@@ -22,6 +24,7 @@ interface Props {
 }
 
 export default function InvoicePayModal({ open, onClose, invoice }: Props) {
+  const fmt = useFormat();
   const { invoices, allocations, updateInvoice, addPartyPayment } = useTra();
   const liveInv = invoice ? invoices.find(i => i.id === invoice.id) : null;
   const effectiveInv = liveInv || invoice;
@@ -107,7 +110,7 @@ export default function InvoicePayModal({ open, onClose, invoice }: Props) {
     <Modal open={open} onClose={onClose} title={title} size="md">
       <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', marginBottom: 'var(--sp-3)', fontSize: 'var(--fs-sm)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ color: 'var(--muted)' }}>مانده فاکتور</span>
-        <b style={{ fontVariantNumeric: 'tabular-nums' }}>{toFa(rem.toLocaleString('fa-IR'))} ت</b>
+        <b style={{ fontVariantNumeric: 'tabular-nums' }}>{fmt.money(rem)}</b>
       </div>
 
       <Grid2>
@@ -125,14 +128,14 @@ export default function InvoicePayModal({ open, onClose, invoice }: Props) {
         {[25, 50, 75, 100].map(pct => (
           <button key={pct} type="button" onClick={() => quickSet(pct / 100)}
             style={{ flex: 1, minWidth: 56, padding: '6px 4px', fontSize: 'var(--fs-xs)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--text)', cursor: 'pointer', fontFamily: 'inherit' }}>
-            {pct === 100 ? 'کل' : `${toFa(pct)}٪`}
+            {pct === 100 ? 'کل' : `${fmt.num(pct)}٪`}
           </button>
         ))}
       </div>
 
       {entered > 0 && entered < rem && (
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', marginBottom: 8 }}>
-          ↳ باقی‌مانده: <b>{toFa(remainingAfter.toLocaleString('fa-IR'))} ت</b>
+          ↳ باقی‌مانده: <b>{fmt.money(remainingAfter)}</b>
         </div>
       )}
       {entered === rem && rem > 0 && (

@@ -2,6 +2,8 @@
  * StatementModal.tsx — صورت‌حساب طرف حساب
  * استاندارد: SAP FBL5N | Layout: 3-line mobile-friendly
  */
+import { getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useState, useMemo } from 'react';
 import { Modal, Btn, BtnRow, ModalFooter, Field, Grid2, Select } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
@@ -265,15 +267,15 @@ export default function StatementModal({ open, onClose, kind }: Props) {
       
       return `
         <tr>
-          <td class="td-center">${toFa(index + 1)}</td>
-          <td class="td-center">${toFa(l.date)}</td>
+          <td class="td-center">${getGlobalFormat().count(index + 1)}</td>
+          <td class="td-center">${getGlobalFormat().date(l.date)}</td>
           <td class="td-right">
             <div style="font-weight: 600;">${metaParts.join(' - ')}</div>
             ${l.description ? `<div style="font-size: 10px; color: #64748b; margin-top: 2px; font-weight: 400;">${l.description}</div>` : ''}
           </td>
-          <td class="td-left" style="color: #dc2626;">${l.debit > 0 ? toFa(l.debit.toLocaleString('fa-IR')) : '—'}</td>
-          <td class="td-left" style="color: #16a34a;">${l.credit > 0 ? toFa(l.credit.toLocaleString('fa-IR')) : '—'}</td>
-          <td class="td-left" style="font-weight: 700;">${toFa(Math.abs(l.balance).toLocaleString('fa-IR'))}</td>
+          <td class="td-left" style="color: #dc2626;">${l.debit > 0 ? getGlobalFormat().money(l.debit, { withUnit: false }) : '—'}</td>
+          <td class="td-left" style="color: #16a34a;">${l.credit > 0 ? getGlobalFormat().money(l.credit, { withUnit: false }) : '—'}</td>
+          <td class="td-left" style="font-weight: 700;">${getGlobalFormat().money(Math.abs(l.balance), { withUnit: false })}</td>
         </tr>
       `;
     }).join('');
@@ -345,7 +347,7 @@ export default function StatementModal({ open, onClose, kind }: Props) {
     </div>
 
     <div class="doc-info">
-      <div class="meta">تاریخ چاپ: ${toFa(getTodayJalali())}</div>
+      <div class="meta">تاریخ چاپ: ${getGlobalFormat().date(getTodayJalali())}</div>
     </div>
   </div>
 
@@ -355,8 +357,8 @@ export default function StatementModal({ open, onClose, kind }: Props) {
       <div class="info-grid">
         <div class="info-lbl">نام:</div><div class="info-val">${farmName}</div>
         <div class="info-lbl">نشانی:</div><div class="info-val">${farmAddr || '—'} ${farmCity ? `(${farmCity})` : ''}</div>
-        <div class="info-lbl">کد پستی:</div><div class="info-val">${farmPostal ? toFa(farmPostal) : '—'}</div>
-        <div class="info-lbl">تلفن:</div><div class="info-val">${farmPhone ? toFa(farmPhone) : '—'}</div>
+        <div class="info-lbl">کد پستی:</div><div class="info-val">${farmPostal ? getGlobalFormat().code(farmPostal) : '—'}</div>
+        <div class="info-lbl">تلفن:</div><div class="info-val">${farmPhone ? getGlobalFormat().code(farmPhone) : '—'}</div>
       </div>
     </div>
     <div class="party-box">
@@ -364,8 +366,8 @@ export default function StatementModal({ open, onClose, kind }: Props) {
       <div class="info-grid">
         <div class="info-lbl">نام:</div><div class="info-val">${party?.name || '—'}</div>
         <div class="info-lbl">نشانی:</div><div class="info-val">${party?.address || '—'} ${party?.city ? `(${party.city})` : ''}</div>
-        <div class="info-lbl">کد ملی:</div><div class="info-val">${party?.nationalId ? toFa(party.nationalId) : '—'}</div>
-        <div class="info-lbl">تلفن:</div><div class="info-val">${party?.phone ? toFa(party.phone) : '—'}</div>
+        <div class="info-lbl">کد ملی:</div><div class="info-val">${party?.nationalId ? getGlobalFormat().code(party.nationalId) : '—'}</div>
+        <div class="info-lbl">تلفن:</div><div class="info-val">${party?.phone ? getGlobalFormat().code(party.phone) : '—'}</div>
       </div>
     </div>
   </div>
@@ -388,9 +390,9 @@ export default function StatementModal({ open, onClose, kind }: Props) {
 
   <div class="summary-container">
     <table class="summary-table">
-      <tr><td class="col-lbl">جمع کل بدهی:</td><td class="col-val">${toFa(totalDebit.toLocaleString('fa-IR'))}</td></tr>
-      <tr><td class="col-lbl">مجموع پرداخت:</td><td class="col-val">${toFa(totalCredit.toLocaleString('fa-IR'))}</td></tr>
-      <tr class="total-row"><td class="col-lbl">مانده نهایی:</td><td class="col-val" style="color: ${netBalance > 0 ? '#dc2626' : '#16a34a'}">${toFa(Math.abs(netBalance).toLocaleString('fa-IR'))} ${netBalance < 0 ? '(بستانکار)' : ''}</td></tr>
+      <tr><td class="col-lbl">جمع کل بدهی:</td><td class="col-val">${getGlobalFormat().money(totalDebit, { withUnit: false })}</td></tr>
+      <tr><td class="col-lbl">مجموع پرداخت:</td><td class="col-val">${getGlobalFormat().money(totalCredit, { withUnit: false })}</td></tr>
+      <tr class="total-row"><td class="col-lbl">مانده نهایی:</td><td class="col-val" style="color: ${netBalance > 0 ? '#dc2626' : '#16a34a'}">${getGlobalFormat().money(Math.abs(netBalance), { withUnit: false })} ${netBalance < 0 ? '(بستانکار)' : ''}</td></tr>
     </table>
     <div class="amount-words">
       <strong>مانده نهایی به حروف:</strong> ${numberToWords(Math.abs(netBalance))} تومان ${netBalance < 0 ? '(بستانکار)' : ''}
@@ -475,16 +477,16 @@ export default function StatementModal({ open, onClose, kind }: Props) {
           }}>
             <div>
               <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>مجموع بدهی</div>
-              <div style={{ fontWeight: 700, color: 'var(--danger)' }}>{toFa(totalDebit.toLocaleString('fa-IR'))} ت</div>
+              <div style={{ fontWeight: 700, color: 'var(--danger)' }}>{getGlobalFormat().money(totalDebit, { withUnit: false })} ت</div>
             </div>
             <div>
               <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>مجموع پرداخت</div>
-              <div style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(totalCredit.toLocaleString('fa-IR'))} ت</div>
+              <div style={{ fontWeight: 700, color: 'var(--accent)' }}>{getGlobalFormat().money(totalCredit, { withUnit: false })} ت</div>
             </div>
             <div>
               <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>مانده نهایی</div>
               <div style={{ fontWeight: 700, color: netBalance > 0 ? 'var(--danger)' : 'var(--accent)' }}>
-                {toFa(Math.abs(netBalance).toLocaleString('fa-IR'))} ت
+                {getGlobalFormat().money(Math.abs(netBalance), { withUnit: false })} ت
               </div>
             </div>
           </div>
@@ -496,7 +498,7 @@ export default function StatementModal({ open, onClose, kind }: Props) {
                 
                 {/* هدر روز */}
                 <div style={{ padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', borderBottom: '2px solid var(--border)', background: 'var(--bg)' }}>
-                  <div style={{ fontSize: '14px', fontWeight: 700 }}>{toFa(day.date)}</div>
+                  <div style={{ fontSize: '14px', fontWeight: 700 }}>{getGlobalFormat().date(day.date)}</div>
                   <div style={{ fontSize: '11px', color: 'var(--muted)' }}>{day.lines.length} تراکنش</div>
                 </div>
                 
@@ -536,7 +538,7 @@ export default function StatementModal({ open, onClose, kind }: Props) {
                         
                         <div style={{ minWidth: '110px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
                            <span style={{ fontSize: '13px', fontWeight: 700, color: isDebit ? 'var(--danger)' : 'var(--accent)', fontVariantNumeric: 'tabular-nums', direction: 'ltr' }}>
-                              {isDebit ? '+' : '-'}{toFa(amount.toLocaleString('fa-IR'))}
+                              {isDebit ? '+' : '-'}{getGlobalFormat().money(amount, { withUnit: false })}
                            </span>
                            <span style={{ fontSize: '9px', padding: '1px 5px', borderRadius: '4px', fontWeight: 500, background: isDebit ? 'var(--danger-soft)' : 'var(--accent-soft)', color: isDebit ? 'var(--danger)' : 'var(--accent)' }}>
                               {isDebit ? 'بدهکار' : 'بستانکار'}
@@ -551,7 +553,7 @@ export default function StatementModal({ open, onClose, kind }: Props) {
                 <div style={{ padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg)', borderTop: '1px solid var(--border)' }}>
                   <span style={{ fontSize: '11px', color: 'var(--muted)' }}>مانده پایان روز</span>
                   <span style={{ fontSize: '13px', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-                    {toFa(day.endBalance.toLocaleString('fa-IR'))} ت
+                    {getGlobalFormat().money(day.endBalance)}
                   </span>
                 </div>
               </div>

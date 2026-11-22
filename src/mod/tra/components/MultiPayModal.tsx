@@ -2,6 +2,8 @@
  * MultiPayModal.tsx — پرداخت گروهی به چند فاکتور
  * یک PartyPayment می‌سازد و بین چند فاکتور توزیع می‌کند.
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { useState, useMemo, useEffect } from 'react';
 import { Btn, BtnRow, Field, Grid2, MoneyField, Modal, NumField, SectionTitle, Select, ErrorBox } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
@@ -21,6 +23,7 @@ interface Props {
 }
 
 export default function MultiPayModal({ open, onClose, kind, prefillPartyId, prefillInvoiceId }: Props) {
+  const fmt = useFormat();
   const { invoices, addPartyPayment, updateInvoice } = useTra();
   const contacts = useCtc(s => s.contacts);
   const [partyId, setPartyId] = useState('');
@@ -188,7 +191,7 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
         count++;
       }
 
-      toastMsg.success(`پرداخت به ${toFa(count)} فاکتور توزیع شد`);
+      toastMsg.success(`پرداخت به ${fmt.count(count)} فاکتور توزیع شد`);
       reset();
       onClose();
     } catch (e: any) {
@@ -305,7 +308,7 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
 
       {partyId && (
         <>
-          <SectionTitle><span style={{ fontSize: 'var(--fs-sm)' }}>📄</span> فاکتورهای بدهکار ({toFa(unpaid.length)})</SectionTitle>
+          <SectionTitle><span style={{ fontSize: 'var(--fs-sm)' }}>📄</span> فاکتورهای بدهکار ({fmt.count(unpaid.length)})</SectionTitle>
           {unpaid.length === 0 ? (
             <div style={{ padding: 'var(--pad-normal)', textAlign: 'center', color: 'var(--muted)', fontSize: 'var(--fs-sm)', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
               این طرف حساب فاکتور بدهکاری ندارد ✅
@@ -359,7 +362,7 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
                         فاکتور {inv.number || inv.id.slice(0, 8)}
                       </div>
                       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-                        📅 {toFa(inv.date)} • مانده: {toFa(rem.toLocaleString('fa-IR'))} تومان
+                        📅 {fmt.date(inv.date)} • مانده: {fmt.money(rem, { withUnit: false })} تومان
                       </div>
                     </div>
                     {isSelected && manualMode && (
@@ -379,7 +382,7 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
                     )}
                     {isSelected && !manualMode && alloc > 0 && (
                       <div style={{ fontWeight: 700, color: 'var(--accent)', fontSize: 'var(--fs-sm)' }}>
-                        {toFa(alloc.toLocaleString('fa-IR'))} تومان
+                        {fmt.money(alloc, { withUnit: false })} تومان
                       </div>
                     )}
                   </div>
@@ -397,9 +400,9 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
               fontSize: 'var(--fs-sm)',
               display: 'flex', justifyContent: 'space-between',
             }}>
-              <span>توزیع‌شده: <b>{toFa(totalAllocated.toLocaleString('fa-IR'))} تومان</b></span>
+              <span>توزیع‌شده: <b>{fmt.money(totalAllocated, { withUnit: false })} تومان</b></span>
               {leftover > 0.5 && (
-                <span style={{ color: 'var(--warn)' }}>پیش‌پرداخت: <b>{toFa(leftover.toLocaleString('fa-IR'))} تومان</b></span>
+                <span style={{ color: 'var(--warn)' }}>پیش‌پرداخت: <b>{fmt.money(leftover, { withUnit: false })} تومان</b></span>
               )}
               {leftover <= 0.5 && leftover > -0.5 && (
                 <span style={{ color: 'var(--accent)' }}>✅ کامل توزیع شد</span>

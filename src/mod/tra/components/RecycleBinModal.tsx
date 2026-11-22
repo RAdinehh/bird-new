@@ -1,3 +1,4 @@
+import { useFormat } from '../../../shr/units/useFormat';
 import { Tag } from '../../../shr/components/ui';
 import { useState, useEffect } from 'react';
 import { Modal, Btn } from '../../../shr/components/ui';
@@ -23,6 +24,7 @@ function daysLeft(expiresAt: string): number {
 }
 
 export default function RecycleBinModal({ open, onClose }: Props) {
+  const fmt = useFormat();
   const { restoreInvoice } = useTra();
   const { contacts } = useCtc();
   const [entries, setEntries] = useState<RecycleBinEntry<DeletedInvoiceSnapshot>[]>([]);
@@ -76,7 +78,7 @@ export default function RecycleBinModal({ open, onClose }: Props) {
 
   const title =
     entries.length > 0
-      ? '🗑️ سبد بازیابی (' + toFa(entries.length) + ')'
+      ? '🗑️ سبد بازیابی (' + fmt.count(entries.length) + ')'
       : '🗑️ سبد بازیابی';
 
   return (
@@ -146,16 +148,16 @@ export default function RecycleBinModal({ open, onClose }: Props) {
                     اقلام: {itemsText || '—'}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ color: 'var(--text)', fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{toFa(inv.total.toLocaleString('fa-IR'))} تومان</span>
-                    <Tag style={{ background: badgeBg, color: badgeColor }}>{toFa(days)} روز مونده</Tag>
+                    <span style={{ color: 'var(--text)', fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{fmt.money(inv.total, { withUnit: false })} تومان</span>
+                    <Tag style={{ background: badgeBg, color: badgeColor }}>{fmt.day(days)} روز مونده</Tag>
                   </div>
                 </div>
 
                 {/* ردیف سوم: متادیتا و دکمه‌ها */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 2, borderTop: '1px dashed var(--border)', paddingTop: 6 }}>
                   <div style={{ fontSize: 10, color: 'var(--dim)', lineHeight: 1.4 }}>
-                    <div>فاکتور: {inv.number} • {toFa(inv.date)}</div>
-                    <div>🗑️ حذف: {new Date(e.deletedAt).toLocaleString('fa-IR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</div>
+                    <div>فاکتور: {inv.number} • {fmt.date(inv.date)}</div>
+                    <div>🗑️ حذف: {fmt.code(new Date(e.deletedAt).toLocaleString('fa-IR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }))}</div>
                   </div>
                   <div style={{ display: 'flex', gap: 4 }}>
                     <Btn size="sm" variant="outline" onClick={() => handleDeleteSingle(inv.id)} style={{ color: 'var(--danger)', borderColor: 'var(--danger)', minHeight: 28, height: 28, padding: '0 8px', fontSize: 11 }}>
@@ -174,7 +176,7 @@ export default function RecycleBinModal({ open, onClose }: Props) {
           {entries.length > visibleCount && (
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12, marginBottom: 8 }}>
               <Btn size="sm" variant="outline" onClick={() => setVisibleCount(c => c + 20)}>
-                نمایش ۲۰ مورد بعدی (از {toFa(entries.length - visibleCount)} مورد باقی‌مانده)
+                نمایش ۲۰ مورد بعدی (از {fmt.count(entries.length - visibleCount)} مورد باقی‌مانده)
               </Btn>
             </div>
           )}

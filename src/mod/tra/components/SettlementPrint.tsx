@@ -2,6 +2,8 @@
  * SettlementPrint.tsx — سند چاپ تسویه دوره‌ای
  * استاندارد SAP MRKO
  */
+import { getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useSet } from '../../set/store';
 import { useCtc } from '../../ctc/store';
 import { toFa } from '../../../shr/utils/fa';
@@ -31,11 +33,11 @@ export default function SettlementPrint({ settlement, deal, onClose }: Props) {
       const price = Number(s.unitPrice) || 0;
       const total = qty * price;
       return '<tr>' +
-        '<td>' + (s.date ? toFa(s.date) : '—') + '</td>' +
+        '<td>' + (s.date ? getGlobalFormat().date(s.date) : '—') + '</td>' +
         '<td>' + (good?.name || '—') + '</td>' +
-        '<td>' + toFa(qty) + '</td>' +
-        '<td>' + toFa(price.toLocaleString('fa-IR')) + '</td>' +
-        '<td>' + toFa(total.toLocaleString('fa-IR')) + '</td>' +
+        '<td>' + getGlobalFormat().num(qty) + '</td>' +
+        '<td>' + getGlobalFormat().money(price, { withUnit: false }) + '</td>' +
+        '<td>' + getGlobalFormat().money(total, { withUnit: false }) + '</td>' +
         '</tr>';
     }).join('');
 
@@ -74,22 +76,22 @@ export default function SettlementPrint({ settlement, deal, onClose }: Props) {
       '<div><span>نوع معامله:</span><strong>' + (DEAL_LABEL[deal.type] || deal.type) + '</strong></div>' +
       '<div><span>طرف حساب:</span><strong>' + (party?.name || '—') + '</strong></div>' +
       '<div><span>وضعیت:</span><strong>' + statusLabel + '</strong></div>' +
-      '<div><span>از تاریخ:</span><strong>' + toFa(settlement.periodStart) + '</strong></div>' +
-      '<div><span>تا تاریخ:</span><strong>' + toFa(settlement.periodEnd) + '</strong></div>' +
+      '<div><span>از تاریخ:</span><strong>' + getGlobalFormat().date(settlement.periodStart) + '</strong></div>' +
+      '<div><span>تا تاریخ:</span><strong>' + getGlobalFormat().date(settlement.periodEnd) + '</strong></div>' +
       '</div>' +
       (salesRows
         ? '<h2>فروش‌های دوره</h2>' +
           '<table><thead><tr><th>تاریخ</th><th>کالا</th><th>مقدار</th><th>قیمت واحد</th><th>جمع</th></tr></thead><tbody>' + salesRows + '</tbody></table>'
         : '<p style="text-align:center;color:#64748b;font-size:12px;">فروشی در این دوره ثبت نشده است</p>') +
       '<div class="summary">' +
-      '<div class="summary-row"><span>فروش کل:</span><span>' + toFa((settlement.grossSales || 0).toLocaleString('fa-IR')) + ' ت</span></div>' +
-      '<div class="summary-row"><span>کمیسیون:</span><span>' + toFa((settlement.commission || 0).toLocaleString('fa-IR')) + ' ت</span></div>' +
-      '<div class="summary-row"><span>خالص قابل پرداخت:</span><span>' + toFa((settlement.netPayable || 0).toLocaleString('fa-IR')) + ' ت</span></div>' +
-      '<div class="summary-row"><span>دریافت‌شده:</span><span>' + toFa((settlement.paidAmount || 0).toLocaleString('fa-IR')) + ' ت</span></div>' +
-      '<div class="summary-row total"><span>مانده:</span><span>' + toFa(Math.abs(balance).toLocaleString('fa-IR')) + ' ت</span></div>' +
+      '<div class="summary-row"><span>فروش کل:</span><span>' + getGlobalFormat().money(settlement.grossSales || 0) + '</span></div>' +
+      '<div class="summary-row"><span>کمیسیون:</span><span>' + getGlobalFormat().money(settlement.commission || 0) + '</span></div>' +
+      '<div class="summary-row"><span>خالص قابل پرداخت:</span><span>' + getGlobalFormat().money(settlement.netPayable || 0) + '</span></div>' +
+      '<div class="summary-row"><span>دریافت‌شده:</span><span>' + getGlobalFormat().money(settlement.paidAmount || 0) + '</span></div>' +
+      '<div class="summary-row total"><span>مانده:</span><span>' + getGlobalFormat().money(Math.abs(balance)) + '</span></div>' +
       '</div>' +
       '<div class="footer">' +
-      'تاریخ چاپ: ' + toFa(new Date().toLocaleDateString('fa-IR')) +
+      'تاریخ چاپ: ' + getGlobalFormat().code(new Date().toLocaleDateString('fa-IR')) +
       (settlement.notes ? '<br>' + settlement.notes : '') +
       '</div>' +
       '</body></html>';
@@ -144,30 +146,30 @@ export default function SettlementPrint({ settlement, deal, onClose }: Props) {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: 2 }}>
               <span style={{ color: 'var(--muted)' }}>دوره:</span>
-              <strong>{toFa(settlement.periodStart)} تا {toFa(settlement.periodEnd)}</strong>
+              <strong>{getGlobalFormat().date(settlement.periodStart)} تا {getGlobalFormat().date(settlement.periodEnd)}</strong>
             </div>
           </div>
           
           <div style={{ padding: 12, background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 8, fontSize: 12 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: 2 }}>
               <span style={{ color: 'var(--muted)' }}>فروش کل:</span>
-              <span>{toFa((settlement.grossSales || 0).toLocaleString('fa-IR'))} ت</span>
+              <span>{getGlobalFormat().money(settlement.grossSales || 0)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: 2 }}>
               <span style={{ color: 'var(--muted)' }}>کمیسیون:</span>
-              <span>{toFa((settlement.commission || 0).toLocaleString('fa-IR'))} ت</span>
+              <span>{getGlobalFormat().money(settlement.commission || 0)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: 2 }}>
               <span style={{ color: 'var(--muted)' }}>دریافت‌شده:</span>
-              <span>{toFa((settlement.paidAmount || 0).toLocaleString('fa-IR'))} ت</span>
+              <span>{getGlobalFormat().money(settlement.paidAmount || 0)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: 2, borderTop: '1px dashed var(--accent-border)', marginTop: 4, paddingTop: 6 }}>
               <strong>خالص:</strong>
-              <strong style={{ color: 'var(--accent)' }}>{toFa((settlement.netPayable || 0).toLocaleString('fa-IR'))} ت</strong>
+              <strong style={{ color: 'var(--accent)' }}>{getGlobalFormat().money(settlement.netPayable || 0)}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: 2 }}>
               <strong>مانده:</strong>
-              <strong style={{ color: balance > 0 ? 'var(--danger)' : 'var(--accent)' }}>{toFa(Math.abs(balance).toLocaleString('fa-IR'))} ت</strong>
+              <strong style={{ color: balance > 0 ? 'var(--danger)' : 'var(--accent)' }}>{getGlobalFormat().money(Math.abs(balance))}</strong>
             </div>
           </div>
         </div>

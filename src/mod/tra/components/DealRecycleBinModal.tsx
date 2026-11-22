@@ -1,3 +1,4 @@
+import { useFormat } from '../../../shr/units/useFormat';
 import { Tag } from '../../../shr/components/ui';
 /**
  * DealRecycleBinModal.tsx — سبد بازیافت معاملات
@@ -25,6 +26,7 @@ function daysLeft(expiresAt: string): number {
 }
 
 export default function DealRecycleBinModal({ open, onClose }: Props) {
+  const fmt = useFormat();
   const { restoreDealFromBin } = useTra();
   const { contacts } = useCtc();
   const [entries, setEntries] = useState<RecycleBinEntry<DeletedDealSnapshot>[]>([]);
@@ -77,7 +79,7 @@ export default function DealRecycleBinModal({ open, onClose }: Props) {
   };
 
   const title = entries.length > 0
-    ? '🗑️ سبد بازیافت (' + toFa(entries.length) + ')'
+    ? '🗑️ سبد بازیافت (' + fmt.count(entries.length) + ')'
     : '🗑️ سبد بازیافت';
 
   return (
@@ -138,17 +140,17 @@ export default function DealRecycleBinModal({ open, onClose }: Props) {
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ color: 'var(--text)', fontWeight: 700, fontSize: 'var(--fs-sm)' }}>
-                      {toFa((deal.value || 0).toLocaleString('fa-IR'))} تومان
+                      {fmt.money(deal.value || 0, { withUnit: false })} تومان
                     </span>
-                    <Tag style={{ background: badgeBg, color: badgeColor }}>{toFa(days)} روز مونده</Tag>
+                    <Tag style={{ background: badgeBg, color: badgeColor }}>{fmt.day(days)} روز مونده</Tag>
                   </div>
                 </div>
 
                 {/* ردیف ۳: متادیتا + دکمه‌ها */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 2, borderTop: '1px dashed var(--border)', paddingTop: 6 }}>
                   <div style={{ fontSize: 10, color: 'var(--dim)', lineHeight: 1.4 }}>
-                    <div>معامله: {deal.dealNumber || 'بدون شماره'} • {toFa(deal.date)}</div>
-                    <div>🗑️ حذف: {new Date(entry.deletedAt).toLocaleString('fa-IR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</div>
+                    <div>معامله: {deal.dealNumber || 'بدون شماره'} • {fmt.date(deal.date)}</div>
+                    <div>🗑️ حذف: {fmt.code(new Date(entry.deletedAt).toLocaleString('fa-IR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }))}</div>
                   </div>
                   <div style={{ display: 'flex', gap: 4 }}>
                     <Btn size="sm" variant="outline" onClick={() => handleDeleteSingle(deal.id)} style={{ color: 'var(--danger)', borderColor: 'var(--danger)', minHeight: 28, height: 28, padding: '0 8px', fontSize: 11 }}>
@@ -166,7 +168,7 @@ export default function DealRecycleBinModal({ open, onClose }: Props) {
           {entries.length > visibleCount && (
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12, marginBottom: 8 }}>
               <Btn size="sm" variant="outline" onClick={() => setVisibleCount(c => c + 20)}>
-                نمایش ۲۰ مورد بعدی (از {toFa(entries.length - visibleCount)} مورد باقی‌مانده)
+                نمایش ۲۰ مورد بعدی (از {fmt.count(entries.length - visibleCount)} مورد باقی‌مانده)
               </Btn>
             </div>
           )}

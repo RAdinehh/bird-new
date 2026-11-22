@@ -4,6 +4,8 @@
  * ۳ روش: تلفنی / حضوری / سایر (با کانال آزاد)
  * پیام قابل ویرایش با لحن صمیمی و محترمانه
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { useState, useEffect, useRef } from 'react';
 import { Btn, BtnRow, Field, Grid2, Input, Modal, SectionTitle, Textarea } from '../../../shr/components/ui';
 import { toFa, toEn } from '../../../shr/utils/fa';
@@ -54,6 +56,7 @@ interface Props {
 }
 
 export default function ReminderModal({ open, onClose, invoiceId, dealId = null }: Props) {
+  const fmt = useFormat();
   const invoice = useTra(s => invoiceId ? s.invoices.find(i => i.id === invoiceId) ?? null : null);
   const deal = useTra(s => dealId ? s.deals.find(d => d.id === dealId) ?? null : null);
   const addReminder = useTra(s => s.addReminder);
@@ -83,14 +86,14 @@ export default function ReminderModal({ open, onClose, invoiceId, dealId = null 
       : '';
   const lastRemindedAt = invoice?.lastRemindedAt ?? deal?.lastRemindedAt;
   const nextReminderAt = invoice?.nextReminderAt ?? deal?.nextReminderAt;
-  const amountFa = toFa(amount.toLocaleString('fa-IR'));
+  const amountFa = fmt.money(amount, { withUnit: false });
   const daysPhrase = days === null
     ? ''
     : days < 0
-      ? `${toFa(Math.abs(days))} روز از سررسید گذشته`
+      ? `${fmt.day(Math.abs(days))} روز از سررسید گذشته`
       : days === 0
         ? 'سرسید امروز است'
-        : `${toFa(days)} روز تا سررسید مانده`;
+        : `${fmt.day(days)} روز تا سررسید مانده`;
 
   const generateMessage = (): string => {
     if (!(invoice || deal) || !party) return '';
@@ -278,7 +281,7 @@ ${farmName} 🐔`;
         <Grid2>
           <DatePicker value={promisedDate} onChange={handleDateChange} />
           <Input
-            value={toFa(intervalDaysStr)}
+            value={fmt.code(intervalDaysStr)}
             onChange={e => handleDaysChange(e.target.value)}
             placeholder="دستی"
             unit="روز"
@@ -289,7 +292,7 @@ ${farmName} 🐔`;
         {lastRemindedAt && (() => {
                       const d = daysUntilJalali(lastRemindedAt);
           const ago = d === null ? null : Math.abs(d);
-          const agoLabel = ago === null ? '' : ago === 0 ? 'امروز' : `${toFa(ago)} روز پیش`;
+          const agoLabel = ago === null ? '' : ago === 0 ? 'امروز' : `${fmt.day(ago)} روز پیش`;
           return (
             <div style={{
               fontSize: 'var(--fs-xs)',
@@ -301,7 +304,7 @@ ${farmName} 🐔`;
               flexWrap: 'wrap',
             }}>
               <span>آخرین ثبت:</span>
-              <span style={{ color: 'var(--text)', fontWeight: 600 }}>{toFa(lastRemindedAt!)}</span>
+              <span style={{ color: 'var(--text)', fontWeight: 600 }}>{fmt.date(lastRemindedAt!)}</span>
               {agoLabel && <span>— {agoLabel}</span>}
             </div>
           );

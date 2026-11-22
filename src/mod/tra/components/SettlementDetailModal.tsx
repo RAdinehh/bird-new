@@ -4,6 +4,8 @@
  * محتوا: از SettlementPrint.tsx (بدون اختراع)
  * مرجع: docs/modules/tra-deals.md
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { Btn, BtnRow, Modal, Tag } from '../../../shr/components/ui';
 import { Row, SectionTitle } from '../helpers';
 import { toFa } from '../../../shr/utils/fa';
@@ -36,6 +38,7 @@ export default function SettlementDetailModal({
   onViewInvoice,
   onDelete,
 }: Props) {
+  const fmt = useFormat();
   const { contacts } = useCtc();
 
   if (!settlement || !deal) return null;
@@ -59,7 +62,7 @@ export default function SettlementDetailModal({
     <Modal
       open={open}
       onClose={onClose}
-      title={`تسویه دوره‌ای — ${toFa(settlement.periodStart)} تا ${toFa(settlement.periodEnd)}`}
+      title={`تسویه دوره‌ای — ${fmt.date(settlement.periodStart)} تا ${fmt.date(settlement.periodEnd)}`}
     >
       {/* KPI بالای modal (الگو: FlockHistoryModal) */}
       <div style={{
@@ -78,11 +81,11 @@ export default function SettlementDetailModal({
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           <Tag tone={statusTone}>{statusLabel}</Tag>
           <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--accent)', marginTop: 4 }}>
-            خالص: {toFa((settlement.netPayable || 0).toLocaleString('fa-IR'))} ت
+            خالص: {fmt.money(settlement.netPayable || 0)}
           </span>
         </div>
         <div style={{ fontSize: 12, color: 'var(--muted)' }}>
-          کمیسیون: {toFa((settlement.commission || 0).toLocaleString('fa-IR'))} ت
+          کمیسیون: {fmt.money(settlement.commission || 0)}
         </div>
       </div>
 
@@ -91,11 +94,11 @@ export default function SettlementDetailModal({
       <Row l="شماره قرارداد" v={deal.dealNumber || '—'} />
       <Row l="نوع معامله" v={DEAL_LABEL[deal.type] || deal.type} />
       <Row l="طرف حساب" v={party?.name || '—'} />
-      <Row l="از تاریخ" v={toFa(settlement.periodStart)} />
-      <Row l="تا تاریخ" v={toFa(settlement.periodEnd)} />
+      <Row l="از تاریخ" v={fmt.date(settlement.periodStart)} />
+      <Row l="تا تاریخ" v={fmt.date(settlement.periodEnd)} />
 
       {/* 📦 فروش‌های دوره */}
-      <SectionTitle>📦 فروش‌های دوره ({toFa(salesSnapshot.length)})</SectionTitle>
+      <SectionTitle>📦 فروش‌های دوره ({fmt.count(salesSnapshot.length)})</SectionTitle>
       {salesSnapshot.length === 0 ? (
         <div style={{ padding: 'var(--sp-4)', textAlign: 'center', color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>
           فروشی در این دوره ثبت نشده است
@@ -109,8 +112,8 @@ export default function SettlementDetailModal({
           return (
             <Row
               key={s.id}
-              l={`${good?.name || '—'} • ${toFa(qty)} × ${toFa(price.toLocaleString('fa-IR'))}`}
-              v={`${toFa(total.toLocaleString('fa-IR'))} ت`}
+              l={`${good?.name || '—'} • ${fmt.num(qty)} × ${fmt.money(price, { withUnit: false })}`}
+              v={`${fmt.money(total)}`}
             />
           );
         })
@@ -118,15 +121,15 @@ export default function SettlementDetailModal({
 
       {/* 💰 خلاصه مالی */}
       <SectionTitle>💰 خلاصه مالی</SectionTitle>
-      <Row l="فروش کل" v={`${toFa((settlement.grossSales || 0).toLocaleString('fa-IR'))} ت`} />
-      <Row l="کمیسیون" v={`${toFa((settlement.commission || 0).toLocaleString('fa-IR'))} ت`} />
-      <Row l="خالص قابل پرداخت" v={`${toFa((settlement.netPayable || 0).toLocaleString('fa-IR'))} ت`} />
-      <Row l="دریافت‌شده" v={`${toFa((settlement.paidAmount || 0).toLocaleString('fa-IR'))} ت`} />
+      <Row l="فروش کل" v={`${fmt.money(settlement.grossSales || 0)}`} />
+      <Row l="کمیسیون" v={`${fmt.money(settlement.commission || 0)}`} />
+      <Row l="خالص قابل پرداخت" v={`${fmt.money(settlement.netPayable || 0)}`} />
+      <Row l="دریافت‌شده" v={`${fmt.money(settlement.paidAmount || 0)}`} />
       <Row
         l="مانده"
         v={
           <span style={{ color: balance > 0 ? 'var(--danger)' : 'var(--accent)' }}>
-            {toFa(Math.abs(balance).toLocaleString('fa-IR'))} ت
+            {fmt.money(Math.abs(balance))}
           </span>
         }
       />

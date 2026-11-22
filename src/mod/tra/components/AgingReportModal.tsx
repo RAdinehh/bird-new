@@ -2,6 +2,8 @@
  * AgingReportModal.tsx — گزارش Aging (تحلیل سنی بدهی/طلب)
  * استاندارد: SAP FBL5N
  */
+import { getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useState, useMemo } from 'react';
 import { Modal, ModalFooter, Field, Grid2 } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
@@ -147,7 +149,7 @@ export default function AgingReportModal({ open, onClose }: Props) {
     const bucketRows = AGING_BUCKETS.map((b) => {
       const k = b.key as BucketKey;
       const s = bucketSummary[k];
-      return `<tr><td>${b.label}</td><td>${toFa(s.count)}</td><td>${toFa(s.sum.toLocaleString('fa-IR'))}</td></tr>`;
+      return `<tr><td>${b.label}</td><td>${getGlobalFormat().count(s.count)}</td><td>${getGlobalFormat().money(s.sum, { withUnit: false })}</td></tr>`;
     }).join('');
 
     const html = `<!DOCTYPE html>
@@ -164,10 +166,10 @@ td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; }
 .total { font-weight: 700; background: #f1f5f9; }
 </style></head><body>
 <div class="header"><h1>${farmName}</h1><div class="meta">گزارش Aging — تحلیل سنی بدهی/طلب</div></div>
-<div class="meta">بازه: ${toFa(fromDate || '—')} تا ${toFa(toDate || '—')} | مجموع: ${toFa(totalCount)} مورد — ${toFa(totalSum.toLocaleString('fa-IR'))} تومان</div>
+<div class="meta">بازه: ${getGlobalFormat().code(fromDate || '—')} تا ${getGlobalFormat().code(toDate || '—')} | مجموع: ${getGlobalFormat().count(totalCount)} مورد — ${getGlobalFormat().money(totalSum, { withUnit: false })} تومان</div>
 <table>
 <thead><tr><th>باکت</th><th>تعداد</th><th>مجموع (تومان)</th></tr></thead>
-<tbody>${bucketRows}<tr class="total"><td>مجموع کل</td><td>${toFa(totalCount)}</td><td>${toFa(totalSum.toLocaleString('fa-IR'))}</td></tr></tbody>
+<tbody>${bucketRows}<tr class="total"><td>مجموع کل</td><td>${getGlobalFormat().count(totalCount)}</td><td>${getGlobalFormat().money(totalSum, { withUnit: false })}</td></tr></tbody>
 </table>
 </body></html>`;
     printHTML(html);
@@ -203,7 +205,7 @@ td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; }
       ) : (
         <>
           <div style={{ marginTop: 8, marginBottom: 8, fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-            مجموع: {toFa(totalCount)} مورد — {toFa(totalSum.toLocaleString('fa-IR'))} تومان
+            مجموع: {getGlobalFormat().count(totalCount)} مورد — {getGlobalFormat().money(totalSum, { withUnit: false })} تومان
           </div>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--fs-sm)' }}>
             <thead>
@@ -220,17 +222,17 @@ td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; }
                 return (
                   <tr key={b.key} style={{ borderBottom: '1px solid var(--border)' }}>
                     <td style={{ padding: 6, color: `var(--${b.color})`, fontWeight: 600 }}>{b.label}</td>
-                    <td style={{ padding: 6, textAlign: 'center', fontVariantNumeric: 'tabular-nums' }}>{toFa(s.count)}</td>
+                    <td style={{ padding: 6, textAlign: 'center', fontVariantNumeric: 'tabular-nums' }}>{getGlobalFormat().count(s.count)}</td>
                     <td style={{ padding: 6, textAlign: 'left', fontVariantNumeric: 'tabular-nums' }}>
-                      {toFa(s.sum.toLocaleString('fa-IR'))}
+                      {getGlobalFormat().money(s.sum, { withUnit: false })}
                     </td>
                   </tr>
                 );
               })}
               <tr style={{ background: 'var(--accent-soft)', fontWeight: 700 }}>
                 <td style={{ padding: 8 }}>مجموع</td>
-                <td style={{ padding: 8, textAlign: 'center' }}>{toFa(totalCount)}</td>
-                <td style={{ padding: 8, textAlign: 'left' }}>{toFa(totalSum.toLocaleString('fa-IR'))}</td>
+                <td style={{ padding: 8, textAlign: 'center' }}>{getGlobalFormat().count(totalCount)}</td>
+                <td style={{ padding: 8, textAlign: 'left' }}>{getGlobalFormat().money(totalSum, { withUnit: false })}</td>
               </tr>
             </tbody>
           </table>

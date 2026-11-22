@@ -2,6 +2,8 @@
  * DealPayModal.tsx v2 — ثبت پرداخت/دریافت برای یک معامله
  * استاندارد Odoo/SAP: quick amounts + partial hint + check details
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { useState, useEffect, useMemo } from 'react';
 import { Modal, Btn, BtnRow, Field, Grid2, MoneyField, Select, Textarea } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
@@ -22,6 +24,7 @@ interface Props {
 }
 
 export default function DealPayModal({ open, onClose, deal }: Props) {
+  const fmt = useFormat();
   const { deals, updateDeal, addPartyPayment } = useTra();
   const liveDeal = deal ? deals.find(d => d.id === deal.id) : null;
   const effectiveDeal = liveDeal || deal;
@@ -134,7 +137,7 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
         alignItems: 'center',
       }}>
         <span style={{ color: 'var(--muted)' }}>بدهی فعلی</span>
-        <b style={{ fontVariantNumeric: 'tabular-nums' }}>{toFa(bal.toLocaleString('fa-IR'))} ت</b>
+        <b style={{ fontVariantNumeric: 'tabular-nums' }}>{fmt.money(bal)}</b>
       </div>
 
       <Grid2>
@@ -167,14 +170,14 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
               fontFamily: 'inherit',
             }}
           >
-            {pct === 100 ? 'کل' : `${toFa(pct)}٪`}
+            {pct === 100 ? 'کل' : `${fmt.num(pct)}٪`}
           </button>
         ))}
       </div>
 
       {entered > 0 && entered < bal && (
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', marginBottom: 8 }}>
-          ↳ باقی‌مانده: <b>{toFa(remaining.toLocaleString('fa-IR'))} ت</b>
+          ↳ باقی‌مانده: <b>{fmt.money(remaining)}</b>
         </div>
       )}
       {entered > bal && bal > 0 && (

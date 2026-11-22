@@ -1,3 +1,4 @@
+import { useFormat } from '../../../shr/units/useFormat';
 import { dueTone, dueLabel } from '../helpers';
 import { remaining, type Invoice } from '../store';
 import { toFa } from '../../../shr/utils/fa';
@@ -11,11 +12,12 @@ interface Props {
 }
 
 export default function UpcomingDueSection({ upcoming, contacts, showUpcoming, onToggle, onDefer }: Props) {
+  const fmt = useFormat();
   if (upcoming.length === 0) return null;
   return (
     <div style={{ background: 'var(--card)', border: '1px solid var(--amber)', borderRadius: 'var(--r-md)', overflow: 'hidden' }}>
       <div role="button" tabIndex={0} onClick={onToggle} style={{ padding: 'var(--pad-normal)', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', background: 'var(--warn-soft)' }}>
-        <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--warn)' }}>⏰ {toFa(upcoming.length)} سرسید نزدیک</span>
+        <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--warn)' }}>⏰ {fmt.count(upcoming.length)} سرسید نزدیک</span>
         <div style={{ flex: 1 }} />
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--warn)" strokeWidth="2.5" strokeLinecap="round" style={{ transform: showUpcoming ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform .2s' }}>
           <path d="m6 9 6 6 6-6" />
@@ -33,7 +35,7 @@ export default function UpcomingDueSection({ upcoming, contacts, showUpcoming, o
                     <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: `var(--${tone})` }}>{party?.name || '—'}</div>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 1 }}>{dueLabel(days)}</div>
                   </div>
-                  <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: `var(--${tone})`, flexShrink: 0 }}>{toFa(remaining(inv).toLocaleString('fa-IR'))} تومان</div>
+                  <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: `var(--${tone})`, flexShrink: 0 }}>{fmt.money(remaining(inv), { withUnit: false })} تومان</div>
                   <button type="button" onClick={() => onDefer(inv)} style={{ padding: '3px 8px', background: 'transparent', border: `1px solid var(--${tone})`, borderRadius: 'var(--r-sm)', color: `var(--${tone})`, fontSize: 'var(--fs-xs)', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0 }}>⏰</button>
                 </div>
               );

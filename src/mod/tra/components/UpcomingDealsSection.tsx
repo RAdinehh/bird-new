@@ -2,6 +2,8 @@
  * UpcomingDealsSection.tsx — معاملات با سرسید نزدیک
  * الگوی آینه‌ای از UpcomingDueSection (بدون onDefer چون deals Defer ندارند)
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { dueTone, dueLabel } from '../helpers';
 import { computeDealBalance, type Deal } from '../store';
 import { toFa } from '../../../shr/utils/fa';
@@ -15,6 +17,7 @@ interface Props {
 }
 
 export default function UpcomingDealsSection({ deals, contacts, showUpcoming, onToggle, onDefer }: Props) {
+  const fmt = useFormat();
   if (deals.length === 0) return null;
   return (
     <div style={{ background: 'var(--card)', border: '1px solid var(--amber)', borderRadius: 'var(--r-md)', overflow: 'hidden' }}>
@@ -25,7 +28,7 @@ export default function UpcomingDealsSection({ deals, contacts, showUpcoming, on
         style={{ padding: 'var(--pad-normal)', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', background: 'var(--warn-soft)' }}
       >
         <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--warn)' }}>
-          ⏰ {toFa(deals.length)} سرسید معامله
+          ⏰ {fmt.count(deals.length)} سرسید معامله
         </span>
         <div style={{ flex: 1 }} />
         <svg
@@ -71,7 +74,7 @@ export default function UpcomingDealsSection({ deals, contacts, showUpcoming, on
                     </div>
                   </div>
                   <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: `var(--${tone})`, flexShrink: 0 }}>
-                    {toFa(Math.abs(bal).toLocaleString('fa-IR'))} تومان
+                    {fmt.money(Math.abs(bal), { withUnit: false })} تومان
                   </div>
                   {onDefer && (
                     <button

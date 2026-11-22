@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useHal } from '../hal/store';
 import { kindForType } from '../hal/api/equipmentCalc';
 /**
@@ -43,6 +44,7 @@ import { AccordionSection } from '../../shr/components/AccordionSection';
 import FlockCreateStandalone from '../flk/components/FlockCreateStandalone';
 
 export default function InvoicePage({ kind, active = true }: { kind: 'purchase' | 'sale'; active?: boolean }) {
+  const fmt = useFormat();
   const isPurchase = kind === 'purchase';
   const { invoices: _allInvoices, deals, addInvoice, updateInvoice, deleteInvoice, reopenInvoice, allocations, resolveDispute, writeOffInvoice, settlements } = useTra();
   const { contacts } = useCtc();
@@ -465,7 +467,7 @@ return (
               key={group.title} 
               title={group.title} 
               icon="📁" 
-              summary={`${toFa(group.items.length)} مورد`}
+              summary={`${fmt.count(group.items.length)} مورد`}
               defaultOpen={true}
             >
               {group.items.map((inv, i) => {
@@ -488,7 +490,7 @@ return (
             const rem = remaining(inv, allocations);
             const reason = await showPromptAsync(
               'حذف بدحساب',
-              `مبلغ ${toFa(rem.toLocaleString('fa-IR'))} تومان به عنوان بدحساب حذف می‌شود. این عمل قابل بازگشت نیست.`,
+              `مبلغ ${fmt.money(rem, { withUnit: false })} تومان به عنوان بدحساب حذف می‌شود. این عمل قابل بازگشت نیست.`,
               { label: 'دلیل', placeholder: 'مثلاً: وصول نشد — مبلغ کم', required: true, multiline: true, rows: 2, danger: true, confirmText: 'حذف کن' },
             );
             if (!reason || !reason.trim()) return;
@@ -524,7 +526,7 @@ return (
             const rem = remaining(inv, allocations);
             const reason = await showPromptAsync(
               'حذف بدحساب',
-              `مبلغ ${toFa(rem.toLocaleString('fa-IR'))} تومان به عنوان بدحساب حذف می‌شود. این عمل قابل بازگشت نیست.`,
+              `مبلغ ${fmt.money(rem, { withUnit: false })} تومان به عنوان بدحساب حذف می‌شود. این عمل قابل بازگشت نیست.`,
               { label: 'دلیل', placeholder: 'مثلاً: وصول نشد — مبلغ کم', required: true, multiline: true, rows: 2, danger: true, confirmText: 'حذف کن' },
             );
             if (!reason || !reason.trim()) return;

@@ -1,3 +1,4 @@
+import { useFormat } from '../../../shr/units/useFormat';
 import { Tag, Btn, CardActions } from '../../../shr/components/ui';
 import { ACTION_PRESETS } from '../../../shr/constants/cardActions';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
@@ -31,6 +32,7 @@ interface Props {
 }
 
 export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTransferClick, onReopen, onEdit, onDispute, onResolveDispute, onWriteOff, index }: Props) {
+  const fmt = useFormat();
   const { updateInvoice, allocations } = useTra();
   const { flocks, restore, update: updateFlock } = useFlk();
   const [flockPickerOpen, setFlockPickerOpen] = useState(false);
@@ -71,10 +73,10 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       id={inv.id}
       ms={ms}
       accent={rem2 === 0 ? 'accent' : 'warn'}
-      index={toFa(index + 1)}
+      index={fmt.count(index + 1)}
       iconEmoji="🛒"
       title={partyName || '—'}
-      subtitle={`${toFa(inv.date)}${inv.number ? ` • ${formatInvoiceNumber(inv.number)}` : ''}`}
+      subtitle={`${fmt.date(inv.date)}${inv.number ? ` • ${formatInvoiceNumber(inv.number)}` : ''}`}
       isOpen={isOpen}
       onToggle={onToggle}
       badge={
@@ -92,11 +94,11 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       }
       stats={
         <>
-          <span>کل: <b>{toFa(inv.total.toLocaleString('fa-IR'))} تومان</b></span>
-          {rem2 > 0 && <span style={{ color: 'var(--warn)' }}>مانده: <b>{toFa(rem2.toLocaleString('fa-IR'))}</b></span>}
+          <span>کل: <b>{fmt.money(inv.total, { withUnit: false })} تومان</b></span>
+          {rem2 > 0 && <span style={{ color: 'var(--warn)' }}>مانده: <b>{fmt.money(rem2, { withUnit: false })}</b></span>}
           {inv.items.length > 0 && (
             <span>
-              {toFa(inv.items.length)} قلم
+              {fmt.count(inv.items.length)} قلم
               {(() => {
                 const catSet = new Set((inv.items || []).map((it: any) => it.category || inv.category));
                 const labels: Record<string, string> = {
@@ -118,7 +120,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
                 // اگه بیشتر از ۲ دسته بود
                 return (
                   <span style={{ color: 'var(--accent)', fontWeight: 700 }}>
-                    {' • '}{catNames.slice(0, 2).join('، ')} و {toFa(catNames.length - 2)} دسته دیگر
+                    {' • '}{catNames.slice(0, 2).join('، ')} و {fmt.count(catNames.length - 2)} دسته دیگر
                   </span>
                 );
               })()}
@@ -130,21 +132,21 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات</SectionTitle>
       <RowGrid>
         <Row l="فروشنده" v={partyName || '—'} />
-        <Row l="تاریخ" v={toFa(inv.date)} />
+        <Row l="تاریخ" v={fmt.date(inv.date)} />
         {inv.number ? <Row l="شماره" v={formatInvoiceNumber(inv.number)} /> : null}
-        {inv.dueDate ? <Row l="سرسید" v={toFa(inv.dueDate)} /> : null}
-        {inv.isPreorder && inv.deliveryDate ? <Row l="📅 تحویل" v={toFa(inv.deliveryDate)} /> : null}
+        {inv.dueDate ? <Row l="سرسید" v={fmt.date(inv.dueDate)} /> : null}
+        {inv.isPreorder && inv.deliveryDate ? <Row l="📅 تحویل" v={fmt.date(inv.deliveryDate)} /> : null}
       </RowGrid>
 
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام</SectionTitle>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
         {inv.items.map(it => (
-          <Row key={it.id} l={`${it.description || '—'} • ${formatQty(it.quantity, it.unit || 'pcs')} × ${toFa((it.unitPrice || 0).toLocaleString('fa-IR'))} تومان`} v={`${toFa(it.total.toLocaleString('fa-IR'))} تومان`} />
+          <Row key={it.id} l={`${it.description || '—'} • ${formatQty(it.quantity, it.unit || 'pcs')} × ${fmt.money(it.unitPrice || 0, { withUnit: false })} تومان`} v={`${fmt.money(it.total, { withUnit: false })} تومان`} />
         ))}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
         <span>جمع کل:</span>
-        <span>{toFa(inv.total.toLocaleString('fa-IR'))} تومان</span>
+        <span>{fmt.money(inv.total, { withUnit: false })} تومان</span>
       </div>
 
       {inv.installments && inv.installments.length > 0 && (() => {
@@ -155,7 +157,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
           <>
             <SectionTitle>
               <span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span>
-              اقساط — {toFa(paidCount)} از {toFa(totalCount)} پرداخت شده
+              اقساط — {fmt.count(paidCount)} از {fmt.count(totalCount)} پرداخت شده
             </SectionTitle>
             {overdueCount > 0 && (
               <div style={{
@@ -164,7 +166,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
                 fontSize: 'var(--fs-xs)', fontWeight: 600, textAlign: 'center',
                 marginBottom: 'var(--sp-1)',
               }}>
-                ⚠️ {toFa(overdueCount)} قسط معوق
+                ⚠️ {fmt.count(overdueCount)} قسط معوق
               </div>
             )}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
@@ -183,19 +185,19 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
                   }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
                       <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
-                        قسط {toFa(inst.number)}
+                        قسط {fmt.count(inst.number)}
                       </span>
                       <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)' }}>
-                        سرسید: {toFa(inst.dueDate)}
+                        سرسید: {fmt.date(inst.dueDate)}
                       </span>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
                       <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
-                        {toFa((inst.amount || 0).toLocaleString('fa-IR'))} تومان
+                        {fmt.money(inst.amount || 0, { withUnit: false })} تومان
                       </span>
                       {isPartial && (
                         <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--accent)' }}>
-                          پرداخت: {toFa((inst.paidAmount || 0).toLocaleString('fa-IR'))} تومان
+                          پرداخت: {fmt.money(inst.paidAmount || 0, { withUnit: false })} تومان
                         </span>
                       )}
                       <Tag tone={tone}>{label}</Tag>
@@ -215,8 +217,8 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
             {inv.payments.map(p => (
               <div key={p.id}>
                 <Row
-                  l={`${p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک'} • ${toFa(p.date)}`}
-                  v={`${toFa(p.amount.toLocaleString('fa-IR'))} تومان`}
+                  l={`${p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک'} • ${fmt.date(p.date)}`}
+                  v={fmt.money(p.amount, { withUnit: false }) + ' تومان'}
                 />
                 {p.method === 'check' && (
                   <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '2px 8px' }}>

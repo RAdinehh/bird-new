@@ -1,3 +1,4 @@
+import { useFormat } from '../../../shr/units/useFormat';
 import { toFa } from '../../../shr/utils/fa';
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function SummaryBox({ kind, totalInvoiced, totalOpen, settledAmount, dueSoonAmount, openCount }: Props) {
+  const fmt = useFormat();
   if (totalInvoiced <= 0) return null;
   const isSale = kind === 'sale';
   const isDeal = kind === 'deal';
@@ -23,24 +25,24 @@ export default function SummaryBox({ kind, totalInvoiced, totalOpen, settledAmou
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
           <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: accent }}>{accentLabel}</span>
-          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 400 }}>({toFa(openCount)} {isDeal ? 'قرارداد' : 'فاکتور'})</span>
+          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 400 }}>({fmt.count(openCount)} {isDeal ? 'قرارداد' : 'فاکتور'})</span>
         </div>
         <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 800, color: accent, fontVariantNumeric: 'tabular-nums', display: 'flex', alignItems: 'baseline', gap: 4 }}>
-          {toFa(totalInvoiced.toLocaleString('fa-IR'))} <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)' }}>تومان</span>
+          {fmt.money(totalInvoiced, { withUnit: false })} <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)' }}>تومان</span>
         </span>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, alignItems: 'center', borderTop: '1px solid rgba(148, 163, 184, 0.4)', paddingTop: 8 }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 1, whiteSpace: 'nowrap' }}>
           <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-sm)', fontWeight: 500 }}>باقی‌مانده</span>
-          <span style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', direction: 'ltr', fontSize: 'var(--fs-md)', color: 'var(--warn)' }}>{toFa(totalOpen.toLocaleString('fa-IR'))}</span>
+          <span style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', direction: 'ltr', fontSize: 'var(--fs-md)', color: 'var(--warn)' }}>{fmt.money(totalOpen, { withUnit: false })}</span>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 1, whiteSpace: 'nowrap' }}>
           <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-sm)', fontWeight: 500 }}>{isDeal ? 'دریافت‌شده' : 'پرداخت‌شده'}</span>
-          <span style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', direction: 'ltr', fontSize: 'var(--fs-md)', color: 'var(--accent)' }}>{toFa(settledAmount.toLocaleString('fa-IR'))}</span>
+          <span style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', direction: 'ltr', fontSize: 'var(--fs-md)', color: 'var(--accent)' }}>{fmt.money(settledAmount, { withUnit: false })}</span>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 1, whiteSpace: 'nowrap' }}>
           <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-sm)', fontWeight: 500 }}>نزدیک سرسید</span>
-          <span style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', direction: 'ltr', fontSize: 'var(--fs-md)', color: 'var(--danger)' }}>{toFa(dueSoonAmount.toLocaleString('fa-IR'))}</span>
+          <span style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', direction: 'ltr', fontSize: 'var(--fs-md)', color: 'var(--danger)' }}>{fmt.money(dueSoonAmount, { withUnit: false })}</span>
         </div>
       </div>
     </div>

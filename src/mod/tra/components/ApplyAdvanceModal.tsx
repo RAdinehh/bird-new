@@ -2,6 +2,8 @@
  * ApplyAdvanceModal.tsx — تخصیص پیش‌پرداخت به فاکتور موجود
  * الگو: FIFO (قدیمی‌ترین اول) | استاندارد: SAP FI-AR credit memo
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { useState, useMemo, useEffect } from 'react';
 import { Modal, Btn, BtnRow, Input } from '../../../shr/components/ui';
 import { useTra, buildAdvanceAllocations, computeUnappliedAdvances, type Invoice } from '../store';
@@ -18,6 +20,7 @@ interface Props {
 }
 
 export default function ApplyAdvanceModal({ open, onClose, invoice }: Props) {
+  const fmt = useFormat();
   const updateInvoice = useTra(s => s.updateInvoice);
   const partyPayments = useTra(s => s.partyPayments);
   const allocations = useTra(s => s.allocations);
@@ -50,7 +53,7 @@ export default function ApplyAdvanceModal({ open, onClose, invoice }: Props) {
 
     const ok = await showConfirmAsync(
       'مصرف پیش‌پرداخت',
-      `${toFa(totalAllocated.toLocaleString('fa-IR'))} تومان پیش‌پرداخت به این فاکتور تخصیص می‌یابد؟`,
+      `${fmt.money(totalAllocated, { withUnit: false })} تومان پیش‌پرداخت به این فاکتور تخصیص می‌یابد؟`,
       { confirmText: 'تخصیص' }
     );
     if (!ok) return;
@@ -92,7 +95,7 @@ export default function ApplyAdvanceModal({ open, onClose, invoice }: Props) {
       footer={
         <BtnRow>
           <Btn variant="primary" onClick={() => void handleSave()} disabled={totalAllocated <= 0}>
-            تخصیص {toFa(totalAllocated.toLocaleString('fa-IR'))} ت
+            تخصیص {fmt.money(totalAllocated)}
           </Btn>
           <Btn onClick={onClose}>لغو</Btn>
         </BtnRow>
@@ -101,18 +104,18 @@ export default function ApplyAdvanceModal({ open, onClose, invoice }: Props) {
       <div style={{ padding: 12, background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', marginBottom: 12 }}>
         <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700 }}>{party?.name || '—'}</div>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 4 }}>
-          فاکتور {invoice.number} — باقی‌مانده: {toFa(rem.toLocaleString('fa-IR'))} ت
+          فاکتور {invoice.number} — باقی‌مانده: {fmt.money(rem)}
         </div>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', marginTop: 4, fontWeight: 600 }}>
-          ⚡ پیش‌پرداخت موجود: {toFa(unapplied.toLocaleString('fa-IR'))} ت
+          ⚡ پیش‌پرداخت موجود: {fmt.money(unapplied)}
         </div>
       </div>
 
       <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)', marginBottom: 6 }}>
-        مبلغ تخصیص (حداکثر {toFa(maxAmount.toLocaleString('fa-IR'))})
+        مبلغ تخصیص (حداکثر {fmt.money(maxAmount, { withUnit: false })})
       </div>
       <Input
-        value={toFa(amountStr)}
+        value={fmt.code(amountStr)}
         onChange={e => setAmountStr(toEn(e.target.value.replace(/[^0-9۰-۹]/g, '')))}
         inputMode="tel"
         unit="تومان"
@@ -128,7 +131,7 @@ export default function ApplyAdvanceModal({ open, onClose, invoice }: Props) {
             return (
               <div key={a.partyPaymentId} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)', padding: '2px 0' }}>
                 <span>{pp?.date || '—'}</span>
-                <span style={{ fontWeight: 600 }}>{toFa(a.amount.toLocaleString('fa-IR'))} ت</span>
+                <span style={{ fontWeight: 600 }}>{fmt.money(a.amount)}</span>
               </div>
             );
           })}

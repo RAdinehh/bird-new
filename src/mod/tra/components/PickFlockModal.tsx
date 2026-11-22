@@ -1,3 +1,4 @@
+import { useFormat } from '../../../shr/units/useFormat';
 import { Modal, Btn } from '../../../shr/components/ui';
 import { toFa } from '../../../shr/utils/fa';
 import { useFlk } from '../../flk/store';
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function PickFlockModal({ open, onClose, onSelect }: Props) {
+  const fmt = useFormat();
   const { flocks } = useFlk();
   
   const archivedFlocks = (flocks || [])
@@ -38,7 +40,7 @@ export default function PickFlockModal({ open, onClose, onSelect }: Props) {
                   {f.name}
                 </div>
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                  {f.currentCount != null ? toFa(f.currentCount) + ' پرنده' : 'تعداد نامشخص'} • {f.archivedReason || 'بدون دلیل'}
+                  {f.currentCount != null ? fmt.count(f.currentCount) + ' پرنده' : 'تعداد نامشخص'} • {f.archivedReason || 'بدون دلیل'}
                 </div>
               </div>
             </button>

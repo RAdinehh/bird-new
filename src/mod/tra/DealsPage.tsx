@@ -1,6 +1,8 @@
 /**
  * DealsPage — معاملات خاص
  */
+import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
+
 import { useState, useMemo , useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useTra, DEAL_LABEL, type Deal, type DealType, type SettlementType, type DealGood, type DealDelivery, type DealSale, type DealPayment, type Settlement } from './store';
@@ -34,7 +36,6 @@ import DealRecycleBinModal from './components/DealRecycleBinModal';
 import SettlementPrint from './components/SettlementPrint';
 import DealPrint from './components/DealPrint';
 import { toFa, toEn } from '../../shr/utils/fa';
-import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
 import { toastMsg } from '../../cor/store/toast';
@@ -610,8 +611,8 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
 
                 <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> خلاصه مالی</SectionTitle>
                 <Grid2>
-                  <Row l="فروش کل" v={`${toFa((d.sales || []).reduce((s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)), 0).toLocaleString('fa-IR'))} ت`} />
-                  <Row l="دریافت‌شده" v={`${toFa((d.payments || []).filter(p => p.direction === 'in').reduce((s, p) => s + (Number(p.amount) || 0), 0).toLocaleString('fa-IR'))} ت`} />
+                  <Row l="فروش کل" v={fmt.money((d.sales || []).reduce((s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)), 0))} />
+                  <Row l="دریافت‌شده" v={fmt.money((d.payments || []).filter(p => p.direction === 'in').reduce((s, p) => s + (Number(p.amount) || 0), 0))} />
                 </Grid2>
                                         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 6 }}>
                                           <button type="button" onClick={(e) => { e.stopPropagation(); setPrintDeal(d); }}
@@ -627,8 +628,8 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                       {(d.payments || []).map(p => (
                         <Row
                           key={p.id}
-                          l={`${p.direction === 'in' ? '📥 دریافت' : '📤 پرداخت'} • ${p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک'} • ${toFa(p.date)}`}
-                          v={`${toFa((p.amount || 0).toLocaleString('fa-IR'))} تومان`}
+                          l={`${p.direction === 'in' ? '📥 دریافت' : '📤 پرداخت'} • ${p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک'} • ${fmt.date(p.date)}`}
+                          v={fmt.money(p.amount || 0, { withUnit: false }) + ' تومان'}
                         />
                       ))}
                     </div>
@@ -1003,7 +1004,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                     const age = getAgeDays(f);
                     const lc = getLifecycle(f.type, age, f.endOfCycleDay ?? null, null, f.layingStartDay ?? null);
                     const fType = f.type === 'layer' ? 'تخم‌گذار' : f.type === 'broiler' ? 'گوشتی' : 'مادر';
-                    return '📊 موجودی: ' + getGlobalFormat().count(f.currentCount || 0) + ' | سن: ' + toFa(age) + ' روز | ' + fType + ' | ' + lc.label;
+                    return '📊 موجودی: ' + getGlobalFormat().count(f.currentCount || 0) + ' | سن: ' + getGlobalFormat().day(age) + ' روز | ' + fType + ' | ' + lc.label;
                   })() : undefined}>
                     <SmartSelect
                       value={g.existingFlockId || ''}

@@ -1,6 +1,8 @@
 /**
  * useInvoiceForm — state و منطق فرم فاکتور
  */
+import { getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useEffect, useState, useMemo } from 'react';
 import { verifyInvariantsIfDev } from '../../../shr/dev/invariants';
 import { logAction } from '../../../cor/logger/auditLog';
@@ -274,8 +276,8 @@ export function useInvoiceForm(params: {
       id: inv.id, date: inv.date, partyId: inv.partyId, category: inv.category,
       items: inv.items || [],
       paymentTerms: inv.paymentTerms || 'cash',
-      installmentCount: inv.installmentCount ? toFa(inv.installmentCount) : '1',
-      installmentGapDays: inv.installmentGapDays ? toFa(inv.installmentGapDays) : '30',
+      installmentCount: inv.installmentCount ? getGlobalFormat().code(inv.installmentCount) : '1',
+      installmentGapDays: inv.installmentGapDays ? getGlobalFormat().code(inv.installmentGapDays) : '30',
       customDueDate: inv.customDueDate || '',
       cashDiscountPct: inv.cashDiscountPct ? String(inv.cashDiscountPct) : '',
       cashDiscountDays: inv.cashDiscountDays ? String(inv.cashDiscountDays) : '',
@@ -283,8 +285,8 @@ export function useInvoiceForm(params: {
       deliveryDate: inv.deliveryDate || '',
       advanceType: (inv.advancePercent && inv.advancePercent > 0) ? 'percent' : 'amount',
       advanceValue: (inv.advancePercent && inv.advancePercent > 0)
-        ? toFa(inv.advancePercent)
-        : (inv.advancePayment ? toFa(inv.advancePayment) : ''),
+        ? getGlobalFormat().code(inv.advancePercent)
+        : (inv.advancePayment ? getGlobalFormat().code(inv.advancePayment) : ''),
       dueDate: inv.dueDate || '',
       payments: inv.payments || [],
       relatedFlockId: (inv as any).relatedFlockId || '',
@@ -359,7 +361,7 @@ export function useInvoiceForm(params: {
     const warnings: string[] = [];
     cleanedItems.forEach((it, idx) => {
       const cat = it.category || form.category;
-      const label = `قلم ${toFa(idx + 1)}`;
+      const label = `قلم ${getGlobalFormat().count(idx + 1)}`;
       if (kind === 'purchase') {
         if ((cat === 'chick' || cat === 'adult') && !it.breedId && !it.birdId) {
           warnings.push(`• ${label} (${cat === 'chick' ? 'جوجه' : 'بالغ'}): نژاد/پرنده انتخاب نشده — گله ساخته نمی‌شود.`);
@@ -409,8 +411,8 @@ export function useInvoiceForm(params: {
         const count = duplicates.length;
         const msg =
           `گله مشابه موجود است:\n«${dup.name}»${hallHint}\n` +
-          `${toFa(dup.currentCount || 0)} پرنده\n\n` +
-          (count > 1 ? `(${toFa(count)} مورد مشابه یافت شد)\n\n` : '') +
+          `${getGlobalFormat().count(dup.currentCount || 0)} پرنده\n\n` +
+          (count > 1 ? `(${getGlobalFormat().count(count)} مورد مشابه یافت شد)\n\n` : '') +
           `با تأیید، گله جدید ساخته می‌شود.\n` +
           `برای اتصال به گله موجود، «لغو» را بزنید و از «اتصال به گله» استفاده کنید.`;
 
@@ -459,9 +461,9 @@ export function useInvoiceForm(params: {
             if (capCheck && !capCheck.ok) {
               const scope = capCheck.scope === 'zone' ? `بخش ${capCheck.scopeName}` : `سالن ${capCheck.scopeName}`;
               const msg = `انتقال/افزایش گله به ${scope} ممکن نیست: ظرفیت تکمیل است.\n` +
-                          `ظرفیت کل: ${toFa(capCheck.capacity)}\n` +
-                          `استفاده شده (با احتساب انتقال): ${toFa(capCheck.current)}\n` +
-                          `بیشبود: ${toFa(capCheck.over)} پرنده`;
+                          `ظرفیت کل: ${getGlobalFormat().count(capCheck.capacity)}\n` +
+                          `استفاده شده (با احتساب انتقال): ${getGlobalFormat().count(capCheck.current)}\n` +
+                          `بیشبود: ${getGlobalFormat().count(capCheck.over)} پرنده`;
               setErr(msg);
               return;
             }
@@ -481,9 +483,9 @@ export function useInvoiceForm(params: {
             if (capCheck && !capCheck.ok) {
               const scope = capCheck.scope === 'zone' ? `بخش ${capCheck.scopeName}` : `سالن ${capCheck.scopeName}`;
               const msg = `ظرفیت ${scope} تکمیل است.\n` +
-                          `ظرفیت کل: ${toFa(capCheck.capacity)}\n` +
-                          `استفاده شده: ${toFa(capCheck.current)}\n` +
-                          `بیشبود: ${toFa(capCheck.over)} پرنده`;
+                          `ظرفیت کل: ${getGlobalFormat().count(capCheck.capacity)}\n` +
+                          `استفاده شده: ${getGlobalFormat().count(capCheck.current)}\n` +
+                          `بیشبود: ${getGlobalFormat().count(capCheck.over)} پرنده`;
               setErr(msg);
               return;
             }
@@ -545,7 +547,7 @@ export function useInvoiceForm(params: {
           const _over = _newDebt - _limit;
           const _ok = await showConfirmAsync(
             'عبور از سقف اعتبار',
-            `بدهی این طرف پس از این فاکتور ${_newDebt.toLocaleString('fa-IR')} تومان می‌شود که ${_over.toLocaleString('fa-IR')} تومان از سقف اعتبار (${_limit.toLocaleString('fa-IR')} تومان) بیشتر است. ادامه می‌دهید؟`,
+            `بدهی این طرف پس از این فاکتور ${getGlobalFormat().money(_newDebt, { withUnit: false })} تومان می‌شود که ${getGlobalFormat().money(_over, { withUnit: false })} تومان از سقف اعتبار (${getGlobalFormat().money(_limit, { withUnit: false })} تومان) بیشتر است. ادامه می‌دهید؟`,
             { confirmText: 'ادامه', cancelText: 'لغو' }
           );
           if (!_ok) return;

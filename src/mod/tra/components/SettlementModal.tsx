@@ -2,6 +2,8 @@
  * SettlementModal.tsx — Phase E.2b
  * مودال تسویه دوره‌ای — انتخاب بازه + پیش‌نمایش زنده
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { useState, useMemo, useEffect } from 'react';
 import { format as formatJ } from 'date-fns-jalali';
 import { Btn, BtnRow, Modal, Field, ErrorBox } from '../../../shr/components/ui';
@@ -22,6 +24,7 @@ function todayJ(): string {
 }
 
 export default function SettlementModal({ open, deal, onClose, onSave }: Props) {
+  const fmt = useFormat();
   const [periodStart, setPeriodStart] = useState<string>(() => deal?.startDate || deal?.date || todayJ());
   const [periodEnd, setPeriodEnd] = useState<string>(() => deal?.endDate || todayJ());
   const [err, setErr] = useState('');
@@ -98,15 +101,15 @@ export default function SettlementModal({ open, deal, onClose, onSave }: Props) 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6, paddingBottom: 8, borderBottom: '1px dashed var(--accent-border)' }}>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 2 }}>تحویل</div>
-              <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>{toFa(computed.deliveriesSnapshot.length)}</div>
+              <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>{fmt.count(computed.deliveriesSnapshot.length)}</div>
             </div>
             <div style={{ textAlign: 'center', borderRight: '1px dashed var(--accent-border)', borderLeft: '1px dashed var(--accent-border)' }}>
               <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 2 }}>فروش</div>
-              <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>{toFa(computed.salesSnapshot.length)}</div>
+              <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>{fmt.count(computed.salesSnapshot.length)}</div>
             </div>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 2 }}>پرداخت</div>
-              <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>{toFa(computed.paymentsSnapshot.length)}</div>
+              <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>{fmt.count(computed.paymentsSnapshot.length)}</div>
             </div>
           </div>
 
@@ -114,17 +117,17 @@ export default function SettlementModal({ open, deal, onClose, onSave }: Props) 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ color: 'var(--muted)' }}>فروش کل</span>
-              <span style={{ fontWeight: 700, color: 'var(--text)' }}>{toFa(computed.grossSales.toLocaleString('fa-IR'))} ت</span>
+              <span style={{ fontWeight: 700, color: 'var(--text)' }}>{fmt.money(computed.grossSales)}</span>
             </div>
             {computed.commission > 0 && (
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ color: 'var(--muted)' }}>کمیسیون</span>
-                <span style={{ fontWeight: 700, color: 'var(--warn)' }}>{toFa(computed.commission.toLocaleString('fa-IR'))} ت</span>
+                <span style={{ fontWeight: 700, color: 'var(--warn)' }}>{fmt.money(computed.commission)}</span>
               </div>
             )}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ color: 'var(--muted)' }}>دریافت‌شده</span>
-              <span style={{ fontWeight: 700, color: 'var(--text)' }}>{toFa(computed.paidAmount.toLocaleString('fa-IR'))} ت</span>
+              <span style={{ fontWeight: 700, color: 'var(--text)' }}>{fmt.money(computed.paidAmount)}</span>
             </div>
           </div>
 
@@ -133,13 +136,13 @@ export default function SettlementModal({ open, deal, onClose, onSave }: Props) 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
               <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)' }}>خالص قابل پرداخت</span>
               <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 800, color: 'var(--accent)', lineHeight: 1 }}>
-                {toFa(computed.netPayable.toLocaleString('fa-IR'))} <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600 }}>ت</span>
+                {fmt.money(computed.netPayable, { withUnit: false })} <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 600 }}>ت</span>
               </span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
               <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>مانده نهایی</span>
               <span style={{ fontSize: 'var(--fs-md)', fontWeight: 800, color: (computed.netPayable - computed.paidAmount) > 0 ? 'var(--danger)' : 'var(--accent)' }}>
-                {toFa(Math.abs(computed.netPayable - computed.paidAmount).toLocaleString('fa-IR'))} ت
+                {fmt.money(Math.abs(computed.netPayable - computed.paidAmount))}
               </span>
             </div>
           </div>

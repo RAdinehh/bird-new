@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { Tag } from '../../shr/components/ui';
 /**
  * ChecksPage.tsx — مدیریت چک‌ها
@@ -43,6 +44,7 @@ interface CheckRow {
 }
 
 export default function ChecksPage({ active = true }: { active?: boolean } = {}) {
+  const fmt = useFormat();
   void active;
   const navigate = useNavigate();
   const { partyPayments, invoices, deals, depositPartyPayment, clearPartyPayment, bouncePartyPayment } = useTra();
@@ -132,7 +134,7 @@ export default function ChecksPage({ active = true }: { active?: boolean } = {})
 
   const handleAction = async (row: CheckRow, action: 'deposit' | 'clear' | 'bounce') => {
     const { pp } = row;
-    const amountFa = toFa(pp.amount.toLocaleString('fa-IR'));
+    const amountFa = fmt.money(pp.amount, { withUnit: false });
     const checkLabel = pp.checkNo ? `چک #${pp.checkNo}` : 'چک';
     let title = '', msg = '', confirmText = '', danger = false;
     if (action === 'deposit') {
@@ -173,9 +175,9 @@ export default function ChecksPage({ active = true }: { active?: boolean } = {})
   const renderCard = (row: CheckRow) => {
     const info = STATUS_INFO[row.status];
     const dueLabel = row.daysUntilDue === null ? null
-      : row.daysUntilDue < 0 ? `${toFa(Math.abs(row.daysUntilDue))} روز گذشته`
+      : row.daysUntilDue < 0 ? `${fmt.day(Math.abs(row.daysUntilDue))} روز گذشته`
       : row.daysUntilDue === 0 ? 'امروز'
-      : `${toFa(row.daysUntilDue)} روز مانده`;
+      : `${fmt.day(row.daysUntilDue)} روز مانده`;
     const dueTone = row.daysUntilDue !== null && row.daysUntilDue <= 3 ? 'var(--danger)'
       : row.daysUntilDue !== null && row.daysUntilDue <= 7 ? 'var(--warn)'
       : 'var(--muted)';
@@ -200,7 +202,7 @@ export default function ChecksPage({ active = true }: { active?: boolean } = {})
             )}
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, whiteSpace: 'nowrap' }}>
-            <span style={{ fontSize: 'var(--fs-md)', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{toFa(row.pp.amount.toLocaleString('fa-IR'))}</span>
+            <span style={{ fontSize: 'var(--fs-md)', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{fmt.money(row.pp.amount, { withUnit: false })}</span>
             <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 500 }}>تومان</span>
           </div>
         </div>
@@ -238,7 +240,7 @@ export default function ChecksPage({ active = true }: { active?: boolean } = {})
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
         <div>
           <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 800 }}>مدیریت چک‌ها</div>
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>{toFa(rows.length)} چک</div>
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>{fmt.count(rows.length)} چک</div>
         </div>
         <Btn size="sm" variant="primary" onClick={() => navigate('/tra?tab=receivables')}>+ ثبت چک</Btn>
       </div>
@@ -248,26 +250,26 @@ export default function ChecksPage({ active = true }: { active?: boolean } = {})
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, paddingBottom: 8, borderBottom: '1px solid var(--border)' }}>
             <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: 'var(--muted)' }}>کل چک‌های باز</span>
             <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
-              {toFa(summary.total.toLocaleString('fa-IR'))}
+              {fmt.money(summary.total, { withUnit: false })}
               <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 500, color: 'var(--muted)', marginRight: 4 }}>تومان</span>
             </span>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 8, borderLeft: '1px solid var(--border)' }}>
               <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 500 }}>در دست</span>
-              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: 'var(--warn)', whiteSpace: 'nowrap' }}>{toFa(summary.hand.toLocaleString('fa-IR'))}</span>
+              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: 'var(--warn)', whiteSpace: 'nowrap' }}>{fmt.money(summary.hand, { withUnit: false })}</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 8 }}>
               <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 500 }}>در جریان</span>
-              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: 'var(--info, #0284c7)', whiteSpace: 'nowrap' }}>{toFa(summary.transit.toLocaleString('fa-IR'))}</span>
+              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: 'var(--info, #0284c7)', whiteSpace: 'nowrap' }}>{fmt.money(summary.transit, { withUnit: false })}</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 8, borderLeft: '1px solid var(--border)', borderTop: '1px solid var(--border)' }}>
               <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 500 }}>وصول شده</span>
-              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: 'var(--accent)', whiteSpace: 'nowrap' }}>{toFa(summary.cleared.toLocaleString('fa-IR'))}</span>
+              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: 'var(--accent)', whiteSpace: 'nowrap' }}>{fmt.money(summary.cleared, { withUnit: false })}</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 8, borderTop: '1px solid var(--border)' }}>
               <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 500 }}>برگشتی</span>
-              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: 'var(--danger)', whiteSpace: 'nowrap' }}>{toFa(summary.bounced.toLocaleString('fa-IR'))}</span>
+              <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: 'var(--danger)', whiteSpace: 'nowrap' }}>{fmt.money(summary.bounced, { withUnit: false })}</span>
             </div>
           </div>
         </div>
@@ -284,7 +286,7 @@ export default function ChecksPage({ active = true }: { active?: boolean } = {})
               color: filter === f.key ? 'var(--accent)' : 'var(--muted)',
               fontWeight: filter === f.key ? 600 : 500,
               fontFamily: 'inherit', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
-            }}>{f.label} ({toFa(f.count)})</button>
+            }}>{f.label} ({fmt.count(f.count)})</button>
           ))}
         </div>
       )}

@@ -1,5 +1,5 @@
-import { Tag } from '../../shr/components/ui';
 import { useFormat } from '../../shr/units/useFormat';
+import { Tag } from '../../shr/components/ui';
 /**
  * ReceivablesPage — مطالبات/بدهی با aging
  */
@@ -491,11 +491,11 @@ renderDetails={(inv) => {
                   </div>
                 )}
                 <div>
-                  <Line l="جمع فاکتور" v={`${toFa(inv.total.toLocaleString('fa-IR'))} تومان`} />
-                  {op > 0.5 && <Line l="پیش‌پرداخت" v={`${toFa(op.toLocaleString('fa-IR'))} تومان`} />}
+                  <Line l="جمع فاکتور" v={fmt.money(inv.total, { withUnit: false }) + ' تومان'} />
+                  {op > 0.5 && <Line l="پیش‌پرداخت" v={fmt.money(op, { withUnit: false }) + ' تومان'} />}
                 </div>
                 <div>
-                  <Line l="پرداخت‌شده" v={`${toFa(paidSumAllocated(inv, allocations).toLocaleString('fa-IR'))} تومان`} />
+                  <Line l="پرداخت‌شده" v={fmt.money(paidSumAllocated(inv, allocations), { withUnit: false }) + ' تومان'} />
                   <Line l="باقی‌مانده" v={<span style={{ fontWeight: 800, color: balColor }}>{fmt.money(rem)}ومان</span>} />
                 </div>
                 {(inv.dueDate || (inv.deferrals && inv.deferrals.length > 0) || inv.nextReminderAt || (inv.reminderLog && inv.reminderLog.length > 0)) && (

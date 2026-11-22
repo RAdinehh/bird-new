@@ -1,8 +1,9 @@
 /**
  * InvoicePrint.tsx — بخش tra
  */
-import { useSet } from '../set/store';
 import { getGlobalFormat } from '../../shr/units/useFormat';
+
+import { useSet } from '../set/store';
 import { useCtc } from '../ctc/store';
 import { PAYMENT_LABEL, remaining, paidSumAllocated, invoiceStatus, useTra, type Invoice } from './store';
 import { toFa } from '../../shr/utils/fa';
@@ -114,14 +115,12 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
       <table style="width: 60%; margin-right: auto; margin-left: auto;">
         <tr><td>جمع کل اقلام:</td><td style="text-align: left;">${getGlobalFormat().money(invoice.items.reduce((a, x) => a + x.total, 0))}</td></tr>
         ${(invoice.discount ||
-          0) > 0 ? '<tr><td>تخفیف:</td><td style="text-align: left;">' + toFa((invoice.discount ||
-          0).toLocaleString('fa-IR')) + ' ت</td></tr>' : ''}
+          0) > 0 ? '<tr><td>تخفیف:</td><td style="text-align: left;">' + getGlobalFormat().money(invoice.discount || 0) + '</td></tr>' : ''}
         ${(invoice.shipping ||
-          0) > 0 ? '<tr><td>حمل:</td><td style="text-align: left;">' + toFa((invoice.shipping ||
-          0).toLocaleString('fa-IR')) + ' ت</td></tr>' : ''}
+          0) > 0 ? '<tr><td>حمل:</td><td style="text-align: left;">' + getGlobalFormat().money(invoice.shipping || 0) + '</td></tr>' : ''}
         <tr class="total-row"><td>قیمت نهایی:</td><td style="text-align: left;">${getGlobalFormat().money(invoice.total)}</td></tr>
         <tr><td>پرداخت‌شده:</td><td style="text-align: left;">${getGlobalFormat().money(paid)}</td></tr>
-        ${rem > 0 ? '<tr class="total-row"><td>مانده:</td><td style="text-align: left; color: #d97706;">' + toFa(rem.toLocaleString('fa-IR')) + ' ت</td></tr>' : ''}
+        ${rem > 0 ? '<tr class="total-row"><td>مانده:</td><td style="text-align: left; color: #d97706;">' + getGlobalFormat().money(rem) + '</td></tr>' : ''}
       </table>
 
       ${(invoice.payments || []).length > 0 ? `
@@ -219,7 +218,7 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
 
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 10, paddingBottom: 8, borderBottom: '1px solid #e2e8f0' }}>
               <span>{party?.name || '—'}</span>
-              <span>{toFa(invoice.date)}</span>
+              <span>{getGlobalFormat().date(invoice.date)}</span>
             </div>
 
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
@@ -234,8 +233,8 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
                 {invoice.items.map(it => (
                   <tr key={it.id}>
                     <td style={{ padding: 4, border: '1px solid #cbd5e1' }}>{it.description}</td>
-                    <td style={{ padding: 4, border: '1px solid #cbd5e1' }}>{toFa(it.quantity)}</td>
-                    <td style={{ padding: 4, border: '1px solid #cbd5e1' }}>{toFa(it.total.toLocaleString('fa-IR'))}</td>
+                    <td style={{ padding: 4, border: '1px solid #cbd5e1' }}>{getGlobalFormat().num(it.quantity)}</td>
+                    <td style={{ padding: 4, border: '1px solid #cbd5e1' }}>{getGlobalFormat().money(it.total, { withUnit: false })}</td>
                   </tr>
                 ))}
               </tbody>
@@ -243,7 +242,7 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
 
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10, padding: 'var(--pad-normal)', background: '#f1f5f9', borderRadius: 6, fontSize: 'var(--fs-xs)', fontWeight: 700 }}>
               <span>قیمت نهایی:</span>
-              <span>{toFa(invoice.total.toLocaleString('fa-IR'))} تومان</span>
+              <span>{getGlobalFormat().money(invoice.total, { withUnit: false })} تومان</span>
             </div>
 
             <div style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', marginTop: 10 }}>

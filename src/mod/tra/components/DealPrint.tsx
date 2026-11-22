@@ -1,6 +1,8 @@
 /**
  * DealPrint.tsx — سند چاپ قرارداد معامله
  */
+import { getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useSet } from '../../set/store';
 import { useCtc } from '../../ctc/store';
 import { toFa } from '../../../shr/utils/fa';
@@ -34,10 +36,10 @@ export default function DealPrint({ deal, onClose }: Props) {
       return '<tr>' +
         '<td>' + g.name + '</td>' +
         '<td>' + g.unit + '</td>' +
-        '<td>' + toFa(g.quantity) + '</td>' +
-        '<td>' + toFa(delivered) + '</td>' +
-        '<td>' + toFa(sold) + '</td>' +
-        '<td>' + toFa(inHand) + '</td>' +
+        '<td>' + getGlobalFormat().num(g.quantity) + '</td>' +
+        '<td>' + getGlobalFormat().num(delivered) + '</td>' +
+        '<td>' + getGlobalFormat().num(sold) + '</td>' +
+        '<td>' + getGlobalFormat().num(inHand) + '</td>' +
         '</tr>';
     }).join('');
 
@@ -50,10 +52,10 @@ export default function DealPrint({ deal, onClose }: Props) {
         p.status === 'in_transit' ? ' (در جریان)' : ' (در انتظار)'
       ) : '';
       return '<tr>' +
-        '<td>' + toFa(p.date) + '</td>' +
+        '<td>' + getGlobalFormat().date(p.date) + '</td>' +
         '<td>' + dirLabel + '</td>' +
         '<td>' + methodLabel + statusLabel + '</td>' +
-        '<td>' + toFa((p.amount || 0).toLocaleString('fa-IR')) + '</td>' +
+        '<td>' + getGlobalFormat().money(p.amount || 0, { withUnit: false }) + '</td>' +
         '</tr>';
     }).join('');
 
@@ -80,7 +82,7 @@ export default function DealPrint({ deal, onClose }: Props) {
       '<div class="header">' +
       '<div style="font-size: 14px; font-weight: 700;">' + farmName + '</div>' +
       (farmAddr ? '<div style="font-size: 11px; color: #64748b;">' + farmAddr + '</div>' : '') +
-      (farmPhone ? '<div style="font-size: 11px; color: #64748b;">تلفن: ' + toFa(farmPhone) + '</div>' : '') +
+      (farmPhone ? '<div style="font-size: 11px; color: #64748b;">تلفن: ' + getGlobalFormat().code(farmPhone) + '</div>' : '') +
       '<h1>قرارداد معامله</h1>' +
       '</div>' +
 
@@ -88,10 +90,10 @@ export default function DealPrint({ deal, onClose }: Props) {
       '<div class="info-row"><span>شماره قرارداد:</span><strong>' + (deal.dealNumber || '—') + '</strong></div>' +
       '<div class="info-row"><span>نوع معامله:</span><strong>' + DEAL_LABEL[deal.type] + '</strong></div>' +
       '<div class="info-row"><span>طرف حساب:</span><strong>' + (party?.name || '—') + '</strong></div>' +
-      (party?.phone ? '<div class="info-row"><span>تلفن طرف:</span><strong>' + toFa(party.phone) + '</strong></div>' : '') +
-      '<div class="info-row"><span>تاریخ قرارداد:</span><strong>' + toFa(deal.date) + '</strong></div>' +
-      (deal.startDate ? '<div class="info-row"><span>دوره:</span><strong>' + toFa(deal.startDate) + (deal.endDate ? ' تا ' + toFa(deal.endDate) : '') + '</strong></div>' : '') +
-      (deal.dueDate ? '<div class="info-row"><span>سرسید:</span><strong>' + toFa(deal.dueDate) + '</strong></div>' : '') +
+      (party?.phone ? '<div class="info-row"><span>تلفن طرف:</span><strong>' + getGlobalFormat().code(party.phone) + '</strong></div>' : '') +
+      '<div class="info-row"><span>تاریخ قرارداد:</span><strong>' + getGlobalFormat().date(deal.date) + '</strong></div>' +
+      (deal.startDate ? '<div class="info-row"><span>دوره:</span><strong>' + getGlobalFormat().date(deal.startDate) + (deal.endDate ? ' تا ' + getGlobalFormat().date(deal.endDate) : '') + '</strong></div>' : '') +
+      (deal.dueDate ? '<div class="info-row"><span>سرسید:</span><strong>' + getGlobalFormat().date(deal.dueDate) + '</strong></div>' : '') +
 
       (deal.description ? '<h2>توضیحات</h2><div style="padding: 8px; background: #f8fafc; border-radius: 4px;">' + deal.description + '</div>' : '') +
 
@@ -104,12 +106,12 @@ export default function DealPrint({ deal, onClose }: Props) {
 
       '<h2>خلاصه مالی</h2>' +
       '<div class="summary">' +
-      '<div class="summary-row"><span>فروش کل:</span><span>' + toFa(bal.totalSales.toLocaleString('fa-IR')) + ' تومان</span></div>' +
-      '<div class="summary-row"><span>کمیسیون:</span><span>' + toFa(bal.commission.toLocaleString('fa-IR')) + ' تومان</span></div>' +
-      '<div class="summary-row"><span>سهم طرف:</span><span>' + toFa(bal.myShare.toLocaleString('fa-IR')) + ' تومان</span></div>' +
-      '<div class="summary-row"><span>دریافت‌شده:</span><span>' + toFa(bal.paidIn.toLocaleString('fa-IR')) + ' تومان</span></div>' +
-      (bal.paidOut > 0 ? '<div class="summary-row"><span>پرداخت‌شده:</span><span>' + toFa(bal.paidOut.toLocaleString('fa-IR')) + ' تومان</span></div>' : '') +
-      '<div class="summary-row total"><span>مانده:</span><span>' + toFa(Math.abs(bal.balance).toLocaleString('fa-IR')) + ' تومان' + (bal.balance < 0 ? ' (بستانکار)' : '') + '</span></div>' +
+      '<div class="summary-row"><span>فروش کل:</span><span>' + getGlobalFormat().money(bal.totalSales, { withUnit: false }) + ' تومان</span></div>' +
+      '<div class="summary-row"><span>کمیسیون:</span><span>' + getGlobalFormat().money(bal.commission, { withUnit: false }) + ' تومان</span></div>' +
+      '<div class="summary-row"><span>سهم طرف:</span><span>' + getGlobalFormat().money(bal.myShare, { withUnit: false }) + ' تومان</span></div>' +
+      '<div class="summary-row"><span>دریافت‌شده:</span><span>' + getGlobalFormat().money(bal.paidIn, { withUnit: false }) + ' تومان</span></div>' +
+      (bal.paidOut > 0 ? '<div class="summary-row"><span>پرداخت‌شده:</span><span>' + getGlobalFormat().money(bal.paidOut, { withUnit: false }) + ' تومان</span></div>' : '') +
+      '<div class="summary-row total"><span>مانده:</span><span>' + getGlobalFormat().money(Math.abs(bal.balance), { withUnit: false }) + ' تومان' + (bal.balance < 0 ? ' (بستانکار)' : '') + '</span></div>' +
       '</div>' +
 
       ((deal.payments || []).length > 0 ?
@@ -127,7 +129,7 @@ export default function DealPrint({ deal, onClose }: Props) {
       '</div>' +
 
       '<div class="footer">' +
-      'تاریخ چاپ: ' + toFa(new Date().toLocaleDateString('fa-IR')) +
+      'تاریخ چاپ: ' + getGlobalFormat().code(new Date().toLocaleDateString('fa-IR')) +
       '</div>' +
       '</body></html>';
   };
@@ -184,26 +186,26 @@ export default function DealPrint({ deal, onClose }: Props) {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: 2 }}>
               <span style={{ color: 'var(--muted)' }}>تاریخ:</span>
-              <strong>{toFa(deal.date)}</strong>
+              <strong>{getGlobalFormat().date(deal.date)}</strong>
             </div>
           </div>
 
           <div style={{ padding: 12, background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 8, fontSize: 12 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: 2 }}>
               <span style={{ color: 'var(--muted)' }}>فروش کل:</span>
-              <span>{toFa(bal.totalSales.toLocaleString('fa-IR'))} ت</span>
+              <span>{getGlobalFormat().money(bal.totalSales)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: 2 }}>
               <span style={{ color: 'var(--muted)' }}>کمیسیون:</span>
-              <span>{toFa(bal.commission.toLocaleString('fa-IR'))} ت</span>
+              <span>{getGlobalFormat().money(bal.commission)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: 2 }}>
               <span style={{ color: 'var(--muted)' }}>دریافت‌شده:</span>
-              <span>{toFa(bal.paidIn.toLocaleString('fa-IR'))} ت</span>
+              <span>{getGlobalFormat().money(bal.paidIn)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: 2, borderTop: '1px dashed var(--accent-border)', marginTop: 4, paddingTop: 6 }}>
               <strong>مانده:</strong>
-              <strong style={{ color: bal.balance > 0 ? 'var(--danger)' : 'var(--accent)' }}>{toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} ت</strong>
+              <strong style={{ color: bal.balance > 0 ? 'var(--danger)' : 'var(--accent)' }}>{getGlobalFormat().money(Math.abs(bal.balance))}</strong>
             </div>
           </div>
         </div>

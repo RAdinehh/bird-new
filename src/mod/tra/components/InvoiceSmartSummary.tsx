@@ -11,6 +11,8 @@
  *
  * اگر هیچ عملیاتی در پیش نباشه، null برمی‌گردونه (کاملاً مخفی).
  */
+import { getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { daysToExpiry } from '../../whs/store';
 import type { F } from '../types-invoice';
@@ -50,10 +52,10 @@ export default function InvoiceSmartSummary({ form, total, paid }: Props) {
   const installmentInfo = form.paymentTerms === 'installment'
     && installmentCount > 0
     && installmentBase > 0
-    ? `${toFa(installmentCount)} قسط × ~${toFa(Math.round(installmentBase / installmentCount).toLocaleString('fa-IR'))} تومان`
+    ? `${getGlobalFormat().count(installmentCount)} قسط × ~${getGlobalFormat().money(Math.round(installmentBase / installmentCount), { withUnit: false })} تومان`
     : null;
 
-  const paidInfo = paid > 0 ? toFa(paid.toLocaleString('fa-IR')) + ' تومان' : null;
+  const paidInfo = paid > 0 ? getGlobalFormat().money(paid, { withUnit: false }) + ' تومان' : null;
 
   const expiringCount = form.items.filter(it => {
     if (!it.expiryDate) return false;
@@ -97,13 +99,13 @@ export default function InvoiceSmartSummary({ form, total, paid }: Props) {
       </div>
 
       {flockCount > 0 && (
-        <Row icon="🪺" text={`${toFa(flockCount)} گله جدید`} />
+        <Row icon="🪺" text={`${getGlobalFormat().count(flockCount)} گله جدید`} />
       )}
       {warehouseCount > 0 && (
-        <Row icon="📦" text={`${toFa(warehouseCount)} حرکت انبار`} />
+        <Row icon="📦" text={`${getGlobalFormat().count(warehouseCount)} حرکت انبار`} />
       )}
       {incubationCount > 0 && (
-        <Row icon="🥚" text={`${toFa(incubationCount)} بچ جوجه‌کشی`} />
+        <Row icon="🥚" text={`${getGlobalFormat().count(incubationCount)} بچ جوجه‌کشی`} />
       )}
       {installmentInfo && (
         <Row icon="📅" text={installmentInfo} />
@@ -112,7 +114,7 @@ export default function InvoiceSmartSummary({ form, total, paid }: Props) {
         <Row icon="💳" text={`پرداخت‌شده: ${paidInfo}`} />
       )}
       {expiringCount > 0 && (
-        <Row icon="⚠️" text={`${toFa(expiringCount)} قلم نزدیک انقضا`} tone="danger" />
+        <Row icon="⚠️" text={`${getGlobalFormat().count(expiringCount)} قلم نزدیک انقضا`} tone="danger" />
       )}
     </div>
   );

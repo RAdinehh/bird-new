@@ -3,6 +3,8 @@
  * استفاده در: مطالبات / بدهی / معاملات
  * استاندارد: Stripe/Odoo — بدون رنگ اضافه، سلسله‌مراتب ۲ سطحی
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { useState, useMemo, type ReactNode } from 'react';
 import { AGING_BUCKETS, type AgingBucket } from '../calc';
 import { toFa } from '../../../shr/utils/fa';
@@ -29,6 +31,7 @@ interface Props<T extends { id: string }> {
 export default function AgingBuckets<T extends { id: string }>({
   items, bucketOf, sumOf, renderSummary, renderDetails, groupActions, emptyText,
 }: Props<T>) {
+  const fmt = useFormat();
   const [openBucket, setOpenBucket] = useState<BucketKey | null>(null);
   const [openItem, setOpenItem] = useState<string | null>(null);
 
@@ -84,12 +87,12 @@ export default function AgingBuckets<T extends { id: string }>({
                   fontSize: 'var(--fs-2xs)', fontWeight: 600, color: 'var(--muted)',
                   padding: '2px 8px', borderRadius: 12, border: '1px solid var(--border)',
                 }}>
-                  {toFa(bucketItems.length)} مورد
+                  {fmt.count(bucketItems.length)} مورد
                 </span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span style={{ fontSize: 'var(--fs-md)', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
-                  {toFa(total.toLocaleString('fa-IR'))} ت
+                  {fmt.money(total)}
                 </span>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2.5" strokeLinecap="round"
                   style={{ marginRight: 8, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }}>

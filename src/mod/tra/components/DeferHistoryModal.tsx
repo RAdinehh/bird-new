@@ -1,6 +1,8 @@
 /**
  * DeferHistoryModal — تاریخچه تعویق‌ها (UI Final)
  */
+import { getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { Empty } from '../../../shr/components/ui';
 import { HistoryModalShell } from '../../../shr/components/history/HistoryModalShell';
 import { toFa } from '../../../shr/utils/fa';
@@ -30,9 +32,9 @@ function toJalaliDate(iso: string | undefined): string {
   if (!iso) return '—';
   try {
     const d = new Date(iso);
-    if (isNaN(d.getTime())) return toFa(iso);
-    return toFa(formatJ(d, 'yyyy/MM/dd'));
-  } catch { return toFa(iso || '—'); }
+    if (isNaN(d.getTime())) return getGlobalFormat().code(iso);
+    return getGlobalFormat().code(formatJ(d, 'yyyy/MM/dd'));
+  } catch { return getGlobalFormat().code(iso || '—'); }
 }
 
 export default function DeferHistoryModal({ open, onClose, deferrals, invoiceNumber, kind = 'invoice', onVoidLatest }: Props) {
@@ -72,11 +74,11 @@ export default function DeferHistoryModal({ open, onClose, deferrals, invoiceNum
                 {/* بخش راست: اطلاعات */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
-                    از {toFa(d.fromDate)} به {toFa(d.toDate)}
+                    از {getGlobalFormat().date(d.fromDate)} به {getGlobalFormat().date(d.toDate)}
                   </div>
                   {delta !== null && (
                     <div style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color: delta < 0 ? 'var(--danger)' : 'var(--accent)' }}>
-                      {delta < 0 ? '⚠️ ' : ''}{toFa(Math.abs(delta))} روز
+                      {delta < 0 ? '⚠️ ' : ''}{getGlobalFormat().day(Math.abs(delta))} روز
                     </div>
                   )}
                   {hasReason && (
