@@ -366,7 +366,7 @@ export function useInvoiceForm(params: {
         if ((cat === 'chick' || cat === 'adult') && !it.breedId && !it.birdId) {
           warnings.push(`• ${label} (${cat === 'chick' ? 'جوجه' : 'بالغ'}): نژاد/پرنده انتخاب نشده — گله ساخته نمی‌شود.`);
         }
-        if (['feed', 'medicine', 'vaccine', 'herbal', 'equipment', 'other'].includes(cat) && !it.itemId) {
+        if (['feed', 'medicine', 'vaccine', 'herbal'].includes(cat) && !it.itemId && !it.stockItemId) {
           warnings.push(`• ${label}: به انبار وصل نیست — سیستم به طور خودکار کالای جدید ثبت می‌کند.`);
         }
       } else {

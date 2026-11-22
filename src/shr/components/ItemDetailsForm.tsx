@@ -50,6 +50,7 @@ export interface ItemDetailFormData {
   warrantyMonths?: number | null;
   costType?: string;
   stockItemId?: string;
+  itemId?: string;
   existingFlockId?: string;
   deviceId?: string;
   equipmentCategory?: string;
@@ -318,7 +319,23 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* ردیف ۳: منبع (هچ/گله) */}
         {isPurchase && (
           <Field label="اتصال به گله موجود" hint="اتصال به گله دستی">
-            <SmartSelect value={String(item.existingFlockId || '')} onChange={v => updateItem({ existingFlockId: v, flockId: v })} options={flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }))} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله" />
+            <SmartSelect value={String(item.existingFlockId || '')} onChange={v => {
+                const f = flocks.find(x => x.id === v);
+                if (f) {
+                  updateItem({
+                    existingFlockId: v,
+                    flockId: v,
+                    hatchDate: f.hatchDate || item.hatchDate,
+                    ageDays: getAgeDays(f),
+                    birdId: f.birdId || item.birdId,
+                    breedId: f.breedId || item.breedId,
+                    hallId: item.hallId || f.hallId || '',
+                    zoneId: item.hallId ? item.zoneId : (f.zoneId || ''),
+                  });
+                } else {
+                  updateItem({ existingFlockId: '', flockId: '' });
+                }
+              }} options={flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }))} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله" />
           </Field>
         )}
 
@@ -326,10 +343,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {isPurchase && (
           <Grid2>
             <Field label="سالن مقصد">
-              <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" />
+              <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.filter(h => !h.archived).map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" />
             </Field>
             <Field label="بخش مقصد (اختیاری)">
-              <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب بخش —" disabled={!item.hallId} modalTitle="انتخاب بخش" />
+              <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId && !z.archived).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب بخش —" disabled={!item.hallId} modalTitle="انتخاب بخش" />
             </Field>
           </Grid2>
         )}
@@ -422,7 +439,9 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                     hatchDate: f.hatchDate || item.hatchDate,
                     ageDays: f ? getAgeDays(f) : item.ageDays,
                     birdId: f.birdId || item.birdId,
-                    breedId: f.breedId || item.breedId
+                    breedId: f.breedId || item.breedId,
+                    hallId: item.hallId || f.hallId || '',
+                    zoneId: item.hallId ? item.zoneId : (f.zoneId || ''),
                   });
                 } else {
                   updateItem({ existingFlockId: v, flockId: v });
@@ -443,10 +462,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {isPurchase && (
           <Grid2>
             <Field label="سالن مقصد">
-              <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" />
+              <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.filter(h => !h.archived).map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" />
             </Field>
             <Field label="بخش مقصد (اختیاری)">
-              <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب بخش —" disabled={!item.hallId} modalTitle="انتخاب بخش" />
+              <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId && !z.archived).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب بخش —" disabled={!item.hallId} modalTitle="انتخاب بخش" />
             </Field>
           </Grid2>
         )}
@@ -500,7 +519,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               const wItem = whsItems.find(x => x.id === v);
               updateItem({
                 stockItemId: v,
-                unit: wItem?.unit || item.unit,
+                  itemId: v,
+                  unit: wItem?.unit || item.unit,
                 unitPrice: wItem?.lastPrice || item.unitPrice,
                 description: wItem?.name || item.description,
               });
@@ -540,7 +560,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             const wItem = whsItems.find(x => x.id === v);
             updateItem({
               stockItemId: v,
-              unit: wItem?.unit || item.unit,
+                  itemId: v,
+                  unit: wItem?.unit || item.unit,
               unitPrice: wItem?.lastPrice || item.unitPrice,
               description: wItem?.name || item.description,
             });
@@ -595,7 +616,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               const wItem = whsItems.find(x => x.id === v);
               updateItem({
                 stockItemId: v,
-                unit: wItem?.unit || item.unit,
+                  itemId: v,
+                  unit: wItem?.unit || item.unit,
                 unitPrice: wItem?.lastPrice || item.unitPrice,
                 description: wItem?.name || item.description,
               });
@@ -703,7 +725,8 @@ if (category === 'vaccine' || category === 'herbal') {
             const wItem = whsItems.find(x => x.id === v);
             updateItem({
               stockItemId: v,
-              unit: wItem?.unit || item.unit,
+                  itemId: v,
+                  unit: wItem?.unit || item.unit,
               unitPrice: wItem?.lastPrice || item.unitPrice,
               description: wItem?.name || item.description,
             });
@@ -828,7 +851,8 @@ if (category === 'vaccine' || category === 'herbal') {
               const wItem = whsItems.find(x => x.id === v);
               updateItem({
                 stockItemId: v,
-                unit: wItem?.unit || item.unit,
+                  itemId: v,
+                  unit: wItem?.unit || item.unit,
                 unitPrice: wItem?.lastPrice || item.unitPrice,
                 description: wItem?.name || item.description,
               });

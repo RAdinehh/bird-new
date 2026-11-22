@@ -179,8 +179,21 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             }))}
             onChange={newCat => {
               const newUnit = getUnitForCategory(newCat);
+              const isBirdCat = newCat === 'chick' || newCat === 'adult';
+              const isStockCat = ['feed', 'medicine', 'vaccine', 'herbal'].includes(newCat);
+              const isEquipCat = newCat === 'equipment';
               const newItems = form.items.map(it => {
-                if (!it.category) return { ...it, unit: newUnit };
+                if (!it.category) {
+                  return {
+                    ...it,
+                    unit: newUnit,
+                    ...(isBirdCat ? {} : { birdId: '', breedId: '', flockId: '', existingFlockId: '', hatchId: '', hatchDate: '', ageDays: null, chickWeight: null, liveWeight: null, maleCount: null, femaleCount: null, unknownCount: null }),
+                    ...(isStockCat || isEquipCat ? {} : { stockItemId: '', itemId: '', expiryDate: '', batchNo: '', withdrawalDays: null }),
+                    ...(isBirdCat || isEquipCat ? {} : { hallId: '', zoneId: '' }),
+                    ...(isEquipCat ? {} : { equipmentCategory: '', equipmentType: '', equipmentId: '' }),
+                    ...(newCat === 'other' ? {} : { costType: '' }),
+                  };
+                }
                 return it;
               });
               const isOther = newCat === 'other';
