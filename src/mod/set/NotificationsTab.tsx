@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useSet } from './store';
 import { Btn, Field, Grid2, Input } from '../../shr/components/ui';
 import TimePicker from '../../shr/components/TimePicker';
@@ -6,6 +7,7 @@ import SettingsGroup from './SettingsGroup';
 import { ToggleRow, LocalNumField } from './helpers';
 
 export default function NotificationsTab() {
+  const fmt = useFormat();
   const s = useSet();
   const al = s.alerts;
   const qh = s.quietHours;
@@ -28,7 +30,7 @@ export default function NotificationsTab() {
       <SettingsGroup
         icon="📡"
         title="سطوح هشدار"
-        subtitle={`${toFa(activeAlerts)} از ۳ سطح فعال`}
+        subtitle={`${fmt.count(activeAlerts)} از ۳ سطح فعال`}
         tone="accent"
       >
         <ToggleRow
@@ -96,7 +98,7 @@ export default function NotificationsTab() {
       <SettingsGroup
         icon="⏰"
         title="یادآور سرسید"
-        subtitle={`${toFa(activeReminders)} یادآور فعال`}
+        subtitle={`${fmt.count(activeReminders)} یادآور فعال`}
         tone="warn"
       >
         <div style={{

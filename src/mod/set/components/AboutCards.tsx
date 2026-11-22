@@ -1,6 +1,8 @@
 /**
  * AboutCards — StatCard و LinkRow
  */
+import { getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { toFa } from '../../../shr/utils/fa';
 
 export function StatCard({ icon, value, label, tone }: { icon: string; value: number; label: string; tone: 'accent' | 'info' | 'purple' | 'warn' }) {
@@ -23,7 +25,7 @@ export function StatCard({ icon, value, label, tone }: { icon: string; value: nu
           color: 'var(--' + tone + ')',
           fontVariantNumeric: 'tabular-nums',
           lineHeight: 1.1,
-        }}>{toFa(value)}</div>
+        }}>{getGlobalFormat().code(value)}</div>
         <div style={{
           fontSize: 'var(--fs-xs)',
           color: 'var(--muted)',

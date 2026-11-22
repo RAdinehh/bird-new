@@ -1,6 +1,8 @@
 /**
  * StatsModal — مودال آمار داده‌ها
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { Btn, Modal } from '../../../shr/components/ui';
 import { toFa } from '../../../shr/utils/fa';
 import { formatSize } from '../../../shr/utils/backup';
@@ -12,6 +14,7 @@ interface Props {
 }
 
 export default function StatsModal({ open, onClose, stats }: Props) {
+  const fmt = useFormat();
   return (
     <>
       <Modal
@@ -64,7 +67,7 @@ export default function StatsModal({ open, onClose, stats }: Props) {
                 justifyContent: 'space-between',
                 gap: 4,
               }}>
-                <span>{toFa(m.records)}</span>
+                <span>{fmt.count(m.records)}</span>
                 <span>{formatSize(m.size)}</span>
               </div>
             </div>

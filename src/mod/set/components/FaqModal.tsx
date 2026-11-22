@@ -1,6 +1,8 @@
 /**
  * FaqModal — مودال سؤالات متداول
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { useState } from 'react';
 import { Btn, Modal } from '../../../shr/components/ui';
 import { toFa } from '../../../shr/utils/fa';
@@ -12,6 +14,7 @@ interface Props {
 }
 
 export default function FaqModal({ open, onClose }: Props) {
+  const fmt = useFormat();
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const handleClose = () => { onClose(); setExpandedFaq(null); };
 
@@ -54,7 +57,7 @@ export default function FaqModal({ open, onClose }: Props) {
                     color: 'var(--accent)',
                     fontWeight: 700,
                     flexShrink: 0,
-                  }}>{toFa(i + 1)}.</span>
+                  }}>{fmt.count(i + 1)}.</span>
                   <span style={{
                     flex: 1,
                     fontSize: 'var(--fs-sm)',

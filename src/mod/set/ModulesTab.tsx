@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useSet, MODULE_LABELS } from './store';
 import { toFa } from '../../shr/utils/fa';
 
@@ -68,6 +69,7 @@ const ALL_IDS = [
 ];
 
 export default function ModulesTab() {
+  const fmt = useFormat();
   const { modules, toggleModule } = useSet();
   const enabledCount = Object.values(modules).filter(v => v).length;
   const totalCount = Object.keys(MODULE_LABELS).length;
@@ -93,7 +95,7 @@ export default function ModulesTab() {
           ماژول‌های فعال
         </span>
         <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-          {toFa(enabledCount)} از {toFa(totalCount)}
+          {fmt.count(enabledCount)} از {fmt.count(totalCount)}
         </span>
       </div>
 

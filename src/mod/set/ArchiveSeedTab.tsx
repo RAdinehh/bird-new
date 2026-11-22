@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useState } from 'react';
 import SettingsGroup from './SettingsGroup';
 import { Row, RowGrid, MiniStat, Btn } from '../../shr/components/ui';
@@ -117,6 +118,7 @@ function buildComparisonSummaries(): FlockArchiveSummary[] {
 }
 
 export default function ArchiveSeedTab() {
+  const fmt = useFormat();
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState('');
   const [count, setCount] = useState(0);
@@ -130,7 +132,7 @@ export default function ArchiveSeedTab() {
     setMsg('');
     try {
       const res = await archiveLogs(makeLogs(n) as any, { months: 0, reason: 'age' }, ARCHIVE_STORES.dlg);
-      setMsg(`✅ ${toFa(res.archivedCount)} لاگ آرشیو شد`);
+      setMsg(`✅ ${fmt.count(res.archivedCount)} لاگ آرشیو شد`);
       await refresh();
     } catch (e: any) {
       setMsg('❌ ' + (e?.message || String(e)));
@@ -253,7 +255,7 @@ export default function ArchiveSeedTab() {
         logs: (dlgState.logs || []).filter((l) => !COMP_FLOCK_IDS.includes(l.flockId)),
       });
 
-      setMsg(`🗑 ${toFa(ids.length)} لاگ و داده‌های تستی مقایسه حذف شد`);
+      setMsg(`🗑 ${fmt.count(ids.length)} لاگ و داده‌های تستی مقایسه حذف شد`);
       await refresh();
     } catch (e: any) {
       setMsg('❌ ' + (e?.message || String(e)));
@@ -266,8 +268,8 @@ export default function ArchiveSeedTab() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
       <SettingsGroup icon="🧪" title="داده تستی آرشیو و مقایسه" tone="warn" defaultOpen persist={false}>
         <RowGrid>
-          <MiniStat label="لاگ در آرشیو" value={toFa(count)} />
-          <MiniStat label="گله‌های تستی" value={toFa(FLOCKS.length)} />
+          <MiniStat label="لاگ در آرشیو" value={fmt.count(count)} />
+          <MiniStat label="گله‌های تستی" value={fmt.count(FLOCKS.length)} />
         </RowGrid>
         <Row l="وضعیت" v={msg || '—'} />
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>

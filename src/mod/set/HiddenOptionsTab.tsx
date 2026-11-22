@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useCustomOptions } from '../../shr/store/customOptions';
 import { Empty, Btn, PageContainer } from '../../shr/components/ui';
 import { showToast, toastMsg } from '../../cor/store/toast';
@@ -25,6 +26,7 @@ function keyLabel(key: string) {
 }
 
 export default function HiddenOptionsTab() {
+  const fmt = useFormat();
   const { getHidden, unhideOption, deleteOption } = useCustomOptions();
   const { equipment } = useHal();
   const usageCheck = (name: string) => equipment.filter((x) => x.type === name).length;
@@ -97,7 +99,7 @@ export default function HiddenOptionsTab() {
                     padding: '3px 8px', borderRadius: 6,
                     background: 'rgba(217,119,6,.12)', color: 'var(--warn)',
                     flexShrink: 0,
-                  }}>{toFa(usageCheck(o.name))} مورد</span>
+                  }}>{fmt.count(usageCheck(o.name))} مورد</span>
                 )}
                 <Btn size="sm" onClick={() => handleUnhide(o.id, o.name)}>بازگردانی</Btn>
                 <Btn size="sm" variant="danger" onClick={() => handleDelete(o.id, o.name)}>حذف کامل</Btn>

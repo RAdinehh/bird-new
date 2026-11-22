@@ -1,3 +1,4 @@
+import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
 import { useEffect, useState } from 'react';
 import SettingsGroup from './SettingsGroup';
 import { Row, RowGrid, MiniStat, Btn } from '../../shr/components/ui';
@@ -7,12 +8,13 @@ import { readStorageStats, type StorageStats } from './storageDebug';
 /** حجم خوانا — بایت واقعی UTF-8 */
 function fmtBytes(b: number): string {
   if (!b) return '۰';
-  if (b < 1024) return toFa(b) + ' بایت';
-  if (b < 1048576) return toFa((b / 1024).toFixed(1)) + ' کیلوبایت';
-  return toFa((b / 1048576).toFixed(2)) + ' مگابایت';
+  if (b < 1024) return getGlobalFormat().num(b) + ' بایت';
+  if (b < 1048576) return getGlobalFormat().code((b / 1024).toFixed(1)) + ' کیلوبایت';
+  return getGlobalFormat().code((b / 1048576).toFixed(2)) + ' مگابایت';
 }
 
 export default function StorageDebugTab() {
+  const fmt = useFormat();
   const [stats, setStats] = useState<StorageStats | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -65,7 +67,7 @@ export default function StorageDebugTab() {
         ) : (
           <RowGrid>
             {years.map(([y, n]) => (
-              <Row key={y} l={y} v={toFa(n) + ' لاگ'} />
+              <Row key={y} l={y} v={fmt.count(n) + ' لاگ'} />
             ))}
           </RowGrid>
         )}
@@ -74,17 +76,17 @@ export default function StorageDebugTab() {
       <SettingsGroup icon="🏷" title="وضعیت" tone="purple" persist={false}>
         <RowGrid>
           {statuses.map(([s, n]) => (
-            <Row key={s} l={s === 'archived' ? 'آرشیوشده' : 'فعال'} v={toFa(n)} />
+            <Row key={s} l={s === 'archived' ? 'آرشیوشده' : 'فعال'} v={fmt.count(n)} />
           ))}
         </RowGrid>
       </SettingsGroup>
 
       <SettingsGroup icon="🔒" title="لاگ‌های حساس (نباید آرشیو شوند)" tone="warn" persist={false}>
         <RowGrid>
-          <Row l="دارای اصلاحات" v={toFa(stats.withCorrections)} warn={stats.withCorrections > 0} />
-          <Row l="دارای تلفات" v={toFa(stats.withDeaths)} warn={stats.withDeaths > 0} />
-          <Row l="دارای رویداد" v={toFa(stats.withEvents)} />
-          <Row l="مجموع رویدادها" v={toFa(stats.totalEvents)} />
+          <Row l="دارای اصلاحات" v={fmt.count(stats.withCorrections)} warn={stats.withCorrections > 0} />
+          <Row l="دارای تلفات" v={fmt.count(stats.withDeaths)} warn={stats.withDeaths > 0} />
+          <Row l="دارای رویداد" v={fmt.count(stats.withEvents)} />
+          <Row l="مجموع رویدادها" v={fmt.count(stats.totalEvents)} />
         </RowGrid>
       </SettingsGroup>
 
@@ -98,11 +100,11 @@ export default function StorageDebugTab() {
 
       <SettingsGroup icon="💽" title="سهمیهٔ مرورگر" tone="accent" persist={false}>
         <RowGrid>
-          <Row l="استفاده‌شده" v={toFa(stats.usageMB.toFixed(2)) + ' مگابایت'} />
-          <Row l="سهمیه" v={toFa(stats.quotaMB.toFixed(0)) + ' مگابایت'} />
+          <Row l="استفاده‌شده" v={fmt.code(stats.usageMB.toFixed(2)) + ' مگابایت'} />
+          <Row l="سهمیه" v={fmt.code(stats.quotaMB.toFixed(0)) + ' مگابایت'} />
           <Row
             l="درصد"
-            v={toFa(stats.percent.toFixed(2)) + '٪'}
+            v={fmt.code(stats.percent.toFixed(2)) + '٪'}
             warn={stats.percent > 80}
           />
         </RowGrid>

@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useSet } from './store';
 import { safeStorage } from '../../shr/utils/storage';
 import { StatCard, LinkRow } from './components/AboutCards';
@@ -12,6 +13,7 @@ import { Section, SubSection } from './helpers';
 import { showToast } from '../../cor/store/toast';
 
 export default function AboutTab() {
+  const fmt = useFormat();
   const resetHelpBanners = () => {
     try {
       const keys = Object.keys(localStorage).filter(k => k.startsWith('help-banner-'));
@@ -79,7 +81,7 @@ export default function AboutTab() {
 
       {/* ═══ ۳. راهنما و آموزش ═══ */}
       <Section title="🎓 راهنما و آموزش">
-        <LinkRow icon="❓" label={`سؤالات متداول (${toFa(FAQS.length)})`} onClick={() => setOpenFaq(true)} />
+        <LinkRow icon="❓" label={`سؤالات متداول (${fmt.count(FAQS.length)})`} onClick={() => setOpenFaq(true)} />
         <LinkRow icon="📖" label="راهنمای کاربری" onClick={() => setOpenGuide(true)} />
         <LinkRow icon="💡" label="نمایش مجدد راهنماهای صفحه‌ها" onClick={resetHelpBanners} />
         <LinkRow

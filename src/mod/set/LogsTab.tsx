@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useState, useEffect } from 'react';
 import { getLogs, clearLogs, exportLogs, type LogEntry } from '../../cor/logger/logger';
 import { getAuditLogs, clearAuditLogs, exportAuditLogs, type AuditEntry } from '../../cor/logger/auditLog';
@@ -30,6 +31,7 @@ const ACTION_TONE: Record<string, string> = {
 };
 
 export default function LogsTab() {
+  const fmt = useFormat();
   const [tab, setTab] = useState<Tab>('activity');
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditEntry[]>([]);
@@ -98,7 +100,7 @@ export default function LogsTab() {
             cursor: 'pointer',
           }}
         >
-          📋 فعالیت‌ها {toFa(auditLogs.length) > '۰' ? `(${toFa(auditLogs.length)})` : ''}
+          📋 فعالیت‌ها {auditLogs.length > 0 ? `(${fmt.count(auditLogs.length)})` : ''}
         </button>
         <button
           type="button"
@@ -118,7 +120,7 @@ export default function LogsTab() {
             cursor: 'pointer',
           }}
         >
-          ⚠ خطاها {toFa(logs.length) > '۰' ? `(${toFa(logs.length)})` : ''}
+          ⚠ خطاها {logs.length > 0 ? `(${fmt.count(logs.length)})` : ''}
         </button>
       </div>
 
@@ -144,7 +146,7 @@ export default function LogsTab() {
               : 'var(--muted)',
             marginTop: 4,
           }}>
-            {toFa(currentLen)}
+            {fmt.count(currentLen)}
           </div>
         </div>
         <div style={{ fontSize: 36 }}>{tab === 'activity' ? '📋' : (logs.length > 0 ? '⚠' : '✓')}</div>
@@ -174,14 +176,14 @@ export default function LogsTab() {
               {auditLogs.map((entry, i) => {
                 const isOpen = expandedId === entry.id;
                 const time = new Date(entry.time);
-                const timeStr = toFa(time.toLocaleString('fa-IR'));
+                const timeStr = fmt.code(time.toLocaleString('fa-IR'));
                 const tone = ACTION_TONE[entry.action] || 'dim';
                 const label = ACTION_LABEL[entry.action] || entry.action;
                 return (
                   <ExpandableCard
                     key={entry.id}
                     accent={tone as any}
-                    index={toFa(i + 1)}
+                    index={fmt.count(i + 1)}
                     iconEmoji="📝"
                     title={entry.summary}
                     subtitle={entry.module + ' • ' + timeStr}
@@ -243,12 +245,12 @@ export default function LogsTab() {
               {logs.map((log, i) => {
                 const isOpen = expandedId === log.id;
                 const time = new Date(log.time);
-                const timeStr = toFa(time.toLocaleString('fa-IR'));
+                const timeStr = fmt.code(time.toLocaleString('fa-IR'));
                 return (
                   <ExpandableCard
                     key={log.id}
                     accent="warn"
-                    index={toFa(i + 1)}
+                    index={fmt.count(i + 1)}
                     iconEmoji="⚠"
                     title={log.message.slice(0, 60) + (log.message.length > 60 ? '...' : '')}
                     subtitle={timeStr}
@@ -320,8 +322,8 @@ export default function LogsTab() {
       >
         <div style={{ textAlign: 'center', fontSize: 'var(--fs-md)', lineHeight: 1.9 }}>
           {tab === 'activity'
-            ? `همه‌ی ${toFa(auditLogs.length)} فعالیت ثبت‌شده پاک شوند؟`
-            : `همه‌ی ${toFa(logs.length)} خطای ثبت‌شده پاک شوند؟`}
+            ? `همه‌ی ${fmt.count(auditLogs.length)} فعالیت ثبت‌شده پاک شوند؟`
+            : `همه‌ی ${fmt.count(logs.length)} خطای ثبت‌شده پاک شوند؟`}
         </div>
       </Modal>
     </div>

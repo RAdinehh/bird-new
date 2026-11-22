@@ -1,3 +1,4 @@
+import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
 import { useState } from 'react';
 import SettingsGroup from './SettingsGroup';
 import { Row, RowGrid, MiniStat, Btn } from '../../shr/components/ui';
@@ -10,16 +11,16 @@ const SIZES = [100, 500, 1000, 2000, 5000];
 /** حجم خوانا — بایت واقعی UTF-8 */
 function fmtBytes(b: number): string {
   if (!b) return '۰';
-  if (b < 1024) return toFa(b) + ' بایت';
-  if (b < 1048576) return toFa((b / 1024).toFixed(1)) + ' کیلوبایت';
-  return toFa((b / 1048576).toFixed(2)) + ' مگابایت';
+  if (b < 1024) return getGlobalFormat().num(b) + ' بایت';
+  if (b < 1048576) return getGlobalFormat().code((b / 1024).toFixed(1)) + ' کیلوبایت';
+  return getGlobalFormat().code((b / 1048576).toFixed(2)) + ' مگابایت';
 }
 
 /** زمان خوانا */
 function fmtMs(ms: number): string {
-  if (ms < 1) return toFa(ms.toFixed(2)) + ' ms';
-  if (ms < 100) return toFa(ms.toFixed(1)) + ' ms';
-  return toFa(Math.round(ms)) + ' ms';
+  if (ms < 1) return getGlobalFormat().code(ms.toFixed(2)) + ' ms';
+  if (ms < 100) return getGlobalFormat().code(ms.toFixed(1)) + ' ms';
+  return getGlobalFormat().int(Math.round(ms)) + ' ms';
 }
 
 const cell: React.CSSProperties = {
@@ -39,6 +40,7 @@ const head: React.CSSProperties = {
 };
 
 export default function StorageBenchTab() {
+  const fmt = useFormat();
   const [rows, setRows] = useState<BenchRow[]>([]);
   const [running, setRunning] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +53,7 @@ export default function StorageBenchTab() {
     if (r.ok) {
       setRows((prev) => [...prev.filter((x) => x.n !== n), r.row].sort((a, b) => a.n - b.n));
     } else {
-      setError(`${toFa(n)} لاگ: ${r.error}`);
+      setError(`${fmt.count(n)} لاگ: ${r.error}`);
     }
     setRunning(null);
   };
@@ -84,13 +86,13 @@ export default function StorageBenchTab() {
               key={n}
               onClick={() => void run(n)}
             >
-              {running === n ? '⏳ ' + toFa(n) : toFa(n) + ' لاگ'}
+              {running === n ? '⏳ ' + fmt.count(n) : fmt.count(n) + ' لاگ'}
             </Btn>
           ))}
         </div>
 
         {running !== null && (
-          <Row l="در حال اجرا" v={toFa(running) + ' لاگ…'} accent />
+          <Row l="در حال اجرا" v={fmt.count(running) + ' لاگ…'} accent />
         )}
 
         {error && <Row l="خطا" v={error} warn />}
@@ -114,7 +116,7 @@ export default function StorageBenchTab() {
             لاگ‌های جدید نیست؛ با رشد آرایه رشد می‌کند.
           </div>
           {worst && worst.n !== last.n && (
-            <Row l="بدترین حالت اندازه‌گیری‌شده" v={fmtMs(worst.appendMs) + ' در ' + toFa(worst.n) + ' لاگ'} warn />
+            <Row l="بدترین حالت اندازه‌گیری‌شده" v={fmtMs(worst.appendMs) + ' در ' + fmt.count(worst.n) + ' لاگ'} warn />
           )}
         </SettingsGroup>
       )}
@@ -139,7 +141,7 @@ export default function StorageBenchTab() {
               <tbody>
                 {rows.map((r) => (
                   <tr key={r.n}>
-                    <td style={cell}>{toFa(r.n)}</td>
+                    <td style={cell}>{fmt.count(r.n)}</td>
                     <td style={cell}>{fmtBytes(r.bytes)}</td>
                     <td style={{ ...cell, fontWeight: 700, color: 'var(--warn)' }}>
                       {fmtMs(r.appendMs)}

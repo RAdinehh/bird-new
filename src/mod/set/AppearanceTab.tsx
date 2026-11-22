@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useSet, MODULE_LABELS } from './store';
 import { Btn, Field, Grid2, Select } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
@@ -6,6 +7,7 @@ import { ToggleRow, ColorBtn } from './helpers';
 import { showToast } from '../../cor/store/toast';
 
 export default function AppearanceTab() {
+  const fmt = useFormat();
   const s = useSet();
   const themes: [string, string, string][] = [['light', '☀', 'روشن'], ['dark', '🌙', 'تیره']];
   const densities: [string, string][] = [['compact', 'فشرده'], ['comfortable', 'راحت']];
@@ -43,7 +45,7 @@ export default function AppearanceTab() {
         </Field>
       </SettingsGroup>
 
-      <SettingsGroup icon="🔤" title="فونت و چیدمان" subtitle={`اندازه ${toFa(s.fontSizePercent || 100)}٪`} tone="info">
+      <SettingsGroup icon="🔤" title="فونت و چیدمان" subtitle={`اندازه ${fmt.int(s.fontSizePercent || 100)}٪`} tone="info">
         {/* اسلایدر اندازه فونت — تمام عرض */}
         <div style={{
           padding: '12px 14px',
@@ -69,7 +71,7 @@ export default function AppearanceTab() {
               borderRadius: 10,
               fontVariantNumeric: 'tabular-nums',
             }}>
-              {toFa(s.fontSizePercent || 100)}٪
+              {fmt.int(s.fontSizePercent || 100)}٪
             </span>
           </div>
 
@@ -129,7 +131,7 @@ export default function AppearanceTab() {
         />
       </SettingsGroup>
 
-      <SettingsGroup icon="📱" title="منوی پایین" subtitle={`${toFa(activeNavCount)} از ۵ جای خالی`} tone="purple">
+      <SettingsGroup icon="📱" title="منوی پایین" subtitle={`${fmt.count(activeNavCount)} از ۵ جای خالی`} tone="purple">
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
           نوار پایین را دلخواه تنظیم کنید
         </div>
@@ -160,7 +162,7 @@ export default function AppearanceTab() {
             const currentId = s.bottomNav[slot] || '';
             const usedIds = s.bottomNav.filter((x, i) => i !== slot && x);
             return (
-              <Field key={slot} label={`جای ${toFa(slot + 1)}${slot === 0 ? ' (قفل)' : ''}`}>
+              <Field key={slot} label={`جای ${fmt.count(slot + 1)}${slot === 0 ? ' (قفل)' : ''}`}>
                 <Select
                   value={currentId}
                   disabled={slot === 0}

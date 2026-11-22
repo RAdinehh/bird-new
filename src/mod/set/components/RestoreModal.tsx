@@ -1,6 +1,8 @@
 /**
  * RestoreModal — مودال بازیابی پشتیبان
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { Btn, BtnRow, Field, Modal, Select } from '../../../shr/components/ui';
 import { toFa } from '../../../shr/utils/fa';
 
@@ -15,6 +17,7 @@ interface Props {
 }
 
 export default function RestoreModal({ open, onClose, preview, previewTotalRecords, mergeMode, setMergeMode, onConfirm }: Props) {
+  const fmt = useFormat();
   return (
     <>
       <Modal
@@ -43,11 +46,11 @@ export default function RestoreModal({ open, onClose, preview, previewTotalRecor
             }}>
               <div>
                 <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>نسخه فایل</div>
-                <div style={{ fontWeight: 700 }}>{toFa(preview.version)}</div>
+                <div style={{ fontWeight: 700 }}>{fmt.code(preview.version)}</div>
               </div>
               <div>
                 <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>نسخه ساختار</div>
-                <div style={{ fontWeight: 700 }}>{toFa(preview.schemaVersion)}</div>
+                <div style={{ fontWeight: 700 }}>{fmt.code(preview.schemaVersion)}</div>
               </div>
               <div>
                 <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>تاریخ</div>
@@ -55,7 +58,7 @@ export default function RestoreModal({ open, onClose, preview, previewTotalRecor
               </div>
               <div>
                 <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>تعداد رکورد</div>
-                <div style={{ fontWeight: 700 }}>{toFa(previewTotalRecords)}</div>
+                <div style={{ fontWeight: 700 }}>{fmt.count(previewTotalRecords)}</div>
               </div>
             </div>
 

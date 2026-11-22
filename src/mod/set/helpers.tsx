@@ -1,6 +1,8 @@
 /**
  * helpers.tsx — ماژول set
  */
+import { getGlobalFormat } from '../../shr/units/useFormat';
+
 import { useEffect, useState, useRef } from 'react';
 import { clearLogs, exportLogs, getLogs, logCount, type LogEntry } from '../../cor/logger/logger';
 import { showAlert, showConfirmAsync, showSuccess } from '../../cor/store/dialog';
@@ -127,13 +129,13 @@ export function LocalNumField({ label, hint, value, onChange, unit, min, max }: 
   min?: number;
   max?: number;
 }) {
-  const [local, setLocal] = useState(toFa(String(value ?? 0)));
+  const [local, setLocal] = useState(getGlobalFormat().code(String(value ?? 0)));
   const editingRef = useRef(false);
 
   // فقط وقتی از بیرون تغییر کنه (نه در حال تایپ)
   useEffect(() => {
     if (editingRef.current) return;
-    setLocal(toFa(String(value ?? 0)));
+    setLocal(getGlobalFormat().code(String(value ?? 0)));
   }, [value]);
 
   const handleChange = (raw: string) => {
@@ -154,7 +156,7 @@ export function LocalNumField({ label, hint, value, onChange, unit, min, max }: 
 
   const handleBlur = () => {
     editingRef.current = false;
-    setLocal(toFa(String(value ?? 0)));
+    setLocal(getGlobalFormat().code(String(value ?? 0)));
   };
 
   return (

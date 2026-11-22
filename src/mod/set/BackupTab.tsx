@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { exportAll, validateBackup, importAll, getStats, downloadBackup, shareBackup, readFile, formatSize, byteSize, clearAllData, type BackupFile, type BackupStats } from '../../shr/utils/backup';
 import { useSet } from './store';
@@ -12,6 +13,7 @@ import ResetModal from './components/ResetModal';
 import { ToggleRow } from './helpers';
 
 export default function BackupTab() {
+  const fmt = useFormat();
   const s = useSet();
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
   const [stats, setStats] = useState<BackupStats>({ totalKeys: 0, totalSize: 0, byModule: [] });
@@ -231,7 +233,7 @@ export default function BackupTab() {
       <SettingsGroup
         icon="⏱"
         title="پشتیبان خودکار"
-        subtitle={s.autoBackup.enabled ? `هر ${toFa(s.autoBackup.intervalHours)} ساعت` : 'غیرفعال'}
+        subtitle={s.autoBackup.enabled ? `هر ${fmt.int(s.autoBackup.intervalHours)} ساعت` : 'غیرفعال'}
         tone="purple"
       >
         <ToggleRow
