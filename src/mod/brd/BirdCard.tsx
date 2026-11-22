@@ -14,6 +14,7 @@ import { toastMsg } from '../../cor/store/toast';
 import { logAction } from '../../cor/logger/auditLog';
 import { CardActions } from '../../shr/components/ui';
 import { ACTION_PRESETS } from '../../shr/constants/cardActions';
+import StandardInfoBox from '../../shr/components/StandardInfoBox';
 
 interface Props {
   bird: Bird;
@@ -185,43 +186,12 @@ export default function BirdCard({
 
       {/* 📖 کادر استاندارد متصل */}
       {hasAnyStandard ? (
-        <div style={{
-          padding: 'var(--pad-box)',
-          background: 'var(--accent-soft)',
-          border: '1px solid var(--accent-border)',
-          borderRadius: 'var(--r-sm)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-        }}>
-          <span style={{ fontSize: 'var(--fs-md)', flexShrink: 0 }}>📖</span>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{
-              fontSize: 'var(--fs-sm)', fontWeight: 800, color: 'var(--accent)',
-              display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap',
-            }}>
-              {displayLabel}
-              <span style={{
-                fontSize: 'var(--fs-2xs)', fontWeight: 600,
-                color: 'var(--muted)',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                maxWidth: 160,
-              }}>
-                {displayStd?.source && `📚 ${displayStd.source}`}
-                {displayStd?.source && displayStd?.publishYear && ' • '}
-                {displayStd?.publishYear && toFa(displayStd.publishYear)}
-              </span>
-            </div>
-          </div>
-          <div style={{
-            fontSize: 'var(--fs-2xs)', fontWeight: 800,
-            padding: 'var(--pad-chip-xs)', borderRadius: 'var(--r-sm)',
-            background: 'var(--accent)', color: 'var(--card-solid)',
-            flexShrink: 0,
-          }}>متصل</div>
-        </div>
+        <StandardInfoBox
+          title={displayLabel}
+          source={displayStd?.source}
+          publishYear={displayStd?.publishYear}
+          badge="متصل"
+        />
       ) : null}
 
       <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>

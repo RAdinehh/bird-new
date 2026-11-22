@@ -16,6 +16,7 @@ import { DEFAULT_STANDARDS } from '../set/standards/data';
 import { Btn, BtnRow, Field, Modal, NumField, ErrorBox } from '../../shr/components/ui';
 import { toastMsg } from '../../cor/store/toast';
 import { HELP } from '../../shr/help/helpTexts';
+import StandardInfoBox from '../../shr/components/StandardInfoBox';
 
 export interface BreedFormData {
   id: string;
@@ -264,26 +265,16 @@ export default function BreedForm({
       </Field>
 
       {std && (
-        <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)',
-          border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)',
-          fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.5 }}>
-          <div style={{ fontWeight: 700, color: 'var(--accent)', marginBottom: 2, fontSize: 'var(--fs-sm)' }}>
-            📚 {std.nameFa}
-          </div>
-          {(std.source || std.publishYear) && (
-            <div style={{ fontSize: 'var(--fs-2xs)', opacity: 0.85, marginBottom: 3 }}>
-              {std.source}{std.publishYear && ` • ${std.publishYear}`}
-            </div>
-          )}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px 8px' }}>
+          <StandardInfoBox title={std.nameFa} source={std.source} publishYear={std.publishYear}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px 8px' }}>
             {std.production?.eggsPerYear && <div>🥚 {toFa(std.production.eggsPerYear)} تخم/سال</div>}
             {std.biology?.layingStartDay && <div>📅 روز {toFa(std.biology.layingStartDay)}</div>}
             {std.production?.peakLayingPct && <div>📊 اوج {toFa(std.production.peakLayingPct)}٪</div>}
             {std.production?.fertilityPct && <div>🐣 باروری {toFa(std.production.fertilityPct)}٪</div>}
             {std.production?.hatchabilityPct && <div>🐣 هچ {toFa(std.production.hatchabilityPct)}٪</div>}
           </div>
-        </div>
-      )}
+          </StandardInfoBox>
+        )}
 
       <Field
         label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>

@@ -12,6 +12,7 @@ import { toastMsg } from '../../cor/store/toast';
 import { logAction } from '../../cor/logger/auditLog';
 import { CardActions } from '../../shr/components/ui';
 import { ACTION_PRESETS } from '../../shr/constants/cardActions';
+import StandardInfoBox from '../../shr/components/StandardInfoBox';
 
 interface Props {
   breed: Breed;
@@ -148,18 +149,11 @@ export default function BreedCard({
 
       {/* 📚 منبع استاندارد */}
       {stdData?.source && (
-        <div style={{
-          fontSize: 'var(--fs-2xs)',
-          color: 'var(--muted)',
-          fontWeight: 600,
-          paddingTop: 2,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 4,
-        }}>
-          📚 {stdData.source}
-          {stdData.publishYear && <span style={{ opacity: 0.6 }}>· {toFa(stdData.publishYear)}</span>}
-        </div>
+        <StandardInfoBox
+          variant="inline"
+          source={stdData.source}
+          publishYear={stdData.publishYear}
+        />
       )}
 
       <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
