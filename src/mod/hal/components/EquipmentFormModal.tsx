@@ -13,7 +13,7 @@ import SmartSelect from '../../../shr/components/SmartSelect';
 import DependentSelect from '../../../shr/components/DependentSelect';
 import { STATUS_LABELS, type EquipmentStatus } from '../store';
 import EditableSelect from '../../../shr/components/EditableSelect';
-import { toEn } from '../../../shr/utils/fa';
+import { toEn, toFa } from '../../../shr/utils/fa';
 import { CATEGORY_LABELS, UNIT_LABELS_EQ, EQUIP_LABELS } from '../store';
 import { getEquipUnit } from '../equipUnits';
 import { getStdDefaultForType } from '../api/equipmentCalc';
@@ -177,6 +177,58 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                       unit={def.secondary!.unit}
                       min={1}
                     />
+                    {(() => {
+                      const isFan = ["fan_tunnel", "fan_ceiling", "fan"].includes(form.type);
+                      if (!isFan) return null;
+                      const selHall = halls.find((h: Hall) => h.id === form.hallId);
+                      const hallCap = selHall?.capacity || 0;
+                      const fanCount = Math.max(1, parseInt(toEn(form.count || ""), 10) || 1);
+                      const stdCoef = stdForDefaults?.equipment?.fanM3PerKg || 4.5;
+                      const targetW = stdForDefaults?.growth?.weightByAge?.[stdForDefaults.growth.weightByAge.length - 1]?.weightG || 2000;
+                      const totalNeedM3h = hallCap > 0 ? Math.ceil(((hallCap * targetW) / 1000) * stdCoef) : 0;
+                      const suggestedPerFan = totalNeedM3h > 0 ? Math.ceil(totalNeedM3h / fanCount) : 0;
+                      return (
+                        <div style={{
+                          marginTop: "6px",
+                          padding: "7px 9px",
+                          borderRadius: "var(--r-sm)",
+                          background: "var(--input-bg)",
+                          border: "1px dashed var(--border)",
+                          fontSize: "var(--fs-xs)",
+                          color: "var(--muted)",
+                          lineHeight: 1.6,
+                        }}>
+                          {hallCap > 0 ? (
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px", flexWrap: "wrap" }}>
+                              <span>
+                                محاسبه برای سالن <strong style={{ color: "var(--text)", fontWeight: 600 }}>{selHall?.name}</strong> (ظرفیت {toFa(hallCap)} قطعه، {toFa(fanCount)} فن): حدود <strong style={{ color: "var(--accent)", fontWeight: 700 }}>{toFa(suggestedPerFan)} m³/h</strong> برای هر فن (کل نیاز ~{toFa(totalNeedM3h)} m³/h)
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setForm({ ...form, capacity: String(suggestedPerFan) });
+                                  clearAuto("capacity");
+                                }}
+                                style={{
+                                  padding: "2px 8px",
+                                  fontSize: "var(--fs-2xs, 11px)",
+                                  borderRadius: "var(--r-xs, 4px)",
+                                  border: "1px solid var(--accent)",
+                                  background: "var(--accent-soft)",
+                                  color: "var(--accent)",
+                                  cursor: "pointer",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                اعمال ظرفیت
+                              </button>
+                            </div>
+                          ) : (
+                            <span>ظرفیت سالن انتخاب‌شده ثبت نشده؛ ظرفیت هر فن بر اساس میانگین استاندارد محاسبه می‌شود.</span>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </Field>
                 ) : (
                   <Field label={(() => {
