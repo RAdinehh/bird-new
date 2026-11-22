@@ -2,6 +2,8 @@
  * ComparisonTable.tsx — جدول مقایسه + بهترین گله + هشدارها
  * (استخراج‌شده از FlockComparisonPanel.tsx — فاز رفکتور)
  */
+import { useFormat } from '../../shr/units/useFormat';
+
 import { useMemo } from 'react';
 import { Tag } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
@@ -25,6 +27,7 @@ interface Props {
 }
 
 export default function ComparisonTable({ orderedCandidates, refCandidate }: Props) {
+  const fmt = useFormat();
   const getTitle = (c: ComparisonCandidate) => cleanCandidateTitle(c.label, c.metric.flockName);
 
   const selectedCount = orderedCandidates.length;
@@ -106,7 +109,7 @@ export default function ComparisonTable({ orderedCandidates, refCandidate }: Pro
       title: getTitle(winner.candidate),
       badge: 'برتر',
       tone: 'green' as TagTone,
-      summary: `بهتر در ${toFa(winner.betterCount)} از ${toFa(winner.comparableCount)} شاخص نسبت به مرجع.`,
+      summary: `بهتر در ${fmt.count(winner.betterCount)} از ${fmt.count(winner.comparableCount)} شاخص نسبت به مرجع.`,
     };
   }, [canCompare, refCandidate, orderedCandidates, sortedMetrics, hasMixedProduction]);
 
@@ -132,20 +135,20 @@ export default function ComparisonTable({ orderedCandidates, refCandidate }: Pro
         Math.abs(refInfo.durationDays - info.durationDays) >= 7
       ) {
         warnings.push(
-          `اختلاف طول دوره بین مرجع (${toFa(refInfo.durationDays)} روز) و «${name}» (${toFa(info.durationDays)} روز).`
+          `اختلاف طول دوره بین مرجع (${fmt.day(refInfo.durationDays)} روز) و «${name}» (${fmt.day(info.durationDays)} روز).`
         );
       }
 
       if (info.lowCoverage && info.coveragePct !== null) {
         warnings.push(
-          `پوشش ثبت لاگ «${name}» (${toFa(info.coveragePct)}٪) کمتر از حد استاندارد ۸۰٪ است.`
+          `پوشش ثبت لاگ «${name}» (${fmt.num(info.coveragePct)}٪) کمتر از حد استاندارد ۸۰٪ است.`
         );
       }
     }
 
     if (refInfo.lowCoverage && refInfo.coveragePct !== null) {
       warnings.push(
-        `پوشش ثبت لاگ گله مرجع «${getTitle(refCandidate)}» (${toFa(refInfo.coveragePct)}٪) کمتر از حد استاندارد ۸۰٪ است.`
+        `پوشش ثبت لاگ گله مرجع «${getTitle(refCandidate)}» (${fmt.num(refInfo.coveragePct)}٪) کمتر از حد استاندارد ۸۰٪ است.`
       );
     }
 
@@ -165,7 +168,7 @@ export default function ComparisonTable({ orderedCandidates, refCandidate }: Pro
           color: 'var(--text)',
         }}
       >
-        برای نمایش مقایسه، حداقل {toFa(MIN_FLOCKS)} و حداکثر {toFa(MAX_FLOCKS)} گله انتخاب کنید.
+        برای نمایش مقایسه، حداقل {fmt.count(MIN_FLOCKS)} و حداکثر {fmt.count(MAX_FLOCKS)} گله انتخاب کنید.
       </div>
     );
   }

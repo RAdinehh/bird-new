@@ -1,6 +1,8 @@
 /**
  * ItemsFormModal — فرم افزودن/ویرایش قلم انبار
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { toEn } from '../../../shr/utils/fa';
 import { Btn, BtnRow, ErrorBox, Field, Grid2, Grid3, Input, Modal, MoneyField, NumField, SectionTitle, Select, Textarea } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
@@ -28,6 +30,7 @@ export interface ItemsFormModalProps {
 }
 
 export default function ItemsFormModal(props: ItemsFormModalProps) {
+  const fmt = useFormat();
   const { open, setOpen, form, setForm, vErrors, showError, markTouched, err, suppliers, halls, currentStockForEdit, save } = props;
   const extras = (CATEGORY_DEFAULTS as any)[form.category];
   const isMedicine = form.category === 'medicine' || form.category === 'vaccine';
@@ -144,7 +147,7 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
                 fontFamily: 'inherit', fontSize: 'var(--fs-base)',
                 color: 'var(--text)', fontWeight: 700, minHeight: 38,
               }}>
-                <span>{toFa(currentStockForEdit)}</span>
+                <span>{fmt.num(currentStockForEdit)}</span>
                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 500 }}>
                   {(UNIT_LABEL as any)[form.unit] || 'عدد'}
                 </span>

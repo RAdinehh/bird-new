@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useState, useMemo, useEffect } from 'react';
 import MoveFormModal from './components/MoveFormModal';
 import { useFab } from '../../shr/hooks/useFab';
@@ -41,6 +42,7 @@ const REASONS_BY_TYPE: Record<MovementType, MovementReason[]> = {
 };
 
 export default function MovesPage({ active = true }: { active?: boolean } = {}) {
+  const fmt = useFormat();
   const navigate = useNavigate();
   const { items, movements, addMovement, deleteMovement } = useWhs();
   const { contacts } = useCtc();
@@ -75,7 +77,7 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
     items: list,
     getId: (x: Movement) => x.id,
     onDelete: async (ids: string[]) => {
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' تراکنش حذف شوند؟', { danger: true });
+      const ok = await showConfirmAsync('حذف گروهی', fmt.count(ids.length) + ' تراکنش حذف شوند؟', { danger: true });
       if (!ok) return;
       const backups: Movement[] = [];
       for (const id of ids) {
@@ -122,8 +124,8 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
   const openEdit = (m: Movement) => {
     setForm({
       id: m.id, itemId: m.itemId, type: m.type,
-      quantity: m.quantity ? toFa(m.quantity) : '',
-      unitPrice: m.unitPrice ? toFa(m.unitPrice) : '',
+      quantity: m.quantity ? fmt.code(m.quantity) : '',
+      unitPrice: m.unitPrice ? fmt.code(m.unitPrice) : '',
       reason: m.reason, date: m.date,
       partyId: m.partyId || '', notes: m.notes || ''
     });
@@ -165,7 +167,7 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
       const ok = await showConfirmAsync(
         '⚠️ موجودی کافی نیست',
         `موجودی فعلی: ${selectedItem ? formatQty(currentStock, selectedItem.unit) : ''}\n` +
-        `مقدار خروج: ${toFa(qty)}\n\n` +
+        `مقدار خروج: ${fmt.num(qty)}\n\n` +
         `با ثبت این گردش، موجودی منفی می‌شود. ادامه می‌دهید؟`,
         { danger: true }
       );
@@ -222,7 +224,7 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
               const name = it?.itemId ? (items.find(x => x.id === it.itemId)?.name || 'گردش') : 'گردش';
               return `«${name}» حذف شد`;
             }
-            return `${toFa(arr.length)} گردش حذف شد`;
+            return `${fmt.count(arr.length)} گردش حذف شد`;
           })()}
           onUndo={undoDelete}
           onDismiss={() => setUndoData(null)}
@@ -287,18 +289,18 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
                 id={m.id}
                 ms={ms}
                 accent={accent}
-                index={toFa(i + 1)}
+                index={fmt.count(i + 1)}
                 iconEmoji={m.type === 'in' ? '📥' : '📤'}
                 title={item?.name || '—'}
-                subtitle={`${toFa(m.date)} • ${MOVEMENT_REASON[m.reason]}`}
+                subtitle={`${fmt.date(m.date)} • ${MOVEMENT_REASON[m.reason]}`}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : m.id)}
                 badge={<Tag tone={m.type === 'in' ? 'green' : 'amber'}>{m.type === 'in' ? 'ورود' : 'خروج'}</Tag>}
                 stats={
                   <>
-                    <span>مقدار: <b style={{ color: 'var(--text)' }}>{item ? formatQty(m.quantity, item.unit) : toFa(m.quantity)}</b></span>
-                    {m.unitPrice > 0 ? <span>قیمت: <b style={{ color: 'var(--text)' }}>{toFa(m.unitPrice.toLocaleString('fa-IR'))}</b></span> : null}
-                    {total > 0 ? <span>جمع: <b style={{ color: 'var(--text)' }}>{toFa(total.toLocaleString('fa-IR'))} ت</b></span> : null}
+                    <span>مقدار: <b style={{ color: 'var(--text)' }}>{item ? formatQty(m.quantity, item.unit) : fmt.num(m.quantity)}</b></span>
+                    {m.unitPrice > 0 ? <span>قیمت: <b style={{ color: 'var(--text)' }}>{fmt.money(m.unitPrice, { withUnit: false })}</b></span> : null}
+                    {total > 0 ? <span>جمع: <b style={{ color: 'var(--text)' }}>{fmt.money(total)}</b></span> : null}
                   </>
                 }
               >
@@ -306,20 +308,20 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
                 <Row l="کالا" v={item ? `${CATEGORY_ICON[item.category]} ${item.name}` : '—'} />
                 <Row l="نوع" v={m.type === 'in' ? 'ورود' : 'خروج'} />
                 <Row l="دلیل" v={MOVEMENT_REASON[m.reason]} />
-                <Row l="تاریخ" v={toFa(m.date)} />
-                <Row l="مقدار" v={item ? formatQty(m.quantity, item.unit) : toFa(m.quantity)} />
+                <Row l="تاریخ" v={fmt.date(m.date)} />
+                <Row l="مقدار" v={item ? formatQty(m.quantity, item.unit) : fmt.num(m.quantity)} />
                 {party ? <Row l="طرف معامله" v={party.name} /> : null}
 
                 {m.unitPrice > 0 ? (
                   <>
                     <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی</SectionTitle>
-                    <Row l="قیمت واحد" v={`${toFa(m.unitPrice.toLocaleString('fa-IR'))} ت`} />
+                    <Row l="قیمت واحد" v={fmt.money(m.unitPrice)} />
                     <div style={{ display: 'flex', justifyContent: 'space-between',
                        fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)',
                        background: 'var(--accent-soft)', color: 'var(--accent)',
                        borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
                       <span>جمع کل:</span>
-                      <span>{toFa(total.toLocaleString('fa-IR'))} ت</span>
+                      <span>{fmt.money(total)}</span>
                     </div>
                   </>
                 ) : null}

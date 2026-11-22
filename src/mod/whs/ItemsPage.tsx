@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useState, useMemo, useEffect } from 'react';
 import { VET_METHOD_LABEL } from '../../shr/constants/vetMethods';
 import { recordHistory } from '../../shr/intelligence';
@@ -98,6 +99,7 @@ const empty = (): F => ({
 const EQUIP_STATUS: Record<string, string> = { active: 'فعال', repair: 'در تعمیر', scrapped: 'اسقاط' };
 
 export default function ItemsPage({ active = true }: { active?: boolean } = {}) {
+  const fmt = useFormat();
   const navigate = useNavigate();
   const { items, movements, addItem, updateItem, deleteItem, archiveItem, unarchiveItem } = useWhs();
   const { contacts } = useCtc();
@@ -138,8 +140,8 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
       const withoutMovements = ids.filter(id => !movements.some(m => m.itemId === id));
 
       const parts: string[] = [];
-      if (withoutMovements.length > 0) parts.push(`${toFa(withoutMovements.length)} کالا حذف کامل`);
-      if (withMovements.length > 0) parts.push(`${toFa(withMovements.length)} کالا آرشیو (تاریخچه حفظ می‌شود)`);
+      if (withoutMovements.length > 0) parts.push(`${fmt.count(withoutMovements.length)} کالا حذف کامل`);
+      if (withMovements.length > 0) parts.push(`${fmt.count(withMovements.length)} کالا آرشیو (تاریخچه حفظ می‌شود)`);
       const msg = parts.join(' و ') + '. ادامه می‌دهید؟';
 
       const ok = await showConfirmAsync('تأیید عملیات گروهی', msg, { danger: true });
@@ -192,7 +194,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
     const current = it.currentStock || 0;
     const input = await showPromptAsync(
       'اصلاح موجودی',
-      `موجودی فعلی: ${toFa(current)} ${UNIT_LABEL[it.unit]}\n\nموجودی واقعی چقدر است؟`,
+      `موجودی فعلی: ${fmt.num(current)} ${UNIT_LABEL[it.unit]}\n\nموجودی واقعی چقدر است؟`,
       {
         placeholder: 'مثلاً — ۱۵۰',
         confirmText: 'ثبت اصلاح',
@@ -204,7 +206,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
     if (val === current) { toastMsg.info('موجودی تغییری نکرد'); return; }
     const ok = await showConfirmAsync(
       'تأیید اصلاح',
-      `موجودی از ${toFa(current)} به ${toFa(val)} ${UNIT_LABEL[it.unit]} تغییر کند؟\n(در تاریخچه ثبت می‌شود)`,
+      `موجودی از ${fmt.num(current)} به ${fmt.num(val)} ${UNIT_LABEL[it.unit]} تغییر کند؟\n(در تاریخچه ثبت می‌شود)`,
       { danger: false }
     );
     if (!ok) return;
@@ -229,34 +231,34 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
   const openEdit = (it: Item) => {
     setForm({
       id: it.id, name: it.name, category: it.category, unit: it.unit, subUnits: it.subUnits || [],
-      minStock: it.minStock ? toFa(it.minStock) : '',
+      minStock: it.minStock ? fmt.code(it.minStock) : '',
       initialStock: '',
       supplierId: it.supplierId || '',
       expireDate: it.expireDate || '',
-      withdrawalDays: it.withdrawalDays === null || it.withdrawalDays === undefined ? '' : toFa(it.withdrawalDays),
+      withdrawalDays: it.withdrawalDays === null || it.withdrawalDays === undefined ? '' : fmt.code(it.withdrawalDays),
       storage: it.storage || 'room',
       notes: it.notes || '',
       purchaseDate: it.purchaseDate || '',
-      purchasePrice: it.purchasePrice ? toFa(it.purchasePrice) : '',
+      purchasePrice: it.purchasePrice ? fmt.code(it.purchasePrice) : '',
       hallId: it.hallId || '',
       equipmentStatus: it.equipmentStatus || 'active',
       warrantyUntil: it.warrantyUntil || '',
       initialPrice: '',
       usageTypes: (() => { const raw: string[] = (it as any).usageTypes || ((it as any).usageType ? [(it as any).usageType] : []); return raw.map((t: string) => t === 'water' ? 'drinking_water' : t === 'injectable' ? 'injection' : t); })(),
       productionDate: it.productionDate || '',
-      dosePerBird: it.dosePerBird ? toFa(it.dosePerBird) : '',
-      dosePerLiter: it.dosePerLiter !== null && it.dosePerLiter !== undefined ? toFa(it.dosePerLiter) : '',
-      dosePerKgFeed: it.dosePerKgFeed !== null && it.dosePerKgFeed !== undefined ? toFa(it.dosePerKgFeed) : '',
+      dosePerBird: it.dosePerBird ? fmt.code(it.dosePerBird) : '',
+      dosePerLiter: it.dosePerLiter !== null && it.dosePerLiter !== undefined ? fmt.code(it.dosePerLiter) : '',
+      dosePerKgFeed: it.dosePerKgFeed !== null && it.dosePerKgFeed !== undefined ? fmt.code(it.dosePerKgFeed) : '',
       feedType: it.feedType || '',
       brand: it.brand || '',
-      protein: it.protein ? toFa(it.protein) : '',
-      energy: it.energy ? toFa(it.energy) : '',
-      fat: it.fat ? toFa(it.fat) : '',
-      fiber: it.fiber ? toFa(it.fiber) : '',
-      calcium: it.calcium ? toFa(it.calcium) : '',
-      phosphorus: it.phosphorus ? toFa(it.phosphorus) : '',
-      methionine: it.methionine ? toFa(it.methionine) : '',
-      lysine: it.lysine ? toFa(it.lysine) : ''
+      protein: it.protein ? fmt.code(it.protein) : '',
+      energy: it.energy ? fmt.code(it.energy) : '',
+      fat: it.fat ? fmt.code(it.fat) : '',
+      fiber: it.fiber ? fmt.code(it.fiber) : '',
+      calcium: it.calcium ? fmt.code(it.calcium) : '',
+      phosphorus: it.phosphorus ? fmt.code(it.phosphorus) : '',
+      methionine: it.methionine ? fmt.code(it.methionine) : '',
+      lysine: it.lysine ? fmt.code(it.lysine) : ''
     });
     setErr(''); reset(); setOpen(true);
   };

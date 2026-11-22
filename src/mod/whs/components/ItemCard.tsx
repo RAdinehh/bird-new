@@ -1,6 +1,8 @@
 /**
  * ItemCard — کارت نمایش قلم انبار
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { toFa } from '../../../shr/utils/fa';
 import { VET_METHOD_LABEL } from '../../../shr/constants/vetMethods';
 import { Btn, Tag } from '../../../shr/components/ui';
@@ -36,6 +38,7 @@ export interface ItemCardProps {
 }
 
 export default function ItemCard(props: ItemCardProps) {
+  const fmt = useFormat();
   const { it, i, hall, sup, myMovements, isOpen, ms, onToggle, onEdit, onAdjust, onDelete, onUndo, onArchive, onUnarchive } = props;
 
   const stock = stockWarning(it);
@@ -60,7 +63,7 @@ export default function ItemCard(props: ItemCardProps) {
     const movementCount = myMovements?.length || 0;
     const ok = await showConfirmAsync(
       '⚠️ آرشیو کالا',
-      `این کالا ${toFa(movementCount)} گردش انبار دارد و قابل حذف کامل نیست.\n\nبا آرشیو، از لیست پنهان می‌شود ولی تمام تاریخچه حفظ می‌شود.`,
+      `این کالا ${fmt.count(movementCount)} گردش انبار دارد و قابل حذف کامل نیست.\n\nبا آرشیو، از لیست پنهان می‌شود ولی تمام تاریخچه حفظ می‌شود.`,
       { confirmText: 'آرشیو کن', cancelText: 'انصراف', danger: false }
     );
     if (!ok) return;
@@ -70,7 +73,7 @@ export default function ItemCard(props: ItemCardProps) {
   };
 
   return (
-    <ExpandableCard key={it.id} id={it.id} ms={ms} accent={accent} index={toFa(i + 1)}
+    <ExpandableCard key={it.id} id={it.id} ms={ms} accent={accent} index={fmt.count(i + 1)}
       iconEmoji={(CATEGORY_ICON as any)[it.category]} title={it.name}
       subtitle={`${(CATEGORY_LABEL as any)[it.category]} • ${formatQty(it.currentStock, it.unit)}`}
       isOpen={isOpen} onToggle={onToggle}
@@ -84,66 +87,66 @@ export default function ItemCard(props: ItemCardProps) {
       }
       stats={<>
         <span>موجودی: <b style={{ color: 'var(--text)' }}>{formatQty(it.currentStock, it.unit)}</b></span>
-        {it.minStock > 0 ? <span>حد: <b style={{ color: 'var(--text)' }}>{toFa(it.minStock)}</b></span> : null}
-        {it.lastPrice > 0 ? <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa((it.currentStock * getAvgPrice(it)).toLocaleString('fa-IR'))} ت</b></span> : null}
+        {it.minStock > 0 ? <span>حد: <b style={{ color: 'var(--text)' }}>{fmt.num(it.minStock)}</b></span> : null}
+        {it.lastPrice > 0 ? <span>ارزش: <b style={{ color: 'var(--text)' }}>{fmt.money(it.currentStock * getAvgPrice(it))}</b></span> : null}
       </>}
     >
       <SectionTitle>📦 مشخصات قلم</SectionTitle>
       <Row l="دسته" v={(CATEGORY_LABEL as any)[it.category]} />
       <Row l="واحد" v={(UNIT_LABEL as any)[it.unit]} />
       <Row l="موجودی فعلی" v={formatQty(it.currentStock, it.unit)} />
-      {it.minStock > 0 ? <Row l="حداقل موجودی" v={`${toFa(it.minStock)} ${(UNIT_LABEL as any)[it.unit]}`} /> : null}
-      {it.avgPrice && it.avgPrice > 0 ? <Row l="💰 قیمت میانگین" v={`${toFa(getAvgPrice(it).toLocaleString('fa-IR'))} ت`} /> : null}
-      {it.lastPrice > 0 ? <Row l="آخرین قیمت خرید" v={`${toFa(it.lastPrice.toLocaleString('fa-IR'))} ت`} /> : null}
+      {it.minStock > 0 ? <Row l="حداقل موجودی" v={`${fmt.num(it.minStock)} ${(UNIT_LABEL as any)[it.unit]}`} /> : null}
+      {it.avgPrice && it.avgPrice > 0 ? <Row l="💰 قیمت میانگین" v={fmt.money(getAvgPrice(it))} /> : null}
+      {it.lastPrice > 0 ? <Row l="آخرین قیمت خرید" v={fmt.money(it.lastPrice)} /> : null}
       {sup ? <Row l="تأمین‌کننده" v={sup.name} /> : null}
 
       {it.currentStock > 0 && it.lastPrice > 0 ? (
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
           <span>ارزش موجودی:</span>
-          <span>{toFa((it.currentStock * getAvgPrice(it)).toLocaleString('fa-IR'))} ت</span>
+          <span>{fmt.money(it.currentStock * getAvgPrice(it))}</span>
         </div>
       ) : null}
 
       {(it.category === 'medicine' || it.category === 'vaccine') ? (
         <>
           <SectionTitle>💊 اطلاعات دارویی</SectionTitle>
-          {it.expireDate ? <Row l="تاریخ انقضا" v={toFa(it.expireDate)} /> : null}
+          {it.expireDate ? <Row l="تاریخ انقضا" v={fmt.date(it.expireDate)} /> : null}
           {days !== null ? (
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: days < 0 ? 'var(--danger-soft)' : days <= 30 ? 'var(--warn-soft)' : 'var(--input-bg)', color: days < 0 ? 'var(--danger)' : days <= 30 ? 'var(--warn)' : 'var(--muted)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
               <span>وضعیت انقضا:</span>
-              <span>{days < 0 ? `${toFa(Math.abs(days))} روز گذشته` : `${toFa(days)} روز مانده`}</span>
+              <span>{days < 0 ? `${fmt.day(Math.abs(days))} روز گذشته` : `${fmt.day(days)} روز مانده`}</span>
             </div>
           ) : null}
-          {it.withdrawalDays !== null && it.withdrawalDays !== undefined ? <Row l="دوره منع مصرف" v={`${toFa(it.withdrawalDays)} روز`} /> : null}
+          {it.withdrawalDays !== null && it.withdrawalDays !== undefined ? <Row l="دوره منع مصرف" v={`${fmt.day(it.withdrawalDays)} روز`} /> : null}
           {it.storage ? <Row l="نگهداری" v={(STORAGE_LABEL as any)[it.storage] || it.storage} /> : null}
           {(() => {
     const arr: string[] = (it as any).usageTypes || ((it as any).usageType ? [(it as any).usageType] : []);
     if (arr.length === 0) return null;
     return <Row l="نوع مصرف" v={arr.map((t: string) => VET_METHOD_LABEL[t] || t).join(' • ')} />;
   })()}
-          {it.dosePerBird ? <Row l="دوز هر پرنده" v={`${toFa(it.dosePerBird)} ml`} /> : null}
-          {it.productionDate ? <Row l="تاریخ تولید" v={toFa(it.productionDate)} /> : null}
+          {it.dosePerBird ? <Row l="دوز هر پرنده" v={`${fmt.num(it.dosePerBird)} ml`} /> : null}
+          {it.productionDate ? <Row l="تاریخ تولید" v={fmt.date(it.productionDate)} /> : null}
         </>
       ) : null}
 
       {it.category === 'equipment' ? (
         <>
           <SectionTitle>🔧 اطلاعات تجهیزات</SectionTitle>
-          {it.purchaseDate ? <Row l="تاریخ خرید" v={toFa(it.purchaseDate)} /> : null}
-          {it.purchasePrice ? <Row l="قیمت خرید" v={`${toFa(it.purchasePrice.toLocaleString('fa-IR'))} ت`} /> : null}
+          {it.purchaseDate ? <Row l="تاریخ خرید" v={fmt.date(it.purchaseDate)} /> : null}
+          {it.purchasePrice ? <Row l="قیمت خرید" v={fmt.money(it.purchasePrice)} /> : null}
           {hall ? <Row l="سالن" v={hall.name} /> : null}
           {it.equipmentStatus ? <Row l="وضعیت" v={EQUIP_STATUS[it.equipmentStatus] || it.equipmentStatus} /> : null}
-          {it.warrantyUntil ? <Row l="گارانتی تا" v={toFa(it.warrantyUntil)} /> : null}
+          {it.warrantyUntil ? <Row l="گارانتی تا" v={fmt.date(it.warrantyUntil)} /> : null}
         </>
       ) : null}
 
       {myMovements.length > 0 ? (
         <>
-          <SectionTitle>📋 آخرین گردش‌ها ({toFa(myMovements.length)})</SectionTitle>
+          <SectionTitle>📋 آخرین گردش‌ها ({fmt.count(myMovements.length)})</SectionTitle>
           {myMovements.slice(-3).reverse().map((m) => (
             <div key={m.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', justifyContent: 'space-between' }}>
               <span>{m.type === 'in' ? '📥' : '📤'} {formatQty(m.quantity, it.unit)}</span>
-              <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>{toFa(m.date)}</span>
+              <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>{fmt.date(m.date)}</span>
             </div>
           ))}
         </>

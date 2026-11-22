@@ -1,3 +1,4 @@
+import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useFlk, getAgeDays, calcCosts, formatAge, SOURCE_LABEL, type Flock } from '../flk/store';
 import { useBrd } from '../brd/store';
@@ -44,13 +45,14 @@ function formatArchiveIsoLabel(val: unknown): string {
   try {
     const datePart = d.toLocaleDateString('fa-IR');
     const timePart = d.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
-    return `${formatArchiveIsoLabel(datePart) || toFa(datePart)} • ${toFa(timePart)}`;
+    return `${formatArchiveIsoLabel(datePart) || getGlobalFormat().code(datePart)} • ${getGlobalFormat().code(timePart)}`;
   } catch {
     return val.slice(0, 10);
   }
 }
 
 export default function ArchivePage() {
+  const fmt = useFormat();
   const { flocks, restore, remove } = useFlk();
   const { birds, breeds } = useBrd();
   const { halls } = useHal();
@@ -399,13 +401,13 @@ export default function ArchivePage() {
   const allComparableCandidates = useMemo(() => {
     const archivedEntries = flockSummaries.map((s) => ({
       id: s.flockId,
-      label: `${s.flockName || s.flockId} (آرشیو • ${toFa(s.durationDays ?? s.logCount)} روز)`,
+      label: `${s.flockName || s.flockId} (آرشیو • ${fmt.day(s.durationDays ?? s.logCount)} روز)`,
       metric: toComparableFlockMetric(s),
       isActive: false,
     }));
     const activeEntries = Array.from(activeComparableMap.values()).map(({ metric }) => ({
       id: metric.flockId,
-      label: `${metric.flockName} (${toFa(metric.durationDays ?? metric.logCount)} روز)`,
+      label: `${metric.flockName} (${fmt.day(metric.durationDays ?? metric.logCount)} روز)`,
       metric,
       isActive: true,
     }));
@@ -630,16 +632,16 @@ export default function ArchivePage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
           {kind === 'logs' && arcLogs.length > 0 && (
             <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-              در {toFa(new Set(arcLogs.map(r => r.flockId || '—')).size)} گله
+              در {fmt.count(new Set(arcLogs.map(r => r.flockId || '—')).size)} گله
             </span>
           )}
           {kind === 'stores' && storeEntries.length > 0 && (
             <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-              {toFa(new Set(storeEntries.map(e => e.storeKey)).size)} مخزن فعال
+              {fmt.count(new Set(storeEntries.map(e => e.storeKey)).size)} مخزن فعال
             </span>
           )}
           <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 800, color: 'var(--text)' }}>
-            {toFa(statValue)}
+            {fmt.code(statValue)}
           </span>
         </div>
       </div>
@@ -733,7 +735,7 @@ export default function ArchivePage() {
                     if (entry.storeKey === 'flk') {
                       const name = typeof raw.name === 'string' && raw.name.trim() ? raw.name.trim() : entry.record.id;
                       const count = Number(raw.currentCount ?? raw.initialCount ?? 0);
-                      return count > 0 ? `${name} • ${toFa(count)} قطعه` : name;
+                      return count > 0 ? `${name} • ${fmt.count(count)} قطعه` : name;
                     }
                     if (entry.storeKey === 'tra') {
                       const title = typeof raw.title === 'string' && raw.title.trim()
@@ -742,7 +744,7 @@ export default function ArchivePage() {
                           ? raw.description.trim()
                           : entry.record.id;
                       const amt = Number(raw.amount ?? raw.total ?? 0);
-                      return amt > 0 ? `${title} • ${toFa(Math.round(amt).toLocaleString('fa-IR'))} ت` : title;
+                      return amt > 0 ? `${title} • ${fmt.money(Math.round(amt))}` : title;
                     }
                     if (entry.storeKey === 'whs') {
                       const itemName = typeof raw.itemName === 'string' && raw.itemName.trim()
@@ -751,7 +753,7 @@ export default function ArchivePage() {
                           ? raw.name.trim()
                           : entry.record.id;
                       const qty = Number(raw.qty ?? raw.quantity ?? raw.weightKg ?? 0);
-                      return qty > 0 ? `${itemName} • ${toFa(qty)}` : itemName;
+                      return qty > 0 ? `${itemName} • ${fmt.num(qty)}` : itemName;
                     }
                     const batchTitle = typeof raw.title === 'string' && raw.title.trim()
                       ? raw.title.trim()
@@ -759,7 +761,7 @@ export default function ArchivePage() {
                         ? `دسته ${raw.batchCode.trim()}`
                         : entry.record.id;
                     const eggs = Number(raw.eggsCount ?? raw.count ?? 0);
-                    return eggs > 0 ? `${batchTitle} • ${toFa(eggs)} تخم` : batchTitle;
+                    return eggs > 0 ? `${batchTitle} • ${fmt.count(eggs)} تخم` : batchTitle;
                   };
 
                   return (
@@ -771,7 +773,7 @@ export default function ArchivePage() {
                             variant={activeStoreKey === 'all' ? 'primary' : 'ghost'}
                             onClick={() => setStoreFilter('all')}
                           >
-                            همه ({toFa(storeEntries.length)})
+                            همه ({fmt.count(storeEntries.length)})
                           </Btn>
                           {availableStoreKeys.map(k => {
                             const label = storeEntries.find(x => x.storeKey === k)?.storeLabel || k;
@@ -782,7 +784,7 @@ export default function ArchivePage() {
                                 variant={activeStoreKey === k ? 'primary' : 'ghost'}
                                 onClick={() => setStoreFilter(k)}
                               >
-                                {label} ({toFa(countsByStore[k] || 0)})
+                                {label} ({fmt.count(countsByStore[k] || 0)})
                               </Btn>
                             );
                           })}
@@ -810,11 +812,11 @@ export default function ArchivePage() {
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                                   <Tag tone="gray">{storeLabel}</Tag>
                                   <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>
-                                    {toFa(describeEntry(entry))}
+                                    {fmt.code(describeEntry(entry))}
                                   </span>
                                 </div>
                                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 4 }}>
-                                  شناسه: {toFa(record.id)} • مرجع: {toFa(record.flockId || '—')} • تاریخ: {formatArchiveIsoLabel(record.date || '—') || toFa(record.date || '—')}
+                                  شناسه: {fmt.code(record.id)} • مرجع: {fmt.code(record.flockId || '—')} • تاریخ: {formatArchiveIsoLabel(record.date || '—') || fmt.code(record.date || '—')}
                                 </div>
                               </div>
                               <Btn
@@ -837,7 +839,7 @@ export default function ArchivePage() {
               {sampleNotice
                 ? sampleNotice
                 : sampleCompareFlocks.length > 0
-                  ? `حالت تست بصری فعال است (${toFa(sampleCompareFlocks.length)} گلهٔ نمونه در حافظه — بدون تغییر در دیتای واقعی).`
+                  ? `حالت تست بصری فعال است (${fmt.count(sampleCompareFlocks.length)} گلهٔ نمونه در حافظه — بدون تغییر در دیتای واقعی).`
                   : 'برای تست بصری مقایسه با داده‌های متنوع، می‌توانید مجموعهٔ نمونه را بارگذاری کنید.'}
             </span>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -893,7 +895,7 @@ export default function ArchivePage() {
               <ExpandableCard
                 key={f.id}
                 accent="dim"
-                index={toFa(i + 1)}
+                index={fmt.count(i + 1)}
                 iconEmoji="🗄"
                 title={f.name}
                 subtitle={(bird?.name || '—') + (breed ? ' • ' + breed.name : '') + (hall ? ' • ' + hall.name : '')}
@@ -902,9 +904,9 @@ export default function ArchivePage() {
                 badge={<Tag tone={f.status === 'sold' ? 'green' : 'gray'}>{statusLabel}</Tag>}
                 stats={
                   <>
-                    <span>سن نهایی: <b style={{ color: 'var(--text)' }}>{toFa(ageDays)} روز</b></span>
-                    {f.currentCount ? <span>تعداد: <b style={{ color: 'var(--text)' }}>{toFa(f.currentCount)}</b></span> : null}
-                    {f.updatedAt ? <span>آرشیو: <b style={{ color: 'var(--text)' }}>{formatArchiveIsoLabel(f.updatedAt.slice(0, 10)) || toFa(f.updatedAt.slice(0, 10))}</b></span> : null}
+                    <span>سن نهایی: <b style={{ color: 'var(--text)' }}>{fmt.day(ageDays)} روز</b></span>
+                    {f.currentCount ? <span>تعداد: <b style={{ color: 'var(--text)' }}>{fmt.count(f.currentCount)}</b></span> : null}
+                    {f.updatedAt ? <span>آرشیو: <b style={{ color: 'var(--text)' }}>{formatArchiveIsoLabel(f.updatedAt.slice(0, 10)) || fmt.code(f.updatedAt.slice(0, 10))}</b></span> : null}
                   </>
                 }
               >
@@ -914,20 +916,20 @@ export default function ArchivePage() {
                 <Row l="سالن" v={hall?.name || '—'} />
                 <Row l="نوع" v={f.type === 'layer' ? 'تخم‌گذار' : f.type === 'broiler' ? 'گوشتی' : 'مادر'} />
                 <Row l="منبع" v={SOURCE_LABEL[f.source] || '—'} />
-                <Row l="تعداد اولیه" v={f.initialCount ? toFa(f.initialCount) : '—'} />
-                {f.currentCount ? <Row l="تعداد نهایی" v={toFa(f.currentCount)} /> : null}
-                <Row l="سن نهایی" v={toFa(ageDays) + ' روز (' + formatAge(ageDays) + ')'} />
+                <Row l="تعداد اولیه" v={f.initialCount ? fmt.count(f.initialCount) : '—'} />
+                {f.currentCount ? <Row l="تعداد نهایی" v={fmt.count(f.currentCount)} /> : null}
+                <Row l="سن نهایی" v={fmt.day(ageDays) + ' روز (' + formatAge(ageDays) + ')'} />
 
                 <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> تاریخ‌ها</SectionTitle>
-                {f.hatchDate ? <Row l="هچ" v={toFa(f.hatchDate)} /> : null}
-                {f.purchaseDate ? <Row l="خرید" v={toFa(f.purchaseDate)} /> : null}
-                {f.startDate ? <Row l="شروع" v={toFa(f.startDate)} /> : null}
+                {f.hatchDate ? <Row l="هچ" v={fmt.date(f.hatchDate)} /> : null}
+                {f.purchaseDate ? <Row l="خرید" v={fmt.date(f.purchaseDate)} /> : null}
+                {f.startDate ? <Row l="شروع" v={fmt.date(f.startDate)} /> : null}
 
                 {costs.total > 0 ? (
                   <>
                     <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> هزینه‌ها</SectionTitle>
-                    <Row l="جمع کل" v={toFa(costs.total.toLocaleString('fa-IR')) + ' ت'} />
-                    {costs.perBird > 0 ? <Row l="هر پرنده" v={toFa(Math.round(costs.perBird).toLocaleString('fa-IR')) + ' ت'} /> : null}
+                    <Row l="جمع کل" v={fmt.money(costs.total)} />
+                    {costs.perBird > 0 ? <Row l="هر پرنده" v={fmt.money(Math.round(costs.perBird))} /> : null}
                   </>
                 ) : null}
 
@@ -1008,10 +1010,10 @@ function LogsArchiveTab({
         const hotCount = hotLogs.filter(l => l.flockId === flockId).length;
         const sortedDates = items.map(r => r.date).filter(Boolean).sort();
         const firstDate = sortedDates[0]
-          ? (formatArchiveIsoLabel(sortedDates[0]) || toFa(sortedDates[0]))
+          ? (formatArchiveIsoLabel(sortedDates[0]) || getGlobalFormat().code(sortedDates[0]))
           : '—';
         const lastDate = sortedDates[sortedDates.length - 1]
-          ? (formatArchiveIsoLabel(sortedDates[sortedDates.length - 1]) || toFa(sortedDates[sortedDates.length - 1]))
+          ? (formatArchiveIsoLabel(sortedDates[sortedDates.length - 1]) || getGlobalFormat().code(sortedDates[sortedDates.length - 1]))
           : '—';
         const isBusy = busy === flockId;
 
@@ -1026,16 +1028,16 @@ function LogsArchiveTab({
             }}>
               <div style={{ minWidth: 0, flex: '1 1 180px' }}>
                 <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: 'var(--text)' }}>
-                  {flock?.name || ('گلهٔ ' + toFa(flockId))}
+                  {flock?.name || ('گلهٔ ' + getGlobalFormat().code(flockId))}
                 </div>
                 <div style={{
                   fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 3,
                   display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center',
                 }}>
-                  <span><b style={{ color: 'var(--text)' }}>{toFa(items.length)}</b> ثبت</span>
+                  <span><b style={{ color: 'var(--text)' }}>{getGlobalFormat().count(items.length)}</b> ثبت</span>
                   <span>•</span>
                   <span>بازه: {firstDate === lastDate ? firstDate : `${firstDate} تا ${lastDate}`}</span>
-                  {hotCount > 0 ? <span>• {toFa(hotCount)} ثبت فعال</span> : null}
+                  {hotCount > 0 ? <span>• {getGlobalFormat().count(hotCount)} ثبت فعال</span> : null}
                 </div>
               </div>
               <Btn
@@ -1064,7 +1066,7 @@ function LogsArchiveTab({
                     minWidth: 0, flex: 1,
                   }}>
                     <span style={{ color: 'var(--text)', fontWeight: 600, whiteSpace: 'nowrap' }}>
-                      {formatArchiveIsoLabel(r.date) || toFa(r.date)}
+                      {formatArchiveIsoLabel(r.date) || getGlobalFormat().date(r.date)}
                     </span>
                     <Tag tone="gray">{REASON_LABEL[r.reason] || r.reason}</Tag>
                   </div>
@@ -1089,7 +1091,7 @@ function LogsArchiveTab({
                     variant="ghost"
                     onClick={() => setExpandedGroups(prev => ({ ...prev, [flockId]: !prev[flockId] }))}
                   >
-                    {expandedGroups[flockId] ? 'بستن لیست' : 'نمایش همه (' + toFa(items.length - 5) + ' مورد دیگر)'}
+                    {expandedGroups[flockId] ? 'بستن لیست' : 'نمایش همه (' + getGlobalFormat().count(items.length - 5) + ' مورد دیگر)'}
                   </Btn>
                 </div>
               ) : null}

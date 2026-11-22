@@ -2,6 +2,8 @@
  * FlockPickerModal.tsx — مودال انتخاب گله برای مقایسه و مرجع
  * (استخراج‌شده از FlockComparisonPanel.tsx — فاز رفکتور)
  */
+import { useFormat } from '../../shr/units/useFormat';
+
 import { useState, useMemo } from 'react';
 import { Tag, Modal, Input, Empty } from '../../shr/components/ui';
 import { IconSearch } from '../../shr/icons';
@@ -39,6 +41,7 @@ export default function FlockPickerModal({
   onToggleFlock,
   onSetReference,
 }: Props) {
+  const fmt = useFormat();
   const [filter, setFilter] = useState<CandidateFilter>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -85,7 +88,7 @@ export default function FlockPickerModal({
     }
     const isAlreadySelected = selectedIds.includes(targetId);
     if (!isAlreadySelected && selectedIds.length >= MAX_FLOCKS) {
-      toastMsg.warn(`حداکثر ${toFa(MAX_FLOCKS)} گله در کل قابل مقایسه است`);
+      toastMsg.warn(`حداکثر ${fmt.count(MAX_FLOCKS)} گله در کل قابل مقایسه است`);
       return;
     }
     onToggleFlock(targetId);
@@ -139,7 +142,7 @@ export default function FlockPickerModal({
                     fontWeight: active ? 700 : 600,
                   }}
                 >
-                  {label} ({toFa(count)})
+                  {label} ({fmt.count(count)})
                 </button>
               );
             })}
@@ -153,7 +156,7 @@ export default function FlockPickerModal({
             {groupedCandidates.map(([year, items]) => (
               <div key={year} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <div style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, color: 'var(--muted)', borderBottom: '1px solid var(--border)', paddingBottom: 4, marginBottom: 2 }}>
-                  سال {toFa(year)}
+                  سال {fmt.code(year)}
                 </div>
                 {items.map((c) => {
               const isRef = c.id === effectiveBaselineId;
@@ -186,7 +189,7 @@ export default function FlockPickerModal({
                         {getTitle(c)}
                       </div>
                       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                        {isActiveFlock ? 'فعال' : 'آرشیو'} • {toFa(getDays(c))} روز
+                        {isActiveFlock ? 'فعال' : 'آرشیو'} • {fmt.day(getDays(c))} روز
                       </div>
                     </div>
                     <Tag tone={isRef ? 'info' : isActiveFlock ? 'green' : 'gray'}>
@@ -221,7 +224,7 @@ export default function FlockPickerModal({
                       {getTitle(c)}
                     </div>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                      {isActiveFlock ? 'فعال' : 'آرشیو'} • {toFa(getDays(c))} روز
+                      {isActiveFlock ? 'فعال' : 'آرشیو'} • {fmt.day(getDays(c))} روز
                     </div>
                   </div>
                   <Tag tone={isRef ? 'info' : isSelected ? 'green' : 'gray'}>

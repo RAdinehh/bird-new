@@ -1,6 +1,8 @@
 /**
  * MoveFormModal — فرم افزودن/ویرایش حرکت انبار
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { Btn, BtnRow, Field, Grid2, Modal, MoneyField, NumField, Select, Textarea, ErrorBox } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
@@ -32,6 +34,7 @@ interface Props {
 }
 
 export default function MoveFormModal(props: Props) {
+  const fmt = useFormat();
   const { open, setOpen, form, setForm, err, vErrors, showError, markTouched, items, filteredContacts, onSave } = props;
 
   const selectedItem = items.find((i) => i.id === form.itemId);
@@ -70,14 +73,14 @@ export default function MoveFormModal(props: Props) {
           </Field>
         </Grid2>
 
-        <Field label="کالا" required hint={selectedItem ? `موجودی فعلی — ${toFa(currentStock)} ${UNIT_LABEL[selectedItem.unit]}` : undefined} error={showError?.('itemId')} onTouch={() => markTouched?.('itemId')}>
+        <Field label="کالا" required hint={selectedItem ? `موجودی فعلی — ${fmt.num(currentStock)} ${UNIT_LABEL[selectedItem.unit]}` : undefined} error={showError?.('itemId')} onTouch={() => markTouched?.('itemId')}>
           <SmartSelect
             value={form.itemId}
             onChange={v => setForm({ ...form, itemId: v })}
             options={items.map(it => ({
               value: it.id,
               label: it.name,
-              subtitle: `${toFa(it.currentStock)} ${UNIT_LABEL[it.unit]}`,
+              subtitle: `${fmt.num(it.currentStock)} ${UNIT_LABEL[it.unit]}`,
               group: it.category,
             }))}
             groupLabels={Object.fromEntries(

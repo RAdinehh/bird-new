@@ -1,6 +1,8 @@
 /**
  * index.tsx — بخش whs
  */
+import { getGlobalFormat } from '../../shr/units/useFormat';
+
 import { useState } from 'react';
 import { useCarousel } from '../../shr/hooks/useCarousel';
 import ItemsPage from './ItemsPage';
@@ -66,7 +68,7 @@ export default function Whs() {
                 padding: '1px 6px',
                 borderRadius: 8,
                 fontWeight: 700,
-              }}>{toFa(warnCount)}</span>
+              }}>{getGlobalFormat().count(warnCount)}</span>
             ) : null}
             {tab === t.id ? (
               <div style={{

@@ -2,6 +2,8 @@
  * comparisonHelpers.ts — توابع کمکی و ثابت‌های مقایسه گله‌ها
  * (استخراج‌شده از FlockComparisonPanel.tsx — فاز رفکتور)
  */
+import { getGlobalFormat } from '../../shr/units/useFormat';
+
 import { safeStorage } from '../../shr/utils/storage';
 import { HELP } from '../../shr/help/helpTexts';
 import type { ComparableFlockMetric } from '../../cor/storage/historyArchive';
@@ -76,19 +78,13 @@ export function extractNumericMetric(metric: ComparableFlockMetric, key: string)
 
 export function formatNumFa(val: number | null, decimals: number, unit: string): string {
   if (val === null || Number.isNaN(val)) return 'ثبت نشده';
-  const formatted = Number(val).toLocaleString('fa-IR', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  });
+  const formatted = getGlobalFormat().num(Number(val));
   return unit ? `${formatted} ${unit}` : formatted;
 }
 
 export function formatPctFa(pct: number): string {
   const sign = pct > 0 ? '+' : pct < 0 ? '-' : '';
-  const formatted = Math.abs(pct).toLocaleString('fa-IR', {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
-  });
+  const formatted = getGlobalFormat().num(Math.abs(pct));
   return `${sign}${formatted}٪`;
 }
 

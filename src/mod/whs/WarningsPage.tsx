@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useMemo } from 'react';
 import { useFilterSort, FilterBar, getWhsWarningsConfig } from '../../shr/filter';
 import { useWhs, UNIT_LABEL, stockWarning, expiryWarning, daysToExpiry, type Item } from './store';
@@ -8,6 +9,7 @@ import { WarningGroup } from './helpers';
 import HelpBanner from '../../shr/components/HelpBanner';
 
 export default function WarningsPage() {
+  const fmt = useFormat();
   const { items } = useWhs();
 
   // ─── فیلتر/مرتب (از config مرکزی) ───
@@ -81,16 +83,16 @@ export default function WarningsPage() {
         borderRadius: 'var(--r-lg)',
       }}>
         <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--warn)', fontWeight: 700, marginBottom: 10 }}>
-          ⚠ {toFa(totalWarnings)} هشدار
+          ⚠ {fmt.count(totalWarnings)} هشدار
         </div>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
-          <StatBox icon="⛔" label="منقضی" value={toFa(expired.length)} tone={expired.length > 0 ? 'danger' : 'default'} />
+          <StatBox icon="⛔" label="منقضی" value={fmt.count(expired.length)} tone={expired.length > 0 ? 'danger' : 'default'} />
           <Dot />
-          <StatBox icon="🔴" label="تمام‌شده" value={toFa(criticalStock.length)} tone={criticalStock.length > 0 ? 'danger' : 'default'} />
+          <StatBox icon="🔴" label="تمام‌شده" value={fmt.count(criticalStock.length)} tone={criticalStock.length > 0 ? 'danger' : 'default'} />
           <Dot />
-          <StatBox icon="⏰" label="نزدیک انقضا" value={toFa(expiringSoon.length)} tone={expiringSoon.length > 0 ? 'warn' : 'default'} />
+          <StatBox icon="⏰" label="نزدیک انقضا" value={fmt.count(expiringSoon.length)} tone={expiringSoon.length > 0 ? 'warn' : 'default'} />
           <Dot />
-          <StatBox icon="⚠" label="کم" value={toFa(lowStock.length)} tone={lowStock.length > 0 ? 'warn' : 'default'} />
+          <StatBox icon="⚠" label="کم" value={fmt.count(lowStock.length)} tone={lowStock.length > 0 ? 'warn' : 'default'} />
         </div>
       </div>
 
@@ -100,7 +102,7 @@ export default function WarningsPage() {
           icon="⛔"
           color="red"
           items={expired}
-          renderLine={(it) => `تاریخ انقضا گذشته — ${toFa(Math.abs(daysToExpiry(it.expireDate) || 0))} روز پیش`}
+          renderLine={(it) => `تاریخ انقضا گذشته — ${fmt.day(Math.abs(daysToExpiry(it.expireDate) || 0))} روز پیش`}
         />
       ) : null}
 
@@ -110,7 +112,7 @@ export default function WarningsPage() {
           icon="🔴"
           color="red"
           items={criticalStock}
-          renderLine={(it) => `موجودی صفر — حداقل ${toFa(it.minStock)} ${UNIT_LABEL[it.unit]}`}
+          renderLine={(it) => `موجودی صفر — حداقل ${fmt.num(it.minStock)} ${UNIT_LABEL[it.unit]}`}
         />
       ) : null}
 
@@ -120,7 +122,7 @@ export default function WarningsPage() {
           icon="⏰"
           color="amber"
           items={expiringSoon}
-          renderLine={(it) => `${toFa(daysToExpiry(it.expireDate) || 0)} روز تا انقضا`}
+          renderLine={(it) => `${fmt.day(daysToExpiry(it.expireDate) || 0)} روز تا انقضا`}
         />
       ) : null}
 
@@ -130,7 +132,7 @@ export default function WarningsPage() {
           icon="⚠"
           color="amber"
           items={lowStock}
-          renderLine={(it) => `${toFa(it.currentStock)} ${UNIT_LABEL[it.unit]} — حداقل ${toFa(it.minStock)}`}
+          renderLine={(it) => `${fmt.num(it.currentStock)} ${UNIT_LABEL[it.unit]} — حداقل ${fmt.num(it.minStock)}`}
         />
       ) : null}
       </>

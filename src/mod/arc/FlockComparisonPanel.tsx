@@ -1,3 +1,4 @@
+import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
 import { useState, useMemo, useEffect } from 'react';
 import {
   Btn,
@@ -126,20 +127,14 @@ function extractNumericMetric(metric: ComparableFlockMetric, key: string): numbe
 
 function formatNumFa(val: number | null, decimals: number, unit: string): string {
   if (val === null || Number.isNaN(val)) return 'ثبت نشده';
-  const formatted = Number(val).toLocaleString('fa-IR', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  });
-  return unit ? `${toFa(formatted)} ${unit}` : toFa(formatted);
+  const formatted = getGlobalFormat().num(Number(val));
+  return unit ? `${formatted} ${unit}` : formatted;
 }
 
 function formatPctFa(pct: number): string {
   const sign = pct > 0 ? '+' : pct < 0 ? '-' : '';
-  const formatted = Math.abs(pct).toLocaleString('fa-IR', {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
-  });
-  return `${sign}${toFa(formatted)}٪`;
+  const formatted = getGlobalFormat().num(Math.abs(pct));
+  return `${sign}${formatted}٪`;
 }
 
 export default function FlockComparisonPanel({
@@ -151,6 +146,7 @@ export default function FlockComparisonPanel({
   onChangeBaseline,
   activeFlockIds,
 }: FlockComparisonPanelProps) {
+  const fmt = useFormat();
   const [panelOpen, setPanelOpen] = useState(false);
   const [pickerMode, setPickerMode] = useState<PickerMode>(null);
   const [filter, setFilter] = useState<CandidateFilter>('all');
@@ -270,7 +266,7 @@ export default function FlockComparisonPanel({
     }
     const isAlreadySelected = selectedIds.includes(targetId);
     if (!isAlreadySelected && otherCandidates.length >= MAX_OTHER_FLOCKS) {
-      toastMsg.warn(`علاوه بر گله مرجع، حداکثر ${toFa(MAX_OTHER_FLOCKS)} گله قابل انتخاب است`);
+      toastMsg.warn(`علاوه بر گله مرجع، حداکثر ${fmt.count(MAX_OTHER_FLOCKS)} گله قابل انتخاب است`);
       return;
     }
     onToggleFlock(targetId);
@@ -336,7 +332,7 @@ export default function FlockComparisonPanel({
       title: getTitle(winner.candidate),
       badge: 'برتر',
       tone: 'green' as TagTone,
-      summary: `این گله در ${toFa(winner.betterCount)} شاخص از ${toFa(winner.comparableCount)} شاخص قابل مقایسه، نتیجه بهتری نسبت به گله مرجع (${getTitle(refCandidate)}) ثبت کرده است.`,
+      summary: `این گله در ${fmt.count(winner.betterCount)} شاخص از ${fmt.count(winner.comparableCount)} شاخص قابل مقایسه، نتیجه بهتری نسبت به گله مرجع (${getTitle(refCandidate)}) ثبت کرده است.`,
       ruleNote: 'معیار انتخاب: در هزینه، تلفات و ضریب تبدیل مقدار کمتر و در درآمد، زنده‌مانی و تخم مقدار بیشتر امتیاز مثبت می‌گیرد.',
     };
   }, [canCompare, refCandidate, orderedCandidates, sortedMetrics]);
@@ -372,8 +368,8 @@ export default function FlockComparisonPanel({
     const htmlBody = `
       <div class="header">
         <div>
-          <h1>گزارش مقایسه گله‌ها (${toFa(orderedCandidates.length)} گله)</h1>
-          <div class="farm-info">مرجع: ${getTitle(refCandidate)} • ${toFa(new Date().toLocaleDateString('fa-IR'))}</div>
+          <h1>گزارش مقایسه گله‌ها (${fmt.count(orderedCandidates.length)} گله)</h1>
+          <div class="farm-info">مرجع: ${getTitle(refCandidate)} • ${fmt.code(new Date().toLocaleDateString('fa-IR'))}</div>
         </div>
       </div>
       <table>
@@ -418,7 +414,7 @@ export default function FlockComparisonPanel({
           </div>
           {refCandidate && (
             <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-              مرجع: {getTitle(refCandidate)} • {toFa(orderedCandidates.length)} از {toFa(MAX_FLOCKS)} گله
+              مرجع: {getTitle(refCandidate)} • {fmt.count(orderedCandidates.length)} از {fmt.count(MAX_FLOCKS)} گله
             </div>
           )}
         </div>
@@ -472,7 +468,7 @@ export default function FlockComparisonPanel({
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <label style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, color: 'var(--text)' }}>
-                  انتخاب گله‌های مقایسه ({toFa(otherCandidates.length)} از {toFa(MAX_OTHER_FLOCKS)})
+                  انتخاب گله‌های مقایسه ({fmt.count(otherCandidates.length)} از {fmt.count(MAX_OTHER_FLOCKS)})
                 </label>
                 <button
                   type="button"
@@ -554,7 +550,7 @@ export default function FlockComparisonPanel({
           <CardSection title="عملکرد و جدول مقایسه">
             {!canCompare ? (
               <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-                گله مرجع و حداقل {toFa(MIN_FLOCKS - 1)} تا حداکثر {toFa(MAX_OTHER_FLOCKS)} گله دیگر برای مقایسه انتخاب کنید.
+                گله مرجع و حداقل {fmt.count(MIN_FLOCKS - 1)} تا حداکثر {fmt.count(MAX_OTHER_FLOCKS)} گله دیگر برای مقایسه انتخاب کنید.
               </div>
             ) : (
               <div className="stack" style={{ gap: 'var(--gap-sm)' }}>
@@ -766,7 +762,7 @@ export default function FlockComparisonPanel({
 
           <CardSection
             title="خروجی گزارش"
-            meta={`${toFa(orderedCandidates.length)} از ${toFa(MAX_FLOCKS)} گله`}
+            meta={`${fmt.count(orderedCandidates.length)} از ${fmt.count(MAX_FLOCKS)} گله`}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -788,8 +784,8 @@ export default function FlockComparisonPanel({
         title={pickerMode === 'baseline' ? 'انتخاب گله مرجع' : 'انتخاب گله‌های مقایسه'}
         subtitle={
           pickerMode === 'baseline'
-            ? `${toFa(filteredCandidates.length)} گله`
-            : `${toFa(otherCandidates.length)} از ${toFa(MAX_OTHER_FLOCKS)} گله دیگر`
+            ? `${fmt.count(filteredCandidates.length)} گله`
+            : `${fmt.count(otherCandidates.length)} از ${fmt.count(MAX_OTHER_FLOCKS)} گله دیگر`
         }
         searchable={candidates.length > ARCHIVE_FILTER_THRESHOLD}
         searchNode={
@@ -832,13 +828,13 @@ export default function FlockComparisonPanel({
             }}
           >
             <TabButton active={filter === 'all'} onClick={() => setFilter('all')}>
-              همه ({toFa(candidates.length)})
+              همه ({fmt.count(candidates.length)})
             </TabButton>
             <TabButton active={filter === 'active'} onClick={() => setFilter('active')}>
-              فعال ({toFa(candidates.filter((c) => getIsActive(c)).length)})
+              فعال ({fmt.count(candidates.filter((c) => getIsActive(c)).length)})
             </TabButton>
             <TabButton active={filter === 'archived'} onClick={() => setFilter('archived')}>
-              آرشیو ({toFa(candidates.filter((c) => !getIsActive(c)).length)})
+              آرشیو ({fmt.count(candidates.filter((c) => !getIsActive(c)).length)})
             </TabButton>
           </div>
         )}
@@ -849,7 +845,7 @@ export default function FlockComparisonPanel({
           groupedByYear.map(([yearLabel, yearItems]) => (
             <SheetGroup
               key={yearLabel}
-              title={yearLabel === 'نامشخص' ? 'سال نامشخص' : `سال ${toFa(yearLabel)}`}
+              title={yearLabel === 'نامشخص' ? 'سال نامشخص' : `سال ${fmt.code(yearLabel)}`}
               count={yearItems.length}
             >
               {yearItems.map((c) => {
@@ -857,7 +853,7 @@ export default function FlockComparisonPanel({
                 const isSelected = selectedIds.includes(c.id);
                 const isActiveFlock = getIsActive(c);
                 const statusText = isActiveFlock ? 'گله فعال' : 'آرشیو شده است';
-                const daysText = `${toFa(getDays(c))} روز`;
+                const daysText = `${fmt.day(getDays(c))} روز`;
                 const checked = pickerMode === 'baseline' ? isRef : isSelected;
 
                 return (

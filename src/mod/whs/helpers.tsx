@@ -1,6 +1,8 @@
 /**
  * helpers.tsx — ماژول whs
  */
+import { getGlobalFormat } from '../../shr/units/useFormat';
+
 import type { ReactNode, CSSProperties } from 'react';
 import { Tag } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
@@ -34,7 +36,7 @@ export function WarningGroup({ title, icon, color, items, renderLine }: {
       }}>
         <span style={{ fontSize: 'var(--fs-lg)' }}>{icon}</span>
         <div style={{ flex: 1, fontSize: 'var(--fs-base)', fontWeight: 700 }}>{title}</div>
-        <Tag tone={tone}>{toFa(items.length)}</Tag>
+        <Tag tone={tone}>{getGlobalFormat().count(items.length)}</Tag>
       </div>
 
       {items.map(it => (
