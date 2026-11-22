@@ -450,25 +450,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
           );
         })()}
 
-        {equipNeed ? (
-          <div style={{
-            fontSize: 'var(--fs-xs)',
-            lineHeight: 1.6,
-            padding: '6px 8px',
-            borderRadius: 'var(--r-sm)',
-            background: (parseInt(toEn(form.count)) || 0) >= equipNeed.need ? 'var(--accent-soft)' : 'var(--danger-soft)',
-            color: (parseInt(toEn(form.count)) || 0) >= equipNeed.need ? 'var(--accent)' : 'var(--danger)',
-          }}>
-            {(() => {
-              const have = parseInt(toEn(form.count)) || 0;
-              if (have >= equipNeed.need) {
-                return '✓ کافیه — نیاز ' + equipNeed.need + ' ' + equipNeed.unit + ' (' + equipNeed.desc + ')';
-              }
-              const pct = equipNeed.need > 0 ? Math.round((have / equipNeed.need) * 100) : 0;
-              return '⚠ کم داره — نیاز ' + equipNeed.need + ' ' + equipNeed.unit + ' • فعلی ' + pct + '٪';
-            })()}
-          </div>
-        ) : null}
+
 
 
 
