@@ -499,13 +499,23 @@ return (
             }
             const rem = remaining(inv, allocations);
             const reason = await showPromptAsync(
-              'حذف بدحساب',
-              `مبلغ ${fmt.money(rem, { withUnit: false })} تومان به عنوان بدحساب حذف می‌شود.`,
-              { label: 'دلیل', placeholder: 'مثلاً: وصول نشد — مبلغ کم', required: true, multiline: true, rows: 2, danger: true, confirmText: 'حذف کن' },
+              isPurchase ? 'بخشش مانده' : 'حذف بدحساب',
+              isPurchase
+                ? `مبلغ ${fmt.money(rem, { withUnit: false })} تومان به عنوان بخشش مانده توسط فروشنده از بدهی کسر می‌شود.`
+                : `مبلغ ${fmt.money(rem, { withUnit: false })} تومان به عنوان بدحساب حذف می‌شود.`,
+              {
+                label: 'دلیل',
+                placeholder: isPurchase ? 'مثلاً: تخفیف تسویه / رند کردن فاکتور' : 'مثلاً: وصول نشد — مبلغ کم',
+                required: true,
+                multiline: true,
+                rows: 2,
+                danger: !isPurchase,
+                confirmText: isPurchase ? 'ثبت بخشش' : 'حذف کن',
+              },
             );
             if (!reason || !reason.trim()) return;
             writeOffInvoice(inv.id, rem, reason.trim());
-            toastMsg.success('مبلغ به عنوان بدحساب حذف شد');
+            toastMsg.success(isPurchase ? 'بخشش مانده ثبت شد' : 'مبلغ به عنوان بدحساب حذف شد');
           } : undefined}
                     index={i}
                   />

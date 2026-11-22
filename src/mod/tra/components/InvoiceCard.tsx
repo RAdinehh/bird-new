@@ -265,7 +265,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
             { label: 'مشاهده گله', onClick: () => { if (linkedFlock) window.location.href = '/flk?focus=' + linkedFlock.id; }, variant: 'outline', hidden: !isFlockActive },
             { label: 'اختلاف', onClick: onDispute || (() => {}), variant: 'outline', hidden: !onDispute },
             { label: 'بازگشایی', onClick: onReopen || (() => {}), variant: 'outline', hidden: !onReopen },
-            { label: 'حذف بدحساب', onClick: onWriteOff || (() => {}), variant: 'danger-outline', hidden: !onWriteOff },
+            { label: inv.type === 'purchase' ? 'بخشش مانده' : 'حذف بدحساب', onClick: onWriteOff || (() => {}), variant: 'danger-outline', hidden: !onWriteOff },
           ]} />
         );
       })()}
