@@ -1,6 +1,8 @@
 /**
  * ProductionsPage — ثبت تخم‌گذاری
  */
+import { useFormat } from '../../shr/units/useFormat';
+
 import { useState, useMemo, useEffect } from 'react';
 import ProductionFormModal from './components/ProductionFormModal';
 import DiscardFormModal from './components/DiscardFormModal';
@@ -48,6 +50,7 @@ const empty = (): F => ({
 });
 
 export default function ProductionsPage({ active = true }: { active?: boolean } = {}) {
+  const fmt = useFormat();
   const { productions, addProduction, updateProduction, deleteProduction, addDiscard } = useEgg();
   const { flocks } = useFlk();
   const { birds } = useBrd();
@@ -84,7 +87,7 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
     items: list,
     getId: (p: any) => p.id,
     onDelete: async (ids: string[]) => {
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' ثبت تخم‌گذاری حذف شوند؟', { danger: true });
+      const ok = await showConfirmAsync('حذف گروهی', fmt.count(ids.length) + ' ثبت تخم‌گذاری حذف شوند؟', { danger: true });
       if (!ok) return;
       const backups: any[] = [];
       const { productions: __prevProds } = useEgg.getState();
@@ -160,12 +163,12 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
   const openEdit = (p: EggProduction) => {
     setForm({
       id: p.id, flockId: p.flockId, date: p.date,
-      eatingCount: p.eatingCount ? toFa(p.eatingCount) : '',
-      fertileCount: p.fertileCount ? toFa(p.fertileCount) : '',
-      brokenCount: p.brokenCount ? toFa(p.brokenCount) : '',
-      softCount: p.softCount ? toFa(p.softCount) : '',
-      dirtyCount: p.dirtyCount ? toFa(p.dirtyCount) : '',
-      avgWeight: p.avgWeight !== null && p.avgWeight !== undefined ? toFa(p.avgWeight) : '',
+      eatingCount: p.eatingCount ? fmt.code(p.eatingCount) : '',
+      fertileCount: p.fertileCount ? fmt.code(p.fertileCount) : '',
+      brokenCount: p.brokenCount ? fmt.code(p.brokenCount) : '',
+      softCount: p.softCount ? fmt.code(p.softCount) : '',
+      dirtyCount: p.dirtyCount ? fmt.code(p.dirtyCount) : '',
+      avgWeight: p.avgWeight !== null && p.avgWeight !== undefined ? fmt.code(p.avgWeight) : '',
       notes: p.notes || '',
     });
     setErr(''); setOpen(true);
@@ -187,7 +190,7 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
     const s = int(form.softCount);
     const d = int(form.dirtyCount);
     if (e < 0 || f < 0 || b < 0 || s < 0 || d < 0) errs.push({ field: 'all', msg: 'مقادیر منفی مجاز نیست' });
-    if (flockCount > 0 && (e + f) > flockCount) errs.push({ field: 'healthy', msg: `مجموع سالم (${toFa(e + f)}) از تعداد گله (${toFa(flockCount)}) بیشتره` });
+    if (flockCount > 0 && (e + f) > flockCount) errs.push({ field: 'healthy', msg: `مجموع سالم (${fmt.count(e + f)}) از تعداد گله (${fmt.count(flockCount)}) بیشتره` });
     if (e > 0 && e > flockCount) errs.push({ field: 'eating', msg: 'تخم خوراکی از تعداد گله بیشتره' });
     if (f > 0 && f > flockCount) errs.push({ field: 'fertile', msg: 'تخم نطفه‌دار از تعداد گله بیشتره' });
     return errs;
@@ -212,7 +215,7 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
     const total = eating + fertile + broken + soft + dirty;
     if (total === 0) { setErr('حداقل یک عدد وارد کنید'); return; }
     if (flockCount > 0 && (eating + fertile) > flockCount) {
-      setErr('تخم سالم (' + toFa(eating + fertile) + ') نمی‌تواند از تعداد گله (' + toFa(flockCount) + ') بیشتر باشد');
+      setErr('تخم سالم (' + fmt.count(eating + fertile) + ') نمی‌تواند از تعداد گله (' + fmt.count(flockCount) + ') بیشتر باشد');
       return;
     }
     // Duplicate check (فقط برای ثبت جدید — نه ویرایش)
@@ -348,41 +351,41 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
                 id={p.id}
                 ms={ms}
                 accent={accent}
-                index={toFa(i + 1)}
+                index={fmt.count(i + 1)}
                 iconEmoji="🥚"
-                title={toFa(healthy2) + ' تخم سالم — ' + (flock?.name || '—')}
-                subtitle={toFa(p.date) + (bird ? ' • ' + bird.name : '') + (ageDays > 0 ? ' • ' + toFa(ageDays) + ' روز' : '')}
+                title={fmt.count(healthy2) + ' تخم سالم — ' + (flock?.name || '—')}
+                subtitle={fmt.date(p.date) + (bird ? ' • ' + bird.name : '') + (ageDays > 0 ? ' • ' + fmt.day(ageDays) + ' روز' : '')}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : p.id)}
-                badge={rate > 0 ? <Tag tone={tone}>{toFa(rate.toFixed(1))}٪</Tag> : undefined}
+                badge={rate > 0 ? <Tag tone={tone}>{fmt.code(rate.toFixed(1))}٪</Tag> : undefined}
                 stats={
                   <>
-                    <span>کل: <b style={{ color: 'var(--text)' }}>{toFa(p.totalCount)}</b></span>
-                    {p.brokenCount > 0 ? <span style={{ color: 'var(--danger)' }}>شکسته: <b>{toFa(p.brokenCount)}</b></span> : null}
-                    {brokenPct > 0 ? <span>شکسته: <b style={{ color: 'var(--text)' }}>{toFa(brokenPct.toFixed(1))}٪</b></span> : null}
+                    <span>کل: <b style={{ color: 'var(--text)' }}>{fmt.count(p.totalCount)}</b></span>
+                    {p.brokenCount > 0 ? <span style={{ color: 'var(--danger)' }}>شکسته: <b>{fmt.count(p.brokenCount)}</b></span> : null}
+                    {brokenPct > 0 ? <span>شکسته: <b style={{ color: 'var(--text)' }}>{fmt.code(brokenPct.toFixed(1))}٪</b></span> : null}
                   </>
                 }
               >
                 <SectionTitle>📊 آمار تخم‌گذاری</SectionTitle>
-                {p.eatingCount > 0 && <Row l="🥚 تخم خوراکی" v={toFa(p.eatingCount)} />}
-                {p.fertileCount > 0 && <Row l="🌱 تخم نطفه‌دار" v={toFa(p.fertileCount)} />}
-                <Row l="تخم سالم" v={toFa(healthy2)} />
-                <Row l="تخم شکسته" v={toFa(p.brokenCount)} />
-                {p.softCount > 0 ? <Row l="تخم نرم" v={toFa(p.softCount)} /> : null}
-                {p.dirtyCount > 0 ? <Row l="تخم کثیف" v={toFa(p.dirtyCount)} /> : null}
-                <Row l="جمع کل" v={toFa((p.totalCount || 0) + (p.brokenCount || 0) + (p.softCount || 0) + (p.dirtyCount || 0))} />
+                {p.eatingCount > 0 && <Row l="🥚 تخم خوراکی" v={fmt.count(p.eatingCount)} />}
+                {p.fertileCount > 0 && <Row l="🌱 تخم نطفه‌دار" v={fmt.count(p.fertileCount)} />}
+                <Row l="تخم سالم" v={fmt.count(healthy2)} />
+                <Row l="تخم شکسته" v={fmt.count(p.brokenCount)} />
+                {p.softCount > 0 ? <Row l="تخم نرم" v={fmt.count(p.softCount)} /> : null}
+                {p.dirtyCount > 0 ? <Row l="تخم کثیف" v={fmt.count(p.dirtyCount)} /> : null}
+                <Row l="جمع کل" v={fmt.count((p.totalCount || 0) + (p.brokenCount || 0) + (p.softCount || 0) + (p.dirtyCount || 0))} />
 
                 {rate > 0 ? (
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
                     <span>نرخ تخم‌گذاری (Hen-Day):</span>
-                    <span>{toFa(rate.toFixed(1))}٪</span>
+                    <span>{fmt.code(rate.toFixed(1))}٪</span>
                   </div>
                 ) : null}
 
                 {p.avgWeight ? (
                   <>
                     <SectionTitle>⚖ وزن</SectionTitle>
-                    <Row l="وزن میانگین" v={toFa(p.avgWeight) + ' گرم'} />
+                    <Row l="وزن میانگین" v={fmt.num(p.avgWeight) + ' گرم'} />
                   </>
                 ) : null}
 

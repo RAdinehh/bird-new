@@ -1,3 +1,4 @@
+import { getGlobalFormat } from '../../shr/units/useFormat';
 import { Btn } from '../../shr/components/ui';
 import { exportTableToCSV, printHTML, printTemplate } from '../../shr/utils/export';
 import { useTra, remaining, paidSum, invoiceStatus, STATUS_LABEL } from '../tra/store';
@@ -142,26 +143,26 @@ export default function ExportButtons() {
       <div class="header">
         <div>
           <h1>گزارش کلی مرغداری</h1>
-          <div class="farm-info">تاریخ گزارش: ${toFa(new Date().toLocaleDateString('fa-IR'))}</div>
+          <div class="farm-info">تاریخ گزارش: ${getGlobalFormat().code(new Date().toLocaleDateString('fa-IR'))}</div>
         </div>
       </div>
 
       <h2><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> خلاصه‌ی مالی</h2>
       <table>
-        <tr><td>فروش کل</td><td style="text-align: left;">${toFa(totalSales.toLocaleString('fa-IR'))} ت</td></tr>
-        <tr><td>خرید کل</td><td style="text-align: left;">${toFa(totalPurchases.toLocaleString('fa-IR'))} ت</td></tr>
-        <tr class="total-row"><td>سود کل</td><td style="text-align: left;">${toFa((totalSales - totalPurchases).toLocaleString('fa-IR'))} ت</td></tr>
+        <tr><td>فروش کل</td><td style="text-align: left;">${getGlobalFormat().money(totalSales)}</td></tr>
+        <tr><td>خرید کل</td><td style="text-align: left;">${getGlobalFormat().money(totalPurchases)}</td></tr>
+        <tr class="total-row"><td>سود کل</td><td style="text-align: left;">${getGlobalFormat().money(totalSales - totalPurchases)}</td></tr>
       </table>
 
       <h2><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🐔</span> وضعیت گله</h2>
       <table>
-        <tr><td>تعداد گله فعال</td><td style="text-align: left;">${toFa(totalFlocks)}</td></tr>
-        <tr><td>جمع پرنده</td><td style="text-align: left;">${toFa(totalBirds.toLocaleString('fa-IR'))}</td></tr>
+        <tr><td>تعداد گله فعال</td><td style="text-align: left;">${getGlobalFormat().count(totalFlocks)}</td></tr>
+        <tr><td>جمع پرنده</td><td style="text-align: left;">${getGlobalFormat().count(totalBirds)}</td></tr>
       </table>
 
       <h2><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🥚</span> تولید</h2>
       <table>
-        <tr><td>جمع تخم‌گذاری</td><td style="text-align: left;">${toFa(totalEggs.toLocaleString('fa-IR'))} عدد</td></tr>
+        <tr><td>جمع تخم‌گذاری</td><td style="text-align: left;">${getGlobalFormat().count(totalEggs)} عدد</td></tr>
       </table>
 
       <div class="footer">

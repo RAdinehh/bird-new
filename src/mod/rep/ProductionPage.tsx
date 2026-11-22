@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useMemo } from 'react';
 import { useEgg } from '../egg/store';
 import { useDlg } from '../dlg/store';
@@ -11,6 +12,7 @@ import { StatCard, Section } from './helpers';
 import HelpBanner from '../../shr/components/HelpBanner';
 
 export default function ProductionPage() {
+  const fmt = useFormat();
   const { productions } = useEgg();
   const { logs } = useDlg();
   const { flocks } = useFlk();
@@ -116,7 +118,7 @@ export default function ProductionPage() {
             میانگین تخم روزانه
           </span>
           <span style={{ fontSize: 'var(--fs-md)', color: 'var(--accent)', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-            {toFa(Math.round(totalEggs / 180).toLocaleString('fa-IR'))} عدد
+            {fmt.count(Math.round(totalEggs / 180))} عدد
           </span>
         </div>
       ) : null}

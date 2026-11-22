@@ -1,6 +1,8 @@
 /**
  * ActiveIncubations — لیست جوجه‌کشی‌های فعال
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { Tag } from '../../../shr/components/ui';
 import { toFa } from '../../../shr/utils/fa';
 import { daysToHatch, isLockdown, isHatchWindow } from '../../inc/store';
@@ -12,6 +14,7 @@ interface Props {
 }
 
 export default function ActiveIncubations({ activeEntries, birds, nav }: Props) {
+  const fmt = useFormat();
   if (activeEntries.length === 0) return null;
   return (
     <>
@@ -20,7 +23,7 @@ export default function ActiveIncubations({ activeEntries, birds, nav }: Props) 
               <>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 4px 8px' }}>
                   <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>
-                    🥚 جوجه‌کشی فعال ({toFa(activeEntries.length)})
+                    🥚 جوجه‌کشی فعال ({fmt.count(activeEntries.length)})
                   </span>
                   <span onClick={() => nav('/inc')} style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', cursor: 'pointer' }}>
                     مشاهده ←
@@ -60,13 +63,13 @@ export default function ActiveIncubations({ activeEntries, birds, nav }: Props) 
                             fontSize: 'var(--fs-sm)', fontWeight: 600,
                             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
                           }}>
-                            {toFa(e.count || 0)} تخم — {bird?.name || '—'}
+                            {fmt.count(e.count || 0)} تخم — {bird?.name || '—'}
                           </div>
                           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                            {window ? '🐣 پنجره هچ' : locked ? '🔒 Lock-down' : toFa(days) + ' روز مانده'}
+                            {window ? '🐣 پنجره هچ' : locked ? '🔒 Lock-down' : fmt.day(days) + ' روز مانده'}
                           </div>
                         </div>
-                        {window ? <Tag tone="purple">هچ</Tag> : locked ? <Tag tone="amber">قفل</Tag> : <Tag tone="blue">{toFa(days)} روز</Tag>}
+                        {window ? <Tag tone="purple">هچ</Tag> : locked ? <Tag tone="amber">قفل</Tag> : <Tag tone="blue">{fmt.day(days)} روز</Tag>}
                       </div>
                     );
                   })}

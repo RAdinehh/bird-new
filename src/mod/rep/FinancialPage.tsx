@@ -1,3 +1,4 @@
+import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
 import { useMemo } from 'react';
 import { useTra } from '../tra/store';
 import { salesInMonth, purchasesInMonth, cashInMonth, cashOutMonth, lastMonths, monthLabel, totalReceivables, totalPayables } from './analytics';
@@ -31,14 +32,14 @@ function ParetoCard({ invoices }: { invoices: any[] }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 'var(--pad-comfy)', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)' }}>
       <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> تحلیل Pareto — اقلام پرهزینه</div>
       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
-        {toFa(top80.length)} قلم اول = حدود ۸۰٪ کل خرید
+        {getGlobalFormat().count(top80.length)} قلم اول = حدود ۸۰٪ کل خرید
       </div>
       {data.slice(0, 6).map((d, i) => (
         <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
             <span style={{ fontWeight: d.cumulative <= 80 ? 700 : 400 }}>{d.label}</span>
             <span style={{ direction: 'ltr', color: d.cumulative <= 80 ? 'var(--danger)' : 'var(--muted)', fontWeight: 600 }}>
-              {toFa(d.percent)}٪
+              {getGlobalFormat().num(d.percent)}٪
             </span>
           </div>
           <div style={{ height: 36, background: 'var(--input-bg)', borderRadius: 2, overflow: 'hidden' }}>
@@ -51,6 +52,7 @@ function ParetoCard({ invoices }: { invoices: any[] }) {
 }
 
 export default function FinancialPage() {
+  const fmt = useFormat();
   const { invoices } = useTra();
 
   const months = useMemo(() => lastMonths(6), []);
@@ -137,7 +139,7 @@ export default function FinancialPage() {
                border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)' }}>
               <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📥</span> طلب از مشتریان</div>
               <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--accent)', marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
-                {toFa(receivables.toLocaleString('fa-IR'))}
+                {fmt.money(receivables, { withUnit: false })}
               </div>
               <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>تومان</div>
             </div>
@@ -146,7 +148,7 @@ export default function FinancialPage() {
             <div style={{ padding: 'var(--pad-comfy)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-md)' }}>
               <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📤</span> بدهی به فروشندگان</div>
               <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--warn)', marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
-                {toFa(payables.toLocaleString('fa-IR'))}
+                {fmt.money(payables, { withUnit: false })}
               </div>
               <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>تومان</div>
             </div>

@@ -1,6 +1,8 @@
 /**
  * FlockList — لیست گله‌های فعال Dashboard
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { Tag } from '../../../shr/components/ui';
 import { toFa } from '../../../shr/utils/fa';
 import { getAgeDays, getLifecycle } from '../../flk/store';
@@ -21,6 +23,7 @@ interface Props {
 }
 
 export default function FlockList({ activeFlocks, birds, productions, nav }: Props) {
+  const fmt = useFormat();
   if (activeFlocks.length === 0) return null;
   return (
     <>
@@ -82,12 +85,12 @@ export default function FlockList({ activeFlocks, birds, productions, nav }: Pro
                             }}>
                               <span>{bird?.name || '—'}</span>
                               <span style={{ color: 'var(--border)' }}>|</span>
-                              <span>{toFa(age)} روز</span>
+                              <span>{fmt.day(age)} روز</span>
                               <span style={{ color: 'var(--border)' }}>|</span>
-                              <span>🐔 {toFa(flockCount)}</span>
+                              <span>🐔 {fmt.count(flockCount)}</span>
                               {flockHenDay > 0 && (<>
                                 <span style={{ color: 'var(--border)' }}>|</span>
-                                <span>{toFa(flockHenDay.toFixed(0))}٪</span>
+                                <span>{fmt.code(flockHenDay.toFixed(0))}٪</span>
                               </>)}
                             </div>
                           </div>
@@ -118,7 +121,7 @@ export default function FlockList({ activeFlocks, birds, productions, nav }: Pro
                               {/* اعداد دو سر — بالای نوار */}
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 12, paddingRight: 2, paddingLeft: 2 }}>
                                 <span>۱</span>
-                                <span>{toFa(cycleDays)} روز</span>
+                                <span>{fmt.day(cycleDays)} روز</span>
                               </div>
 
                               {/* نوار + بج متحرک */}
@@ -147,7 +150,7 @@ export default function FlockList({ activeFlocks, birds, productions, nav }: Pro
                                   return (
                                     <div
                                       key={idx}
-                                      title={mk.label + ' • روز ' + toFa(mk.day)}
+                                      title={mk.label + ' • روز ' + fmt.day(mk.day)}
                                       style={{
                                         position: 'absolute',
                                         top: 29,
@@ -197,7 +200,7 @@ export default function FlockList({ activeFlocks, birds, productions, nav }: Pro
                                   boxShadow: '0 1px 4px rgba(0,0,0,.2)',
                                   zIndex: 3,
                                   transition: 'right .3s',
-                                }}>{toFa(age)}</div>
+                                }}>{fmt.day(age)}</div>
 
                                 {/* خط اتصال بج به نقطه */}
                                 <div style={{
@@ -220,7 +223,7 @@ export default function FlockList({ activeFlocks, birds, productions, nav }: Pro
                                   fontSize: 'var(--fs-xs)',
                                   color: progressColor,
                                   fontWeight: 700,
-                                }}>{toFa(Math.round(lc.progress))}٪</div>
+                                }}>{fmt.int(Math.round(lc.progress))}٪</div>
                               </div>
 
                               {/* Legend مراحل */}
@@ -237,7 +240,7 @@ export default function FlockList({ activeFlocks, birds, productions, nav }: Pro
                                       fontWeight: passed ? 700 : 500,
                                     }}>
                                       <span>{mk.label}</span>
-                                      <span style={{ opacity: 0.6 }}>{toFa(mk.day)}</span>
+                                      <span style={{ opacity: 0.6 }}>{fmt.day(mk.day)}</span>
                                     </div>
                                   );
                                 })}

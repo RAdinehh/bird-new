@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useMemo } from 'react';
 import { useFlk, getAgeDays, getLifecycle } from '../flk/store';
 import { useBrd } from '../brd/store';
@@ -12,6 +13,7 @@ import { applyCorrections } from '../dlg/api/applyCorrections';
 import HelpBanner from '../../shr/components/HelpBanner';
 
 export default function FlockReportPage() {
+  const fmt = useFormat();
   const { flocks } = useFlk();
   const { birds } = useBrd();
   const { productions } = useEgg();
@@ -110,10 +112,10 @@ export default function FlockReportPage() {
           گله‌های فعال
         </div>
         <div style={{ fontSize: 'var(--fs-2xl)', fontWeight: 700, color: 'var(--accent)' }}>
-          {toFa(activeFlocks.length)} گله
+          {fmt.count(activeFlocks.length)} گله
         </div>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 4 }}>
-          جمع پرنده: {toFa(activeFlocks.reduce((a, f) => a + (f.currentCount || f.initialCount || 0), 0).toLocaleString('fa-IR'))}
+          جمع پرنده: {fmt.count(activeFlocks.reduce((a, f) => a + (f.currentCount || f.initialCount || 0), 0))}
         </div>
       </div>
 
@@ -148,26 +150,26 @@ export default function FlockReportPage() {
                 color: 'var(--avatar-text)', fontSize: 'var(--fs-xs)', fontWeight: 800,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 border: '2px solid var(--card-solid)'
-              }}>{toFa(i + 1)}</span>
+              }}>{fmt.count(i + 1)}</span>
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700 }}>{d.flock.name}</div>
               <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                {d.bird?.name || '—'} • {toFa(d.ageDays)} روز • {d.lifecycle.label}
+                {d.bird?.name || '—'} • {fmt.day(d.ageDays)} روز • {d.lifecycle.label}
               </div>
             </div>
             <Tag tone={d.lifecycle.color === 'green' ? 'green' : d.lifecycle.color === 'amber' ? 'amber' : 'blue'}>
-              {toFa(d.flockCount)} پرنده
+              {fmt.count(d.flockCount)} پرنده
             </Tag>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-            <StatCard label="🥚 تخم کل" value={toFa(d.totalEggs.toLocaleString('fa-IR'))} color="accent" />
-            <StatCard label="💀 مرگ‌ومیر" value={toFa(d.mortality.toFixed(1)) + '٪'} color="danger" />
-            <StatCard label="📊 Hen-Day" value={toFa(d.avgHenDay.toFixed(1)) + '٪'} color="info" />
-            <StatCard label="🌾 دان مصرفی" value={toFa(d.totalFeed.toLocaleString('fa-IR')) + ' kg'} color="warn" />
-            {d.avgBroken > 0 ? <StatCard label="💔 شکسته" value={toFa(d.avgBroken.toFixed(1)) + '٪'} color="warn" /> : null}
-            <StatCard label="📋 رکوردها" value={toFa(d.productionsCount + d.logsCount)} color="accent" />
+            <StatCard label="🥚 تخم کل" value={fmt.count(d.totalEggs)} color="accent" />
+            <StatCard label="💀 مرگ‌ومیر" value={fmt.code(d.mortality.toFixed(1)) + '٪'} color="danger" />
+            <StatCard label="📊 Hen-Day" value={fmt.code(d.avgHenDay.toFixed(1)) + '٪'} color="info" />
+            <StatCard label="🌾 دان مصرفی" value={fmt.num(d.totalFeed) + ' kg'} color="warn" />
+            {d.avgBroken > 0 ? <StatCard label="💔 شکسته" value={fmt.code(d.avgBroken.toFixed(1)) + '٪'} color="warn" /> : null}
+            <StatCard label="📋 رکوردها" value={fmt.count(d.productionsCount + d.logsCount)} color="accent" />
           </div>
         </div>
       ))}

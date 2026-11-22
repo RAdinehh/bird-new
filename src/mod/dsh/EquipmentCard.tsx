@@ -2,6 +2,8 @@
  * EquipmentCard — کارت خلاصه تجهیزات در Dashboard
  * نمایش ارزش کل، تعداد فعال/تعمیر/اسقاط و تفکیک سالن
  */
+import { useFormat } from '../../shr/units/useFormat';
+
 import { useMemo } from 'react';
 import { useWhs } from '../whs/store';
 import { useHal } from '../hal/store';
@@ -13,6 +15,7 @@ interface Props {
 }
 
 export default function EquipmentCard({ nav }: Props) {
+  const fmt = useFormat();
   const { items } = useWhs();
   const { halls } = useHal();
 
@@ -103,7 +106,7 @@ export default function EquipmentCard({ nav }: Props) {
           color: 'var(--danger)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)',
           fontWeight: 700, textAlign: 'center',
         }}>
-          🔴 {toFa(stats.broken)} تجهیز خراب — بررسی کنید
+          🔴 {fmt.count(stats.broken)} تجهیز خراب — بررسی کنید
         </div>
       )}
 
@@ -113,7 +116,7 @@ export default function EquipmentCard({ nav }: Props) {
           color: 'var(--warn)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)',
           fontWeight: 700, textAlign: 'center',
         }}>
-          ⏰ {toFa(stats.warrantySoon)} تجهیز — گارانتی نزدیک پایان (کمتر از ۳۰ روز)
+          ⏰ {fmt.count(stats.warrantySoon)} تجهیز — گارانتی نزدیک پایان (کمتر از ۳۰ روز)
         </div>
       )}
 
@@ -132,7 +135,7 @@ export default function EquipmentCard({ nav }: Props) {
               }}>
                 <span style={{ color: 'var(--text)' }}>{label}</span>
                 <span style={{ color: 'var(--muted)' }}>
-                  {toFa(row.count)} قلم • {toFa(row.value.toLocaleString('fa-IR'))} ت
+                  {fmt.count(row.count)} قلم • {fmt.money(row.value)}
                 </span>
               </div>
             );

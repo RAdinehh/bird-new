@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useState, useMemo } from 'react';
 import { useTra } from '../tra/store';
 import { useEgg } from '../egg/store';
@@ -11,6 +12,7 @@ import HelpBanner from '../../shr/components/HelpBanner';
 type Mode = 'month' | 'quarter' | 'year';
 
 export default function ComparePage() {
+  const fmt = useFormat();
   const { invoices } = useTra();
   const { productions } = useEgg();
 
@@ -96,7 +98,7 @@ export default function ComparePage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
               <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700 }}>{best.label}</span>
               <span style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: 'var(--accent)' }}>
-                {toFa(best.sales.toLocaleString('fa-IR'))} ت
+                {fmt.money(best.sales)}
               </span>
             </div>
           </div>
@@ -112,7 +114,7 @@ export default function ComparePage() {
                 میانگین فروش ماهانه
               </div>
               <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: 'var(--accent)', marginTop: 4 }}>
-                {toFa(Math.round(avgSales).toLocaleString('fa-IR'))} ت
+                {fmt.money(Math.round(avgSales))}
               </div>
             </div>
             <div style={{
@@ -125,7 +127,7 @@ export default function ComparePage() {
                 میانگین تخم ماهانه
               </div>
               <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: 'var(--accent)', marginTop: 4 }}>
-                {toFa(Math.round(avgEggs).toLocaleString('fa-IR'))} عدد
+                {fmt.count(Math.round(avgEggs))} عدد
               </div>
             </div>
           </div>

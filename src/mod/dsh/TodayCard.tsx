@@ -1,6 +1,8 @@
 /**
  * TodayCard — بخش «امروز در یک نگاه»: Benchmark گله + 9 KpiCard
  */
+import { useFormat } from '../../shr/units/useFormat';
+
 import { KpiCard, SectionTitle, MiniEmpty } from './cards';
 import { toFa } from '../../shr/utils/fa';
 
@@ -37,6 +39,7 @@ export default function TodayCard({
   waterToday,
   humidToday,
 }: Props) {
+  const fmt = useFormat();
   const deathTone: 'accent' | 'warn' | 'danger' = deathsToday === 0 ? 'accent' : deathsToday <= 3 ? 'warn' : 'danger';
   if (activeFlocks.length === 0) {
     return (
@@ -114,7 +117,7 @@ export default function TodayCard({
                               color: benchmarkData.fcrDiff <= 0 ? 'var(--accent)' : benchmarkData.fcrDiff <= 10 ? 'var(--warn)' : 'var(--danger)',
                               fontVariantNumeric: 'tabular-nums',
                             }}>
-                              {toFa(benchmarkData.fcrActual)}
+                              {fmt.num(benchmarkData.fcrActual)}
                             </div>
                           </div>
                           <div style={{
@@ -131,7 +134,7 @@ export default function TodayCard({
                               color: 'var(--text)',
                               fontVariantNumeric: 'tabular-nums',
                             }}>
-                              {toFa(benchmarkData.fcrStandard)}
+                              {fmt.num(benchmarkData.fcrStandard)}
                             </div>
                           </div>
                         </div>
@@ -147,8 +150,8 @@ export default function TodayCard({
                           textAlign: 'center',
                         }}>
                           {benchmarkData.fcrDiff <= 0
-                            ? `✅ بهتر از استاندارد (${toFa(Math.abs(benchmarkData.fcrDiff))}٪)`
-                            : `⚠️ ${toFa(benchmarkData.fcrDiff)}٪ بالاتر از استاندارد`}
+                            ? `✅ بهتر از استاندارد (${fmt.num(Math.abs(benchmarkData.fcrDiff))}٪)`
+                            : `⚠️ ${fmt.num(benchmarkData.fcrDiff)}٪ بالاتر از استاندارد`}
                         </div>
 
                         {benchmarkData.henDay > 0 && (
@@ -166,7 +169,7 @@ export default function TodayCard({
                               fontWeight: 700,
                               color: benchmarkData.henDay >= 80 ? 'var(--accent)' : benchmarkData.henDay >= 60 ? 'var(--warn)' : 'var(--danger)',
                             }}>
-                              {toFa(benchmarkData.henDay)}٪
+                              {fmt.num(benchmarkData.henDay)}٪
                             </span>
                           </div>
                         )}

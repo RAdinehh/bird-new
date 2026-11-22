@@ -1,6 +1,8 @@
 /**
  * helpers.tsx — helperهای مشترک ماژول rep
  */
+import { getGlobalFormat } from '../../shr/units/useFormat';
+
 import { toFa } from '../../shr/utils/fa';
 
 export { Section } from '../../shr/components/ui/Layout';
@@ -12,7 +14,7 @@ export function StatCard({ label, value, unit, color }: {
   color: 'accent' | 'warn' | 'danger' | 'info';
 }) {
   const displayValue = typeof value === 'number'
-    ? toFa(value.toLocaleString('fa-IR'))
+    ? getGlobalFormat().num(value)
     : value;
   return (
     <div style={{

@@ -1,6 +1,8 @@
 /**
  * AlertList — لیست هشدارهای فعال Dashboard
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { Tag } from '../../../shr/components/ui';
 import { toFa } from '../../../shr/utils/fa';
 import { LEVEL_ICON, LEVEL_LABEL } from '../../alt/store';
@@ -13,6 +15,7 @@ interface Props {
 }
 
 export default function AlertList({ active, counts, nav }: Props) {
+  const fmt = useFormat();
   if (active.length === 0) return null;
   return (
     <>
@@ -21,7 +24,7 @@ export default function AlertList({ active, counts, nav }: Props) {
               <>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 4px 8px' }}>
                   <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>
-                    🔔 هشدارهای فعال ({toFa(counts.total)})
+                    🔔 هشدارهای فعال ({fmt.count(counts.total)})
                   </span>
                   <span onClick={() => nav('/alt')} style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', cursor: 'pointer' }}>
                     مشاهده همه ←

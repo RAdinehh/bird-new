@@ -1,6 +1,8 @@
 /**
  * AnalyticsCards — بخش‌های 2+3+4: سلامت گله، عملکرد تولیدی، مالی این ماه
  */
+import { useFormat } from '../../shr/units/useFormat';
+
 import { SectionTitle, KpiCard, MiniStat, MiniEmpty } from './cards';
 import { LineChart } from '../../shr/components/Charts';
 import { toFa } from '../../shr/utils/fa';
@@ -56,6 +58,7 @@ export default function AnalyticsCards({
   momComparison,
   nav,
 }: Props) {
+  const fmt = useFormat();
   const isEmpty = survivalRate === 100 && henDay7 === 0 && brokenRate7 === 0 && eggTrend.length === 0;
   if (isEmpty) {
     return (
@@ -127,7 +130,7 @@ export default function AnalyticsCards({
                             fontFamily: 'inherit',
                           }}
                         >
-                          {toFa(d)}
+                          {fmt.code(d)}
                         </button>
                       ))}
                     </div>
@@ -217,7 +220,7 @@ export default function AnalyticsCards({
                     icon="📥"
                     label={`فروش ماه ${momComparison.salesChange !== 0 ? (momComparison.salesChange > 0 ? '📈' : '📉') : ''}`}
                     value={salesThisMonth}
-                    unit={`تومان${momComparison.salesChange !== 0 ? ` • ${momComparison.salesChange > 0 ? '+' : ''}${toFa(momComparison.salesChange)}٪` : ''}`}
+                    unit={`تومان${momComparison.salesChange !== 0 ? ` • ${momComparison.salesChange > 0 ? '+' : ''}${fmt.num(momComparison.salesChange)}٪` : ''}`}
                     color="accent"
                     onClick={() => nav('/tra')}
                   />
@@ -225,7 +228,7 @@ export default function AnalyticsCards({
                     icon="📤"
                     label={`خرید ماه ${momComparison.purchaseChange !== 0 ? (momComparison.purchaseChange > 0 ? '📈' : '📉') : ''}`}
                     value={purchasesThisMonth}
-                    unit={`تومان${momComparison.purchaseChange !== 0 ? ` • ${momComparison.purchaseChange > 0 ? '+' : ''}${toFa(momComparison.purchaseChange)}٪` : ''}`}
+                    unit={`تومان${momComparison.purchaseChange !== 0 ? ` • ${momComparison.purchaseChange > 0 ? '+' : ''}${fmt.num(momComparison.purchaseChange)}٪` : ''}`}
                     color="warn"
                     onClick={() => nav('/tra')}
                   />
@@ -263,7 +266,7 @@ export default function AnalyticsCards({
                       📥 طلب از مشتریان
                     </span>
                     <span style={{ fontSize: 'var(--fs-md)', color: 'var(--accent)', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-                      {toFa(receivables.toLocaleString('fa-IR'))} ت
+                      {fmt.money(receivables)}
                     </span>
                   </div>
                 ) : null}

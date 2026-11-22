@@ -2,6 +2,8 @@
  * SexingWidget.tsx — کارت «🕐 زمان تفکیک» در Dashboard
  * فاز ۷.۱ — نمای گله‌های breeder unsplit که به sexingAge رسیده‌اند
  */
+import { useFormat } from '../../shr/units/useFormat';
+
 import { useMemo } from 'react';
 import { useBrd } from '../brd/store';
 import { getStandardFor } from '../set/standards/resolve';
@@ -15,6 +17,7 @@ interface Props {
 }
 
 export default function SexingWidget({ nav, activeFlocks }: Props) {
+  const fmt = useFormat();
   const brd = useBrd();
 
   const stats = useMemo(() => {
@@ -62,14 +65,14 @@ export default function SexingWidget({ nav, activeFlocks }: Props) {
               minWidth: 90,
             }}>
               <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: `var(--${it.color})` }}>
-                {it.icon} {toFa(it.count)}
+                {it.icon} {fmt.count(it.count)}
               </div>
               <div style={{ fontSize: 10, color: 'var(--muted)', marginTop: 2 }}>{it.label}</div>
             </div>
           ))}
         </div>
         <div style={{ marginTop: 8, fontSize: 11, color: 'var(--muted)', textAlign: 'center' }}>
-          {toFa(stats.total)} گله breeder بدون تفکیک — کلیک برای مشاهده
+          {fmt.count(stats.total)} گله breeder بدون تفکیک — کلیک برای مشاهده
         </div>
       </div>
     </div>

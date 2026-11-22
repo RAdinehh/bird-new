@@ -1,6 +1,8 @@
 /**
  * TopAlerts — 3 کارت بالای داشبورد: هشدارهای تجمیعی + سرسیدهای نزدیک + چک‌های در جریان
  */
+import { useFormat } from '../../shr/units/useFormat';
+
 import { useState } from 'react';
 import { toFa } from '../../shr/utils/fa';
 import { remaining } from '../tra/store';
@@ -26,6 +28,7 @@ export default function TopAlerts({
   daysUntilDue,
   nav,
 }: Props) {
+  const fmt = useFormat();
   const [showUpcoming, setShowUpcoming] = useState(false);
   return (
     <>
@@ -44,7 +47,7 @@ export default function TopAlerts({
                   fontWeight: 700,
                   color: 'var(--danger)',
                 }}>
-                  🚨 هشدارهای فوری ({toFa(aggregatedAlerts.length)})
+                  🚨 هشدارهای فوری ({fmt.count(aggregatedAlerts.length)})
                 </div>
                 <div style={{ padding: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
                   {aggregatedAlerts.map((a, i) => (
@@ -66,7 +69,7 @@ export default function TopAlerts({
                         {a.icon} {a.label}
                       </span>
                       <span style={{ fontWeight: 700, color: `var(--${a.tone})` }}>
-                        {toFa(a.count)}
+                        {fmt.count(a.count)}
                       </span>
                     </div>
                   ))}
@@ -78,7 +81,7 @@ export default function TopAlerts({
             {upcomingDues.length > 0 && (
               <div>
                 <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', paddingBottom: 4 }}>
-                  ⏰ سرسیدهای نزدیک ({toFa(upcomingDues.length)})
+                  ⏰ سرسیدهای نزدیک ({fmt.count(upcomingDues.length)})
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   {upcomingDues.map(({ inv, days }) => {
@@ -104,10 +107,10 @@ export default function TopAlerts({
                           {party?.name || '—'}
                         </span>
                         <span style={{ color: `var(--${tone})`, fontSize: 'var(--fs-xs)' }}>
-                          {(days ?? 0) < 0 ? `${toFa(Math.abs(days ?? 0))} روز گذشته` : (days === 0 ? 'امروز' : `${toFa(days ?? 0)} روز مانده`)}
+                          {(days ?? 0) < 0 ? `${fmt.day(Math.abs(days ?? 0))} روز گذشته` : (days === 0 ? 'امروز' : `${fmt.day(days ?? 0)} روز مانده`)}
                         </span>
                         <span style={{ fontWeight: 700, color: `var(--${tone})` }}>
-                          {toFa(remaining(inv).toLocaleString('fa-IR'))} ت
+                          {fmt.money(remaining(inv))}
                         </span>
                       </div>
                     );
@@ -120,7 +123,7 @@ export default function TopAlerts({
             {pendingChecks.length > 0 && (
               <div>
                 <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', paddingBottom: 4 }}>
-                  🏦 چک‌های در جریان ({toFa(pendingChecks.length)})
+                  🏦 چک‌های در جریان ({fmt.count(pendingChecks.length)})
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   {pendingChecks.map(({ inv, pay }) => {
@@ -146,7 +149,7 @@ export default function TopAlerts({
                           چک {pay.checkNo || '—'} • {pay.bank || '—'}
                         </span>
                         <span style={{ fontWeight: 700, color: 'var(--amber)' }}>
-                          {toFa(pay.amount.toLocaleString('fa-IR'))} ت
+                          {fmt.money(pay.amount)}
                         </span>
                       </div>
                     );

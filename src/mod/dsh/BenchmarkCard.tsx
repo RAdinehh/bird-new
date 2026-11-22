@@ -1,3 +1,4 @@
+import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
 import { useMemo } from 'react';
 import { useFlk, getAgeDays } from '../flk/store';
 import { useDlg } from '../dlg/store';
@@ -5,6 +6,7 @@ import { applyCorrections } from '../dlg/api/applyCorrections';
 import { toFa } from '../../shr/utils/fa';
 
 export default function BenchmarkCard() {
+  const fmt = useFormat();
   const { flocks } = useFlk();
   const { logs } = useDlg();
 
@@ -42,10 +44,10 @@ export default function BenchmarkCard() {
     return (
       <div style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--pad-inner)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)' }}>
         <span style={{ flex: 1 }}>{label}</span>
-        <span style={{ direction: 'ltr', width: 70, textAlign: 'center', fontWeight: 600 }}>{toFa(active.toFixed(1))}</span>
-        <span style={{ direction: 'ltr', width: 70, textAlign: 'center', color: 'var(--muted)' }}>{toFa(arch.toFixed(1))}</span>
+        <span style={{ direction: 'ltr', width: 70, textAlign: 'center', fontWeight: 600 }}>{getGlobalFormat().code(active.toFixed(1))}</span>
+        <span style={{ direction: 'ltr', width: 70, textAlign: 'center', color: 'var(--muted)' }}>{getGlobalFormat().code(arch.toFixed(1))}</span>
         <span style={{ direction: 'ltr', width: 70, textAlign: 'center', fontWeight: 700, color: good ? 'var(--accent)' : 'var(--danger)' }}>
-          {cmp > 0 ? '+' : ''}{toFa(cmp.toFixed(0))}٪
+          {cmp > 0 ? '+' : ''}{getGlobalFormat().code(cmp.toFixed(0))}٪
         </span>
       </div>
     );
@@ -55,7 +57,7 @@ export default function BenchmarkCard() {
     <div style={{ padding: 'var(--pad-card)', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', display: 'flex', flexDirection: 'column', gap: 8 }}>
       <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📈</span> Benchmark — مقایسه گله‌ها</div>
       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
-        فعال ({toFa(active.length)}) vs آرشیو ({toFa(archived.length)})
+        فعال ({getGlobalFormat().count(active.length)}) vs آرشیو ({getGlobalFormat().count(archived.length)})
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 10px', fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
         <span style={{ flex: 1 }}>متریک</span>

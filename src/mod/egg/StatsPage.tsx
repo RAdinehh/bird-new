@@ -1,3 +1,4 @@
+import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
 import { MiniStat } from '../../shr/components/ui/MiniStat';
 import { KpiCard } from '../../shr/components/ui/KpiCard';
 import HelpBanner from '../../shr/components/HelpBanner';
@@ -33,6 +34,7 @@ function shortDate(d: string): string {
 }
 
 export default function StatsPage({ active = true }: { active?: boolean } = {}) {
+  const fmt = useFormat();
   const { productions } = useEgg();
   const { flocks } = useFlk();
   const [filterFlock, setFilterFlock] = useState('');
@@ -209,23 +211,23 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
           {alert && (
             <div style={{ padding: '10px 14px', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--danger)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ fontSize: '1.3em' }}>⚠️</span>
-              <span style={{ flex: 1 }}>افت {toFa(Math.abs(alert.drop))}٪ تولید — ۳ روز اخیر {toFa(alert.avgLast)} تخم (قبلاً {toFa(alert.avgPrev)})</span>
+              <span style={{ flex: 1 }}>افت {fmt.num(Math.abs(alert.drop))}٪ تولید — ۳ روز اخیر {fmt.num(alert.avgLast)} تخم (قبلاً {fmt.num(alert.avgPrev)})</span>
             </div>
           )}
           {coverage.insufficient && range !== 'all' && (
             <div style={{ padding: '10px 14px', background: 'var(--warn-soft)', border: '1px dashed var(--warn)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: 'var(--warn)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ fontSize: '1.3em' }}>💡</span>
-              <span style={{ flex: 1 }}>فقط {toFa(coverage.days)} روز از {toFa(coverage.rangeDays)} روز داده دارید</span>
+              <span style={{ flex: 1 }}>فقط {fmt.day(coverage.days)} روز از {fmt.day(coverage.rangeDays)} روز داده دارید</span>
             </div>
           )}
 
           {/* خلاصه */}
           <StatsCard icon="📊" title={`خلاصه ${rangeLabel}`} />
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            <KpiCard size="lg" icon="🥚" label="کل تخم" value={toFa(stats.total.toLocaleString('fa-IR'))} sub={`در ${toFa(coverage.days)} روز`} tone="accent" />
-            <KpiCard size="lg" icon="📅" label="میانگین روزانه" value={canAvg ? toFa(stats.avgHealthy.toLocaleString('fa-IR')) : '—'} sub={canAvg ? 'تخم سالم' : 'داده کم'} tone="info" />
-            <KpiCard size="lg" icon="⚖️" label="توده تخم" value={`${toFa(eggMassKg.toLocaleString('fa-IR'))} kg`} sub="میانگین ۶۰ گرم" tone="purple" />
-            <KpiCard size="lg" icon="⭐" label="نرخ نطفه‌دار" value={`${toFa(stats.fertilePct)}٪`} sub={`${toFa(stats.fertile.toLocaleString('fa-IR'))} تخم`} tone="purple" />
+            <KpiCard size="lg" icon="🥚" label="کل تخم" value={fmt.count(stats.total)} sub={`در ${fmt.day(coverage.days)} روز`} tone="accent" />
+            <KpiCard size="lg" icon="📅" label="میانگین روزانه" value={canAvg ? fmt.num(stats.avgHealthy) : '—'} sub={canAvg ? 'تخم سالم' : 'داده کم'} tone="info" />
+            <KpiCard size="lg" icon="⚖️" label="توده تخم" value={`${fmt.num(eggMassKg)} kg`} sub="میانگین ۶۰ گرم" tone="purple" />
+            <KpiCard size="lg" icon="⭐" label="نرخ نطفه‌دار" value={`${fmt.num(stats.fertilePct)}٪`} sub={`${fmt.count(stats.fertile)} تخم`} tone="purple" />
           </div>
 
           {/* کیفیت تخم */}
@@ -242,7 +244,7 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
           {/* روند روزانه */}
           {trend.days.length >= 2 && (
             <>
-              <StatsCard icon="📈" title="روند روزانه" extra={`${toFa(trend.days.length)} روز`} />
+              <StatsCard icon="📈" title="روند روزانه" extra={`${fmt.day(trend.days.length)} روز`} />
               <div style={{ padding: '14px 16px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 12 }}>
 
                 {/* انتخاب نوع نمودار */}
@@ -279,9 +281,9 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
 
                 {/* خلاصه روند */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, paddingTop: 10, borderTop: '1px dashed var(--border)' }}>
-                  <MiniStat variant="plain" label="بیشترین" value={toFa(trend.max.toLocaleString('fa-IR'))} color="var(--accent)" />
-                  <MiniStat variant="plain" label="میانگین" value={toFa(trend.avg.toLocaleString('fa-IR'))} color="var(--text)" />
-                  <MiniStat variant="plain" label="کمترین" value={toFa(trend.min.toLocaleString('fa-IR'))} color="var(--muted)" />
+                  <MiniStat variant="plain" label="بیشترین" value={fmt.count(trend.max)} color="var(--accent)" />
+                  <MiniStat variant="plain" label="میانگین" value={fmt.num(trend.avg)} color="var(--text)" />
+                  <MiniStat variant="plain" label="کمترین" value={fmt.count(trend.min)} color="var(--muted)" />
                 </div>
               </div>
             </>
@@ -294,17 +296,17 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
               <div style={{ padding: '12px 14px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {flockRank.map((r, i) => {
                   const brokenPct = r.total > 0 ? Math.round((r.broken / r.total) * 1000) / 10 : 0;
-                  const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${toFa(i + 1)}.`;
+                  const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${fmt.count(i + 1)}.`;
                   return (
                     <div key={r.name} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: i === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', borderRadius: 'var(--r-sm)', border: i === 0 ? '1px solid var(--accent-border)' : '1px solid transparent' }}>
                       <span style={{ fontSize: '1.2em', minWidth: 28, textAlign: 'center' }}>{medal}</span>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', marginBottom: 2 }}>{r.name}</div>
-                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(r.days)} روز ثبت</div>
+                        <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{fmt.day(r.days)} روز ثبت</div>
                       </div>
                       <div style={{ textAlign: 'left' }}>
-                        <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: 'var(--accent)' }}>{toFa(r.healthy.toLocaleString('fa-IR'))}</div>
-                        <div style={{ fontSize: '10px', color: 'var(--muted)' }}>سالم{brokenPct > 0 ? ` • ${toFa(brokenPct)}٪ شکسته` : ''}</div>
+                        <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700, color: 'var(--accent)' }}>{fmt.count(r.healthy)}</div>
+                        <div style={{ fontSize: '10px', color: 'var(--muted)' }}>سالم{brokenPct > 0 ? ` • ${fmt.num(brokenPct)}٪ شکسته` : ''}</div>
                       </div>
                     </div>
                   );
@@ -321,8 +323,8 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
                 {byWeekday.map((d, i) => (
                   <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: i === 0 ? 'var(--accent-soft)' : 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
                     <span style={{ flex: 1, fontWeight: i === 0 ? 700 : 600, color: i === 0 ? 'var(--accent)' : 'var(--text)', fontSize: 'var(--fs-sm)' }}>{d.name}</span>
-                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(d.total.toLocaleString('fa-IR'))} کل</span>
-                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: i === 0 ? 'var(--accent)' : 'var(--text)', minWidth: 60, textAlign: 'left' }}>{toFa(d.avg)}/روز</span>
+                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{fmt.count(d.total)} کل</span>
+                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: i === 0 ? 'var(--accent)' : 'var(--text)', minWidth: 60, textAlign: 'left' }}>{fmt.num(d.avg)}/روز</span>
                   </div>
                 ))}
               </div>
@@ -336,9 +338,9 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
               <div style={{ padding: '12px 14px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {dayRank.map((d, i) => (
                   <div key={d.date} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-                    <span style={{ minWidth: 26, color: 'var(--muted)', fontSize: 'var(--fs-sm)', textAlign: 'center', fontWeight: 600 }}>{toFa(i + 1)}</span>
-                    <span style={{ flex: 1, color: 'var(--text)', fontSize: 'var(--fs-sm)' }}>{toFa(d.date)}</span>
-                    <span style={{ color: 'var(--accent)', fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{toFa(d.healthy.toLocaleString('fa-IR'))}</span>
+                    <span style={{ minWidth: 26, color: 'var(--muted)', fontSize: 'var(--fs-sm)', textAlign: 'center', fontWeight: 600 }}>{fmt.count(i + 1)}</span>
+                    <span style={{ flex: 1, color: 'var(--text)', fontSize: 'var(--fs-sm)' }}>{fmt.date(d.date)}</span>
+                    <span style={{ color: 'var(--accent)', fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{fmt.count(d.healthy)}</span>
                   </div>
                 ))}
               </div>
@@ -386,8 +388,8 @@ function QualityBar({ icon, label, pct, count, total, color }: { icon: string; l
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-sm)' }}>
         <span>{icon}</span>
         <span style={{ color: 'var(--text)', fontWeight: 600, flex: 1 }}>{label}</span>
-        <span style={{ color: 'var(--muted)', fontSize: '10px' }}>{toFa(count.toLocaleString('fa-IR'))}/{toFa(total.toLocaleString('fa-IR'))}</span>
-        <span style={{ color, fontWeight: 700, minWidth: 48, textAlign: 'left', fontVariantNumeric: 'tabular-nums' }}>{toFa(pct)}٪</span>
+        <span style={{ color: 'var(--muted)', fontSize: '10px' }}>{getGlobalFormat().count(count)}/{getGlobalFormat().count(total)}</span>
+        <span style={{ color, fontWeight: 700, minWidth: 48, textAlign: 'left', fontVariantNumeric: 'tabular-nums' }}>{getGlobalFormat().num(pct)}٪</span>
       </div>
       <div style={{ height: 7, background: 'var(--input-bg)', borderRadius: 4, overflow: 'hidden' }}>
         <div style={{ height: '100%', width: `${Math.min(100, pct)}%`, background: color, borderRadius: 4, transition: 'width 250ms ease' }} />
