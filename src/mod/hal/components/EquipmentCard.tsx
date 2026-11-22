@@ -151,7 +151,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                     <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🤝 طرف تجاری</div>
                     <RowGrid>
                       {e.supplierId && <Row l="تأمین‌کننده" v={<EntityLink type="party" id={e.supplierId} label={supplierNames?.get(e.supplierId) || '—'} />} />}
-                      {e.sourceInvoiceId && <Row l="فاکتور خرید" v={<EntityLink type="invoice" id={e.sourceInvoiceId} label={invoiceNumbers?.get(e.sourceInvoiceId) || '—'} />} />}
+                      {e.sourceInvoiceId && <Row l="فاکتور خرید" v={<EntityLink type="invoice" id={e.sourceInvoiceId} label={invoiceNumbers?.get(e.sourceInvoiceId) || 'فاکتور حذف‌شده'} />} />}
                       {e.warehouseItemId && <Row l="کالای انبار" v={<EntityLink type="item" id={e.warehouseItemId} label={whsItemNames?.get(e.warehouseItemId) || '—'} />} />}
                     </RowGrid>
                   </>
@@ -294,7 +294,8 @@ export default function EquipmentCard(props: EquipmentCardProps) {
             ...ACTION_PRESETS.RESTORE,
             hidden: e.status !== 'retired',
             onClick: async () => {
-              const ok = await showConfirmAsync('تأیید بازگردانی', 'این تجهیز به لیست فعال‌ها برگردد؟', {});
+              const hasSaleInv = !!e.saleInfo?.saleInvoiceId;
+              const ok = await showConfirmAsync('تأیید بازگردانی', hasSaleInv ? 'این تجهیز قبلاً فروخته شده و فاکتور فروش در معاملات دارد. با بازگردانی، اطلاعات فروش روی تجهیز پاک می‌شود ولی فاکتور معاملات باید دستی بررسی شود. ادامه می‌دهید؟' : 'این تجهیز به لیست فعال‌ها برگردد؟', {});
               if (!ok) return;
               onRestore(e.id);
               logAction('update', 'hal', 'بازگردانی تجهیز: ' + e.name);

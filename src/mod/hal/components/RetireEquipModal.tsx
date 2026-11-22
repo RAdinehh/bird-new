@@ -66,7 +66,7 @@ export default function RetireEquipModal({ open, onClose, equipment, onConfirm }
   const qtyNum = Math.floor(Number(toEn(qtyStr)) || 0);
   const validQty = qtyNum >= 1 && qtyNum <= maxQty;
 
-  const totalCost = (equipment.unitPrice || 0) * (validQty ? qtyNum : maxQty);
+  const totalCost = (equipment.unitPrice || 0) * (validQty ? qtyNum : 0);
   const salePriceNum = reason === 'sale' ? (parseFloat(toEn(salePrice).replace('٫', '.')) || 0) : 0;
   const profit = salePriceNum - totalCost;
   const isLoss = profit < 0;
@@ -212,7 +212,7 @@ export default function RetireEquipModal({ open, onClose, equipment, onConfirm }
           fontSize: 'var(--fs-sm)',
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ color: 'var(--muted)' }}>قیمت خرید ({fmt.num(validQty ? qtyNum : maxQty)} {getUnitLabel(equipment.unit)}):</span>
+            <span style={{ color: 'var(--muted)' }}>قیمت خرید ({fmt.num(validQty ? qtyNum : 0)} {getUnitLabel(equipment.unit)}):</span>
             <b>{fmt.money(totalCost)}</b>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>

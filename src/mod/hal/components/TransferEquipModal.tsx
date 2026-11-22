@@ -101,7 +101,7 @@ export default function TransferEquipModal({ open, onClose, equipment, halls, zo
             value={toHallId}
             placeholder="— انتخاب کنید —"
             modalTitle="انتخاب سالن مقصد"
-            options={halls.map((h) => ({ value: String(h.id), label: String(h.name) }))}
+            options={halls.filter((h) => !h.archived).map((h) => ({ value: String(h.id), label: String(h.name) }))}
             onChange={(val: string) => {
               setToHallId(val);
               setToZoneId('');

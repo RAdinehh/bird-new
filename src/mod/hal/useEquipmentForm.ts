@@ -47,9 +47,10 @@ export function useEquipmentForm() {
   const markAuto = (field: string) => setAutoFields(s => new Set(s).add(field));
   const clearAuto = (field: string) => setAutoFields(s => { const n = new Set(s); n.delete(field); return n; });
 
-  const buildPayload = () => ({
+  const buildPayload = (validZoneIds?: Set<string>) => ({
+    ...(validZoneIds && form.zoneId && !validZoneIds.has(form.zoneId) ? { zoneId: undefined } : {}),
     hallId: form.hallId,
-    zoneId: form.zoneId || undefined,
+    zoneId: (validZoneIds && form.zoneId && !validZoneIds.has(form.zoneId)) ? undefined : (form.zoneId || undefined),
     category: form.category || 'auxiliary',
     type: form.type,
     name: form.name.trim(),

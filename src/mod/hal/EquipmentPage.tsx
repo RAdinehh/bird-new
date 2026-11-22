@@ -325,7 +325,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
                 onDelete={deleteEquip}
                 onRetire={(eq) => setRetireEq(eq)}
                 onTransfer={(eq) => setTransferEq(eq)}
-                onRestore={(id) => updateEquip(id, { status: 'active' })}
+                onRestore={(id) => updateEquip(id, { status: 'active', saleInfo: undefined })}
                 onUndo={(item) => {
                   setUndoData({ item });
                   setTimeout(() => setUndoData((cur) => cur && !Array.isArray(cur.item) && cur.item.id === item.id ? null : cur), 6000);
@@ -412,8 +412,12 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
           const finalInfo = saleInvoiceId ? { ...info, saleInvoiceId } : info;
 
           if (qty < totalCount) {
-            updateEquip(eq.id, { count: totalCount - qty });
-            const { id: _id, createdAt: _c, updatedAt: _u, ...rest } = eq;
+            const remainCount = totalCount - qty;
+            updateEquip(eq.id, { count: remainCount });
+            if (eq.warehouseItemId) {
+              try { useWhs.getState().updateItem(eq.warehouseItemId, { currentStock: remainCount }); } catch {}
+            }
+            const { id: _id, createdAt: _c, updatedAt: _u, warehouseItemId: _w, ...rest } = eq;
             addEquip({
               ...rest,
               count: qty,
@@ -422,6 +426,9 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
             });
           } else {
             updateEquip(eq.id, { status: 'retired', saleInfo: finalInfo });
+            if (eq.warehouseItemId) {
+              try { useWhs.getState().updateItem(eq.warehouseItemId, { currentStock: 0 }); } catch {}
+            }
           }
 
           logAction('update', 'hal', `${info.reason === 'sale' ? 'فروش' : 'اسقاط'} (${qty} عدد): ${eq.name} — ${info.reason === 'sale' ? getGlobalFormat().money(info.salePrice) : 'بدون مبلغ'}`);
@@ -464,23 +471,59 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
             createdAt: new Date().toISOString(),
           };
 
+          const targetDup = equipment.find(x =>
+            x.id !== eq.id &&
+            (x.status || 'active') === (eq.status || 'active') &&
+            x.hallId === toHallId &&
+            (x.zoneId || '') === (toZoneId || '') &&
+            x.name.trim() === eq.name.trim() &&
+            (x.type || '') === (eq.type || '') &&
+            (x.brand || '') === (eq.brand || '') &&
+            (x.unitPrice || 0) === (eq.unitPrice || 0)
+          );
+
           if (moveQty < totalCount) {
+            const remainCount = totalCount - moveQty;
             updateEquip(eq.id, {
-              count: totalCount - moveQty,
+              count: remainCount,
               transferHistory: [...(eq.transferHistory || []), log],
             });
-            const { id: _id, createdAt: _c, updatedAt: _u, ...rest } = eq;
-            addEquip({
-              ...rest,
-              hallId: toHallId,
-              zoneId: toZoneId,
-              count: moveQty,
-              transferHistory: [...(eq.transferHistory || []), log],
+            if (eq.warehouseItemId) {
+              try { useWhs.getState().updateItem(eq.warehouseItemId, { currentStock: remainCount }); } catch {}
+            }
+            if (targetDup) {
+              const newTargetCount = (targetDup.count || 0) + moveQty;
+              updateEquip(targetDup.id, {
+                count: newTargetCount,
+                transferHistory: [...(targetDup.transferHistory || []), log],
+              });
+              if (targetDup.warehouseItemId) {
+                try { useWhs.getState().updateItem(targetDup.warehouseItemId, { currentStock: newTargetCount }); } catch {}
+              }
+            } else {
+              const { id: _id, createdAt: _c, updatedAt: _u, warehouseItemId: _w, ...rest } = eq;
+              addEquip({
+                ...rest,
+                hallId: toHallId,
+                zoneId: toZoneId || undefined,
+                count: moveQty,
+                transferHistory: [...(eq.transferHistory || []), log],
+              });
+            }
+          } else if (targetDup) {
+            const newTargetCount = (targetDup.count || 0) + moveQty;
+            updateEquip(targetDup.id, {
+              count: newTargetCount,
+              transferHistory: [...(targetDup.transferHistory || []), log],
             });
+            if (targetDup.warehouseItemId) {
+              try { useWhs.getState().updateItem(targetDup.warehouseItemId, { currentStock: newTargetCount }); } catch {}
+            }
+            deleteEquip(eq.id);
           } else {
             updateEquip(eq.id, {
               hallId: toHallId,
-              zoneId: toZoneId,
+              zoneId: toZoneId || undefined,
               transferHistory: [...(eq.transferHistory || []), log],
             });
           }

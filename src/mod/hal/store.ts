@@ -182,7 +182,7 @@ const HALL_FIELD_BY_CAT: Record<string, keyof Hall | null> = {
  * آخرین تجهیز هر دسته = مقدار Hall (اولویت آخری که اضافه/ویرایش شده)
  */
 function computeHallPatch(hallId: string, equipment: Equipment[], hall: Hall | null): Partial<Hall> {
-  const hallEquip = equipment.filter(e => e.hallId === hallId);
+  const hallEquip = equipment.filter(e => e.hallId === hallId && e.status !== 'retired' && e.status !== 'archived');
   const patch: Partial<Hall> = {};
   // ── فیلدهای string (نوع تجهیز) ──
   Object.entries(HALL_FIELD_BY_CAT).forEach(([cat, field]) => {
