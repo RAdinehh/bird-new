@@ -221,11 +221,12 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
     // اعتبارسنجی آبشاری بر اساس دسته (Category)
     for (let i = 0; i < (d.items || []).length; i++) {
       const it = d.items[i];
-      
+      const itCat = it.category || d.category;
+
       // ۱. اگر دسته جوجه، پرنده بالغ یا تخم نطفه‌دار است -> انتخاب پرنده اجباری است
-      const isBirdOrEgg = ['chick', 'adult'].includes(d.category) || 
-        (d.type === 'purchase' && d.category === 'egg') || 
-        (d.type === 'sale' && d.category === 'fertile_egg');
+      const isBirdOrEgg = ['chick', 'adult'].includes(itCat) ||
+        (d.type === 'purchase' && itCat === 'egg') ||
+        (d.type === 'sale' && itCat === 'fertile_egg');
       if (isBirdOrEgg) {
         if (!it.birdId) {
           ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.birdRequired(), path: ['items', String(i), 'birdId'] });
@@ -233,15 +234,39 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
         if (!it.breedId) {
           ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.select('نژاد'), path: ['items', String(i), 'breedId'] });
         }
-        if (['chick', 'adult'].includes(d.category) && !it.hatchDate) {
+        if (['chick', 'adult'].includes(itCat) && !it.hatchDate) {
           ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.required('تاریخ هچ'), path: ['items', String(i), 'hatchDate'] });
+        }
+        // هماهنگی با قانون flk.ts: تاریخ هچ باید قبل یا مساوی تاریخ خرید/تحویل باشد
+        if (d.type === 'purchase' && !d.isPreorder && ['chick', 'adult'].includes(itCat) && it.hatchDate) {
+          const effPurchaseDate = d.deliveryDate || d.date;
+          if (effPurchaseDate && it.hatchDate > effPurchaseDate) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'تاریخ هچ باید قبل یا مساوی تاریخ خرید باشد', path: ['items', String(i), 'hatchDate'] });
+          }
+        }
+        // هماهنگی با قانون flk.ts: قیمت خرید هر پرنده بین ۱,۰۰۰ تا ۵,۰۰۰,۰۰۰ تومان
+        if (d.type === 'purchase' && ['chick', 'adult'].includes(itCat) && (it.priceUnit || 'perBird') !== 'perKg') {
+          const up = Number(it.unitPrice) || 0;
+          if (up > 0 && up < 1_000) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'قیمت هر پرنده باید حداقل ۱,۰۰۰ تومان باشد', path: ['items', String(i), 'unitPrice'] });
+          } else if (up > 5_000_000) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'قیمت هر پرنده بیش از حد مجاز (۵,۰۰۰,۰۰۰ تومان) است', path: ['items', String(i), 'unitPrice'] });
+          }
+        }
+        // هماهنگی با قانون flk.ts: مجموع نر و ماده از تعداد کل بیشتر نشود
+        if (['chick', 'adult'].includes(itCat)) {
+          const m = Number(it.maleCount) || 0;
+          const fe = Number(it.femaleCount) || 0;
+          const qty = Number(it.quantity) || 0;
+          if (qty > 0 && m + fe > qty) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'مجموع تعداد نر و ماده نمی‌تواند از تعداد کل بیشتر باشد', path: ['items', String(i), 'maleCount'] });
+          }
         }
       }
 
       // ۲. medicineType — فرم فیلد ندارد، اجبار حذف شد (Phase A)
 
       // ۳. تجهیزات: دسته و نوع اجباری
-      const itCat = it.category || d.category;
       if (itCat === 'equipment') {
         if (!it.equipmentCategory) {
           ctx.addIssue({ code: z.ZodIssueCode.custom, message: MSG.equipmentCategory(), path: ['items', String(i), 'equipmentCategory'] });
