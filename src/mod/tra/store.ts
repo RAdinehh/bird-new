@@ -93,12 +93,28 @@ export const useTra = create<State>()(
       allocations: [],
       reopenInvoice: (id) => {
         const prev = get().invoices.find(x => x.id === id);
-        if (!prev || !prev.paidAt) return;
-        set({
-          invoices: get().invoices.map(x => x.id === id
-            ? { ...x, paidAt: '', workflowStatus: 'confirmed', updatedAt: now() }
-            : x)
-        });
+        if (!prev) return;
+        const isClosed = Boolean(prev.paidAt) || prev.workflowStatus === 'paid' || Boolean(prev.writtenOff) || remaining(prev, get().allocations) <= 0;
+        if (!isClosed) return;
+        const nextInvoices = get().invoices.map(x => x.id === id
+          ? {
+              ...x,
+              paidAt: '',
+              paidNote: '',
+              workflowStatus: 'confirmed' as const,
+              writtenOff: false,
+              writtenOffAmount: 0,
+              writtenOffReason: '',
+              writtenOffAt: '',
+              updatedAt: now(),
+            }
+          : x);
+        set({ invoices: nextInvoices });
+        if (prev.partyId) {
+          try {
+            setPartyCredit(prev.partyId, computePartyCredit(prev.partyId, nextInvoices, get().allocations));
+          } catch {}
+        }
         try {
           void import('../../cor/logger/auditLog').then(m => {
             m.logAction('update', 'tra', 'بازگشایی فاکتور ' + (prev.number || id));
@@ -296,17 +312,30 @@ export const useTra = create<State>()(
         });
       },
       writeOffInvoice: (invoiceId, amount, reason) => {
+        const prev = get().invoices.find(i => i.id === invoiceId);
+        if (!prev) return;
+        const pendingChecks = (prev.payments || []).filter(p => p.method === 'check' && (p as any).checkStatus === 'pending');
+        if (pendingChecks.length > 0) {
+          showToast('این فاکتور چک پاس‌نشده دارد — ابتدا وضعیت چک را مشخص یا برگشت بزنید', 'error');
+          return;
+        }
+        const safeAmount = Math.max(0, Math.min(amount, remaining(prev, get().allocations)));
+        if (safeAmount <= 0) return;
         const today = getTodayJalali();
-        set({
-          invoices: get().invoices.map(i => i.id === invoiceId ? {
-            ...i,
-            writtenOff: true,
-            writtenOffAmount: amount,
-            writtenOffReason: reason,
-            writtenOffAt: today,
-            updatedAt: new Date().toISOString(),
-          } : i),
-        });
+        const nextInvoices = get().invoices.map(i => i.id === invoiceId ? {
+          ...i,
+          writtenOff: true,
+          writtenOffAmount: safeAmount,
+          writtenOffReason: reason,
+          writtenOffAt: today,
+          updatedAt: new Date().toISOString(),
+        } : i);
+        set({ invoices: nextInvoices });
+        if (prev.partyId) {
+          try {
+            setPartyCredit(prev.partyId, computePartyCredit(prev.partyId, nextInvoices, get().allocations));
+          } catch {}
+        }
       },
       restoreInvoice: (id) => {
         // 🆕 Atomic: peek first، pre-flight ALL (simulation)، سپس mutate
