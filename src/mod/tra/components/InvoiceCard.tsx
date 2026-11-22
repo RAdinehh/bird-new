@@ -87,7 +87,12 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
               {WORKFLOW_LABEL[inv.workflowStatus]}
             </Tag>
           )}
-          <Tag tone={st === 'paid' ? 'green' : st === 'partial' ? 'amber' : 'red'}>
+          {inv.writtenOff && (inv.writtenOffAmount || 0) > 0 && (
+              <Tag tone={inv.type === 'purchase' ? 'amber' : 'red'}>
+                {inv.type === 'purchase' ? 'بخشش مانده' : 'حذف بدحساب'}
+              </Tag>
+            )}
+            <Tag tone={st === 'paid' ? 'green' : st === 'partial' ? 'amber' : 'red'}>
             {STATUS_LABEL[st as keyof typeof STATUS_LABEL] || '—'}
           </Tag>
         </div>
@@ -136,6 +141,12 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
         {inv.number ? <Row l="شماره" v={formatInvoiceNumber(inv.number)} /> : null}
         {inv.dueDate ? <Row l="سرسید" v={fmt.date(inv.dueDate)} /> : null}
         {inv.isPreorder && inv.deliveryDate ? <Row l="📅 تحویل" v={fmt.date(inv.deliveryDate)} /> : null}
+          {inv.writtenOff && (inv.writtenOffAmount || 0) > 0 ? (
+            <Row
+              l={inv.type === 'purchase' ? 'بخشش مانده' : 'حذف بدحساب'}
+              v={`${fmt.money(inv.writtenOffAmount || 0, { withUnit: false })} تومان${inv.writtenOffReason ? ` (${inv.writtenOffReason})` : ''}`}
+            />
+          ) : null}
       </RowGrid>
 
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام</SectionTitle>

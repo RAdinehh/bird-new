@@ -538,20 +538,35 @@ return (
                 ms={ms}
                 onToggle={() => setExpandedId(isOpen ? null : inv.id)}
                 onTransferClick={() => setTransferModal({ id: inv.id, to: nextWorkflowStatus(inv.workflowStatus)! })}
-                onReopen={remaining(inv) <= 0 ? () => handleReopen(inv) : undefined}
-          onEdit={remaining(inv) > 0 && !inv.paidAt ? () => openEdit(inv) : undefined}
-          onDispute={!inv.disputeStatus ? () => setDisputeTarget(inv) : undefined}
+                onReopen={remaining(inv, allocations) <= 0 ? () => handleReopen(inv) : undefined}
+                onEdit={remaining(inv, allocations) > 0 && !inv.paidAt && inv.disputeStatus !== 'open' ? () => openEdit(inv) : undefined}
+          onDispute={inv.disputeStatus !== 'open' && remaining(inv, allocations) > 0 ? () => setDisputeTarget(inv) : undefined}
           onResolveDispute={inv.disputeStatus === 'open' ? () => resolveDispute(inv.id) : undefined}
-          onWriteOff={!inv.writtenOff && remaining(inv, allocations) > 0 ? async () => {
+          onWriteOff={!inv.writtenOff && inv.disputeStatus !== 'open' && remaining(inv, allocations) > 0 ? async () => {
+            const pendingChecks = (inv.payments || []).filter(p => p.method === 'check' && (p as any).checkStatus === 'pending');
+            if (pendingChecks.length > 0) {
+              toastMsg.error('این فاکتور چک پاس‌نشده دارد — ابتدا وضعیت چک را مشخص یا برگشت بزنید');
+              return;
+            }
             const rem = remaining(inv, allocations);
             const reason = await showPromptAsync(
-              'حذف بدحساب',
-              `مبلغ ${fmt.money(rem, { withUnit: false })} تومان به عنوان بدحساب حذف می‌شود. این عمل قابل بازگشت نیست.`,
-              { label: 'دلیل', placeholder: 'مثلاً: وصول نشد — مبلغ کم', required: true, multiline: true, rows: 2, danger: true, confirmText: 'حذف کن' },
+              isPurchase ? 'بخشش مانده' : 'حذف بدحساب',
+              isPurchase
+                ? `مبلغ ${fmt.money(rem, { withUnit: false })} تومان به عنوان بخشش مانده توسط فروشنده از بدهی کسر می‌شود.`
+                : `مبلغ ${fmt.money(rem, { withUnit: false })} تومان به عنوان بدحساب حذف می‌شود.`,
+              {
+                label: 'دلیل',
+                placeholder: isPurchase ? 'مثلاً: تخفیف تسویه / رند کردن فاکتور' : 'مثلاً: وصول نشد — مبلغ کم',
+                required: true,
+                multiline: true,
+                rows: 2,
+                danger: !isPurchase,
+                confirmText: isPurchase ? 'ثبت بخشش' : 'حذف کن',
+              },
             );
             if (!reason || !reason.trim()) return;
             writeOffInvoice(inv.id, rem, reason.trim());
-            toastMsg.success('مبلغ به عنوان بدحساب حذف شد');
+            toastMsg.success(isPurchase ? 'بخشش مانده ثبت شد' : 'مبلغ به عنوان بدحساب حذف شد');
           } : undefined}
                 index={i}
               />
