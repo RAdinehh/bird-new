@@ -37,12 +37,14 @@ export interface EquipmentFormModalProps {
   save: () => void;
   suppliers?: Person[];
   stdForDefaults?: BirdStandard | null;
+  activeBirdCount?: number;
+  activeFlockCount?: number;
   /** 🆕 پاک کردن خطا هنگام تایپ */
   onErrorClear?: () => void;
 }
 
 export default function EquipmentFormModal(props: EquipmentFormModalProps) {
-  const { open, setOpen, form, setForm, err, vErrors, halls, zones, equipment, autoFields, clearAuto, markAuto, typesForCategory, equipNeed, save, suppliers, stdForDefaults, onErrorClear } = props;
+  const { open, setOpen, form, setForm, err, vErrors, halls, zones, equipment, autoFields, clearAuto, markAuto, typesForCategory, equipNeed, save, suppliers, stdForDefaults, activeBirdCount = 0, activeFlockCount = 0, onErrorClear } = props;
 
   const mapPrimaryUnit = (u?: string): EquipmentFormData['unit'] => {
     if (u === 'm²' || u === 'm2') return 'm2';
@@ -253,6 +255,11 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
 
                     const selHall = halls.find((h: Hall) => h.id === form.hallId);
                     const hallCap = selHall?.capacity || 0;
+                    const hasFlock = activeBirdCount > 0;
+                    const targetBirds = hasFlock ? activeBirdCount : hallCap;
+                    const basisLabel = hasFlock
+                      ? (activeFlockCount > 1 ? `${toFa(activeFlockCount)} گله فعال (${toFa(activeBirdCount)} راس)` : `گله فعال (${toFa(activeBirdCount)} راس)`)
+                      : (hallCap > 0 ? `ظرفیت سالن (${toFa(hallCap)} راس)` : "");
                     const l = selHall?.length || 0;
                     const w = selHall?.width || 0;
                     const h = selHall?.height || 0;
@@ -308,10 +315,11 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                       }
                       const isFanType = ["fan_tunnel", "fan_ceiling", "fan"].includes(t);
                       if (isFanType) {
-                        if (hallCap > 0) {
+                        if (targetBirds > 0) {
+                          if (basisLabel) rows.push({ label: "معیار سنجش:", value: basisLabel });
                           const stdCoef = stdForDefaults?.equipment?.fanM3PerKg || 4.5;
                           const targetW = stdForDefaults?.growth?.weightByAge?.[stdForDefaults.growth.weightByAge.length - 1]?.weightG || 2000;
-                          const needM3h = Math.ceil(((hallCap * targetW) / 1000) * stdCoef);
+                          const needM3h = Math.ceil(((targetBirds * targetW) / 1000) * stdCoef);
                           const diff = Math.round(totalVal - needM3h);
                           statusText = diff >= 0
                             ? `کافی (نیاز ${fmtInt(needM3h)} m³/h | +${toFa(diff)})`
@@ -329,11 +337,12 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                         label: "ظرفیت پوشش کل:",
                         value: `${priStr} × ${secStr} = ${totStr} راس`,
                       });
-                      if (hallCap > 0) {
-                        const diff = Math.round(totalVal - hallCap);
+                      if (targetBirds > 0) {
+                        if (basisLabel) rows.push({ label: "معیار سنجش:", value: basisLabel });
+                        const diff = Math.round(totalVal - targetBirds);
                         statusText = diff >= 0
-                          ? `کافی (${totStr} در برابر ${toFa(hallCap)} راس | +${toFa(diff)})`
-                          : `کم داره (${totStr} در برابر ${toFa(hallCap)} راس | -${toFa(Math.abs(diff))})`;
+                          ? `کافی (${totStr} در برابر ${toFa(targetBirds)} راس | +${toFa(diff)})`
+                          : `کم داره (${totStr} در برابر ${toFa(targetBirds)} راس | -${toFa(Math.abs(diff))})`;
                       } else {
                         statusText = `${totStr} راس پوشش`;
                       }
@@ -359,9 +368,10 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                       if (hallArea > 0) {
                         const wPerM2 = Math.round((totalVal * 1000) / hallArea);
                         statusText = `${fmtInt(totalVal * 1000)} W ÷ ${fmtInt(hallArea)} m² = ${toFa(wPerM2)} W/m²`;
-                      } else if (hallCap > 0) {
-                        const wPerBird = Math.round((totalVal * 1000) / hallCap);
-                        statusText = `${fmtInt(totalVal * 1000)} W ÷ ${toFa(hallCap)} راس = ${toFa(wPerBird)} W/راس`;
+                      } else if (targetBirds > 0) {
+                        if (basisLabel) rows.push({ label: "معیار سنجش:", value: basisLabel });
+                        const wPerBird = Math.round((totalVal * 1000) / targetBirds);
+                        statusText = `${fmtInt(totalVal * 1000)} W ÷ ${toFa(targetBirds)} راس = ${toFa(wPerBird)} W/راس`;
                       } else {
                         statusText = `${totStr} kW کل توان`;
                       }

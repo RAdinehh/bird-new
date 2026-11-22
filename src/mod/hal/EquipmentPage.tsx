@@ -58,9 +58,17 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
   const hallArea = __selectedHall
     ? (__selectedHall.length || 0) * (__selectedHall.width || 0)
     : 0;
-  const equipNeed = calcEquipNeed(form.type, form.hallId, flocks || [], breedStd, hallArea);
-  // 🆕 استاندارد نژاد سالن انتخاب‌شده
-  const selectedBreedStd = __selectedHall?.breedId ? breedStd.byBreedId(__selectedHall.breedId) : null;
+  const activeHallFlocks = useMemo(
+    () => (flocks || []).filter((f) => f.hallId === form.hallId && f.status === 'active' && !f.paused),
+    [flocks, form.hallId]
+  );
+  const activeBirdCount = useMemo(
+    () => activeHallFlocks.reduce((sum, f) => sum + (f.currentCount || 0), 0),
+    [activeHallFlocks]
+  );
+  const activeFlockBreedId = activeHallFlocks.find((f) => !!f.breedId)?.breedId || __selectedHall?.breedId;
+  const selectedBreedStd = activeFlockBreedId ? breedStd.byBreedId(activeFlockBreedId) : null;
+  const equipNeed = calcEquipNeed(form.type, form.hallId, flocks || [], breedStd, hallArea, __selectedHall?.capacity || 0);
   const [transferEq, setTransferEq] = useState<Equipment | null>(null);
   const [retireEq, setRetireEq] = useState<Equipment | null>(null);
   const [undoData, setUndoData] = useState<{ item: Equipment | Equipment[] } | null>(null);
@@ -355,6 +363,8 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
         typesForCategory={typesForCategory}
         equipNeed={equipNeed}
         stdForDefaults={selectedBreedStd}
+        activeBirdCount={activeBirdCount}
+        activeFlockCount={activeHallFlocks.length}
         save={handleSave}
       />
           <RetireEquipModal

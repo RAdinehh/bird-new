@@ -66,61 +66,55 @@ export function getCapacityHint(type: string, cap: number | null, hallVol: numbe
 }
 
 
-/** محاسبه نیاز تجهیزات بر اساس گله فعال سالن و استاندارد نژاد */
+/** محاسبه نیاز تجهیزات بر اساس مجموع گله‌های فعال سالن و استاندارد نژاد */
 export function calcEquipNeed(
   type: string,
   hallId: string,
   flocks: Flock[],
   breedStd: { byBreedId: (breedId: string | null | undefined) => BirdStandard | null } | null | undefined,
   hallArea: number,
-): { need: number; unit: string; desc: string } | null {
-  // گله فعال این سالن
-  const flock = flocks.find((f: Flock) => f.hallId === hallId && f.status === 'active' && !f.paused);
-  if (!flock) return null;
+  fallbackHallCap: number = 0,
+): { need: number; unit: string; desc: string; source: "flock" | "hall"; birdCount: number; flockCount: number } | null {
+  const activeFlocks = flocks.filter((f: Flock) => f.hallId === hallId && f.status === "active" && !f.paused);
+  const flockBirds = activeFlocks.reduce((sum: number, f: Flock) => sum + (f.currentCount || 0), 0);
+  const hasActiveFlock = flockBirds > 0;
+  const count = hasActiveFlock ? flockBirds : fallbackHallCap;
+  const source: "flock" | "hall" = hasActiveFlock ? "flock" : "hall";
+  const flockCount = activeFlocks.length;
 
-  const std = breedStd?.byBreedId(flock.breedId);
-  if (!std || !std.equipment) return null;
+  const primaryFlockWithBreed = activeFlocks.find((f: Flock) => !!f.breedId);
+  const std = breedStd?.byBreedId(primaryFlockWithBreed?.breedId);
 
-  const count = flock.currentCount || 0;
+  if (["lamp_led", "lamp_fluorescent", "lamp"].includes(type) && hallArea > 0) {
+    const w = std?.equipment?.lampWattPerM2 || 3;
+    const totalW = Math.ceil(hallArea * w);
+    return { need: totalW, unit: "W", desc: hallArea + " m² × " + w + " W/m²", source, birdCount: count, flockCount };
+  }
+
   if (count <= 0) return null;
 
-  if (type === 'feeder') {
-    const eq = std.equipment.feeder;
-    if (eq.panBirdsPerUnit) {
-      const need = Math.ceil(count / eq.panBirdsPerUnit);
-      return { need, unit: 'عدد', desc: count + ' پرنده ÷ ' + eq.panBirdsPerUnit + ' پرنده/واحد' };
-    }
-    if (eq.chainCmPerBird) {
-      const meters = Math.ceil((count * eq.chainCmPerBird) / 100);
-      return { need: meters, unit: 'متر', desc: count + ' پرنده × ' + eq.chainCmPerBird + ' سانتی‌متر' };
-    }
-  }
-
-  if (type === 'drinker') {
-    const eq = std.equipment.drinker;
-    if (eq.nippleBirdsPerUnit) {
-      const need = Math.ceil(count / eq.nippleBirdsPerUnit);
-      return { need, unit: 'عدد', desc: count + ' پرنده ÷ ' + eq.nippleBirdsPerUnit + ' پرنده/نوپل' };
-    }
-    if (eq.cupBirdsPerUnit) {
-      const need = Math.ceil(count / eq.cupBirdsPerUnit);
-      return { need, unit: 'عدد', desc: count + ' پرنده ÷ ' + eq.cupBirdsPerUnit + ' پرنده/کاپ' };
+  const def = getEquipUnit(type);
+  if (def.baseUnit === "راس") {
+    const stdPerUnit = getStdDefaultForType(type, std) || def.secondary?.defaultValue || 0;
+    if (stdPerUnit > 0) {
+      const need = Math.ceil(count / stdPerUnit);
+      return {
+        need,
+        unit: def.primary.unit || "عدد",
+        desc: count + " راس ÷ " + stdPerUnit + " راس/واحد",
+        source,
+        birdCount: count,
+        flockCount,
+      };
     }
   }
 
-  if (type === 'lamp' && hallArea > 0) {
-    const w = std.equipment.lampWattPerM2 || 3;
-    const totalW = Math.ceil(hallArea * w);
-    return { need: totalW, unit: 'W', desc: hallArea + ' m² × ' + w + ' W/m²' };
-  }
-
-  if (type === 'fan') {
-    const kg = std.equipment.fanM3PerKg || 4.5;
-    // وزن هدف از growth یا فرض ۲ کیلوگرم
-    const targetW = std.growth?.weightByAge?.[std.growth.weightByAge.length - 1]?.weightG || 2000;
+  if (["fan_tunnel", "fan_ceiling", "fan"].includes(type)) {
+    const kg = std?.equipment?.fanM3PerKg || 4.5;
+    const targetW = std?.growth?.weightByAge?.[std.growth.weightByAge.length - 1]?.weightG || 2000;
     const totalKg = (count * targetW) / 1000;
     const need = Math.ceil(totalKg * kg);
-    return { need, unit: 'm³/h', desc: 'وزن کل ' + Math.round(totalKg) + ' kg × ' + kg };
+    return { need, unit: "m³/h", desc: "وزن کل " + Math.round(totalKg) + " kg × " + kg, source, birdCount: count, flockCount };
   }
 
   return null;
