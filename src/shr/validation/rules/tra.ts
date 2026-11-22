@@ -325,6 +325,15 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       }
     }
 
+    // 🆕 سررسید فاکتور در حالت غیرنقدی نباید قبل از تاریخ فاکتور باشد
+    if (d.paymentTerms && d.paymentTerms !== 'cash' && d.dueDate && d.date && d.dueDate < d.date) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'تاریخ سررسید نمی‌تواند قبل از تاریخ فاکتور باشد',
+        path: ['dueDate'],
+      });
+    }
+
     // 🆕 priceUnit = perKg → liveWeight اجباری (همه انواع)
     for (let i = 0; i < (d.items || []).length; i++) {
       const it = d.items[i];

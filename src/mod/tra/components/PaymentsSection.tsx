@@ -136,9 +136,12 @@ export default function PaymentsSection({
                     const newVal = e.target.value;
                     const cnt = parseInt(toEn(newVal)) || 0;
                     const gap = parseInt(toEn(form.installmentGapDays)) || 30;
-                    const advanceAmt = form.isPreorder && form.advanceType === 'amount'
-                      ? (parseFloat(toEn(form.advanceValue).replace('٫','.')) || 0)
-                      : 0;
+                    const rawAdv = form.isPreorder
+    ? (form.advanceType === 'percent'
+        ? Math.round(total * ((parseFloat(toEn(form.advanceValue).replace('٫','.')) || 0) / 100))
+        : (parseFloat(toEn(form.advanceValue).replace('٫','.')) || 0))
+    : 0;
+  const advanceAmt = Math.min(total, Math.max(0, rawAdv));
                     const newInst = cnt > 0 ? generateInstallments(total, cnt, gap, form.date, advanceAmt) : [];
                     setForm(f => ({ ...f, installmentCount: newVal, installments: newInst}));
                   }} unit="قسط" min={0} />
@@ -148,9 +151,12 @@ export default function PaymentsSection({
                     const newVal = e.target.value;
                     const cnt = parseInt(toEn(form.installmentCount)) || 0;
                     const gap = parseInt(toEn(newVal)) || 30;
-                    const advanceAmt = form.isPreorder && form.advanceType === 'amount'
-                      ? (parseFloat(toEn(form.advanceValue).replace('٫','.')) || 0)
-                      : 0;
+                    const rawAdv = form.isPreorder
+    ? (form.advanceType === 'percent'
+        ? Math.round(total * ((parseFloat(toEn(form.advanceValue).replace('٫','.')) || 0) / 100))
+        : (parseFloat(toEn(form.advanceValue).replace('٫','.')) || 0))
+    : 0;
+  const advanceAmt = Math.min(total, Math.max(0, rawAdv));
                     const newInst = cnt > 0 ? generateInstallments(total, cnt, gap, form.date, advanceAmt) : [];
                     setForm(f => ({ ...f, installmentGapDays: newVal, installments: newInst}));
                   }} unit="روز" min={0} />
@@ -162,14 +168,20 @@ export default function PaymentsSection({
                 const toEnLocal = (s: string) => s.replace(/[۰-۹]/g, (d: string) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
                 const cnt = parseInt(toEnLocal(form.installmentCount)) || 0;
                 const gap = parseInt(toEnLocal(form.installmentGapDays)) || 30;
-                const advanceAmt = form.isPreorder && form.advanceType === 'amount' ? (parseFloat(toEnLocal(form.advanceValue).replace('٫','.')) || 0) : 0;
                 const totalBase = total;
+                const rawAdvLocal = form.isPreorder
+                  ? (form.advanceType === 'percent'
+                      ? Math.round(totalBase * ((parseFloat(toEnLocal(form.advanceValue).replace('٫','.')) || 0) / 100))
+                      : (parseFloat(toEnLocal(form.advanceValue).replace('٫','.')) || 0))
+                  : 0;
+                const advanceAmt = Math.min(totalBase, Math.max(0, rawAdvLocal));
                 const generated = generateInstallments(totalBase, cnt, gap, form.date, advanceAmt);
                 // detect stale form.installments (total/count/gap changed)
                 const savedInst = form.installments || [];
                 const savedSum = savedInst.reduce((a: number, x: any) => a + (x.amount || 0), 0);
                 const expectedSum = Math.max(0, totalBase - advanceAmt);
-                const isStale = savedInst.length !== cnt || Math.abs(savedSum - expectedSum) > 100;
+                const isDateBeforeInvoice = !!(form.date && savedInst[0]?.dueDate && savedInst[0].dueDate < form.date);
+          const isStale = savedInst.length !== cnt || Math.abs(savedSum - expectedSum) > 100 || isDateBeforeInvoice;
                 const preview = isStale ? generated : savedInst;
                 if (preview.length === 0) return null;
                 return (

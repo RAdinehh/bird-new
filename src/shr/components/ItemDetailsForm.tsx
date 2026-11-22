@@ -278,7 +278,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* ردیف ۲: تاریخ هچ + سن */}
         <Grid2>
           {isPurchase ? (
-            <Field label="تاریخ هچ" required error={err('hatchDate')} onTouch={touch('hatchDate')}>
+            <Field label="تاریخ هچ" required error={err('hatchDate')} onTouch={touch('hatchDate')} hint={category === 'chick' && (item.ageDays ?? 0) > 14 ? '💡 سن بیش از ۱۴ روز (گله دوره قبل یا نیمچه)' : undefined}>
               <DatePicker value={String(item.hatchDate || '')} onChange={v => {
                 const age = computeAgeFromHatch(v);
                 updateItem({ hatchDate: v, ageDays: age });
