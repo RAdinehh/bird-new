@@ -1,6 +1,8 @@
 /**
  * FlockCapacityCard.tsx — کارت ظرفیت سالن + breakdown بخش‌ها
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { toFa } from '../../../shr/utils/fa';
 import type { HallCapacityResult, ZoneBreakdown } from '../api/hallCapacity';
 
@@ -9,6 +11,7 @@ interface Props {
 }
 
 export default function FlockCapacityCard({ hallCapacity }: Props) {
+  const fmt = useFormat();
   if (!hallCapacity) return null;
 
   return (
@@ -25,9 +28,9 @@ export default function FlockCapacityCard({ hallCapacity }: Props) {
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--sp-2)', marginBottom: 6, flexWrap: 'wrap' }}>
         <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)' }}>
-          {hallCapacity.ok ? '✅ ظرفیت کافیه' : '⚠️ اضافه‌بار ' + toFa(hallCapacity.over) + ' پرنده'}
+          {hallCapacity.ok ? '✅ ظرفیت کافیه' : '⚠️ اضافه‌بار ' + fmt.count(hallCapacity.over) + ' پرنده'}
         </span>
-        <span style={{ opacity: 0.85 }}>سالن {hallCapacity.scopeName} · {toFa(hallCapacity.capacity)} ظرفیت</span>
+        <span style={{ opacity: 0.85 }}>سالن {hallCapacity.scopeName} · {fmt.count(hallCapacity.capacity)} ظرفیت</span>
       </div>
 
       {hallCapacity.breakdown && (
@@ -37,13 +40,13 @@ export default function FlockCapacityCard({ hallCapacity }: Props) {
             <span style={{ display: 'flex', gap: 'var(--sp-3)', flexShrink: 0 }}>
               {hallCapacity.breakdown.noZone.used > 0 ? (
                 <>
-                  <span>{toFa(hallCapacity.breakdown.noZone.used)} پرنده</span>
-                  <span style={{ opacity: 0.75, minWidth: 60, textAlign: 'left' }}>({toFa(hallCapacity.breakdown.noZone.remaining)} خالی)</span>
+                  <span>{fmt.count(hallCapacity.breakdown.noZone.used)} پرنده</span>
+                  <span style={{ opacity: 0.75, minWidth: 60, textAlign: 'left' }}>({fmt.count(hallCapacity.breakdown.noZone.remaining)} خالی)</span>
                 </>
               ) : (
                 <>
                   <span style={{ opacity: 0.6 }}>خالی</span>
-                  <span style={{ opacity: 0.75, minWidth: 60, textAlign: 'left' }}>({toFa(hallCapacity.breakdown.noZone.capacity)} ظرفیت)</span>
+                  <span style={{ opacity: 0.75, minWidth: 60, textAlign: 'left' }}>({fmt.count(hallCapacity.breakdown.noZone.capacity)} ظرفیت)</span>
                 </>
               )}
             </span>
@@ -57,18 +60,18 @@ export default function FlockCapacityCard({ hallCapacity }: Props) {
                 <span style={{ display: 'flex', gap: 'var(--sp-3)', flexShrink: 0 }}>
                   {z.used > 0 ? (
                     <>
-                      <span>{toFa(z.used)} از {toFa(z.capacity)}</span>
-                      <span style={{ opacity: 0.75, minWidth: 60, textAlign: 'left' }}>({toFa(z.remaining)} خالی)</span>
+                      <span>{fmt.count(z.used)} از {fmt.count(z.capacity)}</span>
+                      <span style={{ opacity: 0.75, minWidth: 60, textAlign: 'left' }}>({fmt.count(z.remaining)} خالی)</span>
                     </>
                   ) : z.isCurrent ? (
                     <>
                       <span>این گله اینجا</span>
-                      <span style={{ opacity: 0.75, minWidth: 60, textAlign: 'left' }}>({toFa(z.capacity)} ظرفیت)</span>
+                      <span style={{ opacity: 0.75, minWidth: 60, textAlign: 'left' }}>({fmt.count(z.capacity)} ظرفیت)</span>
                     </>
                   ) : (
                     <>
                       <span style={{ opacity: 0.6 }}>خالی</span>
-                      <span style={{ opacity: 0.75, minWidth: 60, textAlign: 'left' }}>({toFa(z.capacity)} ظرفیت)</span>
+                      <span style={{ opacity: 0.75, minWidth: 60, textAlign: 'left' }}>({fmt.count(z.capacity)} ظرفیت)</span>
                     </>
                   )}
                 </span>
@@ -79,13 +82,13 @@ export default function FlockCapacityCard({ hallCapacity }: Props) {
       )}
 
       <div style={{ paddingTop: 6, marginTop: 6, borderTop: '1px dashed currentColor', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--sp-2)', flexWrap: 'wrap' }}>
-        <span>این گله: <b>{toFa(hallCapacity.total - hallCapacity.current)}</b> پرنده</span>
+        <span>این گله: <b>{fmt.count(hallCapacity.total - hallCapacity.current)}</b> پرنده</span>
         <span style={{ fontWeight: 700 }}>
-          مجموع {toFa(hallCapacity.total)} از {toFa(hallCapacity.capacity)}
+          مجموع {fmt.count(hallCapacity.total)} از {fmt.count(hallCapacity.capacity)}
           {' · '}
           {hallCapacity.over > 0
-            ? <span style={{ color: 'var(--danger)' }}>اضافه {toFa(hallCapacity.over)}</span>
-            : <span>{toFa(hallCapacity.remaining)} خالی</span>}
+            ? <span style={{ color: 'var(--danger)' }}>اضافه {fmt.count(hallCapacity.over)}</span>
+            : <span>{fmt.count(hallCapacity.remaining)} خالی</span>}
         </span>
       </div>
     </div>

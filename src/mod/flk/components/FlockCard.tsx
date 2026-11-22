@@ -2,6 +2,8 @@
  * FlockCard.tsx — کارت نمایش یک گله
  * طراحی: Grid2 برای فیلدهای کوتاه + EntityLink بین‌ماژولی
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import {
   type Flock, SOURCE_LABEL, getAgeDays, getLifecycle,
@@ -23,7 +25,6 @@ import { BadgeOverflow } from '../../../shr/components/ui/BadgeOverflow';
 import FlockHistoryModal from './FlockHistoryModal';
 import type { Bird, Breed } from '../../brd/store';
 import type { Hall, Zone } from '../../hal/store';
-import type { useFormat } from '../../../shr/units';
 import type { MultiSelectState } from '../../../shr/multiSelect/useMultiSelect';
 import { CardActions } from '../../../shr/components/ui';
 import { ACTION_PRESETS } from '../../../shr/constants/cardActions';
@@ -221,7 +222,7 @@ export default function FlockCard(props: FlockCardProps) {
       key: 'merged',
       node: (
         <Tag tone="purple">
-          ادغام‌شده ({toFa(_mergedSourcesCount)})
+          ادغام‌شده ({fmt.count(_mergedSourcesCount)})
         </Tag>
       ),
     });
@@ -262,7 +263,7 @@ export default function FlockCard(props: FlockCardProps) {
       id={f.id}
       ms={ms}
       accent={accentColor}
-      index={toFa(i + 1)}
+      index={fmt.count(i + 1)}
       iconEmoji={speciesEmoji}
       title={f.name}
       subtitle={[bird?.name || '—', breed?.name || (f.breedKind === 'mixed' ? f.breedLabel : ''), hall?.name].filter(Boolean).join(' • ')}
@@ -290,7 +291,7 @@ export default function FlockCard(props: FlockCardProps) {
               )}
               {deaths > 0 && (
                 <span style={{ color: danger ? 'var(--danger)' : 'var(--warn)', fontWeight: danger ? 700 : 500 }} title="تلفات">
-                  💀 <b>{fmt.int(deaths)}</b>{deathsPct > 0 ? ` (${toFa(deathsPct.toFixed(1))}٪)` : ''}
+                  💀 <b>{fmt.int(deaths)}</b>{deathsPct > 0 ? ` (${fmt.num(deathsPct)}٪)` : ''}
                 </span>
               )}
             </>

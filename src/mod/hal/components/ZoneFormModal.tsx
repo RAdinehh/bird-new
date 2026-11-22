@@ -2,6 +2,8 @@
  * ZoneFormModal — مودال فرم بخش (Zone)
  * استخراج‌شده از ZonesPage طبق FOUNDATION ۳.۳ (فایل ≤ ۴۰۰ خط)
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { Btn, BtnRow, ErrorBox, Field, Grid2, Input, Modal, NumField, Textarea } from '../../../shr/components/ui';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import type { Hall } from '../store';
@@ -38,6 +40,7 @@ interface Props {
 export default function ZoneFormModal({
   open, onClose, form, setForm, err, vErrors, crossError, halls, birds, breeds, save, onErrorClear, hallCap, hallRemaining,
 }: Props) {
+  const fmt = useFormat();
   const isEdit = !!form.id;
 
   return (
@@ -96,8 +99,8 @@ export default function ZoneFormModal({
           hint={
             hallCap != null
               ? hallRemaining != null && hallRemaining > 0
-                ? `ظرفیت سالن: ${toFa(hallCap)} — باقی‌مونده: ${toFa(hallRemaining)}`
-                : `ظرفیت سالن: ${toFa(hallCap)} — اشغال کامل`
+                ? `ظرفیت سالن: ${fmt.count(hallCap)} — باقی‌مونده: ${fmt.count(hallRemaining)}`
+                : `ظرفیت سالن: ${fmt.count(hallCap)} — اشغال کامل`
               : 'ظرفیت در تب سالن‌ها تنظیم نشده'
           }
         >

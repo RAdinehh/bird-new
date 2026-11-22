@@ -1,5 +1,5 @@
+import { useFormat } from '../../../shr/units/useFormat';
 import { useNavigate } from 'react-router-dom';
-import { useFormat } from "../../../shr/units/useFormat";
 /**
  * EquipmentCard — کارت تجهیز
  */

@@ -1,6 +1,8 @@
 /**
  * FlocksPage — گله‌ها (carousel tabs مثل hal)
  */
+import { useFormat } from '../../shr/units/useFormat';
+
 import { useState, useMemo, useEffect, useRef} from 'react';
 import { useFlk } from './store';
 import { useBrd, type Bird, type Breed } from '../brd/store';
@@ -13,7 +15,6 @@ import { useFlocksKpi } from './hooks/useFlocksKpi';
 import { useTabBadge } from './hooks/useTabBadge';
 import { useCarousel } from '../../shr/hooks/useCarousel';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
-import { useFormat } from '../../shr/units';
 import { useValidation } from '../../shr/validation/useValidation';
 import { useFormErrors } from '../../shr/hooks/useFormErrors';
 import { createFlkSchema } from '../../shr/validation/rules/flk';
@@ -459,7 +460,7 @@ export default function FlocksPage() {
                     dueDate: '',
                     relatedFlockId: saveResult.id,
                     relatedEntryId: '',
-                    notes: 'خودکار از گله دستی «' + form.name + '»' + (_other > 0 ? ' · سایر هزینه‌ها: ' + toFa(_other.toLocaleString('fa-IR')) + ' ت' : ''),
+                    notes: 'خودکار از گله دستی «' + form.name + '»' + (_other > 0 ? ' · سایر هزینه‌ها: ' + fmt.money(_other) : ''),
                   } as any);
                   if (invId) {
                     // 🆕 Fix double-count: cascade گله رو از قبل با _qty ساخته بود،

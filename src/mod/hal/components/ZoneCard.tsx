@@ -1,6 +1,8 @@
 /**
  * ZoneCard — کارت بخش (استخراج‌شده از ZonesPage طبق FOUNDATION ۳.۳)
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import EntityLink from '../../../shr/components/EntityLink';
 import { Btn, Tag } from '../../../shr/components/ui';
@@ -27,31 +29,32 @@ interface Props {
 export default function ZoneCard({
   zone: z, index, hall, flocks, isOpen, onToggle, ms, onEdit, onDelete,
 }: Props) {
+  const fmt = useFormat();
   return (
     <ExpandableCard
       id={z.id}
       ms={ms}
       accent="purple"
-      index={toFa(index + 1)}
+      index={fmt.count(index + 1)}
       iconEmoji="🗂"
       title={z.name}
       subtitle=""
       isOpen={isOpen}
       onToggle={onToggle}
-      badge={z.capacity ? <Tag tone="purple">{toFa(z.capacity)} پرنده</Tag> : undefined}
+      badge={z.capacity ? <Tag tone="purple">{fmt.count(z.capacity)} پرنده</Tag> : undefined}
       stats={<>
         <span>🏠 سالن: {hall ? <b><EntityLink type="hall" id={hall.id} label={hall.name} /></b> : <b style={{ color: 'var(--text)' }}>—</b>}</span>
-        {z.capacity && <span>ظرفیت: <b style={{ color: 'var(--text)' }}>{toFa(z.capacity)}</b></span>}
+        {z.capacity && <span>ظرفیت: <b style={{ color: 'var(--text)' }}>{fmt.count(z.capacity)}</b></span>}
       </>}
     >
       <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🗂 مشخصات بخش</div>
       <RowGrid>
         <Row l="سالن" v={hall ? <EntityLink type="hall" id={hall.id} label={hall.name} /> : '—'} />
-        <Row l="ظرفیت" v={z.capacity ? `${toFa(z.capacity)} پرنده` : '—'} />
+        <Row l="ظرفیت" v={z.capacity ? `${fmt.count(z.capacity)} پرنده` : '—'} />
       </RowGrid>
       {flocks.length > 0 && (
         <>
-          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🐔 گله‌های این بخش ({toFa(flocks.length)})</div>
+          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🐔 گله‌های این بخش ({fmt.count(flocks.length)})</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
             {flocks.map((fl) => (
               <div key={fl.id} style={{ display: 'flex', justifyContent: 'space-between',
@@ -60,7 +63,7 @@ export default function ZoneCard({
                 <span style={{ fontWeight: 600 }}>
                   <EntityLink type="flock" id={fl.id} label={fl.name} />
                 </span>
-                <span style={{ color: 'var(--muted)' }}>{toFa(fl.currentCount || fl.initialCount || 0)} پرنده</span>
+                <span style={{ color: 'var(--muted)' }}>{fmt.count(fl.currentCount || fl.initialCount || 0)} پرنده</span>
               </div>
             ))}
           </div>

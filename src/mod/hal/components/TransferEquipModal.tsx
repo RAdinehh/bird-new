@@ -1,6 +1,8 @@
 /**
  * TransferEquipModal — جابجایی تجهیز بین سالن‌ها و بخش‌ها (Odoo standard)
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { useEffect, useState } from 'react';
 import { Btn, Field, Grid2, Input, Modal, NumField } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
@@ -20,6 +22,7 @@ interface Props {
 }
 
 export default function TransferEquipModal({ open, onClose, equipment, halls, zones, onConfirm }: Props) {
+  const fmt = useFormat();
   const [toHallId, setToHallId] = useState('');
   const [toZoneId, setToZoneId] = useState('');
   const [qtyStr, setQtyStr] = useState('1');
@@ -122,7 +125,7 @@ export default function TransferEquipModal({ open, onClose, equipment, halls, zo
 
         <Grid2>
           {maxQty > 1 && (
-            <Field label={`تعداد جابجایی (از ${toFa(maxQty)} ${getUnitLabel(equipment.unit)})`} required>
+            <Field label={`تعداد جابجایی (از ${fmt.count(maxQty)} ${getUnitLabel(equipment.unit)})`} required>
               <NumField
                 value={qtyStr}
                 onChange={e => setQtyStr(e.target.value)}
