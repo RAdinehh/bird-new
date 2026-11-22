@@ -1,11 +1,13 @@
 /**
- * TransferEquipModal — جابجایی تجهیز بین سالن‌ها (Odoo standard)
+ * TransferEquipModal — جابجایی تجهیز بین سالن‌ها و بخش‌ها (Odoo standard)
  */
-import { useState } from 'react';
-import { Btn, Field, Grid2, Input, Modal, Select } from '../../../shr/components/ui';
+import { useEffect, useState } from 'react';
+import { Btn, Field, Grid2, Input, Modal, NumField } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 import { todayJ } from '../../flk/api/flocksCalc';
-import type { Equipment, TransferLog, Hall, Zone } from '../store';
+import { toFa, toEn } from '../../../shr/utils/fa';
+import { getUnitLabel } from '../_typedLabels';
+import type { Equipment, Hall, Zone } from '../store';
 import SmartSelect from '../../../shr/components/SmartSelect';
 
 interface Props {
@@ -14,19 +16,30 @@ interface Props {
   equipment: Equipment | null;
   halls: Hall[];
   zones: Zone[];
-  onConfirm: (eq: Equipment, toHallId: string, toZoneId: string, date: string, note: string) => void;
+  onConfirm: (eq: Equipment, toHallId: string, toZoneId: string, qty: number, date: string, note: string) => void;
 }
 
 export default function TransferEquipModal({ open, onClose, equipment, halls, zones, onConfirm }: Props) {
   const [toHallId, setToHallId] = useState('');
   const [toZoneId, setToZoneId] = useState('');
+  const [qtyStr, setQtyStr] = useState('1');
   const [date, setDate] = useState(todayJ());
   const [note, setNote] = useState('');
 
-  // Reset on open
+  useEffect(() => {
+    if (open && equipment) {
+      setToHallId(equipment.hallId || '');
+      setToZoneId('');
+      setQtyStr(String(equipment.count || 1));
+      setDate(todayJ());
+      setNote('');
+    }
+  }, [open, equipment]);
+
   const handleClose = () => {
     setToHallId('');
     setToZoneId('');
+    setQtyStr('1');
     setDate(todayJ());
     setNote('');
     onClose();
@@ -34,9 +47,16 @@ export default function TransferEquipModal({ open, onClose, equipment, halls, zo
 
   if (!equipment) return null;
 
+  const maxQty = Math.max(1, equipment.count || 1);
+  const qtyNum = Math.floor(Number(toEn(qtyStr)) || 0);
   const fromHall = halls.find(h => h.id === equipment.hallId);
+  const fromZone = zones.find(z => z.id === equipment.zoneId);
   const zonesForTarget = zones.filter(z => z.hallId === toHallId);
-  const canSave = !!toHallId && toHallId !== equipment.hallId;
+  const isSameHall = toHallId === (equipment.hallId || '');
+  const isSameZone = (toZoneId || '') === (equipment.zoneId || '');
+  const locationChanged = !!toHallId && (!isSameHall || !isSameZone);
+  const validQty = qtyNum >= 1 && qtyNum <= maxQty;
+  const canSave = locationChanged && validQty;
 
   return (
     <Modal
@@ -49,7 +69,7 @@ export default function TransferEquipModal({ open, onClose, equipment, halls, zo
             variant="primary"
             onClick={() => {
               if (!canSave) return;
-              onConfirm(equipment, toHallId, toZoneId, date, note);
+              onConfirm(equipment, toHallId, toZoneId, qtyNum, date, note);
               handleClose();
             }}
             style={{ flex: 1 }}
@@ -62,14 +82,14 @@ export default function TransferEquipModal({ open, onClose, equipment, halls, zo
       }
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <Field label="از سالن">
+        <Field label="مبدأ فعلی">
           <div style={{
             height: 38, display: 'flex', alignItems: 'center',
             padding: '0 12px', background: 'var(--bg)',
             border: '1px solid var(--border)', borderRadius: 'var(--r-md)',
-            color: 'var(--muted)', fontWeight: 600,
+            color: 'var(--muted)', fontWeight: 600, fontSize: 'var(--fs-sm)',
           }}>
-            {fromHall?.name || '— بدون سالن —'}
+            {fromHall?.name || '— بدون سالن —'}{fromZone ? ` • بخش ${fromZone.name}` : ''}
           </div>
         </Field>
 
@@ -78,29 +98,39 @@ export default function TransferEquipModal({ open, onClose, equipment, halls, zo
             value={toHallId}
             placeholder="— انتخاب کنید —"
             modalTitle="انتخاب سالن مقصد"
-            options={halls
-              .filter((h) => h.id !== equipment.hallId)
-              .map((h) => ({ value: String(h.id), label: String(h.name) }))}
+            options={halls.map((h) => ({ value: String(h.id), label: String(h.name) }))}
             onChange={(val: string) => {
               setToHallId(val);
-              setToZoneId("");
+              setToZoneId('');
             }}
           />
         </Field>
 
-        {toHallId && (
-          <Field label="به بخش (اختیاری)">
+        {toHallId && zonesForTarget.length > 0 && (
+          <Field label={isSameHall ? 'به بخش (اجباری در همان سالن)' : 'به بخش (اختیاری)'} required={isSameHall}>
             <SmartSelect
-            value={toZoneId}
-            placeholder="— بدون بخش —"
-            modalTitle="انتخاب بخش مقصد"
-            options={zonesForTarget.map((z) => ({ value: String(z.id), label: String(z.name) }))}
-            onChange={(val: string) => setToZoneId(val)}
-          />
+              value={toZoneId}
+              placeholder="— بدون بخش —"
+              modalTitle="انتخاب بخش مقصد"
+              options={zonesForTarget
+                .filter((z) => !(isSameHall && z.id === equipment.zoneId))
+                .map((z) => ({ value: String(z.id), label: String(z.name) }))}
+              onChange={(val: string) => setToZoneId(val)}
+            />
           </Field>
         )}
 
         <Grid2>
+          {maxQty > 1 && (
+            <Field label={`تعداد جابجایی (از ${toFa(maxQty)} ${getUnitLabel(equipment.unit)})`} required>
+              <NumField
+                value={qtyStr}
+                onChange={e => setQtyStr(e.target.value)}
+                min={1}
+                max={maxQty}
+              />
+            </Field>
+          )}
           <Field label="تاریخ جابجایی">
             <DatePicker value={date} onChange={setDate} placeholder="انتخاب" autoToday />
           </Field>
@@ -110,7 +140,7 @@ export default function TransferEquipModal({ open, onClose, equipment, halls, zo
           <Input
             value={note}
             onChange={e => setNote(e.target.value)}
-            placeholder="مثلاً: نیاز به تعمیر اساسی"
+            placeholder="مثلاً: انتقال به بخش جدید یا تعمیر"
           />
         </Field>
       </div>

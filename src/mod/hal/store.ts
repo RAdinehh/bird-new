@@ -93,11 +93,14 @@ export type EquipmentUnit = 'pcs' | 'kg' | 'm2' | 'm' | 'L';
 
 export interface SaleInfo {
   reason: 'sale' | 'scrap';
+  count?: number;
   salePrice: number;
   totalCost: number;
   profit: number;
   soldAt: string;
   buyer?: string;
+  partyId?: string;
+  saleInvoiceId?: string;
   note?: string;
   createdAt: string;
 }
@@ -106,8 +109,13 @@ export interface TransferLog {
   id: string;
   fromHallId: string;
   fromHallName: string;
+  fromZoneId?: string;
+  fromZoneName?: string;
   toHallId: string;
   toHallName: string;
+  toZoneId?: string;
+  toZoneName?: string;
+  count?: number;
   date: string;
   note?: string;
   createdAt: string;

@@ -4,7 +4,8 @@
 import { toFa } from '../../../shr/utils/fa';
 import type { CustomOption } from '../../../shr/store/customOptions';
 import type { Equipment, Hall } from '../store';
-import { Btn, Tag } from '../../../shr/components/ui';
+import { CardActions, Tag } from '../../../shr/components/ui';
+import { ACTION_PRESETS } from '../../../shr/constants/cardActions';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { EQUIP_LABELS } from '../store';
 import { getKindLabel, getCategoryLabel, getStatusLabel, getUnitLabel } from '../_typedLabels';
@@ -257,7 +258,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                         }}
                       >
                         <div style={{ fontWeight: 600, color: 'var(--text)' }}>
-                          {log.fromHallName || '—'} → {log.toHallName || '—'}
+                          {log.fromHallName || '—'}{log.fromZoneName ? ` (${log.fromZoneName})` : ''} → {log.toHallName || '—'}{log.toZoneName ? ` (${log.toZoneName})` : ''}{log.count ? <span style={{ color: 'var(--accent)', marginRight: 6 }}>({toFa(log.count)} {getUnitLabel(e.unit)})</span> : null}
                         </div>
                         <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-2xs)', marginTop: 2 }}>
                           📅 {toFa(log.date)}
@@ -271,42 +272,51 @@ export default function EquipmentCard(props: EquipmentCardProps) {
 
 
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-2)', paddingTop: 'var(--sp-2)' }}>
-                  {e.unitPrice && e.unitPrice > 0 && (
-                    <Btn
-                      size="sm"
-                      variant="primary"
-                      onClick={() => {
-                        const params = new URLSearchParams({
-                          _tra: 'equip',
-                          equipmentId: e.id,
-                          name: e.name,
-                          type: e.type || 'other',
-                          qty: String(e.count || 1),
-                          price: String(e.unitPrice || 0),
-                          hallId: e.hallId,
-                        });
-                        window.location.href = '/tra?' + params.toString();
-                      }}
-                      style={{ width: '100%' }}
-                    >
-                      💰 ثبت فاکتور
-                    </Btn>
-                  )}
-                  <Btn size="sm" onClick={onEdit} style={{ width: '100%' }}>ویرایش</Btn>
-                  <Btn size="sm" variant="outline" onClick={() => onTransfer(e)} style={{ width: '100%' }}>🔀 جابجایی</Btn>
-                  {e.status === 'retired' ? (
-                    <Btn size="sm" variant="outline" onClick={async () => {
-                      const ok = await showConfirmAsync('تأیید بازگردانی', 'این تجهیز به لیست فعال‌ها برگردد؟', {});
-                      if (!ok) return;
-                      onRestore(e.id);
-                      logAction('update', 'hal', 'بازگردانی تجهیز: ' + e.name);
-                      toastMsg.success('تجهیز بازگردانی شد');
-                    }} style={{ width: '100%' }}>بازگردانی</Btn>
-                  ) : (
-                    <Btn size="sm" variant="danger" onClick={() => onRetire(e)} style={{ width: '100%' }}>🔚 اسقاط / فروش</Btn>
-                  )}
-                </div>
-              </ExpandableCard>
+                <CardActions
+        actions={[
+          {
+            ...ACTION_PRESETS.RECORD_INVOICE,
+            hidden: !(e.unitPrice && e.unitPrice > 0 && !e.sourceInvoiceId && e.status !== 'retired'),
+            onClick: () => {
+              const params = new URLSearchParams({
+                _tra: 'equip',
+                equipmentId: e.id,
+                name: e.name,
+                type: e.type || 'other',
+                qty: String(e.count || 1),
+                price: String(e.unitPrice || 0),
+                hallId: e.hallId,
+              });
+              window.location.href = '/tra?' + params.toString();
+            },
+          },
+          {
+            ...ACTION_PRESETS.RESTORE,
+            hidden: e.status !== 'retired',
+            onClick: async () => {
+              const ok = await showConfirmAsync('تأیید بازگردانی', 'این تجهیز به لیست فعال‌ها برگردد؟', {});
+              if (!ok) return;
+              onRestore(e.id);
+              logAction('update', 'hal', 'بازگردانی تجهیز: ' + e.name);
+              toastMsg.success('تجهیز بازگردانی شد');
+            },
+          },
+          {
+            ...ACTION_PRESETS.EDIT,
+            onClick: onEdit,
+          },
+          {
+            ...ACTION_PRESETS.TRANSFER,
+            hidden: e.status === 'retired',
+            onClick: () => onTransfer(e),
+          },
+          {
+            ...ACTION_PRESETS.RETIRE,
+            hidden: e.status === 'retired',
+            onClick: () => onRetire(e),
+          },
+        ]}
+      />
+    </ExpandableCard>
             );
 }

@@ -368,45 +368,127 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
         save={handleSave}
       />
           <RetireEquipModal
-            open={!!retireEq}
-            onClose={() => setRetireEq(null)}
-            equipment={retireEq}
-            onConfirm={(eq, info) => {
-              updateEquip(eq.id, { status: 'retired', saleInfo: info });
-              logAction('update', 'hal', `${info.reason === 'sale' ? 'فروش' : 'اسقاط'}: ${eq.name} — ${info.reason === 'sale' ? info.salePrice.toLocaleString('fa-IR') + ' تومان' : 'بدون مبلغ'}`);
-              toastMsg.success(info.reason === 'sale' ? 'فروش ثبت شد' : 'تجهیز اسقاط شد');
-              setRetireEq(null);
-            }}
-          />
+        open={!!retireEq}
+        onClose={() => setRetireEq(null)}
+        equipment={retireEq}
+        onConfirm={(eq, info, opts) => {
+          const totalCount = Math.max(1, eq.count || 1);
+          const qty = Math.min(totalCount, Math.max(1, opts.qty || totalCount));
+          let saleInvoiceId: string | undefined;
 
-          <TransferEquipModal
+          if (info.reason === 'sale' && opts.createInvoice && info.partyId) {
+            try {
+              const unitSalePrice = Math.round(info.salePrice / qty);
+              saleInvoiceId = useTra.getState().addInvoice({
+                type: 'sale',
+                date: info.soldAt,
+                partyId: info.partyId,
+                category: 'equipment',
+                items: [{
+                  id: crypto.randomUUID(),
+                  category: 'equipment',
+                  description: `فروش تجهیز: ${eq.name}`,
+                  quantity: qty,
+                  unit: eq.unit || 'pcs',
+                  unitPrice: unitSalePrice,
+                  total: info.salePrice,
+                  brand: eq.brand,
+                  model: eq.model,
+                }],
+                total: info.salePrice,
+                payments: [],
+                dueDate: info.soldAt,
+                relatedFlockId: '',
+                relatedEntryId: '',
+                sourceType: 'manual',
+                notes: info.note ? `فروش تجهیز (${eq.name}) — ${info.note}` : `فروش تجهیز (${eq.name})`,
+              });
+            } catch (err) {
+              console.error('[HAL→TRA] create sale invoice failed:', err);
+            }
+          }
+
+          const finalInfo = saleInvoiceId ? { ...info, saleInvoiceId } : info;
+
+          if (qty < totalCount) {
+            updateEquip(eq.id, { count: totalCount - qty });
+            const { id: _id, createdAt: _c, updatedAt: _u, ...rest } = eq;
+            addEquip({
+              ...rest,
+              count: qty,
+              status: 'retired',
+              saleInfo: finalInfo,
+            });
+          } else {
+            updateEquip(eq.id, { status: 'retired', saleInfo: finalInfo });
+          }
+
+          logAction('update', 'hal', `${info.reason === 'sale' ? 'فروش' : 'اسقاط'} (${qty} عدد): ${eq.name} — ${info.reason === 'sale' ? info.salePrice.toLocaleString('fa-IR') + ' تومان' : 'بدون مبلغ'}`);
+          toastMsg.success(
+            info.reason === 'sale'
+              ? (saleInvoiceId ? 'فروش و فاکتور معاملات ثبت شد' : 'فروش ثبت شد')
+              : 'تجهیز اسقاط شد'
+          );
+          setRetireEq(null);
+        }}
+      />
+
+      <TransferEquipModal
         open={!!transferEq}
         onClose={() => setTransferEq(null)}
         equipment={transferEq}
         halls={halls}
         zones={zones}
-        onConfirm={(eq, toHallId, toZoneId, date, note) => {
+        onConfirm={(eq, toHallId, toZoneId, qty, date, note) => {
+          const totalCount = Math.max(1, eq.count || 1);
+          const moveQty = Math.min(totalCount, Math.max(1, qty || totalCount));
           const fromHall = halls.find(h => h.id === eq.hallId);
           const toHall = halls.find(h => h.id === toHallId);
+          const fromZone = zones.find(z => z.id === eq.zoneId);
+          const toZone = zones.find(z => z.id === toZoneId);
+
           const log: TransferLog = {
             id: crypto.randomUUID(),
             fromHallId: eq.hallId || '',
             fromHallName: fromHall?.name || '—',
+            fromZoneId: eq.zoneId || undefined,
+            fromZoneName: fromZone?.name || undefined,
             toHallId,
             toHallName: toHall?.name || '—',
+            toZoneId: toZoneId || undefined,
+            toZoneName: toZone?.name || undefined,
+            count: moveQty,
             date,
             note,
             createdAt: new Date().toISOString(),
           };
-          updateEquip(eq.id, {
-            hallId: toHallId,
-            zoneId: toZoneId,
-            transferHistory: [...(eq.transferHistory || []), log],
-          });
-          logAction('update', 'hal', `جابجایی: ${eq.name} → ${toHall?.name}`);
+
+          if (moveQty < totalCount) {
+            updateEquip(eq.id, {
+              count: totalCount - moveQty,
+              transferHistory: [...(eq.transferHistory || []), log],
+            });
+            const { id: _id, createdAt: _c, updatedAt: _u, ...rest } = eq;
+            addEquip({
+              ...rest,
+              hallId: toHallId,
+              zoneId: toZoneId,
+              count: moveQty,
+              transferHistory: [...(eq.transferHistory || []), log],
+            });
+          } else {
+            updateEquip(eq.id, {
+              hallId: toHallId,
+              zoneId: toZoneId,
+              transferHistory: [...(eq.transferHistory || []), log],
+            });
+          }
+
+          const destLabel = toZone ? `${toHall?.name} (${toZone.name})` : (toHall?.name || '—');
+          logAction('update', 'hal', `جابجایی (${moveQty} عدد): ${eq.name} → ${destLabel}`);
           toastMsg.success('جابجایی ثبت شد');
         }}
       />
-</PageContainer>
+    </PageContainer>
   );
 }
