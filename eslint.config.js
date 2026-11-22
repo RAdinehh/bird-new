@@ -37,6 +37,23 @@ export default [
       'no-useless-escape': 'off',
     },
   },
+    {
+    files: ['src/**/*.ts', 'src/**/*.tsx'],
+    ignores: ['src/shr/utils/fa.ts', 'src/shr/units/**', 'src/test/**'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "CallExpression[callee.name='toFa']",
+          message: "Use useFormat() or getGlobalFormat() instead of calling toFa() directly.",
+        },
+        {
+          selector: "CallExpression[callee.property.name='toLocaleString'][arguments.0.value='fa-IR']",
+          message: "Use useFormat() or getGlobalFormat() instead of .toLocaleString('fa-IR').",
+        },
+      ],
+    },
+  },
   {
     ignores: [
       'dist/**', 'node_modules/**', 'android/**', 'coverage/**',

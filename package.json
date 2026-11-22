@@ -13,7 +13,8 @@
     "typecheck": "tsc --noEmit --incremental --tsBuildInfoFile ./node_modules/.cache/.tsc-incremental",
     "test:ci": "vitest run --coverage",
     "ci": "npm run typecheck && npm run test:ci",
-    "check:catch": "grep -rn 'catch (e) {}' src/mod --include='*.ts*' || true"
+    "check:catch": "grep -rn 'catch (e) {}' src/mod --include='*.ts*' || true",
+    "lint": "eslint src"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.3",
