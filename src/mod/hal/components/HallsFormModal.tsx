@@ -327,11 +327,11 @@ export default function HallsFormModal(props: HallsFormModalProps) {
 
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>🌡 شرایط محیطی</div>
           <Grid2>
-          <Field label="دمای هدف" autoFrom={autoFields.has("targetTemp") ? (currentBreedName ? `استاندارد «${currentBreedName}»` : 'استاندارد') : undefined} help="این مقدار از استاندارد نژاد پرنده (در بخش تنظیمات) خوانده شده و قابل ویرایش است" error={vErrors.targetTemp}>
+          <Field label="دمای هدف" autoFrom={autoFields.has("targetTemp") ? (currentBreedName ? `استاندارد «${currentBreedName}»` : 'استاندارد') : undefined} help={HELP.hal.targetTemp} error={vErrors.targetTemp}>
             <TempFormField noLabel placeholder="۲۲" value={form.targetTemp} onChange={(v: string) => { setForm({...form, targetTemp: v}); clearAuto("targetTemp"); }} />
             <OverrideHint {...tempHint} />
           </Field>
-          <Field label="رطوبت هدف" autoFrom={autoFields.has("targetHumidity") ? (currentBreedName ? `استاندارد «${currentBreedName}»` : 'استاندارد') : undefined} help="این مقدار از استاندارد نژاد پرنده (در بخش تنظیمات) خوانده شده و قابل ویرایش است" error={vErrors.targetHumidity}>
+          <Field label="رطوبت هدف" autoFrom={autoFields.has("targetHumidity") ? (currentBreedName ? `استاندارد «${currentBreedName}»` : 'استاندارد') : undefined} help={HELP.hal.targetHumidity} error={vErrors.targetHumidity}>
             <NumField placeholder="۶۰" value={form.targetHumidity} onChange={e => { setForm({...form, targetHumidity: e.target.value}); clearAuto("targetHumidity"); }} unit="٪" min={0} max={100} />
             <OverrideHint {...humHint} />
           </Field>
