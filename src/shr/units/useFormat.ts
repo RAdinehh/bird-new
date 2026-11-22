@@ -37,17 +37,22 @@ export function formatNumberRaw(
   fmt: NumberFormat,
   sep: ThousandSep,
   decimals: number,
+  fixed = false,
 ): string {
   if (!Number.isFinite(n)) return '—';
-  const dec = new Decimal(n).toDecimalPlaces(Math.max(0, decimals), Decimal.ROUND_HALF_UP);
+  const maxDec = Math.max(0, decimals);
+  const dec = new Decimal(n).toDecimalPlaces(maxDec, Decimal.ROUND_HALF_UP);
   // نرمال‌سازی -0 به 0
   const isNeg = dec.isNegative() && !dec.isZero();
-  const absFixed = dec.abs().toFixed(Math.max(0, decimals));
-  const [intPart = '0', decPart] = absFixed.split('.');
+  const absFixed = dec.abs().toFixed(maxDec);
+  let [intPart = '0', decPart = ''] = absFixed.split('.');
+  if (!fixed && decPart) {
+    decPart = decPart.replace(/0+$/, '');
+  }
   const sepChar = SEP_MAP[sep] ?? '';
   const intWithSep = sepChar ? intPart.replace(/\B(?=(\d{3})+(?!\d))/g, sepChar) : intPart;
   let result = (isNeg ? '-' : '') + intWithSep;
-  if (decimals > 0 && decPart) {
+  if (maxDec > 0 && decPart) {
     result += getDecimalSep(fmt, sep) + decPart;
   }
   return applyDigits(result, fmt);
