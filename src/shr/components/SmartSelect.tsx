@@ -9,6 +9,8 @@
  *   value, onChange, options, placeholder, groupLabels, groupIcons,
  *   hierarchical, autoThreshold, disabled, modalTitle, required, error, warn, compact
  */
+import { getGlobalFormat } from '../units/useFormat';
+
 
 import { useState, useMemo } from 'react';
 import { Select, Input } from './ui';
@@ -180,7 +182,7 @@ export default function SmartSelect({
         open={open}
         onClose={() => { setOpen(false); setQuery(''); setVisibleCount(10); }}
         title={modalTitle}
-        subtitle={`${toFa(options.length)} مورد`}
+        subtitle={`${getGlobalFormat().count(options.length)} مورد`}
         searchable={searchable}
         searchNode={
           <Input
@@ -248,8 +250,8 @@ export default function SmartSelect({
                   marginTop: 4,
                 }}
               >
-                + نمایش {toFa(Math.min(10, filtered.length - visibleCount))} مورد بیشتر
-                ({toFa(filtered.length - visibleCount)} باقی‌مانده)
+                + نمایش {getGlobalFormat().count(Math.min(10, filtered.length - visibleCount))} مورد بیشتر
+                ({getGlobalFormat().count(filtered.length - visibleCount)} باقی‌مانده)
               </button>
             )}
           </>

@@ -1,3 +1,4 @@
+import { getGlobalFormat } from '../units/useFormat';
 import type { ReactNode } from 'react';
 import type { FilterDef } from './types';
 import { toFa } from '../utils/fa';
@@ -10,19 +11,19 @@ export function summarizeChip<T>(def: FilterDef<T>, v: any): { text: string; ico
     const opts = arr.map(x => def.options?.find(o => o.value === x));
     const labels = opts.map((o, i) => o?.label || arr[i]);
     const icon = opts[0]?.icon;
-    if (labels.length === 1) return { text: toFa(labels[0]), icon };
-    return { text: `${toFa(labels.length)} مورد`, icon };
+    if (labels.length === 1) return { text: getGlobalFormat().code(labels[0]), icon };
+    return { text: `${getGlobalFormat().count(labels.length)} مورد`, icon };
   }
   if (def.kind === 'dateRange') {
     const [a, b] = v as [string, string];
-    return { text: `${a ? toFa(a) : '؟'}–${b ? toFa(b) : '؟'}` };
+    return { text: `${a ? getGlobalFormat().code(a) : '؟'}–${b ? getGlobalFormat().code(b) : '؟'}` };
   }
   if (def.kind === 'numberRange') {
     const [a, b] = v as [number, number];
-    return { text: `${a != null ? toFa(a) : '؟'}–${b != null ? toFa(b) : '؟'}` };
+    return { text: `${a != null ? getGlobalFormat().code(a) : '؟'}–${b != null ? getGlobalFormat().code(b) : '؟'}` };
   }
   if (def.kind === 'boolean') return { text: v ? 'بله' : 'خیر' };
-  return { text: toFa(String(v)) };
+  return { text: getGlobalFormat().code(String(v)) };
 }
 
 export function isEmptyVal(v: any): boolean {

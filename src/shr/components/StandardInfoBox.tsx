@@ -1,6 +1,8 @@
 /**
  * StandardInfoBox.tsx — نمایش یکپارچه اطلاعات و منبع استاندارد متصل
  */
+import { getGlobalFormat } from '../units/useFormat';
+
 import type { ReactNode } from "react";
 import { toFa } from "../utils/fa";
 
@@ -21,7 +23,7 @@ export default function StandardInfoBox({
   variant = "box",
   children,
 }: Props) {
-  const yearText = publishYear != null && publishYear !== "" ? toFa(publishYear) : "";
+  const yearText = publishYear != null && publishYear !== "" ? getGlobalFormat().code(publishYear) : "";
   const sourceLine = [source, yearText].filter(Boolean).join(" • ");
 
   if (variant === "inline") {

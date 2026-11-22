@@ -1,6 +1,8 @@
 /**
  * LockScreen.tsx — قفل PIN + Recovery Code
  */
+import { getGlobalFormat } from '../units/useFormat';
+
 import { useState, useEffect } from 'react';
 import { useSet } from '../../mod/set/store';
 import { toFa } from '../utils/fa';
@@ -50,7 +52,7 @@ export default function LockScreen({ onUnlock }: { onUnlock: () => void }) {
       setError('۵ بار اشتباه - ۳۰ ثانیه صبر کنید');
     } else {
       setAttempts(next);
-      setError('رمز اشتباه - ' + toFa(MAX_ATTEMPTS - next) + ' تلاش مانده');
+      setError('رمز اشتباه - ' + getGlobalFormat().count(MAX_ATTEMPTS - next) + ' تلاش مانده');
     }
     setTimeout(() => setPin(''), 300);
   }, [pin, security.pin, onUnlock, attempts, locked]);
@@ -87,7 +89,7 @@ export default function LockScreen({ onUnlock }: { onUnlock: () => void }) {
       setRecoveryError('۳ بار اشتباه - ۵ دقیقه صبر کنید');
     } else {
       setRecoveryAttempts(next);
-      setRecoveryError('کد اشتباه - ' + toFa(RECOVERY_MAX - next) + ' تلاش مانده');
+      setRecoveryError('کد اشتباه - ' + getGlobalFormat().count(RECOVERY_MAX - next) + ' تلاش مانده');
     }
     setRecoveryInput('');
   };
@@ -117,7 +119,7 @@ export default function LockScreen({ onUnlock }: { onUnlock: () => void }) {
       {error && <div style={{ color: 'var(--danger)', fontSize: 'var(--fs-sm)', marginBottom: 12, fontWeight: 600 }}>{error}</div>}
 
       {locked ? (
-        <div style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, color: 'var(--danger)', marginBottom: 20 }}>{toFa(remainingSec)} ثانیه</div>
+        <div style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, color: 'var(--danger)', marginBottom: 20 }}>{getGlobalFormat().int(remainingSec)} ثانیه</div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, maxWidth: 280, width: '100%', marginBottom: 20 }}>
           {keys.map((k, i) => {
@@ -150,7 +152,7 @@ export default function LockScreen({ onUnlock }: { onUnlock: () => void }) {
             {recoveryLocked ? (
               <div style={{ padding: 16, background: 'var(--danger-soft)', borderRadius: 'var(--r-md)', textAlign: 'center', marginBottom: 12 }}>
                 <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--danger)' }}>
-                  {toFa(recoveryRemainingSec)} ثانیه
+                  {getGlobalFormat().int(recoveryRemainingSec)} ثانیه
                 </div>
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', marginTop: 4 }}>تا رفع قفل صبر کنید</div>
               </div>

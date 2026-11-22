@@ -12,6 +12,8 @@
  * - تاریخ هچ ≤ امروز
  * - FCR بین 1.0-5.0 (اگه پر شده)
  */
+import { getGlobalFormat } from '../../units/useFormat';
+
 import { z } from 'zod';
 import { format as formatJ } from 'date-fns-jalali';
 import {
@@ -124,7 +126,7 @@ export function createFlkSchema(context: ValidationContext = {}) {
       if (male + female + unknown !== targetCount) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `مجموع نر (${male.toLocaleString('fa-IR')}) + ماده (${female.toLocaleString('fa-IR')}) + نامشخص (${unknown.toLocaleString('fa-IR')}) = ${(male+female+unknown).toLocaleString('fa-IR')} — باید با تعداد فعلی (${targetCount.toLocaleString('fa-IR')}) برابر باشد`,
+          message: `مجموع نر (${getGlobalFormat().num(male)}) + ماده (${getGlobalFormat().num(female)}) + نامشخص (${getGlobalFormat().num(unknown)}) = ${getGlobalFormat().num(male+female+unknown)} — باید با تعداد فعلی (${getGlobalFormat().num(targetCount)}) برابر باشد`,
           path: ['_genderSum'],
         });
       }
@@ -134,7 +136,7 @@ export function createFlkSchema(context: ValidationContext = {}) {
     if (d.currentCount != null && d.currentCount > 0 && d.currentCount > d.initialCount) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `تعداد فعلی (${d.currentCount.toLocaleString('fa-IR')}) نمی‌تواند از تعداد اولیه بیشتر باشد`,
+        message: `تعداد فعلی (${getGlobalFormat().num(d.currentCount)}) نمی‌تواند از تعداد اولیه بیشتر باشد`,
         path: ['currentCount'],
       });
     }
@@ -263,7 +265,7 @@ export function createFlkSchema(context: ValidationContext = {}) {
         if (sum > totalRentAmount) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `جمع پرداخت‌ها (${sum.toLocaleString('fa-IR')}) از مبلغ کل اجاره (${totalRentAmount.toLocaleString('fa-IR')}) بیشتر است`,
+            message: `جمع پرداخت‌ها (${getGlobalFormat().num(sum)}) از مبلغ کل اجاره (${getGlobalFormat().num(totalRentAmount)}) بیشتر است`,
             path: ['rentPayments'],
           });
         }

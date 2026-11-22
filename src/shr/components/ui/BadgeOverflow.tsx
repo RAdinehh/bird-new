@@ -1,3 +1,4 @@
+import { getGlobalFormat } from '../../units/useFormat';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { toFa } from '../../utils/fa';
@@ -25,8 +26,8 @@ export function BadgeOverflow({ badges, max = 2, modalTitle = 'برچسب‌ها
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); setShowAll(true); }}
-          title={'نمایش ' + toFa(hidden.length) + ' برچسب دیگر'}
-          aria-label={'نمایش ' + toFa(hidden.length) + ' برچسب دیگر'}
+          title={'نمایش ' + getGlobalFormat().count(hidden.length) + ' برچسب دیگر'}
+          aria-label={'نمایش ' + getGlobalFormat().count(hidden.length) + ' برچسب دیگر'}
           style={{
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             height: 22,
@@ -41,7 +42,7 @@ export function BadgeOverflow({ badges, max = 2, modalTitle = 'برچسب‌ها
             flexShrink: 0,
           }}
         >
-          +{toFa(hidden.length)}
+          +{getGlobalFormat().count(hidden.length)}
         </button>
       )}
       {showAll && typeof document !== 'undefined' && createPortal(

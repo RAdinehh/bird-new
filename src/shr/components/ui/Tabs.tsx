@@ -3,6 +3,8 @@
  * الگو: flk/FlocksTabs.jsx
  * پشتیبانی: count badge، dot پالس (آیتم جدید)، rightAction
  */
+import { getGlobalFormat } from '../../units/useFormat';
+
 import type React from 'react';
 import { toFa } from '../../utils/fa';
 
@@ -69,7 +71,7 @@ export function Tabs<T extends string = string>({
                   padding: '1px 5px',
                   borderRadius: 8,
                   fontWeight: 700,
-                }}>{toFa(t.count)}</span>
+                }}>{getGlobalFormat().count(t.count)}</span>
               )}
               {newTabBadge === t.id && (
                 <span

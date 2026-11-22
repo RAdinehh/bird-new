@@ -1,3 +1,4 @@
+import { getGlobalFormat } from '../units/useFormat';
 import { useState, useEffect, useRef } from 'react';
 import { Btn, Sheet } from './ui';
 import { toFa } from '../utils/fa';
@@ -92,7 +93,7 @@ function WheelColumn({
               transition: 'font-size 140ms ease, color 140ms ease',
             }}
           >
-            {toFa(v)}
+            {getGlobalFormat().code(v)}
           </div>
         );
       })}
@@ -173,7 +174,7 @@ export default function TimePicker({
         }}
       >
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {value ? toFa(value) : placeholder}
+          {value ? getGlobalFormat().code(value) : placeholder}
           {required && !value ? <span style={{ color: 'var(--danger)', marginRight: 4 }}>*</span> : null}
         </span>
         <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0, color: 'var(--dim)' }}>
@@ -191,7 +192,7 @@ export default function TimePicker({
       <Sheet open={open} onClose={() => setOpen(false)} title="انتخاب ساعت">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center', paddingTop: 4 }}>
           <div style={{ fontSize: 42, fontWeight: 800, color: 'var(--accent)', letterSpacing: 2, direction: 'ltr', fontVariantNumeric: 'tabular-nums' }}>
-            {toFa(hour)}:{toFa(minute)}
+            {getGlobalFormat().code(hour)}:{getGlobalFormat().code(minute)}
           </div>
 
           <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, width: '100%', maxWidth: 240, direction: 'ltr' }}>

@@ -2,6 +2,8 @@
  * filter/FilterBar.tsx — نوار فیلتر و مرتب‌سازی مرکزی
  * طراحی: Tabs بین گروه‌ها + ردیف‌های بلند + بدون گرادیانت
  */
+import { getGlobalFormat } from '../units/useFormat';
+
 import { useState, useEffect, useRef, type ReactNode } from 'react';
 import { Sheet, Input, Btn } from '../components/ui';
 import {
@@ -155,7 +157,7 @@ export function FilterBar<T>({
               background: 'rgba(255,255,255,0.28)',
               borderRadius: 'var(--r-md)', fontSize: 'var(--fs-2xs)', fontWeight: 800,
               marginRight: -2,
-            }}>{toFa(activeCount)}</span>
+            }}>{getGlobalFormat().count(activeCount)}</span>
           )}
         </button>
 
@@ -194,10 +196,10 @@ export function FilterBar<T>({
               position: 'relative',
               cursor: 'pointer',
             }}
-            title={`${toFa(recycleCount)} ${recycleLabel} در سبد بازیابی`}
+            title={`${getGlobalFormat().count(recycleCount)} ${recycleLabel} در سبد بازیابی`}
           >
             <span>🗑️</span>
-            <span>بازیابی ({toFa(recycleCount)})</span>
+            <span>بازیابی ({getGlobalFormat().count(recycleCount)})</span>
             {!isAcknowledged && (
               <span
                 aria-label="آیتم جدید"
@@ -239,7 +241,7 @@ export function FilterBar<T>({
             fontWeight: 700, whiteSpace: 'nowrap',
             fontVariantNumeric: 'tabular-nums',
           }}>
-            {count === total ? `${toFa(total)} مورد` : `${toFa(count)} از ${toFa(total)}`}
+            {count === total ? `${getGlobalFormat().count(total)} مورد` : `${getGlobalFormat().count(count)} از ${getGlobalFormat().count(total)}`}
           </span>
         </div>
       </div>
@@ -355,7 +357,7 @@ export function FilterBar<T>({
                       minWidth: 18, height: 18, padding: '0 5px',
                       background: 'var(--accent)', color: 'var(--avatar-text)',
                       borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-2xs)', fontWeight: 800,
-                    }}>{toFa(cnt)}</span>
+                    }}>{getGlobalFormat().count(cnt)}</span>
                   )}
                 </div>
                 {/* محتوا — همیشه باز */}
@@ -438,7 +440,7 @@ export function FilterBar<T>({
             const isActive = stackIdx !== -1;
             const isPrimary = sortStack[0]?.key === def.key;
             const dir = isActive ? sortStack[stackIdx].dir : 'asc';
-            const levelLabel = isActive && sortStack.length > 1 ? toFa(stackIdx + 1) : '';
+            const levelLabel = isActive && sortStack.length > 1 ? getGlobalFormat().count(stackIdx + 1) : '';
             
             return (
               <div key={def.key} style={{ position: 'relative' }}>

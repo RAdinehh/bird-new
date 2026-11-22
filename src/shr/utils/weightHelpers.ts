@@ -1,4 +1,6 @@
 /** weightHelpers.ts — helperهای نمایش وزن (مشترک بین LogCard و EggsWeightSection) */
+import { getGlobalFormat } from '../units/useFormat';
+
 import { toFa } from './fa';
 
 export const GENDER_LABEL: Record<string, string> = {
@@ -10,8 +12,8 @@ export const GENDER_LABEL: Record<string, string> = {
 /** نمایش وزن: اگر ≥ ۱۰۰۰ گرم بود، کیلوگرم */
 export function formatWeightGrams(g: number): string {
   if (!isFinite(g) || g <= 0) return '—';
-  if (g >= 1000) return `${toFa((Math.round(g / 10) / 100).toFixed(2))} کیلوگرم`;
-  return `${toFa(Math.round(g * 10) / 10)} گرم`;
+  if (g >= 1000) return `${getGlobalFormat().code((Math.round(g / 10) / 100).toFixed(2))} کیلوگرم`;
+  return `${getGlobalFormat().num(Math.round(g * 10) / 10)} گرم`;
 }
 
 /** تفسیر CV بر اساس آستانه‌های صنعت (۸/۱۰/۱۲) */

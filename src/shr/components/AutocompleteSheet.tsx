@@ -8,6 +8,8 @@
  *   - گروه‌بندی بر اساس category
  *   - حداکثر ۷۰vh
  */
+import { getGlobalFormat } from '../units/useFormat';
+
 import { useState, useEffect, useRef, useMemo } from 'react';
 import SelectSheetShell, { SheetGroup, SheetItem } from './SelectSheetShell';
 
@@ -226,7 +228,7 @@ export default function AutocompleteSheet({
         open={open}
         onClose={() => setOpen(false)}
         title={title}
-        subtitle={options.length ? `${toFa(options.length)} مورد` : undefined}
+        subtitle={options.length ? `${getGlobalFormat().count(options.length)} مورد` : undefined}
         searchable={options.length > 5}
         searchNode={
           <input
@@ -276,7 +278,7 @@ export default function AutocompleteSheet({
 
             {!isSearching && remaining > 0 && (
               <button type="button" onClick={handleShowMore} style={BTN_MORE}>
-                ↓ نمایش {toFa(remaining)} مورد دیگر
+                ↓ نمایش {getGlobalFormat().count(remaining)} مورد دیگر
               </button>
             )}
 
@@ -313,6 +315,3 @@ const BTN_CUSTOM: React.CSSProperties = {
 };
 
 // ═══ helper ═══
-function toFa(n: number): string {
-  return String(n).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[+d]);
-}

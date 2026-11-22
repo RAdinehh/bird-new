@@ -1,3 +1,4 @@
+import { getGlobalFormat } from '../units/useFormat';
 import { Field, Grid2, Grid3, Input, Select , NumField} from './ui';
 import SmartSelect from './SmartSelect';
 import { useBrd } from '../../mod/brd/store';
@@ -143,9 +144,9 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
   const activeFlocks = flocks.filter(f => f.status === 'active').map(f => {
     const parts: string[] = [];
-    if (typeof f.currentCount === 'number') parts.push('🐔 ' + toFa(f.currentCount) + ' پرنده');
+    if (typeof f.currentCount === 'number') parts.push('🐔 ' + getGlobalFormat().count(f.currentCount) + ' پرنده');
     const age = getAgeDays(f);
-    if (age != null && age > 0) parts.push(toFa(age) + ' روز');
+    if (age != null && age > 0) parts.push(getGlobalFormat().day(age) + ' روز');
     return { value: f.id, label: f.name, subtitle: parts.join(' · ') || undefined };
   });
 
@@ -285,7 +286,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           ) : (item.flockId || item.hatchId) && !hatchOverride ? (
             <Field label="تاریخ هچ (قفل)">
               <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
-                {item.hatchDate ? toFa(item.hatchDate) : '—'}
+                {item.hatchDate ? getGlobalFormat().date(item.hatchDate) : '—'}
                 <span style={{ marginInlineStart: 'auto', fontSize: 14 }} title="قفل — از منبع انتخاب‌شده">🔒</span>
               </div>
             </Field>
@@ -378,7 +379,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           ) : item.existingFlockId ? (
             <Field label="تاریخ هچ (قفل از گله)">
               <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
-                {item.hatchDate ? toFa(item.hatchDate) : '—'}
+                {item.hatchDate ? getGlobalFormat().date(item.hatchDate) : '—'}
                 <span style={{ marginInlineStart: 'auto', fontSize: 14 }} title="قفل — از گله انتخاب‌شده">🔒</span>
               </div>
             </Field>

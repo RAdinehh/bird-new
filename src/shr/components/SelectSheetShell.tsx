@@ -25,6 +25,8 @@
  *     </SheetGroup>
  *   </SelectSheetShell>
  */
+import { getGlobalFormat } from '../units/useFormat';
+
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
@@ -317,7 +319,7 @@ export function SheetGroup({ title, icon, count, children }: GroupProps) {
         <span style={{ flex: 1 }}>{title}</span>
         {count != null && (
           <span style={{ fontSize: 10, fontWeight: 600, opacity: .75 }}>
-            {toFa(count)} مورد
+            {getGlobalFormat().count(count)} مورد
           </span>
         )}
       </div>
@@ -387,6 +389,3 @@ export function SheetItem({ icon, equipType, category, title, selected, onClick,
 }
 
 // ═══ helper ═══
-function toFa(n: number): string {
-  return String(n).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[+d]);
-}

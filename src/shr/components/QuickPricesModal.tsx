@@ -1,3 +1,4 @@
+import { getGlobalFormat } from '../units/useFormat';
 import { useState, useEffect } from 'react';
 import { Modal, Field, Input, Btn, BtnRow } from './ui';
 import { useSet, DEFAULT_MARKET_PRICES, type MarketPrices } from '../../mod/set/store';
@@ -78,7 +79,7 @@ export default function QuickPricesModal({ open, onClose }: Props) {
         قیمت‌ها را دستی وارد کنید. فقط فیلد مربوط به پرنده‌های گله را پر کنید — بقیه خالی بمانند.
         {savedAt && (
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 4 }}>
-            آخرین به‌روزرسانی: {toFa(savedAt)}
+            آخرین به‌روزرسانی: {getGlobalFormat().date(savedAt)}
           </div>
         )}
       </div>

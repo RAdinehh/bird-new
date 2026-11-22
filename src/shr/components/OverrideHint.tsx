@@ -8,6 +8,8 @@
  *   - آیکون ↺ کوچیک انتهای متن
  *   - اگه تغییر نکرده → هیچی نمایش نده
  */
+import { getGlobalFormat } from '../units/useFormat';
+
 
 import { toFa } from '../utils/fa';
 
@@ -30,7 +32,7 @@ export default function OverrideHint({
   if (!overridden || stdValue == null || stdValue === '') return null;
 
   const fmtVal = typeof stdValue === 'number'
-    ? (decimals > 0 ? toFa(stdValue.toFixed(decimals)) : toFa(stdValue))
+    ? (decimals > 0 ? getGlobalFormat().code(stdValue.toFixed(decimals)) : getGlobalFormat().num(stdValue))
     : stdValue;
   const text = unit ? `${fmtVal} ${unit}` : fmtVal;
 

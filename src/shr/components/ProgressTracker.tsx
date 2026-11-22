@@ -1,3 +1,4 @@
+import { getGlobalFormat } from '../units/useFormat';
 import React, { useState, useEffect } from 'react';
 import { toFa } from '../utils/fa';
 import { useSet } from '../../mod/set/store';
@@ -54,7 +55,7 @@ export default function ProgressTracker({
   const cs = `var(--${color}-soft)`;
   const cb = `var(--${color}-border)`;
 
-  const ariaLabel = `${label}: ${toFa(Math.round(percent))} درصد — ${toFa(current)} از ${toFa(target)} ${unit}`;
+  const ariaLabel = `${label}: ${getGlobalFormat().int(Math.round(percent))} درصد — ${getGlobalFormat().num(current)} از ${getGlobalFormat().num(target)} ${unit}`;
 
   return (
     <div
@@ -92,7 +93,7 @@ export default function ProgressTracker({
             fontWeight: 600,
           }}
         >
-          {toFa(Math.round(percent))}٪
+          {getGlobalFormat().int(Math.round(percent))}٪
         </span>
       </div>
 
@@ -135,14 +136,14 @@ export default function ProgressTracker({
       >
         {showStart ? (
           <span>
-            روز <b style={{ color: c }}>{toFa(current)}</b> از {toFa(target)} {unit}
+            روز <b style={{ color: c }}>{getGlobalFormat().num(current)}</b> از {getGlobalFormat().num(target)} {unit}
           </span>
         ) : (
           <span />
         )}
         {showRemaining && !done ? (
           <span style={{ color: c, fontWeight: 700 }}>
-            {toFa(remain)} {unit} مانده
+            {getGlobalFormat().num(remain)} {unit} مانده
           </span>
         ) : done ? (
           <span style={{ color: 'var(--accent)', fontWeight: 700 }}>آماده</span>
@@ -170,7 +171,7 @@ export function MiniProgress({
   const done = current >= target;
   const c = `var(--${color})`;
 
-  const ariaLabel = `${toFa(Math.round(percent))} درصد — ${toFa(current)} از ${toFa(target)}`;
+  const ariaLabel = `${getGlobalFormat().int(Math.round(percent))} درصد — ${getGlobalFormat().num(current)} از ${getGlobalFormat().num(target)}`;
 
   return (
     <div
@@ -189,10 +190,10 @@ export function MiniProgress({
         }}
       >
         <span style={{ color: c, fontWeight: 700 }}>
-          {done ? '✅ آماده' : '⏳ ' + toFa(remain) + ' روز مانده'}
+          {done ? '✅ آماده' : '⏳ ' + getGlobalFormat().num(remain) + ' روز مانده'}
         </span>
         <span style={{ color: 'var(--muted)' }}>
-          {toFa(current)} / {toFa(target)}
+          {getGlobalFormat().num(current)} / {getGlobalFormat().num(target)}
         </span>
       </div>
       <div

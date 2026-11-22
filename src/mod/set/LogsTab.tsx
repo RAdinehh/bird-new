@@ -176,7 +176,7 @@ export default function LogsTab() {
               {auditLogs.map((entry, i) => {
                 const isOpen = expandedId === entry.id;
                 const time = new Date(entry.time);
-                const timeStr = fmt.code(time.toLocaleString('fa-IR'));
+                const timeStr = fmt.code(`${time.getFullYear()}/${String(time.getMonth() + 1).padStart(2, '0')}/${String(time.getDate()).padStart(2, '0')} ${String(time.getHours()).padStart(2, '0')}:${String(time.getMinutes()).padStart(2, '0')}`);
                 const tone = ACTION_TONE[entry.action] || 'dim';
                 const label = ACTION_LABEL[entry.action] || entry.action;
                 return (
@@ -245,7 +245,7 @@ export default function LogsTab() {
               {logs.map((log, i) => {
                 const isOpen = expandedId === log.id;
                 const time = new Date(log.time);
-                const timeStr = fmt.code(time.toLocaleString('fa-IR'));
+                const timeStr = fmt.code(`${time.getFullYear()}/${String(time.getMonth() + 1).padStart(2, '0')}/${String(time.getDate()).padStart(2, '0')} ${String(time.getHours()).padStart(2, '0')}:${String(time.getMinutes()).padStart(2, '0')}`);
                 return (
                   <ExpandableCard
                     key={log.id}

@@ -1,3 +1,4 @@
+import { getGlobalFormat } from '../../units/useFormat';
 import React from 'react';
 import { toFa } from '../../utils/fa';
 
@@ -29,7 +30,7 @@ export function KpiCard({
   };
   const c = colors[finalColor] || colors.accent;
   const displayValue = typeof value === 'number'
-    ? (noFormat ? toFa(String(value)) : toFa(value.toLocaleString('fa-IR')))
+    ? (noFormat ? getGlobalFormat().code(String(value)) : getGlobalFormat().num(value))
     : String(value);
 
   if (size === 'lg') {

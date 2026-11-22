@@ -9,6 +9,8 @@
  * - وزن اعشاری بین 0-200 گرم
  * - تاریخ در آینده نباشد
  */
+import { getGlobalFormat } from '../../units/useFormat';
+
 import { z } from 'zod';
 import {
   intRange, persianDateNotFuture, requiredId, optionalStr,
@@ -63,14 +65,14 @@ export function createEggSchema(context: ValidationContext = {}) {
       if (healthy > context.flockCount) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `مجموع سالم (${healthy.toLocaleString('fa-IR')}) از تعداد گله (${context.flockCount.toLocaleString('fa-IR')}) بیشتر است`,
+          message: `مجموع سالم (${getGlobalFormat().num(healthy)}) از تعداد گله (${getGlobalFormat().num(context.flockCount)}) بیشتر است`,
           path: ['eatingCount'],
         });
       }
       if (total > Math.ceil(context.flockCount * 1.3)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `کل تخم (${total.toLocaleString('fa-IR')}) با تعداد گله (${context.flockCount.toLocaleString('fa-IR')}) همخوانی ندارد`,
+          message: `کل تخم (${getGlobalFormat().num(total)}) با تعداد گله (${getGlobalFormat().num(context.flockCount)}) همخوانی ندارد`,
           path: ['_'],
         });
       }

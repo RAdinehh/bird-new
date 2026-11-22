@@ -2,6 +2,8 @@
  * Segmented.tsx — دکمه‌های segmented (تب‌های داخلی) + ShowMore
  * الگو: FlockHistoryModal (line 836+ / 844+)
  */
+import { getGlobalFormat } from '../../units/useFormat';
+
 import type { ReactNode } from 'react';
 import { toFa } from '../../utils/fa';
 
@@ -52,7 +54,7 @@ export function ShowMoreButton({ count, onClick }: { count: number; onClick: () 
         fontFamily: 'inherit',
       }}
     >
-      📜 نمایش {toFa(count)} رویداد بیشتر
+      📜 نمایش {getGlobalFormat().count(count)} رویداد بیشتر
     </button>
   );
 }

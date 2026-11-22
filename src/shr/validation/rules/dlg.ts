@@ -11,6 +11,8 @@
  * - مقدار آب با تعداد بارها هماهنگ
  * - دارو/واکسن: مقدار مصرفی > 0 در صورت انتخاب از انبار
  */
+import { getGlobalFormat } from '../../units/useFormat';
+
 import { z } from 'zod';
 import {
   intRange, intOpt, floatRange, persianDateNotFuture,
@@ -141,7 +143,7 @@ export function createDlgSchema(context: ValidationContext = {}) {
       if (sumDeaths > 0 && sumDeaths !== d.deathsCount) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `مجموع رکوردهای تلفات (${sumDeaths.toLocaleString('fa-IR')}) با تعداد کل (${d.deathsCount.toLocaleString('fa-IR')}) یکسان نیست`,
+          message: `مجموع رکوردهای تلفات (${getGlobalFormat().num(sumDeaths)}) با تعداد کل (${getGlobalFormat().num(d.deathsCount)}) یکسان نیست`,
           path: ['deaths'],
         });
       }
@@ -173,14 +175,14 @@ export function createDlgSchema(context: ValidationContext = {}) {
         if (!src.refId) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `منبع ${(i + 1).toLocaleString('fa-IR')}: باید یک گزینه انتخاب شود`,
+            message: `منبع ${getGlobalFormat().num(i + 1)}: باید یک گزینه انتخاب شود`,
             path: ['feedSources', i, 'refId'],
           });
         }
         if (!src.quantity || src.quantity <= 0) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `منبع ${(i + 1).toLocaleString('fa-IR')}: مقدار باید بیشتر از صفر باشد`,
+            message: `منبع ${getGlobalFormat().num(i + 1)}: مقدار باید بیشتر از صفر باشد`,
             path: ['feedSources', i, 'quantity'],
           });
         }
@@ -191,7 +193,7 @@ export function createDlgSchema(context: ValidationContext = {}) {
       if (d.deathsCount > flockAlive) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `تلفات (${d.deathsCount.toLocaleString('fa-IR')}) نمی‌تواند از تعداد زنده گله (${flockAlive.toLocaleString('fa-IR')}) بیشتر باشد`,
+          message: `تلفات (${getGlobalFormat().num(d.deathsCount)}) نمی‌تواند از تعداد زنده گله (${getGlobalFormat().num(flockAlive)}) بیشتر باشد`,
           path: ['deathsCount'],
         });
       }

@@ -1,3 +1,4 @@
+import { getGlobalFormat } from '../units/useFormat';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useUI } from '../../cor/store/ui';
 import { useAlt, activeAlerts } from '../../mod/alt/store';
@@ -255,7 +256,7 @@ export default function MenuDrawer() {
                         minWidth: 20, height: 20, borderRadius: 10,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         padding: '0 6px'
-                      }}>{toFa(alertCount)}</span>
+                      }}>{getGlobalFormat().count(alertCount)}</span>
                     ) : null}
 
                     {it.badge === 'stock' && stockCount > 0 ? (
@@ -265,7 +266,7 @@ export default function MenuDrawer() {
                         minWidth: 20, height: 20, borderRadius: 10,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         padding: '0 6px'
-                      }}>{toFa(stockCount)}</span>
+                      }}>{getGlobalFormat().count(stockCount)}</span>
                     ) : null}
                   </div>
                 );

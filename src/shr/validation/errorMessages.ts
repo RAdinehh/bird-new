@@ -3,8 +3,10 @@
  *
  * استاندارد GOV.UK: کوتاه، مثبت (فعل امری)، شامل اقدام
  */
+import { getGlobalFormat } from '../units/useFormat';
 
-const fa = (n: number) => Number(n).toLocaleString('fa-IR');
+
+const fa = (n: number) => getGlobalFormat().num(Number(n));
 
 export const MSG = {
   // اجباری‌ها

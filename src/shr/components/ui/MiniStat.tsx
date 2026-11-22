@@ -1,3 +1,4 @@
+import { getGlobalFormat } from '../../units/useFormat';
 import { toFa } from '../../utils/fa';
 
 type KpiColorKey = 'accent' | 'warn' | 'danger' | 'info';
@@ -25,7 +26,7 @@ export function MiniStat({ label, value, suffix = '', color = 'accent', noFormat
 
   if (variant === 'plain') {
     const display = typeof value === 'number'
-      ? (noFormat ? toFa(String(value)) : toFa(value.toLocaleString('fa-IR')))
+      ? (noFormat ? getGlobalFormat().code(String(value)) : getGlobalFormat().num(value))
       : String(value);
     return (
       <div style={{ textAlign: 'center' }}>
@@ -37,7 +38,7 @@ export function MiniStat({ label, value, suffix = '', color = 'accent', noFormat
 
   const bg = resolveSoft(color);
   const display = typeof value === 'number'
-    ? (noFormat ? toFa(String(Math.round(value))) : toFa((Math.round(value * 100) / 100).toLocaleString('fa-IR')))
+    ? (noFormat ? getGlobalFormat().code(String(Math.round(value))) : getGlobalFormat().num(Math.round(value * 100) / 100))
     : String(value);
   return (
     <div style={{

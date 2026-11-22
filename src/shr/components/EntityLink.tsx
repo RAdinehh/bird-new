@@ -1,3 +1,4 @@
+import { getGlobalFormat } from '../units/useFormat';
 import { useNavigate } from 'react-router-dom';
 import { toFa } from '../utils/fa';
 
@@ -77,7 +78,7 @@ export default function EntityLink({ type, id, label, sub, badge, badgeBg, badge
     >
       <span>{conf.icon}</span>
       <span>{label}</span>
-      {sub && <span style={{ color: 'var(--muted)', fontWeight: 400 }}>· {toFa(sub)}</span>}
+      {sub && <span style={{ color: 'var(--muted)', fontWeight: 400 }}>· {getGlobalFormat().code(sub)}</span>}
     </button>
   );
 }

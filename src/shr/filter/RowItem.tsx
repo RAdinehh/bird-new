@@ -1,3 +1,4 @@
+import { getGlobalFormat } from '../units/useFormat';
 import { type ReactNode } from 'react';
 import { IconCheck } from '../icons';
 import { toFa } from '../utils/fa';
@@ -44,7 +45,7 @@ export function RowItem({
           padding: '1px 5px', borderRadius: 'var(--r-sm)',
           fontVariantNumeric: 'tabular-nums',
           flexShrink: 0,
-        }}>{toFa(cnt)}</span>
+        }}>{getGlobalFormat().count(cnt)}</span>
       )}
       <span style={{
         width: 18, height: 18, flexShrink: 0,

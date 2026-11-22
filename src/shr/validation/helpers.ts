@@ -1,6 +1,8 @@
 /**
  * validation/helpers.ts — اسکیماهای پایه و ابزارها
  */
+import { getGlobalFormat } from '../units/useFormat';
+
 import { z } from 'zod';
 import { format as formatJ } from 'date-fns-jalali';
 import type { ValidationResult, ValidationIssue } from './types';
@@ -72,8 +74,8 @@ export const intRange = (label: string, min: number, max: number) =>
       invalid_type_error: `${label} را وارد کنید`,
     })
     .int('مقدار باید عدد صحیح باشد')
-    .min(min, `${label} باید حداقل ${min.toLocaleString('fa-IR')} باشد`)
-    .max(max, `${label} باید حداکثر ${max.toLocaleString('fa-IR')} باشد`),
+    .min(min, `${label} باید حداقل ${getGlobalFormat().num(min)} باشد`)
+    .max(max, `${label} باید حداکثر ${getGlobalFormat().num(max)} باشد`),
   );
 
 export const floatNonNeg = (label: string, max = 1_000_000) =>
@@ -105,8 +107,8 @@ export const floatRange = (label: string, min: number, max: number) =>
       required_error: `${label} را وارد کنید`,
       invalid_type_error: `${label} را وارد کنید`,
     })
-    .min(min, `${label} باید حداقل ${min.toLocaleString('fa-IR')} باشد`)
-    .max(max, `${label} باید حداکثر ${max.toLocaleString('fa-IR')} باشد`),
+    .min(min, `${label} باید حداقل ${getGlobalFormat().num(min)} باشد`)
+    .max(max, `${label} باید حداکثر ${getGlobalFormat().num(max)} باشد`),
   );
 
 /** 🆕 فیلد اجباری عددی اعشاری با پیام پویا («لطفاً طول را وارد کنید») */
@@ -117,8 +119,8 @@ export const requiredFloatRange = (label: string, min: number, max: number) =>
       required_error: `${label} را وارد کنید`,
       invalid_type_error: `${label} را وارد کنید`,
     })
-      .min(min, `${label} باید حداقل ${min.toLocaleString('fa-IR')} باشد`)
-      .max(max, `${label} باید حداکثر ${max.toLocaleString('fa-IR')} باشد`),
+      .min(min, `${label} باید حداقل ${getGlobalFormat().num(min)} باشد`)
+      .max(max, `${label} باید حداکثر ${getGlobalFormat().num(max)} باشد`),
   );
 
 /** 🆕 فیلد اختیاری عددی — پیام پویا */
@@ -128,8 +130,8 @@ export const optionalFloatRange = (label: string, min: number, max: number) =>
     z.number({
       invalid_type_error: `${label} را وارد کنید`,
     })
-      .min(min, `${label} باید حداقل ${min.toLocaleString('fa-IR')} باشد`)
-      .max(max, `${label} باید حداکثر ${max.toLocaleString('fa-IR')} باشد`)
+      .min(min, `${label} باید حداقل ${getGlobalFormat().num(min)} باشد`)
+      .max(max, `${label} باید حداکثر ${getGlobalFormat().num(max)} باشد`)
       .optional(),
   );
 
@@ -198,7 +200,7 @@ export const requiredStr = (label: string, min = 1, max = 500) =>
     .trim()
     .min(1, `${label} را وارد کنید`)
     .min(min, min > 1
-      ? `${label} باید حداقل ${min.toLocaleString('fa-IR')} کاراکتر باشد`
+      ? `${label} باید حداقل ${getGlobalFormat().num(min)} کاراکتر باشد`
       : `${label} را وارد کنید`)
     .max(max, `${label} بیش از حد طولانی است`);
 

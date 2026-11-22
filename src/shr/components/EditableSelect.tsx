@@ -9,6 +9,8 @@
  *   - ویرایش/حذف داخل آیتم‌های سفارشی
  *   - جستجو فقط اگه > ۵ آیتم
  */
+import { getGlobalFormat } from '../units/useFormat';
+
 
 import { useState, useMemo } from 'react';
 import { Btn, Field, Input } from './ui';
@@ -342,7 +344,7 @@ export default function EditableSelect({
     : (label || 'انتخاب');
 
   const subtitle = view === 'list' && searchable
-    ? `${toFa(all.length)} مورد`
+    ? `${getGlobalFormat().count(all.length)} مورد`
     : undefined;
 
   return (
@@ -383,9 +385,6 @@ export default function EditableSelect({
 }
 
 // ═══ helper ═══
-function toFa(n: number): string {
-  return String(n).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[+d]);
-}
 
 // ═══ Emoji Picker Inline ═══
 function EmojiPickerInline({ onPick, value }: { onPick: (e: string) => void; value?: string }) {

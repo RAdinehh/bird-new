@@ -150,7 +150,7 @@ export default function DealRecycleBinModal({ open, onClose }: Props) {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 2, borderTop: '1px dashed var(--border)', paddingTop: 6 }}>
                   <div style={{ fontSize: 10, color: 'var(--dim)', lineHeight: 1.4 }}>
                     <div>معامله: {deal.dealNumber || 'بدون شماره'} • {fmt.date(deal.date)}</div>
-                    <div>🗑️ حذف: {fmt.code(new Date(entry.deletedAt).toLocaleString('fa-IR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }))}</div>
+                    <div>🗑️ حذف: {(() => { const _d = new Date(entry.deletedAt); return fmt.code(`${String(_d.getMonth() + 1).padStart(2, '0')}/${String(_d.getDate()).padStart(2, '0')} ${String(_d.getHours()).padStart(2, '0')}:${String(_d.getMinutes()).padStart(2, '0')}`); })()}</div>
                   </div>
                   <div style={{ display: 'flex', gap: 4 }}>
                     <Btn size="sm" variant="outline" onClick={() => handleDeleteSingle(deal.id)} style={{ color: 'var(--danger)', borderColor: 'var(--danger)', minHeight: 28, height: 28, padding: '0 8px', fontSize: 11 }}>

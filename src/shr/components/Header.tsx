@@ -1,3 +1,4 @@
+import { getGlobalFormat } from '../units/useFormat';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../cor/store/theme';
@@ -129,7 +130,7 @@ export default function Header({ title }: { title: string }) {
 
       <IconBtn
         onClick={() => nav('/alt')}
-        badge={(counts.total + dueSoon) > 0 ? toFa(counts.total + dueSoon) : null}
+        badge={(counts.total + dueSoon) > 0 ? getGlobalFormat().count(counts.total + dueSoon) : null}
         badgeColor={counts.critical > 0 ? 'var(--danger)' : dueSoon > 0 ? 'var(--warn)' : 'var(--info)'}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">

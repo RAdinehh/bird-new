@@ -1,6 +1,8 @@
 /**
  * validation/rules/tra.ts — فاکتور خرید/فروش
  */
+import { getGlobalFormat } from '../../units/useFormat';
+
 import { z } from 'zod';
 import { MSG } from '../errorMessages';
 import {
@@ -211,7 +213,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       if (false && Math.abs(expected - (Number(it.total) || 0)) > 100) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `قلم ${i + 1}: جمع محاسبه‌شده (${expected.toLocaleString('fa-IR')}) با مقدار وارد شده (${(Number(it.total) || 0).toLocaleString('fa-IR')}) نمی‌خواند`,
+          message: `قلم ${i + 1}: جمع محاسبه‌شده (${getGlobalFormat().num(expected)}) با مقدار وارد شده (${(Number(it.total) || 0).toLocaleString('fa-IR')}) نمی‌خواند`,
           path: ['items', String(i), 'total'],
         });
       }
@@ -326,7 +328,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       
       const maxPrice = CATEGORY_MAX_PRICE[cat];
       if (maxPrice && Number(it.unitPrice) > maxPrice) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: `حداکثر قیمت واحد برای این دسته ${maxPrice.toLocaleString('fa-IR')} تومان است`, path: p('unitPrice') });
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: `حداکثر قیمت واحد برای این دسته ${getGlobalFormat().num(maxPrice)} تومان است`, path: p('unitPrice') });
       }
       
       if (Number(it.shipping) > 10000000000) {
@@ -378,7 +380,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
           if (afterSale > party.creditLimit) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message: `سقف اعتبار مشتری (${party.creditLimit.toLocaleString('fa-IR')} تومان) — بدهی فعلی: ${currentDebt.toLocaleString('fa-IR')}، این فاکتور: ${newTotal.toLocaleString('fa-IR')}`,
+              message: `سقف اعتبار مشتری (${getGlobalFormat().num(party.creditLimit)} تومان) — بدهی فعلی: ${getGlobalFormat().num(currentDebt)}، این فاکتور: ${getGlobalFormat().num(newTotal)}`,
               path: ['partyId'],
             });
           }
@@ -711,7 +713,7 @@ function basePaymentFormSchema(maxAmount: number) {
       .positive('مبلغ باید بیشتر از صفر باشد')
       .max(
         maxAmount,
-        `مبلغ نمی‌تواند بیشتر از بدهی فعلی (${maxAmount.toLocaleString('fa-IR')} تومان) باشد`,
+        `مبلغ نمی‌تواند بیشتر از بدهی فعلی (${getGlobalFormat().num(maxAmount)} تومان) باشد`,
       ),
     method: oneOf('روش', ['cash', 'card', 'check'] as const),
     notes: optionalStr(300),

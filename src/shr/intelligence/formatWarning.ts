@@ -7,6 +7,8 @@
  *   - مثبت و قابل اقدام
  *   - مقایسه با "میانگین شما" (مالکیت‌دار)
  */
+import { getGlobalFormat } from '../units/useFormat';
+
 import type { Warning } from './types';
 import { getProfile } from './fieldProfiles';
 
@@ -130,10 +132,7 @@ function fmtNum(n: number): string {
   if (!Number.isFinite(n)) return '—';
   const rounded = Math.round(n * 100) / 100;
   try {
-    return toFaDigit(rounded.toLocaleString('en-US', {
-      maximumFractionDigits: 2,
-      useGrouping: true,
-    }));
+    return getGlobalFormat().num(rounded);
   } catch {
     return toFaDigit(String(rounded));
   }

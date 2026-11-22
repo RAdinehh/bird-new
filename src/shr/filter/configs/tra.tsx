@@ -1,4 +1,6 @@
 /** filter/configs/tra.tsx */
+import { getGlobalFormat } from '../../units/useFormat';
+
 import { IconFolder, IconActivity, IconTag, IconDollar, IconClock, IconUser, IconCalendar, IconChart } from '../../icons';
 import { type Deal, type Invoice, DEAL_LABEL as TRA_DEAL_LABEL, remaining as traRemaining, ageDays as traAgeDays, agingBucket as traAgingBucket, WORKFLOW_LABEL as TRA_WORKFLOW_LABEL } from '../../../mod/tra/store';
 import type { FilterConfig } from './_types';
@@ -253,7 +255,7 @@ export function getTraInvoicesConfig(ctx: {
       {
         key: 'date', label: 'تاریخ',
         getKey: (i: Invoice) => i.date || 'unknown',
-        getLabel: (key: string) => toFa(key),
+        getLabel: (key: string) => getGlobalFormat().code(key),
       },
       {
         key: 'category', label: 'دسته کالا',
