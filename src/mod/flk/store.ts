@@ -897,7 +897,7 @@ export const useFlk = create<State>()(
           useFlk.setState({ isLoading: false });
         };
       },
-      version: 13,
+      version: 14,
       migrate: flkMigrate,
     }
   )

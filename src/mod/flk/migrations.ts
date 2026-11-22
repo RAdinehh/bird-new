@@ -73,6 +73,19 @@ export function flkMigrate(persistedInput: unknown, version: number): State {
   const state: { flocks?: LegacyFlock[] } = (persisted && persisted.state ? persisted.state : persisted) as { flocks?: LegacyFlock[] };
   if (!state || !state.flocks) return persistedInput as State;
 
+  // 🆕 v14 — ترمیم خودکار گله‌هایی که به علت باگ قبلی فاکتور، hatchDate > purchaseDate یا startDate دارند
+  if (version < 14) {
+    state.flocks = state.flocks.map((f: LegacyFlock) => {
+      const hd = typeof f.hatchDate === 'string' ? f.hatchDate : '';
+      let pd = typeof f.purchaseDate === 'string' ? f.purchaseDate : '';
+      let sd = typeof f.startDate === 'string' ? f.startDate : '';
+      if (hd && pd && hd > pd) pd = hd;
+      const minStart = [hd, pd].filter(Boolean).sort().pop() || '';
+      if (minStart && sd && sd < minStart) sd = minStart;
+      return { ...f, purchaseDate: pd, startDate: sd };
+    });
+  }
+
   // ─── v0 → v1: نسخه‌گذاری رویدادها ───
   if (version < 1) {
     state.flocks = state.flocks.map((f: LegacyFlock) => ({

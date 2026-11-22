@@ -643,16 +643,20 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           if (it.unitPrice) patch.purchasePrice = it.unitPrice;
           const transport = it.transportCost ?? it.shipping;
           if (transport) patch.deliveryCost = transport;
-          if (effectiveDate) patch.purchaseDate = effectiveDate;
         }
-      }
-      // 🆕 hatchDate sync (explicitFlockId)
-      if (inv.type === 'purchase' && it.hatchDate && it.hatchDate !== f.hatchDate) {
-        patch.hatchDate = it.hatchDate;
-      }
-      // 🆕 hatchDate sync (explicitFlockId)
-      if (inv.type === 'purchase' && it.hatchDate && it.hatchDate !== f.hatchDate) {
-        patch.hatchDate = it.hatchDate;
+        const nextHatch = it.hatchDate || f.hatchDate || '';
+        const nextPurchase = effectiveDate && (!f.purchaseDate || delta > 0) ? effectiveDate : (f.purchaseDate || effectiveDate || '');
+        const safePurchase = (nextHatch && nextPurchase && nextHatch > nextPurchase) ? nextHatch : nextPurchase;
+        if (safePurchase && safePurchase !== f.purchaseDate) {
+          patch.purchaseDate = safePurchase;
+        }
+        if (nextHatch && nextHatch !== f.hatchDate) {
+          patch.hatchDate = nextHatch;
+        }
+        const minValidStart = [nextHatch, safePurchase].filter(Boolean).sort().pop() || '';
+        if (minValidStart && (!f.startDate || f.startDate < minValidStart || f.startDate === f.purchaseDate)) {
+          patch.startDate = minValidStart;
+        }
       }
       flk.update(explicitFlockId, patch);
       updatedFlockIds.add(explicitFlockId);
@@ -812,8 +816,14 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           endOfCycleDay: biology?.endOfCycleDay ?? null,
           vaccineScheduleId: '',
           hatchDate: it.hatchDate || computeHatchDate(formatJ(new Date(), 'yyyy/MM/dd'), it.ageDays),
-          purchaseDate: effectiveDate,
-          startDate: effectiveDate,
+          purchaseDate: (() => {
+            const hd = it.hatchDate || computeHatchDate(formatJ(new Date(), 'yyyy/MM/dd'), it.ageDays);
+            return (hd && effectiveDate && hd > effectiveDate) ? hd : effectiveDate;
+          })(),
+          startDate: (() => {
+            const hd = it.hatchDate || computeHatchDate(formatJ(new Date(), 'yyyy/MM/dd'), it.ageDays);
+            return (hd && effectiveDate && hd > effectiveDate) ? hd : effectiveDate;
+          })(),
           source: 'purchase',
           dealType: 'own',
           purchasePrice: it.unitPrice || 0,
