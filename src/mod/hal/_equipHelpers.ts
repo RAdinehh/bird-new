@@ -66,7 +66,7 @@ export const PLACEHOLDER_BY_TYPE: Record<string, string> = {
   cooling_pad:       'پد سلولزی ۱۵۰×۶۰',
   // دانخوری
   feeder_chick_tray: 'سینی دانخوری جوجه',
-  feeder_manual:     'کله‌قندی ۴ کیلویی',
+  feeder_manual:     'دانخوری دستی ۴ کیلویی',
   feeder_pan:        'بشقابی ۴۰ سانت',
   feeder_chain:      'دانخوری زنجیری',
   feeder_tube:       'دانخوری لوله‌ای',
@@ -77,31 +77,31 @@ export const PLACEHOLDER_BY_TYPE: Record<string, string> = {
   drinker_auto_hanging: 'آبخوری آویز اتوماتیک',
   cup:               'کاپ آبخوری',
   trough:            'آبخوری ناودانی',
-  fountain_drinker:  'کله‌قندی ۳ لیتری',
+  fountain_drinker:  'آبخوری کله‌قندی ۳ لیتری',
   // گرمایش
   radiant_brooder:   'هیتر مادون قرمز',
-  jet_heater:        'جت هیتر ۵۰ kW',
+  jet_heater:        'جت هیتر ۵۰ کیلووات',
   duct_heater:       'هیتر کانالی',
   // روشنایی
-  lamp_led:          'لامپ LED سقفی',
+  lamp_led:          'لامپ ال‌ای‌دی سقفی',
   lamp_fluorescent:  'لامپ مهتابی',
   dimmer:            'دیمر تریاک',
   // بستر
-  litter_wood_shavings: 'خاک‌اره نرم',
+  litter_wood_shavings: 'پوشال چوب خشک',
   litter_roll:       'رول کاغذی',
   litter_sand:       'ماسه شسته',
   litter_rice_hull:  'سبوس برنج',
   litter_straw:      'کاه خرد شده',
-  litter_sawdust:    'خاک‌اره زبر',
+  litter_sawdust:    'خاک‌اره نرم',
   litter_peat:       'پیت ماس',
   // برق
-  generator:         'ژنراتور ۱۰ kW',
+  generator:         'ژنراتور ۱۰ کیلووات',
   electrical_panel:  'تابلو برق اصلی',
   cable:             'کابل ۳×۲.۵',
   // جانبی
   camera:            'دوربین دام',
   sensor:            'سنسور دما',
-  scale:             'ترازو دیجیتال',
+  scale:             'ترازو دیجیتال آویز',
   // تصفیه آب
   water_tank:        'مخزن ۳۰۰ لیتری',
   water_filter:      'فیلتر آب',
@@ -127,8 +127,8 @@ export const PLACEHOLDER_BY_TYPE: Record<string, string> = {
   feed_scale:        'ترازو دان',
   platform_scale:    'باسکول ۵۰۰ کیلوگرمی',
   // سردکننده
-  fogger:            'مه‌پاش',
-  misting_system:    'سیستم مه‌پاش',
+  fogger:            'مه‌پاش دیسکی',
+  misting_system:    'خط مه‌پاش نازلی',
   swamp_cooler:      'کولر آبی ۴۰۰۰',
 };
 
