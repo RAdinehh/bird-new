@@ -159,7 +159,7 @@ export default function BreedDetailPage() {
               cursor: 'pointer',
             }}
           >
-            🔄 بازگشت به پیش‌فرض
+            ↺ بازگشت به پیش‌فرض
           </button>
         ) : null}
       </PageContainer>

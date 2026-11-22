@@ -337,7 +337,7 @@ export default function EnvStandardsTab() {
       <Btn onClick={() => setShowAddModal(true)} full>➕ افزودن نژاد جدید</Btn>
 
       {Object.keys(custom).length > 0 ? (
-        <Btn onClick={resetAll} full>🔄 بازگشت همه به پیش‌فرض</Btn>
+        <Btn onClick={resetAll} full>↺ بازگشت همه به پیش‌فرض</Btn>
       ) : null}
 
       {/* 💾 صادرات/واردات */}

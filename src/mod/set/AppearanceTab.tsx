@@ -189,7 +189,7 @@ export default function AppearanceTab() {
         </Grid2>
 
         <Btn size="sm" full onClick={() => s.update({ bottomNav: ['dsh', 'dlg', 'inc', 'rep', 'set'] })}>
-          🔄 بازنشانی به پیش‌فرض
+          ↺ بازنشانی به پیش‌فرض
         </Btn>
       </SettingsGroup>
 

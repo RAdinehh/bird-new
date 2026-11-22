@@ -9,8 +9,7 @@
  *   ✅ بدون ✏️ — فیلد مستقیم قابل ویرایش
  *   ✅ نمایش طبق تنظیم کاربر
  *   ✅ ورودی قبول هر دو فارسی/انگلیسی
- *   ✅ زرد + متن «تغییر یافته» وقتی override
- *   ✅ دکمه 🔄 سمت چپ (فقط وقتی تغییر کرده)
+ *   ✅ یکپارچه با OverrideHint (استاندارد: ... ↺)
  */
 import { useState, useEffect } from 'react';
 import { useFormat } from '../../../../../shr/units/useFormat';
