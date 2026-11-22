@@ -201,14 +201,8 @@ export function createFlkSchema(context: ValidationContext = {}) {
         path: ['startDate'],
       });
     }
-    // خرید ≤ شروع نگهداری
-    if (d.purchaseDate && d.startDate && d.purchaseDate > d.startDate) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'تاریخ خرید باید قبل از شروع نگهداری باشد',
-        path: ['startDate'],
-      });
-    }
+      // توجه: startDate (ورود واقعی به سالن) می‌تواند در ثبت فاکتورهای تاریخی قبل از purchaseDate (تاریخ ثبت فاکتور) باشد،
+      // بنابراین فقط ترتیب بیولوژیکی hatchDate <= startDate و hatchDate <= purchaseDate الزامی است.
 
     // تاریخ‌ها در آینده نباشند (Jalali comparison — fix: بود Gregorian)
     // منبع hatch → hatchDate اجباری
