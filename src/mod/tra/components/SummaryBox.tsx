@@ -29,16 +29,16 @@ export default function SummaryBox({ kind, totalInvoiced, totalOpen, settledAmou
           {toFa(totalInvoiced.toLocaleString('fa-IR'))} <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)' }}>تومان</span>
         </span>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', alignItems: 'center', borderTop: '1px solid rgba(148, 163, 184, 0.4)', paddingTop: 8 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, alignItems: 'center', borderTop: '1px solid rgba(148, 163, 184, 0.4)', paddingTop: 8 }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 1, whiteSpace: 'nowrap' }}>
           <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-sm)', fontWeight: 500 }}>باقی‌مانده</span>
           <span style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', direction: 'ltr', fontSize: 'var(--fs-md)', color: 'var(--warn)' }}>{toFa(totalOpen.toLocaleString('fa-IR'))}</span>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 1, whiteSpace: 'nowrap', borderLeft: '1px solid var(--border)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 1, whiteSpace: 'nowrap' }}>
           <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-sm)', fontWeight: 500 }}>{isDeal ? 'دریافت‌شده' : 'پرداخت‌شده'}</span>
           <span style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', direction: 'ltr', fontSize: 'var(--fs-md)', color: 'var(--accent)' }}>{toFa(settledAmount.toLocaleString('fa-IR'))}</span>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 1, whiteSpace: 'nowrap', borderLeft: '1px solid var(--border)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 1, whiteSpace: 'nowrap' }}>
           <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-sm)', fontWeight: 500 }}>نزدیک سرسید</span>
           <span style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', direction: 'ltr', fontSize: 'var(--fs-md)', color: 'var(--danger)' }}>{toFa(dueSoonAmount.toLocaleString('fa-IR'))}</span>
         </div>
