@@ -77,7 +77,7 @@ export default function ZoneFormModal({
             lineHeight: 1.6,
             marginTop: "calc(-1 * var(--sp-1))",
           }}>
-            ثبت شده طبق سالن برای <strong style={{ color: "var(--text)", fontWeight: 600 }}>{target}</strong>
+            ثبت شده طبق سالن برای {target}
           </div>
         );
       })()}
