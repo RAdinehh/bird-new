@@ -111,7 +111,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   const computeAgeFromHatch = (hatchDateStr: string | undefined): number | null => {
     if (!hatchDateStr) return null;
     try {
-      const inv = invoiceDate || formatJ(new Date(), 'yyyy/MM/dd');
+      const inv = formatJ(new Date(), 'yyyy/MM/dd');
       const d1 = parseJ(toEn(hatchDateStr), 'yyyy/MM/dd', new Date());
       const d2 = parseJ(toEn(inv), 'yyyy/MM/dd', new Date());
       if (isValid(d1) && isValid(d2)) return Math.max(0, differenceInCalendarDays(d2, d1));
@@ -300,10 +300,12 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           )}
           <Field label="سن (روز)" hint="تاریخ هچ خودکار محاسبه می‌شود">
             <Input mode="number" value={item.ageDays != null && item.ageDays >= 0 ? String(item.ageDays) : ''} onChange={e => {
-              const v = Math.round(parseFaNum(e.target.value)) || null;
+              const rawStr = e.target.value.trim();
+              const parsed = rawStr === '' ? NaN : Math.round(parseFaNum(rawStr));
+              const v = !isNaN(parsed) && parsed >= 0 ? parsed : null;
               if (v !== null) {
-                const invDateStr = invoiceDate || formatJ(new Date(), 'yyyy/MM/dd');
-                const invDate = parseJ(toEn(invDateStr), 'yyyy/MM/dd', new Date());
+                const invDateStr = formatJ(new Date(), 'yyyy/MM/dd');
+                const invDate = parseJ(invDateStr, 'yyyy/MM/dd', new Date());
                 const newHatch = subDays(invDate, v);
                 updateItem({ ageDays: v, hatchDate: formatJ(newHatch, 'yyyy/MM/dd') });
               } else {
@@ -393,10 +395,12 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           )}
           <Field label="سن (روز)" hint="تاریخ هچ خودکار محاسبه می‌شود">
             <Input mode="number" value={item.ageDays != null && item.ageDays >= 0 ? String(item.ageDays) : ''} onChange={e => {
-              const v = Math.round(parseFaNum(e.target.value)) || null;
+              const rawStr = e.target.value.trim();
+              const parsed = rawStr === '' ? NaN : Math.round(parseFaNum(rawStr));
+              const v = !isNaN(parsed) && parsed >= 0 ? parsed : null;
               if (v !== null) {
-                const invDateStr = invoiceDate || formatJ(new Date(), 'yyyy/MM/dd');
-                const invDate = parseJ(toEn(invDateStr), 'yyyy/MM/dd', new Date());
+                const invDateStr = formatJ(new Date(), 'yyyy/MM/dd');
+                const invDate = parseJ(invDateStr, 'yyyy/MM/dd', new Date());
                 const newHatch = subDays(invDate, v);
                 updateItem({ ageDays: v, hatchDate: formatJ(newHatch, 'yyyy/MM/dd') });
               } else {

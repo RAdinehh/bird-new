@@ -811,7 +811,7 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           layingStartDay: biology?.layingStartDay ?? 0,
           endOfCycleDay: biology?.endOfCycleDay ?? null,
           vaccineScheduleId: '',
-          hatchDate: it.hatchDate || computeHatchDate(effectiveDate, it.ageDays),
+          hatchDate: it.hatchDate || computeHatchDate(formatJ(new Date(), 'yyyy/MM/dd'), it.ageDays),
           purchaseDate: effectiveDate,
           startDate: effectiveDate,
           source: 'purchase',
