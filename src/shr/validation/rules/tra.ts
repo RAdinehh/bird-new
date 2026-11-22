@@ -213,7 +213,7 @@ export function createInvoiceSchema(ctx: ValidationContext = {}) {
       if (false && Math.abs(expected - (Number(it.total) || 0)) > 100) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `قلم ${i + 1}: جمع محاسبه‌شده (${getGlobalFormat().num(expected)}) با مقدار وارد شده (${(Number(it.total) || 0).toLocaleString('fa-IR')}) نمی‌خواند`,
+          message: `قلم ${i + 1}: جمع محاسبه‌شده (${getGlobalFormat().num(expected)}) با مقدار وارد شده (${getGlobalFormat().num(Number(it.total) || 0)}) نمی‌خواند`,
           path: ['items', String(i), 'total'],
         });
       }
