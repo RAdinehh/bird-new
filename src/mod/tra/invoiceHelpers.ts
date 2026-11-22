@@ -557,6 +557,44 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
     }
   }
 
+  // جابه‌جایی گله در ویرایش فاکتور خرید: اگر کاربر گله متصل‌شده را به گله دیگری تغییر داد
+  for (const k of allKeys) {
+    const p0 = prevMap.get(k);
+    const n0 = newMap.get(k);
+    if (!p0 || !n0 || n0.type !== 'purchase') continue;
+    const prevFlockId = (prev as any)?.relatedFlockId || p0.item.flockId || p0.item.existingFlockId || '';
+    const nextFlockId = (inv as any).relatedFlockId || n0.item.existingFlockId || n0.item.flockId || '';
+    if (prevFlockId && prevFlockId !== nextFlockId) {
+      const oldFlock = flk.flocks.find(x => x.id === prevFlockId);
+      const pq = p0.qty || 0;
+      if (oldFlock && pq > 0) {
+        if ((oldFlock.currentCount ?? 0) < pq) {
+          throw new Error(`امکان تغییر گله نیست: از «${oldFlock.name}» قبلاً مصرف/تلفات ثبت شده و موجودی فعلی (${oldFlock.currentCount}) کمتر از تعداد فاکتور (${pq}) است`);
+        }
+        const nextOldCount = Math.max(0, (oldFlock.currentCount ?? 0) - pq);
+        const oldPatch: any = {
+          currentCount: nextOldCount,
+          initialCount: Math.max(0, (oldFlock.initialCount ?? 0) - pq),
+        };
+        const pm = Number(p0.item.maleCount || 0);
+        const pf = Number(p0.item.femaleCount || 0);
+        const pu = Number(p0.item.unknownCount || 0);
+        if (pm + pf + pu > 0) {
+          if (pm > 0) oldPatch.maleCount = Math.max(0, (oldFlock.maleCount ?? 0) - pm);
+          if (pf > 0) oldPatch.femaleCount = Math.max(0, (oldFlock.femaleCount ?? 0) - pf);
+          if (pu > 0) oldPatch.unknownCount = Math.max(0, (oldFlock.unknownCount ?? 0) - pu);
+        } else if (!oldFlock.genderSplitAt) {
+          oldPatch.unknownCount = nextOldCount;
+        } else {
+          oldPatch.unknownCount = Math.max(0, (oldFlock.unknownCount ?? 0) - pq);
+        }
+        flk.update(prevFlockId, oldPatch);
+        updatedFlockIds.add(prevFlockId);
+      }
+      prevMap.delete(k);
+    }
+  }
+
   for (const k of allKeys) {
     const p0 = prevMap.get(k);
     const n0 = newMap.get(k);

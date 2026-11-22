@@ -274,7 +274,10 @@ export function useInvoiceForm(params: {
     }
     setForm({
       id: inv.id, date: inv.date, partyId: inv.partyId, category: inv.category,
-      items: inv.items || [],
+      items: (inv.items || []).map((it: any) => {
+        const linkedId = it.existingFlockId || it.flockId || (inv as any).relatedFlockId || '';
+        return linkedId ? { ...it, existingFlockId: linkedId, flockId: it.flockId || linkedId } : it;
+      }),
       paymentTerms: inv.paymentTerms || 'cash',
       installmentCount: inv.installmentCount ? getGlobalFormat().code(inv.installmentCount) : '1',
       installmentGapDays: inv.installmentGapDays ? getGlobalFormat().code(inv.installmentGapDays) : '30',
