@@ -231,10 +231,11 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
 
                     if (isAirFlow) {
                       rows.push({ label: "مجموع هوادهی:", value: `${fmtInt(totalVal)} m³/h` });
+                      let minLabel = "";
                       if (hallVol > 0) {
                         const cph = totalVal / hallVol;
                         const cpm = cph / 60;
-                        const minLabel = cpm >= 1
+                        minLabel = cpm >= 1
                           ? `${fmtInt(cpm)} بار در دقیقه`
                           : cpm > 0
                             ? `هر ${toFa(Math.max(1, Math.round(1 / cpm)))} دقیقه ۱ بار`
@@ -245,37 +246,56 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                         });
                       }
                       const isFanType = ["fan_tunnel", "fan_ceiling", "fan"].includes(t);
-                      if (isFanType && hallCap > 0) {
-                        const stdCoef = stdForDefaults?.equipment?.fanM3PerKg || 4.5;
-                        const targetW = stdForDefaults?.growth?.weightByAge?.[stdForDefaults.growth.weightByAge.length - 1]?.weightG || 2000;
-                        const needM3h = Math.ceil(((hallCap * targetW) / 1000) * stdCoef);
-                        rows.push({ label: `نیاز سالن (${toFa(hallCap)} قطعه):`, value: `${fmtInt(needM3h)} m³/h` });
-                        statusText = totalVal >= needM3h ? "کافیه" : "کم داره";
-                      } else if (hallCap > 0) {
-                        statusText = "ثبت شد";
+                      if (isFanType) {
+                        if (hallCap > 0) {
+                          const stdCoef = stdForDefaults?.equipment?.fanM3PerKg || 4.5;
+                          const targetW = stdForDefaults?.growth?.weightByAge?.[stdForDefaults.growth.weightByAge.length - 1]?.weightG || 2000;
+                          const needM3h = Math.ceil(((hallCap * targetW) / 1000) * stdCoef);
+                          const diff = Math.round(totalVal - needM3h);
+                          statusText = diff > 0
+                            ? `کافی (${toFa(diff)} m³/h اضافه)`
+                            : diff === 0
+                              ? "دقیقاً به اندازه نیاز سالن"
+                              : `کم داره (${toFa(Math.abs(diff))} m³/h کمبود)`;
+                        } else {
+                          statusText = "ثبت ظرفیت سالن برای بررسی کفایت";
+                        }
                       } else {
-                        statusText = "ثبت ظرفیت سالن برای بررسی کفایت";
+                        statusText = hallVol > 0
+                          ? (minLabel || "محاسبه شد")
+                          : "ثبت ابعاد سالن برای محاسبه تعویض هوا";
                       }
                     } else if (isBirdCap) {
                       rows.push({ label: "ظرفیت پوشش کل:", value: `${fmtInt(totalVal)} راس` });
                       if (hallCap > 0) {
-                        rows.push({ label: "ظرفیت سالن:", value: `${toFa(hallCap)} راس` });
-                        statusText = totalVal >= hallCap ? "کافیه" : "کم داره";
+                        const diff = Math.round(totalVal - hallCap);
+                        statusText = diff > 0
+                          ? `کافی (${toFa(diff)} راس اضافه)`
+                          : diff === 0
+                            ? "دقیقاً به اندازه ظرفیت سالن"
+                            : `کم داره (${toFa(Math.abs(diff))} راس کمبود)`;
                       } else {
                         statusText = "ثبت ظرفیت سالن برای بررسی کفایت";
                       }
                     } else if (isLamp) {
                       rows.push({ label: "مجموع توان:", value: `${fmtInt(totalVal)} W` });
                       if (hallArea > 0) {
-                        const wPerM2 = totalVal / hallArea;
-                        rows.push({ label: "توان هر مترمربع:", value: `${fmtInt(wPerM2)} W/m²` });
-                        statusText = wPerM2 >= 3 ? "کافیه" : "کم داره";
+                        const wPerM2 = Math.round(totalVal / hallArea);
+                        const stdW = stdForDefaults?.equipment?.lampWattPerM2 || 3;
+                        statusText = wPerM2 >= stdW
+                          ? `کافی (${toFa(wPerM2)} از ${toFa(stdW)} W/m²)`
+                          : `کم داره (${toFa(wPerM2)} از ${toFa(stdW)} W/m²)`;
                       } else {
                         statusText = "ثبت ابعاد سالن برای بررسی کفایت";
                       }
                     } else if (isHeating) {
                       rows.push({ label: "مجموع توان گرمایشی:", value: `${fmtInt(totalVal)} kW` });
-                      statusText = hallCap > 0 ? "ثبت شد" : "ثبت ظرفیت سالن برای بررسی کفایت";
+                      if (hallArea > 0) {
+                        const wPerM2 = Math.round((totalVal * 1000) / hallArea);
+                        statusText = `${toFa(wPerM2)} W به ازای هر m² سالن`;
+                      } else {
+                        statusText = "ثبت ابعاد سالن برای محاسبه پوشش";
+                      }
                     }
 
                     return (
