@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 /**
  * FlockPickerSheet.tsx — انتخاب‌گر گله برای ثبت امروز
  * استاندارد: Batch-Centric + ExpandableCard (L10)
@@ -34,6 +35,7 @@ interface Props {
 
 export default function FlockPickerSheet({ open, onClose, flocks, logs, todayStr, onEdit, onAdd }: Props) {
   const fmt = useFormat();
+  const nav = useNavigate();
   const { breeds } = useBrd();
   const [expandedFlockId, setExpandedFlockId] = useState<string | null>(null);
 
@@ -55,12 +57,37 @@ export default function FlockPickerSheet({ open, onClose, flocks, logs, todayStr
   return (
     <Sheet open={open} onClose={onClose} title="ثبت امروز — انتخاب گله">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '4px 0', maxHeight: '60vh', overflowY: 'auto' }}>
-        <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginBottom: 8 }}>
-          {fmt.count(pending)} گله از {fmt.count(flocks.length)} منتظر ثبت
-        </div>
+        {items.length > 0 && (
+          <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginBottom: 8 }}>
+            {fmt.count(pending)} گله از {fmt.count(flocks.length)} منتظر ثبت
+          </div>
+        )}
         {items.length === 0 && (
-          <div style={{ padding: 24, textAlign: 'center', color: 'var(--muted)' }}>
-            هیچ گله فعالی نداری
+          <div style={{ padding: '24px 16px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+            <div style={{ fontSize: 28 }}>🐔</div>
+            <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>
+              هنوز گله فعالی ثبت نشده است
+            </div>
+            <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', lineHeight: 1.6, maxWidth: 280 }}>
+              برای ثبت گزارش روزانه (دما، دان، آب، تلفات و تخم)، ابتدا یک گله جدید ایجاد یا فعال کنید.
+            </div>
+            <button
+              type="button"
+              onClick={() => { onClose(); nav('/flk'); }}
+              style={{
+                marginTop: 6,
+                padding: '10px 18px',
+                borderRadius: 10,
+                border: 'none',
+                background: 'var(--accent)',
+                color: '#fff',
+                fontWeight: 700,
+                fontSize: 'var(--fs-sm)',
+                cursor: 'pointer',
+              }}
+            >
+              + رفتن به بخش گله‌ها
+            </button>
           </div>
         )}
         {items.map(({ flock, existingLogs, deathsToday, breed, age, alive }) => {
