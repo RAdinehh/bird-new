@@ -1,6 +1,8 @@
 /**
  * HatchFormModal.tsx — فرم ثبت/ویرایش هچ
  */
+import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { toFa } from '../../../shr/utils/fa';
 import {
   Btn, BtnRow, ErrorBox, Field, Grid2, Modal, NumField,
@@ -44,6 +46,7 @@ export interface HatchFormModalProps {
 }
 
 export default function HatchFormModal(props: HatchFormModalProps) {
+  const fmt = useFormat();
   const {
     open, editingId, formDate, setFormDate, formEntryId, setFormEntryId,
     deviceFilter, setDeviceFilter, selectedIds, entriesData, err, vErrors,
@@ -64,7 +67,7 @@ export default function HatchFormModal(props: HatchFormModalProps) {
             onClick={onSave}
             disabled={Object.keys(vErrors).length > 0}
           >
-            ذخیره ({toFa(editingId ? 1 : selectedIds.size)})
+            ذخیره ({fmt.count(editingId ? 1 : selectedIds.size)})
           </Btn>
           <Btn onClick={onClose}>لغو</Btn>
         </BtnRow>
@@ -83,7 +86,7 @@ export default function HatchFormModal(props: HatchFormModalProps) {
               const dev = devicesById[e.deviceId];
               return (
                 <option key={e.id} value={e.id}>
-                  {bird?.name || '—'} • {toFa(e.entryDate)} • {toFa(e.count || 0)} تخم • {dev?.name || ''}
+                  {bird?.name || '—'} • {fmt.date(e.entryDate)} • {fmt.count(e.count || 0)} تخم • {dev?.name || ''}
                 </option>
               );
             })}
@@ -93,7 +96,7 @@ export default function HatchFormModal(props: HatchFormModalProps) {
         <>
           <Field
             label="فیلتر دستگاه"
-            hint={selectedIds.size > 0 ? toFa(selectedIds.size) + ' انتخاب‌شده' : undefined}
+            hint={selectedIds.size > 0 ? fmt.count(selectedIds.size) + ' انتخاب‌شده' : undefined}
           >
             <Select value={deviceFilter} onChange={e => setDeviceFilter(e.target.value)}>
               <option value="">— همه دستگاه‌ها —</option>
@@ -165,6 +168,7 @@ export default function HatchFormModal(props: HatchFormModalProps) {
 
 // ===== بخش ویرایش (فقط وقتی editingId داریم) =====
 function EditFields({ data: d, update }: { data: HatchRowData; update: (p: Partial<HatchRowData>) => void }) {
+  const fmt = useFormat();
   const int = (s: string) => parseInt(s || '0') || 0;
   const h = int(d.hatched);
   const uh = int(d.unhatched);
@@ -227,7 +231,7 @@ function EditFields({ data: d, update }: { data: HatchRowData; update: (p: Parti
       ) : (
         <>
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
-            🏅 تفکیک کیفی — از {toFa(hatchedNum)} هچ‌شده
+            🏅 تفکیک کیفی — از {fmt.count(hatchedNum)} هچ‌شده
           </div>
           <Grid2>
             <Field label="درجه A">
@@ -238,7 +242,7 @@ function EditFields({ data: d, update }: { data: HatchRowData; update: (p: Parti
             </Field>
           </Grid2>
           <StatusBar
-            label={`A + B: ${toFa(gradesUsed)} / ${toFa(hatchedNum)}`}
+            label={`A + B: ${fmt.count(gradesUsed)} / ${fmt.count(hatchedNum)}`}
             remaining={gradesRem}
             ok={gradesOk}
           />
@@ -263,7 +267,7 @@ function EditFields({ data: d, update }: { data: HatchRowData; update: (p: Parti
             </Field>
           </Grid2>
           <StatusBar
-            label={`♂ + ♀ + ?: ${toFa(genderUsed)} / ${toFa(hatchedNum)}`}
+            label={`♂ + ♀ + ?: ${fmt.count(genderUsed)} / ${fmt.count(hatchedNum)}`}
             remaining={genderRem}
             ok={genderOk}
           />
@@ -289,7 +293,7 @@ function StatusBar({ label, remaining, ok }: { label: string; remaining: number;
       fontSize: 'var(--fs-xs)', color,
       fontWeight: 700, textAlign: 'center',
     }}>
-      {label}{!ok ? ' 🔴 اضافی' : remaining === 0 ? ' ✅ کامل' : ' • ⏳ ' + toFa(remaining) + ' باقی'}
+      {label}{!ok ? ' 🔴 اضافی' : remaining === 0 ? ' ✅ کامل' : ' • ⏳ ' + getGlobalFormat().count(remaining) + ' باقی'}
     </div>
   );
 }

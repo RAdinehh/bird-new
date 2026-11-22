@@ -1,3 +1,4 @@
+import { useFormat } from '../../../shr/units/useFormat';
 import { toFa } from '../../../shr/utils/fa';
 import { Btn, Select, Tag } from '../../../shr/components/ui';
 import ExpandableCard, { StatBox, Dot } from '../../../shr/components/ExpandableCard';
@@ -31,6 +32,7 @@ export default function DeviceCard({
   d, index, stats, isOpen, onToggle, ms, chartMetric, setChartMetric,
   onEdit, onDelete, onRecordReading, onRemoveMaintenance, onAddMaintenance,
 }: Props) {
+  const fmt = useFormat();
   const totalEggs = stats.totalEggs;
   const activeEntries = stats.activeCount;
   const caps = d.capacityByBird || [];
@@ -40,16 +42,16 @@ export default function DeviceCard({
   const w = warrantyInfo(d.purchasedAt, d.warranty);
 
   return (
-    <ExpandableCard key={d.id} id={d.id} ms={ms} accent={accentFor(d.status)} index={toFa(index + 1)} iconEmoji="🥚"
+    <ExpandableCard key={d.id} id={d.id} ms={ms} accent={accentFor(d.status)} index={fmt.count(index + 1)} iconEmoji="🥚"
                 title={d.name} subtitle={MODE_FA[d.mode] + ' • ' + STATUS_FA[d.status]}
                 isOpen={isOpen} onToggle={onToggle}
-                badge={activeEntries > 0 ? <Tag tone="green">{toFa(activeEntries)} ورودی فعال</Tag> : undefined}
+                badge={activeEntries > 0 ? <Tag tone="green">{fmt.count(activeEntries)} ورودی فعال</Tag> : undefined}
                 stats={<>
-                  <StatBox icon="📊" label="استفاده" value={toFa(totalEggs) + '/' + toFa(totalCap)} tone={usagePercent > 90 ? 'warn' : 'accent'} />
+                  <StatBox icon="📊" label="استفاده" value={fmt.count(totalEggs) + '/' + fmt.count(totalCap)} tone={usagePercent > 90 ? 'warn' : 'accent'} />
                   <Dot />
-                  <StatBox icon="🔄" label="ورودی" value={toFa(activeEntries)} />
+                  <StatBox icon="🔄" label="ورودی" value={fmt.count(activeEntries)} />
                   <Dot />
-                  <StatBox icon="🛠" label="تعمیر" value={toFa(logs.length)} />
+                  <StatBox icon="🛠" label="تعمیر" value={fmt.count(logs.length)} />
                 </>}
               >
                 {caps.length > 0 && (
@@ -59,7 +61,7 @@ export default function DeviceCard({
                       {caps.map(c => (
                         <div key={c.birdName} style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
                           <span>{c.birdName}</span>
-                          <span style={{ fontWeight: 600 }}>{c.capacity ? toFa(c.capacity) : '—'}</span>
+                          <span style={{ fontWeight: 600 }}>{c.capacity ? fmt.count(c.capacity) : '—'}</span>
                         </div>
                       ))}
                     </div>
@@ -69,12 +71,12 @@ export default function DeviceCard({
                 {(d.purchasedAt || d.price || d.warranty) && (
                   <>
                     <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی</div>
-                    {d.price && <Row l="قیمت" v={toFa(d.price.toLocaleString('fa-IR')) + ' ت'} />}
-                    {d.purchasedAt && <Row l="تاریخ خرید" v={toFa(d.purchasedAt)} />}
-                    {d.warranty && <Row l="گارانتی" v={toFa(d.warranty) + ' ماه'} />}
+                    {d.price && <Row l="قیمت" v={fmt.money(d.price)} />}
+                    {d.purchasedAt && <Row l="تاریخ خرید" v={fmt.date(d.purchasedAt)} />}
+                    {d.warranty && <Row l="گارانتی" v={fmt.int(d.warranty) + ' ماه'} />}
                     {w && w.expired && (
                       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, padding: '4px 8px', background: 'var(--danger-soft)', borderRadius: 'var(--r-sm)', textAlign: 'center' }}>
-                        ⏰ گارانتی تمام شده ({toFa(w.end)})
+                        ⏰ گارانتی تمام شده ({fmt.date(w.end)})
                       </div>
                     )}
                   </>
@@ -84,11 +86,11 @@ export default function DeviceCard({
                 <>
                   <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🌡 پایش زنده</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    {d.temp != null && <Row l="دما محیط" v={toFa(d.temp) + '°C'} />}
-                    {d.humidity != null && <Row l="رطوبت" v={toFa(d.humidity) + '٪'} />}
-                    {d.estCurrent != null && <Row l="EST (پوسته تخم)" v={toFa(d.estCurrent) + '°C'} />}
-                    {d.co2Current != null && <Row l="CO₂" v={toFa(d.co2Current) + '٪'} />}
-                    {d.o2Current != null && <Row l="O₂" v={toFa(d.o2Current) + '٪'} />}
+                    {d.temp != null && <Row l="دما محیط" v={fmt.num(d.temp) + '°C'} />}
+                    {d.humidity != null && <Row l="رطوبت" v={fmt.num(d.humidity) + '٪'} />}
+                    {d.estCurrent != null && <Row l="EST (پوسته تخم)" v={fmt.num(d.estCurrent) + '°C'} />}
+                    {d.co2Current != null && <Row l="CO₂" v={fmt.num(d.co2Current) + '٪'} />}
+                    {d.o2Current != null && <Row l="O₂" v={fmt.num(d.o2Current) + '٪'} />}
                     {d.turningCurrent && <Row l="چرخش" v={d.turningCurrent === 'on' ? '🔄 روشن' : d.turningCurrent === 'off' ? '⏸ قطع' : '🤖 خودکار'} />}
                   </div>
                   <Btn size="sm" full onClick={onRecordReading}>📊 ثبت قرائت</Btn>
@@ -152,8 +154,8 @@ export default function DeviceCard({
                           }}
                         >✕</button>
                         <span style={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.type}</span>
-                        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(m.date)}</span>
-                        {m.cost ? <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600 }}>{toFa(m.cost.toLocaleString('fa-IR'))} ت</span> : null}
+                        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{fmt.date(m.date)}</span>
+                        {m.cost ? <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600 }}>{fmt.money(m.cost)}</span> : null}
                       </div>
                     ))}
                   </div>

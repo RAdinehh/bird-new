@@ -3,6 +3,8 @@
  *
  * بخش «ظرفیت بر اساس پرنده» در فرم DevicesPage.
  */
+import { getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useState } from 'react';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { Field, Grid2, NumField } from '../../../shr/components/ui';
@@ -75,7 +77,7 @@ export default function CapacityEditor(props: CapacityEditorProps) {
     }
   };
 
-  const fmt = (v: any) => (v != null && v !== '') ? toFa(String(v)) : '—';
+  const fmt = (v: any) => (v != null && v !== '') ? getGlobalFormat().code(String(v)) : '—';
   const resetBtnStyle = {
     background: 'none', border: 'none', color: 'var(--warn)',
     cursor: 'pointer', fontSize: 'var(--fs-xs)', fontFamily: 'inherit',

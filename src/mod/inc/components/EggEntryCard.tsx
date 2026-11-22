@@ -1,6 +1,8 @@
 /**
  * EggEntryCard.tsx — کارت نمایش یک ورودی تخم
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { toFa } from '../../../shr/utils/fa';
 import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard, { StatBox, Dot } from '../../../shr/components/ExpandableCard';
@@ -38,6 +40,7 @@ export interface EggEntryCardProps {
 }
 
 export default function EggEntryCard(props: EggEntryCardProps) {
+  const fmt = useFormat();
   const {
     entry: e, index: i, device: dev, bird, breed,
     flocks, contacts, hatches, age, expectedHatch, remain, totalDays,
@@ -57,7 +60,7 @@ export default function EggEntryCard(props: EggEntryCardProps) {
   if (myHatch) { statusLabel = '✅ هچ‌شده'; statusTone = 'green'; }
   else if (hatchWindow) { statusLabel = '🐣 پنجره هچ'; statusTone = 'purple'; }
   else if (locked) { statusLabel = '🔒 Lock-down'; statusTone = 'amber'; }
-  else if (remain > 0) { statusLabel = toFa(remain) + ' روز مانده'; statusTone = 'accent'; }
+  else if (remain > 0) { statusLabel = fmt.day(remain) + ' روز مانده'; statusTone = 'accent'; }
   else if (remain === 0) { statusLabel = '🎯 امروز هچ'; statusTone = 'purple'; }
   else { statusLabel = '⚠️ گذشته از موعد هچ'; statusTone = 'amber'; }
 
@@ -69,21 +72,21 @@ export default function EggEntryCard(props: EggEntryCardProps) {
   return (
     <ExpandableCard
       accent={accent}
-      index={toFa(i + 1)}
+      index={fmt.count(i + 1)}
       iconEmoji="🥚"
-      title={toFa(e.count || 0) + ' تخم • ' + (bird?.name || '—') + (breed ? ' (' + breed.name + ')' : '')}
+      title={fmt.count(e.count || 0) + ' تخم • ' + (bird?.name || '—') + (breed ? ' (' + breed.name + ')' : '')}
       subtitle={dev?.name || '—'}
       isOpen={isOpen}
       onToggle={onToggle}
       badge={<Tag tone={statusTone}>{statusLabel}</Tag>}
       stats={<>
-        <StatBox icon="⏳" label="مانده" value={toFa(remain) + ' روز'} tone={remain <= 3 ? 'warn' : 'default'} />
+        <StatBox icon="⏳" label="مانده" value={fmt.day(remain) + ' روز'} tone={remain <= 3 ? 'warn' : 'default'} />
         <Dot />
-        <StatBox icon="📊" label="پیشرفت" value={toFa(Math.min(100, Math.round(age / Math.max(1, totalDays) * 100))) + '٪'} tone="accent" />
+        <StatBox icon="📊" label="پیشرفت" value={fmt.int(Math.min(100, Math.round(age / Math.max(1, totalDays) * 100))) + '٪'} tone="accent" />
       </>}
     >
       {(() => {
-        const lbl = hatchWindow ? 'پنجره هچ باز است' : locked ? 'در Lock-down' : ('روز ' + toFa(age) + ' از ' + toFa(totalDays));
+        const lbl = hatchWindow ? 'پنجره هچ باز است' : locked ? 'در Lock-down' : ('روز ' + fmt.day(age) + ' از ' + fmt.day(totalDays));
         return <ProgressTracker current={age} target={totalDays} label={lbl} unit="روز" color={hatchWindow ? 'purple' : locked ? 'warn' : 'accent'} />;
       })()}
 
@@ -91,14 +94,14 @@ export default function EggEntryCard(props: EggEntryCardProps) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         <Row l="دستگاه" v={dev?.name || '—'} />
         <Row l="پرنده" v={(bird?.name || '—') + (breed ? ' • ' + breed.name : '')} />
-        <Row l="تعداد" v={toFa(e.count || 0) + ' تخم'} />
+        <Row l="تعداد" v={fmt.count(e.count || 0) + ' تخم'} />
         {e.sampleWeightInitial && e.sampleWeightCurrent && (() => {
           const pct = calcWeightLossPct(e.sampleWeightInitial, e.sampleWeightCurrent);
           if (pct === null) return null;
           const inRange = pct >= 11 && pct <= 13;
-          return <Row l="کاهش وزن نمونه" v={(inRange ? '✅ ' : '⚠️ ') + toFa(pct) + '٪'} />;
+          return <Row l="کاهش وزن نمونه" v={(inRange ? '✅ ' : '⚠️ ') + fmt.num(pct) + '٪'} />;
         })()}
-        <Row l="تاریخ ورود" v={toFa(e.entryDate)} />
+        <Row l="تاریخ ورود" v={fmt.date(e.entryDate)} />
         {e.sourceInvoiceId && (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)' }}>
             <span style={{ color: 'var(--muted)', fontWeight: 600 }}>فاکتور خرید</span>
@@ -109,14 +112,14 @@ export default function EggEntryCard(props: EggEntryCardProps) {
           const st = needEggStorageDays(age);
           if (!st) return null;
           const icon = st.level === 'ok' ? '✅' : st.level === 'warn' ? '⚠️' : '🔴';
-          return <Row l="ذخیره در انبار" v={`${icon} ${toFa(st.value)} روز`} />;
+          return <Row l="ذخیره در انبار" v={`${icon} ${fmt.day(st.value)} روز`} />;
         })()}
-        <Row l="هچ پیش‌بینی" v={toFa(expectedHatch)} />
+        <Row l="هچ پیش‌بینی" v={fmt.date(expectedHatch)} />
         {(() => {
           const std = standard;
           const exp = std ? getExpectedTempHumidity(std, age) : null;
           if (!exp) return null;
-          return <Row l={`🌡 هدف امروز (روز ${toFa(age)})`} v={`${toFa(exp.temp)}°C / ${toFa(exp.humidity)}٪`} />;
+          return <Row l={`🌡 هدف امروز (روز ${fmt.day(age)})`} v={`${fmt.num(exp.temp)}°C / ${fmt.num(exp.humidity)}٪`} />;
         })()}
         {e.trayNumbers && <Row l="طبقات" v={e.trayNumbers} />}
         <Row l="وضعیت" v={(ENTRY_STATUS_LABEL as any)[e.status]} />
@@ -128,13 +131,13 @@ export default function EggEntryCard(props: EggEntryCardProps) {
         {e.dealType === 'own' && (e as any).flockId && <Row l="گله" v={(flocks.find((f) => f.id === (e as any).flockId)?.name) || '—'} />}
         {e.dealType === 'purchase' && sellerName && <Row l="فروشنده" v={String(sellerName)} />}
         {e.dealType === 'partnership' && partnerName && <Row l="شریک" v={String(partnerName)} />}
-        {e.dealType === 'partnership' && e.dealData.partnerPercent && <Row l="درصد شریک" v={toFa(e.dealData.partnerPercent) + '٪'} />}
+        {e.dealType === 'partnership' && e.dealData.partnerPercent && <Row l="درصد شریک" v={fmt.num(e.dealData.partnerPercent) + '٪'} />}
         {e.dealType === 'rent' && lessorName && <Row l="اجاره‌دهنده" v={String(lessorName)} />}
-        {e.dealType === 'rent' && e.dealData.rentAmount && <Row l="اجاره" v={toFa(Number(e.dealData.rentAmount).toLocaleString('fa-IR')) + ' ت'} />}
+        {e.dealType === 'rent' && e.dealData.rentAmount && <Row l="اجاره" v={fmt.money(Number(e.dealData.rentAmount))} />}
         {e.dealType === 'consignment' && consigneeName && <Row l="امانت‌دار" v={String(consigneeName)} />}
         {(e as any).dealStatus === 'withdrawn' && (
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, padding: '4px 8px', background: 'var(--danger-soft)', borderRadius: 'var(--r-sm)' }}>
-            ⚠️ کنار کشیده {((e as any).dealWithdrawnAt ? ' (' + toFa((e as any).dealWithdrawnAt) + ')' : '')}
+            ⚠️ کنار کشیده {((e as any).dealWithdrawnAt ? ' (' + fmt.date((e as any).dealWithdrawnAt) + ')' : '')}
           </div>
         )}
       </div>
@@ -143,11 +146,11 @@ export default function EggEntryCard(props: EggEntryCardProps) {
         <>
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>💰 مالی</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {e.unitPrice && <Row l="قیمت هر تخم" v={toFa(e.unitPrice.toLocaleString('fa-IR')) + ' ت'} />}
-            {(e as any).shippingCost && <Row l="هزینه حمل" v={toFa((e as any).shippingCost.toLocaleString('fa-IR')) + ' ت'} />}
+            {e.unitPrice && <Row l="قیمت هر تخم" v={fmt.money(e.unitPrice)} />}
+            {(e as any).shippingCost && <Row l="هزینه حمل" v={fmt.money((e as any).shippingCost)} />}
             {e.totalPrice && (
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', color: 'var(--text)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-                <span>جمع تخم:</span><span>{toFa(e.totalPrice.toLocaleString('fa-IR'))} ت</span>
+                <span>جمع تخم:</span><span>{fmt.money(e.totalPrice)}</span>
               </div>
             )}
           </div>

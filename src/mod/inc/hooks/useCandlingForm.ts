@@ -3,6 +3,8 @@
  *
  * همه‌ی منطق openNew/openEdit/save/toggle/updateEntryData اینجاست.
  */
+import { getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useState } from 'react';
 import { toEn, toFa } from '../../../shr/utils/fa';
 import { toastMsg } from '../../../cor/store/toast';
@@ -74,10 +76,10 @@ export function useCandlingForm({
     setSelectedIds(new Set([c.eggEntryId]));
     setEntriesData({
       [c.eggEntryId]: {
-        alive: c.alive ? toFa(c.alive) : '',
-        infertile: c.infertile ? toFa(c.infertile) : '',
-        dead: c.dead ? toFa(c.dead) : '',
-        broken: c.broken ? toFa(c.broken) : '',
+        alive: c.alive ? getGlobalFormat().code(c.alive) : '',
+        infertile: c.infertile ? getGlobalFormat().code(c.infertile) : '',
+        dead: c.dead ? getGlobalFormat().code(c.dead) : '',
+        broken: c.broken ? getGlobalFormat().code(c.broken) : '',
         infertileReason: c.infertileReason || '',
         deadReason: c.deadReason || '',
         notes: c.notes || '',

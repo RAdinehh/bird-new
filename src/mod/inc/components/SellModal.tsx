@@ -1,6 +1,8 @@
 /**
  * SellModal.tsx — ثبت فروش جوجه از نتیجه‌ی هچ
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { toFa, toEn } from '../../../shr/utils/fa';
 import {
   Btn, BtnRow, ErrorBox, Field, Grid2, Modal, MoneyField, NumField, Select,
@@ -26,6 +28,7 @@ export interface SellModalProps {
 }
 
 export default function SellModal(props: SellModalProps) {
+  const fmt = useFormat();
   const { open, maxCount, form, setForm, contacts, onSell, onClose, err } = props;
 
   const customers = contacts.filter(c => (c.roles || []).includes('customer'));
@@ -94,7 +97,7 @@ export default function SellModal(props: SellModalProps) {
           fontWeight: 700,
         }}>
           <span>💰 جمع کل:</span>
-          <span>{toFa(total.toLocaleString('fa-IR'))} ت</span>
+          <span>{fmt.money(total)}</span>
         </div>
       )}
     </Modal>

@@ -3,6 +3,8 @@
  *
  * شامل: زمان‌بندی + انتخاب ورودی‌ها + فرم هر ورودی
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { toFa } from '../../../shr/utils/fa';
 import {
   Btn, BtnRow, Field, Grid2, Modal, NumField,
@@ -56,6 +58,7 @@ export interface CandlingFormModalProps {
 }
 
 export default function CandlingFormModal(props: CandlingFormModalProps) {
+  const fmt = useFormat();
   const {
     open, onClose, editingId,
     modalDay, setModalDay, modalDate, setModalDate, modalDevice, setModalDevice,
@@ -84,7 +87,7 @@ export default function CandlingFormModal(props: CandlingFormModalProps) {
             onClick={onSave}
             disabled={Object.keys(vErrors).length > 0}
           >
-            ذخیره ({toFa(editingId ? 1 : selectedIds.size)})
+            ذخیره ({fmt.count(editingId ? 1 : selectedIds.size)})
           </Btn>
           <Btn onClick={onClose}>لغو</Btn>
         </BtnRow>
@@ -105,7 +108,7 @@ export default function CandlingFormModal(props: CandlingFormModalProps) {
           display: 'flex', justifyContent: 'space-between',
         }}>
           <span>🐣 {firstSelectedBirdName}</span>
-          <span>مدت {toFa(profile.totalDays)} روز • قفل {toFa(profile.lockdownDay)}</span>
+          <span>مدت {fmt.day(profile.totalDays)} روز • قفل {fmt.day(profile.lockdownDay)}</span>
         </div>
       ) : null}
 

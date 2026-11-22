@@ -1,6 +1,8 @@
 /**
  * EggEntriesPage — ورودی تخم به دستگاه‌های انکوباسیون (Multi-row + Draft Auto-Save)
  */
+import { useFormat } from '../../shr/units/useFormat';
+
 import { useState, useMemo } from 'react';
 import {
   useInc, DEAL_LABEL, addDaysJalali,
@@ -26,6 +28,7 @@ import HelpBanner from '../../shr/components/HelpBanner';
 
 
 export default function EggEntriesPage({ initialDevice = '', onGoTo, active = true }: { initialDevice?: string; onGoTo?: (t: any, payload?: { entry?: string }) => void; active?: boolean } = {}) {
+  const fmt = useFormat();
   const { devices, eggEntries, candlings, hatches, addEntry, updateEntry, deleteEntry } = useInc();
   const { birds, breeds } = useBrd();
   const breedStd = useBreedStandard();
@@ -194,10 +197,10 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
       <div key={row._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', marginBottom: 4 }}>
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
           <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {toFa(idx + 1)}. {DEAL_LABEL[row.dealType]} • {bird?.name || '—'} • {toFa(row.count || 0)} تخم
+            {fmt.count(idx + 1)}. {DEAL_LABEL[row.dealType]} • {bird?.name || '—'} • {fmt.count(Number(row.count) || 0)} تخم
           </span>
           <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {party} • {toFa(row.entryDate)}
+            {party} • {fmt.date(row.entryDate)}
           </span>
         </div>
         <button type="button" onClick={() => editRow(row)} aria-label="ویرایش ردیف" style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--text)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', padding: '6px 10px', minWidth: 36, minHeight: 36, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>✏️</button>

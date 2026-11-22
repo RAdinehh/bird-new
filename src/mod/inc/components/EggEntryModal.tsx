@@ -3,6 +3,8 @@
  *
  * شامل: بنر راهنما + انتخاب دستگاه + ظرفیت + لیست ردیف‌ها + فرم ردیف جدید
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { clampPercent, complement } from '../../../shr/utils/smart';
 import {
@@ -52,6 +54,7 @@ export interface EggEntryModalProps {
 }
 
 export default function EggEntryModal(props: EggEntryModalProps) {
+  const fmt = useFormat();
   const err = props.err;
   const {
     open, onClose, editingRowId,
@@ -77,7 +80,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
       title={editingRowId ? '✏️ ویرایش ردیف' : '📥 ورود تخم به دستگاه'}
       footer={
         <BtnRow>
-          <Btn onClick={saveAll} disabled={draftRows.length === 0}>💾 ذخیره همه ({toFa(draftRows.length)})</Btn>
+          <Btn onClick={saveAll} disabled={draftRows.length === 0}>💾 ذخیره همه ({fmt.count(draftRows.length)})</Btn>
           <Btn onClick={onClose}>لغو</Btn>
         </BtnRow>
       }
@@ -110,9 +113,9 @@ export default function EggEntryModal(props: EggEntryModalProps) {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span>📊 استفاده کل</span>
-              <span>{toFa(liveUsage.used)} / {toFa(liveUsage.total)} ({toFa(liveUsage.percent)}٪)</span>
+              <span>{fmt.count(liveUsage.used)} / {fmt.count(liveUsage.total)} ({fmt.num(liveUsage.percent)}٪)</span>
             </div>
-            {liveUsage.percent > 100 && <div style={{ marginTop: 4 }}>{toFa(Math.abs(liveUsage.remaining))} واحد اضافی</div>}
+            {liveUsage.percent > 100 && <div style={{ marginTop: 4 }}>{fmt.count(Math.abs(liveUsage.remaining))} واحد اضافی</div>}
           </div>
         )}
       </div>
@@ -121,7 +124,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
       {draftRows.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', paddingTop: 4 }}>
-            <span>📋</span><span>ردیف‌های ثبت‌شده ({toFa(draftRows.length)})</span>
+            <span>📋</span><span>ردیف‌های ثبت‌شده ({fmt.count(draftRows.length)})</span>
           </div>
           {draftRows.map((r, i) => {
             const bird = birds.find(b => b.id === r.birdId);
@@ -145,15 +148,15 @@ export default function EggEntryModal(props: EggEntryModalProps) {
                 <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: 4, background: 'var(--' + accentColor + ')' }} />
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
-                    {toFa(i + 1)}. {DEAL_LABEL[r.dealType]} • {bird?.name || '—'}
+                    {fmt.count(i + 1)}. {DEAL_LABEL[r.dealType]} • {bird?.name || '—'}
                   </span>
                   <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--' + accentColor + ')', direction: 'ltr' }}>
-                    {toFa(r.count || 0)} تخم
+                    {fmt.count(Number(r.count) || 0)} تخم
                   </span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
                   <span>{party}</span>
-                  <span>{toFa(r.entryDate)}{r.entryTime ? ' • ' + toFa(r.entryTime) : ''}</span>
+                  <span>{fmt.date(r.entryDate)}{r.entryTime ? ' • ' + fmt.code(r.entryTime) : ''}</span>
                 </div>
                 <div style={{ position: 'absolute', top: 6, right: 6, display: 'flex', gap: 2 }}>
                   <button type="button" onClick={() => editRow(r)} style={{ background: 'none', border: 'none', color: 'var(--text)', cursor: 'pointer', fontSize: 'var(--fs-xs)', padding: 3 }}>✏️</button>
@@ -220,7 +223,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
                   options={readyFlocks.map((fl) => {
                     const brd = birds.find((b) => b.id === fl.birdId);
                     const r = flockReadyForEggs(fl, brd);
-                    return { value: String(fl.id), label: String(fl.name), subtitle: toFa(r.ageDays) + " روز" };
+                    return { value: String(fl.id), label: String(fl.name), subtitle: fmt.day(r.ageDays) + " روز" };
                   })}
                   onChange={(val: string) => {
                     const fl = flocks.find((x) => x.id === val);
@@ -291,7 +294,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
               <NumField value={currentRow.dealData.partnerPercent || ''} onChange={e => { const v = clampPercent(parseInt(toEn(e.target.value)) || 0); setD('partnerPercent', v === null ? '' : String(v)); }} unit="٪" min={0} />
             </Field>
             <Field label="درصد من" hint="خودکار">
-              <div style={{ height: 38, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '0 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--muted)' }}>{toFa(complement(parseInt(toEn(currentRow.dealData.partnerPercent || '0')) || 0) ?? 100)}٪</div>
+              <div style={{ height: 38, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '0 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--muted)' }}>{fmt.int(complement(parseInt(toEn(currentRow.dealData.partnerPercent || '0')) || 0) ?? 100)}٪</div>
             </Field>
           </Grid2>
         )}
@@ -302,7 +305,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
               <NumField value={currentRow.dealData.consigneePercent || ''} onChange={e => { const v = clampPercent(parseInt(toEn(e.target.value)) || 0); setD('consigneePercent', v === null ? '' : String(v)); }} unit="٪" min={0} />
             </Field>
             <Field label="درصد من" hint="خودکار">
-              <div style={{ height: 38, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '0 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--muted)' }}>{toFa(complement(parseInt(toEn(currentRow.dealData.consigneePercent || '0')) || 0) ?? 100)}٪</div>
+              <div style={{ height: 38, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '0 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--muted)' }}>{fmt.int(complement(parseInt(toEn(currentRow.dealData.consigneePercent || '0')) || 0) ?? 100)}٪</div>
             </Field>
           </Grid2>
         )}
@@ -383,7 +386,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
             const inRange = pct >= 11 && pct <= 13;
             return (
               <div style={{ padding: 'var(--pad-tight)', background: inRange ? 'var(--input-bg)' : 'var(--warn-soft)', border: '1px solid ' + (inRange ? 'var(--border)' : 'var(--warn)'), borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', fontWeight: 700, color: inRange ? 'var(--text)' : 'var(--warn)' }}>
-                {inRange ? '✅' : '⚠️'} کاهش وزن: {toFa(pct)}٪ (هدف استاندارد: ۱۱-۱۳٪)
+                {inRange ? '✅' : '⚠️'} کاهش وزن: {fmt.num(pct)}٪ (هدف استاندارد: ۱۱-۱۳٪)
               </div>
             );
           })()}
@@ -395,12 +398,12 @@ export default function EggEntryModal(props: EggEntryModalProps) {
             }
             if (!liveUsage) return null;
             if (liveUsage.percent > 100) {
-              return <div style={{ padding: 'var(--pad-tight)', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700 }}>🔴 بیشتر از ظرفیت — {toFa(Math.abs(liveUsage.remaining))} واحد اضافی</div>;
+              return <div style={{ padding: 'var(--pad-tight)', background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700 }}>🔴 بیشتر از ظرفیت — {fmt.count(Math.abs(liveUsage.remaining))} واحد اضافی</div>;
             }
             if (liveUsage.percent > 90) {
-              return <div style={{ padding: 'var(--pad-tight)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>🟡 نزدیک به ظرفیت — باقی: {toFa(liveUsage.remaining)} ({toFa(liveUsage.percent)}٪)</div>;
+              return <div style={{ padding: 'var(--pad-tight)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>🟡 نزدیک به ظرفیت — باقی: {fmt.count(liveUsage.remaining)} ({fmt.num(liveUsage.percent)}٪)</div>;
             }
-            return <div style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--text)', fontWeight: 700 }}>✅ قابل قبول — باقی: {toFa(liveUsage.remaining)} ({toFa(liveUsage.percent)}٪)</div>;
+            return <div style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-xs)', color: 'var(--text)', fontWeight: 700 }}>✅ قابل قبول — باقی: {fmt.count(liveUsage.remaining)} ({fmt.num(liveUsage.percent)}٪)</div>;
           })()}
         </div>
 
@@ -421,7 +424,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
               const sh = parseFloat(toEn(currentRow.shippingCost).replace('٫', '.')) || 0;
               const total = (cnt * up) + sh;
               if (total > 0) {
-                return <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', color: 'var(--text)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}><span>💰 جمع ردیف:</span><span>{toFa(total.toLocaleString('fa-IR'))} ت</span></div>;
+                return <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', color: 'var(--text)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}><span>💰 جمع ردیف:</span><span>{fmt.money(total)}</span></div>;
               }
               return null;
             })()}

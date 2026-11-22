@@ -1,6 +1,8 @@
 /**
  * DeviceFormModal — فرم افزودن/ویرایش دستگاه
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { toFa, toEn } from '../../../shr/utils/fa';
 import {
   Btn, BtnRow, ErrorBox, Field, Grid2, Input, MoneyField, Modal,
@@ -27,6 +29,7 @@ export interface DeviceFormModalProps {
 }
 
 export default function DeviceFormModal(props: DeviceFormModalProps) {
+  const fmt = useFormat();
   const { open, setOpen, form, setForm, err, vErrors, devices, birds, save } = props;
   const warrantyForm = warrantyInfo(form.purchasedAt, parseInt(toEn(form.warranty)) || null);
 
@@ -150,7 +153,7 @@ export default function DeviceFormModal(props: DeviceFormModalProps) {
         </Grid2>
         {warrantyForm && (
           <div style={{ padding: 'var(--pad-normal)', background: warrantyForm.expired ? 'var(--danger-soft)' : 'var(--accent-soft)', border: '1px solid ' + (warrantyForm.expired ? 'var(--danger)' : 'var(--accent-border)'), borderRadius: 'var(--r-md)', fontSize: 'var(--fs-sm)', color: warrantyForm.expired ? 'var(--danger)' : 'var(--accent)', fontWeight: 700, textAlign: 'center' }}>
-            {warrantyForm.expired ? '⏰ گارانتی تمام شده — ' : '✅ گارانتی تا — '}{toFa(warrantyForm.end)}
+            {warrantyForm.expired ? '⏰ گارانتی تمام شده — ' : '✅ گارانتی تا — '}{fmt.date(warrantyForm.end)}
           </div>
         )}
 

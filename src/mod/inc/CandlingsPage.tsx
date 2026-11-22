@@ -1,6 +1,8 @@
 /**
  * CandlingsPage — کندلینگ با Multi-select و تجمیع
  */
+import { useFormat } from '../../shr/units/useFormat';
+
 import { useState, useEffect, useMemo } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useInc, type Candling } from './store';
@@ -30,6 +32,7 @@ const DEAD_REASONS: [string, string][] = [
 
 
 export default function CandlingsPage({ initialEntry = '', onGoTo, active = true }: { initialEntry?: string; onGoTo?: (t: any, payload?: { entry?: string }) => void; active?: boolean } = {}) {
+  const fmt = useFormat();
   const { devices, eggEntries, candlings, addCandling, updateCandling, deleteCandling } = useInc();
   const { birds } = useBrd();
 
@@ -65,7 +68,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
   const handleSave = () => {
     const result = save(_entriesById);
     if (result.ok && result.savedCount > 0 && !editingId) {
-      toastMsg.success(toFa(result.savedCount) + ' کندلینگ ثبت شد');
+      toastMsg.success(fmt.count(result.savedCount) + ' کندلینگ ثبت شد');
     }
   };
 
@@ -245,16 +248,16 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
         }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🧬</span> نطفه‌داری کل</span>
-            <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--accent)' }}>{toFa(summary.fertilePercent.toFixed(1))}٪</span>
+            <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--accent)' }}>{fmt.code(summary.fertilePercent.toFixed(1))}٪</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>📉 تلفات کل</span>
-            <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: summary.lossPercent > 50 ? 'var(--danger)' : summary.lossPercent > 20 ? 'var(--warn)' : 'var(--muted)' }}>{toFa(summary.lossPercent.toFixed(1))}٪</span>
+            <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: summary.lossPercent > 50 ? 'var(--danger)' : summary.lossPercent > 20 ? 'var(--warn)' : 'var(--muted)' }}>{fmt.code(summary.lossPercent.toFixed(1))}٪</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', gridColumn: '1 / -1', paddingTop: 8, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
-            <span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📥</span> {toFa(summary.totalEntries)} ورودی</span>
-            <span>🔍 {toFa(summary.totalCandlings)} کندلینگ</span>
-            <span>✅ {toFa(summary.totalAlive)} سالم</span>
+            <span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📥</span> {fmt.count(summary.totalEntries)} ورودی</span>
+            <span>🔍 {fmt.count(summary.totalCandlings)} کندلینگ</span>
+            <span>✅ {fmt.count(summary.totalAlive)} سالم</span>
           </div>
         </div>
       )}

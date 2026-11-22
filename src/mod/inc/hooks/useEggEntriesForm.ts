@@ -3,6 +3,8 @@
  *
  * شامل: bulk mode, draft rows, save + cascade invoice/production
  */
+import { getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useState, useEffect } from 'react';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { showConfirmAsync } from '../../../cor/store/dialog';
@@ -108,7 +110,7 @@ export function useEggEntriesForm(params: UseEggEntriesFormParams) {
       const brd = birds.find(b => b.id === currentRow.birdId);
       const ready = flockReadyForEggs(flk, brd);
       if (!ready.ready) {
-        setRowErr('گله به سن تخم‌گذاری نرسیده — سن فعلی ' + toFa(ready.ageDays) + ' روز، حداقل ' + toFa(ready.minAge) + ' روز، ' + toFa(ready.daysLeft) + ' روز مانده');
+        setRowErr('گله به سن تخم‌گذاری نرسیده — سن فعلی ' + getGlobalFormat().day(ready.ageDays) + ' روز، حداقل ' + getGlobalFormat().day(ready.minAge) + ' روز، ' + getGlobalFormat().day(ready.daysLeft) + ' روز مانده');
         return;
       }
     }
@@ -167,7 +169,7 @@ export function useEggEntriesForm(params: UseEggEntriesFormParams) {
         const percent = Math.round((used / refCap) * 100);
         if (percent > 100) {
           const extra = Math.round((used - refCap) * 10) / 10;
-          const ok = await showConfirmAsync('⚠️ با این ردیف، ظرفیت به ' + toFa(percent) + '٪ می‌رسد.\n' + 'واحد اضافی — ' + toFa(extra) + '\n\nادامه بدهم؟', 'تأیید');
+          const ok = await showConfirmAsync('⚠️ با این ردیف، ظرفیت به ' + getGlobalFormat().num(percent) + '٪ می‌رسد.\n' + 'واحد اضافی — ' + getGlobalFormat().count(extra) + '\n\nادامه بدهم؟', 'تأیید');
           if (!ok) return;
         }
       }
@@ -298,7 +300,7 @@ export function useEggEntriesForm(params: UseEggEntriesFormParams) {
     try { localStorage.removeItem(DRAFT_KEY(multiDeviceId)); } catch {}
     setDraftRows([]);
     setOpen(false);
-    toastMsg.info(toFa(savedCount) + ' ورودی ثبت شد');
+    toastMsg.info(getGlobalFormat().count(savedCount) + ' ورودی ثبت شد');
     if (onGoTo && await showConfirmAsync('تأیید', 'به کندلینگ برو؟')) {
       setTimeout(() => onGoTo('candlings'), 100);
     }
@@ -311,10 +313,10 @@ export function useEggEntriesForm(params: UseEggEntriesFormParams) {
       birdId: e.birdId,
       breedId: e.breedId,
       flockId: (e as any).flockId || '',
-      count: e.count ? toFa(e.count) : '',
+      count: e.count ? getGlobalFormat().code(e.count) : '',
       trayNumbers: e.trayNumbers,
-      unitPrice: e.unitPrice ? toFa(e.unitPrice) : '',
-      shippingCost: (e as any).shippingCost ? toFa((e as any).shippingCost) : '',
+      unitPrice: e.unitPrice ? getGlobalFormat().code(e.unitPrice) : '',
+      shippingCost: (e as any).shippingCost ? getGlobalFormat().code((e as any).shippingCost) : '',
       entryDate: e.entryDate,
       entryTime: (e as any).entryTime || nowTime(),
       notes: e.notes,

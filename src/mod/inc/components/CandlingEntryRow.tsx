@@ -1,6 +1,8 @@
 /**
  * CandlingEntryRow.tsx — ردیف انتخاب یک ورودی تخم در فرم کندلینگ
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { Field, Grid2, NumField, Select } from '../../../shr/components/ui';
 
@@ -38,6 +40,7 @@ export interface CandlingEntryRowProps {
 }
 
 export default function CandlingEntryRow(props: CandlingEntryRowProps) {
+  const fmt = useFormat();
   const {
     birdName, count, entryDate, isSelected, data: d,
     baseInfo, alreadyAgg, onToggle, onUpdate,
@@ -75,9 +78,9 @@ export default function CandlingEntryRow(props: CandlingEntryRowProps) {
           }}
         />
         <span style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 700 }}>
-          {birdName || '—'} • {toFa(count)} تخم
+          {birdName || '—'} • {fmt.count(count)} تخم
         </span>
-        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{toFa(entryDate)}</span>
+        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{fmt.date(entryDate)}</span>
       </label>
 
       {alreadyAgg.alive + alreadyAgg.infertile + alreadyAgg.dead + alreadyAgg.broken > 0 && (
@@ -85,7 +88,7 @@ export default function CandlingEntryRow(props: CandlingEntryRowProps) {
           fontSize: 'var(--fs-xs)', color: 'var(--muted)',
           padding: '4px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)',
         }}>
-          تجمیع قبلی: سالم {toFa(alreadyAgg.alive)} • بی‌نطفه {toFa(alreadyAgg.infertile)} • مرده {toFa(alreadyAgg.dead)}
+          تجمیع قبلی: سالم {fmt.count(alreadyAgg.alive)} • بی‌نطفه {fmt.count(alreadyAgg.infertile)} • مرده {fmt.count(alreadyAgg.dead)}
         </div>
       )}
 
@@ -102,7 +105,7 @@ export default function CandlingEntryRow(props: CandlingEntryRowProps) {
         justifyContent: 'space-between',
       }}>
         <span>🎯 مبنای این کندلینگ:</span>
-        <span>{toFa(baseInfo.base)} تخم ({baseInfo.source})</span>
+        <span>{fmt.count(baseInfo.base)} تخم ({baseInfo.source})</span>
       </div>
 
       {isSelected && (
@@ -125,7 +128,7 @@ export default function CandlingEntryRow(props: CandlingEntryRowProps) {
                 borderRadius: 'var(--r-md)',
                 fontSize: 'var(--fs-base)', fontWeight: 700,
                 color: _over ? 'var(--danger)' : 'var(--accent)',
-              }}>{toFa(_alive)} عدد</div>
+              }}>{fmt.count(_alive)} عدد</div>
             </Field>
           </Grid2>
           <Grid2>
@@ -155,8 +158,8 @@ export default function CandlingEntryRow(props: CandlingEntryRowProps) {
             fontWeight: 700,
             textAlign: 'center',
           }}>
-            مجموع تلفات: {toFa(sum)} از {toFa(baseInfo.base)}
-            {remaining > 0 && ' • باقی — ' + toFa(remaining)}
+            مجموع تلفات: {fmt.count(sum)} از {fmt.count(baseInfo.base)}
+            {remaining > 0 && ' • باقی — ' + fmt.count(remaining)}
             {remaining < 0 && ' — بیشتر از مبنای مرحله قبل!'}
             {remaining === 0 && ' ✅ کامل'}
           </div>

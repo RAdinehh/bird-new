@@ -1,6 +1,8 @@
 /**
  * OvNumField.tsx — فیلد عددی با تبدیل دما و نشانگر override
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { useTempUnit, toUserTemp, toCelsius, round1 } from '../../../shr/utils/temp';
 import { Field, NumField } from '../../../shr/components/ui';
 import { toFa } from '../../../shr/utils/fa';
@@ -19,6 +21,7 @@ interface OvNumFieldProps {
 }
 
 export default function OvNumField(props: OvNumFieldProps) {
+  const fmt = useFormat();
   const { label, hint, value, defValue, onChange, unit, min, max, placeholder, isTemp } = props;
   const tempUnit = useTempUnit();
 
@@ -87,7 +90,7 @@ export default function OvNumField(props: OvNumFieldProps) {
           <NumField value={String(value ?? '')} onChange={onChange} unit={unit} min={min} max={max} placeholder={placeholder} />
         )}
         {overridden && (
-          <span title={`دستی — پیش‌فرض: ${toFa(String(displayDef))}${isTemp ? displayUnit : ''}`} style={{
+          <span title={`دستی — پیش‌فرض: ${fmt.code(String(displayDef))}${isTemp ? displayUnit : ''}`} style={{
             position: 'absolute', top: -2, left: -2,
             width: 8, height: 8, borderRadius: '50%',
             background: 'var(--warn)', cursor: 'help', zIndex: 2,

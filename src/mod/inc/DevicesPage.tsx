@@ -1,6 +1,8 @@
 /**
  * DevicesPage — دستگاه‌های انکوباسیون (ظرفیت، تعمیرات، گارانتی)
  */
+import { useFormat } from '../../shr/units/useFormat';
+
 import { useFab } from '../../shr/hooks/useFab';
 import { useState, useMemo, useEffect } from 'react';
 import { useInc, type Device, type DeviceStatus } from './store';
@@ -28,6 +30,7 @@ import { todayJalali } from './helpers';
 
 
 export default function DevicesPage({ active = true }: { active?: boolean } = {}) {
+  const fmt = useFormat();
   const { devices, eggEntries, addDevice, updateDevice, deleteDevice } = useInc();
   const settings = useSet();
   const { birds } = useBrd();
@@ -88,22 +91,22 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
       id: d.id, name: d.name,
       capacityByBird: d.capacityByBird || [],
       mode: d.mode, status: d.status,
-      temp: d.temp ? toFa(d.temp) : '',
-      humidity: d.humidity ? toFa(d.humidity) : '',
+      temp: d.temp ? fmt.code(d.temp) : '',
+      humidity: d.humidity ? fmt.code(d.humidity) : '',
       purchasedAt: d.purchasedAt,
-      price: d.price ? toFa(d.price) : '',
-      warranty: d.warranty ? toFa(d.warranty) : '',
+      price: d.price ? fmt.code(d.price) : '',
+      warranty: d.warranty ? fmt.code(d.warranty) : '',
       racks: d.racks ? String(d.racks) : '',
       trays: d.trays ? String(d.trays) : '',
       fans: d.fans ? String(d.fans) : '',
       tempSensors: d.tempSensors ? String(d.tempSensors) : '',
       humiditySensors: d.humiditySensors ? String(d.humiditySensors) : '',
       motorPower: d.motorPower ? String(d.motorPower) : '',
-      extraCost: d.extraCost ? toFa(d.extraCost) : '',
+      extraCost: d.extraCost ? fmt.code(d.extraCost) : '',
       notes: d.notes,
-      estCurrent: d.estCurrent ? toFa(d.estCurrent) : '',
-      co2Current: d.co2Current ? toFa(d.co2Current) : '',
-      o2Current: d.o2Current ? toFa(d.o2Current) : '',
+      estCurrent: d.estCurrent ? fmt.code(d.estCurrent) : '',
+      co2Current: d.co2Current ? fmt.code(d.co2Current) : '',
+      o2Current: d.o2Current ? fmt.code(d.o2Current) : '',
       turningCurrent: d.turningCurrent || 'auto',
     });
     setErr(''); setOpen(true);
@@ -233,7 +236,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
     items: list,
     getId: (d: any) => d.id,
     onDelete: async (ids: string[]) => {
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' دستگاه حذف شوند؟', { danger: true });
+      const ok = await showConfirmAsync('حذف گروهی', fmt.count(ids.length) + ' دستگاه حذف شوند؟', { danger: true });
       if (!ok) return;
       const backups: any[] = [];
       for (const id of ids) {
@@ -313,7 +316,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
 
       {devices.length > 0 && (
         <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, padding: '0 4px' }}>
-          🏭 {toFa(devices.length)} دستگاه
+          🏭 {fmt.count(devices.length)} دستگاه
         </div>
       )}
       {list.length === 0 ? (

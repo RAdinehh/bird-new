@@ -3,6 +3,8 @@
  *
  * نمایش: روزهای کندلینگ + تجمیع + نوار پیشرفت بصری
  */
+import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
+
 import type { CandlingLike } from '../api/calc';
 import { toFa } from '../../../shr/utils/fa';
 import { showConfirmAsync } from '../../../cor/store/dialog';
@@ -28,6 +30,7 @@ export interface CandlingCardProps {
 }
 
 export default function CandlingCard(props: CandlingCardProps) {
+  const fmt = useFormat();
   const {
     entryId, list, agg, total, entryTotal,
     fertilePercent, lossPercent,
@@ -40,7 +43,7 @@ export default function CandlingCard(props: CandlingCardProps) {
   const handleDelete = async (c: CandlingLike) => {
     const subsequent = list.filter(x => x.stage > c.stage);
     const msg = subsequent.length > 0
-      ? 'این کندلینگ و ' + toFa(subsequent.length) + ' کندلینگ بعدی حذف می‌شوند.\n\nادامه؟'
+      ? 'این کندلینگ و ' + fmt.count(subsequent.length) + ' کندلینگ بعدی حذف می‌شوند.\n\nادامه؟'
       : 'این کندلینگ حذف شود؟';
     if (await showConfirmAsync('تأیید', msg)) {
       onDelete(c.id);
@@ -53,14 +56,14 @@ export default function CandlingCard(props: CandlingCardProps) {
       accent="accent"
       iconEmoji="🔍"
       title={birdName || '—'}
-      subtitle={`${deviceName || '—'} • ${toFa(entryTotal)} تخم • ${toFa(entryDate || '—')}`}
+      subtitle={`${deviceName || '—'} • ${fmt.count(entryTotal)} تخم • ${fmt.code(entryDate || '—')}`}
       isOpen={isOpen}
       onToggle={onToggle}
-      badge={<Tag tone={lossTone}>تلفات {toFa(lossPercent.toFixed(0))}٪</Tag>}
+      badge={<Tag tone={lossTone}>تلفات {fmt.code(lossPercent.toFixed(0))}٪</Tag>}
       stats={<>
-        <StatBox icon="🧬" label="نطفه" value={toFa(Math.round(fertilePercent)) + '٪'} tone="accent" />
+        <StatBox icon="🧬" label="نطفه" value={fmt.int(Math.round(fertilePercent)) + '٪'} tone="accent" />
         <Dot />
-        <StatBox icon="📊" label="کندلینگ" value={toFa(list.length)} />
+        <StatBox icon="📊" label="کندلینگ" value={fmt.count(list.length)} />
       </>}
     >
       {/* دکمه‌های روز */}
@@ -75,7 +78,7 @@ export default function CandlingCard(props: CandlingCardProps) {
               type="button"
               aria-label={'ویرایش کندلینگ روز ' + c.stage}
               onClick={() => onEdit(c)}
-              title={toFa((c as any).date)}
+              title={fmt.date((c as any).date)}
               style={{
                 padding: '6px 12px 6px 28px',
                 background: 'var(--accent-soft)',
@@ -88,7 +91,7 @@ export default function CandlingCard(props: CandlingCardProps) {
                 fontFamily: 'inherit',
               }}
             >
-              ✓ روز {toFa(c.stage)}
+              ✓ روز {fmt.day(c.stage)}
             </button>
             <button
               type="button"
@@ -140,16 +143,16 @@ export default function CandlingCard(props: CandlingCardProps) {
       {/* تجمیع با درصد */}
       <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
         <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span>
-        {' '}تجمیع ({toFa(list.length)} کندلینگ)
+        {' '}تجمیع ({fmt.count(list.length)} کندلینگ)
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
           <span style={{ color: 'var(--muted)' }}>🧬 نطفه‌داری</span>
-          <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{toFa(fertilePercent.toFixed(1))}٪</span>
+          <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{fmt.code(fertilePercent.toFixed(1))}٪</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
           <span style={{ color: 'var(--muted)' }}>📉 تلفات کل</span>
-          <span style={{ fontWeight: 700, color: lossPercent > 10 ? 'var(--danger)' : 'var(--text)' }}>{toFa(lossPercent.toFixed(1))}٪</span>
+          <span style={{ fontWeight: 700, color: lossPercent > 10 ? 'var(--danger)' : 'var(--text)' }}>{fmt.code(lossPercent.toFixed(1))}٪</span>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
           <StatCell label="✅ سالم" value={agg.alive} />
@@ -182,7 +185,7 @@ function StatCell({ label, value }: { label: string; value: number }) {
       display: 'flex', justifyContent: 'space-between',
     }}>
       <span style={{ color: 'var(--muted)' }}>{label}</span>
-      <span style={{ fontWeight: 700 }}>{toFa(value)}</span>
+      <span style={{ fontWeight: 700 }}>{getGlobalFormat().num(value)}</span>
     </div>
   );
 }

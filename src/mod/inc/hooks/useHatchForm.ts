@@ -1,6 +1,8 @@
 /**
  * useHatchForm — state و منطق فرم ثبت/ویرایش هچ
  */
+import { getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useState, useMemo } from 'react';
 import { format as formatJ } from 'date-fns-jalali';
 import { toFa, toEn } from '../../../shr/utils/fa';
@@ -87,11 +89,11 @@ export function useHatchForm(p: UseHatchFormParams) {
     setFormEntryId(h.eggEntryId);
     setSelectedIds(new Set([h.eggEntryId]));
     setEntriesData({ [h.eggEntryId]: {
-      hatched: h.hatched ? toFa(h.hatched) : '', unhatched: h.unhatched ? toFa(h.unhatched) : '',
-      deadInShell: h.deadInShell ? toFa(h.deadInShell) : '', pipped: h.pipped ? toFa(h.pipped) : '',
-      other: h.other ? toFa(h.other) : '', gradeA: h.gradeA ? toFa(h.gradeA) : '', gradeB: h.gradeB ? toFa(h.gradeB) : '',
-      maleCount: h.maleCount ? toFa(h.maleCount) : '', femaleCount: h.femaleCount ? toFa(h.femaleCount) : '',
-      unknownCount: h.unknownCount ? toFa(h.unknownCount) : '', avgWeight: h.avgWeight ? toFa(h.avgWeight) : '', notes: h.notes
+      hatched: h.hatched ? getGlobalFormat().code(h.hatched) : '', unhatched: h.unhatched ? getGlobalFormat().code(h.unhatched) : '',
+      deadInShell: h.deadInShell ? getGlobalFormat().code(h.deadInShell) : '', pipped: h.pipped ? getGlobalFormat().code(h.pipped) : '',
+      other: h.other ? getGlobalFormat().code(h.other) : '', gradeA: h.gradeA ? getGlobalFormat().code(h.gradeA) : '', gradeB: h.gradeB ? getGlobalFormat().code(h.gradeB) : '',
+      maleCount: h.maleCount ? getGlobalFormat().code(h.maleCount) : '', femaleCount: h.femaleCount ? getGlobalFormat().code(h.femaleCount) : '',
+      unknownCount: h.unknownCount ? getGlobalFormat().code(h.unknownCount) : '', avgWeight: h.avgWeight ? getGlobalFormat().code(h.avgWeight) : '', notes: h.notes
     }});
     setErr(''); setOpen(true);
   };
@@ -157,7 +159,7 @@ export function useHatchForm(p: UseHatchFormParams) {
       saved++;
     });
     setOpen(false);
-    toastMsg.success(toFa(saved) + ' نتیجه هچ ثبت شد');
+    toastMsg.success(getGlobalFormat().count(saved) + ' نتیجه هچ ثبت شد');
 
     // 🆕 ثبت تاریخچه برای Intelligence (فقط bulk/create)
     try {

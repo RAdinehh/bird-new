@@ -1,6 +1,8 @@
 /**
  * HatchEntryRow.tsx — ردیف ورودی تخم در فرم ثبت هچ
  */
+import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { Field, Grid2, NumField, Textarea } from '../../../shr/components/ui';
 import { calcCurrentFertile } from '../api/hatchCalc';
@@ -41,6 +43,7 @@ export interface HatchEntryRowProps {
 }
 
 export default function HatchEntryRow(props: HatchEntryRowProps) {
+  const fmt = useFormat();
   const {
     entry: e, birdName, deviceName, candlings, latestCand,
     data: d, isSelected, daysAgo, isLockdown, onToggle, onUpdate,
@@ -104,7 +107,7 @@ export default function HatchEntryRow(props: HatchEntryRowProps) {
           style={{ width: 20, height: 20, accentColor: 'var(--accent)', cursor: 'pointer', flexShrink: 0 }}
         />
         <span style={{ flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 700 }}>
-          {birdName || '—'} • {toFa(e.count || 0)} تخم
+          {birdName || '—'} • {fmt.count(e.count || 0)} تخم
         </span>
         <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{deviceName || ''}</span>
         <span style={{
@@ -124,8 +127,8 @@ export default function HatchEntryRow(props: HatchEntryRowProps) {
         }}>
           {calc.byStage.map((st, i) => (
             <div key={i} style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>کندلینگ روز {toFa(st.stage)}:</span>
-              <span>بی‌نطفه {toFa(st.infertile)} • مرده {toFa(st.dead)} • شکسته {toFa(st.broken)}</span>
+              <span>کندلینگ روز {fmt.day(st.stage)}:</span>
+              <span>بی‌نطفه {fmt.count(st.infertile)} • مرده {fmt.count(st.dead)} • شکسته {fmt.count(st.broken)}</span>
             </div>
           ))}
           <div style={{
@@ -134,11 +137,11 @@ export default function HatchEntryRow(props: HatchEntryRowProps) {
             color: 'var(--accent)', fontWeight: 700,
           }}>
             <span>📊 مجموع تلفات کندلینگ:</span>
-            <span>{toFa(calc.totalLoss)}</span>
+            <span>{fmt.count(calc.totalLoss)}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--accent)', fontWeight: 700 }}>
             <span>🧬 نطفه‌دار فعلی:</span>
-            <span>{toFa(calc.fertile)}</span>
+            <span>{fmt.count(calc.fertile)}</span>
           </div>
         </div>
       )}
@@ -152,10 +155,10 @@ export default function HatchEntryRow(props: HatchEntryRowProps) {
             display: 'flex', flexDirection: 'column', gap: 4, fontSize: 'var(--fs-xs)',
           }}>
             <InfoRow l="🐦 پرنده" v={birdName || '—'} />
-            <InfoRow l="🥚 تعداد کل" v={`${toFa(e.count || 0)} تخم`} />
-            <InfoRow l="📅 تاریخ ورود" v={toFa(e.entryDate)} />
-            <InfoRow l="🔢 روز انکوباسیون" v={`روز ${toFa(daysAgo(e.entryDate))}`} accent />
-            <InfoRow l="📊 نطفه‌دار فعلی" v={`${toFa(aliveAfter)} تخم`} />
+            <InfoRow l="🥚 تعداد کل" v={`${fmt.count(e.count || 0)} تخم`} />
+            <InfoRow l="📅 تاریخ ورود" v={fmt.date(e.entryDate)} />
+            <InfoRow l="🔢 روز انکوباسیون" v={`روز ${fmt.day(daysAgo(e.entryDate))}`} accent />
+            <InfoRow l="📊 نطفه‌دار فعلی" v={`${fmt.count(aliveAfter)} تخم`} />
             {isLockdown(e) && (
               <div style={{
                 padding: '3px 6px',
@@ -164,7 +167,7 @@ export default function HatchEntryRow(props: HatchEntryRowProps) {
                 borderRadius: 'var(--r-sm)',
                 color: 'var(--warn)', fontWeight: 700, textAlign: 'center', marginTop: 2,
               }}>
-                🔒 Lock-down (روز {toFa(daysAgo(e.entryDate))} از ۱۸)
+                🔒 Lock-down (روز {fmt.day(daysAgo(e.entryDate))} از ۱۸)
               </div>
             )}
           </div>
@@ -179,8 +182,8 @@ export default function HatchEntryRow(props: HatchEntryRowProps) {
             fontWeight: 700, textAlign: 'center',
           }}>
             {calc.byStage.length > 0
-              ? '🧬 سقف این هچ: ' + toFa(base) + ' تخم نطفه‌دار'
-              : '⚠️ بدون کندلینگ — سقف: ' + toFa(base) + ' تخم'}
+              ? '🧬 سقف این هچ: ' + fmt.count(base) + ' تخم نطفه‌دار'
+              : '⚠️ بدون کندلینگ — سقف: ' + fmt.count(base) + ' تخم'}
           </div>
 
           <Grid2>
@@ -229,11 +232,11 @@ export default function HatchEntryRow(props: HatchEntryRowProps) {
             color: !ok ? 'var(--danger)' : remaining === 0 ? 'var(--accent)' : 'var(--text)',
             fontWeight: 700, display: 'flex', justifyContent: 'space-between',
           }}>
-            <span>📊 مجموع: {toFa(sum)} / {toFa(base)}</span>
+            <span>📊 مجموع: {fmt.count(sum)} / {fmt.count(base)}</span>
             <span>
-              {ok && remaining > 0 && '⏳ ' + toFa(remaining) + ' باقی'}
+              {ok && remaining > 0 && '⏳ ' + getGlobalFormat().count(remaining) + ' باقی'}
               {ok && remaining === 0 && '✅ کامل'}
-              {!ok && '🔴 ' + toFa(Math.abs(remaining)) + ' اضافی'}
+              {!ok && '🔴 ' + getGlobalFormat().count(Math.abs(remaining)) + ' اضافی'}
             </span>
           </div>
 
@@ -251,7 +254,7 @@ export default function HatchEntryRow(props: HatchEntryRowProps) {
             </div>
           ) : (
             <>
-              <SectionLabel label="🏅 تفکیک کیفی (اختیاری)" suffix={`از ${toFa(hatchedNum)} هچ‌شده`} />
+              <SectionLabel label="🏅 تفکیک کیفی (اختیاری)" suffix={`از ${fmt.count(hatchedNum)} هچ‌شده`} />
               <Grid2>
                 <Field label="درجه A">
                   <NumField value={d.gradeA}
@@ -265,7 +268,7 @@ export default function HatchEntryRow(props: HatchEntryRowProps) {
                 </Field>
               </Grid2>
               <ProgressBar
-                label={`A + B: ${toFa(gradesUsed)} / ${toFa(hatchedNum)}`}
+                label={`A + B: ${fmt.count(gradesUsed)} / ${fmt.count(hatchedNum)}`}
                 remaining={gradesRem}
                 ok={gradesOk}
               />
@@ -296,7 +299,7 @@ export default function HatchEntryRow(props: HatchEntryRowProps) {
                 </Field>
               </Grid2>
               <ProgressBar
-                label={`♂ + ♀ + ?: ${toFa(genderUsed)} / ${toFa(hatchedNum)}`}
+                label={`♂ + ♀ + ?: ${fmt.count(genderUsed)} / ${fmt.count(hatchedNum)}`}
                 remaining={genderRem}
                 ok={genderOk}
               />
@@ -320,8 +323,8 @@ export default function HatchEntryRow(props: HatchEntryRowProps) {
             color: rem < 0 ? 'var(--danger)' : rem === 0 ? 'var(--accent)' : 'var(--text)',
             fontWeight: 700, textAlign: 'center',
           }}>
-            این هچ: {toFa(sumE)} از {toFa(e.count || 0)}
-            {rem > 0 && ' • باقی — ' + toFa(rem)}
+            این هچ: {fmt.count(sumE)} از {fmt.count(e.count || 0)}
+            {rem > 0 && ' • باقی — ' + fmt.count(rem)}
             {rem < 0 && ' — بیشتر!'}
             {rem === 0 && ' ✅'}
           </div>
@@ -365,7 +368,7 @@ function ProgressBar({ label, remaining, ok }: { label: string; remaining: numbe
       color,
       fontWeight: 700, textAlign: 'center',
     }}>
-      {label}{!ok ? ' 🔴 ' + toFa(Math.abs(remaining)) + ' اضافی' : remaining === 0 ? ' ✅ کامل' : ' • ⏳ ' + toFa(remaining) + ' باقی'}
+      {label}{!ok ? ' 🔴 ' + getGlobalFormat().count(Math.abs(remaining)) + ' اضافی' : remaining === 0 ? ' ✅ کامل' : ' • ⏳ ' + getGlobalFormat().count(remaining) + ' باقی'}
     </div>
   );
 }

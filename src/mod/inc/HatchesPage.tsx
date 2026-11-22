@@ -1,6 +1,8 @@
 /**
  * HatchesPage — هچ، تفکیک، ساخت گله، فروش، validation
  */
+import { useFormat } from '../../shr/units/useFormat';
+
 import { useState, useEffect, useMemo } from 'react';
 import { useHatchForm } from './hooks/useHatchForm';
 import { useFab } from '../../shr/hooks/useFab';
@@ -32,6 +34,7 @@ import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 const emptyRow = () => ({ hatched:'', unhatched:'', deadInShell:'', pipped:'', other:'', gradeA:'', gradeB:'', maleCount:'', femaleCount:'', unknownCount:'', avgWeight:'', notes:'' });
 
 export default function HatchesPage({ initialEntry = '', onGoTo, active = true }: { initialEntry?: string; onGoTo?: (t: any, payload?: { entry?: string }) => void; active?: boolean } = {}) {
+  const fmt = useFormat();
   const { devices, eggEntries, hatches, candlings, addHatch, updateHatch, deleteHatch } = useInc();
   const { birds } = useBrd();
   const { add: addFlock, remove: removeFlock } = useFlk();
@@ -210,7 +213,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
     items: filtered,
     getId: (h: any) => h.id,
     onDelete: async (ids: string[]) => {
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' هچ حذف شوند؟', { danger: true });
+      const ok = await showConfirmAsync('حذف گروهی', fmt.count(ids.length) + ' هچ حذف شوند؟', { danger: true });
       if (!ok) return;
       const backups: any[] = [];
       for (const id of ids) {
@@ -341,7 +344,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
   const _s = _e?.breedId ? breedStd.byBreedId(_e.breedId) : null;
   setFlockErr(''); setFlockModal({ hatchId: h.id, count: h.hatched || 0 });
   setFlockForm({
-    name: 'گله ' + (bird?.name || '') + ' ' + toFa(formatJ(new Date(), 'yyyy')),
+    name: 'گله ' + (bird?.name || '') + ' ' + fmt.code(formatJ(new Date(), 'yyyy')),
     type: 'layer',
     hallId: '',
     zoneId: '',

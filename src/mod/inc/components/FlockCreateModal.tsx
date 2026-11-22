@@ -1,6 +1,8 @@
 /**
  * FlockCreateModal.tsx — ساخت گله‌ی جدید از نتیجه‌ی هچ
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { Btn, BtnRow, Field, Grid2, Input, Modal, Select, ErrorBox } from '../../../shr/components/ui';
 import { toFa } from '../../../shr/utils/fa';
 
@@ -44,6 +46,7 @@ export interface FlockCreateModalProps {
 }
 
 export default function FlockCreateModal(props: FlockCreateModalProps) {
+  const fmt = useFormat();
   const { open, count, form, setForm, halls, zones, sourceData, onCreate, onClose, err } = props;
 
   return (
@@ -141,9 +144,9 @@ export default function FlockCreateModal(props: FlockCreateModalProps) {
             const perChick = hatched > 0 ? Math.round(totalCost / hatched) : 0;
             return (
               <div style={{ padding: 10, background: 'var(--input-bg)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.8 }}>
-                <div>🧮 محاسبه: ({toFa(eggCount)} تخم × {toFa(uPrice.toLocaleString('fa-IR'))} ت) + {toFa(shipCost.toLocaleString('fa-IR'))} ت حمل</div>
+                <div>🧮 محاسبه: ({fmt.count(eggCount)} تخم × {fmt.money(uPrice)}) + {fmt.money(shipCost)} حمل</div>
                 <div style={{ color: 'var(--accent)', fontWeight: 700, marginTop: 4 }}>
-                  ➜ میانگین قیمت هر جوجه: {toFa(perChick.toLocaleString('fa-IR'))} تومان
+                  ➜ میانگین قیمت هر جوجه: {fmt.money(perChick, { withUnit: false })} تومان
                 </div>
               </div>
             );
