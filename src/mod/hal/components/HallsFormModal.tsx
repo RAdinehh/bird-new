@@ -14,6 +14,7 @@ import DependentSelect from '../../../shr/components/DependentSelect';
 import DatePicker from '../../../shr/components/DatePicker';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { toastMsg } from '../../../cor/store/toast';
+import { HELP } from '../../../shr/help/helpTexts';
 
 interface TempFormFieldProps {
   value: string;
@@ -191,7 +192,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
           <Field label="نام سالن" required error={vErrors.name}>
             <Input placeholder="شمالی" value={form.name} onChange={e => { onErrorClear?.(); setForm({...form, name: e.target.value}); }} />
           </Field>
-          <Field label="وضعیت سالن" hint="تعمیر/ضدعفونی: ثبت گله ممنوع">
+          <Field label="وضعیت سالن" help={HELP.hal.status}>
             <Select value={form.status || 'empty'} onChange={e => setForm({...form, status: e.target.value})}>
               <option value="active">🟢 فعال</option>
               <option value="empty">⚪ خالی</option>
