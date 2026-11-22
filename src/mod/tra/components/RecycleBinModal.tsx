@@ -1,3 +1,4 @@
+import { Tag } from '../../../shr/components/ui';
 import { useState, useEffect } from 'react';
 import { Modal, Btn } from '../../../shr/components/ui';
 import { useCtc } from '../../ctc/store';
@@ -146,7 +147,7 @@ export default function RecycleBinModal({ open, onClose }: Props) {
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ color: 'var(--text)', fontWeight: 700, fontSize: 'var(--fs-sm)' }}>{toFa(inv.total.toLocaleString('fa-IR'))} تومان</span>
-                    <span style={{ padding: '2px 6px', borderRadius: 'var(--r-sm)', background: badgeBg, color: badgeColor, fontWeight: 700, fontSize: 10 }}>{toFa(days)} روز مونده</span>
+                    <Tag style={{ background: badgeBg, color: badgeColor }}>{toFa(days)} روز مونده</Tag>
                   </div>
                 </div>
 

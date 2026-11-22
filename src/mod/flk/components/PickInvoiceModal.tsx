@@ -1,9 +1,10 @@
+import { Tag } from '../../../shr/components/ui';
 /**
  * PickInvoiceModal.tsx — انتخاب فاکتور خرید پرنده از tra
  * نمایش کامل: طرف حساب، نوع پرنده، نژاد، تاریخ هچ، وضعیت اتصال
  */
 import { useMemo } from 'react';
-import { Modal, Btn, BtnRow } from '../../../shr/components/ui';
+import { Modal, Btn, BtnRow } /* Tag */ from '../../../shr/components/ui';
 import { useTra } from '../../tra/store';
 import { useBrd } from '../../brd/store';
 import { useCtc } from '../../ctc/store';
@@ -119,13 +120,9 @@ export default function PickInvoiceModal({ open, onClose, onSelect, currentBirdI
                     {partyName || '—'}
                   </span>
                   {isLinked ? (
-                    <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 'var(--r-sm)', background: 'var(--accent-soft)', color: 'var(--accent)', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                      🔗 {linkedFlock.name}
-                    </span>
+                    <Tag tone="accent">{linkedFlock.name}</Tag>
                   ) : (
-                    <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 'var(--r-sm)', background: 'var(--input-bg)', color: 'var(--muted)', fontWeight: 700 }}>
-                      بدون گله
-                    </span>
+                    <Tag tone="gray">بدون گله</Tag>
                   )}
                 </div>
 

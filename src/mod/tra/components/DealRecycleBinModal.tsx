@@ -1,3 +1,4 @@
+import { Tag } from '../../../shr/components/ui';
 /**
  * DealRecycleBinModal.tsx — سبد بازیافت معاملات
  * دقیقاً مطابق RecycleBinModal (فاکتورها)
@@ -139,9 +140,7 @@ export default function DealRecycleBinModal({ open, onClose }: Props) {
                     <span style={{ color: 'var(--text)', fontWeight: 700, fontSize: 'var(--fs-sm)' }}>
                       {toFa((deal.value || 0).toLocaleString('fa-IR'))} تومان
                     </span>
-                    <span style={{ padding: '2px 6px', borderRadius: 'var(--r-sm)', background: badgeBg, color: badgeColor, fontWeight: 700, fontSize: 10 }}>
-                      {toFa(days)} روز مونده
-                    </span>
+                    <Tag style={{ background: badgeBg, color: badgeColor }}>{toFa(days)} روز مونده</Tag>
                   </div>
                 </div>
 

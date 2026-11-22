@@ -183,22 +183,15 @@ export default function FlockCard(props: FlockCardProps) {
     allBadges.push({
       key: 'no-source',
       node: (
-        <button
-          type="button"
+        <Tag
+          tone="warn"
+          bordered
           onClick={(e) => { e.stopPropagation(); void handleEditGuard(); }}
           title="این گله به هیچ سند لینک نیست — کلیک برای اتصال"
-          aria-label="اتصال گله به سند"
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: 3,
-            padding: '2px 7px',
-            background: 'var(--warn-soft)', color: 'var(--warn)',
-            border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)',
-            fontSize: 10, fontWeight: 700,
-            cursor: 'pointer', fontFamily: 'inherit', lineHeight: 1.6,
-          }}
+          ariaLabel="اتصال گله به سند"
         >
           بدون سند
-        </button>
+        </Tag>
       ),
     });
   }
@@ -212,8 +205,8 @@ export default function FlockCard(props: FlockCardProps) {
     });
   }
 
-  if (f.hidden) allBadges.push({ key: 'hidden', node: <Tag tone="gray">👁</Tag> });
-  if (f.paused) allBadges.push({ key: 'paused', node: <Tag tone="amber">⏸</Tag> });
+  if (f.hidden) allBadges.push({ key: 'hidden', node: <Tag tone="gray">پنهان</Tag> });
+  if (f.paused) allBadges.push({ key: 'paused', node: <Tag tone="amber">متوقف</Tag> });
 
   if (DEAL_BADGE[f.dealType || 'own']) {
     allBadges.push({
@@ -228,19 +221,9 @@ export default function FlockCard(props: FlockCardProps) {
     allBadges.push({
       key: 'merged',
       node: (
-        <span style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 3,
-          padding: '2px 7px',
-          background: 'var(--purple-soft)',
-          color: 'var(--purple)',
-          border: '1px solid var(--purple)',
-          borderRadius: 'var(--r-sm)',
-          fontSize: 10,
-          fontWeight: 700,
-          lineHeight: 1.6,
-        }}>🔗 ادغام‌شده ({toFa(_mergedSourcesCount)})</span>
+        <Tag tone="purple" bordered>
+          ادغام‌شده ({toFa(_mergedSourcesCount)})
+        </Tag>
       ),
     });
   }
@@ -261,19 +244,14 @@ export default function FlockCard(props: FlockCardProps) {
     allBadges.push({
       key: 'group-' + g.id,
       node: (
-        <span
+        <Tag
+          bordered
           onClick={(e) => { e.stopPropagation(); onOpenGroups(); }}
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: 2,
-            padding: '2px 6px', background: c.bg,
-            border: '1px solid ' + c.border, borderRadius: 'var(--r-sm)',
-            fontSize: 10, fontWeight: 700, color: c.fg,
-            cursor: 'pointer', whiteSpace: 'nowrap',
-          }}
           title={g.description || g.name}
+          style={{ background: c.bg, borderColor: c.border, color: c.fg }}
         >
-          {GROUP_ICON[g.type]} {g.name}
-        </span>
+          {g.name}
+        </Tag>
       ),
     });
   });

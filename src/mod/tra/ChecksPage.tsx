@@ -1,3 +1,4 @@
+import { Tag } from '../../shr/components/ui';
 /**
  * ChecksPage.tsx — مدیریت چک‌ها
  */
@@ -214,7 +215,7 @@ export default function ChecksPage({ active = true }: { active?: boolean } = {})
           {row.docNumber && <span style={{ fontSize: 10, color: 'var(--dim)', fontWeight: 400 }}>{row.docNumber}</span>}
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: 8 }}>
-          <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 'var(--r-sm)', background: info.bg, color: info.color }}>{info.icon} {info.label}</span>
+          <Tag style={{ background: info.bg, color: info.color }}>{info.label}</Tag>
           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
             {row.status === 'pending' && <Btn size="sm" variant="outline" onClick={() => void handleAction(row, 'deposit')}>↑ واریز به بانک</Btn>}
             {row.status === 'in_transit' && <Btn size="sm" variant="primary" onClick={() => void handleAction(row, 'clear')}>✓ وصول شد</Btn>}

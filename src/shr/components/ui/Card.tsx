@@ -21,49 +21,77 @@ export function Card({ accent = 'accent', onClick, children, style }: CardProps)
 }
 export function Tag({
   tone = 'gray',
+  bordered = false,
+  onClick,
+  title,
+  ariaLabel,
+  style,
   children,
 }: {
   tone?: 'green' | 'amber' | 'red' | 'blue' | 'gray' | 'purple' | 'accent' | 'warn' | 'danger' | 'info' | 'dim';
+  bordered?: boolean;
+  onClick?: (e: React.MouseEvent<HTMLElement>) => void;
+  title?: string;
+  ariaLabel?: string;
+  style?: React.CSSProperties;
   children: React.ReactNode;
 }) {
-  const tones: Record<string, { bg: string; color: string }> = {
-    green: { bg: 'var(--success-soft)', color: 'var(--success)' },
-    accent: { bg: 'var(--accent-soft)', color: 'var(--accent)' },
-    amber: { bg: 'var(--warn-soft)', color: 'var(--warn)' },
-    warn: { bg: 'var(--warn-soft)', color: 'var(--warn)' },
-    red: { bg: 'var(--danger-soft)', color: 'var(--danger)' },
-    danger: { bg: 'var(--danger-soft)', color: 'var(--danger)' },
-    blue: { bg: 'var(--info-soft)', color: 'var(--info)' },
-    info: { bg: 'var(--info-soft)', color: 'var(--info)' },
-    gray: { bg: 'var(--input-bg)', color: 'var(--muted)' },
-    dim: { bg: 'var(--input-bg)', color: 'var(--dim)' },
-    purple: { bg: 'var(--purple-soft)', color: 'var(--purple)' },
+  const tones: Record<string, { bg: string; color: string; border: string }> = {
+    green: { bg: 'var(--success-soft)', color: 'var(--success)', border: 'var(--success-border, var(--success))' },
+    accent: { bg: 'var(--accent-soft)', color: 'var(--accent)', border: 'var(--accent-border, var(--accent))' },
+    amber: { bg: 'var(--warn-soft)', color: 'var(--warn)', border: 'var(--warn-border, var(--warn))' },
+    warn: { bg: 'var(--warn-soft)', color: 'var(--warn)', border: 'var(--warn-border, var(--warn))' },
+    red: { bg: 'var(--danger-soft)', color: 'var(--danger)', border: 'var(--danger-border, var(--danger))' },
+    danger: { bg: 'var(--danger-soft)', color: 'var(--danger)', border: 'var(--danger-border, var(--danger))' },
+    blue: { bg: 'var(--info-soft)', color: 'var(--info)', border: 'var(--info-border, var(--info))' },
+    info: { bg: 'var(--info-soft)', color: 'var(--info)', border: 'var(--info-border, var(--info))' },
+    gray: { bg: 'var(--input-bg)', color: 'var(--muted)', border: 'var(--border)' },
+    dim: { bg: 'var(--input-bg)', color: 'var(--dim)', border: 'var(--border)' },
+    purple: { bg: 'var(--purple-soft)', color: 'var(--purple)', border: 'var(--purple-border, var(--purple))' },
   };
   const t = tones[tone] || tones.gray;
+  const sharedStyle: React.CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    height: 22,
+    minWidth: 46,
+    boxSizing: 'border-box',
+    fontSize: 'var(--fs-xs)',
+    fontWeight: 700,
+    padding: '0 8px',
+    borderRadius: 'var(--r-sm)',
+    background: t.bg,
+    color: t.color,
+    border: bordered ? `1px solid ${t.border}` : '1px solid transparent',
+    whiteSpace: 'nowrap',
+    lineHeight: 1,
+    flexShrink: 0,
+    fontFamily: 'inherit',
+    cursor: onClick ? 'pointer' : 'default',
+    ...style,
+  };
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        title={title}
+        aria-label={ariaLabel}
+        style={sharedStyle}
+      >
+        {children}
+      </button>
+    );
+  }
   return (
-    <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 4,
-        height: 22,
-        minWidth: 46,
-        fontSize: 'var(--fs-xs)',
-        fontWeight: 700,
-        padding: '0 8px',
-        borderRadius: 'var(--r-sm)',
-        background: t.bg,
-        color: t.color,
-        whiteSpace: 'nowrap',
-        lineHeight: 1,
-        flexShrink: 0,
-      }}
-    >
+    <span title={title} aria-label={ariaLabel} style={sharedStyle}>
       {children}
     </span>
   );
 }
+
 interface EmptyProps {
   icon: React.ReactNode;
   title: string;

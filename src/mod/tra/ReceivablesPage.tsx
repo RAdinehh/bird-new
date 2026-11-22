@@ -1,3 +1,4 @@
+import { Tag } from '../../shr/components/ui';
 /**
  * ReceivablesPage — مطالبات/بدهی با aging
  */
