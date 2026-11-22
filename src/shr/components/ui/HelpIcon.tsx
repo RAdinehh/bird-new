@@ -49,34 +49,34 @@ function renderBlock(block: string, idx: number) {
         style={{
           margin: 0,
           padding: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
           fontSize: '13px',
-          lineHeight: 1.42,
-          color: 'var(--text)',
+          lineHeight: 1.45,
           wordBreak: 'break-word',
         }}
       >
-        <span
+        <div
           style={{
             fontWeight: 800,
-            fontSize: '13.5px',
-            color: 'var(--text)',
+            fontSize: '13px',
+            color: 'var(--accent)',
           }}
         >
           {title}
-        </span>
+        </div>
         {rest ? (
-          <>
-            {' '}
-            <span
-              style={{
-                fontWeight: 400,
-                fontSize: '13px',
-                color: 'var(--text-secondary, var(--text))',
-              }}
-            >
-              {renderKeywordBolds(rest)}
-            </span>
-          </>
+          <div
+            style={{
+              fontWeight: 400,
+              fontSize: '12.5px',
+              color: 'var(--text-secondary, var(--text))',
+              paddingRight: 6,
+            }}
+          >
+            {renderKeywordBolds(rest)}
+          </div>
         ) : null}
       </div>
     );
@@ -251,7 +251,7 @@ export function HelpIcon({ text }: Props) {
               lineHeight: 1.42,
               display: 'flex',
               flexDirection: 'column',
-              gap: 3,
+              gap: 8,
               boxShadow: '0 6px 14px rgba(0, 0, 0, 0.28), 0 1px 3px rgba(0, 0, 0, 0.2)',
             }}
           >

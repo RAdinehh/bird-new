@@ -164,10 +164,39 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                     label={def.secondary!.label}
                     autoFrom={autoFields.has('capacity') && String(form.capacity) === String(def.secondary!.defaultValue) ? 'استاندارد' : undefined}
                     help={(() => {
-                      const typeLabel = getEquipLabel(form.type || 'other')?.name;
+                      const t = form.type || 'other';
+                      const typeLabel = getEquipLabel(t)?.name || 'تجهیز';
                       const hintText = def.secondary?.hint;
-                      if (!hintText) return undefined;
-                      return typeLabel ? `${typeLabel}: ${hintText}` : hintText;
+                      const USAGE_NOTES: Record<string, string> = {
+                        fan_tunnel: 'در انتهای سالن نصب می‌شود؛ سرعت باد طولی در تابستان حدود ۲ تا ۲٫۵ m/s ایجاد می‌کند.',
+                        fan_ceiling: 'برای یکنواخت‌سازی دما و جلوگیری از تجمع گاز آمونیاک در کف سالن استفاده می‌شود.',
+                        air_inlet: 'در دیوارهای جانبی نصب می‌شود تا هوای تازه بدون برخورد مستقیم به پرنده وارد سالن شود.',
+                        nipple: 'بهداشتی‌ترین سیستم آب‌رسانی؛ تنظیم ارتفاع خط و فشار آب متناسب با سن گله ضروری است.',
+                        cup: 'دسترسی آسان برای جوجه و نیمچه؛ نیاز به شستشوی دوره‌ای کاسه‌ها برای جلوگیری از آلودگی دارد.',
+                        drinker_auto_hanging: 'تنظیم سطح آب با وزن آب داخل کاسه انجام می‌شود؛ لبه آن باید هم‌سطح پشت پرنده باشد.',
+                        fountain_drinker: 'مخصوص روزهای اول جوجه‌ریزی؛ روی سطح صاف قرار گیرد تا از خیس شدن بستر جلوگیری شود.',
+                        trough: 'تأمین آب پیوسته در طول سالن؛ نیازمند تمیزکاری روزانه و تراز بودن شیب ناودان است.',
+                        drinker_capsule: 'مناسب جوجه‌های کم‌تعداد یا باکس‌های قرنطینه با تعویض آسان مخزن.',
+                        feeder_chick_tray: 'مخصوص هفته اول تا دسترسی آسان جوجه به دان فراهم شود؛ از روز ۷ به سیستم اصلی منتقل شود.',
+                        feeder_pan: 'توزیع هم‌زمان و یکنواخت دان در کل سالن و کاهش پرت دان با لبه ضدریزش بشقاب.',
+                        feeder_chain: 'مناسب سالن‌های طولانی، مرغ مادر و تخم‌گذار با سرعت انتقال یکنواخت دان.',
+                        feeder_tube: 'قابل تنظیم ارتفاع با رشد گله؛ برای جلوگیری از ریختن دان، سینی نباید بیش از نصف پر شود.',
+                        feeder_bucket: 'مناسب سالن‌های کوچک یا تکمیل ظرفیت دان‌خوری در سنین بالا.',
+                        feeder_manual: 'پرکردن دستی در نوبت‌های مشخص؛ برای جلوگیری از رقابت، فضای کافی برای همه پرنده‌ها لازم است.',
+                        lamp_led: 'مصرف برق پایین، عمر بالا و نور بدون پرش؛ شدت نور را در سنین مختلف با دیمر کنترل کنید.',
+                        lamp_fluorescent: 'نوردهی گسترده اما با افت نوری بیشتر در طول زمان نسبت به LED.',
+                        radiant_brooder: 'گرمای موضعی مستقیم به کف سالن و بدن جوجه می‌دهد و بستر را خشک نگه می‌دارد.',
+                        jet_heater: 'گرمایش سریع هوای سالن؛ مدل دودکش‌دار برای حفظ کیفیت هوا و اکسیژن سالن ایمن‌تر است.',
+                        duct_heater: 'توزیع یکنواخت هوای گرم از طریق کانال در سالن‌های بزرگ با راندمان حرارتی بالا.',
+                      };
+                      const blocks: string[] = [];
+                      if (hintText) {
+                        blocks.push(`**استاندارد ${typeLabel}** ${hintText}`);
+                      }
+                      if (USAGE_NOTES[t]) {
+                        blocks.push(`**نکته کاربردی** ${USAGE_NOTES[t]}`);
+                      }
+                      return blocks.length > 0 ? blocks.join('\n') : undefined;
                     })()}
                     error={vErrors.capacity}
                   >
