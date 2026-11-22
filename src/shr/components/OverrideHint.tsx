@@ -15,7 +15,7 @@ interface Props {
   /** آیا مقدار با استاندارد متفاوته؟ */
   overridden: boolean;
   /** مقدار استاندارد که کاربر ازش دور شده */
-  stdValue: number | null;
+  stdValue: number | string | null;
   /** واحد (روز / FCR / ...) */
   unit?: string;
   /** تعداد اعشار */
@@ -27,9 +27,11 @@ interface Props {
 export default function OverrideHint({
   overridden, stdValue, unit, decimals = 0, onReset,
 }: Props) {
-  if (!overridden || stdValue == null) return null;
+  if (!overridden || stdValue == null || stdValue === '') return null;
 
-  const fmtVal = decimals > 0 ? toFa(stdValue.toFixed(decimals)) : toFa(stdValue);
+  const fmtVal = typeof stdValue === 'number'
+    ? (decimals > 0 ? toFa(stdValue.toFixed(decimals)) : toFa(stdValue))
+    : stdValue;
   const text = unit ? `${fmtVal} ${unit}` : fmtVal;
 
   return (

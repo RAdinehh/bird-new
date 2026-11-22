@@ -14,6 +14,7 @@
  */
 import { useState, useEffect } from 'react';
 import { useFormat } from '../../../../../shr/units/useFormat';
+import OverrideHint from '../../../../../shr/components/OverrideHint';
 import { intRange, intNonNeg, floatRange, floatNonNeg, requiredStr } from '../../../../../shr/validation/helpers';
 
 interface Props {
@@ -159,30 +160,6 @@ export default function OverridableField({
           fontSize: 11.5, color: 'var(--muted)', fontWeight: 600,
           flex: 1, textAlign: 'right',
         }}>{label}</span>
-
-        {hasOverride && (
-          <button
-            type="button"
-            onClick={reset}
-            title={`بازگشت به استاندارد (${displayDefault})`}
-            aria-label="بازگشت به استاندارد"
-            style={{
-              width: 44, height: 44,
-              marginInline: -11, marginBlock: -11,
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--warn)',
-              cursor: 'pointer',
-              fontFamily: 'inherit',
-              fontSize: 13,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: 0,
-              flexShrink: 0,
-            }}
-          >🔄</button>
-        )}
       </div>
 
       {/* Input */}
@@ -220,13 +197,13 @@ export default function OverridableField({
             width: '100%',
             height: 38,
             padding: unit ? '0 45px 0 12px' : '0 12px',
-            background: hasOverride ? 'var(--warn-soft, #fef3c7)' : 'var(--input-bg)',
-            border: '1px solid ' + (error ? 'var(--danger, #dc2626)' : hasOverride ? 'var(--warn)' : (focused ? 'var(--accent)' : 'var(--border)')),
+            background: 'var(--input-bg)',
+            border: '1px solid ' + (error ? 'var(--danger, #dc2626)' : (focused ? 'var(--accent)' : 'var(--border)')),
             borderRadius: 'var(--r-md)',
-            color: error ? 'var(--danger, #dc2626)' : hasOverride ? 'var(--warn)' : 'var(--text)',
+            color: error ? 'var(--danger, #dc2626)' : 'var(--text)',
             fontFamily: 'inherit',
             fontSize: 'var(--fs-base)',
-            fontWeight: hasOverride ? 700 : 600,
+            fontWeight: 600,
             textAlign: 'center',
             outline: 'none',
             boxSizing: 'border-box',
@@ -242,7 +219,7 @@ export default function OverridableField({
             top: '50%',
             transform: 'translateY(-50%)',
             fontSize: 11,
-            color: hasOverride ? 'var(--warn)' : 'var(--muted)',
+            color: 'var(--muted)',
             pointerEvents: 'none',
             fontWeight: 500,
           }}>{unit}</span>
@@ -270,16 +247,13 @@ export default function OverridableField({
       )}
 
       {/* پیام تغییر */}
-      {hasOverride && !error && (
-        <div style={{
-          fontSize: 10,
-          color: 'var(--warn)',
-          fontWeight: 600,
-          paddingRight: 4,
-          lineHeight: 1.4,
-        }}>
-          تغییر یافته • استاندارد: {displayDefault}{unit ? ' ' + unit : ''}
-        </div>
+      {!error && (
+        <OverrideHint
+          overridden={hasOverride}
+          stdValue={defaultValue == null || defaultValue === '' ? null : displayDefault}
+          unit={unit}
+          onReset={reset}
+        />
       )}
     </div>
   );
