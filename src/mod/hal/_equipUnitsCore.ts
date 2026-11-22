@@ -156,8 +156,8 @@ export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
     stdKey: 'feeder.chainCmPerBird',
   },
   feeder_tube: {
-    primary: { label: 'طول کل', unit: 'm', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر متر', unit: 'راس', defaultValue: 30, hint: 'دان‌خوری لوله‌ای/آویز: سرانه ۳-۴ سانتی‌متر/پرنده (حدود ۳۰-۵۰ پرنده بسته به قطر)' },
+    primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
+    secondary: { label: 'ظرفیت هر واحد', unit: 'راس', defaultValue: 30, hint: 'دان‌خوری لوله‌ای/آویز: سرانه ۳-۴ سانتی‌متر/پرنده (حدود ۳۰-۵۰ پرنده بسته به قطر)' },
     baseUnit: 'راس',
     calc: (p, s) => p * s,
     summaryLabel: 'راس',

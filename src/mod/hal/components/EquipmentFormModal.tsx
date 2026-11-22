@@ -44,6 +44,15 @@ export interface EquipmentFormModalProps {
 export default function EquipmentFormModal(props: EquipmentFormModalProps) {
   const { open, setOpen, form, setForm, err, vErrors, halls, zones, equipment, autoFields, clearAuto, markAuto, typesForCategory, equipNeed, save, suppliers, stdForDefaults, onErrorClear } = props;
 
+  const mapPrimaryUnit = (u?: string): EquipmentFormData['unit'] => {
+    if (u === 'm²' || u === 'm2') return 'm2';
+    if (u === 'm') return 'm';
+    if (u === 'kg') return 'kg';
+    if (u === 'L') return 'L';
+    return 'pcs';
+  };
+
+
   return (
       <Modal open={open} onClose={() => setOpen(false)} title={form.id ? 'ویرایش تجهیز' : 'افزودن تجهیز'}
         footer={<div style={{ display: "flex", gap: 'var(--sp-2)' }}><Btn variant="primary" onClick={save} style={{ flex: 1 }}>ذخیره</Btn><Btn onClick={() => setOpen(false)} style={{ flex: 1 }}>لغو</Btn></div>}>
@@ -83,7 +92,18 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                 const catEnum = cat as EquipmentCategory;
                 const allowed = typesForCategory(cat);
                 const nextType = allowed.includes(form.type) ? form.type : (allowed[0] || 'other');
-                setForm({...form, category: catEnum, type: nextType, capacity: '', name: ''});
+                const nextDef = getEquipUnit(nextType);
+                const stdVal = stdForDefaults ? getStdDefaultForType(nextType, stdForDefaults) : null;
+                const finalVal = stdVal ?? nextDef.secondary?.defaultValue ?? null;
+                if (finalVal != null) markAuto('capacity'); else clearAuto('capacity');
+                setForm({
+                  ...form,
+                  category: catEnum,
+                  type: nextType,
+                  unit: mapPrimaryUnit(nextDef.primary.unit),
+                  capacity: finalVal != null ? String(finalVal) : '',
+                  name: '',
+                });
               }}
               options={Object.entries(CATEGORY_LABELS).map(([k, v]: [string, any]) => ({
                 value: k,
@@ -101,7 +121,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
             value={form.type}
             onChange={v => {
               const def = getEquipUnit(v);
-              const patch: Record<string, string | undefined> = { type: v };
+              const patch: Record<string, any> = { type: v, unit: mapPrimaryUnit(def.primary.unit) };
               // 🆕 اول از std نژاد، بعد از defaultValue
               const stdVal = stdForDefaults ? getStdDefaultForType(v, stdForDefaults) : null;
               const finalVal = stdVal ?? def.secondary?.defaultValue ?? null;
@@ -156,8 +176,8 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
           return (
             <>
               <Grid2>
-                <Field label="تعداد" error={vErrors.count}>
-                  <NumField placeholder="۵" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit={getUnitLabel(form.unit || 'pcs')} min={1} max={5000} />
+                <Field label={def.primary.label || "تعداد"} error={vErrors.count}>
+                  <NumField placeholder="۵" value={form.count} onChange={e => setForm({...form, count: e.target.value})} unit={def.primary.unit || getUnitLabel(form.unit || 'pcs')} min={1} max={5000} />
                 </Field>
                 {hasSec ? (
                   <Field
