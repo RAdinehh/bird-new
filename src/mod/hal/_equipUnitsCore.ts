@@ -8,7 +8,7 @@ const DEFAULT_ROLL_KG = 50;
 export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
   fan_tunnel: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر فن', unit: 'm³/h', defaultValue: 4000 , hint: 'ظرفیت ۳۵۰۰-۵۰۰۰ m³/h' },
+    secondary: { label: 'ظرفیت هر فن', unit: 'm³/h', defaultValue: 4000  },
     baseUnit: 'm³/h',
     calc: (p, s) => p * s,
     summaryLabel: 'm³/h',
@@ -16,14 +16,14 @@ export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
   },
   fan_ceiling: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر فن', unit: 'm³/h', defaultValue: 2000 , hint: 'ظرفیت ۲۰۰۰-۳۰۰۰ m³/h' },
+    secondary: { label: 'ظرفیت هر فن', unit: 'm³/h', defaultValue: 2000  },
     baseUnit: 'm³/h',
     calc: (p, s) => p * s,
     summaryLabel: 'm³/h',
   },
   air_inlet: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر دریچه', unit: 'm³/h', defaultValue: 500 , hint: 'ظرفیت ۴۰۰-۶۰۰ m³/h' },
+    secondary: { label: 'ظرفیت هر دریچه', unit: 'm³/h', defaultValue: 500  },
     baseUnit: 'm³/h',
     calc: (p, s) => p * s,
     summaryLabel: 'm³/h',
