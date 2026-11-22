@@ -215,9 +215,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                     const fg = "var(--accent)";
                     const dividerColor = "var(--accent-border)";
 
-                    const fmtRate = (n: number) => toFa(
-                      n >= 1 ? n.toFixed(1).replace(".", "٫") : n.toFixed(2).replace(".", "٫")
-                    );
+                    const fmtRate = (n: number) => toFa(Math.round(n));
 
                     const rowStyle: React.CSSProperties = {
                       display: "flex",
@@ -276,7 +274,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                                 ? "ظرفیت فن را وارد کنید"
                                 : isEnough
                                   ? "کافیه"
-                                  : `کم داره (${toFa(needM3h - Math.round(totalAirM3h))} m³/h کسری)`}
+                                  : "کم داره"}
                           </span>
                         </div>
                       </div>
