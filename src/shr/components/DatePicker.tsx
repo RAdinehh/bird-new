@@ -4,11 +4,14 @@ import {
   setYear, getYear, getMonth, startOfMonth, endOfMonth,
 } from 'date-fns-jalali';
 import { Btn, Modal } from './ui';
-import { toFa } from '../utils/fa';
+import { useFormat } from '../units/useFormat';
+import { formatGregorianFromDate } from '../date/jalali';
 import { useSet } from '../../mod/set/store';
 
-const MONTHS = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
-const WEEKDAYS = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
+const JALALI_MONTHS = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
+const GREG_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const JALALI_WEEKDAYS = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
+const GREG_WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 const toLatin = (s: string) =>
   s.replace(/[۰-۹]/g, (d) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
@@ -42,9 +45,11 @@ export default function DatePicker({
 }: Props) {
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(value || '');
-
+  const fmt = useFormat();
+  const isGregorian = fmt.units.dateFormat === 'gregorian';
   const lowPower = useSet((st: any) => st.lowPowerMode);
   const [prefersReduced, setPrefersReduced] = useState(false);
+
   useEffect(() => {
     try {
       const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -59,51 +64,32 @@ export default function DatePicker({
   const today = new Date();
   const todayStr = format(today, 'yyyy/MM/dd');
 
-  const [cursor, setCursor] = useState<Date>(() => {
-    if (value) {
-      try {
-        const p = parse(toLatin(value), 'yyyy/MM/dd', new Date());
-        if (!isNaN(p.getTime())) return p;
-      } catch { /* silent */ }
+  const parseValueToDate = (val?: string): Date | null => {
+    if (!val) return null;
+    try {
+      const p = parse(toLatin(val), 'yyyy/MM/dd', new Date());
+      return isNaN(p.getTime()) ? null : p;
+    } catch {
+      return null;
     }
-    return today;
-  });
+  };
 
-  // autoToday: اگه value خالیه، خودکار امروز رو ست کن
+  const [cursor, setCursor] = useState<Date>(() => parseValueToDate(value) || today);
+
   useEffect(() => {
     if (autoToday && !value && !disabled) {
       onChange(todayStr);
     }
   }, [autoToday, disabled]);
 
-  // هر بار باز شدن: اگه value بود بریم همون، وگرنه امروز
   useEffect(() => {
     if (!open) return;
-    if (value) {
-      try {
-        const p = parse(toLatin(value), 'yyyy/MM/dd', new Date());
-        if (!isNaN(p.getTime())) { setCursor(p); return; }
-      } catch { /* silent */ }
-    }
-    setCursor(new Date());
+    setCursor(parseValueToDate(value) || new Date());
   }, [open]);
 
   useEffect(() => {
     if (open) setPending(value || '');
   }, [open, value]);
-
-  const currentYear = getYear(new Date());
-  const years = useMemo(
-    () => Array.from({ length: 31 }, (_, i) => currentYear - 15 + i),
-    [currentYear]
-  );
-
-  const year = getYear(cursor);
-  const month = getMonth(cursor);
-  const monthStart = startOfMonth(cursor);
-  const monthEnd = endOfMonth(cursor);
-  const daysInMonth = getDate(monthEnd);
-  const firstCol = (monthStart.getDay() + 1) % 7;
 
   const isInRange = (dateStr: string) => {
     if (min && dateStr < min) return false;
@@ -111,15 +97,84 @@ export default function DatePicker({
     return true;
   };
 
+  const borderColor = error ? 'var(--danger)' : warn ? 'var(--warn)' : 'var(--border)';
+  const height = compact ? 32 : 38;
+
+  // محاسبات ماه در حالت شمسی یا میلادی
+  const months = isGregorian ? GREG_MONTHS : JALALI_MONTHS;
+  const weekdays = isGregorian ? GREG_WEEKDAYS : JALALI_WEEKDAYS;
+
+  const { year, month, daysInMonth, firstCol, years } = useMemo(() => {
+    if (!isGregorian) {
+      const cy = getYear(new Date());
+      const yrList = Array.from({ length: 31 }, (_, i) => cy - 15 + i);
+      const y = getYear(cursor);
+      const m = getMonth(cursor);
+      const mStart = startOfMonth(cursor);
+      const mEnd = endOfMonth(cursor);
+      return {
+        year: y,
+        month: m,
+        daysInMonth: getDate(mEnd),
+        firstCol: (mStart.getDay() + 1) % 7,
+        years: yrList,
+      };
+    }
+    const cy = new Date().getFullYear();
+    const yrList = Array.from({ length: 31 }, (_, i) => cy - 15 + i);
+    const y = cursor.getFullYear();
+    const m = cursor.getMonth();
+    const first = new Date(y, m, 1);
+    const last = new Date(y, m + 1, 0);
+    return {
+      year: y,
+      month: m,
+      daysInMonth: last.getDate(),
+      firstCol: first.getDay(),
+      years: yrList,
+    };
+  }, [cursor, isGregorian]);
+
+  const stepMonth = (delta: number) => {
+    if (!isGregorian) {
+      setCursor(delta > 0 ? addMonths(cursor, 1) : subMonths(cursor, 1));
+    } else {
+      setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + delta, 1));
+    }
+  };
+
+  const changeMonth = (mIdx: number) => {
+    if (!isGregorian) setCursor(setMonth(cursor, mIdx));
+    else setCursor(new Date(cursor.getFullYear(), mIdx, 1));
+  };
+
+  const changeYear = (yr: number) => {
+    if (!isGregorian) setCursor(setYear(cursor, yr));
+    else setCursor(new Date(yr, cursor.getMonth(), 1));
+  };
+
+  const buildDateObj = (day: number): Date => {
+    if (!isGregorian) return setDate(cursor, day);
+    return new Date(cursor.getFullYear(), cursor.getMonth(), day);
+  };
+
   const handleSelect = (day: number) => {
-    const d = setDate(cursor, day);
+    const d = buildDateObj(day);
     const dStr = format(d, 'yyyy/MM/dd');
     if (!isInRange(dStr)) return;
     setPending(dStr);
   };
 
-  const borderColor = error ? 'var(--danger)' : warn ? 'var(--warn)' : 'var(--border)';
-  const height = compact ? 32 : 38;
+  const formatCellDay = (d: Date, dayNum: number) => {
+    if (!isGregorian) return fmt.count(dayNum);
+    return fmt.raw.digits(String(dayNum), fmt.units.numberFormat);
+  };
+
+  const formatYearOption = (yr: number) => {
+    return fmt.raw.digits(String(yr), fmt.units.numberFormat);
+  };
+
+  const displayTriggerText = value ? fmt.date(value) : placeholder;
 
   return (
     <>
@@ -150,10 +205,9 @@ export default function DatePicker({
           minWidth: 0,
           outline: 'none',
         }}
-        
       >
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {value ? toFa(value) : placeholder}
+          {displayTriggerText}
           {required && !value ? <span style={{ color: 'var(--danger)', marginRight: 4 }}>*</span> : null}
         </span>
         <svg width={compact ? 13 : 15} height={compact ? 13 : 15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0, color: 'var(--dim)' }} aria-hidden="true">
@@ -189,34 +243,35 @@ export default function DatePicker({
               >پاک</Btn>
             </div>
           </div>
-        }>
+        }
+      >
         {/* ═══ هدر: فلش چپ | ماه | سال | فلش راست ═══ */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 8 }}>
           <button
             type="button"
-            onClick={() => setCursor(subMonths(cursor, 1))}
+            onClick={() => stepMonth(-1)}
             aria-label="ماه قبل"
             style={{ width: 34, height: 34, background: 'var(--btn-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--muted)', cursor: 'pointer', fontSize: 16, fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
           >›</button>
           <select
             value={String(month)}
-            onChange={(e) => setCursor(setMonth(cursor, +e.target.value))}
+            onChange={(e) => changeMonth(+e.target.value)}
             aria-label="ماه"
             style={{ flex: 1.5, height: 34, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 6px', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, minWidth: 0 }}
           >
-            {MONTHS.map((m, i) => <option key={i} value={i}>{m}</option>)}
+            {months.map((m, i) => <option key={i} value={i}>{m}</option>)}
           </select>
           <select
             value={String(year)}
-            onChange={(e) => setCursor(setYear(cursor, +e.target.value))}
+            onChange={(e) => changeYear(+e.target.value)}
             aria-label="سال"
             style={{ flex: 1, height: 34, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 6px', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, minWidth: 0 }}
           >
-            {years.map((y) => <option key={y} value={y}>{toFa(y)}</option>)}
+            {years.map((y) => <option key={y} value={y}>{formatYearOption(y)}</option>)}
           </select>
           <button
             type="button"
-            onClick={() => setCursor(addMonths(cursor, 1))}
+            onClick={() => stepMonth(1)}
             aria-label="ماه بعد"
             style={{ width: 34, height: 34, background: 'var(--btn-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--muted)', cursor: 'pointer', fontSize: 16, fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
           >‹</button>
@@ -224,8 +279,8 @@ export default function DatePicker({
 
         {/* ═══ روزهای هفته ═══ */}
         <div role="row" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, marginTop: 2 }}>
-          {WEEKDAYS.map((w, i) => (
-            <div key={i} role="columnheader" style={{ textAlign: 'center', fontSize: 10, color: i === 6 ? 'var(--danger)' : 'var(--dim)', padding: '2px 0', fontWeight: 700 }}>
+          {weekdays.map((w, i) => (
+            <div key={i} role="columnheader" style={{ textAlign: 'center', fontSize: 10, color: (!isGregorian && i === 6) || (isGregorian && i === 0) ? 'var(--danger)' : 'var(--dim)', padding: '2px 0', fontWeight: 700 }}>
               {w}
             </div>
           ))}
@@ -238,7 +293,7 @@ export default function DatePicker({
           ))}
           {Array.from({ length: daysInMonth }).map((_, i) => {
             const day = i + 1;
-            const d = setDate(cursor, day);
+            const d = buildDateObj(day);
             const dayStr = format(d, 'yyyy/MM/dd');
             const isSelected = dayStr === pending;
             const isToday = dayStr === todayStr;
@@ -251,34 +306,56 @@ export default function DatePicker({
                 type="button"
                 onClick={() => handleSelect(day)}
                 disabled={isDisabled}
-                aria-label={`${toFa(day)} ${MONTHS[month]} ${toFa(year)}`}
+                aria-label={`${formatCellDay(d, day)} ${months[month]} ${formatYearOption(year)}`}
                 aria-selected={isSelected}
                 aria-current={isToday ? 'date' : undefined}
                 style={{
                   height: 34,
                   padding: 0,
                   background: isSelected ? 'var(--accent)' : 'transparent',
-                  border: isToday && !isSelected ? '1.5px solid var(--accent)' : '1px solid transparent',
-                  borderRadius: 'var(--r-sm)',
-                  cursor: isDisabled ? 'not-allowed' : 'pointer',
-                  color: isDisabled ? 'var(--dim)' : isSelected ? 'var(--avatar-text)' : isFriday ? 'var(--danger)' : 'var(--text)',
+                  color: isSelected
+                    ? '#fff'
+                    : isDisabled
+                      ? 'var(--dim)'
+                      : isFriday
+                        ? 'var(--danger)'
+                        : 'var(--text)',
+                  border: isToday && !isSelected ? '1px solid var(--accent)' : '1px solid transparent',
+                  borderRadius: 'var(--r-md)',
                   fontFamily: 'inherit',
                   fontSize: 'var(--fs-sm)',
                   fontWeight: isSelected || isToday ? 700 : 500,
+                  cursor: isDisabled ? 'not-allowed' : 'pointer',
                   opacity: isDisabled ? 0.35 : 1,
-                  transition: noAnim ? 'none' : 'background var(--dur-fast)',
-                  outline: 'none',
+                  transition: noAnim ? 'none' : 'background 0.12s ease',
                 }}
-                onFocus={(e) => { if (!isDisabled && !isSelected) e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-soft)'; }}
-                onBlur={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
               >
-                {toFa(day)}
+                {formatCellDay(d, day)}
               </button>
             );
           })}
         </div>
-      </Modal>
 
+        {/* پیش‌نمایش تاریخ انتخاب‌شده */}
+        {pending && (
+          <div style={{
+            marginTop: 10,
+            padding: '6px 10px',
+            background: 'var(--input-bg)',
+            borderRadius: 'var(--r-sm)',
+            fontSize: 'var(--fs-xs)',
+            color: 'var(--muted)',
+            textAlign: 'center',
+          }}>
+            انتخاب‌شده: <b style={{ color: 'var(--text)' }}>{fmt.date(pending)}</b>
+            {isGregorian && (
+              <span style={{ marginRight: 8, color: 'var(--dim)' }}>
+                ({fmt.raw.digits(pending, fmt.units.numberFormat)} شمسی)
+              </span>
+            )}
+          </div>
+        )}
+      </Modal>
     </>
   );
 }

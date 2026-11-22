@@ -3,7 +3,7 @@
  */
 import Decimal from 'decimal.js';
 import { useSet } from '../../mod/set/store';
-import { parseJalali } from '../date/jalali';
+import { parseJalali, formatGregorianFromDate } from '../date/jalali';
 import {
   tomanToCurrency, gToWeight, mlToVolume, cmToLength, m2ToArea, sToTime, cToTemp,
 } from './convert';
@@ -128,10 +128,7 @@ export function createFormatter(units: Units) {
     if (units.dateFormat === 'gregorian') {
       const parsed = parseJalali(jalaliStr);
       if (parsed) {
-        const y = parsed.getFullYear();
-        const m = String(parsed.getMonth() + 1).padStart(2, '0');
-        const dayNum = String(parsed.getDate()).padStart(2, '0');
-        return applyDigits(`${y}/${m}/${dayNum}`, nf);
+        return applyDigits(formatGregorianFromDate(parsed), nf);
       }
     }
     return applyDigits(jalaliStr, nf);
