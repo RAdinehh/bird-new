@@ -22,13 +22,13 @@ export function categoriesForKind(kind: string): string[] {
 
 export const TYPES_BY_CATEGORY: Record<string, string[]> = {
   ventilation:     ['fan_tunnel', 'fan_ceiling', 'air_inlet', 'cooling_pad'],
-  feeding:         ['feeder_manual', 'feeder_pan', 'feeder_chain', 'feeder_tube', 'feeder_bucket'],
-  drinking:        ['nipple', 'cup', 'trough', 'fountain_drinker'],
-  heating:         ['radiant_brooder', 'jet_heater', 'duct_heater'],
+  feeding:         ['feeder_chick_tray', 'feeder_pan', 'feeder_chain', 'feeder_tube', 'feeder_bucket', 'feeder_manual'],
+  drinking:        ['nipple', 'cup', 'drinker_auto_hanging', 'fountain_drinker', 'trough', 'drinker_capsule'],
+  heating:         ['jet_heater', 'duct_heater', 'radiant_brooder'],
   lighting:        ['lamp_led', 'lamp_fluorescent', 'dimmer'],
-  litter:          ['litter_wood_shavings', 'litter_roll', 'litter_sand'],
+  litter:          ['litter_wood_shavings', 'litter_sawdust', 'litter_roll', 'litter_rice_hull', 'litter_straw', 'litter_sand', 'litter_peat'],
   power:           ['generator', 'electrical_panel', 'cable'],
-  auxiliary:       ['camera', 'sensor', 'scale'],
+  auxiliary:       ['camera', 'sensor'],
   water_treatment: ['water_tank', 'water_filter', 'water_pipe'],
   safety:          ['fire_extinguisher', 'smoke_detector', 'emergency_light', 'first_aid'],
   cleaning:        ['pressure_washer', 'sprayer', 'flame_gun'],

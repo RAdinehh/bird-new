@@ -163,7 +163,12 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                   <Field
                     label={def.secondary!.label}
                     autoFrom={autoFields.has('capacity') && String(form.capacity) === String(def.secondary!.defaultValue) ? 'استاندارد' : undefined}
-                    hint={def.secondary!.hint || undefined}
+                    help={(() => {
+                      const typeLabel = getEquipLabel(form.type || 'other')?.name;
+                      const hintText = def.secondary?.hint;
+                      if (!hintText) return undefined;
+                      return typeLabel ? `${typeLabel}: ${hintText}` : hintText;
+                    })()}
                     error={vErrors.capacity}
                   >
                     <NumField

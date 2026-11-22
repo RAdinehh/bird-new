@@ -8,7 +8,7 @@ const DEFAULT_ROLL_KG = 50;
 export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
   fan_tunnel: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر فن', unit: 'm³/h', defaultValue: 4000  },
+    secondary: { label: 'ظرفیت هر فن', unit: 'm³/h', defaultValue: 4000, hint: 'تهویه تابستانه: حدود ۴٫۵ m³/h به ازای هر کیلوگرم وزن زنده' },
     baseUnit: 'm³/h',
     calc: (p, s) => p * s,
     summaryLabel: 'm³/h',
@@ -16,14 +16,14 @@ export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
   },
   fan_ceiling: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر فن', unit: 'm³/h', defaultValue: 2000  },
+    secondary: { label: 'ظرفیت هر فن', unit: 'm³/h', defaultValue: 2000, hint: 'گردش هوای داخلی و تهویه حداقل زمستانه' },
     baseUnit: 'm³/h',
     calc: (p, s) => p * s,
     summaryLabel: 'm³/h',
   },
   air_inlet: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر دریچه', unit: 'm³/h', defaultValue: 500  },
+    secondary: { label: 'ظرفیت هر دریچه', unit: 'm³/h', defaultValue: 500, hint: 'ورودی هوای تازه متناسب با دبی فن‌های اگزاست' },
     baseUnit: 'm³/h',
     calc: (p, s) => p * s,
     summaryLabel: 'm³/h',
@@ -37,28 +37,28 @@ export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
   },
   radiant_brooder: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'توان هر واحد', unit: 'kW', defaultValue: 5 , hint: 'توان ۵-۷ kW' },
+    secondary: { label: 'توان هر واحد', unit: 'kW', defaultValue: 5, hint: 'هیتر تابشی (مادر مصنوعی): توان ۵-۷ kW مناسب پوشش ۵۰۰-۸۰۰ جوجه' },
     baseUnit: 'kW',
     calc: (p, s) => p * s,
     summaryLabel: 'kW',
   },
   jet_heater: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'توان هر واحد', unit: 'kW', defaultValue: 50 , hint: 'توان ۵۰-۸۰ kW' },
+    secondary: { label: 'توان هر واحد', unit: 'kW', defaultValue: 50, hint: 'جت هیتر: توان ۵۰-۸۰ kW مناسب سالن‌های ۵۰۰ تا ۸۰۰ مترمربع' },
     baseUnit: 'kW',
     calc: (p, s) => p * s,
     summaryLabel: 'kW',
   },
   duct_heater: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'توان هر واحد', unit: 'kW', defaultValue: 80 , hint: 'توان ۸۰-۱۰۰ kW' },
+    secondary: { label: 'توان هر واحد', unit: 'kW', defaultValue: 80, hint: 'هیتر کابینتی/کانالی: توان ۸۰-۱۰۰ kW برای توزیع یکنواخت گرما در سالن بزرگ' },
     baseUnit: 'kW',
     calc: (p, s) => p * s,
     summaryLabel: 'kW',
   },
   lamp_led: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'توان هر لامپ', unit: 'W', defaultValue: 10 , hint: 'بازده ۱۰۰ lm/W' },
+    secondary: { label: 'توان هر لامپ', unit: 'W', defaultValue: 10, hint: 'بازده ~۱۰۰ lm/W — نیاز استاندارد سالن حدود ۳ W/m² (۱۰-۲۰ لوکس)' },
     baseUnit: 'W',
     calc: (p, s) => p * s,
     summaryLabel: 'W',
@@ -66,7 +66,7 @@ export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
   },
   lamp_fluorescent: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'توان هر لامپ', unit: 'W', defaultValue: 40 , hint: 'بازده ۶۰ lm/W' },
+    secondary: { label: 'توان هر لامپ', unit: 'W', defaultValue: 40, hint: 'بازده ~۶۰ lm/W — نیاز استاندارد سالن حدود ۳-۴ W/m²' },
     baseUnit: 'W',
     calc: (p, s) => p * s,
     summaryLabel: 'W',
@@ -80,7 +80,7 @@ export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
   },
   nipple: {
     primary: { label: 'تعداد نیپل', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر نیپل', unit: 'راس', defaultValue: 10, hint: '۸-۱۲ پرنده' },
+    secondary: { label: 'ظرفیت هر نیپل', unit: 'راس', defaultValue: 10, hint: 'استاندارد: ۸ تا ۱۲ پرنده به ازای هر نیپل (۱۰-۱۲ گوشتی / ۸-۱۰ مادر)' },
     baseUnit: 'راس',
     calc: (p, s) => p * s,
     summaryLabel: 'راس',
@@ -88,7 +88,7 @@ export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
   },
   cup: {
     primary: { label: 'تعداد کاپ', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر کاپ', unit: 'راس', defaultValue: 20 , hint: '۱۵-۲۰ پرنده' },
+    secondary: { label: 'ظرفیت هر کاپ', unit: 'راس', defaultValue: 20, hint: 'استاندارد: ۱۵ تا ۲۰ پرنده (تا ۲۵ پرنده در کاپ‌های بزرگ)' },
     baseUnit: 'راس',
     calc: (p, s) => p * s,
     summaryLabel: 'راس',
@@ -96,7 +96,7 @@ export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
   },
   trough: {
     primary: { label: 'طول', unit: 'm', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر متر', unit: 'راس', defaultValue: 50 , hint: '۲-۳ cm/پرنده' },
+    secondary: { label: 'ظرفیت هر متر', unit: 'راس', defaultValue: 50, hint: 'سرانه فضای آبخوری: ۲ تا ۳ سانتی‌متر به ازای هر پرنده (حدود ۴۰-۵۰ راس در متر)' },
     baseUnit: 'راس',
     calc: (p, s) => p * s,
     summaryLabel: 'راس',
@@ -104,21 +104,21 @@ export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
   },
   drinker_capsule: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت', unit: 'راس', defaultValue: 35, hint: '۱-۲ لیتری — ۳۰-۴۰ پرنده' },
+    secondary: { label: 'ظرفیت', unit: 'راس', defaultValue: 35, hint: 'آبخوری کپسولی ۱-۲ لیتری مناسب ۳۰ تا ۴۰ جوجه در روزهای اول' },
     baseUnit: 'راس',
     calc: (p, s) => p * s,
     summaryLabel: 'راس',
   },
   drinker_auto_hanging: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت', unit: 'راس', defaultValue: 90, hint: 'جامیکو — مکانیزم سیفونی ۸۰-۱۰۰ پرنده' },
+    secondary: { label: 'ظرفیت', unit: 'راس', defaultValue: 90, hint: 'آبخوری زنگوله‌ای اتوماتیک (جامیکو): استاندارد ۷۵ تا ۱۰۰ پرنده' },
     baseUnit: 'راس',
     calc: (p, s) => p * s,
     summaryLabel: 'راس',
   },
   fountain_drinker: {
     primary: { label: 'تعداد کله‌قندی', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر واحد', unit: 'راس', defaultValue: 60, hint: '۳ لیتری — ۵۰-۷۰ پرنده' },
+    secondary: { label: 'ظرفیت هر واحد', unit: 'راس', defaultValue: 60, hint: 'آبخوری کله‌قندی جوجه (۳ لیتری): استاندارد ۵۰ تا ۷۰ جوجه' },
     baseUnit: 'راس',
     calc: (p, s) => p * s,
     summaryLabel: 'راس',
@@ -126,14 +126,14 @@ export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
   },
   feeder_chick_tray: {
     primary: { label: 'تعداد سینی', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر سینی', unit: 'راس', defaultValue: 80, hint: '۷۰-۱۰۰ جوجه' },
+    secondary: { label: 'ظرفیت هر سینی', unit: 'راس', defaultValue: 80, hint: 'سینی دان‌خوری هفته اول: استاندارد ۷۰ تا ۱۰۰ جوجه برای هر سینی' },
     baseUnit: 'راس',
     calc: (p, s) => p * s,
     summaryLabel: 'راس',
   },
   feeder_manual: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر واحد', unit: 'راس', defaultValue: 20 , hint: '۵ cm/پرنده' },
+    secondary: { label: 'ظرفیت هر واحد', unit: 'راس', defaultValue: 20, hint: 'دان‌خوری دستی: سرانه ۵ سانتی‌متر لبه دان به ازای هر پرنده (۲۰-۲۵ پرنده)' },
     baseUnit: 'راس',
     calc: (p, s) => p * s,
     summaryLabel: 'راس',
@@ -141,7 +141,7 @@ export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
   },
   feeder_pan: {
     primary: { label: 'تعداد بشقابی', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر بشقابی', unit: 'راس', defaultValue: 85, hint: 'قطر ۳۵-۴۸ cm — ۶۰-۸۵ پرنده' },
+    secondary: { label: 'ظرفیت هر بشقابی', unit: 'راس', defaultValue: 65, hint: 'استاندارد بشقابی (قطر ۳۵-۴۸ cm): ۴۵ تا ۸۰ پرنده بسته به سن' },
     baseUnit: 'راس',
     calc: (p, s) => p * s,
     summaryLabel: 'راس',
@@ -149,7 +149,7 @@ export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
   },
   feeder_chain: {
     primary: { label: 'طول کل', unit: 'm', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر متر', unit: 'راس', defaultValue: 30 , hint: '۱۰ cm/پرنده' },
+    secondary: { label: 'ظرفیت هر متر', unit: 'راس', defaultValue: 20, hint: 'دان‌خوری زنجیری: سرانه ۱۰-۱۵ سانتی‌متر/پرنده در دو طرف زنجیر (حدود ۲۰ راس/متر)' },
     baseUnit: 'راس',
     calc: (p, s) => p * s,
     summaryLabel: 'راس',
@@ -157,7 +157,7 @@ export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
   },
   feeder_tube: {
     primary: { label: 'طول کل', unit: 'm', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر متر', unit: 'راس', defaultValue: 25 , hint: '۵۰-۶۰ پرنده' },
+    secondary: { label: 'ظرفیت هر متر', unit: 'راس', defaultValue: 30, hint: 'دان‌خوری لوله‌ای/آویز: سرانه ۳-۴ سانتی‌متر/پرنده (حدود ۳۰-۵۰ پرنده بسته به قطر)' },
     baseUnit: 'راس',
     calc: (p, s) => p * s,
     summaryLabel: 'راس',
@@ -165,7 +165,7 @@ export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
   },
   feeder_bucket: {
     primary: { label: 'تعداد سطل', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت هر سطل', unit: 'راس', defaultValue: 60, hint: '۱۰ kg — ۵۰-۷۰ پرنده' },
+    secondary: { label: 'ظرفیت هر سطل', unit: 'راس', defaultValue: 55, hint: 'دان‌خوری سطلی ۱۰ کیلویی: استاندارد ۵۰ تا ۶۵ پرنده' },
     baseUnit: 'راس',
     calc: (p, s) => p * s,
     summaryLabel: 'راس',
