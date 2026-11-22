@@ -68,7 +68,9 @@ export function useEquipmentForm() {
   });
 
   const openNew = () => {
-    if (!draft.hasDraft) setForm({ ...EQUIP_FORM_DEFAULTS, hallId: form.hallId });
+    draft.clear();
+    setAutoFields(new Set());
+    setForm({ ...EQUIP_FORM_DEFAULTS });
     setErr('');
     setOpen(true);
   };
