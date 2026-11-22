@@ -67,7 +67,9 @@ export default function ZoneFormModal({
         const hallBird = hall?.birdId ? birds.find((b) => b.id === hall.birdId) : null;
         const hallBreed = hall?.breedId ? breeds.find((b) => b.id === hall.breedId) : null;
         if (!hallBird && !hallBreed) return null;
-        const target = [hallBird?.name, hallBreed?.name].filter(Boolean).join(" ");
+        const target = hallBird && hallBreed
+          ? (hallBreed.name.includes(hallBird.name) ? hallBreed.name : `${hallBird.name} ${hallBreed.name}`)
+          : (hallBreed?.name || hallBird?.name || "");
         return (
           <div style={{
             fontSize: "var(--fs-xs)",
