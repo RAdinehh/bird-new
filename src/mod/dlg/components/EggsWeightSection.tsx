@@ -1,3 +1,4 @@
+import { useFormat } from '../../../shr/units/useFormat';
 import { useState } from 'react';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 /**
@@ -22,6 +23,7 @@ interface Props {
 }
 
 export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCount, showError, markTouched }: Props) {
+  const fmt = useFormat();
  const [expandedId, setExpandedId] = useState<string | null>(null);
  const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
 
@@ -46,8 +48,8 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
     const lbl = cvText(result.cvPct);
     return (
      <div style={{ fontSize: 'var(--fs-xs)', lineHeight: 1.7 }}>
-      <div>میانگین: <b>{toFa(avgG)} گرم</b> • یکنواختی: <b>{toFa(result.uniformityPct)}٪</b></div>
-      <div style={{ color: lbl.color, fontWeight: 700 }}>CV {toFa(result.cvPct)}٪ — {lbl.text}</div>
+      <div>میانگین: <b>{fmt.num(avgG)} گرم</b> • یکنواختی: <b>{fmt.num(result.uniformityPct)}٪</b></div>
+      <div style={{ color: lbl.color, fontWeight: 700 }}>CV {fmt.num(result.cvPct)}٪ — {lbl.text}</div>
      </div>
     );
    }
@@ -59,8 +61,8 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
    const lbl = cvText(cv);
    return (
     <div style={{ fontSize: 'var(--fs-xs)', lineHeight: 1.7 }}>
-     <div>میانگین: <b>{toFa(avg)} گرم</b></div>
-     <div style={{ color: lbl.color, fontWeight: 700 }}>CV {toFa(cv)}٪ — {lbl.text}</div>
+     <div>میانگین: <b>{fmt.num(avg)} گرم</b></div>
+     <div style={{ color: lbl.color, fontWeight: 700 }}>CV {fmt.num(cv)}٪ — {lbl.text}</div>
     </div>
    );
   }
@@ -121,8 +123,8 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
        data-focus-id={'egg-weight-' + w.id}
        variant="inner"
        accent="accent"
-       title={`نمونه ${toFa(i + 1)}`}
-       subtitle={num(w.weight) ? `${toFa(Number(num(w.weight)))} گرم` : 'بدون وزن'}
+       title={`نمونه ${fmt.count(i + 1)}`}
+       subtitle={num(w.weight) ? `${fmt.num(Number(num(w.weight)))} گرم` : 'بدون وزن'}
        isOpen={expandedId === w.id}
        onToggle={() => setExpandedId(expandedId === w.id ? null : w.id)}
        onDelete={() => { setForm(f => ({ ...f, weightSamples: f.weightSamples.filter(x => x.id !== w.id) })); if (expandedId === w.id) setExpandedId(null); }}

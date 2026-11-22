@@ -1,6 +1,8 @@
 /**
  * HealthSection — تلفات + واکسن + دارو
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { useMemo, useState } from 'react';
 import { Btn, Field, Grid2, Input, NumField, Select, Textarea, AlertBox, Tag, SummaryCard, SummarySection, SummaryRow, Chip } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
@@ -58,6 +60,7 @@ function getAllowedMethods(item: any): typeof VET_METHOD_OPTIONS {
 }
 
 export default function HealthSection({ form, setForm, vErrors, flockAliveCount, vaccineEnabled, medicineEnabled, showError, markTouched }: Props) {
+  const fmt = useFormat();
  const { items: whsItems } = useWhs();
  const flock = useFlk(s => s.flocks.find(f => f.id === form.flockId));
  const isSexed = !!flock?.genderSplitAt;
@@ -116,8 +119,8 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
      data-focus-id={'health-death-' + d.id}
      variant="inner"
      accent="accent"
-     title={d.count === 0 && !d.cause ? 'رکورد جدید' : 'رکورد ' + toFa(i + 1)}
-     subtitle={`${(d.count ?? 0) > 0 ? `${toFa(d.count ?? 0)} پرنده` : 'بدون داده'}${d.cause ? ' • ' + (causeOptions.find(o => o.value === d.cause)?.label || '') : ''}`}
+     title={d.count === 0 && !d.cause ? 'رکورد جدید' : 'رکورد ' + fmt.count(i + 1)}
+     subtitle={`${(d.count ?? 0) > 0 ? `${fmt.num(d.count ?? 0)} پرنده` : 'بدون داده'}${d.cause ? ' • ' + (causeOptions.find(o => o.value === d.cause)?.label || '') : ''}`}
      isOpen={expandedId === 'd-' + d.id}
      onToggle={() => setExpandedId(expandedId === 'd-' + d.id ? null : 'd-' + d.id)}
      onDelete={() => setForm(f => ({ ...f, deaths: f.deaths.filter(x => x.id !== d.id) }))}
@@ -167,8 +170,8 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
      data-focus-id={'health-vaccine-' + v.id}
      variant="inner"
      accent="accent"
-     title={v.name || 'واکسن ' + toFa(i + 1)}
-     subtitle={`${v.dose ? 'دوز: ' + toFa(v.dose) : 'بدون دوز'}${v.itemId ? ' • از انبار' : ''}`}
+     title={v.name || 'واکسن ' + fmt.count(i + 1)}
+     subtitle={`${v.dose ? 'دوز: ' + fmt.code(v.dose) : 'بدون دوز'}${v.itemId ? ' • از انبار' : ''}`}
      isOpen={expandedId === 'v-' + v.id}
      onToggle={() => setExpandedId(expandedId === 'v-' + v.id ? null : 'v-' + v.id)}
      onDelete={() => setForm(f => ({ ...f, vaccines: f.vaccines.filter(x => x.id !== v.id) }))}
@@ -176,7 +179,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
       
       {expandedId === 'v-' + v.id && (<>
       {vaccineItems.length > 0 && (
-        <Field label={<>از انبار <Tag tone="blue">{toFa(vaccineItems.length)} نوع</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)">
+        <Field label={<>از انبار <Tag tone="blue">{fmt.count(vaccineItems.length)} نوع</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)">
           <SmartSelect
             value={v.itemId || ''}
             onChange={id => setForm(f => ({
@@ -264,7 +267,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         );
         const vCalcMsg = vCalc ? (
           <div style={{ fontSize: 'var(--fs-xs)', color: vCalc.hasData ? 'var(--accent)' : 'var(--muted)', fontWeight: 600, marginTop: 8, textAlign: 'center' }}>
-            {vCalc.hasData ? `💡 نیاز محاسبه‌شده: ${toFa(vCalc.requiredMl ?? 0)} میلی‌لیتر (${vCalc.reason})` : !v.method ? 'ℹ️ لطفاً برای محاسبه خودکار، روش مصرف را انتخاب کنید.' : `ℹ️ ${vCalc.reason}`}
+            {vCalc.hasData ? `💡 نیاز محاسبه‌شده: ${fmt.num(vCalc.requiredMl ?? 0)} میلی‌لیتر (${vCalc.reason})` : !v.method ? 'ℹ️ لطفاً برای محاسبه خودکار، روش مصرف را انتخاب کنید.' : `ℹ️ ${vCalc.reason}`}
           </div>
         ) : null;
 
@@ -288,8 +291,8 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
      data-focus-id={'health-med-' + m.id}
      variant="inner"
      accent="accent"
-     title={m.name || 'دارو ' + toFa(i + 1)}
-     subtitle={`${m.dose ? 'دوز: ' + toFa(m.dose) : 'بدون دوز'}${isHerbal ? ' • گیاهی' : m.withdrawalDays ? ' • پرهیز: ' + m.withdrawalDays + ' روز' : ''}`}
+     title={m.name || 'دارو ' + fmt.count(i + 1)}
+     subtitle={`${m.dose ? 'دوز: ' + fmt.code(m.dose) : 'بدون دوز'}${isHerbal ? ' • گیاهی' : m.withdrawalDays ? ' • پرهیز: ' + m.withdrawalDays + ' روز' : ''}`}
      isOpen={expandedId === 'm-' + m.id}
      onToggle={() => setExpandedId(expandedId === 'm-' + m.id ? null : 'm-' + m.id)}
      onDelete={() => setForm(f => ({ ...f, medications: f.medications.filter(x => x.id !== m.id) }))}
@@ -297,7 +300,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
       
       {expandedId === 'm-' + m.id && (<>
       {medicineItems.length > 0 && (
-        <Field label={<>از انبار <Tag tone="red">{toFa(chemicalItems.length)} شیمیایی</Tag> <Tag tone="green">{toFa(herbalItems.length)} گیاهی</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)">
+        <Field label={<>از انبار <Tag tone="red">{fmt.count(chemicalItems.length)} شیمیایی</Tag> <Tag tone="green">{fmt.count(herbalItems.length)} گیاهی</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)">
           <SmartSelect
             value={m.itemId || ''}
             onChange={id => setForm(f => ({
@@ -405,7 +408,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
         ) : null;
         const mCalcMsg = mCalc ? (
           <div style={{ fontSize: 'var(--fs-xs)', color: mCalc.hasData ? 'var(--accent)' : 'var(--muted)', fontWeight: 600, marginTop: 8, textAlign: 'center' }}>
-            {mCalc.hasData ? `💡 نیاز محاسبه‌شده: ${toFa(mCalc.requiredMl ?? 0)} میلی‌لیتر (${mCalc.reason})` : !m.method ? 'ℹ️ لطفاً برای محاسبه خودکار، روش مصرف را انتخاب کنید.' : `ℹ️ ${mCalc.reason}`}
+            {mCalc.hasData ? `💡 نیاز محاسبه‌شده: ${fmt.num(mCalc.requiredMl ?? 0)} میلی‌لیتر (${mCalc.reason})` : !m.method ? 'ℹ️ لطفاً برای محاسبه خودکار، روش مصرف را انتخاب کنید.' : `ℹ️ ${mCalc.reason}`}
           </div>
         ) : null;
 
@@ -428,8 +431,8 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
     const medsChem = medsTotal - medsHerbal;
 
     const medParts = [];
-    if (medsChem > 0) medParts.push(`${toFa(medsChem)} 💊`);
-    if (medsHerbal > 0) medParts.push(`${toFa(medsHerbal)} 🌿`);
+    if (medsChem > 0) medParts.push(`${fmt.count(medsChem)} 💊`);
+    if (medsHerbal > 0) medParts.push(`${fmt.count(medsHerbal)} 🌿`);
     const medSummary = medParts.join(' + ');
     
     const deathCauses = form.deaths.map(d => d.cause ? causeLabel(d.cause) : '').filter(Boolean).join('، ');
@@ -443,9 +446,9 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
               meta={
                 <>
                   <span style={{ color: exceeds ? 'var(--danger)' : 'var(--warn)', fontWeight: 700 }}>
-                    {toFa(totalDeaths)} پرنده
+                    {fmt.count(totalDeaths)} پرنده
                   </span>
-                  {flockAliveCount ? ` از ${toFa(flockAliveCount)}` : ''} {exceeds && '⚠️'}
+                  {flockAliveCount ? ` از ${fmt.count(flockAliveCount)}` : ''} {exceeds && '⚠️'}
                 </>
               }
               first={true}
@@ -455,26 +458,26 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
           )}
 
           {vaccineCount > 0 && (
-            <SummarySection title="واکسن‌ها:" meta={`${toFa(vaccineCount)} مورد`} first={totalDeaths === 0}>
+            <SummarySection title="واکسن‌ها:" meta={`${fmt.count(vaccineCount)} مورد`} first={totalDeaths === 0}>
               {form.vaccines.map((v, idx) => (
                 <SummaryRow
                   key={v.id || idx}
                   label={v.name || 'بدون نام'}
-                  value={v.dose ? `دوز: ${toFa(v.dose)}` : ''}
-                  detail={v.quantity ? `مقدار: ${toFa(v.quantity)} ${v.unit || ''}` : ''}
+                  value={v.dose ? `دوز: ${fmt.code(v.dose)}` : ''}
+                  detail={v.quantity ? `مقدار: ${fmt.num(v.quantity)} ${v.unit || ''}` : ''}
                 />
               ))}
             </SummarySection>
           )}
 
           {medsTotal > 0 && (
-            <SummarySection title="داروها:" meta={`${toFa(medsTotal)} مورد`} first={totalDeaths === 0 && vaccineCount === 0}>
+            <SummarySection title="داروها:" meta={`${fmt.count(medsTotal)} مورد`} first={totalDeaths === 0 && vaccineCount === 0}>
               {form.medications.map((m, idx) => (
                 <SummaryRow
                   key={m.id || idx}
                   label={m.name || 'بدون نام'}
-                  value={m.dose ? `دوز: ${toFa(m.dose)}` : ''}
-                  detail={m.quantity ? `مقدار: ${toFa(m.quantity)} ${m.unit || ''}` : ''}
+                  value={m.dose ? `دوز: ${fmt.code(m.dose)}` : ''}
+                  detail={m.quantity ? `مقدار: ${fmt.num(m.quantity)} ${m.unit || ''}` : ''}
                 />
               ))}
             </SummarySection>

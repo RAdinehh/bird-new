@@ -2,6 +2,8 @@
  * FeedSection — تغذیه و آب
  * IDEA-25: پشتیبانی چند منبع دان (backward-compatible)
  */
+import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useMemo, useState } from 'react';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { Field, Grid2, NumField, Btn, Select, Sheet, AlertBox, Tag, SummaryCard, QuantityUnitInput, type UnitOption, SummaryRow } from '../../../shr/components/ui';
@@ -44,6 +46,7 @@ function getFeedUnitOpts(src: FeedSource, feedItems: any[]): UnitOption[] {
 }
 
 export default function FeedSection({ form, setForm }: Props) {
+  const fmt = useFormat();
  const { formulas, ingredients } = useFed();
  const isFeedAuto = ['semi_auto', 'auto_sensor', 'auto_chain'].includes(form.feedMethod || '');
  const isWaterAuto = ['nipple', 'trough', 'tank'].includes(form.waterMethod || '');
@@ -164,12 +167,12 @@ export default function FeedSection({ form, setForm }: Props) {
  const daysAvailable = dailyNeedKg > 0 ? totalAvailable / dailyNeedKg : 0;
  const formatDays = (d: number) => {
   if (d <= 0) return '۰ ساعت';
-  if (d < 1) return `${toFa(Math.round(d * 24))} ساعت`;
+  if (d < 1) return `${fmt.num(Math.round(d * 24))} ساعت`;
   const wd = Math.floor(d);
   const rh = Math.round((d - wd) * 24);
-  if (rh === 0) return `${toFa(wd)} روز`;
-  if (rh === 24) return `${toFa(wd + 1)} روز`;
-  return `${toFa(wd)} روز و ${toFa(rh)} ساعت`;
+  if (rh === 0) return `${fmt.num(wd)} روز`;
+  if (rh === 24) return `${fmt.num(wd + 1)} روز`;
+  return `${fmt.num(wd)} روز و ${fmt.num(rh)} ساعت`;
  };
  const isUnderfed = daysAvailable > 0 && daysAvailable < 0.8;
  const finalSummaryTone = isUnderfed ? 'warn' : 'accent';
@@ -266,8 +269,8 @@ export default function FeedSection({ form, setForm }: Props) {
             else updateSource(idx, { type: 'item', refId: '', displayUnit: undefined, displayValue: undefined });
            }}
            options={[
-            ...formulas.map(f => ({ value: 'f:' + f.id, label: f.name, subtitle: `${toFa(f.lines.length)} ماده`, group: 'formula' })),
-            ...feedItems.map(it => ({ value: 'i:' + it.id, label: it.name, subtitle: `موجودی ${toFa(it.currentStock)} ${UNIT_LABEL[it.unit]}`, group: 'item' })),
+            ...formulas.map(f => ({ value: 'f:' + f.id, label: f.name, subtitle: `${fmt.count(f.lines.length)} ماده`, group: 'formula' })),
+            ...feedItems.map(it => ({ value: 'i:' + it.id, label: it.name, subtitle: `موجودی ${fmt.num(it.currentStock)} ${UNIT_LABEL[it.unit]}`, group: 'item' })),
            ]}
            groupLabels={{ formula: 'جیره‌ها', item: 'دان تکی' }}
            groupIcons={{ formula: '📋', item: '🌾' }}
@@ -312,16 +315,16 @@ export default function FeedSection({ form, setForm }: Props) {
            return (
             <div key={line.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-xs)', padding: '6px 0', borderBottom: isLast ? 'none' : '1px dashed var(--border)' }}>
              <span style={{ color: 'var(--text)' }}>
-              • {ing.name} <span style={{ color: 'var(--muted)' }}>({toFa(line.percent)}٪)</span>
+              • {ing.name} <span style={{ color: 'var(--muted)' }}>({fmt.num(line.percent)}٪)</span>
              </span>
               <span style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
                {stockItem && (
                 <span style={{ padding: '2px 6px', borderRadius: 'var(--r-sm)', background: unavailable ? 'var(--danger-soft)' : 'var(--success-soft)', color: unavailable ? 'var(--danger)' : 'var(--success)', border: unavailable ? '1px solid var(--danger-border)' : '1px solid var(--success-border)', fontSize: 'var(--fs-2xs)', fontWeight: 700, minWidth: 70, textAlign: 'center' }}>
-                 موجودی: {toFa(stockItem.currentStock)}
+                 موجودی: {fmt.num(stockItem.currentStock)}
                 </span>
                )}
                <span style={{ color: unavailable ? 'var(--danger)' : 'var(--text)', fontWeight: 700, minWidth: 60, textAlign: 'left' }}>
-                {need > 0 ? `${toFa(need.toFixed(1))} ${unitLabelIng}` : '—'}
+                {need > 0 ? `${fmt.code(need.toFixed(1))} ${unitLabelIng}` : '—'}
                </span>
               </span>
             </div>
@@ -338,13 +341,13 @@ export default function FeedSection({ form, setForm }: Props) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '8px 12px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)' }}>
            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)' }}>
             <span style={{ color: 'var(--muted)' }}>موجودی انبار:</span>
-            <span style={{ fontWeight: 700, color: 'var(--text)' }}>{toFa(it.currentStock)} {unitLabelIng}</span>
+            <span style={{ fontWeight: 700, color: 'var(--text)' }}>{fmt.num(it.currentStock)} {unitLabelIng}</span>
            </div>
            {src.quantity > 0 && (
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)' }}>
              <span style={{ color: 'var(--muted)' }}>مانده پس از مصرف:</span>
              <span style={{ fontWeight: 700, color: warn ? 'var(--danger)' : 'var(--accent)' }}>
-              {toFa(remaining)} {unitLabelIng}
+              {fmt.code(remaining)} {unitLabelIng}
              </span>
             </div>
            )}
@@ -377,10 +380,10 @@ export default function FeedSection({ form, setForm }: Props) {
 
    {sources.length > 0 && (
     <SummaryCard tone={finalSummaryTone}>
-     <SummaryRow label="مجموع مصرف:" value={`${toFa(totalFeed.toFixed(1))} کیلوگرم`} />
-     {dailyNeedKg > 0 && <SummaryRow label="نیاز روزانه:" value={`${toFa(dailyNeedKg.toFixed(1))} کیلوگرم`} />}
+     <SummaryRow label="مجموع مصرف:" value={`${fmt.code(totalFeed.toFixed(1))} کیلوگرم`} />
+     {dailyNeedKg > 0 && <SummaryRow label="نیاز روزانه:" value={`${fmt.code(dailyNeedKg.toFixed(1))} کیلوگرم`} />}
      {daysAvailable > 0 && <SummaryRow label="دوام دانخوری:" value={isUnderfed ? `⚠️ ${formatDays(daysAvailable)}` : formatDays(daysAvailable)} />}
-     {expectedPerBirdG !== null && <SummaryRow label="استاندارد روزانه نژاد:" value={`${toFa(expectedPerBirdG)} گرم/پرنده`} />}
+     {expectedPerBirdG !== null && <SummaryRow label="استاندارد روزانه نژاد:" value={`${fmt.num(expectedPerBirdG)} گرم/پرنده`} />}
     </SummaryCard>
    )}
 
@@ -398,7 +401,7 @@ export default function FeedSection({ form, setForm }: Props) {
       <SummaryCard tone="info">
        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
        <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 700 }}>مجموع آب مصرفی:</span>
-       <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>{toFa((int(form.waterFillCount) || 0) * (num(form.waterFillVolume) || 0))} لیتر</span>
+       <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>{fmt.num((int(form.waterFillCount) || 0) * (num(form.waterFillVolume) || 0))} لیتر</span>
      </div>
       </SummaryCard>
      )}
@@ -418,7 +421,7 @@ export default function FeedSection({ form, setForm }: Props) {
       <SummaryCard tone="info">
        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
        <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 700 }}>مجموع آب مصرفی:</span>
-       <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>{toFa(int(form.waterAmount) || 0)} لیتر</span>
+       <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>{fmt.num(int(form.waterAmount) || 0)} لیتر</span>
      </div>
       </SummaryCard>
      )}

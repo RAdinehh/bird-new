@@ -8,6 +8,8 @@
  * - خالی کردن = برگشت به حالت تغییر نیافته (به جز weightGender)
  * - چیدمان دو ستونه برای فیلدهای هم‌خانواده (مثل ثبت روزانه)
  */
+import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useEffect, useMemo, useState } from 'react';
 import { Modal, Btn, BtnRow, Field, Select, Input, Grid2 } from '../../../shr/components/ui';
 import type { DailyLog } from '../store';
@@ -90,10 +92,11 @@ function formatOldValue(key: CorrectableKey, val: any): string {
   if (key === 'weightGender') {
     return WEIGHT_GENDER_OPTS.find(o => o.value === val)?.label || String(val);
   }
-  return toFa(String(val));
+  return getGlobalFormat().code(String(val));
 }
 
 export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
+  const fmt = useFormat();
   const [selected, setSelected] = useState<Set<CorrectableKey>>(new Set());
   const [values, setValues] = useState<Partial<Record<CorrectableKey, string>>>({});
   const [reason, setReason] = useState<string>(REASONS[0]);
@@ -303,7 +306,7 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
                 <input
                   type="text"
                   inputMode="decimal"
-                  value={toFa(values[key] || '')}
+                  value={fmt.code(values[key] || '')}
                   onChange={e => setVal(key, toEn(e.target.value))}
                   placeholder=""
                   style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontFamily: 'monospace', fontSize: 'var(--fs-sm)', color: 'var(--text)', textAlign: 'center', minWidth: 0, fontWeight: 700 }}
@@ -368,7 +371,7 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
       footer={
         <BtnRow>
           <Btn variant="primary" onClick={handleSave} disabled={saveDisabled}>
-            ✓ ثبت اصلاح{changedCount > 0 ? ` (${toFa(changedCount)})` : ''}
+            ✓ ثبت اصلاح{changedCount > 0 ? ` (${fmt.count(changedCount)})` : ''}
           </Btn>
           <Btn onClick={onClose}>انصراف</Btn>
         </BtnRow>
@@ -434,7 +437,7 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
             color: 'var(--warn)',
             lineHeight: 1.7,
           }}>
-            ⚠ این لاگ {toFa(log.deaths.length)} رکورد تلفات دارد.
+            ⚠ این لاگ {fmt.count(log.deaths.length)} رکورد تلفات دارد.
             اصلاح تعداد کل روی مجموع اعمال نمی‌شود.
             برای اصلاح، ابتدا از ویرایش لاگ رکوردها را تغییر دهید.
           </div>
@@ -459,7 +462,7 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
               alignItems: 'center',
               marginBottom: 'var(--sp-1)'
             }}>
-              <span>ویرایش فیلدهای انتخاب‌شده ({toFa(selected.size)})</span>
+              <span>ویرایش فیلدهای انتخاب‌شده ({fmt.count(selected.size)})</span>
               {changedCount > 0 && (
                 <span style={{
                   fontSize: 'var(--fs-2xs, 11px)',
@@ -469,7 +472,7 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
                   borderRadius: '999px',
                   fontWeight: 700,
                 }}>
-                  {toFa(changedCount)} فیلد تغییر کرده
+                  {fmt.count(changedCount)} فیلد تغییر کرده
                 </span>
               )}
             </div>

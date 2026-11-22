@@ -2,6 +2,8 @@
  * DlgHistoryModal.tsx — تاریخچه کامل رویدادهای یک لاگ
  * استاندارد: FlockHistoryModal (گروه‌بندی تاریخ، Chip فیلتر، لغو فقط آخرین)
  */
+import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useMemo, useState } from 'react';
 import { Btn, ShowMoreButton, Sheet, Row } from '../../../shr/components/ui';
 import { HistoryModalShell } from '../../../shr/components/history/HistoryModalShell';
@@ -49,6 +51,7 @@ type TimelineItem =
   | { kind: 'correction'; time: string; correction: NonNullable<DailyLog['corrections']>[number] };
 
 export default function DlgHistoryModal({ open, onClose, log }: Props) {
+  const fmt = useFormat();
   const [showAll, setShowAll] = useState(false);
   const [filter, setFilter] = useState<string>('all');
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
@@ -239,7 +242,7 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
     <HistoryModalShell
       open={open}
       onClose={onClose}
-      title={`تاریخچه — ${log.entryTime ? toFa(log.entryTime) + ' • ' : ''}${toFa(log.date)}`}
+      title={`تاریخچه — ${log.entryTime ? fmt.code(log.entryTime) + ' • ' : ''}${fmt.date(log.date)}`}
       onExport={handleExport}
     >
       {/* ═══ هدر خلاصه سبز ═══ */}
@@ -256,12 +259,12 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <b style={{ color: 'var(--accent)', fontSize: 'var(--fs-sm)' }}>خلاصه ثبت روزانه</b>
           <span style={{ color: 'var(--accent)', fontSize: 'var(--fs-xs)', fontWeight: 700 }}>
-            {toFa(items.length)} رویداد
+            {fmt.count(items.length)} رویداد
           </span>
         </div>
         <div style={{ display: 'flex', gap: 12, fontSize: 'var(--fs-xs)', color: 'var(--text)' }}>
-          <span>تاریخ: <b>{toFa(log.date)}</b></span>
-          <span>ساعت: <b>{toFa(log.entryTime || '—')}</b></span>
+          <span>تاریخ: <b>{fmt.date(log.date)}</b></span>
+          <span>ساعت: <b>{fmt.code(log.entryTime || '—')}</b></span>
         </div>
       </div>
 
@@ -289,7 +292,7 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
   style={{ width: '100%', justifyContent: 'space-between' }}
 >
   <span>همه</span>
-  <span>({toFa(items.length)})</span>
+  <span>({fmt.count(items.length)})</span>
 </Btn>
           {Array.from(typeCounts.entries()).map(([type, count]) => {
             const meta = TYPE_META[type as DlgEventType] || { label: 'اصلاح', tone: 'var(--warn)' };
@@ -302,7 +305,7 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
   style={{ width: '100%', justifyContent: 'space-between' }}
 >
   <span>{meta.label}</span>
-  <span>({toFa(count)})</span>
+  <span>({fmt.count(count)})</span>
 </Btn>
             );
           })}
@@ -317,8 +320,8 @@ export default function DlgHistoryModal({ open, onClose, log }: Props) {
           {visibleData.items.map(group => (
             <div key={group.label + group.time} style={{ marginBottom: 10 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>
-                <span>📅 {toFa(group.label)}</span>
-                {group.time && <span style={{ fontFamily: 'monospace' }}>{toFa(group.time)}</span>}
+                <span>📅 {fmt.code(group.label)}</span>
+                {group.time && <span style={{ fontFamily: 'monospace' }}>{fmt.code(group.time)}</span>}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {group.items.map((it) => {
@@ -360,23 +363,23 @@ function EventRow({ ev, isLatest, onRevoke }: { ev: DlgEvent; isLatest: boolean;
   if (ev.before !== undefined && ev.after !== undefined) {
     valueStr = (
       <span style={{ fontFamily: 'monospace' }}>
-                  <span style={{ color: 'var(--accent)' }}>{toFa(String(ev.after ?? '—'))}</span>
+                  <span style={{ color: 'var(--accent)' }}>{getGlobalFormat().code(String(ev.after ?? '—'))}</span>
                   <span style={{ color: 'var(--muted)', margin: '0 4px' }}>→</span>
-                  <span style={{ color: 'var(--danger)' }}>{toFa(String(ev.before ?? '—'))}</span>
+                  <span style={{ color: 'var(--danger)' }}>{getGlobalFormat().code(String(ev.before ?? '—'))}</span>
                 </span>
     );
   } else if (ev.type === 'water' && ev.amount !== undefined) {
-    valueStr = `${toFa(ev.amount)} لیتر`;
+    valueStr = `${getGlobalFormat().num(ev.amount)} لیتر`;
   } else if (ev.type === 'feed' && ev.amount !== undefined) {
-    valueStr = `${toFa(ev.amount)} کیلوگرم`;
+    valueStr = `${getGlobalFormat().num(ev.amount)} کیلوگرم`;
   } else if (ev.type === 'death' && ev.count !== undefined) {
-    valueStr = `${toFa(ev.count)} عدد`;
+    valueStr = `${getGlobalFormat().num(ev.count)} عدد`;
   } else if (ev.type === 'vaccine' || ev.type === 'medication') {
     valueStr = ev.notes || ev.reason || 'ثبت شده';
   } else if (ev.field) {
-    valueStr = toFa(ev.value ?? 0);
+    valueStr = getGlobalFormat().num(ev.value ?? 0);
   } else if (ev.value !== undefined && ev.value !== null) {
-    valueStr = toFa(ev.value);
+    valueStr = getGlobalFormat().num(ev.value);
   }
 
   return (
@@ -446,9 +449,9 @@ function CorrectionRow({ corr, log, beforeLog, isLatest, onRevoke }: { corr: Non
                       <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
                         <span style={{ color: 'var(--muted)' }}>{FIELD_LABEL[k] || k}:</span>
                         <span style={{ fontFamily: 'monospace' }}>
-                          <span style={{ color: 'var(--accent)' }}>{toFa(String(after ?? '—'))}</span>
+                          <span style={{ color: 'var(--accent)' }}>{getGlobalFormat().code(String(after ?? '—'))}</span>
                           <span style={{ color: 'var(--muted)', margin: '0 4px' }}>→</span>
-                          <span style={{ color: 'var(--danger)' }}>{toFa(String(before ?? '—'))}</span>
+                          <span style={{ color: 'var(--danger)' }}>{getGlobalFormat().code(String(before ?? '—'))}</span>
                         </span>
                       </div>
                     );
@@ -489,7 +492,7 @@ function MergedReadingRow({ events }: { events: DlgEvent[] }) {
           <Row
             key={ev.id}
             l={FIELD_LABEL[ev.field || ''] || ev.field || 'مقدار'}
-            v={<span style={{ fontFamily: 'monospace', color: 'var(--info)' }}>{toFa(ev.value ?? 0)}</span>}
+            v={<span style={{ fontFamily: 'monospace', color: 'var(--info)' }}>{getGlobalFormat().num(ev.value ?? 0)}</span>}
           />
         ))}
       </div>
@@ -516,7 +519,7 @@ function MergedHealthRow({ events }: { events: DlgEvent[] }) {
           let l = '', v = '';
           if (ev.type === 'vaccine') { l = 'واکسن'; v = ev.notes || 'ثبت شده'; }
           else if (ev.type === 'medication') { l = 'دارو'; v = ev.notes || 'ثبت شده'; }
-          else if (ev.type === 'death') { l = 'تلفات'; v = `${toFa(ev.count || 0)} عدد`; }
+          else if (ev.type === 'death') { l = 'تلفات'; v = `${getGlobalFormat().num(ev.count || 0)} عدد`; }
           else if (ev.type === 'activity') { l = 'فعالیت'; v = ev.notes || 'ثبت شده'; }
           return <Row key={ev.id} l={l} v={<span style={{ fontFamily: 'monospace', color: 'var(--accent)' }}>{v}</span>} />;
         })}
@@ -542,8 +545,8 @@ function MergedNutritionRow({ events }: { events: DlgEvent[] }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         {events.map(ev => {
           let l = '', v = '';
-          if (ev.type === 'feed') { l = 'مصرف دان'; v = `${toFa(ev.amount || 0)} کیلوگرم`; }
-          else if (ev.type === 'water') { l = 'مصرف آب'; v = `${toFa(ev.amount || 0)} لیتر`; }
+          if (ev.type === 'feed') { l = 'مصرف دان'; v = `${getGlobalFormat().num(ev.amount || 0)} کیلوگرم`; }
+          else if (ev.type === 'water') { l = 'مصرف آب'; v = `${getGlobalFormat().num(ev.amount || 0)} لیتر`; }
           return <Row key={ev.id} l={l} v={<span style={{ fontFamily: 'monospace', color: 'var(--warn)' }}>{v}</span>} />;
         })}
       </div>

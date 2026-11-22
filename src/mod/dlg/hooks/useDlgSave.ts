@@ -3,6 +3,8 @@
  *
  * همه‌ی cascadeها (whs, egg)، اعتبارسنجی و emit event اینجاست.
  */
+import { getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useDlg } from '../store';
 import { buildCorrectionEvents } from '../api/buildCorrectionEvents';
 import { useWhs, type Movement } from '../../whs/store';
@@ -212,7 +214,7 @@ export function useDlgSave(params: UseDlgSaveParams) {
       ingredients,
     });
     if (shortages.length > 0) {
-      const txt = shortages.map(s => `• ${s.name}: نیاز ${toFa(s.need)} ${s.unit}، موجودی ${toFa(s.have)} ${s.unit}`);
+      const txt = shortages.map(s => `• ${s.name}: نیاز ${getGlobalFormat().num(s.need)} ${s.unit}، موجودی ${getGlobalFormat().num(s.have)} ${s.unit}`);
       const ok = await showConfirmAsync(
         'موجودی انبار کافی نیست',
         txt.join('\n') + '\n\nاگه ادامه بدی، موجودی صفر می‌شه ولی کمبود ثبت نمی‌شه.',

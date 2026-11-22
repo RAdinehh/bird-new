@@ -5,6 +5,8 @@
  * خواندن-فقط — بدون ویرایش.
  * applyCorrections روی هر لاگ اعمال می‌شود.
  */
+import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useState, useMemo, useEffect } from 'react';
 import type { CSSProperties } from 'react';
 import { applyCorrections } from '../api/applyCorrections';
@@ -133,7 +135,7 @@ function bucketLabel(key: string, period: Period): string {
   const y = parts[0] ?? "";
   const m = parts[1] ?? "";
   if (period === "month") {
-    return `${toFa(y)}/${toFa(m)}`;
+    return `${getGlobalFormat().code(y)}/${getGlobalFormat().code(m)}`;
   }
   const wToken = parts[2] ?? "";
   const startJdn = parseInt(wToken.replace(/^W/, ""), 10);
@@ -141,9 +143,9 @@ function bucketLabel(key: string, period: Period): string {
     const start = jdnToJalali(startJdn);
     const yearStartJdn = jalaliToJdn(start.y, 1, 1);
     const weekOfYear = Math.max(1, Math.floor((startJdn - yearStartJdn) / 7) + 1);
-    return `${toFa(String(start.y).padStart(4, "0"))}/${toFa(pad2(start.m))} · هفتهٔ ${toFa(weekOfYear)}`;
+    return `${getGlobalFormat().code(String(start.y).padStart(4, "0"))}/${getGlobalFormat().code(pad2(start.m))} · هفتهٔ ${getGlobalFormat().code(weekOfYear)}`;
   }
-  return `${toFa(y)}/${toFa(m)} · هفته`;
+  return `${getGlobalFormat().code(y)}/${getGlobalFormat().code(m)} · هفته`;
 }
 
 function bucketRange(date: string, period: Period): { start: string; end: string } {
@@ -169,15 +171,15 @@ function bucketRange(date: string, period: Period): { start: string; end: string
 }
 
 function fmtNum(val: number, decimals = 1): string {
-  if (typeof val !== 'number' || !Number.isFinite(val)) return toFa(0);
+  if (typeof val !== 'number' || !Number.isFinite(val)) return getGlobalFormat().num(0);
   const factor = Math.pow(10, decimals);
   const rounded = Math.round(val * factor) / factor;
-  return toFa(rounded);
+  return getGlobalFormat().code(rounded);
 }
 
 function fmtFixed(val: number, decimals = 1): string {
-  if (typeof val !== 'number' || !Number.isFinite(val)) return toFa(0);
-  return toFa(val.toFixed(decimals));
+  if (typeof val !== 'number' || !Number.isFinite(val)) return getGlobalFormat().num(0);
+  return getGlobalFormat().code(val.toFixed(decimals));
 }
 
 function renderPeriodCell(label: string) {
@@ -204,6 +206,7 @@ function renderPeriodCell(label: string) {
 }
 
 export default function AggregateTabPanel({ active, logs, flocks }: Props) {
+  const fmt = useFormat();
   const [period, setPeriod] = useState<Period>('week');
   const [flockFilter, setFlockFilter] = useState<string>('');
   const [showAllCols, setShowAllCols] = useState<boolean>(false);
@@ -534,7 +537,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                   : '1px solid var(--border)',
             }}
           >
-            {activePickedCount > 0 ? `${toFa(activePickedCount)} دوره` : 'انتخاب دوره'}
+            {activePickedCount > 0 ? `${fmt.count(activePickedCount)} دوره` : 'انتخاب دوره'}
           </button>
 
           {/* ۴. تغییر تعداد ستون‌ها */}
@@ -603,8 +606,8 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
           >
             <span style={{ color: 'var(--muted)', fontWeight: 600 }}>
               {activePickedCount > 0
-                ? `${toFa(activePickedCount)} دوره از ${toFa(buckets.length)} انتخاب شده`
-                : `همه دوره‌ها نمایش داده می‌شوند (${toFa(buckets.length)} دوره)`}
+                ? `${fmt.count(activePickedCount)} دوره از ${fmt.count(buckets.length)} انتخاب شده`
+                : `همه دوره‌ها نمایش داده می‌شوند (${fmt.count(buckets.length)} دوره)`}
             </span>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
               {filteredPickerBuckets.length > 0 && (
@@ -723,7 +726,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                           cursor: 'pointer',
                         }}
                       >
-                        {toFa(yr)}
+                        {fmt.code(yr)}
                       </button>
                     );
                   })}
@@ -925,7 +928,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                         fontWeight: b.logCount > 0 ? 600 : 400,
                       }}
                     >
-                      {toFa(b.logCount)}
+                      {fmt.count(b.logCount)}
                     </td>
 
                     <td
@@ -936,7 +939,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                         fontWeight: b.deaths > 0 ? 700 : 400,
                       }}
                     >
-                      {toFa(b.deaths)}
+                      {fmt.count(b.deaths)}
                     </td>
 
                     <td style={{ ...TD, borderBottom: '1px solid var(--border-strong, rgba(15, 23, 42, 0.18))' }}>
@@ -998,7 +1001,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                         fontWeight: b.eggsTotal > 0 ? 600 : 400,
                       }}
                     >
-                      {toFa(b.eggsTotal)}
+                      {fmt.count(b.eggsTotal)}
                     </td>
 
                     <td
@@ -1078,7 +1081,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                       fontWeight: 700,
                     }}
                   >
-                    {toFa(totals.logCount)}
+                    {fmt.count(totals.logCount)}
                   </td>
 
                   <td
@@ -1089,7 +1092,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                       fontWeight: 700,
                     }}
                   >
-                    {toFa(totals.deaths)}
+                    {fmt.count(totals.deaths)}
                   </td>
 
                   <td style={{ ...TD, borderTop: '1px solid var(--border)' }}>
@@ -1151,7 +1154,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                       fontWeight: totals.eggsTotal > 0 ? 700 : 400,
                     }}
                   >
-                    {toFa(totals.eggsTotal)}
+                    {fmt.count(totals.eggsTotal)}
                   </td>
 
                   <td

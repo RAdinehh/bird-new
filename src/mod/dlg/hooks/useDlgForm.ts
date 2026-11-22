@@ -1,6 +1,8 @@
 /**
  * useDlgForm — مدیریت state و منطق فرم ثبت روزانه
  */
+import { getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useState, useCallback } from 'react';
 import type { DailyLog } from '../store';
 import type { F } from '../types';
@@ -40,19 +42,19 @@ export interface UseDlgFormParams {
 export function dailyLogToForm(l: DailyLog): F {
   return {
       id: l.id, flockId: l.flockId, date: l.date, entryTime: l.entryTime,
-      temperature: l.temperature != null ? toFa(l.temperature) : '',
-      temperatureMin: l.temperatureMin != null ? toFa(l.temperatureMin) : '',
-      temperatureMax: l.temperatureMax != null ? toFa(l.temperatureMax) : '',
-      humidity: l.humidity != null ? toFa(l.humidity) : '',
-      humidityMin: l.humidityMin != null ? toFa(l.humidityMin) : '',
-      humidityMax: l.humidityMax != null ? toFa(l.humidityMax) : '',
+      temperature: l.temperature != null ? getGlobalFormat().num(l.temperature) : '',
+      temperatureMin: l.temperatureMin != null ? getGlobalFormat().num(l.temperatureMin) : '',
+      temperatureMax: l.temperatureMax != null ? getGlobalFormat().num(l.temperatureMax) : '',
+      humidity: l.humidity != null ? getGlobalFormat().num(l.humidity) : '',
+      humidityMin: l.humidityMin != null ? getGlobalFormat().num(l.humidityMin) : '',
+      humidityMax: l.humidityMax != null ? getGlobalFormat().num(l.humidityMax) : '',
       ventilation: l.ventilation, litter: l.litter,
       behavior: l.behavior, distribution: l.distribution,
       appearance: l.appearance, sound: l.sound,
       feedType: l.feedType,
-      feedDelivered: l.feedDelivered !== null ? toFa(l.feedDelivered) : '',
-      feedRemaining: l.feedRemaining !== null ? toFa(l.feedRemaining) : '',
-      feedWaste: (l.feedWaste != null) ? toFa(l.feedWaste) : '',
+      feedDelivered: l.feedDelivered !== null ? getGlobalFormat().num(l.feedDelivered) : '',
+      feedRemaining: l.feedRemaining !== null ? getGlobalFormat().num(l.feedRemaining) : '',
+      feedWaste: (l.feedWaste != null) ? getGlobalFormat().num(l.feedWaste) : '',
       feedSourceType: l.feedSourceType || '',
       feedSourceId: l.feedSourceId || '',
       feedSources: l.feedSources && l.feedSources.length > 0
@@ -67,14 +69,14 @@ export function dailyLogToForm(l: DailyLog): F {
       waterMethodSource: l.waterMethodSource,
       feedMethodFromHall: l.feedMethodFromHall,
       waterMethodFromHall: l.waterMethodFromHall,
-      waterAmount: l.waterAmount !== null ? toFa(l.waterAmount) : '',
-      waterFillCount: l.waterFillCount !== null ? toFa(l.waterFillCount) : '',
-      waterFillVolume: l.waterFillVolume !== null ? toFa(l.waterFillVolume) : '',
-      weightSamples: (l.weightSamples || []).map(w => ({ id: w.id, weight: toFa(w.weight) })),
-      eatingEggs: l.eatingEggs != null ? toFa(l.eatingEggs) : '',
-      fertileEggs: l.fertileEggs != null ? toFa(l.fertileEggs) : '',
-      brokenEggs: l.brokenEggs != null ? toFa(l.brokenEggs) : '',
-      otherEggs: l.otherEggs != null ? toFa(l.otherEggs) : '',
+      waterAmount: l.waterAmount !== null ? getGlobalFormat().num(l.waterAmount) : '',
+      waterFillCount: l.waterFillCount !== null ? getGlobalFormat().num(l.waterFillCount) : '',
+      waterFillVolume: l.waterFillVolume !== null ? getGlobalFormat().num(l.waterFillVolume) : '',
+      weightSamples: (l.weightSamples || []).map(w => ({ id: w.id, weight: getGlobalFormat().num(w.weight) })),
+      eatingEggs: l.eatingEggs != null ? getGlobalFormat().num(l.eatingEggs) : '',
+      fertileEggs: l.fertileEggs != null ? getGlobalFormat().num(l.fertileEggs) : '',
+      brokenEggs: l.brokenEggs != null ? getGlobalFormat().num(l.brokenEggs) : '',
+      otherEggs: l.otherEggs != null ? getGlobalFormat().num(l.otherEggs) : '',
       weightGender: l.weightGender || '',
       deaths: l.deaths || [], vaccines: l.vaccines || [],
       medications: l.medications || [],

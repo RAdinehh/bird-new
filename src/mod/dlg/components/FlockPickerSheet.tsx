@@ -2,6 +2,8 @@
  * FlockPickerSheet.tsx — انتخاب‌گر گله برای ثبت امروز
  * استاندارد: Batch-Centric + ExpandableCard (L10)
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { useMemo, useState } from 'react';
 import { Sheet, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
@@ -31,6 +33,7 @@ interface Props {
 }
 
 export default function FlockPickerSheet({ open, onClose, flocks, logs, todayStr, onEdit, onAdd }: Props) {
+  const fmt = useFormat();
   const { breeds } = useBrd();
   const [expandedFlockId, setExpandedFlockId] = useState<string | null>(null);
 
@@ -53,7 +56,7 @@ export default function FlockPickerSheet({ open, onClose, flocks, logs, todayStr
     <Sheet open={open} onClose={onClose} title="ثبت امروز — انتخاب گله">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '4px 0', maxHeight: '60vh', overflowY: 'auto' }}>
         <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', marginBottom: 8 }}>
-          {toFa(pending)} گله از {toFa(flocks.length)} منتظر ثبت
+          {fmt.count(pending)} گله از {fmt.count(flocks.length)} منتظر ثبت
         </div>
         {items.length === 0 && (
           <div style={{ padding: 24, textAlign: 'center', color: 'var(--muted)' }}>
@@ -68,9 +71,9 @@ export default function FlockPickerSheet({ open, onClose, flocks, logs, todayStr
           const metaParts = [
             showBreed ? breed : null,
             typeInfo.label,
-            `${toFa(age)} روز`,
-            `${toFa(alive)} زنده`,
-            deathsToday > 0 ? `💀 ${toFa(deathsToday)}` : null,
+            `${fmt.num(age)} روز`,
+            `${fmt.count(alive)} زنده`,
+            deathsToday > 0 ? `💀 ${fmt.count(deathsToday)}` : null,
           ].filter(Boolean) as string[];
 
           return (
@@ -82,7 +85,7 @@ export default function FlockPickerSheet({ open, onClose, flocks, logs, todayStr
               subtitle={metaParts.join(' • ')}
               badge={
                 hasLogs
-                  ? <Tag tone="accent">{toFa(existingLogs.length)} ثبت</Tag>
+                  ? <Tag tone="accent">{fmt.count(existingLogs.length)} ثبت</Tag>
                   : <Tag tone="warn">ثبت نشده</Tag>
               }
               isOpen={isExpanded}
@@ -121,7 +124,7 @@ export default function FlockPickerSheet({ open, onClose, flocks, logs, todayStr
                       cursor: 'pointer', fontWeight: 600,
                     }}
                   >
-                    ✏️ {toFa(log.entryTime || '—')}
+                    ✏️ {fmt.code(log.entryTime || '—')}
                   </button>
                 ))}
               </div>

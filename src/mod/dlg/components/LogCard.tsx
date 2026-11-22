@@ -3,6 +3,8 @@
  *
  * تمام JSX کارت اینجاست. کامپوننت خالص نمایشی با callback ها.
  */
+import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
+
 import type { DailyLog } from '../store';
 import type { Flock } from '../../flk/store';
 import {
@@ -73,6 +75,7 @@ const FIELD_LABEL: Record<string, string> = {
 };
 
 export default function LogCard(props: LogCardProps) {
+  const fmt = useFormat();
   const {
     log: rawLog, index: i, flock, birdName,
     isOpen, selectionMode, vaccineEnabled, medicineEnabled, ms,
@@ -155,33 +158,33 @@ export default function LogCard(props: LogCardProps) {
   const allBadges: BadgeItem[] = [];
   if (hasCorrections) allBadges.push({ key: 'corrections', node: <Tag tone="blue">اصلاح‌شده</Tag> });
   if (l.deathsCount > 0) {
-    allBadges.push({ key: 'deaths', node: <Tag tone={isMortalityHigh ? "amber" : "blue"}>{toFa(l.deathsCount)} تلفات</Tag> });
+    allBadges.push({ key: 'deaths', node: <Tag tone={isMortalityHigh ? "amber" : "blue"}>{fmt.count(l.deathsCount)} تلفات</Tag> });
   }
 
   return (
     <ExpandableCard
       id={l.id} ms={ms} accent={accent}
-      index={toFa(i + 1)} iconEmoji="📋"
+      index={fmt.count(i + 1)} iconEmoji="📋"
       title={flock?.name || '—'}
-      subtitle={`${toFa(l.date)}${l.entryTime ? ` • ${toFa(l.entryTime)}` : ''}${l.birdAgeDays !== null && l.birdAgeDays > 0 ? ` • ${toFa(l.birdAgeDays)} روز` : ''}${birdName ? ` • ${birdName}` : ''}`}
+      subtitle={`${fmt.date(l.date)}${l.entryTime ? ` • ${fmt.code(l.entryTime)}` : ''}${l.birdAgeDays !== null && l.birdAgeDays > 0 ? ` • ${fmt.num(l.birdAgeDays)} روز` : ''}${birdName ? ` • ${birdName}` : ''}`}
       isOpen={isOpen} onToggle={onToggle}
       badge={<BadgeOverflow badges={allBadges} max={2} modalTitle={`برچسب‌های «${flock?.name || 'لاگ'}»`} />}
       stats={<>
-        {l.temperature !== null && <span>🌡 {toFa(l.temperature)}°</span>}
-        {l.humidity !== null && <span>💧 {toFa(l.humidity)}٪</span>}
-        {l.feedDelivered !== null && <span>🌾 {toFa(l.feedDelivered)} کیلوگرم</span>}
-        {l.waterAmount !== null && <span>💧 {toFa(l.waterAmount)} لیتر</span>}
+        {l.temperature !== null && <span>🌡 {fmt.num(l.temperature)}°</span>}
+        {l.humidity !== null && <span>💧 {fmt.num(l.humidity)}٪</span>}
+        {l.feedDelivered !== null && <span>🌾 {fmt.num(l.feedDelivered)} کیلوگرم</span>}
+        {l.waterAmount !== null && <span>💧 {fmt.num(l.waterAmount)} لیتر</span>}
       </>}
     >
       <LogSection title="🌡 محیط">
         <Grid2>
-          {l.temperature !== null && <Row l="دما" v={`${toFa(l.temperature)} °C`} warn={tIsBad} />}
-          {l.humidity !== null && <Row l="رطوبت" v={`${toFa(l.humidity)} ٪`} warn={hIsBad} />}
+          {l.temperature !== null && <Row l="دما" v={`${fmt.num(l.temperature)} °C`} warn={tIsBad} />}
+          {l.humidity !== null && <Row l="رطوبت" v={`${fmt.num(l.humidity)} ٪`} warn={hIsBad} />}
           {(l.temperatureMin !== null || l.temperatureMax !== null) && (
-            <Row l="بازه دما" v={`${l.temperatureMin !== null ? toFa(l.temperatureMin) : '—'} تا ${l.temperatureMax !== null ? toFa(l.temperatureMax) : '—'} °C`} warn={tempMismatch} />
+            <Row l="بازه دما" v={`${l.temperatureMin !== null ? fmt.num(l.temperatureMin) : '—'} تا ${l.temperatureMax !== null ? fmt.num(l.temperatureMax) : '—'} °C`} warn={tempMismatch} />
           )}
           {(l.humidityMin !== null || l.humidityMax !== null) && (
-            <Row l="بازه رطوبت" v={`${l.humidityMin !== null ? toFa(l.humidityMin) : '—'} تا ${l.humidityMax !== null ? toFa(l.humidityMax) : '—'} ٪`} warn={humMismatch} />
+            <Row l="بازه رطوبت" v={`${l.humidityMin !== null ? fmt.num(l.humidityMin) : '—'} تا ${l.humidityMax !== null ? fmt.num(l.humidityMax) : '—'} ٪`} warn={humMismatch} />
           )}
           {l.ventilation !== 'ok' && <Row l="تهویه" v={VENTILATION_LABEL[l.ventilation] || '—'} />}
           {l.litter !== 'dry' && <Row l="بستر" v={LITTER_LABEL[l.litter] || '—'} />}
@@ -203,24 +206,24 @@ export default function LogCard(props: LogCardProps) {
         <LogSection title="🌾 تغذیه و آب">
           <Grid2>
             {l.feedType && <Row l="جیره/دان" v={l.feedType} />}
-            {l.feedDelivered !== null && <Row l="دان داده‌شده" v={`${toFa(l.feedDelivered)} کیلوگرم`} />}
+            {l.feedDelivered !== null && <Row l="دان داده‌شده" v={`${fmt.num(l.feedDelivered)} کیلوگرم`} />}
             {l.feedConsumed !== null && l.feedConsumed !== undefined && l.feedConsumed !== l.feedDelivered && (
-              <Row l="دان مصرف‌شده" v={`${toFa(l.feedConsumed)} کیلوگرم`} />
+              <Row l="دان مصرف‌شده" v={`${fmt.num(l.feedConsumed)} کیلوگرم`} />
             )}
             {l.feedConsumed !== null && l.feedConsumed > 0 && flock && (flock.currentCount || 0) > 0 && (() => {
               const g = (l.feedConsumed * 1000) / (flock.currentCount || 1);
               const isWarn = g < 5 || g > 300;
-              return <Row l="دان/پرنده" v={`${toFa(g.toFixed(1))} گرم`} warn={isWarn} />;
+              return <Row l="دان/پرنده" v={`${fmt.code(g.toFixed(1))} گرم`} warn={isWarn} />;
             })()}
-            {l.feedRemaining !== null && <Row l="باقیمانده" v={`${toFa(l.feedRemaining)} کیلوگرم`} />}
-            {l.waterAmount !== null && <Row l="آب" v={`${toFa(l.waterAmount)} لیتر`} />}
+            {l.feedRemaining !== null && <Row l="باقیمانده" v={`${fmt.num(l.feedRemaining)} کیلوگرم`} />}
+            {l.waterAmount !== null && <Row l="آب" v={`${fmt.num(l.waterAmount)} لیتر`} />}
             {l.waterFillCount !== null && l.waterFillVolume !== null && (
-              <Row l="روش آب" v={`${toFa(l.waterFillCount)} بار × ${toFa(l.waterFillVolume)} لیتر`} />
+              <Row l="روش آب" v={`${fmt.num(l.waterFillCount)} بار × ${fmt.num(l.waterFillVolume)} لیتر`} />
             )}
             {(() => {
               const effectiveFeed = (l.feedConsumed && l.feedConsumed > 0) ? l.feedConsumed : l.feedDelivered;
               if (!l.waterAmount || !effectiveFeed || effectiveFeed <= 0) return null;
-              return <Row l="نسبت آب/دان" v={toFa((l.waterAmount / effectiveFeed).toFixed(2))} />;
+              return <Row l="نسبت آب/دان" v={fmt.code((l.waterAmount / effectiveFeed).toFixed(2))} />;
             })()}
           </Grid2>
         </LogSection>
@@ -229,14 +232,14 @@ export default function LogCard(props: LogCardProps) {
       {((l.eatingEggs || 0) + (l.fertileEggs || 0) + (l.brokenEggs || 0) + (l.otherEggs || 0)) > 0 && (
         <LogSection title="🥚 تخم">
           <Grid2>
-            {l.eatingEggs ? <Row l="خوراکی" v={toFa(l.eatingEggs)} /> : null}
-            {l.fertileEggs ? <Row l="نطفه‌دار" v={toFa(l.fertileEggs)} /> : null}
+            {l.eatingEggs ? <Row l="خوراکی" v={fmt.count(l.eatingEggs)} /> : null}
+            {l.fertileEggs ? <Row l="نطفه‌دار" v={fmt.count(l.fertileEggs)} /> : null}
           </Grid2>
           <Grid2>
-            {l.brokenEggs ? <Row l="شکسته" v={toFa(l.brokenEggs)} /> : null}
-            {l.otherEggs ? <Row l="سایر" v={toFa(l.otherEggs)} /> : null}
+            {l.brokenEggs ? <Row l="شکسته" v={fmt.count(l.brokenEggs)} /> : null}
+            {l.otherEggs ? <Row l="سایر" v={fmt.count(l.otherEggs)} /> : null}
           </Grid2>
-          <Row l="مجموع" v={toFa((l.eatingEggs||0)+(l.fertileEggs||0)+(l.brokenEggs||0)+(l.otherEggs||0))} />
+          <Row l="مجموع" v={fmt.num((l.eatingEggs||0)+(l.fertileEggs||0)+(l.brokenEggs||0)+(l.otherEggs||0))} />
         </LogSection>
       )}
 
@@ -260,20 +263,20 @@ export default function LogCard(props: LogCardProps) {
         return (
           <LogSection title="⚖️ وزن‌کشی">
             <Grid2>
-              <Row l="تعداد نمونه" v={toFa(weights.length)} />
+              <Row l="تعداد نمونه" v={fmt.count(weights.length)} />
               <Row l="میانگین" v={formatWeightGrams(avg)} />
             </Grid2>
             <Grid2>
               {l.weightGender ? (
                 <Row l="جنسیت" v={GENDER_LABEL[l.weightGender] || l.weightGender} />
               ) : <div />}
-              <Row l="ضریب تغییرات" v={`${toFa(cv)}٪`} />
+              <Row l="ضریب تغییرات" v={`${fmt.num(cv)}٪`} />
             </Grid2>
             <div style={{ fontSize: 'var(--fs-xs)', color: cvLbl.color, fontWeight: 600, paddingRight: 4, marginTop: 2 }}>
               {cvLbl.text}
             </div>
             {metrics && metrics.hasData && (
-              <Row l="یکنواختی" v={`${toFa(metrics.uniformityPct)}٪`} accent={metrics.uniformityPct >= 80} />
+              <Row l="یکنواختی" v={`${fmt.num(metrics.uniformityPct)}٪`} accent={metrics.uniformityPct >= 80} />
             )}
           </LogSection>
         );
@@ -290,7 +293,7 @@ export default function LogCard(props: LogCardProps) {
             {hasDeaths && (
               <Grid2>
                 {deaths.map(d => (
-                  <Row key={d.id} l="تلفات" v={`${toFa(d.count)} پرنده`} warn={isMortalityHigh} />
+                  <Row key={d.id} l="تلفات" v={`${fmt.num(d.count)} پرنده`} warn={isMortalityHigh} />
                 ))}
               </Grid2>
             )}
@@ -301,9 +304,9 @@ export default function LogCard(props: LogCardProps) {
                   const methodLabel = v.method ? (VET_METHOD_LABEL[v.method] || v.method) : null;
                   const detail = [
                     v.name || 'بدون نام',
-                    v.dose ? `دوز ${toFa(v.dose)}` : null,
+                    v.dose ? `دوز ${fmt.code(v.dose)}` : null,
                     methodLabel,
-                    v.quantity ? `مقدار ${toFa(v.quantity)} ${v.unit || ''}` : null,
+                    v.quantity ? `مقدار ${fmt.num(v.quantity)} ${v.unit || ''}` : null,
                   ].filter(Boolean).join(' • ');
                   return <Row key={v.id} l="واکسن" v={detail} />;
                 })}
@@ -316,10 +319,10 @@ export default function LogCard(props: LogCardProps) {
                   const methodLabel = m.method ? (VET_METHOD_LABEL[m.method] || m.method) : null;
                   const detail = [
                     m.name || 'بدون نام',
-                    m.dose ? `دوز ${toFa(m.dose)}` : null,
+                    m.dose ? `دوز ${fmt.code(m.dose)}` : null,
                     methodLabel,
-                    m.quantity ? `مقدار ${toFa(m.quantity)} ${m.unit || ''}` : null,
-                    m.withdrawalDays ? `پرهیز ${toFa(m.withdrawalDays)} روز` : null,
+                    m.quantity ? `مقدار ${fmt.num(m.quantity)} ${m.unit || ''}` : null,
+                    m.withdrawalDays ? `پرهیز ${fmt.num(m.withdrawalDays)} روز` : null,
                   ].filter(Boolean).join(' • ');
                   return <Row key={m.id} l="دارو" v={detail} />;
                 })}
@@ -391,7 +394,7 @@ export default function LogCard(props: LogCardProps) {
                         fontWeight: 700,
                         fontSize: 'var(--fs-xs)',
                         color: 'var(--muted)',
-                      }}>{toFa(corr.timestamp)}</span>
+                      }}>{fmt.code(corr.timestamp)}</span>
                       <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>({corr.reason})</span>
                     </div>
                     {corr.revoked ? (
@@ -410,7 +413,7 @@ export default function LogCard(props: LogCardProps) {
                           e.stopPropagation();
                           const ok = await showConfirmAsync(
                             'لغو اصلاح',
-                            `اصلاح ${toFa(corr.timestamp)} لغو شود؟ (مقادیر به حالت قبل برمی‌گردند)`
+                            `اصلاح ${fmt.code(corr.timestamp)} لغو شود؟ (مقادیر به حالت قبل برمی‌گردند)`
                           );
                           if (ok) onRevokeCorrection(corr.id);
                         }}
@@ -436,13 +439,13 @@ export default function LogCard(props: LogCardProps) {
                           const newVal = (corr.changes as any)[k];
                           const label = FIELD_LABEL[k] || k;
 
-                          const fmt = (v: any) => {
+                          const formatFieldVal = (v: any) => {
                             if (v === null || v === undefined || v === '') return '—';
                             if (k === 'weightGender') {
                               const opts: any = { '': 'نامشخص', 'male': 'نر', 'female': 'ماده', 'mixed': 'مخلوط' };
                               return opts[v] || v;
                             }
-                            return toFa(String(v));
+                            return fmt.code(String(v));
                           };
 
                           return (
@@ -461,11 +464,11 @@ export default function LogCard(props: LogCardProps) {
                               v={
                                 <span style={{ fontSize: 'var(--fs-sm)', display: 'flex', alignItems: 'center', gap: 4, textDecoration: corr.revoked ? 'line-through' : 'none', flexWrap: 'wrap' }}>
                                   {/* مقدار جدید (سبز) سمت راست */}
-                                  <span style={{ color: corr.revoked ? 'var(--muted)' : 'var(--accent)', fontWeight: 700 }}>{fmt(newVal)}</span>
+                                  <span style={{ color: corr.revoked ? 'var(--muted)' : 'var(--accent)', fontWeight: 700 }}>{formatFieldVal(newVal)}</span>
                                   {/* فلش به سمت مقدار جدید */}
                                   <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>→</span>
                                   {/* مقدار قبلی (قرمز) سمت چپ */}
-                                  <span style={{ color: corr.revoked ? 'var(--muted)' : 'var(--danger)' }}>{fmt(oldVal)}</span>
+                                  <span style={{ color: corr.revoked ? 'var(--muted)' : 'var(--danger)' }}>{formatFieldVal(oldVal)}</span>
                                 </span>
                               }
                             />

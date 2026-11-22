@@ -1,6 +1,8 @@
 /**
  * FormModal — فرم افزودن/ویرایش ثبت روزانه
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import type { Dispatch, SetStateAction } from 'react';
 import { useMemo } from 'react';
 import { useFlk } from '../../flk/store';
@@ -12,7 +14,6 @@ import SmartSelect from '../../../shr/components/SmartSelect';
 import { Btn, BtnRow, Field, Grid2, Modal, ErrorBox, SectionTitle, AlertBox, Textarea } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 import TimePicker from '../../../shr/components/TimePicker';
-import { useFormat } from '../../../shr/units';
 import { getAgeDays } from '../../flk/store';
 import EnvironmentSection from './EnvironmentSection';
 import FeedSection from './FeedSection';
@@ -76,7 +77,7 @@ export default function FormModal(props: FormModalProps) {
           onChange={onFlockChange}
           options={activeFlocks.map(f => ({
             value: f.id, label: f.name,
-            subtitle: f.currentCount ? `${toFa(f.currentCount)} پرنده` : undefined,
+            subtitle: f.currentCount ? `${fmt.count(f.currentCount)} پرنده` : undefined,
           }))}
           placeholder="— انتخاب گله —"
           modalTitle="انتخاب گله"

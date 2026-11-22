@@ -1,6 +1,8 @@
 /**
  * DlgTabPanel — محتوای یک تب از ثبت روزانه (carousel)
  */
+import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { format as formatJ } from 'date-fns-jalali';
 import { useFab } from '../../../shr/hooks/useFab';
@@ -55,6 +57,7 @@ export default function DlgTabPanel({
   vaccineEnabled, medicineEnabled,
   onEdit, onAdd, onDeleteLog, onRestoreLogFull, onApplyCorrection, onRevokeCorrection,
 }: Props) {
+  const fmt = useFormat();
   const { add, archive, restore, restoreArchived, countArchivedLogs } = useDlg();
   const [coldCount, setColdCount] = useState<number>(0);
   const [coldOpen, setColdOpen] = useState<boolean>(false);
@@ -118,13 +121,13 @@ const formatColdDateFa = (rawDate?: string): string => {
   if (!rawDate) return "—";
   const trimmed = rawDate.trim();
   if (/^1[34]\d{2}\/\d{2}\/\d{2}$/.test(trimmed)) {
-    return toFa(trimmed);
+    return fmt.code(trimmed);
   }
   const parsed = new Date(trimmed);
   if (!Number.isNaN(parsed.getTime())) {
-    return toFa(formatJ(parsed, "yyyy/MM/dd"));
+    return fmt.date(formatJ(parsed, "yyyy/MM/dd"));
   }
-  return toFa(trimmed);
+  return fmt.code(trimmed);
 };
 
 const summarizeColdLogFa = (log?: DailyLog): string => {
@@ -139,12 +142,12 @@ const summarizeColdLogFa = (log?: DailyLog): string => {
   const temp = anyLog.temp ?? anyLog.temperature;
   const humidity = anyLog.humidity;
 
-  if (typeof feed === "number" && feed > 0) parts.push(`دان: ${toFa(feed)} کیلوگرم`);
-  if (typeof water === "number" && water > 0) parts.push(`آب: ${toFa(water)} لیتر`);
-  if (typeof deaths === "number" && deaths > 0) parts.push(`تلفات: ${toFa(deaths)}`);
-  if (typeof eggs === "number" && eggs > 0) parts.push(`تخم: ${toFa(eggs)}`);
-  if (typeof temp === "number" && temp > 0) parts.push(`دما: ${toFa(temp)}°`);
-  if (typeof humidity === "number" && humidity > 0) parts.push(`رطوبت: ${toFa(humidity)}٪`);
+  if (typeof feed === "number" && feed > 0) parts.push(`دان: ${fmt.num(feed)} کیلوگرم`);
+  if (typeof water === "number" && water > 0) parts.push(`آب: ${fmt.num(water)} لیتر`);
+  if (typeof deaths === "number" && deaths > 0) parts.push(`تلفات: ${fmt.num(deaths)}`);
+  if (typeof eggs === "number" && eggs > 0) parts.push(`تخم: ${fmt.num(eggs)}`);
+  if (typeof temp === "number" && temp > 0) parts.push(`دما: ${fmt.num(temp)}°`);
+  if (typeof humidity === "number" && humidity > 0) parts.push(`رطوبت: ${fmt.num(humidity)}٪`);
 
   return parts.join(" • ");
 };
@@ -153,14 +156,14 @@ const getMonthKeyFa = (dateStr?: string): string => {
   if (!dateStr) return "نامشخص";
   const match = dateStr.trim().match(/^(1[34]\d{2})\/(\d{2})/);
   if (!match) return "نامشخص";
-  return `${toFa(match[1])}/${toFa(match[2])}`;
+  return `${fmt.code(match[1])}/${fmt.code(match[2])}`;
 };
 
 const getMonthLabelFa = (dateStr?: string): string => {
   if (!dateStr) return "تاریخ نامشخص";
   const match = dateStr.trim().match(/^(1[34]\d{2})\/(\d{2})/);
-  if (!match) return toFa(dateStr);
-  return `${toFa(match[1])}/${toFa(match[2])}`;
+  if (!match) return fmt.code(dateStr);
+  return `${fmt.code(match[1])}/${fmt.code(match[2])}`;
 };
 
 function sliceUpToDayBoundary<T extends { date?: string }>(
@@ -246,7 +249,7 @@ useEffect(() => {
     items: logs,
     getId: (l: DailyLog) => l.id,
     onDelete: async (ids) => {
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' ثبت روزانه حذف شوند؟', { danger: true });
+      const ok = await showConfirmAsync('حذف گروهی', fmt.count(ids.length) + ' ثبت روزانه حذف شوند؟', { danger: true });
       if (!ok) return;
       const backups: DailyLog[] = [];
       let deletedCount = 0;
@@ -266,7 +269,7 @@ useEffect(() => {
       logAction('delete', 'dlg', 'حذف گروهی ثبت روزانه: ' + backups.length);
     },
     onArchive: async (ids) => {
-      const ok = await showConfirmAsync('آرشیو گروهی', toFa(ids.length) + ' ثبت آرشیو شوند؟');
+      const ok = await showConfirmAsync('آرشیو گروهی', fmt.count(ids.length) + ' ثبت آرشیو شوند؟');
       if (!ok) return;
       for (const id of ids) {
         try { archive(id); } catch { /* silent */ }
@@ -409,7 +412,7 @@ useEffect(() => {
                 key={g.key}
                 title={g.title}
                 icon="📁"
-                summary={`${toFa(g.items.length)} ثبت`}
+                summary={`${fmt.num(g.items.length)} ثبت`}
                 defaultOpen={true}
               >
                 {g.items.map((l, i) => renderLogCard(l, i))}
@@ -421,7 +424,7 @@ useEffect(() => {
           {isHistoryLimited && (
             <div style={{ display: "flex", justifyContent: "center", paddingTop: 6 }}>
               <Btn variant="ghost" onClick={() => setShowAllHistory(true)}>
-                {toFa(`نمایش روزهای بیشتر (${list.length - visibleList.length} ثبت دیگر)`)}
+                {fmt.code(`نمایش روزهای بیشتر (${list.length - visibleList.length} ثبت دیگر)`)}
               </Btn>
             </div>
           )}
@@ -443,7 +446,7 @@ useEffect(() => {
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
             <span style={{ fontSize: "var(--fs-xs)", color: "var(--muted)" }}>
-              آرشیو سرد: <b style={{ color: "var(--text)" }}>{toFa(coldCount)}</b> ثبت قدیمی
+              آرشیو سرد: <b style={{ color: "var(--text)" }}>{fmt.count(coldCount)}</b> ثبت قدیمی
             </span>
             <Btn size="sm" variant="outline" onClick={handleToggleColdArchive}>
               {coldOpen ? "بستن آرشیو سرد" : "مشاهده آرشیو سرد"}
