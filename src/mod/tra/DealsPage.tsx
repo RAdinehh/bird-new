@@ -34,6 +34,7 @@ import DealRecycleBinModal from './components/DealRecycleBinModal';
 import SettlementPrint from './components/SettlementPrint';
 import DealPrint from './components/DealPrint';
 import { toFa, toEn } from '../../shr/utils/fa';
+import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
 import { toastMsg } from '../../cor/store/toast';
@@ -48,6 +49,7 @@ import HelpBanner from '../../shr/components/HelpBanner';
 import { useDealCalc, useDealStats } from './deals/useDealCalc';
 import { type F, empty, STATUS_LABEL, isSameIdentity } from './deals/types';
 export default function DealsPage({ active = true }: { active?: boolean } = {}) {
+  const fmt = useFormat();
   const navigate = useNavigate();
   const { deals, invoices, addDeal, updateDeal, deleteDeal, addSettlement, updateSettlement, deleteSettlement, undoSettlement, reopenSettlement, settlements, addInvoice, reopenDeal, listDeletedDeals } = useTra();
   const { flocks } = useFlk();
@@ -65,7 +67,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
           label: 'گله ' + f.name,
           rows: [
             ['نوع', typeLabel],
-            ['سن', toFa(age) + ' روز'],
+            ['سن', `${getGlobalFormat().day(age)} روز`],
             ['فاز', lc.label],
             ['وضعیت', f.status === 'active' ? 'فعال' : 'غیرفعال'],
           ] as Array<[string, string]>,
@@ -79,9 +81,9 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
           available: computeGoodsCap(g, form.id || 'new', deals, Number(h.hatched || 0), form.id ? undefined : form.goods),
           label: 'هچ ' + h.date,
           rows: [
-            ['تاریخ هچ', toFa(h.date)],
-            ['هچ موفق', toFa(h.hatched || 0) + ' جوجه'],
-            ['نطفه‌داری نشده', toFa(h.unhatched || 0)],
+            ['تاریخ هچ', getGlobalFormat().date(h.date)],
+            ['هچ موفق', `${getGlobalFormat().count(h.hatched || 0)} جوجه`],
+            ['نطفه‌داری نشده', getGlobalFormat().count(h.unhatched || 0)],
           ] as Array<[string, string]>,
         };
       }
@@ -94,7 +96,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
           label: 'انبار ' + it.name,
           rows: [
             ['واحد', (UNIT_LABEL as any)[it.unit] || it.unit],
-            ['قیمت آخرین', (it.lastPrice || 0) > 0 ? toFa(Number(it.lastPrice).toLocaleString('fa-IR')) + ' ت' : '—'],
+            ['قیمت آخرین', (it.lastPrice || 0) > 0 ? getGlobalFormat().money(Number(it.lastPrice)) : '—'],
           ] as Array<[string, string]>,
         };
       }
@@ -187,14 +189,14 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     items: list,
     getId: (x: any) => x.id,
     onDelete: async (ids: string[]) => {
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' معامله حذف شوند؟', { danger: true });
+      const ok = await showConfirmAsync('حذف گروهی', `${getGlobalFormat().count(ids.length)} معامله حذف شوند؟`, { danger: true });
       if (!ok) return;
       const _lInvC = ids.filter(id => invoices.some((inv: any) => inv.relatedDealId === id)).length;
       const _lFlkC = ids.filter(id => flocks.some((f: any) => f.dealData?.dealId === id)).length;
       if (_lInvC > 0 || _lFlkC > 0) {
         const _ptB: string[] = [];
-        if (_lInvC > 0) _ptB.push(toFa(_lInvC) + ' معامله به فاکتور');
-        if (_lFlkC > 0) _ptB.push(toFa(_lFlkC) + ' معامله به گله');
+        if (_lInvC > 0) _ptB.push(`${getGlobalFormat().count(_lInvC)} معامله به فاکتور`);
+        if (_lFlkC > 0) _ptB.push(`${getGlobalFormat().count(_lFlkC)} معامله به گله`);
         const ok2 = await showConfirmAsync('هشدار', _ptB.join(' و ') + ' وصله. با حذف، این ارتباط قطع می‌شه. ادامه؟', { danger: true });
         if (!ok2) return;
       }
@@ -290,8 +292,8 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     let extraMsg = '';
     if (invCount > 0 || flkCount > 0) {
       const parts: string[] = [];
-      if (invCount > 0) parts.push(toFa(invCount) + ' فاکتور');
-      if (flkCount > 0) parts.push(toFa(flkCount) + ' گله');
+      if (invCount > 0) parts.push(`${getGlobalFormat().count(invCount)} فاکتور`);
+      if (flkCount > 0) parts.push(`${getGlobalFormat().count(flkCount)} گله`);
       extraMsg = '\n\n⚠️ این معامله به ' + parts.join(' و ') + ' وصله. با حذف، این ارتباط قطع می‌شه.';
     }
     const ok = await showConfirmAsync('تأیید حذف', 'این معامله حذف شود؟' + extraMsg, { danger: true });
@@ -464,20 +466,20 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, marginBottom: 8 }}>
         <div style={{ padding: 'var(--pad-normal)', background: 'var(--accent-soft)', borderRadius: 'var(--r-md)', textAlign: 'center' }}>
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 2 }}>فعال</div>
-          <div style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, color: 'var(--accent)' }}>{toFa(stats.active)}</div>
+          <div style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, color: 'var(--accent)' }}>{fmt.count(stats.active)}</div>
         </div>
         <div style={{ padding: 'var(--pad-normal)', background: 'var(--info-soft)', borderRadius: 'var(--r-md)', textAlign: 'center' }}>
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 2 }}>تسویه‌شده</div>
-          <div style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, color: 'var(--info)' }}>{toFa(stats.settled)}</div>
+          <div style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, color: 'var(--info)' }}>{fmt.count(stats.settled)}</div>
         </div>
         <div style={{ padding: 'var(--pad-normal)', background: 'var(--danger-soft)', borderRadius: 'var(--r-md)', textAlign: 'center' }}>
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 2 }}>لغو‌شده</div>
-          <div style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, color: 'var(--danger)' }}>{toFa(stats.cancelled)}</div>
+          <div style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, color: 'var(--danger)' }}>{fmt.count(stats.cancelled)}</div>
         </div>
       </div>
       {stats.totalBalance !== 0 && (
         <div style={{ padding: 'var(--pad-normal)', background: stats.totalBalance > 0 ? 'var(--warn-soft)' : 'var(--accent-soft)', borderRadius: 'var(--r-md)', textAlign: 'center', marginBottom: 8, fontSize: 'var(--fs-sm)' }}>
-          مجموع مانده‌های فعال: <b style={{ color: stats.totalBalance > 0 ? 'var(--warn)' : 'var(--accent)' }}>{toFa(Math.abs(stats.totalBalance).toLocaleString('fa-IR'))} تومان</b>
+          مجموع مانده‌های فعال: <b style={{ color: stats.totalBalance > 0 ? 'var(--warn)' : 'var(--accent)' }}>{fmt.money(Math.abs(stats.totalBalance))}</b>
         </div>
       )}
 
@@ -535,13 +537,13 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
             const _ag = dealAging(d);
             if (_ag) {
               const _tone = _ag.tone === 'ok' ? 'green' : _ag.tone === 'warn' ? 'amber' : 'danger';
-              dealBadges.push({ key: 'age', node: <Tag tone={_tone as any}>{toFa(_ag.days)} روز</Tag> });
+              dealBadges.push({ key: 'age', node: <Tag tone={_tone as any}>{fmt.day(_ag.days)} روز</Tag> });
             }
             if (relatedInvoices.length > 0) {
-              dealBadges.push({ key: 'inv', node: <Tag tone="info">{toFa(relatedInvoices.length)} فاکتور</Tag> });
+              dealBadges.push({ key: 'inv', node: <Tag tone="info">{fmt.count(relatedInvoices.length)} فاکتور</Tag> });
             }
             if (relatedFlocks.length > 0) {
-              dealBadges.push({ key: 'flk', node: <Tag tone="green">{toFa(relatedFlocks.length)} گله</Tag> });
+              dealBadges.push({ key: 'flk', node: <Tag tone="green">{fmt.count(relatedFlocks.length)} گله</Tag> });
             }
             return (
               <ExpandableCard
@@ -549,22 +551,22 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                 id={d.id}
                 ms={ms}
                 accent={accent}
-                index={toFa(i + 1)}
+                index={fmt.count(i + 1)}
                 iconEmoji="🤝"
                 title={`${DEAL_LABEL[d.type]} — ${d.description}`}
-                subtitle={`${party?.name || '—'} • ${toFa(d.date)}`}
+                subtitle={`${party?.name || '—'} • ${fmt.date(d.date)}`}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : d.id)}
                 badge={<BadgeOverflow badges={dealBadges} max={2} modalTitle={`برچسب‌های معامله #${d.dealNumber || '—'}`} />}
                 stats={
                   <>
-                    {d.value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa(d.value.toLocaleString('fa-IR'))} تومان</b></span>}
+                    {d.value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{fmt.money(d.value)}</b></span>}
                     {d.percent !== null && d.percent !== undefined && <span>درصد: <b style={{ color: 'var(--text)' }}>{toFa(d.percent)}٪</b></span>}
                     {(() => {
                       const salesTotal = (d.sales || []).reduce((s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)), 0);
-                      return salesTotal > 0 ? <span>🏷 فروش: <b style={{ color: 'var(--text)' }}>{toFa(salesTotal.toLocaleString('fa-IR'))} ت</b></span> : null;
+                      return salesTotal > 0 ? <span>🏷 فروش: <b style={{ color: 'var(--text)' }}>{fmt.money(salesTotal)}</b></span> : null;
                     })()}
-                    {d.dueDate ? <span>سرسید: <b style={{ color: 'var(--text)' }}>{toFa(d.dueDate)}</b></span> : null}
+                    {d.dueDate ? <span>سرسید: <b style={{ color: 'var(--text)' }}>{fmt.date(d.dueDate)}</b></span> : null}
                   </>
                 }
               >
@@ -572,8 +574,8 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   <>
                     <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات قرارداد</SectionTitle>
                     <Grid2>
-                      {d.dealNumber ? <Row l="شماره قرارداد" v={toFa(d.dealNumber)} /> : null}
-                      {d.startDate ? <Row l="دوره" v={d.endDate ? `${toFa(d.startDate)} تا ${toFa(d.endDate)}` : toFa(d.startDate)} /> : null}
+                      {d.dealNumber ? <Row l="شماره قرارداد" v={fmt.code(d.dealNumber)} /> : null}
+                      {d.startDate ? <Row l="دوره" v={d.endDate ? `${fmt.date(d.startDate)} تا ${fmt.date(d.endDate)}` : fmt.date(d.startDate)} /> : null}
                       {d.settlementType ? <Row l="نوع تسویه" v={d.settlementType === 'percent' ? 'کمیسیون درصدی' : d.settlementType === 'barter' ? 'تهاتر مستقیم' : d.settlementType} /> : null}
                       {d.settlementValue ? <Row l="مقدار تسویه" v={toFa(d.settlementValue)} /> : null}
                     </Grid2>
@@ -640,11 +642,11 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   if (dealSettlements.length === 0) return null;
                   return (
                     <>
-                      <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> تسویه‌های دوره‌ای ({toFa(dealSettlements.length)})</SectionTitle>
+                      <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> تسویه‌های دوره‌ای ({fmt.count(dealSettlements.length)})</SectionTitle>
                       {dealSettlements.map((st: any) => {
                         const statusLabel = st.status === 'draft' ? 'پیش‌نویس' : st.status === 'confirmed' ? 'تأییدشده' : 'فاکتور شده';
                         const statusTone: 'amber' | 'info' | 'green' = st.status === 'draft' ? 'amber' : st.status === 'confirmed' ? 'info' : 'green';
-                        const netTxt = toFa(Number(st.netPayable || 0).toLocaleString('fa-IR'));
+                        const netTxt = fmt.money(Number(st.netPayable || 0));
                         return (
                           <div
                             key={st.id}
@@ -652,7 +654,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                             style={{ cursor: 'pointer' }}
                           >
                             <Row
-                              l={`${toFa(st.periodStart)} — ${toFa(st.periodEnd)}`}
+                              l={`${fmt.date(st.periodStart)} — ${fmt.date(st.periodEnd)}`}
                               v={
                                 <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                                   <span style={{ fontWeight: 700, color: 'var(--accent)' }}>خالص: {netTxt} ت</span>
@@ -921,7 +923,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
       {form.goods.map((g, gi) => (
         <div key={g.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>کالای {toFa(gi + 1)}{getSourceInfo(g)?.label ? ' — ' + getSourceInfo(g)?.label : ''}</span>
+            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>کالای {fmt.count(gi + 1)}{getSourceInfo(g)?.label ? ' — ' + getSourceInfo(g)?.label : ''}</span>
             <button type="button" onClick={() => setForm(f => ({ ...f, goods: f.goods.filter(x => x.id !== g.id), deliveries: f.deliveries.filter(x => x.goodId !== g.id), sales: f.sales.filter(x => x.goodId !== g.id) }))} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700 }}>✕</button>
           </div>
           <Field label="دسته کالا" hint="انتخاب دسته، منبع کالا را تعیین می‌کند" error={showError?.(`goods.${gi}.category`)} onTouch={() => markTouched?.(`goods.${gi}.category`)}>
@@ -1018,7 +1020,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   <Field label="هچ مبدأ" required hint={g.hatchId ? (() => {
                     const h = hatches.find(x => x.id === g.hatchId);
                     if (!h) return undefined;
-                    return '📊 هچ موفق: ' + toFa(h.hatched || 0) + ' جوجه | نطفه‌داری نشده: ' + toFa(h.unhatched || 0);
+                    return '📊 هچ موفق: ' + toFa(h.hatched || 0) + ' جوجه | نطفه‌داری نشده: ' + getGlobalFormat().count(h.unhatched || 0);
                   })() : undefined}>
                     <SmartSelect
                       value={g.hatchId || ''}
