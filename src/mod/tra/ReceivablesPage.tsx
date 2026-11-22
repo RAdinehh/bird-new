@@ -496,7 +496,7 @@ renderDetails={(inv) => {
                 </div>
                 <div>
                   <Line l="پرداخت‌شده" v={fmt.money(paidSumAllocated(inv, allocations), { withUnit: false }) + ' تومان'} />
-                  <Line l="باقی‌مانده" v={<span style={{ fontWeight: 800, color: balColor }}>{fmt.money(rem)}ومان</span>} />
+                  <Line l="باقی‌مانده" v={<span style={{ fontWeight: 800, color: balColor }}>{fmt.money(rem, { withUnit: false })} تومان</span>} />
                 </div>
                 {(inv.dueDate || (inv.deferrals && inv.deferrals.length > 0) || inv.nextReminderAt || (inv.reminderLog && inv.reminderLog.length > 0)) && (
                   <div>
