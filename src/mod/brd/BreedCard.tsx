@@ -124,9 +124,9 @@ export default function BreedCard({
         <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           {breedPurposes.map((p: string) => {
             const info = getPurposeInfo(p);
-            return info ? <Tag key={p} tone="green">{info.emoji} {info.label}</Tag> : null;
+            return info ? <Tag key={p} tone="green">{info.label}</Tag> : null;
           })}
-          {category && <Tag tone="blue">{category.emoji} {category.label}</Tag>}
+          {category && <Tag tone="blue">{category.label}</Tag>}
         </div>
       }
       stats={<>

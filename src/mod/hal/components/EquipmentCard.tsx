@@ -60,21 +60,21 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                   <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                     {(() => {
                       const kind = kindForType(e.type);
-                      if (kind === 'asset') return <Tag tone="purple">🏭 دارایی</Tag>;
-                      if (kind === 'consumable') return <Tag tone="gray">📦 مصرفی</Tag>;
+                      if (kind === 'asset') return <Tag tone="purple">دارایی</Tag>;
+                      if (kind === 'consumable') return <Tag tone="gray">مصرفی</Tag>;
                       return null;
                     })()}
-                    {(!e.hallId || e.hallId === '') && <Tag tone="amber">⚠️ بدون سالن</Tag>}
+                    {(!e.hallId || e.hallId === '') && <Tag tone="amber">بدون سالن</Tag>}
                     {e.status && e.status !== 'active' && (() => {
                       const st = getStatusLabel(e.status);
                       if (!st) return null;
-                      return <Tag tone={st.tone || 'gray'}>{st.icon} {st.name}</Tag>;
+                      return <Tag tone={st.tone || 'gray'}>{st.name}</Tag>;
                     })()}
                     {e.count ? <Tag tone="blue">{toFa(e.count)} {getUnitLabel(e.unit)}</Tag> : undefined}
                     {(() => {
                       const ws = getWarrantyStatus(e.purchasedAt, e.warranty);
-                      if (ws.status === 'expired') return <Tag tone="red">⚠️ گارانتی تمام</Tag>;
-                      if (ws.status === 'expiring' && ws.daysLeft !== null) return <Tag tone="amber">⏰ {toFa(ws.daysLeft)} روز گارانتی</Tag>;
+                      if (ws.status === 'expired') return <Tag tone="red">گارانتی تمام</Tag>;
+                      if (ws.status === 'expiring' && ws.daysLeft !== null) return <Tag tone="amber">{toFa(ws.daysLeft)} روز گارانتی</Tag>;
                       return null;
                     })()}
                   </div>

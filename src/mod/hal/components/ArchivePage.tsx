@@ -140,7 +140,7 @@ export default function ArchivePage({ active = true }: Props = {}) {
                   gap: 'var(--sp-2)',
                   flexWrap: 'wrap',
                 }}>
-                  <Tag tone="gray">🏭 آرشیو</Tag>
+                  <Tag tone="gray">آرشیو</Tag>
                   <span style={{ flex: 1, fontWeight: 700 }}>{h.name}</span>
                   <Btn size="sm" variant="primary" onClick={() => restoreHall(h)}>بازگردانی</Btn>
                   <Btn size="sm" onClick={() => permDeleteHall(h)}>حذف</Btn>
@@ -194,7 +194,7 @@ export default function ArchivePage({ active = true }: Props = {}) {
                   gap: 'var(--sp-2)',
                   flexWrap: 'wrap',
                 }}>
-                  <Tag tone="gray">🔧 آرشیو</Tag>
+                  <Tag tone="gray">آرشیو</Tag>
                   <span style={{ flex: 1, fontWeight: 700 }}>{e.name}</span>
                   <Btn size="sm" variant="primary" onClick={() => restoreEquip(e)}>بازگردانی</Btn>
                   <Btn size="sm" onClick={() => permDeleteEquip(e)}>حذف</Btn>

@@ -297,7 +297,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
       
       {expandedId === 'm-' + m.id && (<>
       {medicineItems.length > 0 && (
-        <Field label={<>از انبار <Tag tone="red">{toFa(chemicalItems.length)} 💊</Tag> <Tag tone="green">{toFa(herbalItems.length)} 🌿</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)">
+        <Field label={<>از انبار <Tag tone="red">{toFa(chemicalItems.length)} شیمیایی</Tag> <Tag tone="green">{toFa(herbalItems.length)} گیاهی</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)">
           <SmartSelect
             value={m.itemId || ''}
             onChange={id => setForm(f => ({

@@ -82,8 +82,8 @@ export default function FlockPickerSheet({ open, onClose, flocks, logs, todayStr
               subtitle={metaParts.join(' • ')}
               badge={
                 hasLogs
-                  ? <Tag tone="accent">✅ {toFa(existingLogs.length)} ثبت</Tag>
-                  : <Tag tone="warn">⬜ ثبت نشده</Tag>
+                  ? <Tag tone="accent">{toFa(existingLogs.length)} ثبت</Tag>
+                  : <Tag tone="warn">ثبت نشده</Tag>
               }
               isOpen={isExpanded}
               onToggle={() => {

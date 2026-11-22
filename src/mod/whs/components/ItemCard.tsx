@@ -75,7 +75,7 @@ export default function ItemCard(props: ItemCardProps) {
       subtitle={`${(CATEGORY_LABEL as any)[it.category]} • ${formatQty(it.currentStock, it.unit)}`}
       isOpen={isOpen} onToggle={onToggle}
       badge={
-        it.currentStock < 0 ? <Tag tone="red">⚠️ منفی</Tag> :
+        it.currentStock < 0 ? <Tag tone="red">منفی</Tag> :
         stock === 'critical' ? <Tag tone="red">تمام شد</Tag> :
         stock === 'low' ? <Tag tone="amber">کم</Tag> :
         exp === 'expired' ? <Tag tone="red">منقضی</Tag> :

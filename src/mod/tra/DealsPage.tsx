@@ -535,13 +535,13 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
             const _ag = dealAging(d);
             if (_ag) {
               const _tone = _ag.tone === 'ok' ? 'green' : _ag.tone === 'warn' ? 'amber' : 'danger';
-              dealBadges.push({ key: 'age', node: <Tag tone={_tone as any}>⏳ {toFa(_ag.days)} روز</Tag> });
+              dealBadges.push({ key: 'age', node: <Tag tone={_tone as any}>{toFa(_ag.days)} روز</Tag> });
             }
             if (relatedInvoices.length > 0) {
-              dealBadges.push({ key: 'inv', node: <Tag tone="info">📄 {toFa(relatedInvoices.length)} فاکتور</Tag> });
+              dealBadges.push({ key: 'inv', node: <Tag tone="info">{toFa(relatedInvoices.length)} فاکتور</Tag> });
             }
             if (relatedFlocks.length > 0) {
-              dealBadges.push({ key: 'flk', node: <Tag tone="green">🐔 {toFa(relatedFlocks.length)} گله</Tag> });
+              dealBadges.push({ key: 'flk', node: <Tag tone="green">{toFa(relatedFlocks.length)} گله</Tag> });
             }
             return (
               <ExpandableCard

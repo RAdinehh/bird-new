@@ -218,7 +218,7 @@ export default function FlockCard(props: FlockCardProps) {
   if (DEAL_BADGE[f.dealType || 'own']) {
     allBadges.push({
       key: 'deal',
-      node: <Tag tone="purple">{DEAL_BADGE[f.dealType || 'own'].emoji} {DEAL_BADGE[f.dealType || 'own'].label}</Tag>,
+      node: <Tag tone="purple">{DEAL_BADGE[f.dealType || 'own'].label}</Tag>,
     });
   }
 
@@ -251,7 +251,7 @@ export default function FlockCard(props: FlockCardProps) {
     if (_sexingAge != null && ageDays >= _sexingAge) {
       allBadges.push({
         key: 'sexing-reminder',
-        node: <Tag tone="amber">⏰ زمان تفکیک</Tag>,
+        node: <Tag tone="amber">زمان تفکیک</Tag>,
       });
     }
   }

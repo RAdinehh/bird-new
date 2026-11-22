@@ -145,7 +145,7 @@ export default function WithdrawalModal({ open, onClose }: Props) {
                       </div>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
-                      <Tag tone={tone}>⏱ {toFa(days)} روز</Tag>
+                      <Tag tone={tone}>{toFa(days)} روز</Tag>
                       <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--dim)' }}>
                         {toFa(it.aw.until)}
                       </span>
