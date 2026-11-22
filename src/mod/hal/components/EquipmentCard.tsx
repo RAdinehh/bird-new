@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 /**
  * EquipmentCard — کارت تجهیز
  */
@@ -38,6 +39,7 @@ export interface EquipmentCardProps {
 }
 
 export default function EquipmentCard(props: EquipmentCardProps) {
+  const navigate = useNavigate();
   const { e, i, hall, allCustomOpts, isOpen, ms, onToggle, onEdit, onDelete, onRetire, onRestore, onTransfer, onUndo, supplierNames,
         invoiceNumbers, whsItemNames, zoneNames } = props;
   const _cm = allCustomOpts.find(o => o.key.startsWith('hal.equip.type.') && o.name === e.type);
@@ -283,7 +285,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                 _tra: 'equip',
                 equipmentId: e.id,
               });
-              window.location.href = '/tra?' + params.toString();
+              navigate('/tra?' + params.toString());
             },
           },
           {
