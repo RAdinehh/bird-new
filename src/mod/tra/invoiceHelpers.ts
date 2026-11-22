@@ -462,7 +462,7 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           const transport = it.transportCost ?? it.shipping;
           if (transport) patch.deliveryCost = transport;
           const effDate = (inv as any).deliveryDate || inv.date || '';
-          if (effDate) patch.purchaseDate = effDate;
+          if (effDate && !f.purchaseDate) patch.purchaseDate = effDate;
           // 🆕 hatchDate sync (existingFlockId)
           if (it.hatchDate && it.hatchDate !== f.hatchDate) {
             patch.hatchDate = it.hatchDate;
