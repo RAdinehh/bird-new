@@ -29,7 +29,7 @@ export type TimeUnit = 's' | 'min' | 'h' | 'day';
 
 // ═══ نمایش ═══
 export type NumberFormat = 'fa' | 'en';
-export type ThousandSep = 'fa' | 'en' | 'space' | 'dot' | 'none';
+export type ThousandSep = 'fa' | 'en' | 'space' | 'dot' | 'slash' | 'none';
 export type DateFormat = 'jalali' | 'gregorian';
 
 // ═══ واحدهای کامل ═══
@@ -81,7 +81,7 @@ export const UNIT_LABELS: Record<string, Record<string, string>> = {
   area: { m2: 'مترمربع', ha: 'هکتار', ft2: 'فوتمربع' },
   time: { s: 'ثانیه', min: 'دقیقه', h: 'ساعت', day: 'روز' },
   numberFormat: { fa: 'فارسی', en: 'انگلیسی' },
-  thousandSep: { fa: '٬ فارسی', en: ', انگلیسی', space: 'فاصله', dot: '. نقطه', none: 'هیچ' },
+  thousandSep: { fa: '٬ فارسی', en: ', انگلیسی', space: 'فاصله', dot: '. نقطه', slash: '/ اسلش', none: 'هیچ' },
   dateFormat: { jalali: 'شمسی', gregorian: 'میلادی' },
 };
 

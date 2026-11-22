@@ -11,7 +11,7 @@ import {
   type NumberFormat, type ThousandSep, type DateFormat,
 } from '../../../shr/units/types';
 
-const SEP_OPTIONS: ThousandSep[] = ['fa', 'en', 'space', 'dot', 'none'];
+const SEP_OPTIONS: ThousandSep[] = ['fa', 'en', 'space', 'dot', 'slash', 'none'];
 const DEC_OPTIONS = [0, 1, 2, 3, 4];
 
 const SAMPLE = {
