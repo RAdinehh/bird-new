@@ -137,7 +137,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                   <>
                     <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>💰 مالی</div>
                     <RowGrid>
-                      {e.unitPrice && <Row l="قیمت واحد" v={`${toFa(e.unitPrice.toLocaleString('fa-IR'))} ت`} />}
+                      {e.unitPrice && <Row l="قیمت واحد" v={fmt.money(e.unitPrice)} />}
                       {e.purchasedAt && <Row l="تاریخ خرید" v={fmt.date(e.purchasedAt)} />}
                       {e.warranty && <Row l="گارانتی" v={`${fmt.count(e.warranty)} ماه`} />}
                       {value > 0 && <Row l="ارزش کل" v={`${fmt.money(value)}`} accent />}

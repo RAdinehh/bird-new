@@ -1,6 +1,7 @@
 /**
  * HallCard — کارت نمایش یک سالن (با محاسبات هوشمند)
  */
+
 import { toFa } from '../../../shr/utils/fa';
 import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
@@ -131,7 +132,7 @@ export default function HallCard(props: HallCardProps) {
       <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📐 ابعاد و ظرفیت</div>
       <RowGrid>
         <Row l="مساحت" v={`${fmt.num(area)} م²`} />
-        <Row l="حجم" v={`${toFa(volume.toFixed(1))} م³`} />
+        <Row l="حجم" v={`${fmt.code(volume.toFixed(1))} م³`} />
         <Row l="ظرفیت" v={h.capacity ? `${fmt.int(h.capacity)} پرنده` : '—'} />
         {realCapacity && !h.capacity && (
           <Row l="ظرفیت پیشنهادی" v={`~${fmt.int(realCapacity)}`} accent />

@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths } from 'date-fns-jalali';
 import { eventsOfDay, TYPE_COLORS, type CalEvent, type EventType } from './store';
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export default function MonthView({ events, onDayClick, filter }: Props) {
+  const fmt = useFormat();
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const todayStr = format(new Date(), 'yyyy/MM/dd');
@@ -66,10 +68,10 @@ export default function MonthView({ events, onDayClick, filter }: Props) {
 
         <div style={{ flex: 1, textAlign: 'center' }}>
           <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--accent)' }}>
-            {monthName} {toFa(year)}
+            {monthName} {fmt.code(year)}
           </div>
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-            {toFa(monthEventsCount)} رویداد این ماه
+            {fmt.count(monthEventsCount)} رویداد این ماه
           </div>
         </div>
 
@@ -97,7 +99,7 @@ export default function MonthView({ events, onDayClick, filter }: Props) {
           fontFamily: 'inherit'
         }}
       >
-        📅 امروز ({toFa(format(new Date(), 'd MMMM'))})
+        📅 امروز ({fmt.code(format(new Date(), 'd MMMM'))})
       </button>
 
       {/* گرید */}
@@ -163,7 +165,7 @@ export default function MonthView({ events, onDayClick, filter }: Props) {
                   color: isToday ? 'var(--avatar-text)' : (isFriday ? 'var(--danger)' : 'var(--text)'),
                   lineHeight: 1
                 }}>
-                  {toFa(dayNum)}
+                  {fmt.count(dayNum)}
                 </span>
 
                 {/* نقاط رویداد */}

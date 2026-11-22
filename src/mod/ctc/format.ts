@@ -1,3 +1,4 @@
+import { getGlobalFormat } from '../../shr/units/useFormat';
 import { BANKS, ROLE_LABEL, type Person, type Role } from './store';
 import { toFa } from '../../shr/utils/fa';
 
@@ -6,12 +7,12 @@ function group4(digits: string): string {
 }
 
 export function formatPhone(p: string): string {
-  return toFa(p || '');
+  return p ? getGlobalFormat().code(p) : '';
 }
 
 export function formatCard(c: string): string {
   if (!c) return '';
-  return toFa(group4(c));
+  return getGlobalFormat().code(group4(c));
 }
 
 export function formatShaba(s: string): string {
@@ -45,13 +46,13 @@ export function formatBankSection(p: Person): string {
   }
   if (bk.accountHolder) lines.push(`👤 صاحب حساب: ${bk.accountHolder}`);
   if (bk.cardNumber) lines.push(`💳 کارت: ${formatCard(bk.cardNumber)}`);
-  if (bk.accountNumber) lines.push(`🔢 حساب: ${toFa(bk.accountNumber)}`);
+  if (bk.accountNumber) lines.push(`🔢 حساب: ${getGlobalFormat().code(bk.accountNumber)}`);
   if (bk.shaba) lines.push(`🔗 شبا: ${formatShaba(bk.shaba)}`);
   return lines.join('\n');
 }
 
 export function formatNationalId(p: Person): string {
-  return p.nationalId ? `🆔 کد ملی: ${toFa(p.nationalId)}` : '';
+  return p.nationalId ? `🆔 کد ملی: ${getGlobalFormat().code(p.nationalId)}` : '';
 }
 
 export function formatNotes(p: Person): string {

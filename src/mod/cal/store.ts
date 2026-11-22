@@ -1,3 +1,4 @@
+import { getGlobalFormat } from '../../shr/units/useFormat';
 import { useInc, daysToHatch } from '../inc/store';
 import { useDlg } from '../dlg/store';
 import { useTra, remaining } from '../tra/store';
@@ -220,7 +221,7 @@ export function collectEvents(): CalEvent[] {
             date: inv.dueDate,
             type: 'payment',
             title: inv.type === 'sale' ? '📥 دریافت از مشتری' : '📤 پرداخت به فروشنده',
-            subtitle: rem.toLocaleString('fa-IR') + ' ت — فاکتور ' + (inv.number || '—'),
+            subtitle: getGlobalFormat().money(rem) + ' — فاکتور ' + (inv.number || '—'),
             status: daysFromToday(inv.dueDate) < 0 ? 'overdue' : statusOf(inv.dueDate),
             icon: '💰',
             refId: inv.id
@@ -236,7 +237,7 @@ export function collectEvents(): CalEvent[] {
               date: p.dueDate,
               type: 'payment',
               title: '🏦 سرسید چک',
-              subtitle: p.amount.toLocaleString('fa-IR') + ' ت' + (p.bank ? ' — ' + p.bank : ''),
+              subtitle: getGlobalFormat().money(p.amount) + (p.bank ? ' — ' + p.bank : ''),
               status: daysFromToday(p.dueDate) < 0 ? 'overdue' : statusOf(p.dueDate),
               icon: '🏦',
               refId: inv.id

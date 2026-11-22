@@ -1,6 +1,8 @@
 /**
  * ContactFormModal — فرم افزودن/ویرایش مخاطب
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { Btn, BtnRow, DigitField, Field, Grid2, Input, Modal, PhoneField, Select, Textarea, ErrorBox } from '../../../shr/components/ui';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { ROLE_LABEL, CUSTOMER_TYPES, BANKS_BY_GROUP, BANKS, isBankCode, findBankByShabaCode, findBankByCardBin, type Role, type Gender, type BankAccount , useCtc} from '../store';
@@ -34,6 +36,7 @@ interface Props {
 }
 
 export default function ContactFormModal({ open, setOpen, form, setForm, err, onSave }: Props) {
+  const fmt = useFormat();
   const { contacts } = useCtc();
   const toggleRole = (r: Role) => setForm(f => ({ ...f, roles: f.roles.includes(r) ? f.roles.filter(x => x !== r) : [...f.roles, r] }));
 
@@ -109,13 +112,13 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
                   return (
                     <div style={{ marginTop: 6, fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                       {_debt > 0 && (
-                        <span>📊 بدهی فعلی: <b style={{ color: 'var(--danger)' }}>{toFa(_debt.toLocaleString('fa-IR'))} ت</b></span>
+                        <span>📊 بدهی فعلی: <b style={{ color: 'var(--danger)' }}>{fmt.money(_debt)}</b></span>
                       )}
                       {_credit > 0 && (
-                        <span>⚡ پیش‌پرداخت: <b style={{ color: 'var(--accent)' }}>{toFa(_credit.toLocaleString('fa-IR'))} ت</b></span>
+                        <span>⚡ پیش‌پرداخت: <b style={{ color: 'var(--accent)' }}>{fmt.money(_credit)}</b></span>
                       )}
                       {_limit > 0 && (
-                        <span>✅ فضای باقی‌مانده: <b style={{ color: 'var(--accent)' }}>{toFa(Math.max(0, _limit - _debt).toLocaleString('fa-IR'))} ت</b></span>
+                        <span>✅ فضای باقی‌مانده: <b style={{ color: 'var(--accent)' }}>{fmt.money(Math.max(0, _limit - _debt))}</b></span>
                       )}
                     </div>
                   );

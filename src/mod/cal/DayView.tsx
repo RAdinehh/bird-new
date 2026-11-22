@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { eventsOfDay, type CalEvent } from './store';
 import { useManual } from './manual';
 import ManualEventCard from './ManualEventCard';
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export default function DayView({ date, events, onBack, onChanged }: Props) {
+  const fmt = useFormat();
   const manualAll = useManual(s => s.events);
   const manualDay = manualAll.filter(e => e.date === date);
   const autoEvents = eventsOfDay(events, date).filter(e => !e.id.startsWith('manual-'));
@@ -46,10 +48,10 @@ export default function DayView({ date, events, onBack, onChanged }: Props) {
 
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700 }}>
-            {toFa(parts[2])} {monthName} {toFa(parts[0])}
+            {fmt.code(parts[2])} {monthName} {fmt.code(parts[0])}
           </div>
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-            {toFa(totalCount)} رویداد
+            {fmt.count(totalCount)} رویداد
           </div>
         </div>
       </div>
@@ -62,7 +64,7 @@ export default function DayView({ date, events, onBack, onChanged }: Props) {
             padding: '4px 4px 8px', display: 'flex', alignItems: 'center', gap: 6
           }}>
             <span>📌 رویدادهای شما</span>
-            <span style={{ color: 'var(--dim)' }}>({toFa(manualDay.length)})</span>
+            <span style={{ color: 'var(--dim)' }}>({fmt.count(manualDay.length)})</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {manualDay.map(m => (
@@ -80,7 +82,7 @@ export default function DayView({ date, events, onBack, onChanged }: Props) {
             padding: '4px 4px 8px', display: 'flex', alignItems: 'center', gap: 6
           }}>
             <span>🔔 رویدادهای سیستم</span>
-            <span style={{ color: 'var(--dim)' }}>({toFa(autoEvents.length)})</span>
+            <span style={{ color: 'var(--dim)' }}>({fmt.count(autoEvents.length)})</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {autoEvents.map(e => (

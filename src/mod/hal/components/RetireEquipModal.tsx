@@ -4,6 +4,7 @@
 import { useFormat } from '../../../shr/units/useFormat';
 
 
+
 import { useEffect, useState } from 'react';
 import { Btn, Field, Grid2, Input, Modal, NumField, Select } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
@@ -210,7 +211,7 @@ export default function RetireEquipModal({ open, onClose, equipment, onConfirm }
           fontSize: 'var(--fs-sm)',
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ color: 'var(--muted)' }}>قیمت خرید ({toFa(validQty ? qtyNum : maxQty)} {getUnitLabel(equipment.unit)}):</span>
+            <span style={{ color: 'var(--muted)' }}>قیمت خرید ({fmt.num(validQty ? qtyNum : maxQty)} {getUnitLabel(equipment.unit)}):</span>
             <b>{fmt.money(totalCost)}</b>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>

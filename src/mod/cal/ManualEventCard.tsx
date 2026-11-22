@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useState } from 'react';
 import { useManual, TYPE_OPTIONS, type ManualEvent } from './manual';
 import { TYPE_COLORS, statusOf } from './store';
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export default function ManualEventCard({ event, onChanged }: Props) {
+  const fmt = useFormat();
   const { update, remove, toggleDone } = useManual();
   const [editOpen, setEditOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -98,8 +100,8 @@ export default function ManualEventCard({ event, onChanged }: Props) {
           </div>
 
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 4, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> {toFa(event.date)}</span>
-            {event.time ? <span>⏰ {toFa(event.time)}</span> : null}
+            <span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> {fmt.date(event.date)}</span>
+            {event.time ? <span>⏰ {fmt.code(event.time)}</span> : null}
             <span style={{ color: colors.text }}>🏷 {typeLabel}</span>
           </div>
 

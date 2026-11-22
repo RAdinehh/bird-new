@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useState, useEffect, useMemo } from 'react';
 import {
   listFiles, deleteFile, downloadFile, openFile, totalSize,
@@ -18,6 +19,7 @@ import HelpBanner from '../../shr/components/HelpBanner';
 type ViewMode = 'grid' | 'list';
 
 export default function FilesPage() {
+  const fmt = useFormat();
   const [files, setFiles] = useState<DocFile[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalBytes, setTotalBytes] = useState(0);
@@ -121,11 +123,11 @@ export default function FilesPage() {
           </button>
         </div>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
-          <StatBox icon="📁" label="فایل‌ها" value={toFa(files.length)} tone="accent" />
+          <StatBox icon="📁" label="فایل‌ها" value={fmt.count(files.length)} tone="accent" />
           <Dot />
           <StatBox icon="💾" label="حجم" value={formatSize(totalBytes)} />
           <Dot />
-          <StatBox icon="📂" label="دسته‌ها" value={toFa(Object.keys(counts).length - 1)} />
+          <StatBox icon="📂" label="دسته‌ها" value={fmt.count(Object.keys(counts).length - 1)} />
         </div>
       </div>
 

@@ -269,11 +269,11 @@ export default function BreedForm({
       {std && (
           <StandardInfoBox title={std.nameFa} source={std.source} publishYear={std.publishYear}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px 8px' }}>
-            {std.production?.eggsPerYear && <div>🥚 {toFa(std.production.eggsPerYear)} تخم/سال</div>}
-            {std.biology?.layingStartDay && <div>📅 روز {toFa(std.biology.layingStartDay)}</div>}
-            {std.production?.peakLayingPct && <div>📊 اوج {toFa(std.production.peakLayingPct)}٪</div>}
-            {std.production?.fertilityPct && <div>🐣 باروری {toFa(std.production.fertilityPct)}٪</div>}
-            {std.production?.hatchabilityPct && <div>🐣 هچ {toFa(std.production.hatchabilityPct)}٪</div>}
+            {std.production?.eggsPerYear && <div>🥚 {fmt.count(std.production.eggsPerYear)} تخم/سال</div>}
+            {std.biology?.layingStartDay && <div>📅 روز {fmt.day(std.biology.layingStartDay)}</div>}
+            {std.production?.peakLayingPct && <div>📊 اوج {fmt.num(std.production.peakLayingPct)}٪</div>}
+            {std.production?.fertilityPct && <div>🐣 باروری {fmt.num(std.production.fertilityPct)}٪</div>}
+            {std.production?.hatchabilityPct && <div>🐣 هچ {fmt.num(std.production.hatchabilityPct)}٪</div>}
           </div>
           </StandardInfoBox>
         )}

@@ -6,6 +6,8 @@
  * - شبا: MOD-97-10 (ISO 13616) — IBAN ایران
  * - شماره حساب: فقط طول (۱۰-۲۰) — الگوریتم ریاضی نداره
  */
+import { getGlobalFormat } from '../../shr/units/useFormat';
+
 import { toFa, toEn } from '../../shr/utils/fa';
 
 export type ValidationState = 'empty' | 'partial' | 'invalid' | 'valid';
@@ -37,7 +39,7 @@ export function isValidCardNumber(card: string): boolean {
 export function cardValidation(card: string): ValidationResult {
   const digits = toEn(card || '').replace(/\D/g, '');
   if (digits.length === 0) return { state: 'empty' };
-  if (digits.length < 16) return { state: 'partial', message: `${toFa(digits.length)}/۱۶ رقم` };
+  if (digits.length < 16) return { state: 'partial', message: `${getGlobalFormat().count(digits.length)}/۱۶ رقم` };
   if (digits.length === 16) {
     if (isValidCardNumber(digits)) return { state: 'valid' };
     return { state: 'invalid', message: 'شماره کارت معتبر نیست (Luhn)' };
@@ -70,7 +72,7 @@ export function shabaValidation(shaba: string): ValidationResult {
   const clean = toEn(shaba || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
   if (clean.length === 0) return { state: 'empty' };
   if (!clean.startsWith('IR')) return { state: 'invalid', message: 'شبا باید با IR شروع شود' };
-  if (clean.length < 26) return { state: 'partial', message: `${toFa(clean.length)}/۲۶ کاراکتر` };
+  if (clean.length < 26) return { state: 'partial', message: `${getGlobalFormat().count(clean.length)}/۲۶ کاراکتر` };
   if (clean.length === 26) {
     if (isValidShaba(clean)) return { state: 'valid' };
     return { state: 'invalid', message: 'شماره شبا معتبر نیست (MOD-97)' };
@@ -89,7 +91,7 @@ export function isValidAccountNumber(account: string): boolean {
 export function accountValidation(account: string): ValidationResult {
   const digits = toEn(account || '').replace(/\D/g, '');
   if (digits.length === 0) return { state: 'empty' };
-  if (digits.length < 10) return { state: 'partial', message: `${toFa(digits.length)}/۱۰ رقم` };
+  if (digits.length < 10) return { state: 'partial', message: `${getGlobalFormat().count(digits.length)}/۱۰ رقم` };
   if (digits.length <= 20) return { state: 'valid' };
   return { state: 'invalid', message: 'شماره حساب حداکثر ۲۰ رقم است' };
 }

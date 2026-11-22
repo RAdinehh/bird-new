@@ -1,6 +1,8 @@
 /**
  * ContactsPage — مخاطبین (carousel tabs مثل hal)
  */
+import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
+
 import { useState } from 'react';
 import { useCtc, type Person, type Role, type Gender, type BankAccount, CUSTOMER_TYPES } from './store';
 import { useCarousel } from '../../shr/hooks/useCarousel';
@@ -33,6 +35,7 @@ const empty: F = {
 type TabId = 'all' | 'customer' | 'supplier' | 'worker';
 
 export default function ContactsPage() {
+  const fmt = useFormat();
   const { contacts, add, update } = useCtc();
   const [tab, setTab] = useState<TabId>('all');
   const [open, setOpen] = useState(false);
@@ -48,12 +51,12 @@ export default function ContactsPage() {
       address: p.address, city: p.city, nationalId: p.nationalId, roles: p.roles, notes: p.notes,
       customerType: p.customerType || 'wholesale',
       customerTypes: p.customerTypes || (p.customerType ? [p.customerType] : []),
-      trustScore: p.trustScore ? toFa(p.trustScore) : '',
-      defaultDiscount: p.defaultDiscount ? toFa(p.defaultDiscount) : '',
+      trustScore: p.trustScore ? getGlobalFormat().code(p.trustScore) : '',
+      defaultDiscount: p.defaultDiscount ? getGlobalFormat().code(p.defaultDiscount) : '',
       supplierTypes: p.supplierTypes || [],
       position: p.position, startDate: p.startDate,
       salaryType: p.salaryType || 'monthly',
-      salaryAmount: p.salaryAmount ? toFa(p.salaryAmount) : '',
+      salaryAmount: p.salaryAmount ? getGlobalFormat().code(p.salaryAmount) : '',
       insurance: p.insurance,
       gender: p.gender || 'unspecified',
       bankAccount: p.bankAccount || {},
@@ -174,7 +177,7 @@ export default function ContactsPage() {
               padding: '1px 5px',
               borderRadius: 8,
               fontWeight: 700,
-            }}>{toFa(tabCount(t.id))}</span>
+            }}>{fmt.count(tabCount(t.id))}</span>
             {tab === t.id && (
               <div style={{
                 position: 'absolute', bottom: 0,

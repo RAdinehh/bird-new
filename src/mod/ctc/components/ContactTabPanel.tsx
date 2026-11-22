@@ -1,6 +1,8 @@
 /**
  * ContactTabPanel — محتوای یک تب از مخاطبین (carousel)
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { useState, useMemo, useEffect } from 'react';
 import { useFab } from '../../../shr/hooks/useFab';
 import { useCtc, type Person, type Role, ROLE_LABEL, CUSTOMER_TYPES, SUPPLIER_TYPES, SALARY_TYPES, avatarLetter } from '../store';
@@ -73,6 +75,7 @@ function ShareBtn({ title, text }: { title: string; text: string }) {
 }
 
 export default function ContactTabPanel({ tab, active, onEdit, onAdd }: Props) {
+  const fmt = useFormat();
   const { contacts, add, remove } = useCtc();
   const [undoData, setUndoData] = useState<{ item: Person | Person[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -100,7 +103,7 @@ export default function ContactTabPanel({ tab, active, onEdit, onAdd }: Props) {
     items: list,
     getId: (p: Person) => p.id,
     onDelete: async (ids) => {
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' مخاطب حذف شوند؟', { danger: true });
+      const ok = await showConfirmAsync('حذف گروهی', fmt.count(ids.length) + ' مخاطب حذف شوند؟', { danger: true });
       if (!ok) return;
       const backups: Person[] = [];
       for (const id of ids) {
@@ -211,7 +214,7 @@ export default function ContactTabPanel({ tab, active, onEdit, onAdd }: Props) {
                 id={p.id}
                 ms={ms}
                 accent={accent as 'accent' | 'info' | 'purple'}
-                index={toFa(i + 1)}
+                index={fmt.count(i + 1)}
                 iconEmoji={avatarLetter(p.name)}
                 title={p.name}
                 subtitle={`${p.phone || '—'}${p.city ? ` • ${p.city}` : ''}`}
@@ -227,9 +230,9 @@ export default function ContactTabPanel({ tab, active, onEdit, onAdd }: Props) {
                   </div>
                 }
                 stats={<>
-                  {p.roles.includes('customer') && p.trustScore ? <span>اعتبار: <b style={{ color: 'var(--text)' }}>{toFa(p.trustScore)}/۱۰</b></span> : null}
+                  {p.roles.includes('customer') && p.trustScore ? <span>اعتبار: <b style={{ color: 'var(--text)' }}>{fmt.num(p.trustScore)}/۱۰</b></span> : null}
                   {p.roles.includes('worker') && p.position ? <span>سمت: <b style={{ color: 'var(--text)' }}>{p.position}</b></span> : null}
-                  {p.roles.includes('supplier') && p.supplierTypes.length > 0 ? <span>کالاها: <b style={{ color: 'var(--text)' }}>{toFa(p.supplierTypes.length)}</b></span> : null}
+                  {p.roles.includes('supplier') && p.supplierTypes.length > 0 ? <span>کالاها: <b style={{ color: 'var(--text)' }}>{fmt.count(p.supplierTypes.length)}</b></span> : null}
                 </>}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -283,8 +286,8 @@ export default function ContactTabPanel({ tab, active, onEdit, onAdd }: Props) {
                     <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🛒 اطلاعات مشتری</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                       <Row l="نوع" v={CUSTOMER_TYPES.find(x => x[0] === p.customerType)?.[1] || '—'} />
-                      {p.trustScore && <Row l="اعتبار" v={`${toFa(p.trustScore)} از ۱۰`} />}
-                      {p.defaultDiscount && <Row l="تخفیف پیش‌فرض" v={`${toFa(p.defaultDiscount)}٪`} />}
+                      {p.trustScore && <Row l="اعتبار" v={`${fmt.num(p.trustScore)} از ۱۰`} />}
+                      {p.defaultDiscount && <Row l="تخفیف پیش‌فرض" v={`${fmt.num(p.defaultDiscount)}٪`} />}
                     </div>
                   </>
                 )}
@@ -311,8 +314,8 @@ export default function ContactTabPanel({ tab, active, onEdit, onAdd }: Props) {
                     <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>👷 اطلاعات کارگر</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                       {p.position && <Row l="سمت" v={p.position} />}
-                      {p.startDate && <Row l="تاریخ شروع" v={toFa(p.startDate)} />}
-                      {p.salaryAmount && <Row l={`حقوق ${SALARY_TYPES.find(x => x[0] === p.salaryType)?.[1] || ''}`} v={`${toFa(p.salaryAmount.toLocaleString('fa-IR'))} ت`} />}
+                      {p.startDate && <Row l="تاریخ شروع" v={fmt.date(p.startDate)} />}
+                      {p.salaryAmount && <Row l={`حقوق ${SALARY_TYPES.find(x => x[0] === p.salaryType)?.[1] || ''}`} v={fmt.money(p.salaryAmount)} />}
                       {p.insurance && <Row l="بیمه" v="دارد" accent />}
                     </div>
                   </>

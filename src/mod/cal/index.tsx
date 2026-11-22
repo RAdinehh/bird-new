@@ -1,3 +1,4 @@
+import { getGlobalFormat } from '../../shr/units/useFormat';
 import { useState, useMemo } from 'react';
 import { collectEvents, type EventType, type CalEvent } from './store';
 import MonthView from './MonthView';
@@ -113,7 +114,7 @@ export default function Cal() {
                   fontWeight: 700,
                   minWidth: 16,
                   textAlign: 'center'
-                }}>{toFa(count)}</span>
+                }}>{getGlobalFormat().count(count)}</span>
               ) : null}
             </button>
           );

@@ -1,3 +1,4 @@
+import { getGlobalFormat } from '../../shr/units/useFormat';
 import { toFa } from '../../shr/utils/fa';
 /**
  * toast.ts — سیستم Toast (پیام کوتاه بالای صفحه)
@@ -91,21 +92,21 @@ export const toastMsg = {
     showToast(name ? `«${name}» حذف شد` : 'حذف شد', 'error'),
 
   deletedBulk: (count: number, itemType: string) =>
-    showToast(`${toFa(count)} ${itemType} حذف شد`, 'error'),
+    showToast(`${getGlobalFormat().count(count)} ${itemType} حذف شد`, 'error'),
 
   // ─── آرشیو ───
   archived: (name?: string) =>
     showToast(name ? `«${name}» آرشیو شد` : 'آرشیو شد', 'warn'),
 
   archivedBulk: (count: number, itemType: string) =>
-    showToast(`${toFa(count)} ${itemType} آرشیو شد`, 'warn'),
+    showToast(`${getGlobalFormat().count(count)} ${itemType} آرشیو شد`, 'warn'),
 
   // ─── بازگردانی ───
   restored: (name: string) =>
     showToast(`«${name}» بازگردانی شد`, 'success'),
 
   restoredBulk: (count: number, itemType: string) =>
-    showToast(`${toFa(count)} ${itemType} بازگردانی شد`, 'success'),
+    showToast(`${getGlobalFormat().count(count)} ${itemType} بازگردانی شد`, 'success'),
 
   // ─── پنهان / نمایان ───
   hidden: (name: string) =>
