@@ -1,6 +1,8 @@
 /**
  * FlockDealSection.tsx — مدل بهره‌برداری (مالکیت، شراکت، امانی، اجاره)
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { Field, Grid2, MoneyField, NumField, Select } from '../../../shr/components/ui';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { useCtc } from '../../ctc/store';
@@ -52,6 +54,7 @@ const DISABLED_FIELD = {
 } as const;
 
 export default function FlockDealSection({ form, setForm, showError, markTouched }: Props) {
+  const fmt = useFormat();
   const contacts = useCtc((s: { contacts: Array<{ id: string; name: string }> }) => s.contacts) || [];
   const deals = useTra((s: { deals: Array<{ id: string; type: string; date: string }> }) => s.deals) || [];
 
@@ -154,7 +157,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
               <NumField value={form.partnerShare || ''} onChange={e => setForm({ ...form, partnerShare: e.target.value })} unit="٪" min={0} max={100} />
             </Field>
             <Field label="سهم من" hint="خودکار">
-              <div style={DISABLED_FIELD}>{toFa(String(myShare))}٪</div>
+              <div style={DISABLED_FIELD}>{fmt.count(myShare)}٪</div>
             </Field>
           </Grid2>
         </>
@@ -221,7 +224,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
           </Grid2>
           {rentAmountNum > 0 && form.rentPeriod !== 'total' && calcDays > 0 && (
             <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 4, paddingRight: 2 }}>
-              مبلغ کل دوره ({toFa(Math.max(1, Math.ceil(calcDays / (form.rentPeriod === 'season' ? 90 : 30))))} {form.rentPeriod === 'season' ? 'فصل' : 'ماه'}): {toFa(totalRentAmount.toLocaleString('fa-IR'))} تومان
+              مبلغ کل دوره ({fmt.count(Math.max(1, Math.ceil(calcDays / (form.rentPeriod === 'season' ? 90 : 30))))} {form.rentPeriod === 'season' ? 'فصل' : 'ماه'}): {fmt.money(totalRentAmount)}
             </div>
           )}
           <Grid2>
@@ -262,7 +265,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
                   }} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <MoneyField placeholder="مبلغ پرداخت" value={p.amount > 0 ? toFa(String(p.amount)) : ''} onChange={e => {
+                  <MoneyField placeholder="مبلغ پرداخت" value={p.amount > 0 ? fmt.raw.digits(String(p.amount), fmt.units.numberFormat) : ''} onChange={e => {
                     const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
                     const updated = (form.rentPayments || []).map((x, i) => i === idx ? { ...x, amount: raw } : x);
                     setForm({ ...form, rentPayments: updated });
@@ -297,11 +300,11 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
           )}
           {(form.rentPayments || []).length > 0 && (
             <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', textAlign: 'center', marginTop: 8 }}>
-              جمع پرداخت‌ها: {toFa(rentPaidTotal.toLocaleString('fa-IR'))} تومان
+              جمع پرداخت‌ها: {fmt.money(rentPaidTotal)}
               {totalRentAmount > 0 && (
                 rentPaidTotal === totalRentAmount ? ' · ✅ تسویه شده' :
-                rentPaidTotal > totalRentAmount ? ' · ❌ مازاد: ' + toFa((rentPaidTotal - totalRentAmount).toLocaleString('fa-IR')) :
-                ' · باقیمانده: ' + toFa((totalRentAmount - rentPaidTotal).toLocaleString('fa-IR'))
+                rentPaidTotal > totalRentAmount ? ' · ❌ مازاد: ' + fmt.money(rentPaidTotal - totalRentAmount) :
+                ' · باقیمانده: ' + fmt.money(totalRentAmount - rentPaidTotal)
               )}
               {rentPaidTotal > totalRentAmount && (
                 <div style={{ marginTop: 6, color: 'var(--danger)', fontWeight: 700, background: 'var(--danger-soft)', padding: '6px', borderRadius: 'var(--r-sm)' }}>

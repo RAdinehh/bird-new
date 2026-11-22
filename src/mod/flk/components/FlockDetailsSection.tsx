@@ -1,6 +1,8 @@
 /**
  * FlockDetailsSection.tsx — تاریخ‌ها + هزینه‌ها + واکسن + یادداشت
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { Field, Grid2, MoneyField, Textarea, Select } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 import { toFa } from '../../../shr/utils/fa';
@@ -24,6 +26,7 @@ interface Props {
 const dividerStyle = { paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' } as const;
 
 export default function FlockDetailsSection({ form, setForm, showError, markTouched, liveCosts, vaccineEnabled, isSourceLinked }: Props) {
+  const fmt = useFormat();
   return (
     <>
       <div style={dividerStyle}>📅 تاریخ‌ها</div>
@@ -77,28 +80,28 @@ export default function FlockDetailsSection({ form, setForm, showError, markTouc
         <div style={{ padding: 'var(--pad-comfy)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 'var(--fs-sm)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--muted)' }}>
             <span>قیمت پرنده‌ها:</span>
-            <span style={{ color: 'var(--text)', fontWeight: 600 }}>{toFa(liveCosts.bird.toLocaleString('fa-IR'))} ت</span>
+            <span style={{ color: 'var(--text)', fontWeight: 600 }}>{fmt.money(liveCosts.bird)}</span>
           </div>
           {liveCosts.del > 0 && (
             <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--muted)' }}>
               <span>هزینه حمل:</span>
-              <span style={{ color: 'var(--text)', fontWeight: 600 }}>{toFa(liveCosts.del.toLocaleString('fa-IR'))} ت</span>
+              <span style={{ color: 'var(--text)', fontWeight: 600 }}>{fmt.money(liveCosts.del)}</span>
             </div>
           )}
           {liveCosts.oth > 0 && (
             <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--muted)' }}>
               <span>سایر:</span>
-              <span style={{ color: 'var(--text)', fontWeight: 600 }}>{toFa(liveCosts.oth.toLocaleString('fa-IR'))} ت</span>
+              <span style={{ color: 'var(--text)', fontWeight: 600 }}>{fmt.money(liveCosts.oth)}</span>
             </div>
           )}
           <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--accent-border)', paddingTop: 6, marginTop: 2 }}>
             <span style={{ color: 'var(--accent)', fontWeight: 700 }}>جمع کل:</span>
-            <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{toFa(liveCosts.total.toLocaleString('fa-IR'))} ت</span>
+            <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{fmt.money(liveCosts.total)}</span>
           </div>
           {liveCosts.per > 0 && (
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: 'var(--accent)', fontWeight: 700 }}>💰 هر پرنده:</span>
-              <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{toFa(Math.round(liveCosts.per).toLocaleString('fa-IR'))} ت</span>
+              <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{fmt.money(Math.round(liveCosts.per))}</span>
             </div>
           )}
         </div>

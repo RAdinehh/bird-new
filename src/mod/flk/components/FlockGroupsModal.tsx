@@ -1,6 +1,8 @@
 /**
  * FlockGroupsModal.tsx — انتخاب گروه برای یک گله
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { useMemo, useState } from 'react';
 import { Modal, Btn, BtnRow } from '../../../shr/components/ui';
 import { useFlk, type Flock, type FlockGroupType } from '../store';
@@ -17,6 +19,7 @@ const TYPE_ICON: Record<FlockGroupType, string> = {
 };
 
 export default function FlockGroupsModal({ open, onClose, flock }: Props) {
+  const fmt = useFormat();
   const groups = useFlk(s => s.groups);
   const groupMembers = useFlk(s => s.groupMembers);
   const addToGroup = useFlk(s => s.addToGroup);
@@ -131,7 +134,7 @@ export default function FlockGroupsModal({ open, onClose, flock }: Props) {
 
       <BtnRow>
         <Btn variant="primary" onClick={handleSave}>
-          ذخیره ({toFa(localSelected.size)} انتخاب)
+          ذخیره ({fmt.count(localSelected.size)} انتخاب)
         </Btn>
         <Btn onClick={onClose}>لغو</Btn>
       </BtnRow>

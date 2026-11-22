@@ -2,7 +2,9 @@
  * FlockCard.tsx — کارت نمایش یک گله
  * طراحی: Grid2 برای فیلدهای کوتاه + EntityLink بین‌ماژولی
  */
-import { useFormat } from '../../../shr/units/useFormat';
+import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
+
+
 
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import {
@@ -337,7 +339,7 @@ export default function FlockCard(props: FlockCardProps) {
 
       <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📊 مشخصات</div>
       <RowGrid>
-        {f.initialCount != null && <Row l="تعداد اولیه" v={toFa(f.initialCount)} />}
+        {f.initialCount != null && <Row l="تعداد اولیه" v={getGlobalFormat().count(f.initialCount)} />}
         {f.initialCount != null && (() => {
           const evs = ((f as any).events || []).filter((e: any) => !e.revoked);
           const evSales = evs.filter((e: any) => e.type === 'sell').reduce((s: number, e: any) => s + (e.count || 0), 0);
@@ -345,7 +347,7 @@ export default function FlockCard(props: FlockCardProps) {
           const unmatched = Math.max(0, (f.initialCount ?? 0) - (f.currentCount ?? 0) - evSales - evDeaths - consignmentCount);
           return (
             <>
-              {evDeaths > 0 && <Row l="تلفات" v={`${fmt.int(evDeaths)} (${toFa(((evDeaths / (f.initialCount || 1)) * 100).toFixed(1))}٪)`} />}
+              {evDeaths > 0 && <Row l="تلفات" v={`${fmt.int(evDeaths)} (${getGlobalFormat().num((evDeaths / (f.initialCount || 1)) * 100)}٪)`} />}
               {evSales > 0 && <Row l="فروش" v={fmt.int(evSales)} />}
               {consignmentCount > 0 && <Row l="در دست طرف" v={fmt.int(consignmentCount)} />}
               {unmatched > 0 && <Row l="تعدیل نامشخص" v={`${fmt.int(unmatched)} (بررسی کنید)`} accent />}
@@ -373,7 +375,7 @@ export default function FlockCard(props: FlockCardProps) {
         {vaccineEnabled && f.vaccineScheduleId && (() => {
           const sch = getSchedule(f.vaccineScheduleId);
           if (!sch) return null;
-          return <Row l="برنامه واکسن" v={`${sch.label} • ${toFa(sch.items.length)} مرحله`} />;
+          return <Row l="برنامه واکسن" v={`${sch.label} • ${getGlobalFormat().count(sch.items.length)} مرحله`} />;
         })()}
       </RowGrid>
 
@@ -381,9 +383,9 @@ export default function FlockCard(props: FlockCardProps) {
         <>
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📅 تاریخ‌ها</div>
           <RowGrid>
-            {f.hatchDate && <Row l="هچ" v={toFa(f.hatchDate)} />}
-            {f.purchaseDate && <Row l="خرید" v={toFa(f.purchaseDate)} />}
-            {f.startDate && <Row l="شروع" v={toFa(f.startDate)} />}
+            {f.hatchDate && <Row l="هچ" v={getGlobalFormat().date(f.hatchDate)} />}
+            {f.purchaseDate && <Row l="خرید" v={getGlobalFormat().date(f.purchaseDate)} />}
+            {f.startDate && <Row l="شروع" v={getGlobalFormat().date(f.startDate)} />}
           </RowGrid>
         </>
       )}
@@ -446,11 +448,11 @@ export default function FlockCard(props: FlockCardProps) {
               )}
               <Row l="هزینه کل" v={fmt.money(totalCost)} />
               <Row l={isProfit ? 'سود خالص' : 'زیان'} v={fmt.money(Math.abs(profit))} accent={isProfit} />
-              {totalCost > 0 && <Row l="ROI" v={`${toFa(roi.toFixed(1))}٪`} />}
+              {totalCost > 0 && <Row l="ROI" v={`${getGlobalFormat().num(roi)}٪`} />}
               {dealType === 'partnership' && partnerShare > 0 && (
                 <>
-                  <Row l={`سهم شریک (${toFa(partnerShare)}٪)`} v={fmt.money(Math.round(profit * partnerShare / 100))} />
-                  <Row l={`سهم شما (${toFa(myShare)}٪)`} v={fmt.money(Math.round(profit * myShare / 100))} accent={isProfit} />
+                  <Row l={`سهم شریک (${getGlobalFormat().count(partnerShare)}٪)`} v={fmt.money(Math.round(profit * partnerShare / 100))} />
+                  <Row l={`سهم شما (${getGlobalFormat().count(myShare)}٪)`} v={fmt.money(Math.round(profit * myShare / 100))} accent={isProfit} />
                 </>
               )}
             </RowGrid>
@@ -478,7 +480,7 @@ export default function FlockCard(props: FlockCardProps) {
                   padding: '1px 6px',
                   borderRadius: 4,
                   fontWeight: 600,
-                }}>از {toFa(_count)} گله</span>
+                }}>از {getGlobalFormat().count(_count)} گله</span>
               </div>
               <button
                 type="button"

@@ -2,6 +2,8 @@
  * FlockHistoryModal.tsx — تاریخچه رویدادهای گله
  * ۳ تب با سلسله‌مراتب منطقی + موجودی تفکیک‌شده
  */
+import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useEffect, useState, useMemo, type ReactNode } from 'react';
 import { Btn, Select } from '../../../shr/components/ui';
 import { HistoryModalShell } from '../../../shr/components/history/HistoryModalShell';
@@ -51,6 +53,7 @@ interface Props {
 }
 
 export default function FlockHistoryModal({ open, onClose, flock }: Props) {
+  const fmt = useFormat();
   const [filter, setFilter] = useState<Filter>('all');
   const [tabMode, setTabMode] = useState<'events' | 'audit' | 'consumption'>('events');
   const [showAllEvents, setShowAllEvents] = useState(false);
@@ -132,14 +135,14 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
   const handleSaveCorrection = async () => {
     setValidationError('');
     if (num === 0) { setValidationError('عدد را وارد کنید'); return; }
-    if (newCount < 0) { setValidationError('موجودی کافی نیست — موجودی فعلی ' + toFa(current) + ' پرنده'); return; }
+    if (newCount < 0) { setValidationError('موجودی کافی نیست — موجودی فعلی ' + getGlobalFormat().count(current) + ' پرنده'); return; }
     if (num > 0 && newCount > initial) {
-      const ok = await showConfirmAsync('بیشتر از تعداد اولیه', 'تعداد جدید (' + toFa(newCount) + ') از تعداد اولیه (' + toFa(initial) + ') بیشتر می‌شود. ادامه؟');
+      const ok = await showConfirmAsync('بیشتر از تعداد اولیه', 'تعداد جدید (' + getGlobalFormat().count(newCount) + ') از تعداد اولیه (' + getGlobalFormat().count(initial) + ') بیشتر می‌شود. ادامه؟');
       if (!ok) return;
     }
     if (num < 0 && initial > 0 && newCount < initial * 0.1) {
       const pct = Math.round((newCount / initial) * 100);
-      const ok = await showConfirmAsync('هشدار موجودی کم', 'موجودی زیر ۱۰٪ می‌رود (' + toFa(pct) + '٪). ادامه؟');
+      const ok = await showConfirmAsync('هشدار موجودی کم', 'موجودی زیر ۱۰٪ می‌رود (' + getGlobalFormat().count(pct) + '٪). ادامه؟');
       if (!ok) return;
     }
     const label = REASON_OPTIONS.find(r => r.value === reasonCode)?.label || reasonCode;
@@ -151,7 +154,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
 
   const handleRevoke = async (e: FlockEvent) => {
     const info = TYPE_INFO[e.type] || { label: e.type, icon: '•' };
-    const ok = await showConfirmAsync('لغو رویداد', '«' + info.label + ' ' + toFa(e.count) + ' پرنده» لغو شود؟ یک رویداد اصلاح معکوس ثبت می‌شود.');
+    const ok = await showConfirmAsync('لغو رویداد', '«' + info.label + ' ' + getGlobalFormat().count(e.count) + ' پرنده» لغو شود؟ یک رویداد اصلاح معکوس ثبت می‌شود.');
     if (!ok) return;
     revokeEvent(flock.id, e.id);
   };
@@ -402,13 +405,13 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
           <span>
-            🐔 <b>{toFa(current)}</b> زنده
+            🐔 <b>{getGlobalFormat().count(current)}</b> زنده
             <span style={{ color: 'var(--muted)', margin: '0 6px' }}>·</span>
-            <span style={{ color: 'var(--muted)' }}>اولیه {toFa(initial)}</span>
+            <span style={{ color: 'var(--muted)' }}>اولیه {getGlobalFormat().count(initial)}</span>
           </span>
           {losses > 0 && (
             <span style={{ color: lossesPct > 5 ? 'var(--danger)' : 'var(--warn)', fontWeight: 700 }}>
-              {toFa(losses)} کاهش ({toFa(lossesPct.toFixed(1))}٪)
+              {fmt.count(losses)} کاهش ({fmt.num(lossesPct)}٪)
             </span>
           )}
           {flock.dealType && flock.dealType !== 'own' && (
@@ -432,16 +435,16 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
         border: '1px solid var(--border)',
       }}>
         <TabButton active={tabMode === 'events'} onClick={() => setTabMode('events')}>
-          📋 رویدادها ({toFa(totalCount)})
+          📋 رویدادها ({fmt.count(totalCount)})
         </TabButton>
         {auditCount > 0 && (
           <TabButton active={tabMode === 'audit'} onClick={() => setTabMode('audit')}>
-            ⚥ تعادل جنسیتی ({toFa(auditCount)})
+            ⚥ تعادل جنسیتی ({fmt.count(auditCount)})
           </TabButton>
         )}
         {consumptionCount > 0 && (
           <TabButton active={tabMode === 'consumption'} onClick={() => setTabMode('consumption')}>
-            🍽️ مصرف ({toFa(consumptionCount)})
+            🍽️ مصرف ({fmt.count(consumptionCount)})
           </TabButton>
         )}
       </div>
@@ -458,7 +461,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
                 if (n === 0) return null;
                 return (
                   <Chip key={t} active={filter === t} onClick={() => setFilter(filter === t ? 'all' : t)}>
-                    {TYPE_INFO[t].icon} {TYPE_INFO[t].label} ({toFa(n)})
+                    {TYPE_INFO[t].icon} {TYPE_INFO[t].label} ({fmt.count(n)})
                   </Chip>
                 );
               })}
@@ -491,15 +494,15 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
               <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>مقدار تغییر</span>
               <div style={{ display: 'flex', alignItems: 'center', background: 'var(--card)', border: '1px solid ' + (validationError ? 'var(--danger)' : 'var(--warn)'), borderRadius: 'var(--r-md)', height: 40, overflow: 'hidden', minWidth: 0 }}>
-                <button type="button" onClick={() => { const n = parseInt(toEn(delta), 10) || 0; setDelta(toFa(String(n + 1))); }} style={{ width: 32, height: '100%', border: 'none', background: 'transparent', fontSize: 18, fontWeight: num > 0 ? 700 : 400, color: num > 0 ? 'var(--accent)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderLeft: '1px solid var(--border)', flexShrink: 0, padding: 0 }}>+</button>
+                <button type="button" onClick={() => { const n = parseInt(toEn(delta), 10) || 0; setDelta(fmt.raw.digits(String(n + 1), fmt.units.numberFormat)); }} style={{ width: 32, height: '100%', border: 'none', background: 'transparent', fontSize: 18, fontWeight: num > 0 ? 700 : 400, color: num > 0 ? 'var(--accent)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderLeft: '1px solid var(--border)', flexShrink: 0, padding: 0 }}>+</button>
                 <input type="text" value={delta} onChange={e => {
                   const raw = toEn(e.target.value);
                   const isNegative = raw.startsWith('-') || raw.startsWith('−');
                   const digits = raw.replace(/[^0-9]/g, '');
-                  if (digits) { setDelta(toFa(isNegative ? '-' + digits : digits)); } else { setDelta(isNegative ? '−' : ''); }
+                  if (digits) { setDelta(fmt.raw.digits(isNegative ? '-' + digits : digits, fmt.units.numberFormat)); } else { setDelta(isNegative ? '−' : ''); }
                   setValidationError('');
                 }} inputMode="text" style={{ flex: 1, minWidth: 0, width: '100%', background: 'none', border: 'none', outline: 'none', fontFamily: 'monospace', fontSize: 'var(--fs-base)', fontWeight: 700, color: num > 0 ? 'var(--accent)' : num < 0 ? 'var(--danger)' : 'var(--text)', textAlign: 'center', padding: '0 4px', direction: 'ltr' }} />
-                <button type="button" onClick={() => { const n = parseInt(toEn(delta), 10) || 0; setDelta(toFa(String(n - 1))); }} style={{ width: 32, height: '100%', border: 'none', background: 'transparent', fontSize: 18, fontWeight: num < 0 ? 700 : 400, color: num < 0 ? 'var(--danger)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderRight: '1px solid var(--border)', flexShrink: 0, padding: 0 }}>−</button>
+                <button type="button" onClick={() => { const n = parseInt(toEn(delta), 10) || 0; setDelta(fmt.raw.digits(String(n - 1), fmt.units.numberFormat)); }} style={{ width: 32, height: '100%', border: 'none', background: 'transparent', fontSize: 18, fontWeight: num < 0 ? 700 : 400, color: num < 0 ? 'var(--danger)' : 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', borderRight: '1px solid var(--border)', flexShrink: 0, padding: 0 }}>−</button>
               </div>
             </div>
 
@@ -509,10 +512,10 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               <div style={{ background: 'var(--card)', border: '1px solid ' + (num !== 0 ? (newCount < 0 ? 'var(--danger)' : (newCount < initial * 0.1 ? 'var(--warn)' : 'var(--accent)')) : 'var(--warn)'), borderRadius: 'var(--r-md)', height: 40, padding: '0 4px', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden', minWidth: 0 }}>
                 <div dir="rtl" style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13 }}>
                   <span style={{ fontSize: 10, color: 'var(--muted)' }}>فعلی</span>
-                  <span style={{ fontFamily: 'monospace', fontWeight: 700, color: 'var(--text)' }}>{toFa(current)}</span>
+                  <span style={{ fontFamily: 'monospace', fontWeight: 700, color: 'var(--text)' }}>{getGlobalFormat().count(current)}</span>
                   <span style={{ color: 'var(--dim)', fontSize: 12 }}>←</span>
                   <span style={{ fontSize: 10, color: 'var(--muted)' }}>بعدی</span>
-                  {num === 0 ? <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 400, color: 'var(--dim)' }}>؟</span> : newCount < 0 ? <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, color: 'var(--danger)' }}>منفی</span> : num > 0 ? <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'var(--accent)' }}>{toFa(newCount)}</span> : <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'var(--danger)' }}>{toFa(newCount)}</span>}
+                  {num === 0 ? <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 400, color: 'var(--dim)' }}>؟</span> : newCount < 0 ? <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, color: 'var(--danger)' }}>منفی</span> : num > 0 ? <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'var(--accent)' }}>{getGlobalFormat().count(newCount)}</span> : <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'var(--danger)' }}>{getGlobalFormat().count(newCount)}</span>}
                 </div>
               </div>
             </div>
@@ -576,13 +579,13 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>📊 خلاصه ۳۰ روز اخیر</div>
               <div style={{ padding: '8px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 11 }}>
                 <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                  <span>🍽️ دان: <b>{toFa(consumptionSummary.totalFeedKg)} kg</b></span>
-                  <span>💧 آب: <b>{toFa(consumptionSummary.totalWaterL)} L</b></span>
-                  <span style={{ color: 'var(--muted)', fontSize: 10 }}>({toFa(consumptionSummary.eventCount)} رویداد)</span>
+                  <span>🍽️ دان: <b>{fmt.num(consumptionSummary.totalFeedKg)} kg</b></span>
+                  <span>💧 آب: <b>{fmt.num(consumptionSummary.totalWaterL)} L</b></span>
+                  <span style={{ color: 'var(--muted)', fontSize: 10 }}>({fmt.count(consumptionSummary.eventCount)} رویداد)</span>
                 </div>
                 {(consumptionSummary.bySex.male > 0 || consumptionSummary.bySex.female > 0) && (
                   <div style={{ marginTop: 4, fontSize: 10, color: 'var(--muted)' }}>
-                    ♂ نر: {toFa(consumptionSummary.bySex.male)} kg · ♀ ماده: {toFa(consumptionSummary.bySex.female)} kg
+                    ♂ نر: {fmt.num(consumptionSummary.bySex.male)} kg · ♀ ماده: {fmt.num(consumptionSummary.bySex.female)} kg
                   </div>
                 )}
               </div>
@@ -594,7 +597,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               <div style={{ padding: '8px 10px', background: fcrResult.confidence === 'exact' ? 'var(--accent-soft)' : 'var(--warn-soft)', border: `1px solid ${fcrResult.confidence === 'exact' ? 'var(--accent-border)' : 'var(--warn)'}`, borderRadius: 'var(--r-md)', fontSize: 11 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, marginBottom: 4 }}>
                   <span style={{ fontSize: 14, fontWeight: 700, color: fcrResult.confidence === 'exact' ? 'var(--accent)' : 'var(--warn)' }}>
-                    {toFa(fcrResult.fcr.toFixed(2))}
+                    {fmt.num(fcrResult.fcr)}
                   </span>
                   <span style={{ fontSize: 9, padding: '1px 5px', borderRadius: 3, background: fcrResult.confidence === 'exact' ? 'var(--accent)' : 'var(--warn)', color: 'white', fontWeight: 700 }}>
                     {fcrResult.confidence === 'exact' ? 'دقیق' : fcrResult.confidence === 'standard' ? 'استاندارد' : 'ناقص'}
@@ -602,7 +605,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
                 </div>
                 <div style={{ fontSize: 10, color: 'var(--muted)', lineHeight: 1.6 }}>
                   {fcrResult.note}<br />
-                  دان/پرنده: {toFa(fcrResult.feedPerBird)} kg
+                  دان/پرنده: {fmt.num(fcrResult.feedPerBird)} kg
                 </div>
               </div>
             </div>
@@ -979,7 +982,7 @@ function EventRow({ e, onRevoke }: { e: FlockEvent; onRevoke: () => void }) {
             textDecoration: isRevoked ? 'line-through' : 'none',
           }}
         >
-          {isPlus ? '+' : '-'}{toFa(e.count)}
+          {isPlus ? '+' : '-'}{getGlobalFormat().count(e.count)}
         </span>
         {isRevoked && (
           <span style={{
