@@ -111,7 +111,7 @@ export const EQUIP_UNITS_CORE: Record<string, EquipUnitDef> = {
   },
   drinker_auto_hanging: {
     primary: { label: 'تعداد', unit: 'عدد', defaultValue: 1 },
-    secondary: { label: 'ظرفیت', unit: 'راس', defaultValue: 90, hint: 'آبخوری زنگوله‌ای اتوماتیک (جامیکو): استاندارد ۷۵ تا ۱۰۰ پرنده' },
+    secondary: { label: 'ظرفیت', unit: 'راس', defaultValue: 90, hint: 'آبخوری آویز اتوماتیک (سوپاپ‌دار): استاندارد ۷۵ تا ۱۰۰ پرنده' },
     baseUnit: 'راس',
     calc: (p, s) => p * s,
     summaryLabel: 'راس',
