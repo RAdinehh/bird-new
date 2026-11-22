@@ -1,6 +1,8 @@
 /**
  * AlertsPage — هشدارها (carousel tabs مثل hal)
  */
+import { useFormat } from '../../shr/units/useFormat';
+
 import { useState, useEffect, useMemo } from 'react';
 import { useAlt, countByLevel } from './store';
 import { runRules } from './rules';
@@ -12,6 +14,7 @@ import HelpBanner from '../../shr/components/HelpBanner';
 type TabId = 'active' | 'history';
 
 export default function AlertsPage() {
+  const fmt = useFormat();
   const { alerts } = useAlt();
   const [tab, setTab] = useState<TabId>('active');
 
@@ -70,7 +73,7 @@ export default function AlertsPage() {
               padding: '1px 6px',
               borderRadius: 8,
               fontWeight: 700,
-            }}>{toFa(counts.total)}</span>
+            }}>{fmt.count(counts.total)}</span>
           ) : null}
         </div>
         <div
@@ -78,7 +81,7 @@ export default function AlertsPage() {
           onClick={() => { setInstant(); setTab('history'); }}
           style={tabStyle(tab === 'history')}
         >
-          تاریخچه ({toFa(historyCount)})
+          تاریخچه ({fmt.count(historyCount)})
         </div>
       </div>
 

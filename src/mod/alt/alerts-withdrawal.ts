@@ -3,6 +3,8 @@
  *
  * فقط وقتی features.withdrawal روشنه، از rules.ts اجرا می‌شه.
  */
+import { getGlobalFormat } from '../../shr/units/useFormat';
+
 import { useFlk } from '../flk/store';
 import { jalaliDate, todayJalali, type RuleAlert } from './alerts-helpers';
 import { toFa } from '../../shr/utils/fa';
@@ -27,8 +29,8 @@ export function detectWithdrawalAlerts(alerts: RuleAlert[]): void {
     const isCritical = daysLeft <= 3;
     const medName = aw.medicine || 'دارو';
     const message = isCritical
-      ? `دوره پرهیز ${toFa(daysLeft)} روز مونده — دارو: ${medName} — تا ${toFa(aw.until)}. فروش نکن.`
-      : `دوره پرهیز ${toFa(daysLeft)} روز مونده — دارو: ${medName} — تا ${toFa(aw.until)}.`;
+      ? `دوره پرهیز ${getGlobalFormat().count(daysLeft)} روز مونده — دارو: ${medName} — تا ${getGlobalFormat().date(aw.until)}. فروش نکن.`
+      : `دوره پرهیز ${getGlobalFormat().count(daysLeft)} روز مونده — دارو: ${medName} — تا ${getGlobalFormat().date(aw.until)}.`;
 
     alerts.push({
       level: isCritical ? 'critical' : 'important',

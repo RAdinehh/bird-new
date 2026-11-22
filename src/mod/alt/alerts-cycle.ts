@@ -4,6 +4,8 @@
  * - 🔚 پایان چرخه نزدیک (age ∈ [end-30, end])
  * - ⏰ شروع تخم‌گذاری نزدیک (age ∈ [start-14, start))
  */
+import { getGlobalFormat } from '../../shr/units/useFormat';
+
 import { useFlk, getAgeDays, type Flock } from '../flk/store';
 import { today, type RuleAlert } from './alerts-helpers';
 import { toFa } from '../../shr/utils/fa';
@@ -28,7 +30,7 @@ export function detectCycleAlerts(alerts: RuleAlert[]): void {
         level: 'critical',
         category: 'reproduction',
         title: `⏹ تخم‌گذاری متوقف: ${f.name}`,
-        message: `${toFa(age - end)} روز از پایان چرخه گذشته. گله را آرشیو یا تمدید کنید.`,
+        message: `${getGlobalFormat().count(age - end)} روز از پایان چرخه گذشته. گله را آرشیو یا تمدید کنید.`,
         source: 'flk',
         sourceId: f.id + ':cycle-stopped',
         date: today(),
@@ -39,7 +41,7 @@ export function detectCycleAlerts(alerts: RuleAlert[]): void {
         level: 'important',
         category: 'reproduction',
         title: `🔚 پایان چرخه نزدیک: ${f.name}`,
-        message: `${toFa(end - age)} روز تا پایان چرخه باقی مانده (در سن ${toFa(end)} روز)`,
+        message: `${getGlobalFormat().count(end - age)} روز تا پایان چرخه باقی مانده (در سن ${getGlobalFormat().count(end)} روز)`,
         source: 'flk',
         sourceId: f.id + ':cycle-ending',
         date: today(),
@@ -50,7 +52,7 @@ export function detectCycleAlerts(alerts: RuleAlert[]): void {
         level: 'info',
         category: 'reproduction',
         title: `⏰ شروع تخم‌گذاری نزدیک: ${f.name}`,
-        message: `${toFa(start - age)} روز تا شروع تخم‌گذاری (در سن ${toFa(start)} روز)`,
+        message: `${getGlobalFormat().count(start - age)} روز تا شروع تخم‌گذاری (در سن ${getGlobalFormat().count(start)} روز)`,
         source: 'flk',
         sourceId: f.id + ':cycle-starting',
         date: today(),

@@ -1,3 +1,4 @@
+import { getGlobalFormat } from '../../shr/units/useFormat';
 import { useAlt, type AlertLevel, type AlertCategory } from './store';
 import { useWhs, stockWarning, expiryWarning, daysToExpiry } from '../whs/store';
 import { useTra, remaining, ageDays, agingBucket } from '../tra/store';
@@ -47,7 +48,7 @@ export function detectAllAlerts(): RuleAlert[] {
         level: 'important',
         category: 'stock',
         title: 'موجودی کم: ' + item.name,
-        message: 'موجودی: ' + toFa(item.currentStock) + ' — حداقل: ' + toFa(item.minStock),
+        message: 'موجودی: ' + getGlobalFormat().num(item.currentStock) + ' — حداقل: ' + getGlobalFormat().num(item.minStock),
         source: 'whs',
         sourceId: item.id + ':stock-low',
         date: today(), notes: ''
@@ -79,7 +80,7 @@ export function detectAllAlerts(): RuleAlert[] {
         level: 'important',
         category: alertCat,
         title: 'نزدیک انقضا: ' + item.name,
-        message: toFa(days) + ' روز تا انقضا',
+        message: getGlobalFormat().num(days) + ' روز تا انقضا',
         source: 'whs',
         sourceId: item.id + ':expiring-soon',
         date: today(), notes: ''
@@ -96,7 +97,7 @@ export function detectAllAlerts(): RuleAlert[] {
             level: 'important',
             category: 'other',
             title: 'گارانتی نزدیک پایان: ' + item.name,
-            message: toFa(wDays) + ' روز تا پایان گارانتی — قبل از اتمام، بررسی کنید.',
+            message: getGlobalFormat().num(wDays) + ' روز تا پایان گارانتی — قبل از اتمام، بررسی کنید.',
             source: 'whs',
             sourceId: item.id + ':warranty-ending',
             date: today(), notes: ''
@@ -187,7 +188,7 @@ export function detectAllAlerts(): RuleAlert[] {
         level: 'important',
         category: 'payment',
         title: 'تعویق مکرر',
-        message: 'فاکتور ' + (inv.number || '—') + ' — ' + toFa(inv.deferrals.length) + ' بار تعویق شده است',
+        message: 'فاکتور ' + (inv.number || '—') + ' — ' + getGlobalFormat().num(inv.deferrals.length) + ' بار تعویق شده است',
         source: 'tra',
         sourceId: inv.id + ':frequent-deferrals',
         date: today(), notes: ''
@@ -201,7 +202,7 @@ export function detectAllAlerts(): RuleAlert[] {
         level: 'critical',
         category: 'payment',
         title: 'چک برگشتی',
-        message: 'فاکتور ' + (inv.number || '—') + ' — ' + toFa(_bouncedChecks.length) + ' چک برگشتی',
+        message: 'فاکتور ' + (inv.number || '—') + ' — ' + getGlobalFormat().num(_bouncedChecks.length) + ' چک برگشتی',
         source: 'tra',
         sourceId: inv.id + ':bounced-check',
         date: today(), notes: ''
@@ -214,8 +215,8 @@ export function detectAllAlerts(): RuleAlert[] {
         alerts.push({
           level: 'critical',
           category: 'payment',
-          title: 'طلب معوق ' + toFa(days) + ' روزه',
-          message: 'فاکتور ' + (inv.number || '—') + ' — مانده ' + toFa(rem.toLocaleString('fa-IR')) + ' ت',
+          title: 'طلب معوق ' + getGlobalFormat().num(days) + ' روزه',
+          message: 'فاکتور ' + (inv.number || '—') + ' — مانده ' + getGlobalFormat().money(rem) + ' ت',
           source: 'tra',
           sourceId: inv.id + ':overdue-receivable',
           date: today(), notes: ''
@@ -224,8 +225,8 @@ export function detectAllAlerts(): RuleAlert[] {
         alerts.push({
           level: 'important',
           category: 'payment',
-          title: 'طلب ' + toFa(days) + ' روزه',
-          message: 'مانده ' + toFa(rem.toLocaleString('fa-IR')) + ' ت از ' + (inv.number || '—'),
+          title: 'طلب ' + getGlobalFormat().num(days) + ' روزه',
+          message: 'مانده ' + getGlobalFormat().money(rem) + ' ت از ' + (inv.number || '—'),
           source: 'tra',
           sourceId: inv.id + ':receivable',
           date: today(), notes: ''
@@ -237,8 +238,8 @@ export function detectAllAlerts(): RuleAlert[] {
         alerts.push({
           level: 'critical',
           category: 'payment',
-          title: 'بدهی معوق ' + toFa(days) + ' روزه',
-          message: 'فاکتور ' + (inv.number || '—') + ' — مانده ' + toFa(rem.toLocaleString('fa-IR')) + ' ت',
+          title: 'بدهی معوق ' + getGlobalFormat().num(days) + ' روزه',
+          message: 'فاکتور ' + (inv.number || '—') + ' — مانده ' + getGlobalFormat().money(rem) + ' ت',
           source: 'tra',
           sourceId: inv.id + ':overdue-payable',
           date: today(), notes: ''
@@ -247,8 +248,8 @@ export function detectAllAlerts(): RuleAlert[] {
         alerts.push({
           level: 'important',
           category: 'payment',
-          title: 'بدهی ' + toFa(days) + ' روزه',
-          message: 'مانده ' + toFa(rem.toLocaleString('fa-IR')) + ' ت',
+          title: 'بدهی ' + getGlobalFormat().num(days) + ' روزه',
+          message: 'مانده ' + getGlobalFormat().money(rem) + ' ت',
           source: 'tra',
           sourceId: inv.id + ':payable',
           date: today(), notes: ''
@@ -278,7 +279,7 @@ export function detectAllAlerts(): RuleAlert[] {
           level: 'critical',
           category: 'other',
           title: 'پایان چرخه گله: ' + flock.name,
-          message: 'سن: ' + toFa(age) + ' از ' + toFa(cycleDays) + ' روز (' + toFa(Math.round(progress)) + '٪) — آماده‌ی جایگزینی فوری',
+          message: 'سن: ' + getGlobalFormat().num(age) + ' از ' + getGlobalFormat().num(cycleDays) + ' روز (' + getGlobalFormat().count(Math.round(progress)) + '٪) — آماده‌ی جایگزینی فوری',
           source: 'flk',
           sourceId: flock.id + ':end-cycle-95',
           date: today(), notes: ''
@@ -290,7 +291,7 @@ export function detectAllAlerts(): RuleAlert[] {
           level: 'important',
           category: 'other',
           title: 'نزدیک پایان چرخه: ' + flock.name,
-          message: 'سن: ' + toFa(age) + ' از ' + toFa(cycleDays) + ' روز (' + toFa(Math.round(progress)) + '٪) — برنامه‌ی جایگزینی',
+          message: 'سن: ' + getGlobalFormat().num(age) + ' از ' + getGlobalFormat().num(cycleDays) + ' روز (' + getGlobalFormat().count(Math.round(progress)) + '٪) — برنامه‌ی جایگزینی',
           source: 'flk',
           sourceId: flock.id + ':end-cycle-80',
           date: today(), notes: ''
@@ -302,7 +303,7 @@ export function detectAllAlerts(): RuleAlert[] {
           level: 'info',
           category: 'other',
           title: 'چرخه تمام شده: ' + flock.name,
-          message: 'سن: ' + toFa(age) + ' روز (از ' + toFa(cycleDays) + ' روز گذشته)',
+          message: 'سن: ' + getGlobalFormat().num(age) + ' روز (از ' + getGlobalFormat().num(cycleDays) + ' روز گذشته)',
           source: 'flk',
           sourceId: flock.id + ':cycle-over',
           date: today(), notes: ''
@@ -316,7 +317,7 @@ export function detectAllAlerts(): RuleAlert[] {
         level: 'info',
         category: 'reproduction',
         title: 'گله مادر — آماده‌ی جوجه‌کشی: ' + flock.name,
-        message: 'سن: ' + toFa(age) + ' روز — نطفه‌داری در اوج',
+        message: 'سن: ' + getGlobalFormat().num(age) + ' روز — نطفه‌داری در اوج',
         source: 'flk',
         sourceId: flock.id + ':breeder-optimal',
         date: today(), notes: ''
@@ -362,7 +363,7 @@ export function detectAllAlerts(): RuleAlert[] {
         level: 'critical',
         category: 'mortality',
         title: 'تلفات بالا در ' + (flock?.name || 'گله'),
-        message: toFa(deaths) + ' مورد در ' + toFa(log.date) + ' (' + toFa(mortality.toFixed(1)) + ' در هزار، حداکثر ' + toFa(maxMortalityPerThousand.toFixed(1)) + ')',
+        message: getGlobalFormat().num(deaths) + ' مورد در ' + getGlobalFormat().date(log.date) + ' (' + getGlobalFormat().num(mortality) + ' در هزار، حداکثر ' + getGlobalFormat().num(maxMortalityPerThousand) + ')',
         source: 'dlg',
         sourceId: log.id + ':high-mortality',
         date: log.date, notes: ''
@@ -372,7 +373,7 @@ export function detectAllAlerts(): RuleAlert[] {
         level: 'important',
         category: 'mortality',
         title: 'افزایش تلفات',
-        message: toFa(deaths) + ' مورد در ' + toFa(log.date),
+        message: getGlobalFormat().num(deaths) + ' مورد در ' + getGlobalFormat().date(log.date),
         source: 'dlg',
         sourceId: log.id + ':mortality',
         date: log.date, notes: ''
@@ -401,8 +402,8 @@ export function detectAllAlerts(): RuleAlert[] {
         alerts.push({
           level: 'critical',
           category: 'temp',
-          title: 'دمای بحرانی: ' + toFa(log.temperature) + '°C',
-          message: 'در ' + (flock?.name || 'گله') + ' — محدوده: ' + toFa(criticalLow) + '-' + toFa(criticalHigh) + '°C — تاریخ ' + toFa(log.date),
+          title: 'دمای بحرانی: ' + getGlobalFormat().num(log.temperature) + '°C',
+          message: 'در ' + (flock?.name || 'گله') + ' — محدوده: ' + getGlobalFormat().num(criticalLow) + '-' + getGlobalFormat().num(criticalHigh) + '°C — تاریخ ' + getGlobalFormat().date(log.date),
           source: 'dlg',
           sourceId: log.id + ':temp-critical',
           date: log.date, notes: ''
@@ -424,8 +425,8 @@ export function detectAllAlerts(): RuleAlert[] {
           alerts.push({
             level: 'important',
             category: 'humidity',
-            title: 'رطوبت خارج بازه: ' + toFa(log.humidity) + '٪',
-            message: 'در ' + (flock?.name || 'گله') + ' — محدوده: ' + toFa(humMin) + '-' + toFa(humMax) + '٪ — تاریخ ' + toFa(log.date),
+            title: 'رطوبت خارج بازه: ' + getGlobalFormat().num(log.humidity) + '٪',
+            message: 'در ' + (flock?.name || 'گله') + ' — محدوده: ' + getGlobalFormat().num(humMin) + '-' + getGlobalFormat().num(humMax) + '٪ — تاریخ ' + getGlobalFormat().date(log.date),
             source: 'dlg',
             sourceId: log.id + ':humidity',
             date: log.date, notes: ''
@@ -440,7 +441,7 @@ export function detectAllAlerts(): RuleAlert[] {
         level: 'important',
         category: 'ventilation',
         title: 'تهویه ضعیف',
-        message: 'در ' + (flock?.name || 'گله') + ' — بررسی فن‌ها و دریچه‌ها — تاریخ ' + toFa(log.date),
+        message: 'در ' + (flock?.name || 'گله') + ' — بررسی فن‌ها و دریچه‌ها — تاریخ ' + getGlobalFormat().date(log.date),
         source: 'dlg',
         sourceId: log.id + ':ventilation-low',
         date: log.date, notes: ''
@@ -453,7 +454,7 @@ export function detectAllAlerts(): RuleAlert[] {
         level: 'important',
         category: 'litter',
         title: 'بستر مرطوب',
-        message: 'در ' + (flock?.name || 'گله') + ' — خطر آمونیاک و بیماری — تاریخ ' + toFa(log.date),
+        message: 'در ' + (flock?.name || 'گله') + ' — خطر آمونیاک و بیماری — تاریخ ' + getGlobalFormat().date(log.date),
         source: 'dlg',
         sourceId: log.id + ':litter-wet',
         date: log.date, notes: ''
@@ -463,7 +464,7 @@ export function detectAllAlerts(): RuleAlert[] {
         level: 'info',
         category: 'litter',
         title: 'بستر کلوخه',
-        message: 'در ' + (flock?.name || 'گله') + ' — نیاز به زیر و رو کردن — تاریخ ' + toFa(log.date),
+        message: 'در ' + (flock?.name || 'گله') + ' — نیاز به زیر و رو کردن — تاریخ ' + getGlobalFormat().date(log.date),
         source: 'dlg',
         sourceId: log.id + ':litter-clumped',
         date: log.date, notes: ''
@@ -476,7 +477,7 @@ export function detectAllAlerts(): RuleAlert[] {
         level: 'important',
         category: 'behavior',
         title: 'پرنده‌های بی‌حال',
-        message: 'در ' + (flock?.name || 'گله') + ' — احتمال بیماری — تاریخ ' + toFa(log.date),
+        message: 'در ' + (flock?.name || 'گله') + ' — احتمال بیماری — تاریخ ' + getGlobalFormat().date(log.date),
         source: 'dlg',
         sourceId: log.id + ':behavior-lethargic',
         date: log.date, notes: ''
@@ -489,7 +490,7 @@ export function detectAllAlerts(): RuleAlert[] {
         level: 'important',
         category: 'behavior',
         title: 'سرفه — بیماری تنفسی محتمل',
-        message: 'در ' + (flock?.name || 'گله') + ' — بررسی فوری — تاریخ ' + toFa(log.date),
+        message: 'در ' + (flock?.name || 'گله') + ' — بررسی فوری — تاریخ ' + getGlobalFormat().date(log.date),
         source: 'dlg',
         sourceId: log.id + ':sound-cough',
         date: log.date, notes: ''
@@ -502,7 +503,7 @@ export function detectAllAlerts(): RuleAlert[] {
         level: 'important',
         category: 'behavior',
         title: 'عطسه — بیماری تنفسی محتمل',
-        message: 'در ' + (flock?.name || 'گله') + ' — تاریخ ' + toFa(log.date),
+        message: 'در ' + (flock?.name || 'گله') + ' — تاریخ ' + getGlobalFormat().date(log.date),
         source: 'dlg',
         sourceId: log.id + ':sound-sneeze',
         date: log.date, notes: ''
@@ -515,7 +516,7 @@ export function detectAllAlerts(): RuleAlert[] {
         level: 'important',
         category: 'behavior',
         title: 'توزیع گوشه‌گیر',
-        message: 'در ' + (flock?.name || 'گله') + ' — احتمال سرما یا استرس — تاریخ ' + toFa(log.date),
+        message: 'در ' + (flock?.name || 'گله') + ' — احتمال سرما یا استرس — تاریخ ' + getGlobalFormat().date(log.date),
         source: 'dlg',
         sourceId: log.id + ':distribution-cornered',
         date: log.date, notes: ''
@@ -531,8 +532,8 @@ export function detectAllAlerts(): RuleAlert[] {
           alerts.push({
             level: 'important',
             category: 'water',
-            title: 'نسبت آب/دان بالا: ' + toFa(ratio.toFixed(2)),
-            message: 'در ' + (flock?.name || 'گله') + ' — احتمال بیماری یا گرما — تاریخ ' + toFa(log.date),
+            title: 'نسبت آب/دان بالا: ' + getGlobalFormat().num(ratio),
+            message: 'در ' + (flock?.name || 'گله') + ' — احتمال بیماری یا گرما — تاریخ ' + getGlobalFormat().date(log.date),
             source: 'dlg',
             sourceId: log.id + ':water-ratio-high',
             date: log.date, notes: ''
@@ -541,8 +542,8 @@ export function detectAllAlerts(): RuleAlert[] {
           alerts.push({
             level: 'info',
             category: 'water',
-            title: 'نسبت آب/دان پایین: ' + toFa(ratio.toFixed(2)),
-            message: 'در ' + (flock?.name || 'گله') + ' — بررسی آبخوری — تاریخ ' + toFa(log.date),
+            title: 'نسبت آب/دان پایین: ' + getGlobalFormat().num(ratio),
+            message: 'در ' + (flock?.name || 'گله') + ' — بررسی آبخوری — تاریخ ' + getGlobalFormat().date(log.date),
             source: 'dlg',
             sourceId: log.id + ':water-ratio-low',
             date: log.date, notes: ''
@@ -557,7 +558,7 @@ export function detectAllAlerts(): RuleAlert[] {
         level: 'info',
         category: 'feed',
         title: 'دان مصرف محاسبه نشد',
-        message: 'در ' + (flock?.name || 'گله') + ' — ' + toFa(log.feedDelivered) + ' kg داده شد ولی مصرف صفر — تاریخ ' + toFa(log.date),
+        message: 'در ' + (flock?.name || 'گله') + ' — ' + getGlobalFormat().num(log.feedDelivered) + ' kg داده شد ولی مصرف صفر — تاریخ ' + getGlobalFormat().date(log.date),
         source: 'dlg',
         sourceId: log.id + ':feed-no-consumed',
         date: log.date, notes: ''
@@ -584,7 +585,7 @@ export function detectAllAlerts(): RuleAlert[] {
         level: 'important',
         category: 'reproduction',
         title: 'افت تخم‌گذاری در ' + (flock?.name || 'گله'),
-        message: 'نرخ: ' + toFa(rate.toFixed(1)) + '٪ در ' + toFa(p.date),
+        message: 'نرخ: ' + getGlobalFormat().num(rate) + '٪ در ' + getGlobalFormat().date(p.date),
         source: 'egg',
         sourceId: p.id + ':low-rate',
         date: p.date, notes: ''

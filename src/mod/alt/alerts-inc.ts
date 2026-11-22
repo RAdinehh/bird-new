@@ -2,6 +2,8 @@
  * alerts-inc.ts — هشدارهای جوجه‌کشی و انکوباسیون
  * جدا شده از rules.ts
  */
+import { getGlobalFormat } from '../../shr/units/useFormat';
+
 import { useInc, daysToHatch, isHatchWindow } from '../inc/store';
 import { useBrd } from '../brd/store';
 import { useSet } from '../set/store';
@@ -34,7 +36,7 @@ export function detectIncAlerts(alerts: RuleAlert[]): void {
         level: 'important',
         category: 'reproduction',
         title: '🔒 Lock-down امروز',
-        message: toFa(entry.count || 0) + ' تخم — چرخش قطع، رطوبت بالا',
+        message: getGlobalFormat().count(entry.count || 0) + ' تخم — چرخش قطع، رطوبت بالا',
         source: 'inc',
         sourceId: entry.id + ':lockdown',
         date: today(), notes: ''
@@ -46,7 +48,7 @@ export function detectIncAlerts(alerts: RuleAlert[]): void {
         level: 'critical',
         category: 'reproduction',
         title: '🐣 پنجره هچ باز است',
-        message: toFa(entry.count || 0) + ' تخم — ' + (days <= 0 ? 'امروز' : toFa(days) + ' روز تا هچ'),
+        message: getGlobalFormat().count(entry.count || 0) + ' تخم — ' + (days <= 0 ? 'امروز' : getGlobalFormat().count(days) + ' روز تا هچ'),
         source: 'inc',
         sourceId: entry.id + ':hatch-window',
         date: today(), notes: ''
@@ -56,7 +58,7 @@ export function detectIncAlerts(alerts: RuleAlert[]): void {
         level: 'info',
         category: 'reproduction',
         title: '📅 نزدیک هچ',
-        message: toFa(days) + ' روز تا هچ ' + toFa(entry.count || 0) + ' تخم',
+        message: getGlobalFormat().count(days) + ' روز تا هچ ' + getGlobalFormat().count(entry.count || 0) + ' تخم',
         source: 'inc',
         sourceId: entry.id + ':hatch-near',
         date: today(), notes: ''
@@ -77,8 +79,8 @@ export function detectIncAlerts(alerts: RuleAlert[]): void {
         alerts.push({
           level: 'important',
           category: 'reproduction',
-          title: '⏸ چرخش قطع — قبل از روز ' + toFa(lockDay),
-          message: toFa(entry.count || 0) + ' تخم — روز ' + toFa(age) + '، چرخش باید روشن باشه',
+          title: '⏸ چرخش قطع — قبل از روز ' + getGlobalFormat().count(lockDay),
+          message: getGlobalFormat().count(entry.count || 0) + ' تخم — روز ' + getGlobalFormat().count(age) + '، چرخش باید روشن باشه',
           source: 'inc',
           sourceId: entry.id + ':turning-off-early',
           date: today(), notes: ''
@@ -88,7 +90,7 @@ export function detectIncAlerts(alerts: RuleAlert[]): void {
           level: 'critical',
           category: 'reproduction',
           title: '🔄 چرخش روشن — باید قطع باشه',
-          message: toFa(entry.count || 0) + ' تخم — روز ' + toFa(age) + ' (بعد از lock-down)، فوراً چرخش رو قطع کن',
+          message: getGlobalFormat().count(entry.count || 0) + ' تخم — روز ' + getGlobalFormat().count(age) + ' (بعد از lock-down)، فوراً چرخش رو قطع کن',
           source: 'inc',
           sourceId: entry.id + ':turning-on-late',
           date: today(), notes: ''
@@ -113,8 +115,8 @@ export function detectIncAlerts(alerts: RuleAlert[]): void {
           alerts.push({
             level: far ? 'critical' : 'important',
             category: 'reproduction',
-            title: (tooFast ? '🔴 کاهش وزن تخم سریع' : '🟡 کاهش وزن تخم کند') + ' — ' + toFa(entry.count || 0) + ' تخم',
-            message: 'کاهش وزن: ' + toFa(pct) + '٪ (هدف: ' + toFa(minPct) + '-' + toFa(maxPct) + '٪) — روز ' + toFa(age) + (tooFast ? ' رطوبت کم است' : ' رطوبت زیاد است'),
+            title: (tooFast ? '🔴 کاهش وزن تخم سریع' : '🟡 کاهش وزن تخم کند') + ' — ' + getGlobalFormat().count(entry.count || 0) + ' تخم',
+            message: 'کاهش وزن: ' + getGlobalFormat().num(pct) + '٪ (هدف: ' + getGlobalFormat().num(minPct) + '-' + getGlobalFormat().num(maxPct) + '٪) — روز ' + getGlobalFormat().count(age) + (tooFast ? ' رطوبت کم است' : ' رطوبت زیاد است'),
             source: 'inc',
             sourceId: entry.id + ':weight-loss',
             date: today(), notes: ''
@@ -146,7 +148,7 @@ export function detectIncAlerts(alerts: RuleAlert[]): void {
         level: 'critical',
         category: 'temp',
         title: '🌡 EST خارج بازه — ' + device.name,
-        message: 'دمای پوسته تخم: ' + toFa(est) + '°C (هدف: ' + range + '°C) — تنظیم فوری دما',
+        message: 'دمای پوسته تخم: ' + getGlobalFormat().num(est) + '°C (هدف: ' + range + '°C) — تنظیم فوری دما',
         source: 'inc',
         sourceId: device.id + ':est-out',
         date: today(), notes: ''
@@ -160,7 +162,7 @@ export function detectIncAlerts(alerts: RuleAlert[]): void {
         level: 'critical',
         category: 'temp',
         title: '💨 CO₂ بالا — ' + device.name,
-        message: 'CO₂: ' + toFa(co2) + '٪ (حد مجاز: ' + toFa(std?.incubation?.co2MaxPct ?? 0.5) + '٪) — افزایش تهویه',
+        message: 'CO₂: ' + getGlobalFormat().num(co2) + '٪ (حد مجاز: ' + getGlobalFormat().num(std?.incubation?.co2MaxPct ?? 0.5) + '٪) — افزایش تهویه',
         source: 'inc',
         sourceId: device.id + ':co2-high',
         date: today(), notes: ''
@@ -174,7 +176,7 @@ export function detectIncAlerts(alerts: RuleAlert[]): void {
         level: 'critical',
         category: 'temp',
         title: '💨 O₂ پایین — ' + device.name,
-        message: 'O₂: ' + toFa(o2) + '٪ (حد مجاز: ' + toFa(std?.incubation?.o2MinPct ?? 20) + '٪) — افزایش تهویه',
+        message: 'O₂: ' + getGlobalFormat().num(o2) + '٪ (حد مجاز: ' + getGlobalFormat().num(std?.incubation?.o2MinPct ?? 20) + '٪) — افزایش تهویه',
         source: 'inc',
         sourceId: device.id + ':o2-low',
         date: today(), notes: ''

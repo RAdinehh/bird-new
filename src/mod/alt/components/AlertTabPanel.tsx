@@ -1,6 +1,8 @@
 /**
  * AlertTabPanel — محتوای یک تب از هشدارها (carousel)
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { useState, useMemo } from 'react';
 import { useAlt, LEVEL_LABEL, LEVEL_ICON, CATEGORY_LABEL, activeAlerts, countByLevel, type Alert, type AlertLevel } from '../store';
 import { runRules } from '../rules';
@@ -24,6 +26,7 @@ interface Props {
 }
 
 export default function AlertTabPanel({ tab, active: isActive }: Props) {
+  const fmt = useFormat();
   const { alerts, dismiss, snooze, restore, remove, clearAll } = useAlt();
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -151,10 +154,10 @@ export default function AlertTabPanel({ tab, active: isActive }: Props) {
               <ExpandableCard
                 key={a.id}
                 accent={accent}
-                index={toFa(i + 1)}
+                index={fmt.count(i + 1)}
                 iconEmoji={LEVEL_ICON[a.level]}
                 title={a.title}
-                subtitle={CATEGORY_LABEL[a.category] + ' • ' + toFa(a.date)}
+                subtitle={CATEGORY_LABEL[a.category] + ' • ' + fmt.date(a.date)}
                 isOpen={isOpen}
                 onToggle={() => setExpandedId(isOpen ? null : a.id)}
                 badge={<Tag tone={a.level === 'critical' ? 'red' : a.level === 'important' ? 'amber' : 'blue'}>{LEVEL_LABEL[a.level]}</Tag>}
@@ -171,9 +174,9 @@ export default function AlertTabPanel({ tab, active: isActive }: Props) {
                 <Row l="سطح" v={LEVEL_LABEL[a.level]} />
                 <Row l="دسته" v={CATEGORY_LABEL[a.category]} />
                 <Row l="منبع" v={a.source} />
-                <Row l="تاریخ هشدار" v={toFa(a.date)} />
+                <Row l="تاریخ هشدار" v={fmt.date(a.date)} />
                 {a.status === 'snoozed' && a.snoozeUntil ? (
-                  <Row l="به تعویق تا" v={toFa(a.snoozeUntil)} />
+                  <Row l="به تعویق تا" v={fmt.date(a.snoozeUntil)} />
                 ) : null}
 
                 <div style={{ display: 'flex', gap: 6, paddingTop: 4, flexWrap: 'wrap' }}>
@@ -223,7 +226,18 @@ export default function AlertTabPanel({ tab, active: isActive }: Props) {
   );
 }
 
-function CountBox({ label, count, color, icon }: { label: string; count: number; color: 'danger' | 'warn' | 'info'; icon: string }) {
+function CountBox({
+  label,
+  count,
+  color,
+  icon,
+}: {
+  label: string;
+  count: number;
+  color: 'danger' | 'warn' | 'info';
+  icon: string;
+}) {
+  const fmt = useFormat();
   return (
     <div style={{
       padding: '12px 10px', textAlign: 'center',
@@ -237,7 +251,7 @@ function CountBox({ label, count, color, icon }: { label: string; count: number;
         {label}
       </div>
       <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--' + color + ')', marginTop: 2 }}>
-        {toFa(count)}
+        {fmt.count(count)}
       </div>
     </div>
   );
