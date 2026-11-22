@@ -299,7 +299,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                   </span>
                   <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>
                     {it.quantity > 0 || it.unitPrice > 0
-                      ? `${toFa(it.quantity)} ${(UNIT_LABEL as any)[it.unit || 'pcs'] || 'عدد'} × ${toFa(it.unitPrice)} تومان`
+                      ? `${toFa(it.quantity)} ${(UNIT_LABEL as any)[it.unit || 'pcs'] || 'عدد'} × ${toFa((it.unitPrice || 0).toLocaleString('fa-IR'))} تومان`
                       : ''}
                   </span>
                 </div>

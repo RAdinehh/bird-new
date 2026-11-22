@@ -170,9 +170,20 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
         unitPrice: price,
         total: qty * price,
         equipmentId,
-        equipmentKind: eq ? (eq.kind || kindForType(eq.type)) : undefined,
-        equipmentCategory: eq?.category,
-        equipmentType: eq?.type,
+        equipmentKind: (() => {
+          const raw = eq?.kind || (eq ? kindForType(eq.type) : undefined);
+          return raw === 'consumable' ? 'consumable' : 'asset';
+        })(),
+        equipmentType: (() => {
+          const raw = eq?.kind || (eq ? kindForType(eq.type) : undefined);
+          return raw === 'consumable' ? 'consumable' : 'asset';
+        })(),
+        equipmentCategory: (() => {
+          const validCats = ['ventilation', 'feeding', 'watering', 'lighting', 'cage', 'other'];
+          if (eq?.category && validCats.includes(eq.category)) return eq.category;
+          if (eq?.category === 'drinking') return 'watering';
+          return 'other';
+        })(),
         hallId: eq?.hallId || '',
         zoneId: eq?.zoneId || '',
         brand: eq?.brand || '',
