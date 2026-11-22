@@ -2,6 +2,7 @@
  * InvoicePrint.tsx — بخش tra
  */
 import { useSet } from '../set/store';
+import { getGlobalFormat } from '../../shr/units/useFormat';
 import { useCtc } from '../ctc/store';
 import { PAYMENT_LABEL, remaining, paidSumAllocated, invoiceStatus, useTra, type Invoice } from './store';
 import { toFa } from '../../shr/utils/fa';
@@ -42,19 +43,19 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
       '<tr>' +
         '<td>' + (it.description || '—') + '</td>' +
         '<td>' + (it.unit || '—') + '</td>' +
-        '<td>' + toFa(it.quantity) + '</td>' +
-        '<td>' + toFa(it.unitPrice.toLocaleString('fa-IR')) + '</td>' +
-        '<td>' + toFa(it.total.toLocaleString('fa-IR')) + '</td>' +
+        '<td>' + getGlobalFormat().count(it.quantity) + '</td>' +
+        '<td>' + getGlobalFormat().money(it.unitPrice, { withUnit: false }) + '</td>' +
+        '<td>' + getGlobalFormat().money(it.total, { withUnit: false }) + '</td>' +
       '</tr>'
     )).join('');
 
     const paymentsRows = (invoice.payments || []).map(p => (
       '<tr>' +
         '<td>' + PAYMENT_LABEL[p.method] + '</td>' +
-        '<td>' + (p.date ? toFa(p.date) : '—') + '</td>' +
+        '<td>' + (p.date ? getGlobalFormat().date(p.date) : '—') + '</td>' +
         '<td>' + (p.checkNo ? p.checkNo : '—') + '</td>' +
         '<td>' + (p.bank ? p.bank : '—') + '</td>' +
-        '<td>' + toFa(p.amount.toLocaleString('fa-IR')) + '</td>' +
+        '<td>' + getGlobalFormat().money(p.amount, { withUnit: false }) + '</td>' +
       '</tr>'
     )).join('');
 
@@ -77,8 +78,8 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
           <h2>${title}</h2>
           <div class="farm-info">
             شماره: ${formatInvoiceNumber(invoice.number)}<br>
-            تاریخ: ${toFa(invoice.date)}<br>
-            ${invoice.dueDate ? 'سرسید — ' + toFa(invoice.dueDate) : ''}
+            تاریخ: ${getGlobalFormat().date(invoice.date)}<br>
+            ${invoice.dueDate ? 'سرسید — ' + getGlobalFormat().date(invoice.dueDate) : ''}
           </div>
         </div>
       </div>
@@ -111,15 +112,15 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
       </table>
 
       <table style="width: 60%; margin-right: auto; margin-left: auto;">
-        <tr><td>جمع کل اقلام:</td><td style="text-align: left;">${toFa(invoice.items.reduce((a, x) => a + x.total, 0).toLocaleString('fa-IR'))} تومان</td></tr>
+        <tr><td>جمع کل اقلام:</td><td style="text-align: left;">${getGlobalFormat().money(invoice.items.reduce((a, x) => a + x.total, 0))}</td></tr>
         ${(invoice.discount ||
           0) > 0 ? '<tr><td>تخفیف:</td><td style="text-align: left;">' + toFa((invoice.discount ||
           0).toLocaleString('fa-IR')) + ' ت</td></tr>' : ''}
         ${(invoice.shipping ||
           0) > 0 ? '<tr><td>حمل:</td><td style="text-align: left;">' + toFa((invoice.shipping ||
           0).toLocaleString('fa-IR')) + ' ت</td></tr>' : ''}
-        <tr class="total-row"><td>قیمت نهایی:</td><td style="text-align: left;">${toFa(invoice.total.toLocaleString('fa-IR'))} تومان</td></tr>
-        <tr><td>پرداخت‌شده:</td><td style="text-align: left;">${toFa(paid.toLocaleString('fa-IR'))} تومان</td></tr>
+        <tr class="total-row"><td>قیمت نهایی:</td><td style="text-align: left;">${getGlobalFormat().money(invoice.total)}</td></tr>
+        <tr><td>پرداخت‌شده:</td><td style="text-align: left;">${getGlobalFormat().money(paid)}</td></tr>
         ${rem > 0 ? '<tr class="total-row"><td>مانده:</td><td style="text-align: left; color: #d97706;">' + toFa(rem.toLocaleString('fa-IR')) + ' ت</td></tr>' : ''}
       </table>
 
@@ -139,7 +140,7 @@ export default function InvoicePrint({ invoice, onClose }: Props) {
         </table>
       ` : ''}
 
-      ${bankInfo ? '<div style="margin-top: 10px; font-size: 11px; color: #475569;">' + bankInfo + (settings.bank.cardNo ? ' — کارت: ' + toFa(settings.bank.cardNo) : '') + (settings.bank.sheba ? ' — شبا: ' + settings.bank.sheba : '') + '</div>' : ''}
+      ${bankInfo ? '<div style="margin-top: 10px; font-size: 11px; color: #475569;">' + bankInfo + (settings.bank.cardNo ? ' — کارت: ' + getGlobalFormat().code(settings.bank.cardNo) : '') + (settings.bank.sheba ? ' — شبا: ' + settings.bank.sheba : '') + '</div>' : ''}
 
       ${invoice.notes ? '<div style="margin-top: 10px; padding: 8px 10px; background: #f8fafc; border-radius: 6px; font-size: 11px; line-height: 36.8;"><b>یادداشت:</b> ' + invoice.notes + '</div>' : ''}
 

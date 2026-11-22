@@ -1,4 +1,5 @@
 import { Tag } from '../../shr/components/ui';
+import { useFormat } from '../../shr/units/useFormat';
 /**
  * ReceivablesPage — مطالبات/بدهی با aging
  */
@@ -31,6 +32,7 @@ import HelpBanner from '../../shr/components/HelpBanner';
 
 
 export default function ReceivablesPage({ active = true }: { active?: boolean } = {}) {
+  const fmt = useFormat();
   const { invoices, deals, updateInvoice, updateDeal, allocations, addReminder } = useTra();
   const navigate = useNavigate();
   const { contacts } = useCtc();
@@ -342,13 +344,13 @@ renderSummary={(d) => {
                         if (_c <= 0.5) return null;
                         return (
                           <span style={{ fontSize: 'var(--fs-2xs)', fontWeight: 700, padding: '2px 6px', borderRadius: 4, color: 'var(--accent)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                            ⚡ {toFa(_c.toLocaleString('fa-IR'))}
+                            ⚡ {fmt.count(_c)}
                           </span>
                         );
                       })()}
                     </div>
                     <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', flexShrink: 0, color: bal.balance > 0 ? 'var(--danger)' : bal.balance < 0 ? 'var(--accent)' : 'var(--muted)' }}>
-                      {toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} ت
+                      {fmt.money(Math.abs(bal.balance))}
                     </span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
@@ -375,28 +377,28 @@ renderDetails={(d) => {
                   return (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                       <div>
-                        <Line l="فروش کل" v={`${toFa(bal.totalSales.toLocaleString('fa-IR'))} تومان`} />
-                        <Line l="کمیسیون" v={`${toFa(bal.commission.toLocaleString('fa-IR'))} تومان`} />
-                        <Line l="سهم شما" v={`${toFa(bal.myShare.toLocaleString('fa-IR'))} تومان`} />
+                        <Line l="فروش کل" v={fmt.money(bal.totalSales)} />
+                        <Line l="کمیسیون" v={fmt.money(bal.commission)} />
+                        <Line l="سهم شما" v={fmt.money(bal.myShare)} />
                       </div>
                       <div>
-                        <Line l="دریافت‌شده" v={`${toFa(bal.paidIn.toLocaleString('fa-IR'))} تومان`} />
-                        <Line l="باقی‌مانده" v={<span style={{ fontWeight: 800, color: balColor }}>{toFa(Math.abs(bal.balance).toLocaleString('fa-IR'))} تومان</span>} />
+                        <Line l="دریافت‌شده" v={fmt.money(bal.paidIn)} />
+                        <Line l="باقی‌مانده" v={<span style={{ fontWeight: 800, color: balColor }}>{fmt.money(Math.abs(bal.balance))}ومان</span>} />
                       </div>
                       {(d.dueDate || (d.deferrals && d.deferrals.length > 0) || d.nextReminderAt || (d.reminderLog && d.reminderLog.length > 0)) && (
                         <div>
-                          {d.dueDate && <Line l="سرسید" v={toFa(d.dueDate)} />}
+                          {d.dueDate && <Line l="سرسید" v={fmt.date(d.dueDate)} />}
                           {d.deferrals && d.deferrals.length > 0 && (
                             <Line l="⏰ تعویق‌ها" v={
                               <button type="button" onClick={(e) => { e.stopPropagation(); setHistoryTarget({ kind: 'deal', id: d.id, label: d.dealNumber || d.id.slice(0,6), deferrals: d.deferrals }); }} style={{ background: 'transparent', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>
-                                {toFa(d.deferrals.length)} بار (مشاهده تاریخچه)
+                                {fmt.count(d.deferrals.length)} بار (مشاهده تاریخچه)
                               </button>
                             } />
                           )}
                           {d.reminderLog && d.reminderLog.length > 0 && (
-                            <Line l="آخرین یادآوری" v={`${toFa(d.reminderLog[d.reminderLog.length - 1].date)}${d.reminderLog[d.reminderLog.length - 1].methodLabel ? ' — ' + d.reminderLog[d.reminderLog.length - 1].methodLabel : ''}`} />
+                            <Line l="آخرین یادآوری" v={`${fmt.date(d.reminderLog[d.reminderLog.length - 1].date)}${d.reminderLog[d.reminderLog.length - 1].methodLabel ? ' — ' + d.reminderLog[d.reminderLog.length - 1].methodLabel : ''}`} />
                           )}
-                          {d.nextReminderAt && <Line l="یادآوری بعدی" v={toFa(d.nextReminderAt)} />}
+                          {d.nextReminderAt && <Line l="یادآوری بعدی" v={fmt.date(d.nextReminderAt)} />}
                         </div>
                       )}
                       <div style={{ display: 'flex', gap: 6, borderTop: '1px solid var(--border)', paddingTop: 12, marginTop: 8 }}>
@@ -440,13 +442,13 @@ renderSummary={(inv) => {
                       if (_c <= 0.5) return null;
                       return (
                         <span style={{ fontSize: 'var(--fs-2xs)', fontWeight: 700, padding: '2px 6px', borderRadius: 4, color: 'var(--accent)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                          ⚡ {toFa(_c.toLocaleString('fa-IR'))}
+                          ⚡ {fmt.count(_c)}
                         </span>
                       );
                     })()}
                   </div>
                   <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', flexShrink: 0, color: balColor }}>
-                    {toFa(rem.toLocaleString('fa-IR'))} ت
+                    {fmt.money(rem)}
                   </span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
@@ -494,16 +496,16 @@ renderDetails={(inv) => {
                 </div>
                 <div>
                   <Line l="پرداخت‌شده" v={`${toFa(paidSumAllocated(inv, allocations).toLocaleString('fa-IR'))} تومان`} />
-                  <Line l="باقی‌مانده" v={<span style={{ fontWeight: 800, color: balColor }}>{toFa(rem.toLocaleString('fa-IR'))} تومان</span>} />
+                  <Line l="باقی‌مانده" v={<span style={{ fontWeight: 800, color: balColor }}>{fmt.money(rem)}ومان</span>} />
                 </div>
                 {(inv.dueDate || (inv.deferrals && inv.deferrals.length > 0) || inv.nextReminderAt || (inv.reminderLog && inv.reminderLog.length > 0)) && (
                   <div>
-                    {inv.dueDate && <Line l="سرسید" v={toFa(inv.dueDate)} />}
+                    {inv.dueDate && <Line l="سرسید" v={fmt.date(inv.dueDate)} />}
                     {inv.deferrals && inv.deferrals.length > 0 && (
-                      <Line l="⏰ تعویق‌ها" v={<button type="button" onClick={(e) => { e.stopPropagation(); setHistoryTarget({ kind: 'invoice', id: inv.id, label: inv.number || inv.id.slice(0,6), deferrals: inv.deferrals }); }} style={{ background: 'transparent', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>{toFa(inv.deferrals.length)} بار (مشاهده تاریخچه)</button>} />
+                      <Line l="⏰ تعویق‌ها" v={<button type="button" onClick={(e) => { e.stopPropagation(); setHistoryTarget({ kind: 'invoice', id: inv.id, label: inv.number || inv.id.slice(0,6), deferrals: inv.deferrals }); }} style={{ background: 'transparent', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>{fmt.count(inv.deferrals.length)} بار (مشاهده تاریخچه)</button>} />
                     )}
-                    {inv.reminderLog && inv.reminderLog.length > 0 && <Line l="آخرین یادآوری" v={`${toFa(inv.reminderLog[inv.reminderLog.length - 1].date)}${inv.reminderLog[inv.reminderLog.length - 1].methodLabel ? ' — ' + inv.reminderLog[inv.reminderLog.length - 1].methodLabel : ''}`} />}
-                    {inv.nextReminderAt && <Line l="یادآوری بعدی" v={toFa(inv.nextReminderAt)} />}
+                    {inv.reminderLog && inv.reminderLog.length > 0 && <Line l="آخرین یادآوری" v={`${fmt.date(inv.reminderLog[inv.reminderLog.length - 1].date)}${inv.reminderLog[inv.reminderLog.length - 1].methodLabel ? ' — ' + inv.reminderLog[inv.reminderLog.length - 1].methodLabel : ''}`} />}
+                    {inv.nextReminderAt && <Line l="یادآوری بعدی" v={fmt.date(inv.nextReminderAt)} />}
                   </div>
                 )}
                 {(inv.workflowStatus || relatedDeal || inv.relatedFlockId || checkPending.length > 0) && (
@@ -511,7 +513,7 @@ renderDetails={(inv) => {
                     {inv.workflowStatus && <Line l="وضعیت" v={WORKFLOW_LABEL[inv.workflowStatus].replace(/^[^؀-ۿA-Za-z0-9]+/u, '')} />}
                     {relatedDeal && <Line l="معامله" v={relatedDeal.dealNumber || relatedDeal.id.slice(0, 6)} />}
                     {inv.relatedFlockId && <Line l="گله" v={inv.items?.[0]?.flockName || 'مشاهده'} />}
-                    {checkPending.length > 0 && <Line l="چک‌ها" v={`${toFa(checkPending.length)} در جریان (${toFa(checkPending.reduce((s, p) => s + (p.amount || 0), 0).toLocaleString('fa-IR'))} ت)`} />}
+                    {checkPending.length > 0 && <Line l="چک‌ها" v={`${fmt.count(checkPending.length)} در جریان (${fmt.money(checkPending.reduce((acc, p) => acc + (p.amount || 0), 0))})`} />}
                   </div>
                 )}
                 <div style={{ display: 'flex', gap: 6, borderTop: '1px solid var(--border)', paddingTop: 12, marginTop: 8 }}>

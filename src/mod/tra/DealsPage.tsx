@@ -1238,7 +1238,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
           {form.deliveries.map((dv, di) => (
             <div key={dv.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>تحویل {toFa(di + 1)}</span>
+                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>تحویل {fmt.count(di + 1)}</span>
                 <button type="button" onClick={() => setForm(f => ({ ...f, deliveries: f.deliveries.filter(x => x.id !== dv.id) }))} style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', color: 'var(--danger)', cursor: 'pointer', borderRadius: 'var(--r-sm)', width: 28, height: 28, padding: 0, fontFamily: 'inherit', fontWeight: 700 }}>✕</button>
               </div>
               <Grid2>
@@ -1572,7 +1572,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
           {calc.commission > 0 && (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 4, borderTop: '1px dashed var(--accent-border)' }}>
               <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>کمیسیون:</span>
-              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--warn)' }}>{toFa(calc.commission.toLocaleString('fa-IR'))}</span>
+              <span style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--warn)' }}>{fmt.money(calc.commission, { withUnit: false })}</span>
             </div>
           )}
 
