@@ -177,65 +177,6 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                       unit={def.secondary!.unit}
                       min={1}
                     />
-                    {(() => {
-                      const isFan = ["fan_tunnel", "fan_ceiling", "fan"].includes(form.type);
-                      if (!isFan) return null;
-                      const selHall = halls.find((h: Hall) => h.id === form.hallId);
-                      const fanCount = Math.max(1, parseInt(toEn(form.count || ""), 10) || 1);
-                      const capPerFan = Math.max(0, parseFloat(toEn(form.capacity || "")) || 0);
-                      const totalAirM3h = fanCount * capPerFan;
-
-                      const l = selHall?.length || 0;
-                      const w = selHall?.width || 0;
-                      const h = selHall?.height || 0;
-                      const hallVol = l > 0 && w > 0 && h > 0 ? l * w * h : 0;
-                      const changesPerHour = hallVol > 0 && totalAirM3h > 0 ? (totalAirM3h / hallVol) : 0;
-
-                      const hallCap = selHall?.capacity || 0;
-                      const stdCoef = stdForDefaults?.equipment?.fanM3PerKg || 4.5;
-                      const targetW = stdForDefaults?.growth?.weightByAge?.[stdForDefaults.growth.weightByAge.length - 1]?.weightG || 2000;
-                      const needM3h = hallCap > 0 ? Math.ceil(((hallCap * targetW) / 1000) * stdCoef) : 0;
-
-                      if (capPerFan <= 0 && !hallCap && !hallVol) return null;
-
-                      const isEnough = needM3h > 0 ? totalAirM3h >= needM3h : null;
-                      const bg = isEnough === null ? "var(--input-bg)" : isEnough ? "var(--accent-soft)" : "var(--danger-soft)";
-                      const fg = isEnough === null ? "var(--muted)" : isEnough ? "var(--accent)" : "var(--danger)";
-
-                      const achRateStr = changesPerHour >= 1
-                        ? changesPerHour.toFixed(1).replace(".", "٫")
-                        : changesPerHour > 0
-                          ? changesPerHour.toFixed(2).replace(".", "٫")
-                          : "";
-
-                      return (
-                        <div style={{
-                          marginTop: "6px",
-                          padding: "6px 8px",
-                          borderRadius: "var(--r-sm)",
-                          background: bg,
-                          color: fg,
-                          fontSize: "var(--fs-xs)",
-                          lineHeight: 1.6,
-                        }}>
-                          {capPerFan > 0 ? (
-                            <div>
-                              <strong>مجموع {toFa(Math.round(totalAirM3h))} m³/h</strong>
-                              {changesPerHour > 0 ? ` — حدود ${toFa(achRateStr)} بار در ساعت هوای سالن را خارج می‌کند` : ""}
-                              {needM3h > 0 ? (
-                                isEnough
-                                  ? ` • برای ${toFa(hallCap)} قطعه کافیه (نیاز ~${toFa(needM3h)})`
-                                  : ` • برای ${toFa(hallCap)} قطعه کم داره (نیاز ~${toFa(needM3h)})`
-                              ) : selHall ? " • ظرفیت سالن ثبت نشده" : ""}
-                            </div>
-                          ) : (
-                            <div>
-                              ظرفیت هر فن را وارد کن تا تعویض هوا و کفایت برای {selHall ? `سالن «${selHall.name}»` : "سالن"} محاسبه شود{needM3h > 0 ? ` (نیاز ~${toFa(needM3h)} m³/h)` : ""}.
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })()}
                   </Field>
                 ) : (
                   <Field label={(() => {
@@ -246,6 +187,67 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                   </Field>
                 )}
               </Grid2>
+
+                  {(() => {
+                    const isFan = ["fan_tunnel", "fan_ceiling", "fan"].includes(form.type);
+                    if (!isFan) return null;
+                    const selHall = halls.find((h: Hall) => h.id === form.hallId);
+                    const fanCount = Math.max(1, parseInt(toEn(form.count || ""), 10) || 1);
+                    const capPerFan = Math.max(0, parseFloat(toEn(form.capacity || "")) || 0);
+                    const totalAirM3h = fanCount * capPerFan;
+
+                    const l = selHall?.length || 0;
+                    const w = selHall?.width || 0;
+                    const h = selHall?.height || 0;
+                    const hallVol = l > 0 && w > 0 && h > 0 ? l * w * h : 0;
+                    const changesPerHour = hallVol > 0 && totalAirM3h > 0 ? (totalAirM3h / hallVol) : 0;
+
+                    const hallCap = selHall?.capacity || 0;
+                    const stdCoef = stdForDefaults?.equipment?.fanM3PerKg || 4.5;
+                    const targetW = stdForDefaults?.growth?.weightByAge?.[stdForDefaults.growth.weightByAge.length - 1]?.weightG || 2000;
+                    const needM3h = hallCap > 0 ? Math.ceil(((hallCap * targetW) / 1000) * stdCoef) : 0;
+
+                    if (capPerFan <= 0 && !hallCap && !hallVol) return null;
+
+                    const isEnough = needM3h > 0 ? totalAirM3h >= needM3h : null;
+                    const bg = isEnough === null ? "var(--input-bg)" : isEnough ? "var(--accent-soft)" : "var(--danger-soft)";
+                    const fg = isEnough === null ? "var(--muted)" : isEnough ? "var(--accent)" : "var(--danger)";
+
+                    const achRateStr = changesPerHour >= 1
+                      ? changesPerHour.toFixed(1).replace(".", "٫")
+                      : changesPerHour > 0
+                        ? changesPerHour.toFixed(2).replace(".", "٫")
+                        : "";
+
+                    return (
+                      <div style={{
+                        marginTop: 8,
+                        marginBottom: 8,
+                        padding: "8px 10px",
+                        borderRadius: "var(--r-sm)",
+                        background: bg,
+                        color: fg,
+                        fontSize: "var(--fs-sm)",
+                        lineHeight: 1.65,
+                      }}>
+                        {capPerFan > 0 ? (
+                          <div>
+                            <strong>مجموع {toFa(Math.round(totalAirM3h))} m³/h</strong>
+                            {changesPerHour > 0 ? ` — حدود ${toFa(achRateStr)} بار در ساعت هوای سالن را خارج می‌کند` : ""}
+                            {needM3h > 0 ? (
+                              isEnough
+                                ? ` • برای ${toFa(hallCap)} قطعه کافیه (نیاز ~${toFa(needM3h)})`
+                                : ` • برای ${toFa(hallCap)} قطعه کم داره (نیاز ~${toFa(needM3h)})`
+                            ) : selHall ? " • ظرفیت سالن ثبت نشده" : ""}
+                          </div>
+                        ) : (
+                          <div>
+                            ظرفیت هر فن را وارد کن تا تعویض هوا و کفایت برای {selHall ? `سالن «${selHall.name}»` : "سالن"} محاسبه شود{needM3h > 0 ? ` (نیاز ~${toFa(needM3h)} m³/h)` : ""}.
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
 
               {hasSec && (
                 <Grid2>
