@@ -189,38 +189,26 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               </Grid2>
 
                   {(() => {
-                    const isFan = ["fan_tunnel", "fan_ceiling", "fan"].includes(form.type);
-                    if (!isFan) return null;
-                    const selHall = halls.find((h: Hall) => h.id === form.hallId);
-                    const fanCount = Math.max(1, parseInt(toEn(form.count || ""), 10) || 1);
-                    const capPerFan = Math.max(0, parseFloat(toEn(form.capacity || "")) || 0);
-                    const totalAirM3h = fanCount * capPerFan;
+                    const t = form.type || "";
+                    const secVal = Math.max(0, parseFloat(toEn(form.capacity || "")) || 0);
+                    if (secVal <= 0) return null;
 
+                    const priVal = Math.max(1, parseFloat(toEn(form.count || "")) || 1);
+                    const totalVal = def.calc(priVal, secVal);
+                    if (totalVal <= 0) return null;
+
+                    const selHall = halls.find((h: Hall) => h.id === form.hallId);
+                    const hallCap = selHall?.capacity || 0;
                     const l = selHall?.length || 0;
                     const w = selHall?.width || 0;
                     const h = selHall?.height || 0;
-                    const hallVol = l > 0 && w > 0 && h > 0 ? l * w * h : 0;
-                    const changesPerHour = hallVol > 0 && totalAirM3h > 0 ? (totalAirM3h / hallVol) : 0;
-                    const changesPerMin = changesPerHour > 0 ? (changesPerHour / 60) : 0;
+                    const hallArea = l > 0 && w > 0 ? l * w : 0;
+                    const hallVol = hallArea > 0 && h > 0 ? hallArea * h : 0;
 
-                    const hallCap = selHall?.capacity || 0;
-                    const stdCoef = stdForDefaults?.equipment?.fanM3PerKg || 4.5;
-                    const targetW = stdForDefaults?.growth?.weightByAge?.[stdForDefaults.growth.weightByAge.length - 1]?.weightG || 2000;
-                    const needM3h = hallCap > 0 ? Math.ceil(((hallCap * targetW) / 1000) * stdCoef) : 0;
-
-                    if (capPerFan <= 0) return null;
-
-                    const isEnough = needM3h > 0 ? totalAirM3h >= needM3h : true;
                     const bg = "var(--accent-soft)";
                     const fg = "var(--accent)";
                     const dividerColor = "var(--accent-border)";
-
-                    const fmtRate = (n: number) => toFa(Math.round(n));
-                    const minRateLabel = changesPerMin >= 1
-                      ? `${fmtRate(changesPerMin)} بار در دقیقه`
-                      : changesPerMin > 0
-                        ? `هر ${toFa(Math.max(1, Math.round(1 / changesPerMin)))} دقیقه ۱ بار`
-                        : "";
+                    const fmtInt = (n: number) => toFa(Math.round(n));
 
                     const rowStyle: React.CSSProperties = {
                       display: "flex",
@@ -230,6 +218,66 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                       fontSize: "var(--fs-sm)",
                       lineHeight: 1.6,
                     };
+
+                    const isAirFlow = ["fan_tunnel", "fan_ceiling", "fan", "air_inlet", "swamp_cooler", "cooler"].includes(t);
+                    const isBirdCap = def.baseUnit === "راس";
+                    const isLamp = ["lamp_led", "lamp_fluorescent", "lamp"].includes(t);
+                    const isHeating = ["radiant_brooder", "jet_heater", "duct_heater", "heater"].includes(t);
+
+                    if (!isAirFlow && !isBirdCap && !isLamp && !isHeating) return null;
+
+                    const rows: { label: string; value: string }[] = [];
+                    let statusText = "";
+
+                    if (isAirFlow) {
+                      rows.push({ label: "مجموع هوادهی:", value: `${fmtInt(totalVal)} m³/h` });
+                      if (hallVol > 0) {
+                        const cph = totalVal / hallVol;
+                        const cpm = cph / 60;
+                        const minLabel = cpm >= 1
+                          ? `${fmtInt(cpm)} بار در دقیقه`
+                          : cpm > 0
+                            ? `هر ${toFa(Math.max(1, Math.round(1 / cpm)))} دقیقه ۱ بار`
+                            : "";
+                        rows.push({
+                          label: "تعویض هوای سالن:",
+                          value: minLabel ? `${fmtInt(cph)} بار در ساعت (${minLabel})` : `${fmtInt(cph)} بار در ساعت`,
+                        });
+                      }
+                      const isFanType = ["fan_tunnel", "fan_ceiling", "fan"].includes(t);
+                      if (isFanType && hallCap > 0) {
+                        const stdCoef = stdForDefaults?.equipment?.fanM3PerKg || 4.5;
+                        const targetW = stdForDefaults?.growth?.weightByAge?.[stdForDefaults.growth.weightByAge.length - 1]?.weightG || 2000;
+                        const needM3h = Math.ceil(((hallCap * targetW) / 1000) * stdCoef);
+                        rows.push({ label: `نیاز سالن (${toFa(hallCap)} قطعه):`, value: `${fmtInt(needM3h)} m³/h` });
+                        statusText = totalVal >= needM3h ? "کافیه" : "کم داره";
+                      } else if (hallCap > 0) {
+                        statusText = "ثبت شد";
+                      } else {
+                        statusText = "ثبت ظرفیت سالن برای بررسی کفایت";
+                      }
+                    } else if (isBirdCap) {
+                      rows.push({ label: "ظرفیت پوشش کل:", value: `${fmtInt(totalVal)} راس` });
+                      if (hallCap > 0) {
+                        rows.push({ label: "ظرفیت سالن:", value: `${toFa(hallCap)} راس` });
+                        statusText = totalVal >= hallCap ? "کافیه" : "کم داره";
+                      } else {
+                        statusText = "ثبت ظرفیت سالن برای بررسی کفایت";
+                      }
+                    } else if (isLamp) {
+                      rows.push({ label: "مجموع توان:", value: `${fmtInt(totalVal)} W` });
+                      if (hallArea > 0) {
+                        const wPerM2 = totalVal / hallArea;
+                        rows.push({ label: "توان هر مترمربع:", value: `${fmtInt(wPerM2)} W/m²` });
+                        statusText = wPerM2 >= 3 ? "کافیه" : "کم داره";
+                      } else {
+                        statusText = "ثبت ابعاد سالن برای بررسی کفایت";
+                      }
+                    } else if (isHeating) {
+                      rows.push({ label: "مجموع توان گرمایشی:", value: `${fmtInt(totalVal)} kW` });
+                      statusText = hallCap > 0 ? "ثبت شد" : "ثبت ظرفیت سالن برای بررسی کفایت";
+                    }
+
                     return (
                       <div style={{
                         marginTop: 8,
@@ -242,27 +290,12 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                         flexDirection: "column",
                         gap: 4,
                       }}>
-                        <div style={rowStyle}>
-                          <span>مجموع هوادهی:</span>
-                          <span style={{ fontWeight: 700 }}>{toFa(Math.round(totalAirM3h))} m³/h</span>
-                        </div>
-
-                        {changesPerHour > 0 && (
-                          <div style={rowStyle}>
-                            <span>تعویض هوای سالن:</span>
-                            <span style={{ fontWeight: 700 }}>
-                              {fmtRate(changesPerHour)} بار در ساعت ({minRateLabel})
-                            </span>
+                        {rows.map((r, idx) => (
+                          <div key={idx} style={rowStyle}>
+                            <span>{r.label}</span>
+                            <span style={{ fontWeight: 700 }}>{r.value}</span>
                           </div>
-                        )}
-
-                        {needM3h > 0 && (
-                          <div style={rowStyle}>
-                            <span>نیاز سالن ({toFa(hallCap)} قطعه):</span>
-                            <span style={{ fontWeight: 700 }}>{toFa(needM3h)} m³/h</span>
-                          </div>
-                        )}
-
+                        ))}
                         <div style={{
                           ...rowStyle,
                           marginTop: 4,
@@ -271,15 +304,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                           fontWeight: 700,
                         }}>
                           <span>وضعیت:</span>
-                          <span>
-                            {needM3h <= 0
-                              ? "ثبت ظرفیت سالن برای بررسی کفایت"
-                              : capPerFan <= 0
-                                ? "ظرفیت فن را وارد کنید"
-                                : isEnough
-                                  ? "کافیه"
-                                  : "کم داره"}
-                          </span>
+                          <span>{statusText}</span>
                         </div>
                       </div>
                     );
