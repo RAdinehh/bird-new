@@ -216,6 +216,11 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                     const dividerColor = "var(--accent-border)";
 
                     const fmtRate = (n: number) => toFa(Math.round(n));
+                    const minRateLabel = changesPerMin >= 1
+                      ? `${fmtRate(changesPerMin)} بار در دقیقه`
+                      : changesPerMin > 0
+                        ? `هر ${toFa(Math.max(1, Math.round(1 / changesPerMin)))} دقیقه ۱ بار`
+                        : "";
 
                     const rowStyle: React.CSSProperties = {
                       display: "flex",
@@ -225,7 +230,6 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                       fontSize: "var(--fs-sm)",
                       lineHeight: 1.6,
                     };
-
                     return (
                       <div style={{
                         marginTop: 8,
@@ -247,7 +251,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                           <div style={rowStyle}>
                             <span>تعویض هوای سالن:</span>
                             <span style={{ fontWeight: 700 }}>
-                              {fmtRate(changesPerHour)} بار در ساعت ({fmtRate(changesPerMin)} بار در دقیقه)
+                              {fmtRate(changesPerHour)} بار در ساعت ({minRateLabel})
                             </span>
                           </div>
                         )}
