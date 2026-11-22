@@ -393,10 +393,13 @@ export function useInvoiceForm(params: {
     if (kind === 'purchase' && !hasExistingLink) {
       const flkState = useFlk.getState();
       const duplicates: Array<{ item: any; dup: any }> = [];
+      const prevInvForDup = form.id ? invoices.find((i: any) => i.id === form.id) : undefined;
       for (const it of cleanedItems as any[]) {
         const cat = it.category || form.category;
         if (cat !== 'chick' && cat !== 'adult') continue;
         if (it.existingFlockId) continue;
+        const prevSameFlock = prevInvForDup && (prevInvForDup.items || []).find((pit: any) => pit.id === it.id && (pit.flockId || pit.existingFlockId));
+        if (prevSameFlock) continue;
         if (!it.birdId || !it.breedId) continue;
         const incomingHall = String(it.hallId || '');
         const dup = flkState.flocks.find((f: any) =>
@@ -432,33 +435,52 @@ export function useInvoiceForm(params: {
       }
     }
 
-    // ═══ 🆕 VALIDATION: چک ظرفیت سالن/بخش (Over-stocking & Transfer) ═══
+    // ═══ VALIDATION: چک ظرفیت سالن/بخش با پشتیبانی از ویرایش، تغییر گله و چند قلم هم‌زمان ═══
     if (kind === 'purchase') {
       const flkState = useFlk.getState();
       const halState = useHal.getState();
-      // breedStd now at top-level (was: useBreedStandard() — hook-in-async bug)
+      const prevInv = form.id ? invoices.find((i: any) => i.id === form.id) : undefined;
+      const prevItems = prevInv ? (prevInv.items || []) : [];
 
-      for (const it of cleanedItems) {
+      let virtualFlocks = flkState.flocks.map((f: any) => ({ ...f }));
+
+      if (prevInv) {
+        for (const pit of prevItems as any[]) {
+          const pCat = pit.category || prevInv.category;
+          if (pCat !== 'chick' && pCat !== 'adult') continue;
+          const pCount = Number(pit.healthyCount ?? pit.quantity) || 0;
+          const pFlockId = (prevInv as any).relatedFlockId || pit.flockId || pit.existingFlockId || '';
+          if (pFlockId && pCount > 0) {
+            virtualFlocks = virtualFlocks.map((vf: any) =>
+              vf.id === pFlockId
+                ? { ...vf, currentCount: Math.max(0, (vf.currentCount || 0) - pCount) }
+                : vf
+            );
+          }
+        }
+      }
+
+      for (let idx = 0; idx < cleanedItems.length; idx++) {
+        const it: any = cleanedItems[idx];
         const cat = it.category || form.category;
         if (cat !== 'chick' && cat !== 'adult') continue;
-        
+
         const newCount = Number(it.healthyCount ?? it.quantity) || 0;
         if (newCount <= 0) continue;
 
         if (it.existingFlockId) {
-          // جابه‌جایی یا افزایش گله موجود
-          const f = flkState.flocks.find(x => x.id === it.existingFlockId);
+          const f = virtualFlocks.find((x: any) => x.id === it.existingFlockId);
           if (!f) continue;
-          
+
           const targetHallId = it.hallId || f.hallId;
           const targetZoneId = it.zoneId !== undefined ? it.zoneId : f.zoneId;
-          
+
           if (targetHallId) {
             const totalFutureCount = (f.currentCount || 0) + newCount;
             const capCheck = checkHallCapacity(
-              targetHallId, targetZoneId, totalFutureCount, 
-              flkState.flocks, halState.halls, halState.zones, 
-              breedStd, it.existingFlockId, it.breedId || f.breedId // excludeFlockId: گله خودش را از ظرفیت قبلی کم می‌کند
+              targetHallId, targetZoneId, totalFutureCount,
+              virtualFlocks, halState.halls, halState.zones,
+              breedStd, it.existingFlockId, it.breedId || f.breedId
             );
 
             if (capCheck && !capCheck.ok) {
@@ -471,15 +493,25 @@ export function useInvoiceForm(params: {
               return;
             }
           }
+
+          virtualFlocks = virtualFlocks.map((vf: any) =>
+            vf.id === it.existingFlockId
+              ? {
+                  ...vf,
+                  currentCount: (vf.currentCount || 0) + newCount,
+                  hallId: targetHallId || vf.hallId,
+                  zoneId: targetZoneId !== undefined ? targetZoneId : vf.zoneId,
+                }
+              : vf
+          );
         } else {
-          // ایجاد گله جدید
           const hallId = it.hallId || '';
           const zoneId = it.zoneId || '';
-          
+
           if (hallId) {
             const capCheck = checkHallCapacity(
-              hallId, zoneId, newCount, 
-              flkState.flocks, halState.halls, halState.zones, 
+              hallId, zoneId, newCount,
+              virtualFlocks, halState.halls, halState.zones,
               breedStd, undefined, it.breedId
             );
 
@@ -493,6 +525,15 @@ export function useInvoiceForm(params: {
               return;
             }
           }
+
+          virtualFlocks.push({
+            id: `__virtual_${idx}`,
+            status: 'active',
+            hallId,
+            zoneId,
+            breedId: it.breedId || '',
+            currentCount: newCount,
+          });
         }
       }
     }

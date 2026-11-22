@@ -335,7 +335,16 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 } else {
                   updateItem({ existingFlockId: '', flockId: '' });
                 }
-              }} options={flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }))} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله" />
+              }} options={flocks.filter(f => f.status === 'active').map(f => {
+                const hallName = halls.find(h => h.id === f.hallId)?.name;
+                const countStr = typeof f.currentCount === 'number' ? `${getGlobalFormat().count(f.currentCount)} پرنده` : '';
+                const meta = [countStr, hallName].filter(Boolean).join(' • ');
+                const isLinked = Boolean(item.flockId && item.flockId === f.id);
+                return {
+                  value: f.id,
+                  label: `${isLinked ? '🟢 ' : ''}${f.name}${meta ? ` — ${meta}` : ''}`,
+                };
+              })} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله" />
           </Field>
         )}
 
@@ -446,7 +455,16 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 } else {
                   updateItem({ existingFlockId: v, flockId: v });
                 }
-              }} options={flocks.filter(f => f.status === 'active').map(f => ({ value: f.id, label: f.name }))} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله" />
+              }} options={flocks.filter(f => f.status === 'active').map(f => {
+                const hallName = halls.find(h => h.id === f.hallId)?.name;
+                const countStr = typeof f.currentCount === 'number' ? `${getGlobalFormat().count(f.currentCount)} پرنده` : '';
+                const meta = [countStr, hallName].filter(Boolean).join(' • ');
+                const isLinked = Boolean(item.flockId && item.flockId === f.id);
+                return {
+                  value: f.id,
+                  label: `${isLinked ? '🟢 ' : ''}${f.name}${meta ? ` — ${meta}` : ''}`,
+                };
+              })} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله" />
             </Field>
           ) : (
             <Field label="گله مبدأ" required error={err('flockId')} onTouch={touch('flockId')}>
