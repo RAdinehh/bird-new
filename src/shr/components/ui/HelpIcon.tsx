@@ -61,7 +61,7 @@ function renderBlock(block: string, idx: number) {
           style={{
             fontWeight: 800,
             fontSize: '13px',
-            color: 'var(--accent)',
+            color: 'var(--text)',
           }}
         >
           {title}
