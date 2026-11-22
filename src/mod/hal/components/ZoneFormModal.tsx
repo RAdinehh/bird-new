@@ -67,20 +67,17 @@ export default function ZoneFormModal({
         const hallBird = hall?.birdId ? birds.find((b) => b.id === hall.birdId) : null;
         const hallBreed = hall?.breedId ? breeds.find((b) => b.id === hall.breedId) : null;
         if (!hallBird && !hallBreed) return null;
+        const target = hallBird && hallBreed
+          ? `${hallBird.name} (${hallBreed.name})`
+          : (hallBird?.name || hallBreed?.name || "");
         return (
           <div style={{
-            fontSize: 'var(--fs-xs)', color: 'var(--muted)',
-            padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-            border: '1px dashed var(--border)', borderRadius: 'var(--r-sm)',
-            display: 'flex', alignItems: 'center', gap: 'var(--sp-2)',
-            lineHeight: 1.7, marginTop: 'calc(-1 * var(--sp-1))',
+            fontSize: "var(--fs-xs)",
+            color: "var(--muted)",
+            lineHeight: 1.6,
+            marginTop: "calc(-1 * var(--sp-1))",
           }}>
-            <span style={{ fontSize: 'var(--fs-sm)' }}>📋</span>
-            <span>
-              ارثی از سالن:
-              {hallBird ? ` 🐔 ${hallBird.name}` : ''}
-              {hallBreed ? ` • 🧬 ${hallBreed.name}` : ''}
-            </span>
+            این بخش طبق سالن برای <strong style={{ color: "var(--text)", fontWeight: 600 }}>{target}</strong> ثبت می‌شود
           </div>
         );
       })()}
