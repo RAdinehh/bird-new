@@ -21,8 +21,6 @@ import { useFilterSort, FilterBar, getTraReceivablesConfig, getTraDealsConfig } 
 import MultiPayModal from './components/MultiPayModal';
 import DealPayModal from './components/DealPayModal';
 import SummaryBox from './components/SummaryBox';
-import UpcomingDueSection from './components/UpcomingDueSection';
-import UpcomingDealsSection from './components/UpcomingDealsSection';
 import StatementModal from './components/StatementModal';
 import ApplyAdvanceModal from './components/ApplyAdvanceModal';
 import AgingBuckets from './components/AgingBuckets';
@@ -272,13 +270,6 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
 
       {/* خلاصه — یه خط */}
       <SummaryBox kind={kind} totalInvoiced={kind === 'deal' ? dealTotalMyShare : totalInvoiced} totalOpen={effectiveTotal} settledAmount={kind === 'deal' ? dealSettledAmount : settledAmount} dueSoonAmount={kind === 'deal' ? dealDueSoonAmount : dueSoonAmount} openCount={kind === 'deal' ? openDeals.length : openInvoices.length} />
-
-      {/* ⏰ سرسیدهای نزدیک — collapsible */}
-      {kind === 'deal' ? (
-        <UpcomingDealsSection deals={upcomingDeals} contacts={contacts} showUpcoming={showUpcoming} onToggle={() => setShowUpcoming(!showUpcoming)} onDefer={openDealDefer} />
-      ) : (
-        <UpcomingDueSection upcoming={upcoming} contacts={contacts} showUpcoming={showUpcoming} onToggle={() => setShowUpcoming(!showUpcoming)} onDefer={openDefer} />
-      )}
 
       {/* FilterBar */}
       {kind === 'deal' ? (
