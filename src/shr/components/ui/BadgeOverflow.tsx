@@ -28,14 +28,17 @@ export function BadgeOverflow({ badges, max = 2, modalTitle = 'برچسب‌ها
           title={'نمایش ' + toFa(hidden.length) + ' برچسب دیگر'}
           aria-label={'نمایش ' + toFa(hidden.length) + ' برچسب دیگر'}
           style={{
-            display: 'inline-flex', alignItems: 'center',
-            padding: '2px 7px',
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            height: 22,
+            padding: '0 7px',
             background: 'var(--input-bg)',
             border: '1px solid var(--border)',
             borderRadius: 'var(--r-sm)',
-            fontSize: 10, fontWeight: 700,
+            fontSize: 'var(--fs-xs)', fontWeight: 700,
             color: 'var(--muted)',
             cursor: 'pointer', fontFamily: 'inherit',
+            lineHeight: 1,
+            flexShrink: 0,
           }}
         >
           +{toFa(hidden.length)}

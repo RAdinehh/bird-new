@@ -45,15 +45,19 @@ export function Tag({
       style={{
         display: 'inline-flex',
         alignItems: 'center',
+        justifyContent: 'center',
         gap: 4,
+        height: 22,
+        minWidth: 46,
         fontSize: 'var(--fs-xs)',
         fontWeight: 700,
-        padding: '3px 8px',
+        padding: '0 8px',
         borderRadius: 'var(--r-sm)',
         background: t.bg,
         color: t.color,
         whiteSpace: 'nowrap',
-        lineHeight: 1.5,
+        lineHeight: 1,
+        flexShrink: 0,
       }}
     >
       {children}
