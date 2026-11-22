@@ -70,11 +70,11 @@ export const PLACEHOLDER_BY_TYPE: Record<string, string> = {
   feeder_pan:        'بشقابی ۴۰ سانت',
   feeder_chain:      'دانخوری زنجیری',
   feeder_tube:       'دانخوری لوله‌ای',
-  feeder_bucket:     'سطل لبه‌دار ۱۰ kg',
+  feeder_bucket:     'دانخوری سطلی ۱۰ کیلوگرمی',
   // آبخوری
   nipple:            'نیپل استیل',
   drinker_capsule:   'کپسولی ۱ لیتری',
-  drinker_auto_hanging: 'جامیکو ستاره',
+  drinker_auto_hanging: 'آبخوری آویز اتوماتیک',
   cup:               'کاپ آبخوری',
   trough:            'آبخوری ناودانی',
   fountain_drinker:  'کله‌قندی ۳ لیتری',
@@ -107,7 +107,7 @@ export const PLACEHOLDER_BY_TYPE: Record<string, string> = {
   water_filter:      'فیلتر آب',
   water_pipe:        'لوله پلی‌اتیلن',
   // ایمنی
-  fire_extinguisher: 'کپسول ۶ kg',
+  fire_extinguisher: 'کپسول ۶ کیلوگرمی',
   smoke_detector:    'دتکتور دود',
   emergency_light:   'چراغ اضطراری',
   first_aid:         'جعبه کمک‌های اولیه',
@@ -125,7 +125,7 @@ export const PLACEHOLDER_BY_TYPE: Record<string, string> = {
   // وزن‌کشی
   bird_scale:        'ترازو پرنده',
   feed_scale:        'ترازو دان',
-  platform_scale:    'باسکول ۵۰۰ kg',
+  platform_scale:    'باسکول ۵۰۰ کیلوگرمی',
   // سردکننده
   fogger:            'مه‌پاش',
   misting_system:    'سیستم مه‌پاش',
