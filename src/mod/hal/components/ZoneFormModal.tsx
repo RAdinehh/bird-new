@@ -67,9 +67,7 @@ export default function ZoneFormModal({
         const hallBird = hall?.birdId ? birds.find((b) => b.id === hall.birdId) : null;
         const hallBreed = hall?.breedId ? breeds.find((b) => b.id === hall.breedId) : null;
         if (!hallBird && !hallBreed) return null;
-        const target = hallBird && hallBreed
-          ? `${hallBird.name} (${hallBreed.name})`
-          : (hallBird?.name || hallBreed?.name || "");
+        const target = [hallBird?.name, hallBreed?.name].filter(Boolean).join(" ");
         return (
           <div style={{
             fontSize: "var(--fs-xs)",
@@ -77,7 +75,7 @@ export default function ZoneFormModal({
             lineHeight: 1.6,
             marginTop: "calc(-1 * var(--sp-1))",
           }}>
-            این بخش طبق سالن برای <strong style={{ color: "var(--text)", fontWeight: 600 }}>{target}</strong> ثبت می‌شود
+            ثبت شده طبق سالن برای <strong style={{ color: "var(--text)", fontWeight: 600 }}>{target}</strong>
           </div>
         );
       })()}
