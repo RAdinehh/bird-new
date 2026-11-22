@@ -76,7 +76,7 @@ export default function DeviceCard({
                     {d.warranty && <Row l="گارانتی" v={fmt.int(d.warranty) + ' ماه'} />}
                     {w && w.expired && (
                       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, padding: '4px 8px', background: 'var(--danger-soft)', borderRadius: 'var(--r-sm)', textAlign: 'center' }}>
-                        ⏰ گارانتی تمام شده ({fmt.date(w.end)})
+                        ⏰ اتمام گارانتی شده ({fmt.date(w.end)})
                       </div>
                     )}
                   </>

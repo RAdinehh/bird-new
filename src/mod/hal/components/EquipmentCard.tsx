@@ -78,7 +78,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                     {e.count ? <Tag tone="blue">{fmt.count(e.count)} {getUnitLabel(e.unit)}</Tag> : undefined}
                     {(() => {
                       const ws = getWarrantyStatus(e.purchasedAt, e.warranty);
-                      if (ws.status === 'expired') return <Tag tone="red">گارانتی تمام</Tag>;
+                      if (ws.status === 'expired') return <Tag tone="red">اتمام گارانتی</Tag>;
                       if (ws.status === 'expiring' && ws.daysLeft !== null) return <Tag tone="amber">{fmt.day(ws.daysLeft)} روز گارانتی</Tag>;
                       return null;
                     })()}
