@@ -24,7 +24,8 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
   const [isEditing, setIsEditing] = React.useState(false);
   const [localValue, setLocalValue] = React.useState<string>('');
   const parentValueStr = (value === undefined || value === null) ? '' : String(value);
-  const displayValue = getGlobalFormat().code(isEditing ? localValue : parentValueStr);
+  const rawVal = isEditing ? localValue : parentValueStr;
+  const displayValue = rawVal === '' ? '' : getGlobalFormat().code(rawVal);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let v = e.target.value;
