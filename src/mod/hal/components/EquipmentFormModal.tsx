@@ -208,7 +208,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                     const targetW = stdForDefaults?.growth?.weightByAge?.[stdForDefaults.growth.weightByAge.length - 1]?.weightG || 2000;
                     const needM3h = hallCap > 0 ? Math.ceil(((hallCap * targetW) / 1000) * stdCoef) : 0;
 
-                    if (capPerFan <= 0 && !hallCap && !hallVol) return null;
+                    if (capPerFan <= 0) return null;
 
                     const isEnough = needM3h > 0 ? totalAirM3h >= needM3h : true;
                     const bg = isEnough ? "var(--accent-soft)" : "var(--danger-soft)";
