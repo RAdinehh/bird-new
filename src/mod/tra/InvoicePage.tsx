@@ -1,3 +1,5 @@
+import { useHal } from '../hal/store';
+import { kindForType } from '../hal/api/equipmentCalc';
 /**
  * InvoicePage — صفحه مشترک خرید و فروش
  */
@@ -9,6 +11,7 @@ import {
   WORKFLOW_LABEL, calcDueDate, CHECK_STATUS_LABEL, nextWorkflowStatus, workflowTone,
   type Invoice, type WorkflowStatus,
 } from './store';
+import { getTodayJalali } from './calc';
 import { useWhs } from '../whs/store';
 import { useFlk } from '../flk/store';
 import { useCtc } from '../ctc/store';
@@ -136,42 +139,56 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
     }
   }, [parties, form.partyId, open]);
 
-  // بازکردن خودکار از URL (از EquipmentPage)
+  // بازکردن خودکار از URL (از EquipmentPage) — خواندن کامل تمام فیلدهای تجهیز از useHal
   useEffect(() => {
     if (!isPurchase) return;
     const flag = searchParams.get('_tra');
     if (flag !== 'equip') return;
 
     const equipmentId = searchParams.get('equipmentId') || '';
-    const name = searchParams.get('name') || 'تجهیز';
-    const qty = parseInt(searchParams.get('qty') || '1') || 1;
-    const price = parseInt(searchParams.get('price') || '0') || 0;
-
     if (!equipmentId) return;
 
-    const today = (() => {
-      const d = new Date();
-      return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
-    })();
+    const eq = useHal.getState().equipment.find(x => x.id === equipmentId);
+    const name = eq?.name || searchParams.get('name') || 'تجهیز';
+    const qty = eq?.count || parseInt(searchParams.get('qty') || '1') || 1;
+    const price = eq?.unitPrice || parseInt(searchParams.get('price') || '0') || 0;
+    const invoiceDate = eq?.purchasedAt || getTodayJalali();
 
     setForm({
       ...empty(true),
-      date: today,
+      date: invoiceDate,
+      dueDate: invoiceDate,
+      partyId: eq?.supplierId || '',
       category: 'equipment',
+      notes: eq?.notes || '',
       items: [{
         id: crypto.randomUUID(),
+        category: 'equipment',
         description: name,
-        unit: 'عدد',
+        unit: eq?.unit || 'pcs',
         quantity: qty,
         unitPrice: price,
         total: qty * price,
         equipmentId,
+        equipmentKind: eq ? (eq.kind || kindForType(eq.type)) : undefined,
+        equipmentCategory: eq?.category,
+        equipmentType: eq?.type,
+        hallId: eq?.hallId || '',
+        zoneId: eq?.zoneId || '',
+        brand: eq?.brand || '',
+        model: eq?.model || '',
+        warrantyMonths: eq?.warranty ?? null,
       } as any],
     });
     setErr('');
     setOpen(true);
 
-    try { setSearchParams({}); } catch {}
+    try {
+      const next = new URLSearchParams(searchParams);
+      next.delete('_tra');
+      next.delete('equipmentId');
+      setSearchParams(next, { replace: true });
+    } catch {}
   }, [searchParams, isPurchase]);
   useEffect(() => {
     if (!open) return;

@@ -279,13 +279,9 @@ export default function EquipmentCard(props: EquipmentCardProps) {
             hidden: !(e.unitPrice && e.unitPrice > 0 && !e.sourceInvoiceId && e.status !== 'retired'),
             onClick: () => {
               const params = new URLSearchParams({
+                tab: 'purchases',
                 _tra: 'equip',
                 equipmentId: e.id,
-                name: e.name,
-                type: e.type || 'other',
-                qty: String(e.count || 1),
-                price: String(e.unitPrice || 0),
-                hallId: e.hallId,
               });
               window.location.href = '/tra?' + params.toString();
             },
