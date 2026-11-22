@@ -52,7 +52,7 @@ const PRESETS: Record<string, Partial<F>> = {
   'مرغ-finisher':  { protein: '18',   energy: '3100', calcium: '1',   phosphorus: '0.45', methionine: '0.5',  lysine: '1.2' },
 };
 
-export default function RequirementsPage() {
+export default function RequirementsPage({ active = true }: { active?: boolean }) {
   const fmt = useFormat();
   const { requirements, addRequirement, updateRequirement, deleteRequirement } = useFed();
 
@@ -109,7 +109,7 @@ export default function RequirementsPage() {
     const lastR = requirements.filter(x => x.birdType).slice().reverse()[0];
     setForm({ ...empty(), ...(lastR?.birdType ? { birdType: lastR.birdType } : {}) }); setErr(''); setOpen(true);
   };
-  useFab({ label: 'افزودن نیاز', onClick: openNew });
+  useFab(active && requirements.length > 0 ? { label: 'افزودن نیاز', onClick: openNew } : null);
 
   const openEdit = (r: Requirement) => {
     setForm({

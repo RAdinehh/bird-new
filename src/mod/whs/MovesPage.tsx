@@ -119,7 +119,7 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
     });
     setErr(''); reset(); setOpen(true);
   };
-  useFab(active ? { label: 'ثبت تراکنش', onClick: openNew } : null);
+  useFab(active && movements.length > 0 ? { label: 'ثبت تراکنش', onClick: openNew } : null);
 
   const openEdit = (m: Movement) => {
     setForm({

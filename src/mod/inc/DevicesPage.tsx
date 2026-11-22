@@ -127,7 +127,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
     toastMsg.saved('قرائت');
   };
 
-  useFab(active ? { label: 'افزودن دستگاه', onClick: openNew } : null);
+  useFab(active && devices.length > 0 ? { label: 'افزودن دستگاه', onClick: openNew } : null);
 
 
 

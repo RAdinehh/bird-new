@@ -158,7 +158,7 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
     setOpenDiscard(false);
   };
 
-  useFab(active ? { label: 'ثبت تخم‌گذاری', onClick: openNew } : null);
+  useFab(active && productions.length > 0 ? { label: 'ثبت تخم‌گذاری', onClick: openNew } : null);
 
   const openEdit = (p: EggProduction) => {
     setForm({

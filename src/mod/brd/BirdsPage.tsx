@@ -120,7 +120,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
     
     setError(''); setOpen(true);
   };
-  useFab(active ? { label: 'افزودن پرنده', onClick: openNew } : null);
+  useFab(active && birds.length > 0 ? { label: 'افزودن پرنده', onClick: openNew } : null);
   const save = () => {
     attemptSave();
     if (!form.name.trim()) return;

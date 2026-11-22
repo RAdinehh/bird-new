@@ -243,7 +243,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     resetErrors();
     setErr(''); setOpen(true);
   };
-  useFab(active ? { label: 'افزودن معامله', onClick: openNew } : null);
+  useFab(active && deals.length > 0 ? { label: 'افزودن معامله', onClick: openNew } : null);
 
   const openEdit = (d: Deal) => {
     setForm({

@@ -25,7 +25,7 @@ export default function FilesPage() {
   const [totalBytes, setTotalBytes] = useState(0);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [uploadOpen, setUploadOpen] = useState(false);
-  useFab({ label: 'افزودن فایل', onClick: () => setUploadOpen(true) });
+  useFab(files.length > 0 ? { label: 'افزودن فایل', onClick: () => setUploadOpen(true) } : null);
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [refresh, setRefresh] = useState(0);
 

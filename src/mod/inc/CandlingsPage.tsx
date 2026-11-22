@@ -116,7 +116,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
     setUndoData(null);
   };
 
-  useFab(active ? { label: 'ثبت کندلینگ', onClick: () => handleOpenNew() } : null);
+  useFab(active && candlings.length > 0 ? { label: 'ثبت کندلینگ', onClick: () => handleOpenNew() } : null);
 
   const availableEntries = useMemo(() => {
     const dayNum = parseInt(toEn(modalDay)) || 0;

@@ -187,7 +187,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
     const lastR = items.filter(x => x.category).slice().reverse()[0];
     setForm({ ...empty(), ...(lastR?.category ? { category: lastR.category } : {}) }); setErr(''); reset(); setOpen(true);
   };
-  useFab(active ? { label: 'افزودن کالا', onClick: openNew } : null);
+  useFab(active && items.length > 0 ? { label: 'افزودن کالا', onClick: openNew } : null);
 
   /** اصلاح موجودی — از prompt می‌گیره، adjust می‌سازه */
   const adjustStock = async (it: Item) => {
@@ -483,7 +483,6 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
             icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>}
             title="نتیجه‌ای پیدا نشد"
             desc="هیچ کالایی با فیلترهای فعلی هم‌خوانی ندارد. فیلترها را تغییر دهید یا پاک کنید."
-            action={<Btn variant="primary" onClick={openNew}>+ افزودن قلم</Btn>}
           />
         )
       ) : (

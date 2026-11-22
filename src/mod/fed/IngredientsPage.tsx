@@ -21,7 +21,7 @@ import { toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
-export default function IngredientsPage() {
+export default function IngredientsPage({ active = true }: { active?: boolean }) {
   const fmt = useFormat();
   const { ingredients, addIngredient, updateIngredient, deleteIngredient } = useFed();
   const { items } = useWhs();
@@ -84,7 +84,7 @@ export default function IngredientsPage() {
     const lastR = ingredients.filter(x => x.category).slice().reverse()[0];
     setForm({ ...empty(), ...(lastR?.category ? { category: lastR.category } : {}) }); setErr(''); setOpen(true);
   };
-  useFab({ label: 'افزودن ماده اولیه', onClick: openNew });
+  useFab(active && ingredients.length > 0 ? { label: 'افزودن ماده اولیه', onClick: openNew } : null);
 
   // === انتخاب از کتابخانه ===
   const pickFromLibrary = (key: string) => {

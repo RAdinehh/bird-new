@@ -157,7 +157,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     },
   );
 
-  useFab(active ? { label: 'افزودن بخش', onClick: openNew } : null);
+  useFab(active && halls.length > 0 && zones.length > 0 ? { label: 'افزودن بخش', onClick: openNew } : null);
 
   /** 🆕 محاسبه hint ظرفیت */
   const hallCapForForm = (() => {

@@ -111,7 +111,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
     setInitialData({ id: '', birdId: birds[0]?.id || '', name: '', fcr: '', standardKey: '', purposes: [] });
     setOpen(true);
   };
-  useFab(active ? { label: 'افزودن نژاد', onClick: openNew } : null);
+  useFab(active && birds.length > 0 && breeds.length > 0 ? { label: 'افزودن نژاد', onClick: openNew } : null);
 
   if (birds.length === 0) {
     return (

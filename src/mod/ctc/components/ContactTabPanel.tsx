@@ -80,13 +80,14 @@ export default function ContactTabPanel({ tab, active, onEdit, onAdd }: Props) {
   const [undoData, setUndoData] = useState<{ item: Person | Person[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  useFab(active ? { label: 'افزودن مخاطب', onClick: onAdd } : null);
 
   // مرحله ۱: tab
   const tabFiltered = useMemo(() => {
     if (tab === 'all') return contacts;
     return contacts.filter(c => c.roles.includes(tab as Role));
   }, [contacts, tab]);
+
+  useFab(active && tabFiltered.length > 0 ? { label: 'افزودن مخاطب', onClick: onAdd } : null);
 
   // مرحله ۲: FilterBar
   const config = useMemo(() => getCtcContactsConfig(), []);

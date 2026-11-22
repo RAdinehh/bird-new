@@ -104,7 +104,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
     dataFor, updateData, toggleEntry, openNew, openEdit, vErrors, save,
   } = useHatchForm({ eggEntries, candlings, hatches, entriesById: _entriesById, addHatch, updateHatch });
 
-  useFab(active ? { label: 'ثبت هچ', onClick: () => openNew() } : null);
+  useFab(active && hatches.length > 0 ? { label: 'ثبت هچ', onClick: () => openNew() } : null);
 
   const undoDeleteHatch = () => {
     if (!undoData) return;

@@ -20,7 +20,7 @@ import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 import HelpBanner from '../../shr/components/HelpBanner';
 
-export default function FormulasPage() {
+export default function FormulasPage({ active = true }: { active?: boolean }) {
   const fmt = useFormat();
   const { ingredients, requirements, formulas, addFormula, updateFormula, deleteFormula } = useFed();
 
@@ -84,7 +84,7 @@ export default function FormulasPage() {
     });
     setErr(''); setOpen(true);
   };
-  useFab({ label: 'افزودن فرمول', onClick: openNew });
+  useFab(active && formulas.length > 0 ? { label: 'افزودن فرمول', onClick: openNew } : null);
 
   const openEdit = (f: Formula) => {
     setForm({

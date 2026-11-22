@@ -92,13 +92,13 @@ export default function Fed() {
           }}
         >
           <div key="ingredients" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
-            <IngredientsPage />
+            <IngredientsPage active={tab === 'ingredients'} />
           </div>
           <div key="requirements" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
-            <RequirementsPage />
+            <RequirementsPage active={tab === 'requirements'} />
           </div>
           <div key="formulas" style={{ flex: '0 0 100%', width: '100%', minWidth: 0, maxWidth: '100%', direction: 'rtl', overflow: 'hidden', boxSizing: 'border-box', isolation: 'isolate' }}>
-            <FormulasPage />
+            <FormulasPage active={tab === 'formulas'} />
           </div>
         </div>
       </div>

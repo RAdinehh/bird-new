@@ -226,7 +226,6 @@ useEffect(() => {
   const [groupBy, setGroupBy] = useState<string>(tab === 'history' ? 'flockId' : 'none');
   useEffect(() => { if (tab === 'history' && groupBy === 'none') setGroupBy('flockId'); }, [tab]);
 
-  useFab(active ? { label: 'ثبت امروز', onClick: () => setPickerOpen(true) } : null);
 
   const { filtered: list, filters, setFilter, clearFilter, sort, setSort, toggleSort,
           resetAll, hasActiveFilters, total, count } = useFilterSort<DailyLog>({
@@ -242,6 +241,8 @@ useEffect(() => {
     () => (isHistoryLimited ? sliceUpToDayBoundary(list, 100) : list),
     [isHistoryLimited, list]
   );
+
+  useFab(active && tab !== 'archive' && visibleList.length > 0 ? { label: 'ثبت امروز', onClick: () => setPickerOpen(true) } : null);
 
   const grouped = useGroupedList({ list: visibleList, groupDefs: config.groupDefs, groupBy, ctx: { flocks: activeFlocks } });
 

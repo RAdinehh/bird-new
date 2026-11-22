@@ -202,7 +202,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       });
     setErr(''); setDupError(null); setSaveAttempted(false); setOpen(true);
   };
-  useFab(active ? { label: 'افزودن سالن', onClick: openNew } : null);
+  useFab(active && halls.length > 0 ? { label: 'افزودن سالن', onClick: openNew } : null);
   const num = (s: string) => s ? parseFloat(toEn(s).replace('٫','.')) || null : null;
 
   // ═══ اعتبارسنجی زنده ═══

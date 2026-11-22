@@ -89,7 +89,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     saveForm(equipment, addEquip, updateEquip);
   };
 
-  useFab(active ? { label: 'افزودن تجهیز', onClick: handleOpenNew } : null);
+  useFab(active && halls.length > 0 && equipment.length > 0 ? { label: 'افزودن تجهیز', onClick: handleOpenNew } : null);
 
 
   // ═══ اعتبارسنجی زنده ═══
