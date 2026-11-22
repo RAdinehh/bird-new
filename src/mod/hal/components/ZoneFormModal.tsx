@@ -98,7 +98,7 @@ export default function ZoneFormModal({
               ? hallRemaining != null && hallRemaining > 0
                 ? `ظرفیت سالن: ${toFa(hallCap)} — باقی‌مونده: ${toFa(hallRemaining)}`
                 : `ظرفیت سالن: ${toFa(hallCap)} — اشغال کامل`
-              : 'ظرفیت سالن تنظیم نشده — از تب سالن‌ها تنظیم کن'
+              : 'ظرفیت در تب سالن‌ها تنظیم نشده'
           }
         >
           <NumField
