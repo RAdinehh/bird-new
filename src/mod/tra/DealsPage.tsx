@@ -233,13 +233,14 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
     const defaultX = lastRec?.partyId || '';
     const today = formatJ(new Date(), 'yyyy/MM/dd');
 
-    if (contacts.length === 0) { toastMsg.error('اول یک مخاطب بسازید'); return; }
+    const dealParties = contacts.filter(c => c.roles?.includes('customer') || c.roles?.includes('supplier'));
+    if (dealParties.length === 0) { toastMsg.error('اول یک خریدار یا فروشنده بسازید'); return; }
     const defaultDue = (() => {
       const d = new Date();
       d.setDate(d.getDate() + 30);
       return formatJ(d, 'yyyy/MM/dd');
     })();
-    setForm({ ...empty(), partyId: defaultX || contacts[0].id, date: today, dueDate: defaultDue, dealNumber: generateDealNumber(today, deals) });
+    setForm({ ...empty(), partyId: defaultX || dealParties[0].id, date: today, dueDate: defaultDue, dealNumber: generateDealNumber(today, deals) });
     resetErrors();
     setErr(''); setOpen(true);
   };
@@ -816,7 +817,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
             <SmartSelect
               value={form.partyId}
               onChange={v => setForm({...form, partyId: v})}
-              options={contacts.filter(c => c.roles?.includes('customer')).map(c => ({ value: c.id, label: c.name, subtitle: c.phone || undefined }))}
+              options={contacts.filter(c => c.roles?.includes('customer') || c.roles?.includes('supplier')).map(c => ({ value: c.id, label: c.name, subtitle: c.phone || undefined }))}
               placeholder="— انتخاب کنید —"
               modalTitle="انتخاب طرف معامله"
             />

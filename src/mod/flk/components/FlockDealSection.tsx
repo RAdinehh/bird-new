@@ -55,7 +55,8 @@ const DISABLED_FIELD = {
 
 export default function FlockDealSection({ form, setForm, showError, markTouched }: Props) {
   const fmt = useFormat();
-  const contacts = useCtc((s: { contacts: Array<{ id: string; name: string }> }) => s.contacts) || [];
+  const rawContacts = useCtc((s: { contacts: Array<{ id: string; name: string; roles?: string[] }> }) => s.contacts) || [];
+  const contacts = rawContacts.filter(c => (c.roles || []).includes('customer') || (c.roles || []).includes('supplier'));
   const deals = useTra((s: { deals: Array<{ id: string; type: string; date: string }> }) => s.deals) || [];
 
   const partnerShare = parseInt(toEn(form.partnerShare || '')) || 0;

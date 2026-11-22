@@ -204,7 +204,7 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
     ? contacts.filter(c => c.roles.includes('supplier'))
     : isSale
       ? contacts.filter(c => c.roles.includes('customer'))
-      : contacts;
+      : contacts.filter(c => c.roles.includes('customer') || c.roles.includes('supplier'));
   const partyRequired = isPurchase || isSale;
   const partyLabel = isPurchase
     ? 'فروشنده'

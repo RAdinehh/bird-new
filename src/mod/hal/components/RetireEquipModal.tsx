@@ -24,7 +24,8 @@ interface Props {
 
 export default function RetireEquipModal({ open, onClose, equipment, onConfirm }: Props) {
   const fmt = useFormat();
-  const contacts = useCtc(s => s.contacts);
+  const allContacts = useCtc(s => s.contacts);
+  const contacts = allContacts.filter(c => (c.roles || []).includes('customer'));
   const [reason, setReason] = useState<'sale' | 'scrap'>('sale');
   const [qtyStr, setQtyStr] = useState('1');
   const [salePrice, setSalePrice] = useState('');
