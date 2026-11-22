@@ -1,3 +1,4 @@
+import { useFormat } from "../../../shr/units/useFormat";
 import { useNavigate } from 'react-router-dom';
 /**
  * EquipmentCard — کارت تجهیز
@@ -39,6 +40,7 @@ export interface EquipmentCardProps {
 }
 
 export default function EquipmentCard(props: EquipmentCardProps) {
+  const fmt = useFormat();
   const navigate = useNavigate();
   const { e, i, hall, allCustomOpts, isOpen, ms, onToggle, onEdit, onDelete, onRetire, onRestore, onTransfer, onUndo, supplierNames,
         invoiceNumbers, whsItemNames, zoneNames } = props;
@@ -53,7 +55,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                 id={e.id}
                 ms={ms}
                 accent="accent"
-                index={toFa(i + 1)}
+                index={fmt.count(i + 1)}
                 iconEmoji={meta.icon}
                 title={e.name}
                 subtitle={[meta.name, e.brand, _isDeleted ? 'حذف‌شده' : null, hall?.name].filter(Boolean).join(' • ')}
@@ -73,24 +75,24 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                       if (!st) return null;
                       return <Tag tone={st.tone || 'gray'}>{st.name}</Tag>;
                     })()}
-                    {e.count ? <Tag tone="blue">{toFa(e.count)} {getUnitLabel(e.unit)}</Tag> : undefined}
+                    {e.count ? <Tag tone="blue">{fmt.count(e.count)} {getUnitLabel(e.unit)}</Tag> : undefined}
                     {(() => {
                       const ws = getWarrantyStatus(e.purchasedAt, e.warranty);
                       if (ws.status === 'expired') return <Tag tone="red">گارانتی تمام</Tag>;
-                      if (ws.status === 'expiring' && ws.daysLeft !== null) return <Tag tone="amber">{toFa(ws.daysLeft)} روز گارانتی</Tag>;
+                      if (ws.status === 'expiring' && ws.daysLeft !== null) return <Tag tone="amber">{fmt.day(ws.daysLeft)} روز گارانتی</Tag>;
                       return null;
                     })()}
                   </div>
                 }
                 stats={<>
-                  {value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{toFa(value.toLocaleString('fa-IR'))} ت</b></span>}
+                  {value > 0 && <span>ارزش: <b style={{ color: 'var(--text)' }}>{fmt.money(value)}</b></span>}
                   {e.warranty && (() => {
                     const ws = getWarrantyStatus(e.purchasedAt, e.warranty);
                     const color = ws.status === 'expired' ? 'var(--danger)' : ws.status === 'expiring' ? 'var(--warn)' : 'var(--text)';
                     return (
                       <span>
-                        گارانتی: <b style={{ color }}>{toFa(e.warranty)} ماه</b>
-                        {ws.endDate && <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-2xs)' }}> (تا {toFa(ws.endDate)}{ws.status === 'expired' ? ' — منقضی' : ws.daysLeft !== null && ws.daysLeft > 0 ? ` — ${toFa(ws.daysLeft)} روز مانده` : ''})</span>}
+                        گارانتی: <b style={{ color }}>{fmt.count(e.warranty)} ماه</b>
+                        {ws.endDate && <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-2xs)' }}> (تا {fmt.date(ws.endDate)}{ws.status === 'expired' ? ' — منقضی' : ws.daysLeft !== null && ws.daysLeft > 0 ? ` — ${fmt.day(ws.daysLeft)} روز مانده` : ''})</span>}
                       </span>
                     );
                   })()}
@@ -124,8 +126,8 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                   <>
                     <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📊 مشخصات</div>
                     <RowGrid>
-                      {e.count && <Row l="تعداد" v={`${toFa(e.count)} ${getUnitLabel(e.unit)}`} />}
-                      {e.capacity != null && e.capacity > 0 && <Row l="ظرفیت" v={toFa(e.capacity)} />}
+                      {e.count && <Row l="تعداد" v={`${fmt.count(e.count)} ${getUnitLabel(e.unit)}`} />}
+                      {e.capacity != null && e.capacity > 0 && <Row l="ظرفیت" v={fmt.num(e.capacity)} />}
                     </RowGrid>
                   </>
                 )}
@@ -136,9 +138,9 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                     <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>💰 مالی</div>
                     <RowGrid>
                       {e.unitPrice && <Row l="قیمت واحد" v={`${toFa(e.unitPrice.toLocaleString('fa-IR'))} ت`} />}
-                      {e.purchasedAt && <Row l="تاریخ خرید" v={toFa(e.purchasedAt)} />}
-                      {e.warranty && <Row l="گارانتی" v={`${toFa(e.warranty)} ماه`} />}
-                      {value > 0 && <Row l="ارزش کل" v={`${toFa(value.toLocaleString('fa-IR'))} ت`} accent />}
+                      {e.purchasedAt && <Row l="تاریخ خرید" v={fmt.date(e.purchasedAt)} />}
+                      {e.warranty && <Row l="گارانتی" v={`${fmt.count(e.warranty)} ماه`} />}
+                      {value > 0 && <Row l="ارزش کل" v={`${fmt.money(value)}`} accent />}
                     </RowGrid>
                   </>
                 )}
@@ -185,12 +187,12 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
                         <span style={{ color: 'var(--muted)' }}>قیمت خرید:</span>
-                        <b>{toFa((e.saleInfo.totalCost || 0).toLocaleString('fa-IR'))} ت</b>
+                        <b>{fmt.money(e.saleInfo.totalCost || 0)}</b>
                       </div>
                       {e.saleInfo.reason === 'sale' && (
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
                           <span style={{ color: 'var(--muted)' }}>مبلغ فروش:</span>
-                          <b>{toFa((e.saleInfo.salePrice || 0).toLocaleString('fa-IR'))} ت</b>
+                          <b>{fmt.money(e.saleInfo.salePrice || 0)}</b>
                         </div>
                       )}
                       <div style={{
@@ -204,7 +206,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                         color: e.saleInfo.profit >= 0 ? 'var(--accent)' : 'var(--danger)',
                       }}>
                         <span>{e.saleInfo.profit >= 0 ? '✅ سود:' : '❌ ضرر:'}</span>
-                        <b>{toFa(Math.abs(e.saleInfo.profit).toLocaleString('fa-IR'))} ت</b>
+                        <b>{fmt.money(Math.abs(e.saleInfo.profit))}</b>
                       </div>
                       {e.saleInfo.buyer && (
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
@@ -213,7 +215,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                         </div>
                       )}
                       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-                        📅 {toFa(e.saleInfo.soldAt)}
+                        📅 {fmt.date(e.saleInfo.soldAt)}
                       </div>
                       {e.saleInfo.note && (
                         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
@@ -245,7 +247,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                     fontWeight: 700,
                     color: 'var(--text)',
                   }}>
-                    🔀 تاریخچه جابجایی ({toFa(e.transferHistory.length)} مورد)
+                    🔀 تاریخچه جابجایی ({fmt.count(e.transferHistory.length)} مورد)
                   </summary>
                   <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
                     {e.transferHistory.slice().reverse().map((log) => (
@@ -260,10 +262,10 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                         }}
                       >
                         <div style={{ fontWeight: 600, color: 'var(--text)' }}>
-                          {log.fromHallName || '—'}{log.fromZoneName ? ` (${log.fromZoneName})` : ''} → {log.toHallName || '—'}{log.toZoneName ? ` (${log.toZoneName})` : ''}{log.count ? <span style={{ color: 'var(--accent)', marginRight: 6 }}>({toFa(log.count)} {getUnitLabel(e.unit)})</span> : null}
+                          {log.fromHallName || '—'}{log.fromZoneName ? ` (${log.fromZoneName})` : ''} → {log.toHallName || '—'}{log.toZoneName ? ` (${log.toZoneName})` : ''}{log.count ? <span style={{ color: 'var(--accent)', marginRight: 6 }}>({fmt.count(log.count)} {getUnitLabel(e.unit)})</span> : null}
                         </div>
                         <div style={{ color: 'var(--muted)', fontSize: 'var(--fs-2xs)', marginTop: 2 }}>
-                          📅 {toFa(log.date)}
+                          📅 {fmt.date(log.date)}
                           {log.note && <span> — {log.note}</span>}
                         </div>
                       </div>

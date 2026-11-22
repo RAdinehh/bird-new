@@ -1,3 +1,4 @@
+import { useFormat } from "../../../shr/units/useFormat";
 /**
  * CategoryPicker — انتخاب دسته‌ی تجهیز (Bottom Sheet + Portal)
  */
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export default function CategoryPicker({ open, onClose, onPick, grouped }: Props) {
+  const fmt = useFormat();
   if (!open) return null;
   return createPortal(
     <div
@@ -96,7 +98,7 @@ export default function CategoryPicker({ open, onClose, onPick, grouped }: Props
                   <CategoryIcon category={cat} size={18} weight="duotone" color={color} />
                 </span>
                 <span style={{ flex: 1, fontSize: 'var(--fs-base)', fontWeight: 600, color: 'var(--text)' }}>{label}</span>
-                {count > 0 && <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>{toFa(count)} مورد</span>}
+                {count > 0 && <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>{fmt.count(count)} مورد</span>}
               </button>
             );
           })}

@@ -1,3 +1,4 @@
+import { useFormat } from "../../../shr/units/useFormat";
 /**
  * ArchivePage — تب آرشیو hal (سالن + بخش + تجهیز)
  * الگو: Material 3 Segmented Control
@@ -18,6 +19,7 @@ type Seg = 'halls' | 'zones' | 'equip';
 interface Props { active?: boolean }
 
 export default function ArchivePage({ active = true }: Props = {}) {
+  const fmt = useFormat();
   const { halls, zones, equipment, updateHall, updateZone, updateEquip, deleteHall, deleteZone, deleteEquip } = useHal();
   const { flocks, update: updateFlock } = useFlk();
   const [seg, setSeg] = useState<Seg>('halls');
@@ -117,7 +119,7 @@ export default function ArchivePage({ active = true }: Props = {}) {
           }}>
             {segmented.map(s => (
               <TabButton key={s.id} active={seg === s.id} onClick={() => setSeg(s.id)}>
-                {s.label} ({toFa(s.count)})
+                {s.label} ({fmt.count(s.count)})
               </TabButton>
             ))}
           </div>

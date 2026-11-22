@@ -17,6 +17,7 @@ import MultiSelectBar from '../../shr/multiSelect/MultiSelectBar';
 import { useFilterSort, FilterBar, getHalZonesConfig } from '../../shr/filter';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
+import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
 import { Row, RowGrid } from './helpers';
 import ZoneFormModal from './components/ZoneFormModal';
 import ZoneCard from './components/ZoneCard';
@@ -27,6 +28,7 @@ import { showConfirmAsync } from '../../cor/store/dialog';
 import { logAction } from '../../cor/logger/auditLog';
 
 export default function ZonesPage({ active = true }: { active?: boolean } = {}) {
+  const fmt = useFormat();
   const { halls: _hallsRaw, zones: _zonesRaw, equipment, addZone, updateZone, deleteZone } = useHal();
   const { birds, breeds } = useBrd();
   const { flocks, update: updateFlock } = useFlk();
@@ -90,11 +92,11 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
         totalFlocks += flocks.filter((f: Flock) => f.zoneId === id).length;
         totalEquip += equipment.filter((e: Equipment) => e.zoneId === id).length;
       }
-      let delMsg = toFa(ids.length) + ' بخش حذف شوند؟';
+      let delMsg = `${getGlobalFormat().count(ids.length)} بخش حذف شوند؟`;
       if (totalFlocks > 0 || totalEquip > 0) {
         delMsg += '\n\n';
-        if (totalFlocks > 0) delMsg += '• ' + toFa(totalFlocks) + ' گله\n';
-        if (totalEquip > 0) delMsg += '• ' + toFa(totalEquip) + ' تجهیز\n';
+        if (totalFlocks > 0) delMsg += '• ' + `${getGlobalFormat().count(totalFlocks)} گله\n`;
+        if (totalEquip > 0) delMsg += '• ' + `${getGlobalFormat().count(totalEquip)} تجهیز\n`;
         delMsg += 'اتصال‌شون به این بخش‌ها قطع می‌شه.';
       }
       const ok = await showConfirmAsync('حذف گروهی', delMsg, { danger: true });
@@ -113,7 +115,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
       toastMsg.deletedBulk(backups.length, 'بخش')
     },
     onArchive: async (ids) => {
-      const ok = await showConfirmAsync('آرشیو گروهی', toFa(ids.length) + ' بخش آرشیو شوند؟', { danger: false });
+      const ok = await showConfirmAsync('آرشیو گروهی', `${getGlobalFormat().count(ids.length)} بخش آرشیو شوند؟`, { danger: false });
       if (!ok) return;
       for (const id of ids) {
         try { updateZone(id, { archived: true }); } catch {}
@@ -142,7 +144,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
 
   const openNew = () => { setForm({ id:'', hallId: halls[0]?.id || '', name:'', capacity:'', notes:'' }); setErr(''); setDupError(null); setSaveAttempted(false); setOpen(true); };
   const openEdit = (z: Zone) => { setForm({ id: z.id, hallId: z.hallId,
-     name: z.name, capacity: z.capacity ? toFa(z.capacity) : '', notes: z.notes }); setErr(''); setDupError(null); setSaveAttempted(false); setOpen(true); };
+     name: z.name, capacity: z.capacity ? fmt.raw.digits(String(z.capacity), fmt.units.numberFormat) : '', notes: z.notes }); setErr(''); setDupError(null); setSaveAttempted(false); setOpen(true); };
 
   const int = (s: string) => s ? parseInt(toEn(s)) || 0 : 0;
   const { errors: vErrors } = useValidation(
@@ -185,7 +187,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
       .reduce((s: number, z: Zone) => s + (z.capacity || 0), 0);
     const totalAfter = othersSum + cap;
     if (totalAfter > hallCap) {
-      return `جمع ظرفیت بخش‌ها (${toFa(totalAfter)}) از ظرفیت سالن (${toFa(hallCap)}) بیشتر می‌شود`;
+      return `جمع ظرفیت بخش‌ها (${fmt.count(totalAfter)}) از ظرفیت سالن (${fmt.count(hallCap)}) بیشتر می‌شود`;
     }
     return null;
   })();
@@ -252,8 +254,8 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     let delMsg = 'این منطقه حذف شود؟';
     if (flockCount > 0 || equipCount > 0) {
       delMsg += '\n\n';
-      if (flockCount > 0) delMsg += '• ' + toFa(flockCount) + ' گله\n';
-      if (equipCount > 0) delMsg += '• ' + toFa(equipCount) + ' تجهیز\n';
+      if (flockCount > 0) delMsg += '• ' + `${getGlobalFormat().count(flockCount)} گله\n`;
+      if (equipCount > 0) delMsg += '• ' + `${getGlobalFormat().count(equipCount)} تجهیز\n`;
       delMsg += 'اتصال‌شون قطع می‌شه.';
     }
     const ok = await showConfirmAsync('تأیید حذف', delMsg, { danger: true });
@@ -359,7 +361,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
             <div style={{ marginBottom: 4, fontWeight: 700 }}>⚠️ مجموع بخش‌ها بیشتر از ظرفیت سالن ئه</div>
             {offenders.map(o => (
               <div key={o.hall.name}>
-                · سالن <b>{o.hall.name}</b>: ظرفیت {toFa(o.hall.capacity || 0)} — بخش‌ها {toFa(o.sum)}
+                · سالن <b>{o.hall.name}</b>: ظرفیت {fmt.count(o.hall.capacity || 0)} — بخش‌ها {fmt.count(o.sum)}
               </div>
             ))}
             <div style={{ marginTop: 4, fontStyle: 'italic', opacity: 0.9 }}>

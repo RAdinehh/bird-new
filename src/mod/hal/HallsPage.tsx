@@ -21,7 +21,7 @@ import { useFilterSort, FilterBar, getHalHallsConfig } from '../../shr/filter';
 import HelpBanner from '../../shr/components/HelpBanner';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { useTempUnit } from '../../shr/utils/temp';
-import { useFormat } from '../../shr/units';
+import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
 import { type HallFormData, empty, calcSuggestedCapacity } from './_hallsHelpers';
 import { useHallsCascade } from './hooks/useHallsCascade';
 import UndoBar from '../../cor/ui/UndoBar';
@@ -33,6 +33,7 @@ import { getAgeDays } from '../flk/helpers-store';
 
 
 export default function HallsPage({ active = true }: { active?: boolean } = {}) {
+  const fmt = useFormat();
   const { halls: _hallsRaw, zones, equipment, addHall, updateHall, deleteHall } = useHal();
   const breedStd = useBreedStandard();
   const { flocks, update: updateFlock } = useFlk();
@@ -73,7 +74,6 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
   const __stdEnv = __breedStd?.env ? findInRange(__breedStd.env, __editingAge) : null;
   const __stdTemp = (__stdEnv as any)?.temp?.target ?? __breedStd?.env?.[0]?.temp?.target ?? null;
   const __stdHumidity = (__stdEnv as any)?.humidity?.min ?? __breedStd?.env?.[0]?.humidity?.min ?? null;
-  const fmt = useFormat();
 
   const halls = useMemo(() => {
     const seen = new Set<string>();
@@ -128,13 +128,13 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       const targetNames = ids.map(id => halls.find(h => h.id === id)?.name).filter(Boolean).join('، ');
       let msg = ids.length === 1 
         ? `آیا از حذف سالن «${targetNames}» مطمئن هستید؟\n\n`
-        : `آیا از حذف ${toFa(ids.length)} سالن (${targetNames}) مطمئن هستید؟\n\n`;
+        : `آیا از حذف ${getGlobalFormat().count(ids.length)} سالن (${targetNames}) مطمئن هستید؟\n\n`;
         
       if (totalZones > 0 || totalEquip > 0 || hasFlocks > 0) {
         msg += `📋 تأثیرات این حذف:\n`;
-        if (totalZones > 0) msg += `${toFa(totalZones)} بخش (Zone) به طور کامل حذف می‌شود.\n`;
-        if (totalEquip > 0) msg += `${toFa(totalEquip)} تجهیز متصل به این سالن حذف می‌شود.\n`;
-        if (hasFlocks > 0) msg += `${toFa(hasFlocks)} گله فعال بدون سالن می‌ماند (گله‌ها حذف نمی‌شوند).\n`;
+        if (totalZones > 0) msg += `${getGlobalFormat().count(totalZones)} بخش (Zone) به طور کامل حذف می‌شود.\n`;
+        if (totalEquip > 0) msg += `${getGlobalFormat().count(totalEquip)} تجهیز متصل به این سالن حذف می‌شود.\n`;
+        if (hasFlocks > 0) msg += `${getGlobalFormat().count(hasFlocks)} گله فعال بدون سالن می‌ماند (گله‌ها حذف نمی‌شوند).\n`;
       } else {
         msg += `این سالن هیچ بخش، تجهیز یا گله فعالی ندارد.`;
       }
@@ -154,7 +154,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
       toastMsg.deletedBulk(backups.length, 'سالن')
     },
     onArchive: async (ids) => {
-      const ok = await showConfirmAsync('آرشیو گروهی', toFa(ids.length) + ' سالن آرشیو شوند؟', { danger: false });
+      const ok = await showConfirmAsync('آرشیو گروهی', `${getGlobalFormat().count(ids.length)} سالن آرشیو شوند؟`, { danger: false });
       if (!ok) return;
       for (const id of ids) {
         try { updateHall(id, { archived: true }); } catch {}
@@ -187,11 +187,11 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
     setAutoFields(new Set());
     setForm({
       id: h.id, name: h.name, code: h.code,
-      length: h.length ? toFa(h.length) : '', width: h.width ? toFa(h.width) : '', height: h.height ? toFa(h.height) : '',
-      capacity: h.capacity ? toFa(h.capacity) : '', targetTemp: h.targetTemp ? toFa(h.targetTemp) : '',
-         targetHumidity: h.targetHumidity ? toFa(h.targetHumidity) : '',
+      length: h.length ? fmt.raw.digits(String(h.length), fmt.units.numberFormat) : '', width: h.width ? fmt.raw.digits(String(h.width), fmt.units.numberFormat) : '', height: h.height ? fmt.raw.digits(String(h.height), fmt.units.numberFormat) : '',
+      capacity: h.capacity ? fmt.raw.digits(String(h.capacity), fmt.units.numberFormat) : '', targetTemp: h.targetTemp ? fmt.raw.digits(String(h.targetTemp), fmt.units.numberFormat) : '',
+         targetHumidity: h.targetHumidity ? fmt.raw.digits(String(h.targetHumidity), fmt.units.numberFormat) : '',
         
-      ventilation: h.ventilation ? toFa(h.ventilation) : '', light: h.light ? toFa(h.light) : '',
+      ventilation: h.ventilation ? fmt.raw.digits(String(h.ventilation), fmt.units.numberFormat) : '', light: h.light ? fmt.raw.digits(String(h.light), fmt.units.numberFormat) : '',
       ventilationSystem: h.ventilationSystem || '',
       feederType: h.feederType || '',
       drinkerType: h.drinkerType || '',

@@ -13,6 +13,7 @@ import {
   type Equipment,
   type EquipmentCategory } from './store';
 import { toFa, toEn } from '../../shr/utils/fa';
+import { useFormat } from '../../shr/units/useFormat';
 import { toastMsg } from '../../cor/store/toast';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import { NEED_CALCULATORS, type NeedInput } from './needs';
@@ -58,6 +59,7 @@ const TONE_LABEL: Record<Tone, string> = {
 };
 
 export function HallEquipSection({ hallId, needInput, legacy }: Props) {
+  const fmt = useFormat();
   const { equipment, addEquip, updateEquip, deleteEquip } = useHal();
 
   const [open, setOpen] = useState(false);
@@ -191,8 +193,8 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
 
   const openEdit = (e: Equipment) => {
     setEditId(e.id);
-    setEditCount(e.count ? toFa(e.count) : '');
-    setEditCap(e.capacity ? toFa(e.capacity) : '');
+    setEditCount(e.count ? fmt.raw.digits(String(e.count), fmt.units.numberFormat) : '');
+    setEditCap(e.capacity ? fmt.raw.digits(String(e.capacity), fmt.units.numberFormat) : '');
   };
 
   const saveEdit = () => {
@@ -256,7 +258,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
           <span style={{
             fontSize: 'var(--fs-2xs)', fontWeight: 600, padding: 'var(--pad-chip-xs)',
             borderRadius: 'var(--r-sm)', background: 'var(--card-solid)', color: 'var(--muted)',
-          }}>{toFa(hallEquips.length)} مورد</span>
+          }}>{fmt.count(hallEquips.length)} مورد</span>
           <div style={{ display: 'flex', gap: 4, marginRight: 'auto' }}>
             {headerDots.map((t, i) => (
               <span key={i} style={{
@@ -281,7 +283,7 @@ export function HallEquipSection({ hallId, needInput, legacy }: Props) {
             {issueCount > 0 ? (
               <>
                 ⚠️ <span style={{ fontWeight: 700, color: 'var(--warn)' }}>
-                  {toFa(issueCount)} دسته
+                  {fmt.count(issueCount)} دسته
                 </span>{' '}
                 نیاز به توجه داره
               </>

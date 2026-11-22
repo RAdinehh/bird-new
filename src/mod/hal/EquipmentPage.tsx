@@ -1,3 +1,4 @@
+import { getGlobalFormat } from "../../shr/units/useFormat";
 /**
  * EquipmentPage — تجهیزات
  */
@@ -177,7 +178,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
     items: list,
     getId: (e: Equipment) => e.id,
     onDelete: async (ids) => {
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' تجهیز حذف شوند؟', { danger: true });
+      const ok = await showConfirmAsync('حذف گروهی', `${getGlobalFormat().count(ids.length)} تجهیز حذف شوند؟`, { danger: true });
       if (!ok) return;
       const backups: Equipment[] = [];
       for (const id of ids) {
@@ -423,7 +424,7 @@ export default function EquipmentPage({ active = true }: { active?: boolean } = 
             updateEquip(eq.id, { status: 'retired', saleInfo: finalInfo });
           }
 
-          logAction('update', 'hal', `${info.reason === 'sale' ? 'فروش' : 'اسقاط'} (${qty} عدد): ${eq.name} — ${info.reason === 'sale' ? info.salePrice.toLocaleString('fa-IR') + ' تومان' : 'بدون مبلغ'}`);
+          logAction('update', 'hal', `${info.reason === 'sale' ? 'فروش' : 'اسقاط'} (${qty} عدد): ${eq.name} — ${info.reason === 'sale' ? getGlobalFormat().money(info.salePrice) : 'بدون مبلغ'}`);
           toastMsg.success(
             info.reason === 'sale'
               ? (saleInvoiceId ? 'فروش و فاکتور معاملات ثبت شد' : 'فروش ثبت شد')
