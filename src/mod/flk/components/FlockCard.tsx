@@ -185,7 +185,6 @@ export default function FlockCard(props: FlockCardProps) {
       node: (
         <Tag
           tone="warn"
-          bordered
           onClick={(e) => { e.stopPropagation(); void handleEditGuard(); }}
           title="این گله به هیچ سند لینک نیست — کلیک برای اتصال"
           ariaLabel="اتصال گله به سند"
@@ -221,7 +220,7 @@ export default function FlockCard(props: FlockCardProps) {
     allBadges.push({
       key: 'merged',
       node: (
-        <Tag tone="purple" bordered>
+        <Tag tone="purple">
           ادغام‌شده ({toFa(_mergedSourcesCount)})
         </Tag>
       ),
@@ -245,10 +244,9 @@ export default function FlockCard(props: FlockCardProps) {
       key: 'group-' + g.id,
       node: (
         <Tag
-          bordered
           onClick={(e) => { e.stopPropagation(); onOpenGroups(); }}
           title={g.description || g.name}
-          style={{ background: c.bg, borderColor: c.border, color: c.fg }}
+          style={{ background: c.bg, color: c.fg }}
         >
           {g.name}
         </Tag>

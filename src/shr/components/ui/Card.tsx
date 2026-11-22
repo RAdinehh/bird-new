@@ -64,7 +64,6 @@ export function Tag({
     borderRadius: 'var(--r-sm)',
     background: t.bg,
     color: t.color,
-    border: bordered ? `1px solid ${t.border}` : '1px solid transparent',
     whiteSpace: 'nowrap',
     lineHeight: 1,
     flexShrink: 0,
