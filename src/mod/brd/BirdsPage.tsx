@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useState, useMemo, useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useFocusParam } from '../../shr/hooks/useFocusParam';
@@ -26,6 +27,7 @@ import { showConfirmAsync } from '../../cor/store/dialog';
 
 
 export default function BirdsPage({ active = true }: { active?: boolean } = {}) {
+  const fmt = useFormat();
   const { birds: _birdsRaw, breeds, addBird, updateBird, deleteBird } = useBrd();
   const customStandards = useSet((st: any) => st.customStandards);
   const customOverrides = useSet((st: any) => st.customOverrides || {});
@@ -89,7 +91,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
     getId: (b: any) => b.id,
     onDelete: async (ids: string[]) => {
       const warn = getBirdDeleteWarning(ids);
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' پرنده حذف شوند؟' + warn, { danger: true });
+      const ok = await showConfirmAsync('حذف گروهی', fmt.count(ids.length) + ' پرنده حذف شوند؟' + warn, { danger: true });
       if (!ok) return;
       const backups: any[] = [];
       for (const id of ids) {

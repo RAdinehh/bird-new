@@ -1,3 +1,4 @@
+import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
 import type { Bird, Breed } from './store';
 import { toFa } from '../../shr/utils/fa';
 import { getPurposeInfo, getCategoryInfo } from './_display';
@@ -52,33 +53,33 @@ function getRelevantFields(stdData: any, purposes: string[]): Array<{ icon: stri
   // 🥚 layer/breeder
   if (hasLayer) {
     if (stdData.biology?.cullDay) {
-      fields.push({ icon: '⏱', label: 'چرخه', value: `${toFa(stdData.biology.cullDay)} روز` });
+      fields.push({ icon: '⏱', label: 'چرخه', value: `${getGlobalFormat().count(stdData.biology.cullDay)} روز` });
     }
     if (stdData.biology?.layingStartDay) {
-      fields.push({ icon: '📅', label: 'شروع تخم', value: `روز ${toFa(stdData.biology.layingStartDay)}` });
+      fields.push({ icon: '📅', label: 'شروع تخم', value: `روز ${getGlobalFormat().count(stdData.biology.layingStartDay)}` });
     }
     if (stdData.production?.eggsPerYear) {
-      fields.push({ icon: '🥚', label: 'تخم/سال', value: toFa(stdData.production.eggsPerYear) });
+      fields.push({ icon: '🥚', label: 'تخم/سال', value: getGlobalFormat().count(stdData.production.eggsPerYear) });
     }
     if (stdData.production?.fertilityPct) {
-      fields.push({ icon: '🐣', label: 'باروری', value: `${toFa(stdData.production.fertilityPct)}٪` });
+      fields.push({ icon: '🐣', label: 'باروری', value: `${getGlobalFormat().num(stdData.production.fertilityPct)}٪` });
     }
   }
 
   // 🍗 broiler
   if (hasBroiler) {
     if (stdData.biology?.cullDay && !hasLayer) {
-      fields.push({ icon: '⏱', label: 'چرخه', value: `${toFa(stdData.biology.cullDay)} روز` });
+      fields.push({ icon: '⏱', label: 'چرخه', value: `${getGlobalFormat().count(stdData.biology.cullDay)} روز` });
     }
     if (stdData.growth?.finalWeightG) {
-      fields.push({ icon: '⚖️', label: 'وزن بلوغ', value: `${toFa(Math.round(stdData.growth.finalWeightG / 100) / 10)} کیلو` });
+      fields.push({ icon: '⚖️', label: 'وزن بلوغ', value: `${getGlobalFormat().num(stdData.growth.finalWeightG / 1000)} کیلو` });
     }
     if (stdData.growth?.weightByAge?.length) {
       const last = stdData.growth.weightByAge[stdData.growth.weightByAge.length - 1];
-      if (last?.adgG) fields.push({ icon: '📈', label: 'ADG', value: `${toFa(last.adgG)} گرم` });
+      if (last?.adgG) fields.push({ icon: '📈', label: 'ADG', value: `${getGlobalFormat().num(last.adgG)} گرم` });
     }
     if (stdData.mortalityTotalPct) {
-      fields.push({ icon: '💀', label: 'تلفات', value: `${toFa(stdData.mortalityTotalPct)}٪` });
+      fields.push({ icon: '💀', label: 'تلفات', value: `${getGlobalFormat().num(stdData.mortalityTotalPct)}٪` });
     }
   }
 
@@ -88,6 +89,7 @@ function getRelevantFields(stdData: any, purposes: string[]): Array<{ icon: stri
 export default function BreedCard({
   breed: b, index, bird, isOpen, onToggle, ms, onEdit, onDelete, customStandards, customOverrides,
 }: Props) {
+  const fmt = useFormat();
   const stdKey = (b as any).standardKey;
   const stdData = resolveStandard(stdKey, customStandards, customOverrides);
   const fcrValue = getBreedFcr(b, customStandards, customOverrides);
@@ -114,7 +116,7 @@ export default function BreedCard({
     <ExpandableCard
       id={b.id} ms={ms}
       accent="purple"
-      index={toFa(index + 1)}
+      index={fmt.count(index + 1)}
       iconEmoji="🧬"
       title={getBreedDisplayName(b, { customStandards, customOverrides })}
       subtitle=""
@@ -131,7 +133,7 @@ export default function BreedCard({
       }
       stats={<>
         <span>🐔 پرنده: {bird ? <b><EntityLink type="bird" id={bird.id} label={getBirdDisplayName(bird, { customStandards, customOverrides })} /></b> : <b style={{ color: 'var(--text)' }}>—</b>}</span>
-        {fcrValue != null && <span>📊 FCR: <b style={{ color: 'var(--text)' }}>{toFa(fcrValue)}</b></span>}
+        {fcrValue != null && <span>📊 FCR: <b style={{ color: 'var(--text)' }}>{fmt.num(fcrValue)}</b></span>}
       </>}
     >
       {relevantFields.length > 0 && (

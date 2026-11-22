@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useEffect, useState } from 'react';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -70,6 +71,7 @@ export default function BreedForm({
   open, onClose, initialData, birds, breeds, onSaved, onRedirectToStandards,
   customStandards = {}, customOverrides = {},
 }: Props) {
+  const fmt = useFormat();
   const methods = useForm<BreedFormData>({
     resolver: zodResolver(BreedFormSchema),
     mode: 'onSubmit',
@@ -95,7 +97,7 @@ export default function BreedForm({
   const { hint: fcrHint } = useOverride({
     current: fcrCurrent,
     stdValue: fcrBaseline.value,
-    onReset: () => setValue('fcr', fcrBaseline.value != null ? toFa(fcrBaseline.value) : ''),
+    onReset: () => setValue('fcr', fcrBaseline.value != null ? fmt.num(fcrBaseline.value) : ''),
     unit: 'FCR',
     decimals: 1,
   });
@@ -228,13 +230,13 @@ export default function BreedForm({
                   if (match) {
                     setValue('standardKey', match[0]);
                     const last = (match[1] as any)?.growth?.weightByAge?.slice(-1)?.[0];
-                    if (last?.fcr != null) setValue('fcr', toFa(last.fcr));
+                    if (last?.fcr != null) setValue('fcr', fmt.num(last.fcr));
                   }
                 }}
                 onPick={(pick: BreedPick) => {
                   field.onChange(pick.name);
                   if (pick.standardKey) setValue('standardKey', pick.standardKey);
-                  if (pick.fcr !== null) setValue('fcr', toFa(pick.fcr));
+                  if (pick.fcr !== null) setValue('fcr', fmt.num(pick.fcr));
                 }}
                 parentBirdName={parentBird?.name}
                 parentKind={(parentBird as any)?.birdKind}

@@ -1,4 +1,6 @@
 /** src/mod/brd/_deps.ts — بررسی وابستگی پرنده و نژاد پیش از حذف */
+import { getGlobalFormat } from '../../shr/units/useFormat';
+
 import { useBrd } from "./store";
 import { useFlk } from "../flk/store";
 import { useInc } from "../inc/store";
@@ -21,10 +23,10 @@ export function getBirdDeleteWarning(birdIds: string[]): string {
   ).length;
 
   const parts: string[] = [];
-  if (breedsCount > 0) parts.push(`${toFa(breedsCount)} نژاد`);
-  if (flocksCount > 0) parts.push(`${toFa(flocksCount)} گله`);
-  if (incCount > 0) parts.push(`${toFa(incCount)} دوره جوجه‌کشی`);
-  if (invCount > 0) parts.push(`${toFa(invCount)} فاکتور`);
+  if (breedsCount > 0) parts.push(`${getGlobalFormat().count(breedsCount)} نژاد`);
+  if (flocksCount > 0) parts.push(`${getGlobalFormat().count(flocksCount)} گله`);
+  if (incCount > 0) parts.push(`${getGlobalFormat().count(incCount)} دوره جوجه‌کشی`);
+  if (invCount > 0) parts.push(`${getGlobalFormat().count(invCount)} فاکتور`);
 
   if (parts.length === 0) return "";
   const subj = birdIds.length === 1 ? "این پرنده" : "این پرنده‌ها";
@@ -45,9 +47,9 @@ export function getBreedDeleteWarning(breedIds: string[]): string {
   ).length;
 
   const parts: string[] = [];
-  if (flocksCount > 0) parts.push(`${toFa(flocksCount)} گله`);
-  if (incCount > 0) parts.push(`${toFa(incCount)} دوره جوجه‌کشی`);
-  if (invCount > 0) parts.push(`${toFa(invCount)} فاکتور`);
+  if (flocksCount > 0) parts.push(`${getGlobalFormat().count(flocksCount)} گله`);
+  if (incCount > 0) parts.push(`${getGlobalFormat().count(incCount)} دوره جوجه‌کشی`);
+  if (invCount > 0) parts.push(`${getGlobalFormat().count(invCount)} فاکتور`);
 
   if (parts.length === 0) return "";
   const subj = breedIds.length === 1 ? "این نژاد" : "این نژادها";

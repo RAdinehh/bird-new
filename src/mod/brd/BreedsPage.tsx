@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useState, useMemo, useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useBrd, type Breed } from './store';
@@ -19,6 +20,7 @@ import { getBreedDeleteWarning } from './_deps';
 import { showConfirmAsync } from '../../cor/store/dialog';
 
 export default function BreedsPage({ active = true }: { active?: boolean } = {}) {
+  const fmt = useFormat();
   const { birds, breeds: _breedsRaw, addBreed, updateBreed, deleteBreed } = useBrd();
   const [open, setOpen] = useState(false);
   const [initialData, setInitialData] = useState<BreedFormData>(EMPTY_BREED_FORM);
@@ -84,7 +86,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
     getId: (x: any) => x.id,
     onDelete: async (ids: string[]) => {
       const warn = getBreedDeleteWarning(ids);
-      const ok = await showConfirmAsync('حذف گروهی', toFa(ids.length) + ' مورد حذف شوند؟' + warn, { danger: true });
+      const ok = await showConfirmAsync('حذف گروهی', fmt.count(ids.length) + ' مورد حذف شوند؟' + warn, { danger: true });
       if (!ok) return;
       const backups: any[] = [];
       for (const id of ids) {
@@ -135,7 +137,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
     setInitialData({
       id: b.id, birdId: b.birdId,
       name: getBreedDisplayName(b, { customStandards, customOverrides }),
-      fcr: b.fcr ? toFa(b.fcr) : '',
+      fcr: b.fcr ? fmt.num(b.fcr) : '',
       standardKey: b.standardKey || '',
       purposes: b.purposes || [],
     });

@@ -1,3 +1,4 @@
+import { useFormat } from '../../shr/units/useFormat';
 import { useMemo } from 'react';
 import type { Bird, Breed } from './store';
 import { toFa } from '../../shr/utils/fa';
@@ -46,6 +47,7 @@ function StatRow({ label, value }: { label: string; value: string }) {
 export default function BirdCard({
   bird: b, index, birdBreeds, isOpen, onToggle, ms, customStandards, customOverrides, onEdit, onDelete,
 }: Props) {
+  const fmt = useFormat();
   const kind = getKindInfo((b as any).birdKind);
   const stdKey = (b as any).standardKey;
   const stdData = (stdKey && resolveStandard(stdKey, customStandards, customOverrides))
@@ -118,13 +120,13 @@ export default function BirdCard({
     <ExpandableCard
       id={b.id} ms={ms}
       accent="accent"
-      index={toFa(index + 1)}
+      index={fmt.count(index + 1)}
       iconEmoji={kind.emoji}
       title={getBirdDisplayName(b, customStandards)}
       subtitle=""
       isOpen={isOpen}
       onToggle={onToggle}
-      badge={<Tag tone="blue">{toFa(birdBreeds.length)} نژاد</Tag>}
+      badge={<Tag tone="blue">{fmt.count(birdBreeds.length)} نژاد</Tag>}
       stats={
         <>
                     {category && <span style={{
@@ -141,22 +143,22 @@ export default function BirdCard({
             <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> خلاصه
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
-            <StatRow label="🧬 کل نژاد" value={toFa(aggregate.total)} />
+            <StatRow label="🧬 کل نژاد" value={fmt.count(aggregate.total)} />
             {aggregate.nativeCount > 0 && (
-              <StatRow label="🌾 بومی" value={toFa(aggregate.nativeCount)} />
+              <StatRow label="🌾 بومی" value={fmt.count(aggregate.nativeCount)} />
             )}
             {aggregate.industrialCount > 0 && (
-              <StatRow label="🏭 صنعتی" value={toFa(aggregate.industrialCount)} />
+              <StatRow label="🏭 صنعتی" value={fmt.count(aggregate.industrialCount)} />
             )}
             {aggregate.fancyCount > 0 && (
-              <StatRow label="🎨 تزئینی" value={toFa(aggregate.fancyCount)} />
+              <StatRow label="🎨 تزئینی" value={fmt.count(aggregate.fancyCount)} />
             )}
             {aggregate.fcrMin != null && aggregate.fcrMax != null && (
               <StatRow
                 label="📊 FCR"
                 value={aggregate.fcrMin === aggregate.fcrMax
-                  ? toFa(aggregate.fcrMin)
-                  : `${toFa(aggregate.fcrMin)} - ${toFa(aggregate.fcrMax)}`}
+                  ? fmt.num(aggregate.fcrMin)
+                  : `${fmt.num(aggregate.fcrMin)} - ${fmt.num(aggregate.fcrMax)}`}
               />
             )}
           </div>
@@ -174,7 +176,7 @@ export default function BirdCard({
                 key={bd.id}
                 type="breed"
                 id={bd.id}
-                label={`${getBreedDisplayName(bd, customStandards)}${bd.fcr ? ` • FCR ${toFa(bd.fcr)}` : ''}`}
+                label={`${getBreedDisplayName(bd, customStandards)}${bd.fcr ? ` • FCR ${fmt.num(bd.fcr)}` : ''}`}
                 badge
                 badgeBg="var(--purple-soft)"
                 badgeColor="var(--purple)"
