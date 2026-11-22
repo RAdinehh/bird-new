@@ -2,6 +2,8 @@
  * helpers-store.ts — برچسب‌ها و توابع کمکی flk
  * جدا شده از store.ts
  */
+import { getGlobalFormat } from '../../shr/units/useFormat';
+
 import { toFa, toEn } from '../../shr/utils/fa';
 import { parse, differenceInDays, differenceInCalendarDays } from 'date-fns-jalali';
 import { todayJ } from './api/flocksCalc';
@@ -127,14 +129,14 @@ export function formatAge(days: number): string {
 export function sexRatio(male: number | null, female: number | null): string {
   if (male == null || female == null) return '—';
   if (male === 0 && female === 0) return '—';
-  if (male === 0) return `۰ : ${toFa(String(female))}`;
-  if (female === 0) return `${toFa(String(male))} : ۰`;
+  if (male === 0) return `۰ : ${getGlobalFormat().count(female)}`;
+  if (female === 0) return `${getGlobalFormat().count(male)} : ۰`;
   const r = female / male;
   if (r >= 1) {
-    return `${toFa('1')} : ${toFa(String(Math.round(r)))}`;
+    return `${getGlobalFormat().count(1)} : ${getGlobalFormat().count(Math.round(r))}`;
   }
   const inv = male / female;
-  return `${toFa(String(Math.round(inv)))} : ${toFa('1')}`;
+  return `${getGlobalFormat().count(Math.round(inv))} : ${getGlobalFormat().count(1)}`;
 }
 
 /** سن پیش‌فرض تخم‌گذاری (اگه استاندارد نژاد موجود نبود) — استاندارد ایران */

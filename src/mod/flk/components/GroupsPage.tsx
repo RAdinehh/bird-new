@@ -1,6 +1,8 @@
 /**
  * GroupsPage.tsx — مدیریت گروه‌های گله
  */
+import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useState, useMemo, useRef } from 'react';
 import { Modal, Btn, BtnRow, Field, Input, Select, Textarea, Grid2, ErrorBox } from '../../../shr/components/ui';
 import { IconX, IconSearch } from '../../../shr/icons';
@@ -44,6 +46,7 @@ interface Node extends FlockGroup {
 }
 
 export default function GroupsPage({ open, onClose }: Props) {
+  const fmt = useFormat();
   const groups = useFlk(s => s.groups);
   const groupMembers = useFlk(s => s.groupMembers);
   const addGroup = useFlk(s => s.addGroup);
@@ -226,7 +229,7 @@ export default function GroupsPage({ open, onClose }: Props) {
   const handleArchive = async (g: FlockGroup) => {
     const childCount = groups.filter(c => c.parentGroupId === g.id).length;
     const msg = childCount > 0
-      ? 'گروه «' + g.name + '» ' + toFa(childCount) + ' زیرگروه دارد. آرشیو شود؟'
+      ? 'گروه «' + g.name + '» ' + getGlobalFormat().count(childCount) + ' زیرگروه دارد. آرشیو شود؟'
       : 'گروه «' + g.name + '» آرشیو شود؟';
     const okA = await showConfirmAsync('آرشیو گروه', msg, {});
     if (!okA) return;
@@ -238,7 +241,7 @@ export default function GroupsPage({ open, onClose }: Props) {
   const handleDelete = async (g: FlockGroup) => {
     const childCount = groups.filter(c => c.parentGroupId === g.id).length;
     const msg = childCount > 0
-      ? 'گروه «' + g.name + '» ' + toFa(childCount) + ' زیرگروه دارد. با حذف، زیرگروه‌ها یتیم می‌شن. ادامه؟'
+      ? 'گروه «' + g.name + '» ' + getGlobalFormat().count(childCount) + ' زیرگروه دارد. با حذف، زیرگروه‌ها یتیم می‌شن. ادامه؟'
       : 'گروه «' + g.name + '» حذف شود؟';
     const ok = await showConfirmAsync('حذف گروه', msg, { danger: true });
     if (!ok) return;
@@ -273,7 +276,7 @@ export default function GroupsPage({ open, onClose }: Props) {
             <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2, display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
               <span style={{ padding: '1px 6px', borderRadius: 4, background: 'var(--input-bg)', color: 'var(--muted)', fontSize: 10, fontWeight: 700 }}>{TYPE_LABEL[node.type]}</span>
               <span>·</span>
-              <span>{toFa(node.memberCount)} گله عضو</span>
+              <span>{fmt.count(node.memberCount)} گله عضو</span>
               {node.description && (
                 <>
                   <span>·</span>

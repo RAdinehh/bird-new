@@ -2,6 +2,9 @@
  * PickHatchModal.tsx — انتخاب هچ از inc
  * auto-fill: تعداد اولیه، تاریخ هچ، پرنده، نژاد
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
+
 import { useMemo } from 'react';
 import { Modal, Btn, BtnRow } from '../../../shr/components/ui';
 import { useInc } from '../../inc/store';
@@ -15,6 +18,7 @@ interface Props {
 }
 
 export default function PickHatchModal({ open, onClose, onSelect }: Props) {
+  const fmt = useFormat();
   const hatches = useInc(s => s.hatches);
   const eggEntries = useInc(s => s.eggEntries);
   const devices = useInc(s => s.devices);
@@ -69,15 +73,15 @@ export default function PickHatchModal({ open, onClose, onSelect }: Props) {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontWeight: 700, fontSize: 13, color: 'var(--accent)' }}>
-                    {toFa(h.hatched || 0)} جوجه
+                    {fmt.count(h.hatched || 0)} جوجه
                   </span>
                   <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--muted)' }}>
-                    {toFa(h.date)}
+                    {fmt.date(h.date)}
                   </span>
                 </div>
                 <div style={{ fontSize: 11, color: 'var(--muted)', display: 'flex', gap: 6, alignItems: 'center' }}>
                   {device && <span>· {device.name}</span>}
-                  {entry && entry.count && <span>· از {toFa(entry.count)} تخم</span>}
+                  {entry && entry.count && <span>· از {fmt.count(entry.count)} تخم</span>}
                 </div>
               </button>
             );

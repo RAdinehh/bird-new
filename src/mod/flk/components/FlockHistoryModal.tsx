@@ -4,6 +4,10 @@
  */
 import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
 
+
+
+
+
 import { useEffect, useState, useMemo, type ReactNode } from 'react';
 import { Btn, Select } from '../../../shr/components/ui';
 import { HistoryModalShell } from '../../../shr/components/history/HistoryModalShell';
@@ -615,7 +619,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
           <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>🏆 EPEF</div>
           <div style={{ padding: '8px 10px', background: `var(--${epefResult.tone === 'accent' ? 'accent-soft' : epefResult.tone === 'warn' ? 'warn-soft' : 'danger-soft'})`, border: `1px solid var(--${epefResult.tone === 'accent' ? 'accent-border' : epefResult.tone === 'warn' ? 'warn' : 'danger'})`, borderRadius: 'var(--r-md)', fontSize: 11 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-              <span style={{ fontSize: 14, fontWeight: 700 }}>{toFa(epefResult.epef.toFixed(1))}</span>
+              <span style={{ fontSize: 14, fontWeight: 700 }}>{fmt.num(epefResult.epef)}</span>
               <span style={{ fontSize: 9, padding: '1px 5px', borderRadius: 3, background: `var(--${epefResult.tone === 'accent' ? 'accent' : epefResult.tone === 'warn' ? 'warn' : 'danger'})`, color: 'white', fontWeight: 700 }}>
                 {epefResult.tone === 'accent' ? 'خوب' : epefResult.tone === 'warn' ? 'متوسط' : 'ضعیف'}
               </span>
@@ -631,11 +635,11 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
           <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>💀 نرخ تلفات</div>
           <div style={{ padding: '8px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 11 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-              <span style={{ fontSize: 14, fontWeight: 700 }}>{toFa(mortalityResult.cumulativePct.toFixed(2))}٪</span>
+              <span style={{ fontSize: 14, fontWeight: 700 }}>{fmt.num(mortalityResult.cumulativePct)}٪</span>
               <span style={{ fontSize: 9, padding: '1px 5px', borderRadius: 3, background: 'var(--muted)', color: 'white', fontWeight: 700 }}>تجمعی</span>
             </div>
             <div style={{ fontSize: 10, color: 'var(--muted)', lineHeight: 1.6 }}>
-              از {toFa(flock.initialCount || 0)} پرنده اولیه
+              از {fmt.count(flock.initialCount || 0)} پرنده اولیه
             </div>
           </div>
         </div>
@@ -645,7 +649,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
           <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>📐 چگالی</div>
           <div style={{ padding: '8px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 11 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-              <span style={{ fontSize: 14, fontWeight: 700 }}>{toFa(stockingResult.densityBirdPerSqM)}</span>
+              <span style={{ fontSize: 14, fontWeight: 700 }}>{fmt.num(stockingResult.densityBirdPerSqM)}</span>
               <span style={{ fontSize: 9, padding: '1px 5px', borderRadius: 3, background: 'var(--muted)', color: 'white', fontWeight: 700 }}>پرنده/م²</span>
             </div>
             {stockingResult.warning && (
@@ -671,11 +675,11 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 6 }}>
                         <b dir="ltr">
-                          {toFa(ev.amount)} {ev.unit}
+                          {fmt.num(ev.amount)} {ev.unit}
                           {ev.sex === 'male' && <span style={{ color: 'var(--info)', marginRight: 4 }}>♂</span>}
                           {ev.sex === 'female' && <span style={{ color: 'var(--purple)', marginRight: 4 }}>♀</span>}
                         </b>
-                        <span style={{ color: 'var(--muted)', fontSize: 10 }}>{toFa(ev.date)}</span>
+                        <span style={{ color: 'var(--muted)', fontSize: 10 }}>{fmt.date(ev.date)}</span>
                       </div>
                       <div style={{ color: 'var(--muted)', fontSize: 10, marginTop: 2 }}>
                         {ev.source === 'bulk_manual' ? 'پر کردن سطل' : ev.source === 'daily_manual' ? 'روزانه' : ev.source === 'sensor_scale' ? 'سنسور وزن' : ev.source === 'sensor_level' ? 'سنسور سطح' : ev.source === 'auto_feeder' ? 'اتومات' : 'استاندارد'}
@@ -732,31 +736,31 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
             {/* نر — بدون ایموجی */}
             <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr 1fr 1fr 1fr 1fr', padding: '6px 0', borderBottom: '1px dashed var(--accent-border)', fontSize: 'var(--fs-sm)' }}>
               <span style={{ color: 'var(--info)', fontWeight: 700 }}>نر</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace' }}>{toFa(sexAggregates.init.male)}</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.deaths.male > 0 ? 'var(--danger)' : 'var(--muted)' }}>{sexAggregates.deaths.male > 0 ? `-${toFa(sexAggregates.deaths.male)}` : '۰'}</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.sells.male > 0 ? 'var(--purple)' : 'var(--muted)' }}>{sexAggregates.sells.male > 0 ? `-${toFa(sexAggregates.sells.male)}` : '۰'}</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.others.male !== 0 ? 'var(--warn)' : 'var(--muted)' }}>{sexAggregates.others.male > 0 ? '+' : ''}{sexAggregates.others.male !== 0 ? toFa(sexAggregates.others.male) : '۰'}</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace', fontWeight: 700, color: 'var(--text)' }}>{toFa(sexAggregates.current.male)}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace' }}>{fmt.count(sexAggregates.init.male)}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.deaths.male > 0 ? 'var(--danger)' : 'var(--muted)' }}>{sexAggregates.deaths.male > 0 ? `-${fmt.count(sexAggregates.deaths.male)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.sells.male > 0 ? 'var(--purple)' : 'var(--muted)' }}>{sexAggregates.sells.male > 0 ? `-${fmt.count(sexAggregates.sells.male)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.others.male !== 0 ? 'var(--warn)' : 'var(--muted)' }}>{sexAggregates.others.male > 0 ? '+' : ''}{sexAggregates.others.male !== 0 ? fmt.count(sexAggregates.others.male) : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', fontWeight: 700, color: 'var(--text)' }}>{fmt.count(sexAggregates.current.male)}</span>
             </div>
 
             {/* ماده — بدون ایموجی */}
             <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr 1fr 1fr 1fr 1fr', padding: '6px 0', borderBottom: '1px dashed var(--accent-border)', fontSize: 'var(--fs-sm)' }}>
               <span style={{ color: 'var(--purple)', fontWeight: 700 }}>ماده</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace' }}>{toFa(sexAggregates.init.female)}</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.deaths.female > 0 ? 'var(--danger)' : 'var(--muted)' }}>{sexAggregates.deaths.female > 0 ? `-${toFa(sexAggregates.deaths.female)}` : '۰'}</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.sells.female > 0 ? 'var(--purple)' : 'var(--muted)' }}>{sexAggregates.sells.female > 0 ? `-${toFa(sexAggregates.sells.female)}` : '۰'}</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.others.female !== 0 ? 'var(--warn)' : 'var(--muted)' }}>{sexAggregates.others.female > 0 ? '+' : ''}{sexAggregates.others.female !== 0 ? toFa(sexAggregates.others.female) : '۰'}</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace', fontWeight: 700, color: 'var(--text)' }}>{toFa(sexAggregates.current.female)}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace' }}>{fmt.count(sexAggregates.init.female)}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.deaths.female > 0 ? 'var(--danger)' : 'var(--muted)' }}>{sexAggregates.deaths.female > 0 ? `-${fmt.count(sexAggregates.deaths.female)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.sells.female > 0 ? 'var(--purple)' : 'var(--muted)' }}>{sexAggregates.sells.female > 0 ? `-${fmt.count(sexAggregates.sells.female)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.others.female !== 0 ? 'var(--warn)' : 'var(--muted)' }}>{sexAggregates.others.female > 0 ? '+' : ''}{sexAggregates.others.female !== 0 ? fmt.count(sexAggregates.others.female) : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', fontWeight: 700, color: 'var(--text)' }}>{fmt.count(sexAggregates.current.female)}</span>
             </div>
 
             {/* نامشخص — بدون ایموجی */}
             <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr 1fr 1fr 1fr 1fr', padding: '6px 0', fontSize: 'var(--fs-sm)' }}>
               <span style={{ color: 'var(--muted)', fontWeight: 700 }}>نامشخص</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace' }}>{toFa(sexAggregates.init.unknown)}</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.deaths.unknown > 0 ? 'var(--danger)' : 'var(--muted)' }}>{sexAggregates.deaths.unknown > 0 ? `-${toFa(sexAggregates.deaths.unknown)}` : '۰'}</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.sells.unknown > 0 ? 'var(--purple)' : 'var(--muted)' }}>{sexAggregates.sells.unknown > 0 ? `-${toFa(sexAggregates.sells.unknown)}` : '۰'}</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.others.unknown !== 0 ? 'var(--warn)' : 'var(--muted)' }}>{sexAggregates.others.unknown > 0 ? '+' : ''}{sexAggregates.others.unknown !== 0 ? toFa(sexAggregates.others.unknown) : '۰'}</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace', fontWeight: 700, color: 'var(--text)' }}>{toFa(sexAggregates.current.unknown)}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace' }}>{fmt.count(sexAggregates.init.unknown)}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.deaths.unknown > 0 ? 'var(--danger)' : 'var(--muted)' }}>{sexAggregates.deaths.unknown > 0 ? `-${fmt.count(sexAggregates.deaths.unknown)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.sells.unknown > 0 ? 'var(--purple)' : 'var(--muted)' }}>{sexAggregates.sells.unknown > 0 ? `-${fmt.count(sexAggregates.sells.unknown)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: sexAggregates.others.unknown !== 0 ? 'var(--warn)' : 'var(--muted)' }}>{sexAggregates.others.unknown > 0 ? '+' : ''}{sexAggregates.others.unknown !== 0 ? fmt.count(sexAggregates.others.unknown) : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', fontWeight: 700, color: 'var(--text)' }}>{fmt.count(sexAggregates.current.unknown)}</span>
             </div>
 
             {/* جمع — border نازک */}
@@ -770,11 +774,11 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               fontWeight: 700,
             }}>
               <span style={{ color: 'var(--accent)' }}>جمع</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace' }}>{toFa(sexAggregates.init.male + sexAggregates.init.female + sexAggregates.init.unknown)}</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: (sexAggregates.deaths.male + sexAggregates.deaths.female + sexAggregates.deaths.unknown) > 0 ? 'var(--danger)' : 'var(--muted)' }}>{(sexAggregates.deaths.male + sexAggregates.deaths.female + sexAggregates.deaths.unknown) > 0 ? `-${toFa(sexAggregates.deaths.male + sexAggregates.deaths.female + sexAggregates.deaths.unknown)}` : '۰'}</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: (sexAggregates.sells.male + sexAggregates.sells.female + sexAggregates.sells.unknown) > 0 ? 'var(--purple)' : 'var(--muted)' }}>{(sexAggregates.sells.male + sexAggregates.sells.female + sexAggregates.sells.unknown) > 0 ? `-${toFa(sexAggregates.sells.male + sexAggregates.sells.female + sexAggregates.sells.unknown)}` : '۰'}</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: 'var(--warn)' }}>{(sexAggregates.others.male + sexAggregates.others.female + sexAggregates.others.unknown) !== 0 ? `${(sexAggregates.others.male + sexAggregates.others.female + sexAggregates.others.unknown) > 0 ? '+' : ''}${toFa(sexAggregates.others.male + sexAggregates.others.female + sexAggregates.others.unknown)}` : '۰'}</span>
-              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: 'var(--accent)' }}>{toFa(sexAggregates.current.male + sexAggregates.current.female + sexAggregates.current.unknown)}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace' }}>{fmt.count(sexAggregates.init.male + sexAggregates.init.female + sexAggregates.init.unknown)}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: (sexAggregates.deaths.male + sexAggregates.deaths.female + sexAggregates.deaths.unknown) > 0 ? 'var(--danger)' : 'var(--muted)' }}>{(sexAggregates.deaths.male + sexAggregates.deaths.female + sexAggregates.deaths.unknown) > 0 ? `-${fmt.count(sexAggregates.deaths.male + sexAggregates.deaths.female + sexAggregates.deaths.unknown)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: (sexAggregates.sells.male + sexAggregates.sells.female + sexAggregates.sells.unknown) > 0 ? 'var(--purple)' : 'var(--muted)' }}>{(sexAggregates.sells.male + sexAggregates.sells.female + sexAggregates.sells.unknown) > 0 ? `-${fmt.count(sexAggregates.sells.male + sexAggregates.sells.female + sexAggregates.sells.unknown)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: 'var(--warn)' }}>{(sexAggregates.others.male + sexAggregates.others.female + sexAggregates.others.unknown) !== 0 ? `${(sexAggregates.others.male + sexAggregates.others.female + sexAggregates.others.unknown) > 0 ? '+' : ''}${fmt.count(sexAggregates.others.male + sexAggregates.others.female + sexAggregates.others.unknown)}` : '۰'}</span>
+              <span style={{ textAlign: 'center', fontFamily: 'monospace', color: 'var(--accent)' }}>{fmt.count(sexAggregates.current.male + sexAggregates.current.female + sexAggregates.current.unknown)}</span>
             </div>
           </div>
           </div>
@@ -790,7 +794,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 {visibleData.audit.items.map(g => (
                   <div key={g.label}>
-                    <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6 }}>📅 {toFa(g.label)}</div>
+                    <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6 }}>📅 {fmt.raw.digits(String(g.label), fmt.units.numberFormat)}</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {g.events.map(ev => <AuditRow key={ev.id} ev={ev} />)}
                     </div>
@@ -814,7 +818,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {visibleData.events.items.map(g => (
                 <div key={g.label}>
-                  <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6 }}>📅 {toFa(g.label)}</div>
+                  <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6 }}>📅 {fmt.raw.digits(String(g.label), fmt.units.numberFormat)}</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                     {g.events.map(e => <EventRow key={e.id} e={e} onRevoke={() => handleRevoke(e)} />)}
                   </div>
@@ -837,7 +841,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
 function ShowMoreButton({ count, onClick }: { count: number; onClick: () => void }) {
   return (
     <button type="button" onClick={onClick} style={{ width: '100%', padding: '10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
-      📜 نمایش {toFa(count)} رویداد بیشتر
+      📜 نمایش {getGlobalFormat().count(count)} رویداد بیشتر
     </button>
   );
 }
@@ -891,12 +895,12 @@ function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 40 }}>
             <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 2 }}>قبل</span>
-            <span style={{ color: 'var(--muted)', fontFamily: 'monospace', fontSize: 'var(--fs-base)', fontWeight: 600 }}>{toFa(before)}</span>
+            <span style={{ color: 'var(--muted)', fontFamily: 'monospace', fontSize: 'var(--fs-base)', fontWeight: 600 }}>{getGlobalFormat().count(before)}</span>
           </div>
           <span style={{ color: 'var(--dim)', fontSize: 14, marginTop: 14 }}>←</span>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 40 }}>
             <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 2 }}>بعد</span>
-            <span style={{ fontWeight: 700, color: 'var(--text)', fontFamily: 'monospace', fontSize: 'var(--fs-base)' }}>{toFa(after)}</span>
+            <span style={{ fontWeight: 700, color: 'var(--text)', fontFamily: 'monospace', fontSize: 'var(--fs-base)' }}>{getGlobalFormat().count(after)}</span>
           </div>
         </div>
 
@@ -905,7 +909,7 @@ function AuditRow({ ev }: { ev: FlockSexBalanceEvent }) {
           {isNoChange ? (
             <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>بدون تغییر</span>
           ) : (
-            <span>{delta > 0 ? '+' : ''}{toFa(delta)}</span>
+            <span>{delta > 0 ? '+' : ''}{getGlobalFormat().count(delta)}</span>
           )}
         </div>
       </div>

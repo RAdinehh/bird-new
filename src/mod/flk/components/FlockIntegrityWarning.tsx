@@ -5,6 +5,9 @@
  *   1. Bug: male + female + unknown !== currentCount → قرمز + دکمه اصلاح
  *   2. Partial split: male/female > 0 ولی unknown > 0 → آبی (اطلاع)
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
+
 import { toFa } from '../../../shr/utils/fa';
 
 interface Props {
@@ -20,6 +23,7 @@ function parseN(s: any): number {
 }
 
 export default function FlockIntegrityWarning({ form, setForm }: Props) {
+  const fmt = useFormat();
   const m = parseN(form.maleCount);
   const f = parseN(form.femaleCount);
   const u = parseN(form.unknownCount);
@@ -35,20 +39,20 @@ export default function FlockIntegrityWarning({ form, setForm }: Props) {
       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 600, lineHeight: 1.7, marginTop: 4 }}>
         {mf > cc ? (
           <>
-            ⚠️ نر ({toFa(String(m))}) + ماده ({toFa(String(f))}) = {toFa(String(mf))} بیشتر از تعداد فعلی ({toFa(String(cc))}) است
+            ⚠️ نر ({fmt.count(m)}) + ماده ({fmt.count(f)}) = {fmt.count(mf)} بیشتر از تعداد فعلی ({fmt.count(cc)}) است
             {' '}
             — ابتدا نر یا ماده را کاهش دهید
           </>
         ) : (
           <>
-            ⚠️ جمع (نر {toFa(String(m))} + ماده {toFa(String(f))} + نامشخص {toFa(String(u))}) = {toFa(String(sum))} — باید با تعداد فعلی ({toFa(String(cc))}) برابر باشد
+            ⚠️ جمع (نر {fmt.count(m)} + ماده {fmt.count(f)} + نامشخص {fmt.count(u)}) = {fmt.count(sum)} — باید با تعداد فعلی ({fmt.count(cc)}) برابر باشد
             {canAutoFix && (
               <>
                 {' '}
                 <button
                   type="button"
                   onClick={() =>
-                    setForm((prev: any) => ({ ...prev, unknownCount: toFa(String(fixU)) }))
+                    setForm((prev: any) => ({ ...prev, unknownCount: fmt.raw.digits(String(fixU), fmt.units.numberFormat) }))
                   }
                   style={{
                     background: 'none',
@@ -62,7 +66,7 @@ export default function FlockIntegrityWarning({ form, setForm }: Props) {
                     textDecoration: 'underline',
                   }}
                 >
-                  [اصلاح: نامشخص → {toFa(String(fixU))}]
+                  [اصلاح: نامشخص → {fmt.count(fixU)}]
                 </button>
               </>
             )}
@@ -76,7 +80,7 @@ export default function FlockIntegrityWarning({ form, setForm }: Props) {
   if (m + f > 0 && u > 0) {
     return (
       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7, marginTop: 4 }}>
-        ℹ️ این گله {toFa(String(u))} پرنده با جنسیت نامشخص دارد (از مجموع {toFa(String(cc))}).
+        ℹ️ این گله {fmt.count(u)} پرنده با جنسیت نامشخص دارد (از مجموع {fmt.count(cc)}).
       </div>
     );
   }

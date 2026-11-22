@@ -1,6 +1,8 @@
 /**
  * MergeFlocksModal.tsx — ادغام گروهی با انتخاب درون‌گروه
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { useEffect, useMemo, useState } from 'react';
 import { Modal, Btn, BtnRow } from '../../../shr/components/ui';
 import { toastMsg } from '../../../cor/store/toast';
@@ -34,6 +36,7 @@ interface Group {
 }
 
 export default function MergeFlocksModal({ open, onClose, flockIds, onMergeGroup }: Props) {
+  const fmt = useFormat();
   const allFlocks = useFlk(s => s.flocks);
   const breeds = useBrd((s: any) => s.breeds);
   const [showAll, setShowAll] = useState(false);
@@ -139,13 +142,13 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onMergeGroup
     });
     const totalFlocks = toMerge.reduce((s, x) => s + x.groupSize, 0);
     const msg = enabledGroups.length === 1
-      ? `${toFa(toMerge[0].groupSize)} گله در «${toMerge[0].target.name}» ادغام می‌شود.`
-      : `${toFa(enabledGroups.length)} گروه (${toFa(totalFlocks)} گله) ادغام می‌شود.`;
+      ? `${fmt.count(toMerge[0].groupSize)} گله در «${toMerge[0].target.name}» ادغام می‌شود.`
+      : `${fmt.count(enabledGroups.length)} گروه (${fmt.count(totalFlocks)} گله) ادغام می‌شود.`;
     const ok = await showConfirmAsync('تأیید ادغام', msg + ' از طریق 🔓 بازگردانی قابل بازگشت است.', { confirmText: 'ادغام' });
     if (!ok) return;
     try {
       for (const m of toMerge) onMergeGroup(m.targetId, m.sourceIds);
-      toastMsg.success(`${toFa(totalFlocks)} گله ادغام شد`);
+      toastMsg.success(`${fmt.count(totalFlocks)} گله ادغام شد`);
       onClose();
     } catch (e) { console.error(e); toastMsg.error('خطا در ادغام'); }
   };
@@ -159,7 +162,7 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onMergeGroup
         enabledGroups.length > 0 ? (
           <BtnRow>
             <Btn variant="primary" onClick={handleMerge}>
-              🔗 {enabledGroups.length === 1 ? `ادغام ${toFa(enabledGroups[0].sel.size)} گله` : `ادغام ${toFa(enabledGroups.length)} گروه`}
+              🔗 {enabledGroups.length === 1 ? `ادغام ${fmt.count(enabledGroups[0].sel.size)} گله` : `ادغام ${fmt.count(enabledGroups.length)} گروه`}
             </Btn>
             <Btn onClick={onClose}>لغو</Btn>
           </BtnRow>
@@ -172,11 +175,11 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onMergeGroup
         <div>گله‌ها خودکار گروه‌بندی می‌شوند. با تیک هر گله، آن را به ادغام اضافه یا حذف کنید.</div>
         {!showAll ? (
           <button type="button" onClick={() => setShowAll(true)} style={{ alignSelf: 'flex-start', padding: '4px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-sm)', color: 'var(--accent)', fontSize: 'var(--fs-xs)', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
-            + نمایش همه گله‌های فعال ({toFa(activeFlocks.length)})
+            + نمایش همه گله‌های فعال ({fmt.count(activeFlocks.length)})
           </button>
         ) : (
           <button type="button" onClick={() => setShowAll(false)} style={{ alignSelf: 'flex-start', padding: '4px 10px', background: 'var(--btn-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontSize: 'var(--fs-xs)', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
-            − فقط انتخاب‌شده‌ها ({toFa(flockIds.length)})
+            − فقط انتخاب‌شده‌ها ({fmt.count(flockIds.length)})
           </button>
         )}
       </div>
@@ -204,7 +207,7 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onMergeGroup
                 {g.label}
               </div>
               <span style={{ fontSize: 'var(--fs-xs)', color: g.color.text, fontWeight: 600 }}>
-                {toFa(sel.size)} از {toFa(g.flocks.length)}
+                {fmt.count(sel.size)} از {fmt.count(g.flocks.length)}
               </span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -241,7 +244,7 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onMergeGroup
                         )}
                       </div>
                       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-                        {toFa(f.currentCount || 0)} پرنده · {toFa(age)} روز
+                        {fmt.count(f.currentCount || 0)} پرنده · {fmt.count(age)} روز
                       </div>
                     </div>
                   </div>
@@ -259,7 +262,7 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onMergeGroup
                 color: 'var(--text)',
                 fontWeight: 600,
               }}>
-                ℹ️ نتیجه: {toFa(total)} پرنده در «{targetFlock?.name}»
+                ℹ️ نتیجه: {fmt.count(total)} پرنده در «{targetFlock?.name}»
               </div>
             )}
             {enabled && !isValid && (

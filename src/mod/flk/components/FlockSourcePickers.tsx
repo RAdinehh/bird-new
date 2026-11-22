@@ -1,6 +1,8 @@
 /**
  * FlockSourcePickers.tsx — انتخاب فاکتور خرید / هچ
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { Field } from '../../../shr/components/ui';
 import { toFa } from '../../../shr/utils/fa';
 import type { F } from '../types-flocks';
@@ -15,6 +17,7 @@ interface Props {
 }
 
 export default function FlockSourcePickers({ form, setForm, onOpenInvoicePicker, onOpenHatchPicker }: Props) {
+  const fmt = useFormat();
   const invoices = useTra((s: any) => s.invoices || s.deals) || [];
   const contacts = useCtc((s: any) => s.contacts) || [];
   const inv = invoices.find((i: any) => i.id === form.sourceInvoiceId);
@@ -112,7 +115,7 @@ export default function FlockSourcePickers({ form, setForm, onOpenInvoicePicker,
               }}
             >
               <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {form.hatchId ? '🐣 هچ ' + toFa(form.hatchDate || '') : '— انتخاب از هچ —'}
+                {form.hatchId ? '🐣 هچ ' + fmt.date(form.hatchDate || '') : '— انتخاب از هچ —'}
               </span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" strokeWidth="2.5">
                 <path d="m6 9 6 6 6-6"/>

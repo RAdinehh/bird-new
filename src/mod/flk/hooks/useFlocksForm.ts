@@ -1,6 +1,8 @@
 /**
  * useFlocksForm — state و منطق فرم گله
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { useState } from 'react';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { toastMsg } from '../../../cor/store/toast';
@@ -27,6 +29,7 @@ export interface UseFlocksFormParams {
 }
 
 export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: UseFlocksFormParams) {
+  const fmt = useFormat();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(emptyForm());
   const [layingFromStd, setLayingFromStd] = useState(false);
@@ -53,26 +56,26 @@ export function useFlocksForm({ birds, halls, flocks, breedStd, add, update }: U
     setForm({
       id: f.id, name: f.name, type: f.type, birdId: f.birdId, breedId: f.breedId,
       hallId: f.hallId, zoneId: f.zoneId,
-      initialCount: f.initialCount ? toFa(f.initialCount) : '',
-      currentCount: f.currentCount ? toFa(f.currentCount) : '',
-      maleCount: f.maleCount ? toFa(f.maleCount) : '',
-      femaleCount: f.femaleCount ? toFa(f.femaleCount) : '',
-      unknownCount: f.unknownCount ? toFa(f.unknownCount) : '',
-      layingStartDay: f.layingStartDay ? toFa(f.layingStartDay) : '',
-      endOfCycleDay: f.endOfCycleDay ? toFa(f.endOfCycleDay) : '',
+      initialCount: f.initialCount ? fmt.raw.digits(String(f.initialCount), fmt.units.numberFormat) : '',
+      currentCount: f.currentCount ? fmt.raw.digits(String(f.currentCount), fmt.units.numberFormat) : '',
+      maleCount: f.maleCount ? fmt.raw.digits(String(f.maleCount), fmt.units.numberFormat) : '',
+      femaleCount: f.femaleCount ? fmt.raw.digits(String(f.femaleCount), fmt.units.numberFormat) : '',
+      unknownCount: f.unknownCount ? fmt.raw.digits(String(f.unknownCount), fmt.units.numberFormat) : '',
+      layingStartDay: f.layingStartDay ? fmt.raw.digits(String(f.layingStartDay), fmt.units.numberFormat) : '',
+      endOfCycleDay: f.endOfCycleDay ? fmt.raw.digits(String(f.endOfCycleDay), fmt.units.numberFormat) : '',
       vaccineScheduleId: f.vaccineScheduleId || '',
       hatchDate: f.hatchDate || '', purchaseDate: f.purchaseDate || '', startDate: f.startDate || '',
       source: f.source,
-      purchasePrice: f.purchasePrice ? toFa(f.purchasePrice) : '',
-      deliveryCost: f.deliveryCost ? toFa(f.deliveryCost) : '',
-      otherCosts: f.otherCosts ? toFa(f.otherCosts) : '',
+      purchasePrice: f.purchasePrice ? fmt.raw.digits(String(f.purchasePrice), fmt.units.numberFormat) : '',
+      deliveryCost: f.deliveryCost ? fmt.raw.digits(String(f.deliveryCost), fmt.units.numberFormat) : '',
+      otherCosts: f.otherCosts ? fmt.raw.digits(String(f.otherCosts), fmt.units.numberFormat) : '',
       status: f.status, notes: f.notes,
       dealType: f.dealType || 'own',
       partnerId: f.dealData?.partnerId || '',
-      partnerShare: f.dealData?.partnerShare ? toFa(f.dealData.partnerShare) : '',
+      partnerShare: f.dealData?.partnerShare ? fmt.raw.digits(String(f.dealData.partnerShare), fmt.units.numberFormat) : '',
       consignorId: f.dealData?.consignorId || '',
       lessorId: f.dealData?.lessorId || '',
-      rentAmount: f.dealData?.rentAmount ? toFa(f.dealData.rentAmount) : '',
+      rentAmount: f.dealData?.rentAmount ? fmt.raw.digits(String(f.dealData.rentAmount), fmt.units.numberFormat) : '',
       rentStartDate: f.dealData?.rentStartDate || f.startDate || '',
       rentEndDate: f.dealData?.rentEndDate || '',
       rentPayments: f.dealData?.rentPayments || [],

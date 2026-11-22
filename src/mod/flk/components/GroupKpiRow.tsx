@@ -2,6 +2,10 @@
  * GroupKpiRow.tsx — کارت KPI گروه گله
  * جدا شده از GroupsPage.tsx
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
+
+
 import type { FlockGroup } from '../store';
 import { useGroupKpi } from '../hooks/useGroupKpi';
 import { toFa } from '../../../shr/utils/fa';
@@ -12,6 +16,7 @@ export interface GroupKpiRowProps {
 }
 
 export function GroupKpiRow({ group, onOpen }: GroupKpiRowProps) {
+  const fmt = useFormat();
   const kpi = useGroupKpi(group.id);
   if (kpi.flockCount === 0) return null;
 
@@ -35,15 +40,15 @@ export function GroupKpiRow({ group, onOpen }: GroupKpiRowProps) {
       }}
       title="کلیک برای گزارش کامل"
     >
-      <span>🐔 <b style={{ color: 'var(--text)' }}>{toFa(kpi.totalCurrent)}</b></span>
+      <span>🐔 <b style={{ color: 'var(--text)' }}>{fmt.count(kpi.totalCurrent)}</b></span>
       {(kpi.totalMale > 0 || kpi.totalFemale > 0) && (
-        <span title="نر / ماده">♂ {toFa(kpi.totalMale)} / ♀ {toFa(kpi.totalFemale)}</span>
+        <span title="نر / ماده">♂ {fmt.count(kpi.totalMale)} / ♀ {fmt.count(kpi.totalFemale)}</span>
       )}
       {kpi.totalDeaths > 0 && (
-        <span>💀 <b style={{ color: mortalityTone }}>{toFa(kpi.totalDeaths)}</b> ({toFa(kpi.mortalityRate.toFixed(1))}٪)</span>
+        <span>💀 <b style={{ color: mortalityTone }}>{fmt.count(kpi.totalDeaths)}</b> ({fmt.num(kpi.mortalityRate)}٪)</span>
       )}
-      {kpi.totalCost > 0 && <span>💰 <b style={{ color: 'var(--text)' }}>{toFa(Math.round(kpi.totalCost / 1_000_000))}M</b></span>}
-      {kpi.totalRevenue > 0 && <span>📈 <b style={{ color: profitTone }}>{toFa(Math.round(kpi.totalProfit / 1_000_000))}M</b></span>}
+      {kpi.totalCost > 0 && <span>💰 <b style={{ color: 'var(--text)' }}>{fmt.num(kpi.totalCost / 1_000_000)}M</b></span>}
+      {kpi.totalRevenue > 0 && <span>📈 <b style={{ color: profitTone }}>{fmt.num(kpi.totalProfit / 1_000_000)}M</b></span>}
     </div>
   );
 }

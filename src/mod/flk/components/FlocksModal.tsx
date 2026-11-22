@@ -1,6 +1,10 @@
 /**
  * FlocksModal.tsx — فرم افزودن/ویرایش گله
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
+
+
 import { useEffect, useRef, useState } from 'react';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import {
@@ -30,7 +34,6 @@ import type { Invoice, InvoiceItem } from '../../tra/types';
 import type { HatchResult, EggEntry } from '../../inc/store';
 import type { Hall, Zone } from '../../hal/store';
 import type { useBreedStandard } from '../../../shr/hooks/useBreedStandard';
-import type { useFormat } from '../../../shr/units';
 
 type BreedStd = ReturnType<typeof useBreedStandard>;
 type Fmt = ReturnType<typeof useFormat>;
@@ -313,7 +316,7 @@ export default function FlocksModal(props: FlocksModalProps) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
             <Field
               label="سن شروع تخم‌گذاری (روز)" error={showError('layingStartDay')} onTouch={() => markTouched('layingStartDay')}
-              autoFrom={layingFromStd && formStd?.biology?.layingStartDay ? 'استاندارد نژاد (' + toFa(formStd.biology.layingStartDay) + ' روز)' : undefined}
+              autoFrom={layingFromStd && formStd?.biology?.layingStartDay ? 'استاندارد نژاد (' + fmt.count(formStd.biology.layingStartDay) + ' روز)' : undefined}
             >
               <NumField
                 value={form.layingStartDay || (formLaying ? String(formLaying) : '')}

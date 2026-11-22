@@ -1,6 +1,8 @@
 /**
  * GroupTimeline.tsx — Gantt تاریخچه عضویت گله‌ها در گروه
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { useMemo } from 'react';
 import { useFlk, jalaliToDate } from '../store';
 import { todayJ } from '../api/flocksCalc';
@@ -28,6 +30,7 @@ function daysDiff(from: string, to: string): number {
 }
 
 export default function GroupTimeline({ groupId }: Props) {
+  const fmt = useFormat();
   const groups = useFlk(s => s.groups);
   const groupMembers = useFlk(s => s.groupMembers);
   const flocks = useFlk(s => s.flocks);
@@ -145,11 +148,11 @@ export default function GroupTimeline({ groupId }: Props) {
                     overflow: 'hidden',
                     whiteSpace: 'nowrap',
                   }}>
-                    {toFa(Math.abs(r.endOffset - r.startOffset))} روز
+                    {fmt.count(Math.abs(r.endOffset - r.startOffset))} روز
                   </div>
                 </div>
                 <div style={{ width: 110, fontSize: 10, color: 'var(--muted)', flexShrink: 0, textAlign: 'left' }}>
-                  {toFa(r.joinedAt)} {r.leftAt ? '→ ' + toFa(r.leftAt) : '→ امروز'}
+                  {fmt.date(r.joinedAt)} {r.leftAt ? '→ ' + fmt.date(r.leftAt) : '→ امروز'}
                 </div>
               </div>
             );

@@ -1,6 +1,8 @@
 /**
  * GroupComparisonModal.tsx — مقایسه ۲-۳ گروه
  */
+import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useState } from 'react';
 import { Modal, Btn, BtnRow, Select } from '../../../shr/components/ui';
 import { useFlk, type FlockGroupType } from '../store';
@@ -18,9 +20,9 @@ const TYPE_ICON: Record<FlockGroupType, string> = {
 };
 
 function fmtMoney(n: number): string {
-  if (Math.abs(n) >= 1_000_000) return toFa((n / 1_000_000).toFixed(1)) + 'M';
-  if (Math.abs(n) >= 1_000) return toFa(Math.round(n / 1_000)) + 'K';
-  return toFa(Math.round(n));
+  if (Math.abs(n) >= 1_000_000) return getGlobalFormat().num(n / 1_000_000) + 'M';
+  if (Math.abs(n) >= 1_000) return getGlobalFormat().count(Math.round(n / 1_000)) + 'K';
+  return getGlobalFormat().count(Math.round(n));
 }
 
 interface KpiRow {
@@ -29,6 +31,7 @@ interface KpiRow {
 }
 
 export default function GroupComparisonModal({ open, onClose }: Props) {
+  const fmt = useFormat();
   const groups = useFlk(s => s.groups);
   const [ids, setIds] = useState<string[]>([]);
 
@@ -45,16 +48,16 @@ export default function GroupComparisonModal({ open, onClose }: Props) {
   const rows: KpiRow[] = [
     {
       label: 'گله',
-      values: kpis.map(({ kpi }) => ({ display: toFa(kpi.flockCount), raw: kpi.flockCount })),
+      values: kpis.map(({ kpi }) => ({ display: fmt.count(kpi.flockCount), raw: kpi.flockCount })),
     },
     {
       label: 'پرنده فعلی',
-      values: kpis.map(({ kpi }) => ({ display: toFa(kpi.totalCurrent), raw: kpi.totalCurrent })),
+      values: kpis.map(({ kpi }) => ({ display: fmt.count(kpi.totalCurrent), raw: kpi.totalCurrent })),
     },
     {
       label: 'تلفات',
       values: kpis.map(({ kpi }) => ({
-        display: toFa(kpi.totalDeaths) + ' (' + toFa(kpi.mortalityRate.toFixed(1)) + '٪)',
+        display: fmt.count(kpi.totalDeaths) + ' (' + fmt.num(kpi.mortalityRate) + '٪)',
         raw: kpi.mortalityRate,
         better: 'low',
       })),

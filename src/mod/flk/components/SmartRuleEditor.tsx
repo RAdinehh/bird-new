@@ -2,6 +2,8 @@
  * SmartRuleEditor.tsx — ویرایشگر قانون گروه هوشمند
  * چیدمان ۲ ستونه + مرحله زندگی (preset) + hint هوشمند
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { useState } from 'react';
 import { Select, Field, Input, Grid2 } from '../../../shr/components/ui';
 import type { FlockGroupRule, FlockGroupType, FlockStatus } from '../store';
@@ -16,6 +18,7 @@ export interface SmartRuleEditorProps {
 }
 
 export function SmartRuleEditor({ rule, onChange, breeds, halls }: SmartRuleEditorProps) {
+  const fmt = useFormat();
   const update = (patch: Partial<FlockGroupRule>) => {
     const next: FlockGroupRule = { ...rule, ...patch };
     Object.keys(next).forEach(k => {
@@ -176,7 +179,7 @@ export function SmartRuleEditor({ rule, onChange, breeds, halls }: SmartRuleEdit
         <Grid2>
           <Field label="سن از (روز)" hint={!rule.minAge ? 'حداقل سن (حداکثر ۶۰۰) — مثلاً: ۱۴۰' : undefined}>
             <Input
-              value={typeof rule.minAge === 'number' ? toFa(rule.minAge) : ''}
+              value={typeof rule.minAge === 'number' ? fmt.raw.digits(String(rule.minAge), fmt.units.numberFormat) : ''}
               onChange={e => update({ minAge: parseAge(e.target.value) })}
               placeholder="—"
               inputMode="numeric"
@@ -187,7 +190,7 @@ export function SmartRuleEditor({ rule, onChange, breeds, halls }: SmartRuleEdit
           </Field>
           <Field label="سن تا (روز)" hint={!rule.maxAge ? 'حداکثر سن (حداکثر ۶۰۰) — مثلاً: ۲۰۰' : undefined}>
             <Input
-              value={typeof rule.maxAge === 'number' ? toFa(rule.maxAge) : ''}
+              value={typeof rule.maxAge === 'number' ? fmt.raw.digits(String(rule.maxAge), fmt.units.numberFormat) : ''}
               onChange={e => update({ maxAge: parseAge(e.target.value) })}
               placeholder="—"
               inputMode="numeric"

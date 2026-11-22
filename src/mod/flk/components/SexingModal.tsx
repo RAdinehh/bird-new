@@ -3,6 +3,9 @@
  * فیلدهای نر، ماده، نامشخص همه editable.
  * Invariant: male + female + unknown === currentCount
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
+
 import { useState, useEffect } from 'react';
 import { Modal, Btn, BtnRow, Field, Grid2, NumField, Input } from '../../../shr/components/ui';
 import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
@@ -39,6 +42,7 @@ function toEnNum(s: string): number {
 }
 
 export default function SexingModal({ open, onClose, flock }: Props) {
+  const fmt = useFormat();
   const recordSexing = useFlk(s => s.recordSexing);
 
   const [maleStr, setMaleStr] = useState('');
@@ -170,7 +174,7 @@ export default function SexingModal({ open, onClose, flock }: Props) {
           <HelpIcon text={HELP.flk.sexing} />
         </div>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-          تعداد زنده: <b style={{ color: 'var(--text)' }}>{toFa(currentCount.toLocaleString('fa-IR'))}</b> پرنده
+          تعداد زنده: <b style={{ color: 'var(--text)' }}>{fmt.count(currentCount)}</b> پرنده
         </div>
       </div>
 
@@ -214,10 +218,10 @@ export default function SexingModal({ open, onClose, flock }: Props) {
             textAlign: 'center',
           }}>
             {isIncomplete
-              ? `— / ${toFa(currentCount.toLocaleString('fa-IR'))}`
+              ? `— / ${fmt.count(currentCount)}`
               : mismatch
-                ? `✗ ${toFa(totalInput.toLocaleString('fa-IR'))} / ${toFa(currentCount.toLocaleString('fa-IR'))}`
-                : `✓ ${toFa(totalInput.toLocaleString('fa-IR'))} = ${toFa(currentCount.toLocaleString('fa-IR'))}`}
+                ? `✗ ${fmt.count(totalInput)} / ${fmt.count(currentCount)}`
+                : `✓ ${fmt.count(totalInput)} = ${fmt.count(currentCount)}`}
           </div>
         </Field>
       </Grid2>
@@ -233,11 +237,11 @@ export default function SexingModal({ open, onClose, flock }: Props) {
         </div>
       ) : isIncomplete && autoFillField ? (
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--info)', marginBottom: 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {autoFillField === 'male' ? 'نر' : autoFillField === 'female' ? 'ماده' : 'نامشخص'} = {toFa(autoFillValue)} (خودکار — وارد کنید)
+          {autoFillField === 'male' ? 'نر' : autoFillField === 'female' ? 'ماده' : 'نامشخص'} = {fmt.count(autoFillValue)} (خودکار — وارد کنید)
         </div>
       ) : mismatch ? (
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', marginBottom: 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {toFa(Math.abs(diff))} پرنده {diff > 0 ? 'بیشتر' : 'کمتر'} از موجودی ({toFa(currentCount)})
+          {fmt.count(Math.abs(diff))} پرنده {diff > 0 ? 'بیشتر' : 'کمتر'} از موجودی ({fmt.count(currentCount)})
         </div>
       ) : null}
 

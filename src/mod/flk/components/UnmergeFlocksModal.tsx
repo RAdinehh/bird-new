@@ -5,6 +5,9 @@
  *   ۲. منابع ادغام‌شده (📦) — با مرتب‌سازی در header
  *   ۳. پیش‌بینی (📊) — نتیجه
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
+
 import { useState, useMemo } from 'react';
 import { Modal, Btn, BtnRow } from '../../../shr/components/ui';
 import { toastMsg } from '../../../cor/store/toast';
@@ -60,6 +63,7 @@ const cell = (label: string, value: React.ReactNode) => (
 );
 
 export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Props) {
+  const fmt = useFormat();
   const allFlocks = useFlk(s => s.flocks);
   const unmergeFlocks = useFlk(s => s.unmergeFlocks);
 
@@ -122,7 +126,7 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
     if (!selectedSrc) return;
     const ok = await showConfirmAsync(
       'تأیید بازگردانی',
-      `گله «${selectedSrc.flockName}» با ${toFa(selectedSrc.count || 0)} پرنده به حالت فعال بازمی‌گردد.`,
+      `گله «${selectedSrc.flockName}» با ${fmt.count(selectedSrc.count || 0)} پرنده به حالت فعال بازمی‌گردد.`,
       { confirmText: 'بازگردانی' }
     );
     if (!ok) return;
@@ -180,7 +184,7 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
                   {cell('نر', fmtInt(targetItem.maleCount))}
                   {cell('ماده', fmtInt(targetItem.femaleCount))}
                   {cell('نامشخص', fmtInt(targetItem.unknownCount))}
-                  {mergeDate && cell('تاریخ ادغام', toFa(mergeDate))}
+                  {mergeDate && cell('تاریخ ادغام', fmt.date(mergeDate))}
                 </div>
               </div>
             </div>
@@ -191,10 +195,10 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
             <div>
               <div style={{ marginBottom: 8, paddingBottom: 6, borderBottom: '1px solid var(--border)' }}>
                 <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', marginBottom: 2 }}>
-                  📦 منابع ادغام‌شده ({toFa(sourceItems.length)} گله)
+                  📦 منابع ادغام‌شده ({fmt.count(sourceItems.length)} گله)
                 </div>
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.6 }}>
-                  این گله از ادغام {toFa(sourceItems.length)} گله ساخته شده. برای بازگردانی یکی را انتخاب کنید.
+                  این گله از ادغام {fmt.count(sourceItems.length)} گله ساخته شده. برای بازگردانی یکی را انتخاب کنید.
                 </div>
               </div>
 
@@ -261,7 +265,7 @@ export default function UnmergeFlocksModal({ open, onClose, targetFlockId }: Pro
                 <br />
                 • <b>{targetItem?.flockName}</b> ← <b>{fmtInt(prediction.targetAfter)}</b> پرنده ({fmtInt(targetItem?.count)} − {fmtInt(prediction.sourceAfter)})
                 {prediction.remainingSources > 0 && (
-                  <><br /><span style={{ color: 'var(--muted)' }}>• {toFa(prediction.remainingSources)} منبع دیگر همچنان در گله اصلی باقی می‌ماند</span></>
+                  <><br /><span style={{ color: 'var(--muted)' }}>• {fmt.count(prediction.remainingSources)} منبع دیگر همچنان در گله اصلی باقی می‌ماند</span></>
                 )}
               </div>
             </div>

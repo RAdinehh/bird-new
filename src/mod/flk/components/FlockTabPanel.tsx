@@ -1,6 +1,8 @@
 /**
  * FlockTabPanel — محتوای یک تب از گله‌ها (carousel)
  */
+import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useState, useMemo, useEffect } from 'react';
 import { useFlk, getAgeDays, type Flock } from '../store';
 import { useFab } from '../../../shr/hooks/useFab';
@@ -8,7 +10,6 @@ import type { Bird, Breed } from '../../brd/store';
 import type { Hall, Zone } from '../../hal/store';
 import type { Invoice } from '../../tra/store';
 import type { useBreedStandard } from '../../../shr/hooks/useBreedStandard';
-import type { useFormat } from '../../../shr/units';
 import type { TabId } from '../types-flocks';
 import type { FlocksKpi } from '../hooks/useFlocksKpi';
 import { filterFlocksByTab } from '../_flkList';
@@ -136,12 +137,12 @@ export default function FlockTabPanel({
         if (withRefs.length > 0) {
           await showConfirmAsync(
             '⛔ حذف کامل مجاز نیست',
-            `از ${toFa(ids.length)} گله انتخاب شده، ${toFa(withRefs.length)} گله دارای سابقه (فاکتور، هچ یا ثبت روزانه) هستند.\n\nطبق استانداردهای سیستم، حذف کامل گله‌های دارای سابقه ممنوع است تا داده‌های مالی و آماری خراب نشوند.\n\nلطفاً از دکمه «آرشیو» برای انتقال آن‌ها به بایگانی استفاده کنید.`,
+            `از ${getGlobalFormat().count(ids.length)} گله انتخاب شده، ${getGlobalFormat().count(withRefs.length)} گله دارای سابقه (فاکتور، هچ یا ثبت روزانه) هستند.\n\nطبق استانداردهای سیستم، حذف کامل گله‌های دارای سابقه ممنوع است تا داده‌های مالی و آماری خراب نشوند.\n\nلطفاً از دکمه «آرشیو» برای انتقال آن‌ها به بایگانی استفاده کنید.`,
             { confirmText: 'متوجه شدم', danger: true }
           );
           return;
         }
-        const msg = `آیا از حذف کامل ${toFa(ids.length)} گله خالی (بدون هیچ سابقه‌ای) مطمئنید؟ این عمل غیرقابل بازگشت است.`;
+        const msg = `آیا از حذف کامل ${getGlobalFormat().count(ids.length)} گله خالی (بدون هیچ سابقه‌ای) مطمئنید؟ این عمل غیرقابل بازگشت است.`;
         const ok = await showConfirmAsync('حذف کامل گله‌های خالی', msg, { danger: true, confirmText: 'بله، حذف کن', cancelText: 'انصراف' });
         if (!ok) return;
       }
@@ -163,7 +164,7 @@ export default function FlockTabPanel({
     onArchive: async (ids) => {
       if (tab === 'archived') {
         // بازگردانی از آرشیو
-        const ok = await showConfirmAsync('بازگردانی گروهی', toFa(ids.length) + ' گله بازگردانی شوند؟');
+        const ok = await showConfirmAsync('بازگردانی گروهی', getGlobalFormat().count(ids.length) + ' گله بازگردانی شوند؟');
         if (!ok) return;
         for (const id of ids) {
           try { restore(id); } catch { /* silent */ }
@@ -173,7 +174,7 @@ export default function FlockTabPanel({
         return;
       }
       // آرشیو معمولی
-      const ok = await showConfirmAsync('آرشیو گروهی', toFa(ids.length) + ' گله آرشیو شوند؟');
+      const ok = await showConfirmAsync('آرشیو گروهی', getGlobalFormat().count(ids.length) + ' گله آرشیو شوند؟');
       if (!ok) return;
       for (const id of ids) {
         try { archive(id); } catch { /* silent */ }
@@ -207,7 +208,7 @@ export default function FlockTabPanel({
           const { showPromptAsync } = await import('../../../cor/store/dialog');
           const note = await showPromptAsync(
             'واکسن گروهی',
-            'نام واکسن برای ' + toFa(ids.length) + ' گله:',
+            'نام واکسن برای ' + getGlobalFormat().count(ids.length) + ' گله:',
             { label: 'واکسن', placeholder: 'مثلاً نیوکاسل', required: true, confirmText: 'ثبت' }
           );
           if (!note?.trim()) return;
@@ -224,7 +225,7 @@ export default function FlockTabPanel({
               notes: 'Bulk vaccine',
             });
           }
-          toastMsg.success('واکسن «' + note.trim() + '» برای ' + toFa(ids.length) + ' گله ثبت شد');
+          toastMsg.success('واکسن «' + note.trim() + '» برای ' + getGlobalFormat().count(ids.length) + ' گله ثبت شد');
           logAction('add', 'flk', 'واکسن گروهی: ' + note.trim() + ' (' + ids.length + ' گله)');
         },
       },
@@ -236,7 +237,7 @@ export default function FlockTabPanel({
           const { showPromptAsync } = await import('../../../cor/store/dialog');
           const note = await showPromptAsync(
             'دان گروهی',
-            'توضیح دان برای ' + toFa(ids.length) + ' گله:',
+            'توضیح دان برای ' + getGlobalFormat().count(ids.length) + ' گله:',
             { label: 'دان', placeholder: 'مثلاً دان رشد', required: true, confirmText: 'ثبت' }
           );
           if (!note?.trim()) return;
@@ -253,7 +254,7 @@ export default function FlockTabPanel({
               notes: 'Bulk feed',
             });
           }
-          toastMsg.success('دان «' + note.trim() + '» برای ' + toFa(ids.length) + ' گله ثبت شد');
+          toastMsg.success('دان «' + note.trim() + '» برای ' + getGlobalFormat().count(ids.length) + ' گله ثبت شد');
           logAction('add', 'flk', 'دان گروهی: ' + note.trim() + ' (' + ids.length + ' گله)');
         },
       },
@@ -263,10 +264,10 @@ export default function FlockTabPanel({
         icon: '📄',
         action: (ids) => {
           const selectedFlocks = ids.map(id => flocks.find(f => f.id === id)).filter(Boolean) as Flock[];
-          const lines = ['# گزارش گروهی گله‌ها', '', 'تعداد: ' + toFa(ids.length), ''];
+          const lines = ['# گزارش گروهی گله‌ها', '', 'تعداد: ' + getGlobalFormat().count(ids.length), ''];
           for (const f of selectedFlocks) {
             lines.push('## ' + f.name);
-            lines.push('- تعداد: ' + toFa(f.currentCount || 0) + ' / ' + toFa(f.initialCount || 0));
+            lines.push('- تعداد: ' + getGlobalFormat().count(f.currentCount || 0) + ' / ' + getGlobalFormat().count(f.initialCount || 0));
             lines.push('- وضعیت: ' + (f.status === 'active' ? 'فعال' : f.status));
             lines.push('');
           }

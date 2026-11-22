@@ -1,6 +1,8 @@
 /**
  * GroupReportModal.tsx — گزارش جزئیات گروه گله
  */
+import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
+
 import { useMemo, useState } from 'react';
 import { Modal, Btn, BtnRow } from '../../../shr/components/ui';
 import { useFlk, type FlockGroupType } from '../store';
@@ -29,12 +31,12 @@ const STATUS_LABEL: Record<string, string> = {
 
 function fmtMoney(n: number): string {
   if (Math.abs(n) >= 1_000_000) {
-    return toFa((n / 1_000_000).toFixed(1)) + 'M';
+    return getGlobalFormat().num(n / 1_000_000) + 'M';
   }
   if (Math.abs(n) >= 1_000) {
-    return toFa(Math.round(n / 1_000)) + 'K';
+    return getGlobalFormat().count(Math.round(n / 1_000)) + 'K';
   }
-  return toFa(Math.round(n));
+  return getGlobalFormat().count(Math.round(n));
 }
 
 function fmtPerBird(v: number): string {
@@ -43,6 +45,7 @@ function fmtPerBird(v: number): string {
 }
 
 export default function GroupReportModal({ open, onClose, groupId }: Props) {
+  const fmt = useFormat();
   const groups = useFlk(s => s.groups);
   const group = useMemo(() => groups.find(g => g.id === groupId), [groups, groupId]);
   const kpi = useGroupKpi(groupId || '');
@@ -95,16 +98,16 @@ export default function GroupReportModal({ open, onClose, groupId }: Props) {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, fontSize: 'var(--fs-sm)' }}>
           <div>
             <div style={{ color: 'var(--muted)', fontSize: 10 }}>گله‌ها</div>
-            <div style={{ fontWeight: 700 }}>{toFa(kpi.flockCount)} ({toFa(kpi.liveFlockCount)} فعال)</div>
+            <div style={{ fontWeight: 700 }}>{fmt.count(kpi.flockCount)} ({fmt.count(kpi.liveFlockCount)} فعال)</div>
           </div>
           <div>
             <div style={{ color: 'var(--muted)', fontSize: 10 }}>پرنده</div>
-            <div style={{ fontWeight: 700 }}>{toFa(kpi.totalCurrent)} از {toFa(kpi.totalInitial)}</div>
+            <div style={{ fontWeight: 700 }}>{fmt.count(kpi.totalCurrent)} از {fmt.count(kpi.totalInitial)}</div>
           </div>
           <div>
             <div style={{ color: 'var(--muted)', fontSize: 10 }}>تلفات</div>
             <div style={{ fontWeight: 700, color: mortalityTone }}>
-              {toFa(kpi.totalDeaths)} ({toFa(kpi.mortalityRate.toFixed(1))}٪)
+              {fmt.count(kpi.totalDeaths)} ({fmt.num(kpi.mortalityRate)}٪)
             </div>
           </div>
           <div>
@@ -119,9 +122,9 @@ export default function GroupReportModal({ open, onClose, groupId }: Props) {
         </div>
         {(kpi.totalMale > 0 || kpi.totalFemale > 0) && (
           <div style={{ display: 'flex', gap: 12, marginTop: 6, paddingTop: 6, borderTop: '1px solid var(--accent-border)', fontSize: 11 }}>
-            <span>♂ نر: <b style={{ color: 'var(--text)' }}>{toFa(kpi.totalMale)}</b></span>
-            <span>♀ ماده: <b style={{ color: 'var(--text)' }}>{toFa(kpi.totalFemale)}</b></span>
-            {kpi.totalUnknown > 0 && <span>❓ نامشخص: <b style={{ color: 'var(--muted)' }}>{toFa(kpi.totalUnknown)}</b></span>}
+            <span>♂ نر: <b style={{ color: 'var(--text)' }}>{fmt.count(kpi.totalMale)}</b></span>
+            <span>♀ ماده: <b style={{ color: 'var(--text)' }}>{fmt.count(kpi.totalFemale)}</b></span>
+            {kpi.totalUnknown > 0 && <span>❓ نامشخص: <b style={{ color: 'var(--muted)' }}>{fmt.count(kpi.totalUnknown)}</b></span>}
           </div>
         )}
       </div>
@@ -196,7 +199,7 @@ export default function GroupReportModal({ open, onClose, groupId }: Props) {
                   </span>
                 </div>
                 <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', fontSize: 11, color: 'var(--muted)' }}>
-                  <span>🐔 <b style={{ color: 'var(--text)' }}>{toFa(f.currentCount)}</b>/{toFa(f.initialCount)}</span>
+                  <span>🐔 <b style={{ color: 'var(--text)' }}>{fmt.count(f.currentCount)}</b>/{fmt.count(f.initialCount)}</span>
                   {f.sexRatio !== '—' && (
                     <span title="نسبت خروس به مرغ">♂️♀️ <b style={{ color: 'var(--text)' }}>{f.sexRatio}</b></span>
                   )}
@@ -210,7 +213,7 @@ export default function GroupReportModal({ open, onClose, groupId }: Props) {
                       ♀️ {fmtPerBird(f.profitPerFemale)}
                     </span>
                   )}
-                  <span>🎂 {toFa(f.ageDays)} روز</span>
+                  <span>🎂 {fmt.count(f.ageDays)} روز</span>
                   <span>💰 {fmtMoney(f.cost)}</span>
                   <span>📈 {fmtMoney(f.revenue)}</span>
                   <span style={{ color: fTone, fontWeight: 700 }}>{f.profit >= 0 ? '+' : ''}{fmtMoney(f.profit)}</span>

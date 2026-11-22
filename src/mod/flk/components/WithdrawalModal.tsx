@@ -2,6 +2,9 @@
  * WithdrawalModal — نمایش وضعیت دوره پرهیز دارو
  * فقط-خواندنی. برای ویرایش از «ثبت روزانه» استفاده می‌شود.
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
+
 import { useMemo } from 'react';
 import { Modal, Btn, BtnRow, Tag, Empty } from '../../../shr/components/ui';
 import { toFa } from '../../../shr/utils/fa';
@@ -28,6 +31,7 @@ interface Props {
 type Item = { flock: Flock; aw: NonNullable<Flock['activeWithdrawal']>; daysLeft: number };
 
 export default function WithdrawalModal({ open, onClose }: Props) {
+  const fmt = useFormat();
   const flocks = useFlk(s => s.flocks);
 
   const items: Item[] = useMemo(() => {
@@ -78,7 +82,7 @@ export default function WithdrawalModal({ open, onClose }: Props) {
                 alignItems: 'center', textAlign: 'center',
               }}>
                 <div style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, color: 'var(--danger)', lineHeight: 1.2 }}>
-                  {toFa(urgentCount)}
+                  {fmt.count(urgentCount)}
                 </div>
                 <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', fontWeight: 600 }}>
                   گله فوری (≤ ۳ روز)
@@ -93,7 +97,7 @@ export default function WithdrawalModal({ open, onClose }: Props) {
                 alignItems: 'center', textAlign: 'center',
               }}>
                 <div style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, color: 'var(--warn)', lineHeight: 1.2 }}>
-                  {nearestDays !== null ? toFa(nearestDays) : '—'}
+                  {nearestDays !== null ? fmt.count(nearestDays) : '—'}
                 </div>
                 <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', fontWeight: 600 }}>
                   نزدیک‌ترین پایان (روز)
@@ -112,7 +116,7 @@ export default function WithdrawalModal({ open, onClose }: Props) {
                 📋 گله‌های درگیر
               </span>
               <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 500 }}>
-                {toFa(items.length)} گله
+                {fmt.count(items.length)} گله
               </span>
             </div>
 
@@ -145,9 +149,9 @@ export default function WithdrawalModal({ open, onClose }: Props) {
                       </div>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
-                      <Tag tone={tone}>{toFa(days)} روز</Tag>
+                      <Tag tone={tone}>{fmt.count(days)} روز</Tag>
                       <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--dim)' }}>
-                        {toFa(it.aw.until)}
+                        {fmt.date(it.aw.until)}
                       </span>
                     </div>
                   </div>

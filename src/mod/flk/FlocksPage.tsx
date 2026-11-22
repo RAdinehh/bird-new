@@ -1,7 +1,11 @@
 /**
  * FlocksPage — گله‌ها (carousel tabs مثل hal)
  */
-import { useFormat } from '../../shr/units/useFormat';
+import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
+
+
+
+
 
 
 import { useState, useMemo, useEffect, useRef} from 'react';
@@ -435,7 +439,7 @@ export default function FlocksPage() {
             if (isManual && _total > 0) {
               const okShadow = await showConfirmAsync(
                 'فاکتور خرید خودکار',
-                'این گله هزینه‌ای معادل ' + toFa(_total.toLocaleString('fa-IR')) + ' تومان دارد.\n\nآیا یک فاکتور خرید پیش‌نویس در «معاملات» بسازم تا هزینه‌ها در گزارش‌های مالی هم لحاظ شوند؟',
+                'این گله هزینه‌ای معادل ' + getGlobalFormat().money(_total) + ' دارد.\n\nآیا یک فاکتور خرید پیش‌نویس در «معاملات» بسازم تا هزینه‌ها در گزارش‌های مالی هم لحاظ شوند؟',
               );
               if (okShadow) {
                 try {

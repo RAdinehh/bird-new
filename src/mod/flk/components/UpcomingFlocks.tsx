@@ -3,12 +3,14 @@
  * طراحی: رینگ دایره‌ای + responsive (۱-۳ تک‌ستونه • ۴+ دو‌ستونه)
  * الگو: FOUNDATION-PATTERNS ب۲۲ (KPI Cards)
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
+
 import { toFa } from '../../../shr/utils/fa';
 import { DEFAULT_LAYING_START, getAgeDays, getLayingStartDay } from '../store';
 import type { Flock } from '../store';
 import type { TabId } from '../types-flocks';
 import type { useBreedStandard } from '../../../shr/hooks/useBreedStandard';
-import type { useFormat } from '../../../shr/units';
 
 type BreedStd = ReturnType<typeof useBreedStandard>;
 type Fmt = ReturnType<typeof useFormat>;
@@ -27,6 +29,7 @@ interface RingProps {
 }
 
 function Ring({ pct, color, size = 40 }: RingProps) {
+  const fmt = useFormat();
   const r = (size / 2) - 4;
   const c = 2 * Math.PI * r;
   const offset = c - (Math.min(100, pct) / 100) * c;
@@ -42,7 +45,7 @@ function Ring({ pct, color, size = 40 }: RingProps) {
       />
       <text x={size / 2} y={size / 2 + size * 0.09} textAnchor="middle"
         fontSize={size * 0.26} fontWeight="700" fill={color}>
-        {toFa(Math.round(pct))}٪
+        {fmt.count(Math.round(pct))}٪
       </text>
     </svg>
   );
@@ -95,7 +98,7 @@ export default function UpcomingFlocks({ flocks, breedStd, fmt, tab }: UpcomingF
           fontSize: 'var(--fs-2xs)', fontWeight: 700,
           background: 'var(--accent)', color: 'var(--avatar-text, #fff)',
           padding: '1px 7px', borderRadius: 'var(--r-sm)',
-        }}>{toFa(items.length)}</span>
+        }}>{fmt.count(items.length)}</span>
       </div>
 
       {/* Grid / List */}
@@ -156,9 +159,9 @@ export default function UpcomingFlocks({ flocks, breedStd, fmt, tab }: UpcomingF
                   whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                 }}>{f.name}</div>
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  <span>سن: <b style={{ color: 'var(--text)' }}>{toFa(age)}</b> روز</span>
+                  <span>سن: <b style={{ color: 'var(--text)' }}>{fmt.count(age)}</b> روز</span>
                   <span aria-hidden>·</span>
-                  <span>شروع: <b style={{ color: 'var(--text)' }}>{toFa(startDay)}</b> روز</span>
+                  <span>شروع: <b style={{ color: 'var(--text)' }}>{fmt.count(startDay)}</b> روز</span>
                 </div>
               </div>
               <div style={{

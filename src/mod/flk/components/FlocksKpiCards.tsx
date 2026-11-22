@@ -2,6 +2,8 @@
  * FlocksKpiCards — ۳ کارت KPI بالای لیست گله‌ها
  * الگو: FOUNDATION-PATTERNS ب۲۲
  */
+import { useFormat } from '../../../shr/units/useFormat';
+
 import { toFa } from '../../../shr/utils/fa';
 
 interface Props {
@@ -63,13 +65,14 @@ function KpiCard({ icon, label, value, tone }: KpiCardProps) {
 }
 
 export default function FlocksKpiCards({ totalFlocks, totalBirds, totalValue }: Props) {
+  const fmt = useFormat();
   if (totalFlocks === 0) return null;
 
   const valueText = totalValue >= 1_000_000_000
-    ? `${toFa((totalValue / 1_000_000_000).toFixed(1))} میلیارد`
+    ? `${fmt.money(totalValue)}`
     : totalValue >= 1_000_000
-      ? `${toFa((totalValue / 1_000_000).toFixed(1))} میلیون`
-      : `${toFa(totalValue.toLocaleString('fa-IR'))}`;
+      ? `${fmt.money(totalValue)}`
+      : `${fmt.money(totalValue)}`;
 
   return (
     <div style={{
@@ -80,13 +83,13 @@ export default function FlocksKpiCards({ totalFlocks, totalBirds, totalValue }: 
       <KpiCard
         icon="🐔"
         label="کل گله‌ها"
-        value={`${toFa(totalFlocks)} گله`}
+        value={`${fmt.count(totalFlocks)} گله`}
         tone="accent"
       />
       <KpiCard
         icon="🥚"
         label="کل پرنده‌ها"
-        value={`${toFa(totalBirds)} پرنده`}
+        value={`${fmt.count(totalBirds)} پرنده`}
         tone="purple"
       />
       <KpiCard

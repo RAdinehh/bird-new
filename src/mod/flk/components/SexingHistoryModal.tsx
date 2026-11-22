@@ -2,6 +2,9 @@
  * SexingHistoryModal — تاریخچه تفکیک جنسیت گله
  * تاریخ سمت راست (بدون کادر) + یک wrapper برای کل گروه + جداکننده بین کارت‌ها
  */
+import { getGlobalFormat } from '../../../shr/units/useFormat';
+
+
 import { useMemo, useState } from 'react';
 import { Tag } from '../../../shr/components/ui';
 import { HistoryModalShell } from '../../../shr/components/history/HistoryModalShell';
@@ -36,7 +39,7 @@ function deltaTone(d: number): string {
 }
 
 function deltaLabel(d: number): string {
-  return (d > 0 ? '+' : '') + toFa(d);
+  return (d > 0 ? '+' : '') + getGlobalFormat().count(d);
 }
 
 export default function SexingHistoryModal({ open, onClose, flock }: Props) {
@@ -109,7 +112,7 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
                 paddingBottom: 6,
                 marginBottom: 6,
               }}>
-                📅 {toFa(g.label)}
+                📅 {getGlobalFormat().raw.digits(String(g.label), getGlobalFormat().units.numberFormat)}
               </div>
 
               {/* wrapper کل گروه */}
@@ -208,7 +211,7 @@ export default function SexingHistoryModal({ open, onClose, flock }: Props) {
                 fontFamily: 'inherit',
               }}
             >
-              📜 نمایش {toFa(hiddenCount)} رویداد بیشتر
+              📜 نمایش {getGlobalFormat().count(hiddenCount)} رویداد بیشتر
             </button>
           )}
         </div>

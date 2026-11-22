@@ -1,3 +1,4 @@
+import { useFormat } from '../../../shr/units/useFormat';
 import { Tag } from '../../../shr/components/ui';
 /**
  * PickInvoiceModal.tsx — انتخاب فاکتور خرید پرنده از tra
@@ -26,6 +27,7 @@ interface FlockLite {
 }
 
 export default function PickInvoiceModal({ open, onClose, onSelect, currentBirdId }: Props) {
+  const fmt = useFormat();
   const invoices = useTra(s => s.invoices);
   const { contacts } = useCtc();
   const { flocks } = useFlk();
@@ -138,11 +140,11 @@ export default function PickInvoiceModal({ open, onClose, onSelect, currentBirdI
                 {/* ردیف ۳: تعداد + مبلغ + تاریخ هچ + تاریخ فاکتور */}
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                   <span style={{ color: 'var(--accent)', fontWeight: 700 }}>
-                    {toFa(totalQty)} پرنده
+                    {fmt.count(totalQty)} پرنده
                   </span>
-                  {inv.total > 0 && <span>· {toFa(Math.round(inv.total).toLocaleString('fa-IR'))} ت</span>}
-                  {firstBird.hatchDate && <span>· هچ: {toFa(firstBird.hatchDate)}</span>}
-                  <span style={{ marginInlineStart: 'auto' }}>{toFa(inv.date)}</span>
+                  {inv.total > 0 && <span>· {fmt.money(inv.total)}</span>}
+                  {firstBird.hatchDate && <span>· هچ: {fmt.date(firstBird.hatchDate)}</span>}
+                  <span style={{ marginInlineStart: 'auto' }}>{fmt.date(inv.date)}</span>
                 </div>
               </button>
             );
