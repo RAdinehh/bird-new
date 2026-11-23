@@ -212,15 +212,15 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       
       <Grid2>
         <Field label="نوع سفارش" help={isPurchase ? HELP.tra.invoice.orderType : HELP.tra.invoice.orderTypeSale}>
-          <Select
+          <SmartSelect
             value={(form.isPreorder && form.category !== 'other') ? 'preorder' : 'stock'}
-            onChange={e => setForm(f => ({ ...f, isPreorder: e.target.value === 'preorder' }))}
-          >
-            <option value="stock">{isPurchase ? "📦 خرید از موجودی" : "📦 فروش از موجودی"}</option>
-            {form.category !== 'other' && (
-              <option value="preorder">{isPurchase ? "📅 پیش‌خرید" : "📅 پیش‌فروش"}</option>
-            )}
-          </Select>
+            modalTitle="انتخاب نوع سفارش"
+            options={[
+              { value: 'stock', label: isPurchase ? '📦 خرید از موجودی' : '📦 فروش از موجودی' },
+              ...(form.category !== 'other' ? [{ value: 'preorder', label: isPurchase ? '📅 پیش‌خرید' : '📅 پیش‌فروش' }] : []),
+            ]}
+            onChange={v => setForm(f => ({ ...f, isPreorder: v === 'preorder' }))}
+          />
         </Field>
                 {(() => {
           const isPartyLocked = !!form.relatedSettlementId && !!form.partyId;

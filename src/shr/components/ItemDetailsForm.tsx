@@ -214,13 +214,18 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {!isPurchase && (
           <Grid2>
             <Field label="منبع جوجه" hint="جوجه از گله موجود می‌آید یا از هچری">
-              <Select value={item.source || 'flock'} onChange={e => {
-                const ns = e.target.value as 'flock' | 'hatch';
-                updateItem({ source: ns, flockId: '', hatchId: '' });
-              }}>
-                <option value="flock">🐔 از گله موجود</option>
-                <option value="hatch">🥚 از هچری</option>
-              </Select>
+              <SmartSelect
+                value={String(item.source || 'flock')}
+                modalTitle="انتخاب منبع جوجه"
+                options={[
+                  { value: 'flock', label: '🐔 از گله موجود' },
+                  { value: 'hatch', label: '🥚 از هچری' },
+                ]}
+                onChange={v => {
+                  const ns = v as 'flock' | 'hatch';
+                  updateItem({ source: ns, flockId: '', hatchId: '' });
+                }}
+              />
             </Field>
           {(item.source || 'flock') === 'hatch' ? (
             <Field label="هچ مبدأ" required error={err('hatchId')} onTouch={touch('hatchId')} hint="هچی که جوجه‌ها از آن آمده">
@@ -374,9 +379,9 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label={isPurchase ? "وزن اولیه (گرم)" : "میانگین وزن (گرم)"} hint={isPurchase ? "حداکثر ۱۰۰ گرم" : undefined}>
             <Input mode="number" value={item.chickWeight != null && item.chickWeight > 0 ? String(item.chickWeight) : ''} onChange={e => {
               let v = parseFaNum(e.target.value) || null;
-              if (v !== null && v > 100) v = 100;
+              if (isPurchase && v !== null && v > 100) v = 100;
               updateItem({ chickWeight: v });
-            }} unit="g" min={20} max={100} />
+            }} unit="g" min={isPurchase ? 20 : 0} max={isPurchase ? 100 : 50000} />
           </Field>
           {quantityField}
         </Grid2>
@@ -386,35 +391,58 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   }
 
   if (category === 'adult') {
+    const isSaleLocked = !isPurchase && !!item.flockId;
+    const isLocked = !!item.existingFlockId || isSaleLocked;
+
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
         <SecTitle icon="🐓" title="اطلاعات پرنده بالغ" />
 
-        {/* --- بخش ۱: هویت --- */}
-        <Grid2>
-          <Field label="نوع پرنده" required error={err('birdId')} onTouch={touch('birdId')} hint={(!isPurchase && item.flockId) ? 'از گله انتخاب‌شده' : undefined}>
-            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" disabled={!!item.existingFlockId || (!isPurchase && !!item.flockId)} />
+        {/* در حالت فروش: گله مبدأ بالاترین اولویت سلسله‌مراتبی را دارد */}
+        {!isPurchase && (
+          <Field label="گله مبدأ" required error={err('flockId')} onTouch={touch('flockId')}>
+            <SmartSelect
+              value={String(item.flockId || '')}
+              error={err('flockId')}
+              onChange={v => {
+                const f = flocks.find(x => x.id === v);
+                const age = f ? getAgeDays(f) : item.ageDays;
+                updateItem({
+                  flockId: v,
+                  birdId: f?.birdId || item.birdId,
+                  breedId: f?.breedId || item.breedId,
+                  ageDays: age,
+                  hatchDate: f?.hatchDate || item.hatchDate,
+                });
+              }}
+              options={flocks.filter(f => f.status === 'active' && (f.currentCount ?? 0) > 0).map(f => {
+                const b = birds.find(x => x.id === f.birdId);
+                return { value: f.id, label: `${f.name} — ${b ? `${b.name} · ` : ''}${getGlobalFormat().count(f.currentCount ?? 0)} پرنده · ${getAgeDays(f)} روز` };
+              })}
+              placeholder="— انتخاب گله —"
+              modalTitle="انتخاب گله مبدأ"
+            />
           </Field>
-          <Field label="نژاد" required error={err('breedId')} onTouch={touch('breedId')} hint={(!isPurchase && item.flockId) ? 'از گله انتخاب‌شده' : undefined}>
+        )}
+
+        {/* --- بخش ۱: هویت مشتق‌شده از گله --- */}
+        <Grid2>
+          <Field label="نوع پرنده" required error={err('birdId')} onTouch={touch('birdId')} hint={isSaleLocked ? 'از گله انتخاب‌شده' : undefined}>
+            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" disabled={isLocked} />
+          </Field>
+          <Field label="نژاد" required error={err('breedId')} onTouch={touch('breedId')} hint={isSaleLocked ? 'از گله انتخاب‌شده' : undefined}>
             <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
               const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
               const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
               return { value: b.id, label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name };
-            })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" disabled={!!item.existingFlockId || !item.birdId || (!isPurchase && !!item.flockId)} />
+            })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" disabled={isLocked || !item.birdId} />
           </Field>
         </Grid2>
 
         <Grid2>
-          {isPurchase && !item.existingFlockId ? (
-            <Field label="تاریخ هچ" required error={err('hatchDate')} onTouch={touch('hatchDate')}>
-              <DatePicker value={String(item.hatchDate || '')} onChange={v => {
-                const age = computeAgeFromHatch(v);
-                updateItem({ hatchDate: v, ageDays: age });
-              }} placeholder="1405/07/26" />
-            </Field>
-          ) : item.existingFlockId ? (
-            <Field label="تاریخ هچ (قفل از گله)">
+          {isLocked ? (
+            <Field label={isSaleLocked ? "تاریخ هچ (قفل)" : "تاریخ هچ (قفل از گله)"}>
               <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
                 {item.hatchDate ? getGlobalFormat().date(item.hatchDate) : '—'}
                 <span style={{ marginInlineStart: 'auto', fontSize: 14 }} title="قفل — از گله انتخاب‌شده">🔒</span>
@@ -428,25 +456,35 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               }} placeholder="1405/07/26" />
             </Field>
           )}
-          <Field label="سن (روز)" hint={isPurchase ? "تاریخ هچ خودکار محاسبه می‌شود" : undefined}>
-            <Input mode="number" value={item.ageDays != null && item.ageDays >= 0 ? String(item.ageDays) : ''} onChange={e => {
-              const rawStr = e.target.value.trim();
-              const parsed = rawStr === '' ? NaN : Math.round(parseFaNum(rawStr));
-              const v = !isNaN(parsed) && parsed >= 0 ? parsed : null;
-              if (v !== null) {
-                const invDateStr = formatJ(new Date(), 'yyyy/MM/dd');
-                const invDate = parseJ(invDateStr, 'yyyy/MM/dd', new Date());
-                const newHatch = subDays(invDate, v);
-                updateItem({ ageDays: v, hatchDate: formatJ(newHatch, 'yyyy/MM/dd') });
-              } else {
-                updateItem({ ageDays: null });
-              }
-            }} unit="روز" min={0} placeholder="مثلاً ۹۰" />
-          </Field>
+          {isLocked ? (
+            <Field label="سن (روز) (قفل)">
+              <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
+                {item.ageDays != null && item.ageDays >= 0 ? `${getGlobalFormat().int(item.ageDays)} روز` : '—'}
+                <span style={{ marginInlineStart: 'auto', fontSize: 14 }} title="قفل — محاسبه‌شده از گله">🔒</span>
+              </div>
+            </Field>
+          ) : (
+            <Field label="سن (روز)" hint={isPurchase ? "تاریخ هچ خودکار محاسبه می‌شود" : undefined}>
+              <Input mode="number" value={item.ageDays != null && item.ageDays >= 0 ? String(item.ageDays) : ''} onChange={e => {
+                const rawStr = e.target.value.trim();
+                const parsed = rawStr === '' ? NaN : Math.round(parseFaNum(rawStr));
+                const v = !isNaN(parsed) && parsed >= 0 ? parsed : null;
+                if (v !== null) {
+                  const invDateStr = formatJ(new Date(), 'yyyy/MM/dd');
+                  const invDate = parseJ(invDateStr, 'yyyy/MM/dd', new Date());
+                  const newHatch = subDays(invDate, v);
+                  updateItem({ ageDays: v, hatchDate: formatJ(newHatch, 'yyyy/MM/dd') });
+                } else {
+                  updateItem({ ageDays: null });
+                }
+              }} unit="روز" min={0} placeholder="مثلاً ۹۰" />
+            </Field>
+          )}
         </Grid2>
 
-        <Grid2>
-          {isPurchase ? (
+        {/* --- بخش ۲: اتصال به گله و مکان (فقط در خرید) --- */}
+        {isPurchase && (
+          <>
             <Field label="اتصال به گله موجود" hint="اتصال به گله دستی">
               <SmartSelect value={String(item.existingFlockId || '')} onChange={v => {
                 const f = flocks.find(x => x.id === v);
@@ -475,41 +513,33 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 };
               })} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله" />
             </Field>
-          ) : (
-            <Field label="گله مبدأ" required error={err('flockId')} onTouch={touch('flockId')}>
-              <SmartSelect value={String(item.flockId || '')} error={err('flockId')} onChange={v => {
-                const f = flocks.find(x => x.id === v);
-                updateItem({ flockId: v, birdId: f?.birdId || item.birdId, breedId: f?.breedId || item.breedId, ageDays: f ? getAgeDays(f) : item.ageDays, hatchDate: f?.hatchDate || item.hatchDate });
-              }} options={activeFlocks} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" />
-            </Field>
-          )}
-        </Grid2>
 
-        {/* --- بخش ۲: مکان (فقط خرید) --- */}
-        {isPurchase && (
-          <Grid2>
-            <Field label="سالن مقصد">
-              <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.filter(h => !h.archived).map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" />
-            </Field>
-            <Field label="بخش مقصد (اختیاری)">
-              <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId && !z.archived).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب بخش —" disabled={!item.hallId} modalTitle="انتخاب بخش" />
-            </Field>
-          </Grid2>
+            <Grid2>
+              <Field label="سالن مقصد">
+                <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.filter(h => !h.archived).map(h => ({ value: h.id, label: h.name }))} placeholder="— سالن —" modalTitle="انتخاب سالن" />
+              </Field>
+              <Field label="بخش مقصد (اختیاری)">
+                <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId && !z.archived).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب بخش —" disabled={!item.hallId} modalTitle="انتخاب بخش" />
+              </Field>
+            </Grid2>
+          </>
         )}
 
-        {/* --- بخش ۳: وزن و قیمت --- */}
+        {/* --- بخش ۳: مقدار و فروش --- */}
         <Grid2>
-          <Field label="وزن زنده کل (کیلوگرم)" hint="برای محاسبه قیمت" error={err('liveWeight')} onTouch={touch('liveWeight')}>
-            <Input mode="number" value={item.liveWeight != null && item.liveWeight > 0 ? String(item.liveWeight) : ''} onChange={e => updateItem({ liveWeight: parseFaNum(e.target.value) || null })} unit="kg" min={0} />
+          <Field label="وزن زنده کل (کیلوگرم)" hint="برای محاسبه قیمت">
+            <Input mode="number" value={item.liveWeight != null && item.liveWeight > 0 ? String(item.liveWeight) : ''} onChange={e => updateItem({ liveWeight: parseFaNum(e.target.value) || null })} unit="kg" min={0} placeholder="مثلاً ۱۲۰۰" />
           </Field>
-          <Field 
-            label="واحد قیمت" 
-            help="اگر 'هر پرنده' را انتخاب کنید، مبلغ کل = تعداد × قیمت. اگر 'هر کیلوگرم' را انتخاب کنید، مبلغ کل = وزن زنده کل × قیمت."
-          >
-            <Select value={String(item.priceUnit || 'perBird')} onChange={e => updateItem({ priceUnit: e.target.value })}>
-              <option value="perBird">به ازای هر پرنده</option>
-              <option value="perKg">به ازای هر کیلوگرم</option>
-            </Select>
+          <Field label="واحد قیمت">
+            <SmartSelect
+              value={String(item.priceUnit || 'perBird')}
+              modalTitle="انتخاب واحد قیمت"
+              options={[
+                { value: 'perBird', label: 'به ازای هر پرنده' },
+                { value: 'perKg', label: 'به ازای هر کیلوگرم' },
+              ]}
+              onChange={v => updateItem({ priceUnit: v })}
+            />
           </Field>
         </Grid2>
 
@@ -517,15 +547,20 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {!isPurchase && (
           <Grid2>
             <Field label="دلیل فروش" error={err('saleReason')} onTouch={touch('saleReason')}>
-              <Select value={String(item.saleReason || '')} onChange={e => updateItem({ saleReason: e.target.value })}>
-                <option value="">— انتخاب —</option>
-                <option value="culling">حذف از گله (کالینگ)</option>
-                <option value="sick">بیماری</option>
-                <option value="old_age">سن بالا</option>
-                <option value="surplus">مازاد</option>
-                <option value="breeding_stock">فروش مولد</option>
-                <option value="other">سایر</option>
-              </Select>
+              <SmartSelect
+                value={String(item.saleReason || '')}
+                modalTitle="انتخاب دلیل فروش"
+                placeholder="— انتخاب —"
+                options={[
+                  { value: 'culling', label: 'حذف از گله (کالینگ)' },
+                  { value: 'sick', label: 'بیماری' },
+                  { value: 'old_age', label: 'سن بالا' },
+                  { value: 'surplus', label: 'مازاد' },
+                  { value: 'breeding_stock', label: 'فروش مولد' },
+                  { value: 'other', label: 'سایر' },
+                ]}
+                onChange={v => updateItem({ saleReason: v })}
+              />
             </Field>
           </Grid2>
         )}
@@ -694,10 +729,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         <SecTitle icon="⚙️" title="مشخصات تجهیزات" />
         <Grid2>
           <Field label="دسته تجهیزات" required error={err('equipmentCategory')} onTouch={touch('equipmentCategory')}>
-            <Select value={String(item.equipmentCategory || '')} onChange={e => updateItem({ equipmentCategory: e.target.value })}>
-              <option value="">— انتخاب —</option>
-              {EQUIP_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-            </Select>
+            <SmartSelect value={String(item.equipmentCategory || '')} modalTitle="انتخاب دسته‌بندی تجهیز" placeholder="— انتخاب —" options={EQUIP_CATEGORIES.map((c: any) => ({ value: c.value, label: c.label }))} onChange={v => updateItem({ equipmentCategory: v, equipmentType: '' })} />
           </Field>
           <Field label="نوع تجهیز" required error={err('equipmentType')} onTouch={touch('equipmentType')}>
             <Select value={String(item.equipmentType || '')} onChange={e => updateItem({ equipmentType: e.target.value })}>
