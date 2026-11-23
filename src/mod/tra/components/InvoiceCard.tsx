@@ -265,14 +265,14 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
 {inv.disputeStatus === 'open' && (
         <>
           <SectionTitle>یادداشت اختلاف</SectionTitle>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
+          <RowGrid>
             <Row
               l="علت اختلاف"
               v={inv.disputeReason === 'price' ? 'قیمت' : inv.disputeReason === 'quantity' ? 'تعداد' : inv.disputeReason === 'quality' ? 'کیفیت' : 'سایر'}
             />
             {inv.disputeOpenedAt ? <Row l="تاریخ ثبت" v={fmt.date(inv.disputeOpenedAt)} /> : null}
             {inv.disputeNote ? <Row l="توضیحات" v={inv.disputeNote} /> : null}
-          </div>
+          </RowGrid>
         </>
       )}
 
