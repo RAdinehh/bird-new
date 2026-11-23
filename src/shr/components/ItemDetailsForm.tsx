@@ -574,24 +574,102 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     );
   }
 
-  // ========== دان ==========
-  if (category === 'feed') {
+  
+  const renderPurchaseStockSelector = (
+    catLabel: string,
+    modalTitle: string,
+    placeholderExample: string,
+    filteredWhs: any[],
+    requiredField = false
+  ) => {
+    const selectedId = String(item.stockItemId || '');
+    const isNewMode = !selectedId;
+    const selectValue = selectedId || '__new__';
+
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {nameFieldJsx}
-        <SecTitle icon="🌾" title="اطلاعات دان" />
-        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} error={err('stockItemId')} onTouch={touch('stockItemId')} hint={isPurchase ? "برای افزودن به موجودی" : "برای کاهش از موجودی"} help={isPurchase ? "اگر این کالا از قبل در انبار ثبت شده، از این لیست انتخابش کن تا موجودی به همان کالا اضافه شود (نه کالای تکراری). اگر خالی بگذاری، سیستم به‌طور خودکار یک کالای جدید در انبار می‌سازد." : "کالایی که از انبار کاهش می‌یابد. اگه انتخاب نکنی، سیستم بر اساس نام کالا جستجو می‌کند."}>
-          <SmartSelect value={String(item.stockItemId || '')} onChange={v => {
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <Field
+          label={`انتخاب ${catLabel} از انبار یا تعریف جدید`}
+          error={err('stockItemId')}
+          onTouch={touch('stockItemId')}
+          required={requiredField}
+          hint={isNewMode ? `کالای جدید با نام زیر در انبار ساخته می‌شود` : `موجودی به این کالا در انبار اضافه می‌شود`}
+        >
+          <SmartSelect
+            value={selectValue}
+            onChange={v => {
+              if (v === '__new__') {
+                const prevW = whsItems.find(x => x.id === selectedId);
+                updateItem({
+                  stockItemId: '',
+                  itemId: '',
+                  description: prevW && item.description === prevW.name ? '' : item.description,
+                });
+                return;
+              }
               const wItem = whsItems.find(x => x.id === v);
               updateItem({
                 stockItemId: v,
-                  itemId: v,
-                  unit: wItem?.unit || item.unit,
+                itemId: v,
+                unit: wItem?.unit || item.unit,
                 unitPrice: wItem?.lastPrice || item.unitPrice,
                 description: wItem?.name || item.description,
               });
-            }} options={(whsItems || []).filter(w => w.category === 'feed').map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب کالای انبار —" modalTitle="انتخاب کالای انبار" />
+            }}
+            options={[
+              { value: '__new__', label: `➕ تعریف ${catLabel} جدید در انبار` },
+              ...filteredWhs.map(i => ({
+                value: i.id,
+                label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}`,
+              })),
+            ]}
+            placeholder={`— انتخاب یا تعریف ${catLabel} —`}
+            modalTitle={modalTitle}
+          />
         </Field>
+
+        {isNewMode && (
+          <Field
+            label={`نام ${catLabel} جدید (برای ثبت در انبار)`}
+            required
+            error={err('description')}
+            onTouch={touch('description')}
+            hint="این نام به عنوان کالای جدید در انبار ثبت و ذخیره می‌شود"
+          >
+            <Input
+              placeholder={placeholderExample}
+              value={String(item.description || '')}
+              onChange={e => updateItem({ description: e.target.value })}
+            />
+          </Field>
+        )}
+      </div>
+    );
+  };
+
+  // ========== دان ==========
+  if (category === 'feed') {
+    const feedItems = (whsItems || []).filter(w => w.category === 'feed');
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {!isPurchase && nameFieldJsx}
+        <SecTitle icon="🌾" title="اطلاعات دان" />
+        {isPurchase ? (
+          renderPurchaseStockSelector('دان', 'انتخاب یا تعریف دان', 'مثلاً دان استارتر پلت', feedItems, false)
+        ) : (
+          <Field label="کاهش از انبار" error={err('stockItemId')} onTouch={touch('stockItemId')} hint="برای کاهش از موجودی">
+            <SmartSelect value={String(item.stockItemId || '')} onChange={v => {
+              const wItem = whsItems.find(x => x.id === v);
+              updateItem({
+                stockItemId: v,
+                itemId: v,
+                unit: wItem?.unit || item.unit,
+                unitPrice: wItem?.lastPrice || item.unitPrice,
+                description: wItem?.name || item.description,
+              });
+            }} options={feedItems.map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب کالای انبار —" modalTitle="انتخاب کالای انبار" />
+          </Field>
+        )}
         <Grid2>
           <Field label="تاریخ انقضا">
             <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
@@ -615,24 +693,27 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
   // ========== دارو ==========
   if (category === 'medicine') {
+    const medItems = (whsItems || []).filter(w => w.category === 'medicine' || w.category === 'vaccine');
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {nameFieldJsx}
+        {!isPurchase && nameFieldJsx}
         <SecTitle icon="💊" title="اطلاعات دارو و واکسن" />
-
-        {/* ردیف ۱: کالای انبار (تمام عرض) - شامل دارو و واکسن */}
-        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} error={err('stockItemId')} onTouch={touch('stockItemId')} required={!isPurchase} hint={isPurchase ? "دارو/واکسن به انبار اضافه می‌شود" : "دارو/واکسن از انبار کاهش می‌یابد"}>
-          <SmartSelect value={String(item.stockItemId || '')} onChange={v => {
-            const wItem = whsItems.find(x => x.id === v);
-            updateItem({
-              stockItemId: v,
-                  itemId: v,
-                  unit: wItem?.unit || item.unit,
-              unitPrice: wItem?.lastPrice || item.unitPrice,
-              description: wItem?.name || item.description,
-            });
-          }} options={(whsItems || []).filter(w => w.category === 'medicine' || w.category === 'vaccine').map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب از انبار —" modalTitle="انتخاب دارو یا واکسن" />
-        </Field>
+        {isPurchase ? (
+          renderPurchaseStockSelector('دارو / واکسن', 'انتخاب یا تعریف دارو و واکسن', 'مثلاً انروفلوکساسین ۱۰٪ یا واکسن نیوکاسل', medItems, false)
+        ) : (
+          <Field label="کاهش از انبار" error={err('stockItemId')} onTouch={touch('stockItemId')} required hint="دارو/واکسن از انبار کاهش می‌یابد">
+            <SmartSelect value={String(item.stockItemId || '')} onChange={v => {
+              const wItem = whsItems.find(x => x.id === v);
+              updateItem({
+                stockItemId: v,
+                itemId: v,
+                unit: wItem?.unit || item.unit,
+                unitPrice: wItem?.lastPrice || item.unitPrice,
+                description: wItem?.name || item.description,
+              });
+            }} options={medItems.map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب از انبار —" modalTitle="انتخاب دارو یا واکسن" />
+          </Field>
+        )}
 
         {/* ردیف ۲: تاریخ انقضا + دوره پرهیز */}
         <Grid2>
@@ -775,35 +856,42 @@ if (category === 'egg' || category === 'fertile_egg') {
 
 // ========== واکسن و داروی گیاهی ==========
 if (category === 'vaccine' || category === 'herbal') {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {nameFieldJsx}
-      <SecTitle icon="💊" title={category === 'vaccine' ? 'اطلاعات واکسن' : 'اطلاعات داروی گیاهی'} />
-      <Field
-        label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"}
-        required={!isPurchase}
-        error={err('stockItemId')}
-        onTouch={touch('stockItemId')}
-        hint={isPurchase ? "به موجودی اضافه می‌شود" : "از موجودی کاهش می‌یابد"}
-      >
-        <SmartSelect
-          value={String(item.stockItemId || '')}
-          error={err('stockItemId')}
-          onChange={v => {
-            const wItem = whsItems.find(x => x.id === v);
-            updateItem({
-              stockItemId: v,
+    const subItems = (whsItems || []).filter(w => w.category === category);
+    const subLabel = category === 'vaccine' ? 'واکسن' : 'داروی گیاهی';
+    const subExample = category === 'vaccine' ? 'مثلاً واکسن برونشیت H120' : 'مثلاً عصاره آویشن و اکالیپتوس';
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {!isPurchase && nameFieldJsx}
+        <SecTitle icon="💊" title={category === 'vaccine' ? 'اطلاعات واکسن' : 'اطلاعات داروی گیاهی'} />
+        {isPurchase ? (
+          renderPurchaseStockSelector(subLabel, `انتخاب یا تعریف ${subLabel}`, subExample, subItems, false)
+        ) : (
+          <Field
+            label="کاهش از انبار"
+            required
+            error={err('stockItemId')}
+            onTouch={touch('stockItemId')}
+            hint="از موجودی کاهش می‌یابد"
+          >
+            <SmartSelect
+              value={String(item.stockItemId || '')}
+              error={err('stockItemId')}
+              onChange={v => {
+                const wItem = whsItems.find(x => x.id === v);
+                updateItem({
+                  stockItemId: v,
                   itemId: v,
                   unit: wItem?.unit || item.unit,
-              unitPrice: wItem?.lastPrice || item.unitPrice,
-              description: wItem?.name || item.description,
-            });
-          }}
-          options={(whsItems || []).filter(w => w.category === category).map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))}
-          placeholder="— انتخاب کالای انبار —"
-          modalTitle={category === 'vaccine' ? 'انتخاب واکسن' : 'انتخاب داروی گیاهی'}
-        />
-      </Field>
+                  unitPrice: wItem?.lastPrice || item.unitPrice,
+                  description: wItem?.name || item.description,
+                });
+              }}
+              options={subItems.map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))}
+              placeholder="— انتخاب کالای انبار —"
+              modalTitle={category === 'vaccine' ? 'انتخاب واکسن' : 'انتخاب داروی گیاهی'}
+            />
+          </Field>
+        )}
       {sellerSlot}
     </div>
   );
