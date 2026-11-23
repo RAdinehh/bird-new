@@ -263,6 +263,7 @@ export default function FlockCard(props: FlockCardProps) {
     <>
       <ExpandableCard
       id={f.id}
+      data-focus-id={f.id}
       ms={ms}
       accent={accentColor}
       index={fmt.count(i + 1)}

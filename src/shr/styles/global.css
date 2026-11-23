@@ -587,3 +587,31 @@ html {
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.25); opacity: 0.75; }
 }
+
+/* ═══ Entity Focus Spotlight (استاندارد برجسته‌سازی کارت انتخاب‌شده با EntityLink) ═══ */
+@keyframes pm-focus-pulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--accent-soft), 0 4px 16px rgba(22, 163, 74, 0.14);
+  }
+  45% {
+    box-shadow: 0 0 0 6px var(--accent-soft), 0 6px 22px rgba(22, 163, 74, 0.22);
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent, 0 2px 8px rgba(15, 23, 42, 0.06);
+  }
+}
+
+.pm-entity-focused {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: 2px;
+  border-color: var(--accent) !important;
+  animation: pm-focus-pulse 1.5s ease-out 2;
+  transition: outline-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pm-entity-focused {
+    animation: none !important;
+    box-shadow: 0 0 0 4px var(--accent-soft) !important;
+  }
+}

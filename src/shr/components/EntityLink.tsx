@@ -1,8 +1,17 @@
 import { getGlobalFormat } from '../units/useFormat';
 import { useNavigate } from 'react-router-dom';
-import { toFa } from '../utils/fa';
 
-type EntityType = 'flock' | 'bird' | 'breed' | 'hall' | 'zone' | 'party' | 'invoice' | 'item' | 'device' | 'log';
+export type EntityType =
+  | 'flock'
+  | 'bird'
+  | 'breed'
+  | 'hall'
+  | 'zone'
+  | 'party'
+  | 'invoice'
+  | 'item'
+  | 'device'
+  | 'log';
 
 const MAP: Record<EntityType, { path: string; icon: string; color: string; tab?: string }> = {
   flock:   { path: '/flk', icon: '🐔', color: 'var(--accent)' },
@@ -17,68 +26,106 @@ const MAP: Record<EntityType, { path: string; icon: string; color: string; tab?:
   log:     { path: '/dlg', icon: '📋', color: 'var(--muted)' },
 };
 
+export function getEntityUrl(
+  type: EntityType,
+  id: string,
+  opts?: { tab?: string; edit?: boolean },
+): string {
+  const conf = MAP[type];
+  if (!conf || !id) return '/';
+  const finalTab = opts?.tab || conf.tab;
+  const param = opts?.edit ? 'edit' : 'focus';
+  return `${conf.path}?${finalTab ? `tab=${finalTab}&` : ''}${param}=${id}${opts?.edit ? `&_t=${Date.now()}` : ''}`;
+}
+
+export function useEntityNav() {
+  const nav = useNavigate();
+  return (type: EntityType, id: string, opts?: { tab?: string; edit?: boolean }) => {
+    if (!id) return;
+    nav(getEntityUrl(type, id, opts));
+  };
+}
+
 interface Props {
   type: EntityType;
   id: string;
   label: string;
   sub?: string;
-  /** 🆕 حالت بج (پس‌زمینه رنگی، بدون underline) */
+  /** حالت بج (پس‌زمینه رنگی، بدون underline) */
   badge?: boolean;
-  /** 🆕 رنگ پس‌زمینه بج */
+  /** رنگ پس‌زمینه بج */
   badgeBg?: string;
-  /** 🆕 رنگ متن بج */
+  /** رنگ متن بج */
   badgeColor?: string;
-  /** 🆕 بازنویسی تب (برای invoice: sales/purchases) */
+  /** بازنویسی تب (برای invoice: sales/purchases) */
   tab?: string;
-  /** 🆕 برای invoice: باز کردن فرم ویرایش (به جای focus) */
+  /** برای invoice: باز کردن فرم ویرایش (به جای focus) */
   edit?: boolean;
 }
 
-export default function EntityLink({ type, id, label, sub, badge, badgeBg, badgeColor, tab, edit }: Props) {
-  const nav = useNavigate();
+export default function EntityLink({
+  type,
+  id,
+  label,
+  sub,
+  badge,
+  badgeBg,
+  badgeColor,
+  tab,
+  edit,
+}: Props) {
+  const entityNav = useEntityNav();
   const conf = MAP[type];
   if (!conf || !id) return <span>{label}</span>;
-  const finalTab = tab || conf.tab;
-  const param = edit ? 'edit' : 'focus';
-  const url = `${conf.path}?${finalTab ? `tab=${finalTab}&` : ''}${param}=${id}${edit ? `&_t=${Date.now()}` : ''}`;
 
   return (
     <button
       type="button"
-      onClick={(e) => { e.stopPropagation(); nav(url); }}
-      aria-label={`برو به ${label}`}
-      style={badge ? {
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 4,
-        background: badgeBg || 'transparent',
-        color: badgeColor || conf.color,
-        border: 'none',
-        fontFamily: 'inherit',
-        fontSize: 'var(--fs-xs)',
-        fontWeight: 600,
-        cursor: 'pointer',
-        padding: '4px 10px',
-        borderRadius: 6,
-      } : {
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 4,
-        background: 'transparent',
-        border: 'none',
-        color: conf.color,
-        fontFamily: 'inherit',
-        fontSize: 'inherit',
-        fontWeight: 600,
-        cursor: 'pointer',
-        padding: 0,
-        textDecoration: 'underline dotted',
-        textUnderlineOffset: 3,
+      onClick={(e) => {
+        e.stopPropagation();
+        entityNav(type, id, { tab, edit });
       }}
+      aria-label={`برو به ${label}`}
+      style={
+        badge
+          ? {
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              background: badgeBg || 'transparent',
+              color: badgeColor || conf.color,
+              border: 'none',
+              fontFamily: 'inherit',
+              fontSize: 'var(--fs-xs)',
+              fontWeight: 600,
+              cursor: 'pointer',
+              padding: '4px 10px',
+              borderRadius: 6,
+            }
+          : {
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              background: 'transparent',
+              border: 'none',
+              color: conf.color,
+              fontFamily: 'inherit',
+              fontSize: 'inherit',
+              fontWeight: 600,
+              cursor: 'pointer',
+              padding: 0,
+              textDecoration: 'underline dotted',
+              textUnderlineOffset: 3,
+            }
+      }
     >
       <span>{conf.icon}</span>
       <span>{label}</span>
-      {sub && <span style={{ color: 'var(--muted)', fontWeight: 400 }}>· {getGlobalFormat().code(sub)}</span>}
+      {sub && (
+        <span style={{ color: 'var(--muted)', fontWeight: 400 }}>
+          · {getGlobalFormat().code(sub)}
+        </span>
+      )}
     </button>
   );
 }

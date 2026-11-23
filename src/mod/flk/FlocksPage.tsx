@@ -19,6 +19,7 @@ import { checkHallCapacity } from './api/hallCapacity';
 import { useFlocksKpi } from './hooks/useFlocksKpi';
 import { useTabBadge } from './hooks/useTabBadge';
 import { useCarousel } from '../../shr/hooks/useCarousel';
+import { useFocusParam } from '../../shr/hooks/useFocusParam';
 import { useBreedStandard } from '../../shr/hooks/useBreedStandard';
 import { useValidation } from '../../shr/validation/useValidation';
 import { useFormErrors } from '../../shr/hooks/useFormErrors';
@@ -46,6 +47,7 @@ export default function FlocksPage() {
   const { invoices } = useTra();
 
   const [tab, setTab] = useState<TabId>('all');
+  const focusId = useFocusParam();
 
   const [saving, setSaving] = useState(false);
   const savingRef = useRef(false);
@@ -200,6 +202,22 @@ export default function FlocksPage() {
     if (archivedCount > 0) base.push({ id: 'archived', label: 'آرشیو' });
     return base;
   }, [pausedCount, hiddenCount, archivedCount]);
+
+  // ─── هدایت هوشمند به تب گله هنگام ورود با ?focus= (بدون باز کردن کارت) ───
+  useEffect(() => {
+    if (!focusId) return;
+    const target = flocks.find(f => f.id === focusId);
+    if (!target) return;
+    if (target.status === 'archived' || target.status === 'sold') {
+      setTab('archived');
+    } else if (target.hidden && target.status === 'active' && !target.paused) {
+      setTab('hidden');
+    } else if (target.paused && target.status === 'active' && !target.hidden) {
+      setTab('paused');
+    } else {
+      setTab('all');
+    }
+  }, [focusId, flocks]);
 
   // ─── اگه کاربر توی تب پنهان/آرشیو باشه و خالی شه، برگرد به «فعال» ───
   useEffect(() => {

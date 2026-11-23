@@ -12,7 +12,7 @@ import { formatInvoiceNumber } from '../calc';
 import { useTra } from '../store';
 import PickFlockModal from './PickFlockModal';
 import { useFlk, type Flock } from '../../flk/store';
-import { useState } from 'react';
+import { useState, createElement } from 'react';
 import { toastMsg } from '../../../cor/store/toast';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import EntityLink from '../../../shr/components/EntityLink';
@@ -219,6 +219,12 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
         <Row l="تاریخ" v={fmt.date(inv.date)} />
         {inv.number ? <Row l="شماره" v={formatInvoiceNumber(inv.number)} /> : null}
         {inv.dueDate ? <Row l="سرسید" v={fmt.date(inv.dueDate)} /> : null}
+            {linkedFlock ? (
+              <Row
+                l="گله متصل"
+                v={createElement(EntityLink, { type: 'flock', id: linkedFlock.id, label: linkedFlock.name })}
+              />
+            ) : null}
         {inv.isPreorder && inv.deliveryDate ? <Row l="📅 تحویل" v={fmt.date(inv.deliveryDate)} /> : null}
           {inv.writtenOff && (inv.writtenOffAmount || 0) > 0 ? (
             <Row
@@ -357,7 +363,6 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
         const skipCashReceived = (String(inv.paymentTerms) === 'cash' || String(inv.paymentTerms) === 'card') && nextWs === 'received';
         const hasBirdItems = inv.type === 'purchase' && !inv.isPreorder && liveBirdItems.length > 0;
         const isFlockArchived = !!(linkedFlock && (linkedFlock.status === 'archived' || linkedFlock.status === 'sold'));
-        const isFlockActive = !!(linkedFlock && !isFlockArchived);
 
         return (
           <CardActions actions={[
@@ -366,7 +371,6 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
             { ...ACTION_PRESETS.RESTORE, onClick: () => { if (linkedFlock) { restore(linkedFlock.id); toastMsg.success('گله با موفقیت بازیابی شد'); } }, hidden: !isFlockArchived },
             { ...ACTION_PRESETS.EDIT, onClick: onEdit || (() => {}), hidden: !onEdit },
             { label: 'اتصال دستی', onClick: () => setFlockPickerOpen(true), variant: 'outline', hidden: !(!linkedFlock && hasBirdItems) },
-            { label: 'مشاهده گله', onClick: () => { if (linkedFlock) window.location.href = '/flk?focus=' + linkedFlock.id; }, variant: 'outline', hidden: !isFlockActive },
             { label: 'قطع اتصال', onClick: handleManualUnlink, variant: 'outline', hidden: !(inv.type === 'purchase' && linkedFlock && inv.disputeStatus !== 'open') },
             { label: 'اختلاف', onClick: onDispute || (() => {}), variant: 'outline', hidden: !onDispute },
             { label: 'بازگشایی', onClick: onReopen || (() => {}), variant: 'outline', hidden: !onReopen },

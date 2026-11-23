@@ -1,16 +1,12 @@
 /**
- * useFocusParam — خواندن ?focus=xxx از URL
- *
- * استفاده:
- *   const focusId = useFocusParam();
- *   useEffect(() => {
- *     if (focusId) setExpandedId(focusId);
- *   }, [focusId]);
+ * useFocusParam — خواندن ?focus=xxx از URL و برجسته‌سازی استاندارد کارت هدف
  *
  * رفتار:
  *   - مقدار focus رو از URL می‌خونه
- *   - بعد از ۳ ثانیه خودکار از URL پاک می‌شه (تا رفرش بعدی باز نشه)
- *   - scroll خودکار به element با data-focus-id
+ *   - به صورت نرم به element با [data-focus-id="xxx"] اسکرول می‌کنه
+ *   - کلاس .pm-entity-focused (حاشیه + پالس استاندارد) رو به مدت ۳.۲ ثانیه روی کارت اعمال می‌کنه
+ *   - بدون باز کردن کارت (کارت در حالت بسته باقی می‌مونه)
+ *   - بعد از اتمام، focus از URL پاک می‌شه تا در رفرش بعدی تکرار نشه
  */
 
 import { useEffect } from 'react';
@@ -23,27 +19,40 @@ export function useFocusParam(autoClear = true): string | null {
   useEffect(() => {
     if (!focusId) return;
 
-    // scroll به element بعد از رندر
-    const t1 = setTimeout(() => {
-      const el = document.querySelector(`[data-focus-id="${focusId}"]`);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 150);
+    let targetEl: Element | null = null;
 
-    // پاک کردن focus از URL بعد از ۳ ثانیه
-    let t2: ReturnType<typeof setTimeout> | undefined;
-    if (autoClear) {
-      t2 = setTimeout(() => {
-        setParams(prev => {
-          const next = new URLSearchParams(prev);
-          next.delete('focus');
-          return next;
-        }, { replace: true });
-      }, 3000);
-    }
+    const t1 = setTimeout(() => {
+      targetEl = document.querySelector(`[data-focus-id="${focusId}"]`);
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        targetEl.classList.remove('pm-entity-focused');
+        void (targetEl as HTMLElement).offsetWidth;
+        targetEl.classList.add('pm-entity-focused');
+      }
+    }, 180);
+
+    const t2 = setTimeout(() => {
+      if (targetEl) {
+        targetEl.classList.remove('pm-entity-focused');
+      }
+      if (autoClear) {
+        setParams(
+          (prev) => {
+            const next = new URLSearchParams(prev);
+            next.delete('focus');
+            return next;
+          },
+          { replace: true },
+        );
+      }
+    }, 3200);
 
     return () => {
       clearTimeout(t1);
-      if (t2) clearTimeout(t2);
+      clearTimeout(t2);
+      if (targetEl) {
+        targetEl.classList.remove('pm-entity-focused');
+      }
     };
   }, [focusId, autoClear, setParams]);
 
