@@ -2,17 +2,36 @@
  * DisputeModal.tsx — ثبت اختلاف روی فاکتور
  */
 import { useState, useEffect } from 'react';
-import { Modal, Btn, BtnRow, Field, Input, Textarea } from '../../../shr/components/ui';
+import { Modal, Btn, BtnRow, Field, Textarea, AlertBox } from '../../../shr/components/ui';
 import { useTra } from '../store';
 import { toastMsg } from '../../../cor/store/toast';
 import type { Invoice } from '../types';
 
-const REASON_LABEL: Record<'price' | 'quantity' | 'quality' | 'other', string> = {
+type DisputeReason = 'price' | 'quantity' | 'quality' | 'other';
+
+const REASON_LABEL: Record<DisputeReason, string> = {
   price: 'قیمت',
   quantity: 'تعداد',
   quality: 'کیفیت',
   other: 'سایر',
 };
+
+function getReasonPlaceholder(reason: DisputeReason, isPurchase: boolean): string {
+  switch (reason) {
+    case 'price':
+      return isPurchase
+        ? 'مغایرت قیمت توافقی با نرخ درج‌شده در فاکتور'
+        : 'مغایرت قیمت توافقی و مبلغ فاکتور (مثلاً ۵ میلیون تومان اختلاف)';
+    case 'quantity':
+      return isPurchase
+        ? 'کسری یا مغایرت تعداد تحویلی نسبت به فاکتور'
+        : 'مغایرت تعداد ارسالی با تعداد ثبت‌شده در فاکتور';
+    case 'quality':
+      return 'توضیح مشکل کیفی (مثلاً تلفات، شکستگی یا ضعف گله)';
+    case 'other':
+      return 'شرح مختصر دلیل اختلاف روی این فاکتور...';
+  }
+}
 
 const chipStyle = (active: boolean) => ({
   padding: '6px 12px',
@@ -34,7 +53,7 @@ interface Props {
 
 export default function DisputeModal({ open, onClose, invoice }: Props) {
   const markDispute = useTra(s => s.markDispute);
-  const [reason, setReason] = useState<'price' | 'quantity' | 'quality' | 'other'>('price');
+  const [reason, setReason] = useState<DisputeReason>('price');
   const [note, setNote] = useState('');
 
   useEffect(() => {
@@ -45,6 +64,8 @@ export default function DisputeModal({ open, onClose, invoice }: Props) {
   }, [open, invoice?.id]);
 
   if (!invoice) return null;
+
+  const isPurchase = invoice.type === 'purchase';
 
   const handleSave = () => {
     markDispute(invoice.id, reason, note.trim());
@@ -65,10 +86,6 @@ export default function DisputeModal({ open, onClose, invoice }: Props) {
         </BtnRow>
       }
     >
-      <div style={{ padding: 'var(--pad-normal)', background: 'var(--warn-soft)', borderRadius: 'var(--r-sm)', marginBottom: 'var(--sp-3)', fontSize: 'var(--fs-sm)', color: 'var(--warn)' }}>
-        ⚠️ بعد از ثبت، این فاکتور از لیست طلبی خارج می‌شود تا مشکل حل شود.
-      </div>
-
       <Field label="دلیل اختلاف">
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {(['price', 'quantity', 'quality', 'other'] as const).map(r => (
@@ -79,9 +96,19 @@ export default function DisputeModal({ open, onClose, invoice }: Props) {
         </div>
       </Field>
 
-      <Field label="یادداشت (اختیاری)" hint="مثلاً مشتری می‌گه قیمت ۵ میلیون کمتره">
-        <Textarea value={note} onChange={e => setNote(e.target.value)} rows={3} maxHeight={120} />
+      <Field label="یادداشت (اختیاری)">
+        <Textarea
+          value={note}
+          onChange={e => setNote(e.target.value)}
+          placeholder={getReasonPlaceholder(reason, isPurchase)}
+          rows={3}
+          maxHeight={120}
+        />
       </Field>
+
+      <AlertBox tone="warn" icon="⚠️" style={{ marginTop: 'var(--sp-3)' }}>
+        بعد از ثبت، این فاکتور از لیست طلبی خارج می‌شود تا مشکل حل شود.
+      </AlertBox>
     </Modal>
   );
 }
