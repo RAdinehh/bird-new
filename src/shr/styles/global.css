@@ -590,6 +590,13 @@ html {
 
 
 /* ═══ EntityLink Unified Chip Interaction ═══ */
+.pm-entity-link {
+  font-size: inherit !important;
+  line-height: inherit !important;
+  font-family: inherit !important;
+  font-weight: 600 !important;
+  letter-spacing: inherit !important;
+}
 .pm-entity-link:hover {
   filter: brightness(0.96);
 }
