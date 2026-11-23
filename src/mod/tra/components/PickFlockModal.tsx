@@ -1,7 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useFormat } from '../../../shr/units/useFormat';
 import { Modal, Input, Tag, Btn, BtnRow } from '../../../shr/components/ui';
-import { IconSearch } from '../../../shr/icons';
 import { useFlk } from '../../flk/store';
 import { useBrd } from '../../brd/store';
 import type { Flock } from '../../flk/store';
@@ -12,6 +11,21 @@ interface Props {
   onSelect: (flock: Flock) => void;
   invoiceBirdIds?: string[];
 }
+
+const HeaderSearchIcon = () => (
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+  >
+    <circle cx="11" cy="11" r="8" />
+    <path d="m21 21-4.35-4.35" />
+  </svg>
+);
 
 export default function PickFlockModal({ open, onClose, onSelect, invoiceBirdIds = [] }: Props) {
   const fmt = useFormat();
@@ -28,11 +42,13 @@ export default function PickFlockModal({ open, onClose, onSelect, invoiceBirdIds
     }
   }, [open]);
 
-  useEffect(() => {
-    if (!searchOpen) {
-      setQ('');
-    }
-  }, [searchOpen]);
+  const toggleSearch = () => {
+    setSearchOpen(v => {
+      const next = !v;
+      if (!next) setQ('');
+      return next;
+    });
+  };
 
   const birdMap = useMemo(() => {
     const m = new Map<string, string>();
@@ -151,7 +167,7 @@ export default function PickFlockModal({ open, onClose, onSelect, invoiceBirdIds
         allFlocks.length > 0 ? (
           <button
             type="button"
-            onClick={() => setSearchOpen(v => !v)}
+            onClick={toggleSearch}
             aria-label="جستجو"
             aria-expanded={searchOpen}
             style={{
@@ -168,23 +184,25 @@ export default function PickFlockModal({ open, onClose, onSelect, invoiceBirdIds
               fontFamily: 'inherit',
             }}
           >
-            <IconSearch size={18} />
+            <HeaderSearchIcon />
           </button>
         ) : undefined
       }
     >
       {searchOpen && (
-        <div style={{ position: 'relative', marginBottom: 10 }}>
-          <div style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted)', pointerEvents: 'none' }}>
-            <IconSearch size={16} />
-          </div>
+        <div
+          style={{
+            marginTop: 2,
+            paddingBottom: 10,
+            borderBottom: '1px solid var(--border)',
+          }}
+        >
           <Input
-            autoFocus
             type="search"
             value={q}
             onChange={e => setQ(e.target.value)}
-            placeholder="جستجوی نام گله یا گونه پرنده..."
-            style={{ paddingRight: 32 }}
+            placeholder="جستجو..."
+            autoFocus
           />
         </div>
       )}
