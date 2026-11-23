@@ -3,14 +3,21 @@
  *
  * رفتار:
  *   - مقدار focus رو از URL می‌خونه
- *   - به صورت نرم به element با [data-focus-id="xxx"] اسکرول می‌کنه
- *   - کلاس .pm-entity-focused (حاشیه + پالس استاندارد) رو به مدت ۳.۲ ثانیه روی کارت اعمال می‌کنه
- *   - بدون باز کردن کارت (کارت در حالت بسته باقی می‌مونه)
- *   - بعد از اتمام، focus از URL پاک می‌شه تا در رفرش بعدی تکرار نشه
+ *   - بررسی می‌کنه آیا کارت خارج از دید (Viewport) هست یا نه؛ اگر همین الان در دید کاربر باشه (مثل صفحات کوتاه بدون اسکرول) هیچ اسکرولی انجام نمی‌ده تا چیدمان صفحه به هم نریزه
+ *   - کلاس .pm-entity-focused رو روی کارت اعمال می‌کنه بدون باز کردن کارت
+ *   - بعد از اتمام، focus از URL پاک می‌شه
  */
 
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+
+function isElementOutOfView(el: Element): boolean {
+  const rect = el.getBoundingClientRect();
+  const vh = window.innerHeight || document.documentElement.clientHeight;
+  const topSafe = 72; // فضای هدر ثابت بالای صفحه
+  const bottomSafe = vh - 24;
+  return rect.top < topSafe || rect.bottom > bottomSafe;
+}
 
 export function useFocusParam(autoClear = true): string | null {
   const [params, setParams] = useSearchParams();
@@ -24,7 +31,9 @@ export function useFocusParam(autoClear = true): string | null {
     const t1 = setTimeout(() => {
       targetEl = document.querySelector(`[data-focus-id="${focusId}"]`);
       if (targetEl) {
-        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (isElementOutOfView(targetEl)) {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
         targetEl.classList.remove('pm-entity-focused');
         void (targetEl as HTMLElement).offsetWidth;
         targetEl.classList.add('pm-entity-focused');
@@ -45,7 +54,7 @@ export function useFocusParam(autoClear = true): string | null {
           { replace: true },
         );
       }
-    }, 3600);
+    }, 3400);
 
     return () => {
       clearTimeout(t1);
