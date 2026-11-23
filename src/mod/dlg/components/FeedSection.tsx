@@ -223,7 +223,7 @@ export default function FeedSection({ form, setForm }: Props) {
    </div>
 
    {formulas.length === 0 && feedItems.length === 0 && (
-    <AlertBox tone="warn" variant="dashed" size="xs" icon={false}>⚠️ هنوز هیچ جیره‌ای نساخته‌اید و دان تکی هم تعریف نکرده‌اید. ابتدا از بخش «تغذیه» یک جیره بسازید، سپس به اینجا برگردید.</AlertBox>
+    <AlertBox tone="warn" variant="dashed">هیچ جیره یا دانی تعریف نشده است؛ ابتدا از بخش «تغذیه» ایجاد کنید.</AlertBox>
    )}
 
    {(formulas.length > 0 || feedItems.length > 0) && (

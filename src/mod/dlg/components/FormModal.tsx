@@ -93,7 +93,7 @@ export default function FormModal(props: FormModalProps) {
       <FeedSection form={form} setForm={setForm} vErrors={vErrors} showError={showError} markTouched={markTouched} />
 
       {isLayerType && !isFlockMature && selectedFlock && (
-        <AlertBox tone="warn" variant="dashed" size="sm" icon={false} style={{ fontWeight: 'normal', lineHeight: 1.7, marginBottom: 8 }}>💡 این گله هنوز به سن تخم‌گذاری نرسیده ({fmt.int(getAgeDays(selectedFlock))} از {fmt.int(selectedFlock.layingStartDay)} روز). فرم تخم‌گذاری بعد از بلوغ فعال می‌شود.</AlertBox>
+        <AlertBox tone="warn" variant="dashed" style={{ marginBottom: 8 }}>گله هنوز به سن تخم‌گذاری نرسیده ({fmt.int(getAgeDays(selectedFlock))} از {fmt.int(selectedFlock.layingStartDay)} روز)؛ فرم پس از بلوغ فعال می‌شود.</AlertBox>
       )}
 
       {isLayerFlock && (

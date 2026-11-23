@@ -1,3 +1,4 @@
+import { AlertBox } from '../../../shr/components/ui';
 /**
  * EggEntryModal.tsx — Modal ورود تخم به دستگاه
  *
