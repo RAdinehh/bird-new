@@ -11,12 +11,13 @@ export interface TransferModalProps {
   transferDate: string;
   setTransferNote: (v: string) => void;
   setTransferDate: (v: string) => void;
+  dateError?: string;
   onClose: () => void;
   onConfirm: () => void;
 }
 
 export default function TransferModal(props: TransferModalProps) {
-  const { transferModal, transferNote, transferDate, setTransferNote, setTransferDate, onClose, onConfirm } = props;
+  const { transferModal, transferNote, transferDate, setTransferNote, setTransferDate, dateError, onClose, onConfirm } = props;
 
   return (
     <Modal
@@ -27,7 +28,7 @@ export default function TransferModal(props: TransferModalProps) {
     >
       {transferModal && (
         <>
-          <Field label="تاریخ"><DatePicker value={transferDate} onChange={v => setTransferDate(v)} autoToday /></Field>
+          <Field label="تاریخ" error={dateError}><DatePicker value={transferDate} onChange={v => setTransferDate(v)} autoToday /></Field>
           {(transferModal.to === 'received' || transferModal.to === 'paid') && (
             <Field label="یادداشت">
               <Textarea placeholder="یادداشت..." value={transferNote} onChange={e => setTransferNote(e.target.value)} />

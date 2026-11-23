@@ -34,6 +34,8 @@ import { useValidation } from '../../shr/validation/useValidation';
 import { createInvoiceSchema } from '../../shr/validation/rules/tra';
 import { emptyForm as empty } from './types-invoice';
 import { useInvoiceForm } from './hooks/useInvoiceForm';
+import { differenceInCalendarDays } from 'date-fns-jalali';
+import { parseJalali } from '../../shr/date/jalali';
 import TransferModal from './components/TransferModal';
 import InvoiceCard from './components/InvoiceCard';
 import InvoiceFormModal from './components/InvoiceFormModal';
@@ -62,6 +64,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
   const [newFlockModalOpen, setNewFlockModalOpen] = useState(false);
   const [transferNote, setTransferNote] = useState('');
   const [transferDate, setTransferDate] = useState('');
+  const [transferDateError, setTransferDateError] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
   const relatedDealIdFilter = searchParams.get('relatedDealId') || '';
   const invoices = useMemo(() => {
@@ -344,10 +347,50 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
     setTouchedFields(new Set());
   }, [form.category]);
 
-  const doTransfer = () => {
+  const doTransfer = async () => {
     if (!transferModal) return;
     const inv = invoices.find(i => i.id === transferModal.id);
     if (!inv) return;
+
+    setTransferDateError('');
+    const rawDate = transferDate.trim();
+    if (!rawDate) {
+      setTransferDateError('لطفاً تاریخ را انتخاب کنید.');
+      return;
+    }
+
+    const parsedTransfer = parseJalali(rawDate);
+    if (!parsedTransfer) {
+      setTransferDateError('فرمت تاریخ واردشده معتبر نیست.');
+      return;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const diffFromToday = differenceInCalendarDays(parsedTransfer, today);
+
+    if (diffFromToday > 0) {
+      setTransferDateError(`تاریخ نمی‌تواند در آینده (${fmt.date(rawDate)}) باشد.`);
+      return;
+    }
+
+    if (inv.date) {
+      const parsedInvDate = parseJalali(inv.date.trim());
+      if (parsedInvDate && differenceInCalendarDays(parsedTransfer, parsedInvDate) < 0) {
+        setTransferDateError(`تاریخ نمی‌تواند قبل از تاریخ ثبت فاکتور (${fmt.date(inv.date)}) باشد.`);
+        return;
+      }
+    }
+
+    if (diffFromToday < -90) {
+      const pastDays = Math.abs(diffFromToday);
+      const okOld = await showConfirmAsync(
+        '⚠️ هشدار تاریخ قدیمی',
+        `تاریخ انتخاب‌شده (${fmt.date(rawDate)}) مربوط به ${fmt.count(pastDays)} روز قبل است.\nآیا از ثبت با این تاریخ مطمئن هستید؟`,
+        { confirmText: 'بله، تأیید' }
+      );
+      if (!okOld) return;
+    }
     const patch: Partial<Invoice> = { workflowStatus: transferModal.to };
     if (transferModal.to === 'confirmed') patch.confirmedAt = transferDate || new Date().toISOString();
     else if (transferModal.to === 'received') {
@@ -370,7 +413,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
       patch.paidNote = transferNote;
     }
     updateInvoice(inv.id, patch);
-    setTransferModal(null); setTransferNote(''); setTransferDate('');
+    setTransferModal(null); setTransferNote(''); setTransferDate(''); setTransferDateError('');
   };
 
   
@@ -629,8 +672,9 @@ return (
         transferNote={transferNote}
         transferDate={transferDate}
         setTransferNote={setTransferNote}
-        setTransferDate={setTransferDate}
-        onClose={() => { setTransferModal(null); setTransferNote(''); setTransferDate(''); }}
+        setTransferDate={v => { setTransferDate(v); if (transferDateError) setTransferDateError(''); }}
+        dateError={transferDateError}
+        onClose={() => { setTransferModal(null); setTransferNote(''); setTransferDate(''); setTransferDateError(''); }}
         onConfirm={doTransfer}
       />
 
