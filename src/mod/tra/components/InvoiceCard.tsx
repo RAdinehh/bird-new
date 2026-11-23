@@ -14,6 +14,7 @@ import PickFlockModal from './PickFlockModal';
 import { useFlk, type Flock } from '../../flk/store';
 import { useState } from 'react';
 import { toastMsg } from '../../../cor/store/toast';
+import { showConfirmAsync } from '../../../cor/store/dialog';
 import EntityLink from '../../../shr/components/EntityLink';
 
 interface Props {
@@ -43,28 +44,93 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
   );
   const rem2 = remaining(inv, allocations);
 
-  // 🆕 اتصال دستی برای داده‌های قدیمی
-  const handleManualLink = (flock: Flock) => {
-    // ۱. به‌روزرسانی گله (ذخیره شناسه فاکتور)
-    updateFlock(flock.id, { 
-      sourceInvoiceId: inv.id, 
-      sourceCategory: inv.category 
-    });
+  // 🆕 اتصال دستی هوشمند برای داده‌های قدیمی و گله‌های بدون فاکتور
+  const liveBirdItems = (inv.items || []).filter(it => {
+    const cat = it.category || inv.category;
+    return (cat === 'chick' || cat === 'adult') && !!it.birdId;
+  });
+  const invoiceBirdIds = Array.from(new Set(liveBirdItems.map(it => it.birdId).filter(Boolean) as string[]));
 
-    // ۲. به‌روزرسانی فاکتور (ذخیره شناسه گله بدون دست زدن به cascade)
+  const handleManualLink = async (flock: Flock) => {
+    if (flock.sourceInvoiceId && flock.sourceInvoiceId !== inv.id) {
+      const ok = await showConfirmAsync(
+        'تغییر فاکتور متصل به گله',
+        `گله «${flock.name}» قبلاً به فاکتور دیگری متصل است. آیا اتصال قبلی جایگزین این فاکتور شود؟`,
+        { confirmText: 'بله، جایگزین شود' }
+      );
+      if (!ok) return;
+      // پاک کردن اتصال از فاکتور قبلی
+      useTra.setState(state => ({
+        invoices: state.invoices.map(i =>
+          i.id === flock.sourceInvoiceId
+            ? {
+                ...i,
+                relatedFlockId: '',
+                items: i.items.map(it => it.flockId === flock.id ? { ...it, flockId: '' } : it),
+              }
+            : i
+        ),
+      }));
+    }
+
+    const firstBirdItem = liveBirdItems[0];
+    const flockPatch: Partial<Flock> = {
+      sourceInvoiceId: inv.id,
+      sourceCategory: (firstBirdItem?.category || inv.category) as any,
+    };
+    if (!flock.birdId && firstBirdItem?.birdId) flockPatch.birdId = firstBirdItem.birdId;
+    if (!flock.breedId && firstBirdItem?.breedId) flockPatch.breedId = firstBirdItem.breedId;
+    if (!flock.purchaseDate && inv.date) flockPatch.purchaseDate = inv.date;
+    if (flock.purchasePrice == null && firstBirdItem?.unitPrice) {
+      flockPatch.purchasePrice = firstBirdItem.unitPrice;
+    }
+
+    // ۱. به‌روزرسانی گله
+    updateFlock(flock.id, flockPatch);
+
+    // ۲. به‌روزرسانی فاکتور (ذخیره شناسه گله بدون اجرای cascade مجدد)
     useTra.setState(state => ({
-      invoices: state.invoices.map(i => 
-        i.id === inv.id 
-          ? { 
-              ...i, 
-              relatedFlockId: flock.id, 
-              items: i.items.map(it => it.birdId ? { ...it, flockId: flock.id } : it) 
-            } 
+      invoices: state.invoices.map(i =>
+        i.id === inv.id
+          ? {
+              ...i,
+              relatedFlockId: flock.id,
+              items: i.items.map(it => {
+                const cat = it.category || inv.category;
+                return (cat === 'chick' || cat === 'adult') && it.birdId ? { ...it, flockId: flock.id } : it;
+              }),
+            }
           : i
-      )
+      ),
     }));
-    
-    toastMsg.success('فاکتور با موفقیت به گله متصل شد');
+
+    toastMsg.success(`فاکتور با موفقیت به گله «${flock.name}» متصل شد`);
+  };
+
+  const handleManualUnlink = async () => {
+    if (!linkedFlock) return;
+    const ok = await showConfirmAsync(
+      'قطع اتصال فاکتور و گله',
+      `آیا اتصال این فاکتور از گله «${linkedFlock.name}» قطع شود؟ (اطلاعات و موجودی گله حذف نمی‌شود)`,
+      { confirmText: 'قطع اتصال' }
+    );
+    if (!ok) return;
+
+    if (linkedFlock.sourceInvoiceId === inv.id) {
+      updateFlock(linkedFlock.id, { sourceInvoiceId: '', sourceCategory: '' });
+    }
+    useTra.setState(state => ({
+      invoices: state.invoices.map(i =>
+        i.id === inv.id
+          ? {
+              ...i,
+              relatedFlockId: '',
+              items: i.items.map(it => it.flockId === linkedFlock.id ? { ...it, flockId: '' } : it),
+            }
+          : i
+      ),
+    }));
+    toastMsg.success('اتصال فاکتور از گله قطع شد');
   };
   const st = rem2 === 0 ? 'paid' : paidSumAllocated(inv, allocations) > 0 ? 'partial' : 'unpaid';
 
@@ -279,7 +345,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       {(onEdit || nextWorkflowStatus(inv.workflowStatus) || onReopen || linkedFlock || onDispute || onResolveDispute || onWriteOff) && (() => {
         const nextWs = nextWorkflowStatus(inv.workflowStatus);
         const skipCashReceived = (String(inv.paymentTerms) === 'cash' || String(inv.paymentTerms) === 'card') && nextWs === 'received';
-        const hasBirdItems = inv.type === 'purchase' && !!inv.items?.some(it => it.birdId);
+        const hasBirdItems = inv.type === 'purchase' && !inv.isPreorder && liveBirdItems.length > 0;
         const isFlockArchived = !!(linkedFlock && (linkedFlock.status === 'archived' || linkedFlock.status === 'sold'));
         const isFlockActive = !!(linkedFlock && !isFlockArchived);
 
@@ -291,6 +357,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
             { ...ACTION_PRESETS.EDIT, onClick: onEdit || (() => {}), hidden: !onEdit },
             { label: 'اتصال دستی', onClick: () => setFlockPickerOpen(true), variant: 'outline', hidden: !(!linkedFlock && hasBirdItems) },
             { label: 'مشاهده گله', onClick: () => { if (linkedFlock) window.location.href = '/flk?focus=' + linkedFlock.id; }, variant: 'outline', hidden: !isFlockActive },
+            { label: 'قطع اتصال', onClick: handleManualUnlink, variant: 'outline', hidden: !linkedFlock },
             { label: 'اختلاف', onClick: onDispute || (() => {}), variant: 'outline', hidden: !onDispute },
             { label: 'بازگشایی', onClick: onReopen || (() => {}), variant: 'outline', hidden: !onReopen },
             { label: inv.type === 'purchase' ? 'بخشش مانده' : 'حذف بدحساب', onClick: onWriteOff || (() => {}), variant: 'danger-outline', hidden: !onWriteOff },
