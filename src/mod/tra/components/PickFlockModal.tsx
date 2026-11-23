@@ -144,7 +144,6 @@ export default function PickFlockModal({ open, onClose, onSelect, invoiceBirdIds
       onSearchClear={() => setQ('')}
       searchNode={
         <Input
-          type="search"
           value={q}
           onChange={e => setQ(e.target.value)}
           placeholder="جستجو..."
