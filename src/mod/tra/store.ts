@@ -332,20 +332,34 @@ export const useTra = create<State>()(
       writeOffInvoice: (invoiceId, amount, reason) => {
         const prev = get().invoices.find(i => i.id === invoiceId);
         if (!prev) return;
+        if (prev.disputeStatus === 'open') {
+          showToast('این فاکتور دارای اختلاف باز است — ابتدا اختلاف را حل کنید', 'error');
+          return;
+        }
+        if (prev.isPreorder) {
+          showToast('فاکتور پیش‌خرید تحویل‌نشده امکان بخشش یا بستن مانده ندارد', 'error');
+          return;
+        }
         const pendingChecks = (prev.payments || []).filter(p => p.method === 'check' && (p as any).checkStatus === 'pending');
         if (pendingChecks.length > 0) {
           showToast('این فاکتور چک پاس‌نشده دارد — ابتدا وضعیت چک را مشخص یا برگشت بزنید', 'error');
           return;
         }
-        const safeAmount = Math.max(0, Math.min(amount, remaining(prev, get().allocations)));
+        const currentRem = remaining(prev, get().allocations);
+        const safeAmount = Math.max(0, Math.min(amount, currentRem));
         if (safeAmount <= 0) return;
         const today = getTodayJalali();
+        const isFullySettled = (currentRem - safeAmount) <= 0;
         const nextInvoices = get().invoices.map(i => i.id === invoiceId ? {
           ...i,
           writtenOff: true,
-          writtenOffAmount: safeAmount,
+          writtenOffAmount: (i.writtenOffAmount || 0) + safeAmount,
           writtenOffReason: reason,
           writtenOffAt: today,
+          ...(isFullySettled ? {
+            workflowStatus: 'paid' as const,
+            paidAt: i.paidAt || new Date().toISOString(),
+          } : {}),
           updatedAt: new Date().toISOString(),
         } : i);
         set({ invoices: nextInvoices });

@@ -279,7 +279,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
     if (ms.selectionMode) setExpandedId(null);
   }, [ms.selectionMode]);
 
-  useFab(active && list.length > 0 ? { label: 'ثبت فاکتور', onClick: openNew, wakeMode: false } : null);
+  useFab(active && list.length > 0 ? { label: 'علت', onClick: openNew, wakeMode: false } : null);
 
   // ═══ اعتبارسنجی زنده ═══
   // 🆕 Filter empty items/payments to match save() behavior in useInvoiceForm.ts
@@ -534,7 +534,7 @@ return (
                     onEdit={remaining(inv, allocations) > 0 && !inv.paidAt && inv.disputeStatus !== 'open' ? () => openEdit(inv) : undefined}
           onDispute={inv.disputeStatus !== 'open' && remaining(inv, allocations) > 0 ? () => setDisputeTarget(inv) : undefined}
           onResolveDispute={inv.disputeStatus === 'open' ? () => resolveDispute(inv.id) : undefined}
-          onWriteOff={!inv.writtenOff && inv.disputeStatus !== 'open' && remaining(inv, allocations) > 0 ? async () => {
+          onWriteOff={!inv.writtenOff && !inv.isPreorder && inv.disputeStatus !== 'open' && remaining(inv, allocations) > 0 ? async () => {
             const pendingChecks = (inv.payments || []).filter(p => p.method === 'check' && (p as any).checkStatus === 'pending');
             if (pendingChecks.length > 0) {
               toastMsg.error('این فاکتور چک پاس‌نشده دارد — ابتدا وضعیت چک را مشخص یا برگشت بزنید');
@@ -544,10 +544,10 @@ return (
             const reason = await showPromptAsync(
               isPurchase ? 'بخشش مانده' : 'حذف بدحساب',
               isPurchase
-                ? `مبلغ ${fmt.money(rem, { withUnit: false })} تومان به عنوان بخشش مانده توسط فروشنده از بدهی کسر می‌شود.`
-                : `مبلغ ${fmt.money(rem, { withUnit: false })} تومان به عنوان بدحساب حذف می‌شود.`,
+                ? `مبلغ ${fmt.money(rem, { withUnit: false })} تومان بخشیده شده و فاکتور تسویه می‌شود.`
+                : `مبلغ ${fmt.money(rem, { withUnit: false })} تومان از طلب مشتری کسر شده و فاکتور بسته می‌شود.`,
               {
-                label: 'دلیل',
+                label: 'علت',
                 placeholder: isPurchase ? 'مثلاً: تخفیف تسویه / رند کردن فاکتور' : 'مثلاً: وصول نشد — مبلغ کم',
                 required: true,
                 multiline: true,
@@ -585,7 +585,7 @@ return (
                 onEdit={remaining(inv, allocations) > 0 && !inv.paidAt && inv.disputeStatus !== 'open' ? () => openEdit(inv) : undefined}
           onDispute={inv.disputeStatus !== 'open' && remaining(inv, allocations) > 0 ? () => setDisputeTarget(inv) : undefined}
           onResolveDispute={inv.disputeStatus === 'open' ? () => resolveDispute(inv.id) : undefined}
-          onWriteOff={!inv.writtenOff && inv.disputeStatus !== 'open' && remaining(inv, allocations) > 0 ? async () => {
+          onWriteOff={!inv.writtenOff && !inv.isPreorder && inv.disputeStatus !== 'open' && remaining(inv, allocations) > 0 ? async () => {
             const pendingChecks = (inv.payments || []).filter(p => p.method === 'check' && (p as any).checkStatus === 'pending');
             if (pendingChecks.length > 0) {
               toastMsg.error('این فاکتور چک پاس‌نشده دارد — ابتدا وضعیت چک را مشخص یا برگشت بزنید');
@@ -595,10 +595,10 @@ return (
             const reason = await showPromptAsync(
               isPurchase ? 'بخشش مانده' : 'حذف بدحساب',
               isPurchase
-                ? `مبلغ ${fmt.money(rem, { withUnit: false })} تومان به عنوان بخشش مانده توسط فروشنده از بدهی کسر می‌شود.`
-                : `مبلغ ${fmt.money(rem, { withUnit: false })} تومان به عنوان بدحساب حذف می‌شود.`,
+                ? `مبلغ ${fmt.money(rem, { withUnit: false })} تومان بخشیده شده و فاکتور تسویه می‌شود.`
+                : `مبلغ ${fmt.money(rem, { withUnit: false })} تومان از طلب مشتری کسر شده و فاکتور بسته می‌شود.`,
               {
-                label: 'دلیل',
+                label: 'علت',
                 placeholder: isPurchase ? 'مثلاً: تخفیف تسویه / رند کردن فاکتور' : 'مثلاً: وصول نشد — مبلغ کم',
                 required: true,
                 multiline: true,

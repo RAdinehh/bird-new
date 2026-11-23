@@ -213,7 +213,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
           {inv.writtenOff && (inv.writtenOffAmount || 0) > 0 ? (
             <Row
               l={inv.type === 'purchase' ? 'بخشش مانده' : 'حذف بدحساب'}
-              v={`${fmt.money(inv.writtenOffAmount || 0, { withUnit: false })} تومان${inv.writtenOffReason ? ` (${inv.writtenOffReason})` : ''}`}
+              v={`${fmt.money(inv.writtenOffAmount || 0, { withUnit: false })} تومان${inv.writtenOffReason ? ` (${inv.writtenOffReason})` : ''}${inv.writtenOffAt ? ` • ${fmt.date(inv.writtenOffAt)}` : ''}`}
             />
           ) : null}
       </RowGrid>
