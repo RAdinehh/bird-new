@@ -1,3 +1,4 @@
+import { createElement } from 'react';
 import { useFormat } from '../../shr/units/useFormat';
 import { useMemo } from 'react';
 import type { Bird, Breed } from './store';
@@ -31,7 +32,7 @@ interface Props {
 }
 
 /** ردیف استاندارد نمایش label/value */
-function StatRow({ label, value }: { label: string; value: string }) {
+function StatRow({ label, value }: { label: React.ReactNode; value: string }) {
   return (
     <div style={{
       display: 'flex', justifyContent: 'space-between',
@@ -170,18 +171,12 @@ export default function BirdCard({
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
             <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🧬</span> نژادهای این پرنده
           </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, fontSize: 'var(--fs-xs)' }}>
-            {birdBreeds.map(bd => (
-              <EntityLink
-                key={bd.id}
-                type="breed"
-                id={bd.id}
-                label={`${getBreedDisplayName(bd, customStandards)}${bd.fcr ? ` • FCR ${fmt.num(bd.fcr)}` : ''}`}
-                badge
-                badgeBg="var(--purple-soft)"
-                badgeColor="var(--purple)"
-              />
-            ))}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+            {birdBreeds.map(bd => createElement(StatRow, {
+              key: bd.id,
+              label: createElement(EntityLink, { type: "breed", id: bd.id, label: getBreedDisplayName(bd, customStandards) }),
+              value: bd.fcr ? `FCR ${fmt.num(bd.fcr)}` : "—"
+            }))}
           </div>
         </>
       )}
