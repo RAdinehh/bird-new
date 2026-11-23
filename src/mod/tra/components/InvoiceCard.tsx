@@ -265,12 +265,13 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
 {inv.disputeStatus === 'open' && (
         <>
           <SectionTitle>یادداشت اختلاف</SectionTitle>
-          <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-            <div style={{ fontWeight: 700, color: 'var(--text)' }}>
-              علت: {inv.disputeReason === 'price' ? 'قیمت' : inv.disputeReason === 'quantity' ? 'تعداد' : inv.disputeReason === 'quality' ? 'کیفیت' : 'سایر'}
-              {inv.disputeOpenedAt ? ` • ${fmt.date(inv.disputeOpenedAt)}` : ''}
-            </div>
-            {inv.disputeNote ? <div style={{ marginTop: 4, color: 'var(--muted)' }}>{inv.disputeNote}</div> : null}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
+            <Row
+              l="علت اختلاف"
+              v={inv.disputeReason === 'price' ? 'قیمت' : inv.disputeReason === 'quantity' ? 'تعداد' : inv.disputeReason === 'quality' ? 'کیفیت' : 'سایر'}
+            />
+            {inv.disputeOpenedAt ? <Row l="تاریخ ثبت" v={fmt.date(inv.disputeOpenedAt)} /> : null}
+            {inv.disputeNote ? <Row l="توضیحات" v={inv.disputeNote} /> : null}
           </div>
         </>
       )}
