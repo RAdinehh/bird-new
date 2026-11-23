@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useFormat } from '../../../shr/units/useFormat';
-import { Input, Tag } from '../../../shr/components/ui';
+import { Input, Tag, Btn, BtnRow } from '../../../shr/components/ui';
 import SelectSheetShell, { SheetGroup } from '../../../shr/components/SelectSheetShell';
 import { useFlk } from '../../flk/store';
 import { useBrd } from '../../brd/store';
@@ -149,6 +149,11 @@ export default function PickFlockModal({ open, onClose, onSelect, invoiceBirdIds
           placeholder="جستجو..."
           autoFocus
         />
+      }
+      footer={
+        <BtnRow>
+          <Btn variant="primary" onClick={handleClose}>بستن</Btn>
+        </BtnRow>
       }
     >
       {isEmpty ? (
