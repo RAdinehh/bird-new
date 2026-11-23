@@ -106,8 +106,10 @@ export default function DisputeModal({ open, onClose, invoice }: Props) {
         />
       </Field>
 
-      <AlertBox tone="warn" style={{ marginTop: 6 }}>
-        بعد از ثبت، این فاکتور از لیست طلبی خارج می‌شود تا مشکل حل شود.
+      <AlertBox tone="warn" style={{ marginTop: -4 }}>
+        {isPurchase
+          ? 'با ثبت اختلاف، این فاکتور تا زمان رفع مشکل از فهرست بدهی‌ها و یادآوری سررسید خارج می‌شود.'
+          : 'با ثبت اختلاف، این فاکتور تا زمان رفع مشکل از فهرست مطالبات و یادآوری سررسید خارج می‌شود.'}
       </AlertBox>
     </Modal>
   );
