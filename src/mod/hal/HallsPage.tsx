@@ -52,12 +52,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
   const [saveAttempted, setSaveAttempted] = useState(false);
   const [undoData, setUndoData] = useState<{ item: Hall | Hall[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-
-  // 🆕 focus از URL → باز کردن کارت
-  const focusId = useFocusParam();
-  useEffect(() => {
-    if (focusId) setExpandedId(focusId);
-  }, [focusId]);
+  useFocusParam();
 
   /** 🆕 وقتی سالنی حذف می‌شه، گله‌های یتیم رو آزاد کن */
   useHallsCascade(_hallsRaw, flocks, updateFlock);

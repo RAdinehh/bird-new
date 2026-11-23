@@ -45,7 +45,7 @@ export function useFocusParam(autoClear = true): string | null {
           { replace: true },
         );
       }
-    }, 3200);
+    }, 3600);
 
     return () => {
       clearTimeout(t1);

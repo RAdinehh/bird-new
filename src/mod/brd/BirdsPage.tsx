@@ -45,12 +45,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const draft = useFormDraft('brd-bird', form, (v: any) => setForm(v));
-
-  // 🆕 focus از URL → باز کردن کارت
-  const focusId = useFocusParam();
-  useEffect(() => {
-    if (focusId) setExpandedId(focusId);
-  }, [focusId]);
+  useFocusParam();
 
   // فیلتر تکرارها تو render
   const birds = useMemo(() => {

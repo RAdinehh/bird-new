@@ -29,11 +29,7 @@ export default function BreedsPage({ active = true }: { active?: boolean } = {})
   const { redirect: masterRedirect, MasterRedirectModal } = useMasterRedirect();
   const [undoData, setUndoData] = useState<{ item: any } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-
-  const focusId = useFocusParam();
-  useEffect(() => {
-    if (focusId) setExpandedId(focusId);
-  }, [focusId]);
+  useFocusParam();
 
   const _birdsUnique = useMemo(() => {
     const seen = new Set<string>();

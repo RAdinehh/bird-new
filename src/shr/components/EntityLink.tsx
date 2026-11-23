@@ -13,17 +13,17 @@ export type EntityType =
   | 'device'
   | 'log';
 
-const MAP: Record<EntityType, { path: string; icon: string; color: string; tab?: string }> = {
-  flock:   { path: '/flk', icon: '🐔', color: 'var(--accent)' },
-  bird:    { path: '/brd', icon: '🐣', color: 'var(--purple)', tab: 'birds' },
-  breed:   { path: '/brd', icon: '🧬', color: 'var(--purple)', tab: 'breeds' },
-  hall:    { path: '/hal', icon: '🏠', color: 'var(--info)' },
-  zone:    { path: '/hal', icon: '📦', color: 'var(--purple)', tab: 'zones' },
-  party:   { path: '/ctc', icon: '👤', color: 'var(--warn)' },
-  invoice: { path: '/tra', icon: '📄', color: 'var(--info)' },
-  item:    { path: '/whs', icon: '📦', color: 'var(--accent)' },
-  device:  { path: '/inc', icon: '🥚', color: 'var(--purple)' },
-  log:     { path: '/dlg', icon: '📋', color: 'var(--muted)' },
+const MAP: Record<EntityType, { path: string; icon: string; tab?: string }> = {
+  flock:   { path: '/flk', icon: '🐔' },
+  bird:    { path: '/brd', icon: '🐣', tab: 'birds' },
+  breed:   { path: '/brd', icon: '🧬', tab: 'breeds' },
+  hall:    { path: '/hal', icon: '🏠' },
+  zone:    { path: '/hal', icon: '📦', tab: 'zones' },
+  party:   { path: '/ctc', icon: '👤' },
+  invoice: { path: '/tra', icon: '📄' },
+  item:    { path: '/whs', icon: '📦' },
+  device:  { path: '/inc', icon: '🥚' },
+  log:     { path: '/dlg', icon: '📋' },
 };
 
 export function getEntityUrl(
@@ -51,11 +51,9 @@ interface Props {
   id: string;
   label: string;
   sub?: string;
-  /** حالت بج (پس‌زمینه رنگی، بدون underline) */
+  /** حفظ سازگاری با فراخوانی‌های قبلی — ظاهر همیشه یکپارچه و استاندارد است */
   badge?: boolean;
-  /** رنگ پس‌زمینه بج */
   badgeBg?: string;
-  /** رنگ متن بج */
   badgeColor?: string;
   /** بازنویسی تب (برای invoice: sales/purchases) */
   tab?: string;
@@ -68,9 +66,6 @@ export default function EntityLink({
   id,
   label,
   sub,
-  badge,
-  badgeBg,
-  badgeColor,
   tab,
   edit,
 }: Props) {
@@ -81,51 +76,41 @@ export default function EntityLink({
   return (
     <button
       type="button"
+      className="pm-entity-link"
       onClick={(e) => {
         e.stopPropagation();
         entityNav(type, id, { tab, edit });
       }}
       aria-label={`برو به ${label}`}
-      style={
-        badge
-          ? {
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
-              background: badgeBg || 'transparent',
-              color: badgeColor || conf.color,
-              border: 'none',
-              fontFamily: 'inherit',
-              fontSize: 'var(--fs-xs)',
-              fontWeight: 600,
-              cursor: 'pointer',
-              padding: '4px 10px',
-              borderRadius: 6,
-            }
-          : {
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
-              background: 'transparent',
-              border: 'none',
-              color: conf.color,
-              fontFamily: 'inherit',
-              fontSize: 'inherit',
-              fontWeight: 600,
-              cursor: 'pointer',
-              padding: 0,
-              textDecoration: 'underline dotted',
-              textUnderlineOffset: 3,
-            }
-      }
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 5,
+        background: 'var(--accent-soft)',
+        color: 'var(--accent)',
+        border: '1px solid var(--accent-border)',
+        borderRadius: 8,
+        padding: '2px 8px',
+        marginInline: 2,
+        fontFamily: 'inherit',
+        fontSize: 'var(--fs-xs)',
+        fontWeight: 700,
+        lineHeight: 1.4,
+        textDecoration: 'none',
+        cursor: 'pointer',
+        verticalAlign: 'middle',
+        maxWidth: '100%',
+        transition: 'background-color 0.15s ease, transform 0.1s ease',
+      }}
     >
-      <span>{conf.icon}</span>
-      <span>{label}</span>
+      <span style={{ fontSize: '1.05em', lineHeight: 1, flexShrink: 0 }}>{conf.icon}</span>
+      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
       {sub && (
-        <span style={{ color: 'var(--muted)', fontWeight: 400 }}>
+        <span style={{ color: 'var(--muted)', fontWeight: 500, flexShrink: 0 }}>
           · {getGlobalFormat().code(sub)}
         </span>
       )}
+      <span aria-hidden="true" style={{ fontSize: '0.85em', opacity: 0.75, lineHeight: 1, flexShrink: 0 }}>↗</span>
     </button>
   );
 }
