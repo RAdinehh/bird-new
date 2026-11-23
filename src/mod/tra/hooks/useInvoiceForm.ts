@@ -6,7 +6,8 @@ import { getGlobalFormat } from '../../../shr/units/useFormat';
 import { useEffect, useState, useMemo } from 'react';
 import { verifyInvariantsIfDev } from '../../../shr/dev/invariants';
 import { logAction } from '../../../cor/logger/auditLog';
-import { format as formatJ } from 'date-fns-jalali';
+import { format as formatJ, differenceInCalendarDays } from 'date-fns-jalali';
+import { parseJalali } from '../../../shr/date/jalali';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { useFlk } from '../../flk/store';
 import { paidSum, calcItemTotal, generateInstallments, remaining, computePartyCredit, buildAdvanceAllocations, type Invoice, type InvoiceItem, type Payment } from '../store';
@@ -358,6 +359,33 @@ export function useInvoiceForm(params: {
     // inline errors shown by useFormErrors (showError)
     if (!form.partyId) return;
     if (!form.date.trim()) return;
+
+    // ─── اعتبارسنجی منطقی تاریخ فاکتور (جلوگیری از اشتباه تایپی سال/آینده) ───
+    const parsedInvoiceDate = parseJalali(form.date.trim());
+    if (parsedInvoiceDate) {
+      const todayDate = new Date();
+      todayDate.setHours(0, 0, 0, 0);
+      const diffFromToday = differenceInCalendarDays(parsedInvoiceDate, todayDate);
+
+      if (!form.isPreorder && diffFromToday > 0) {
+        setErr(
+          `تاریخ فاکتور قطعی نمی‌تواند در آینده (${getGlobalFormat().date(form.date)}) باشد. ` +
+          `برای ثبت سفارش آینده از گزینه «پیش‌خرید / پیش‌فروش» استفاده کنید.`
+        );
+        return;
+      }
+
+      if (diffFromToday < -90) {
+        const pastDays = Math.abs(diffFromToday);
+        const confirmOldDate = await showConfirmAsync(
+          '⚠️ هشدار تاریخ قدیمی فاکتور',
+          `تاریخ انتخاب‌شده (${getGlobalFormat().date(form.date)}) مربوط به ${getGlobalFormat().count(pastDays)} روز قبل است.\n` +
+          `ثبت فاکتور با تاریخ قدیمی ممکن است تراز صورت‌حساب‌های گذشته و سن گله را تغییر دهد.\n\nآیا از صحت این تاریخ مطمئن هستید؟`,
+          {}
+        );
+        if (!confirmOldDate) return;
+      }
+    }
 
 
     // ─── اعتبارسنجی نرم (Soft Validation) ───
