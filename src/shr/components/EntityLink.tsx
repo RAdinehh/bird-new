@@ -102,7 +102,6 @@ export default function EntityLink({
         maxWidth: '100%',
       }}
     >
-      <span style={{ fontSize: '1.05em', lineHeight: 1, flexShrink: 0 }}>{conf.icon}</span>
       <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
       {sub && (
         <span style={{ color: 'var(--muted)', fontWeight: 500, flexShrink: 0 }}>

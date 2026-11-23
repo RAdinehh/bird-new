@@ -64,7 +64,7 @@ export default function HelpBanner({
   const c = TONE_COLORS[tone] || TONE_COLORS.info;
 
   return (
-    <div
+    <div data-help-banner="true"
       role="region"
       aria-label={title}
       style={{
