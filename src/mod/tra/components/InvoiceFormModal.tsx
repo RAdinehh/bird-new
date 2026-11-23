@@ -18,6 +18,8 @@ import InvoiceSmartSummary from './InvoiceSmartSummary';
 import PaymentsSection from './PaymentsSection';
 import { type CheckStatus , computeUnappliedAdvances} from '../store';
 import { CATEGORIES, generateInstallments, type InvoiceItem, type Payment } from '../store';
+import { useBrd } from '../../brd/store';
+import { isBreedAllowedForCategory } from '../../brd/categoryBreedRules';
 import { UNIT_LABEL } from '../../whs/store';
 import type { F } from '../types-invoice';
 import { useCtc } from '../../ctc/store';
@@ -99,6 +101,7 @@ const getQuantityMax = (cat: string): number | undefined => {
 };
 
 export default function InvoiceFormModal(props: InvoiceFormModalProps) {
+  const { breeds } = useBrd();
   const fmt = useFormat();
   const {
     open, setOpen, form, setForm, isPurchase,
@@ -179,7 +182,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             }))}
             onChange={newCat => {
               const newUnit = getUnitForCategory(newCat);
-              const isBirdCat = newCat === 'chick' || newCat === 'adult';
+              const isBirdCat = newCat === 'chick' || newCat === 'adult' || newCat === 'egg' || newCat === 'fertile_egg';
               const isStockCat = ['feed', 'medicine', 'vaccine', 'herbal'].includes(newCat);
               const isEquipCat = newCat === 'equipment';
               const newItems = form.items.map(it => {
@@ -187,7 +190,11 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                   return {
                     ...it,
                     unit: newUnit,
-                    ...(isBirdCat ? {} : { birdId: '', breedId: '', flockId: '', existingFlockId: '', hatchId: '', hatchDate: '', ageDays: null, chickWeight: null, liveWeight: null, maleCount: null, femaleCount: null, unknownCount: null }),
+                    ...(isBirdCat ? (() => {
+                      const curBreed = breeds.find(b => b.id === it.breedId);
+                      const validBreed = curBreed && isBreedAllowedForCategory(curBreed, newCat, isPurchase);
+                      return validBreed ? {} : { breedId: '', flockId: '', existingFlockId: '' };
+                    })() : { birdId: '', breedId: '', flockId: '', existingFlockId: '', hatchId: '', hatchDate: '', ageDays: null, chickWeight: null, liveWeight: null, maleCount: null, femaleCount: null, unknownCount: null }),
                     ...(isStockCat || isEquipCat ? {} : { stockItemId: '', itemId: '', expiryDate: '', batchNo: '', withdrawalDays: null }),
                     ...(isBirdCat || isEquipCat ? {} : { hallId: '', zoneId: '' }),
                     ...(isEquipCat ? {} : { equipmentCategory: '', equipmentType: '', equipmentId: '' }),

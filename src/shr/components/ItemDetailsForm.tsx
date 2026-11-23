@@ -1,5 +1,8 @@
 import { getGlobalFormat } from '../units/useFormat';
-import { Field, LockedValue, Grid2, Grid3, Input, Select , NumField} from './ui';
+import { Field, LockedValue, AlertBox, Btn, Grid2, Grid3, Input, Select, NumField } from './ui';
+import { useNavigate } from 'react-router-dom';
+import { isBreedAllowedForCategory, getRequiredPurposeHint } from '../../mod/brd/categoryBreedRules';
+import { getMasterPath } from '../../mod/brd/data-ownership';
 import SmartSelect from './SmartSelect';
 import { useBrd } from '../../mod/brd/store';
 import { useHal } from '../../mod/hal/store';
@@ -101,6 +104,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     if (!isFieldRequired(category, field, kind, item)) return;
     markTouched?.(`items.${itemIndex}.${field}`);
   };
+  const navigate = useNavigate();
   const { birds, breeds } = useBrd();
   const { halls, zones, equipment: halEquipment = [] } = useHal();
   const { flocks } = useFlk();
@@ -141,7 +145,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   const allHatches: HatchResult[] = ((incStore as unknown as { hatches?: HatchResult[] }).hatches) || [];
   const availableHatches = allHatches.filter(h => h.generatedFlockId && (h.hatched || 0) > 0);
 
-  const breedsForBird = item.birdId ? breeds.filter(b => b.birdId === item.birdId) : [];
+  const allBreedsForBird = item.birdId ? breeds.filter(b => b.birdId === item.birdId) : [];
+  const breedsForBird = allBreedsForBird.filter(b => isBreedAllowedForCategory(b, category, isPurchase));
+  const missingPurposeHint = getRequiredPurposeHint(category, isPurchase);
+  const hasIncompatibleBreedsOnly = Boolean(item.birdId && allBreedsForBird.length > 0 && breedsForBird.length === 0 && missingPurposeHint);
 
   const activeFlocks = flocks.filter(f => f.status === 'active').map(f => {
     const parts: string[] = [];
@@ -158,6 +165,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       if (!flock) return false;
       if (it.birdId && flock.birdId !== it.birdId) return false;
       if (it.breedId && flock.breedId !== it.breedId) return false;
+      const flockBreed = breeds.find(b => b.id === flock.breedId);
+      if (flockBreed && !isBreedAllowedForCategory(flockBreed, category, isPurchase)) return false;
       return true;
     });
   };
@@ -279,6 +288,14 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             )}
           </Field>
         </Grid2>
+        {hasIncompatibleBreedsOnly && (
+          <AlertBox tone="warn" icon="⚠️">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+              <span>نژادی با کاربرد «{missingPurposeHint}» برای این پرنده ثبت نشده است.</span>
+              <Btn size="sm" onClick={() => navigate(getMasterPath('breed'))}>ساخت نژاد جدید</Btn>
+            </div>
+          </AlertBox>
+        )}
 
         {/* ردیف ۲: تاریخ هچ + سن */}
         <Grid2>
@@ -433,6 +450,14 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" disabled={isLocked || !item.birdId} />
           </Field>
         </Grid2>
+        {hasIncompatibleBreedsOnly && (
+          <AlertBox tone="warn" icon="⚠️">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+              <span>نژادی با کاربرد «{missingPurposeHint}» برای این پرنده ثبت نشده است.</span>
+              <Btn size="sm" onClick={() => navigate(getMasterPath('breed'))}>ساخت نژاد جدید</Btn>
+            </div>
+          </AlertBox>
+        )}
 
         <Grid2>
           {isLocked ? (
@@ -748,6 +773,14 @@ if (category === 'egg' || category === 'fertile_egg') {
           })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" />
         </Field>
       </Grid2>
+        {hasIncompatibleBreedsOnly && (
+          <AlertBox tone="warn" icon="⚠️">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+              <span>نژادی با کاربرد «{missingPurposeHint}» برای این پرنده ثبت نشده است.</span>
+              <Btn size="sm" onClick={() => navigate(getMasterPath('breed'))}>ساخت نژاد جدید</Btn>
+            </div>
+          </AlertBox>
+        )}
     </div>
   );
 }
