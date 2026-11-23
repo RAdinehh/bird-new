@@ -596,6 +596,9 @@ html {
   font-family: inherit !important;
   font-weight: 600 !important;
   letter-spacing: inherit !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  vertical-align: baseline !important;
 }
 .pm-entity-link:hover {
   filter: brightness(0.96);
