@@ -183,12 +183,33 @@ export function useInvoiceForm(params: {
       })();
       nx.total = calcItemTotal(nx.quantity, nx.unitPrice, nx.discountType, nx.discountValue, factor) + (nx.shipping || 0);
 
-      // auto-calc unknownCount for chick/adult
-      if ((cat === 'chick' || cat === 'adult') && (patch.quantity !== undefined || patch.maleCount !== undefined || patch.femaleCount !== undefined)) {
+      // auto-calc gender counts intelligently for chick/adult
+      if ((cat === 'chick' || cat === 'adult') && (patch.quantity !== undefined || patch.maleCount !== undefined || patch.femaleCount !== undefined || patch.flockId !== undefined)) {
         const m = Number(nx.maleCount) || 0;
         const fe = Number(nx.femaleCount) || 0;
         const q = Number(nx.quantity) || 0;
-        nx.unknownCount = Math.max(0, q - m - fe);
+        const rem = Math.max(0, q - m - fe);
+
+        if (kind === 'purchase') {
+          nx.unknownCount = rem;
+        } else {
+          const flkObj = nx.flockId ? useFlk.getState().flocks.find(x => x.id === nx.flockId) : undefined;
+          const availU = flkObj?.unknownCount ?? 0;
+          const availM = flkObj?.maleCount ?? 0;
+          const availF = flkObj?.femaleCount ?? 0;
+
+          if (!flkObj || availU > 0) {
+            nx.unknownCount = flkObj ? Math.min(rem, availU) : rem;
+          } else {
+            // گله تعیین‌جنسیت شده (unknownCount === 0): هرگز نامشخص را پر نکن
+            nx.unknownCount = 0;
+            if (patch.flockId !== undefined && m === 0 && fe === 0 && q > 0) {
+              // اگر فقط یک جنسیت در گله موجود است، همان را پیشنهاد بده
+              if (availM > 0 && availF === 0) nx.maleCount = Math.min(q, availM);
+              else if (availF > 0 && availM === 0) nx.femaleCount = Math.min(q, availF);
+            }
+          }
+        }
       }
 
       const identityFields = ['flockId', 'hatchId', 'stockItemId', 'unit', 'unitPrice', 'birdId', 'breedId', 'description'];
