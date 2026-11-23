@@ -48,7 +48,7 @@ export const PAYMENT_TERMS_LABEL: Record<PaymentTerms, string> = {
 
 export const WORKFLOW_LABEL: Record<WorkflowStatus, string> = {
   draft: '✏️ در حال نوشتن',
-  confirmed: '📝 خرید قطعی',
+  confirmed: 'خرید قطعی',
   received: '📦 کالا رسید',
   paid: '💰 تسویه شد',
 };
