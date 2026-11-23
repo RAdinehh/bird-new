@@ -290,10 +290,9 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               }} placeholder="1405/07/26" />
             </Field>
           ) : (item.flockId || item.hatchId) && !hatchOverride ? (
-            <Field label="تاریخ هچ (قفل)">
+            <Field label="🔒 تاریخ هچ">
               <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
                 {item.hatchDate ? getGlobalFormat().date(item.hatchDate) : '—'}
-                <span style={{ marginInlineStart: 'auto', fontSize: 14 }} title="قفل — از منبع انتخاب‌شده">🔒</span>
               </div>
             </Field>
           ) : (
@@ -305,10 +304,9 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             </Field>
           )}
           {!isPurchase && (item.flockId || item.hatchId) && !hatchOverride ? (
-            <Field label="سن (روز) (قفل)">
+            <Field label="🔒 سن (روز)">
               <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
                 {item.ageDays != null && item.ageDays >= 0 ? `${getGlobalFormat().int(item.ageDays)} روز` : '—'}
-                <span style={{ marginInlineStart: 'auto', fontSize: 14 }} title="قفل — محاسبه‌شده از منبع">🔒</span>
               </div>
             </Field>
           ) : (
@@ -418,7 +416,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               }}
               options={flocks.filter(f => f.status === 'active' && (f.currentCount ?? 0) > 0).map(f => {
                 const b = birds.find(x => x.id === f.birdId);
-                return { value: f.id, label: `${f.name} — ${b ? `${b.name} · ` : ''}${getGlobalFormat().count(f.currentCount ?? 0)} پرنده · ${getAgeDays(f)} روز` };
+                return { value: f.id, label: `${f.name} — ${b ? `${b.name} · ` : ''}${getGlobalFormat().count(f.currentCount ?? 0)} پرنده · ${getGlobalFormat().int(getAgeDays(f))} روز` };
               })}
               placeholder="— انتخاب گله —"
               modalTitle="انتخاب گله مبدأ"
@@ -442,10 +440,9 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
         <Grid2>
           {isLocked ? (
-            <Field label={isSaleLocked ? "تاریخ هچ (قفل)" : "تاریخ هچ (قفل از گله)"}>
+            <Field label="🔒 تاریخ هچ">
               <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
                 {item.hatchDate ? getGlobalFormat().date(item.hatchDate) : '—'}
-                <span style={{ marginInlineStart: 'auto', fontSize: 14 }} title="قفل — از گله انتخاب‌شده">🔒</span>
               </div>
             </Field>
           ) : (
@@ -457,10 +454,9 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             </Field>
           )}
           {isLocked ? (
-            <Field label="سن (روز) (قفل)">
+            <Field label="🔒 سن (روز)">
               <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
                 {item.ageDays != null && item.ageDays >= 0 ? `${getGlobalFormat().int(item.ageDays)} روز` : '—'}
-                <span style={{ marginInlineStart: 'auto', fontSize: 14 }} title="قفل — محاسبه‌شده از گله">🔒</span>
               </div>
             </Field>
           ) : (
