@@ -1,5 +1,5 @@
 import { useFormat } from '../../../shr/units/useFormat';
-import { Tag, Btn, CardActions, AlertBox } from '../../../shr/components/ui';
+import { Tag, Btn, CardActions } from '../../../shr/components/ui';
 import { ACTION_PRESETS } from '../../../shr/constants/cardActions';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { toFa , formatQty } from '../../../shr/utils/fa';
@@ -151,15 +151,6 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
             />
           ) : null}
       </RowGrid>
-      {inv.disputeStatus === 'open' && (
-        <AlertBox tone="warn" style={{ marginTop: 'var(--sp-2)' }}>
-          <div style={{ fontWeight: 700 }}>
-            در اختلاف ({inv.disputeReason === 'price' ? 'قیمت' : inv.disputeReason === 'quantity' ? 'تعداد' : inv.disputeReason === 'quality' ? 'کیفیت' : 'سایر'})
-            {inv.disputeOpenedAt ? ` • ${fmt.date(inv.disputeOpenedAt)}` : ''}
-          </div>
-          {inv.disputeNote ? <div style={{ marginTop: 2 }}>{inv.disputeNote}</div> : null}
-        </AlertBox>
-      )}
 
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام</SectionTitle>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
@@ -271,7 +262,20 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
           📦 تحویل گرفتم (ایجاد گله و موجودی)
         </Btn>
       )}
-{(onEdit || nextWorkflowStatus(inv.workflowStatus) || onReopen || linkedFlock || onDispute || onResolveDispute || onWriteOff) && (() => {
+{inv.disputeStatus === 'open' && (
+        <>
+          <SectionTitle>یادداشت اختلاف</SectionTitle>
+          <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
+            <div style={{ fontWeight: 700, color: 'var(--text)' }}>
+              علت: {inv.disputeReason === 'price' ? 'قیمت' : inv.disputeReason === 'quantity' ? 'تعداد' : inv.disputeReason === 'quality' ? 'کیفیت' : 'سایر'}
+              {inv.disputeOpenedAt ? ` • ${fmt.date(inv.disputeOpenedAt)}` : ''}
+            </div>
+            {inv.disputeNote ? <div style={{ marginTop: 4, color: 'var(--muted)' }}>{inv.disputeNote}</div> : null}
+          </div>
+        </>
+      )}
+
+      {(onEdit || nextWorkflowStatus(inv.workflowStatus) || onReopen || linkedFlock || onDispute || onResolveDispute || onWriteOff) && (() => {
         const nextWs = nextWorkflowStatus(inv.workflowStatus);
         const skipCashReceived = (String(inv.paymentTerms) === 'cash' || String(inv.paymentTerms) === 'card') && nextWs === 'received';
         const hasBirdItems = inv.type === 'purchase' && !!inv.items?.some(it => it.birdId);
