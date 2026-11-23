@@ -279,7 +279,7 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
     if (ms.selectionMode) setExpandedId(null);
   }, [ms.selectionMode]);
 
-  useFab(active && invoices.length > 0 ? { label: 'ثبت فاکتور', onClick: openNew, wakeMode: false } : null);
+  useFab(active && list.length > 0 ? { label: 'ثبت فاکتور', onClick: openNew, wakeMode: false } : null);
 
   // ═══ اعتبارسنجی زنده ═══
   // 🆕 Filter empty items/payments to match save() behavior in useInvoiceForm.ts

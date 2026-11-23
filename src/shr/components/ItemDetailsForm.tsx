@@ -299,21 +299,30 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               }} placeholder="1405/07/26" />
             </Field>
           )}
-          <Field label="سن (روز)" hint={isPurchase ? "تاریخ هچ خودکار محاسبه می‌شود" : undefined}>
-            <Input mode="number" value={item.ageDays != null && item.ageDays >= 0 ? String(item.ageDays) : ''} onChange={e => {
-              const rawStr = e.target.value.trim();
-              const parsed = rawStr === '' ? NaN : Math.round(parseFaNum(rawStr));
-              const v = !isNaN(parsed) && parsed >= 0 ? parsed : null;
-              if (v !== null) {
-                const invDateStr = formatJ(new Date(), 'yyyy/MM/dd');
-                const invDate = parseJ(invDateStr, 'yyyy/MM/dd', new Date());
-                const newHatch = subDays(invDate, v);
-                updateItem({ ageDays: v, hatchDate: formatJ(newHatch, 'yyyy/MM/dd') });
-              } else {
-                updateItem({ ageDays: null });
-              }
-            }} unit="روز" min={0} placeholder="مثلاً ۹۰" />
-          </Field>
+          {!isPurchase && (item.flockId || item.hatchId) && !hatchOverride ? (
+            <Field label="سن (روز) (قفل)">
+              <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
+                {item.ageDays != null && item.ageDays >= 0 ? `${getGlobalFormat().int(item.ageDays)} روز` : '—'}
+                <span style={{ marginInlineStart: 'auto', fontSize: 14 }} title="قفل — محاسبه‌شده از منبع">🔒</span>
+              </div>
+            </Field>
+          ) : (
+            <Field label="سن (روز)" hint={isPurchase ? "تاریخ هچ خودکار محاسبه می‌شود" : undefined}>
+              <Input mode="number" value={item.ageDays != null && item.ageDays >= 0 ? String(item.ageDays) : ''} onChange={e => {
+                const rawStr = e.target.value.trim();
+                const parsed = rawStr === '' ? NaN : Math.round(parseFaNum(rawStr));
+                const v = !isNaN(parsed) && parsed >= 0 ? parsed : null;
+                if (v !== null) {
+                  const invDateStr = formatJ(new Date(), 'yyyy/MM/dd');
+                  const invDate = parseJ(invDateStr, 'yyyy/MM/dd', new Date());
+                  const newHatch = subDays(invDate, v);
+                  updateItem({ ageDays: v, hatchDate: formatJ(newHatch, 'yyyy/MM/dd') });
+                } else {
+                  updateItem({ ageDays: null });
+                }
+              }} unit="روز" min={0} placeholder="مثلاً ۹۰" />
+            </Field>
+          )}
         </Grid2>
 
         {/* ردیف ۳: منبع (هچ/گله) */}

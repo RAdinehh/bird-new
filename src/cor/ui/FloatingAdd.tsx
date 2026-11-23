@@ -45,15 +45,30 @@ export default function FloatingAdd() {
       setPageScrollable(scrollable);
       setPageHasEmptyCTA(hasVisibleCTA);
     };
+    let rafId: number | null = null;
+    const scheduleCheck = () => {
+      if (rafId !== null) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        checkState();
+      });
+    };
     checkState();
-    window.addEventListener('resize', checkState);
-    const observer = new MutationObserver(checkState);
-    observer.observe(document.body, { childList: true, subtree: true });
+    scheduleCheck();
+    window.addEventListener('resize', scheduleCheck);
+    const observer = new MutationObserver(scheduleCheck);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['style', 'class', 'hidden'],
+    });
     return () => {
-      window.removeEventListener('resize', checkState);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', scheduleCheck);
       observer.disconnect();
     };
-  }, []);
+  }, [config]);
 
   // explicit true/false → استفاده از همان
   // explicit 'auto' یا undefined → خودکار بر اساس اسکرول‌پذیری
