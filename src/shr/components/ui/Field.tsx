@@ -5,6 +5,10 @@ import { HelpIcon } from './HelpIcon';
 interface FieldProps {
   label: React.ReactNode;
   required?: boolean;
+  /** قفل بودن فیلد — آیکون 🔒 را جلوی متن عنوان قرار می‌دهد */
+  locked?: boolean;
+  /** منبع قفل شدن (مثلاً «گله» یا «تسویه») — متن راهنمای ثابت زیر کادر را یکدست می‌سازد */
+  lockedFrom?: string;
   hint?: string;
   /** 🆕 اگه فیلد خودکار از ماژول دیگه پر شده — نام ماژول */
   autoFrom?: string;
@@ -18,7 +22,8 @@ interface FieldProps {
   autoHideMs?: number;
   children: React.ReactNode;
 }
-export function Field({ label, required, hint, autoFrom, error, warning, onTouch, help, autoHideMs = 4000, children }: FieldProps) {
+
+export function Field({ label, required, locked, lockedFrom, hint, autoFrom, error, warning, onTouch, help, autoHideMs = 4000, children }: FieldProps) {
   const [showError, setShowError] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -52,6 +57,9 @@ export function Field({ label, required, hint, autoFrom, error, warning, onTouch
       return () => clearTimeout(t);
     }
   }, [warning, autoHideMs, isTyping]);
+
+  const resolvedHint = hint ?? (lockedFrom ? `از ${lockedFrom} انتخاب‌شده` : undefined);
+
   return (
     <div
       style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}
@@ -67,7 +75,9 @@ export function Field({ label, required, hint, autoFrom, error, warning, onTouch
         gap: 4,
         paddingRight: 2,
       }}>
-        {label}{required && <span style={{ color: 'var(--danger)', fontSize: '1.2em', fontWeight: 700, lineHeight: 1 }} aria-label="اجباری">*</span>}
+        <span>{label}</span>
+        {required && <span style={{ color: 'var(--danger)', fontSize: '1.2em', fontWeight: 700, lineHeight: 1 }} aria-label="اجباری">*</span>}
+        {(locked || lockedFrom) && <span style={{ fontSize: 13, lineHeight: 1 }} aria-label="قفل">🔒</span>}
         {autoFrom ? (
           <span style={{
             width: 6, height: 6, borderRadius: '50%',
@@ -75,14 +85,14 @@ export function Field({ label, required, hint, autoFrom, error, warning, onTouch
             flexShrink: 0,
           }} aria-label={'از ' + autoFrom} />
         ) : null}
-  {help && <HelpIcon text={help} />}
+        {help && <HelpIcon text={help} />}
       </label>
       {React.isValidElement(children)
         ? React.cloneElement(children as React.ReactElement<any>, {
             error: showError ? (typeof error === 'string' ? error : 'error') : undefined,
           })
         : children}
-      {(hint || autoFrom) && (
+      {(resolvedHint || autoFrom) && (
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -110,12 +120,12 @@ export function Field({ label, required, hint, autoFrom, error, warning, onTouch
               <span>از {autoFrom}</span>
             </span>
           )}
-          {hint && (
+          {resolvedHint && (
             <span style={{
               fontSize: 'var(--fs-xs)',
               color: 'var(--dim)',
               lineHeight: 1.5,
-            }}>{hint}</span>
+            }}>{resolvedHint}</span>
           )}
         </div>
       )}
@@ -151,6 +161,25 @@ export function Field({ label, required, hint, autoFrom, error, warning, onTouch
           <span>{warning}</span>
         </div>
       )}
+    </div>
+  );
+}
+
+/** کادر نمایشی استاندارد برای فیلدهای قفل‌شده و فقط-خواندنی */
+export function LockedValue({ value }: { value: React.ReactNode }) {
+  return (
+    <div style={{
+      height: 38,
+      display: 'flex',
+      alignItems: 'center',
+      background: 'var(--input-bg)',
+      border: '1px solid var(--border)',
+      borderRadius: 'var(--r-md)',
+      padding: '0 12px',
+      color: 'var(--muted)',
+      fontSize: 'var(--fs-sm)',
+    }}>
+      {value || '—'}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { getGlobalFormat } from '../units/useFormat';
-import { Field, Grid2, Grid3, Input, Select , NumField} from './ui';
+import { Field, LockedValue, Grid2, Grid3, Input, Select , NumField} from './ui';
 import SmartSelect from './SmartSelect';
 import { useBrd } from '../../mod/brd/store';
 import { useHal } from '../../mod/hal/store';
@@ -290,10 +290,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               }} placeholder="1405/07/26" />
             </Field>
           ) : (item.flockId || item.hatchId) && !hatchOverride ? (
-            <Field label="🔒 تاریخ هچ">
-              <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
-                {item.hatchDate ? getGlobalFormat().date(item.hatchDate) : '—'}
-              </div>
+            <Field label="تاریخ هچ" locked>
+              <LockedValue value={item.hatchDate ? getGlobalFormat().date(item.hatchDate) : '—'} />
             </Field>
           ) : (
             <Field label="تاریخ هچ" required error={err('hatchDate')} onTouch={touch('hatchDate')}>
@@ -304,10 +302,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             </Field>
           )}
           {!isPurchase && (item.flockId || item.hatchId) && !hatchOverride ? (
-            <Field label="🔒 سن (روز)">
-              <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
-                {item.ageDays != null && item.ageDays >= 0 ? `${getGlobalFormat().int(item.ageDays)} روز` : '—'}
-              </div>
+            <Field label="سن (روز)" locked>
+              <LockedValue value={item.ageDays != null && item.ageDays >= 0 ? `${getGlobalFormat().int(item.ageDays)} روز` : '—'} />
             </Field>
           ) : (
             <Field label="سن (روز)" hint={isPurchase ? "تاریخ هچ خودکار محاسبه می‌شود" : undefined}>
@@ -426,10 +422,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
         {/* --- بخش ۱: هویت مشتق‌شده از گله --- */}
         <Grid2>
-          <Field label="نوع پرنده" required error={err('birdId')} onTouch={touch('birdId')} hint={isSaleLocked ? 'از گله انتخاب‌شده' : undefined}>
+          <Field label="نوع پرنده" required error={err('birdId')} onTouch={touch('birdId')} lockedFrom={isSaleLocked ? "گله" : undefined}>
             <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" disabled={isLocked} />
           </Field>
-          <Field label="نژاد" required error={err('breedId')} onTouch={touch('breedId')} hint={isSaleLocked ? 'از گله انتخاب‌شده' : undefined}>
+          <Field label="نژاد" required error={err('breedId')} onTouch={touch('breedId')} lockedFrom={isSaleLocked ? "گله" : undefined}>
             <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
               const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
               const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
@@ -440,10 +436,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
         <Grid2>
           {isLocked ? (
-            <Field label="🔒 تاریخ هچ">
-              <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
-                {item.hatchDate ? getGlobalFormat().date(item.hatchDate) : '—'}
-              </div>
+            <Field label="تاریخ هچ" locked>
+              <LockedValue value={item.hatchDate ? getGlobalFormat().date(item.hatchDate) : '—'} />
             </Field>
           ) : (
             <Field label="تاریخ هچ" required error={err('hatchDate')} onTouch={touch('hatchDate')}>
@@ -454,10 +448,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             </Field>
           )}
           {isLocked ? (
-            <Field label="🔒 سن (روز)">
-              <div style={{ height: 38, display: 'flex', alignItems: 'center', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', color: 'var(--muted)' }}>
-                {item.ageDays != null && item.ageDays >= 0 ? `${getGlobalFormat().int(item.ageDays)} روز` : '—'}
-              </div>
+            <Field label="سن (روز)" locked>
+              <LockedValue value={item.ageDays != null && item.ageDays >= 0 ? `${getGlobalFormat().int(item.ageDays)} روز` : '—'} />
             </Field>
           ) : (
             <Field label="سن (روز)" hint={isPurchase ? "تاریخ هچ خودکار محاسبه می‌شود" : undefined}>
