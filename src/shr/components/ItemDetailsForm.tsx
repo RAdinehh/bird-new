@@ -623,7 +623,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}`,
               })),
             ]}
-            placeholder={`— انتخاب یا تعریف ${catLabel} —`}
+            placeholder={undefined}
             modalTitle={modalTitle}
           />
         </Field>
