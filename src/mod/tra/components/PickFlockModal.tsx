@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useFormat } from '../../../shr/units/useFormat';
 import { Modal, Input, Tag, Btn, BtnRow } from '../../../shr/components/ui';
 import { IconSearch } from '../../../shr/icons';
@@ -18,7 +18,21 @@ export default function PickFlockModal({ open, onClose, onSelect, invoiceBirdIds
   const { flocks } = useFlk();
   const birds = useBrd(s => s.birds);
   const breeds = useBrd(s => s.breeds);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [q, setQ] = useState('');
+
+  useEffect(() => {
+    if (!open) {
+      setSearchOpen(false);
+      setQ('');
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (!searchOpen) {
+      setQ('');
+    }
+  }, [searchOpen]);
 
   const birdMap = useMemo(() => {
     const m = new Map<string, string>();
@@ -33,7 +47,6 @@ export default function PickFlockModal({ open, onClose, onSelect, invoiceBirdIds
   }, [breeds]);
 
   const allFlocks = flocks || [];
-  const showSearch = allFlocks.length > 6;
 
   const { activeFlocks, archivedFlocks } = useMemo(() => {
     const term = q.trim().toLowerCase();
@@ -109,9 +122,9 @@ export default function PickFlockModal({ open, onClose, onSelect, invoiceBirdIds
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
             {speciesMismatch ? <Tag tone="red">گونه متفاوت</Tag> : null}
             {hasOtherInvoice ? (
-              <Tag tone="amber">دارای فاکتور</Tag>
+              <Tag tone="green">دارای فاکتور</Tag>
             ) : (
-              <Tag tone="green">بدون فاکتور</Tag>
+              <Tag tone="amber">بدون فاکتور</Tag>
             )}
             {isArchived ? <Tag tone="gray">آرشیو</Tag> : null}
           </div>
@@ -130,13 +143,43 @@ export default function PickFlockModal({ open, onClose, onSelect, invoiceBirdIds
   const isEmpty = activeFlocks.length === 0 && archivedFlocks.length === 0;
 
   return (
-    <Modal open={open} onClose={onClose} title="🐔 انتخاب گله برای اتصال">
-      {showSearch && (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="🐔 انتخاب گله برای اتصال"
+      headerAction={
+        allFlocks.length > 0 ? (
+          <button
+            type="button"
+            onClick={() => setSearchOpen(v => !v)}
+            aria-label="جستجو"
+            aria-expanded={searchOpen}
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 'var(--r-md)',
+              background: searchOpen ? 'var(--accent-soft)' : 'var(--btn-bg)',
+              border: `1px solid ${searchOpen ? 'var(--accent-border)' : 'var(--border)'}`,
+              color: searchOpen ? 'var(--accent)' : 'var(--muted)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontFamily: 'inherit',
+            }}
+          >
+            <IconSearch size={18} />
+          </button>
+        ) : undefined
+      }
+    >
+      {searchOpen && (
         <div style={{ position: 'relative', marginBottom: 10 }}>
           <div style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted)', pointerEvents: 'none' }}>
             <IconSearch size={16} />
           </div>
           <Input
+            autoFocus
             type="search"
             value={q}
             onChange={e => setQ(e.target.value)}
@@ -151,7 +194,7 @@ export default function PickFlockModal({ open, onClose, onSelect, invoiceBirdIds
           <div style={{ fontSize: 48, marginBottom: 8 }}>🐔</div>
           <div>هیچ گله‌ای پیدا نشد</div>
           <div style={{ fontSize: 'var(--fs-sm)', marginTop: 4, opacity: 0.7 }}>
-            ابتدا از بخش گله‌ها، یک گله ثبت کنید
+            {q.trim() ? 'عبارت جستجو را تغییر دهید' : 'ابتدا از بخش گله‌ها، یک گله ثبت کنید'}
           </div>
         </div>
       ) : (

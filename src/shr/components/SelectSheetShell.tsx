@@ -91,6 +91,7 @@ interface Props {
   searchable?: boolean;
   /** محتوای کادر جستجو */
   searchNode?: ReactNode;
+  onSearchClear?: () => void;
   /** محتوای Sheet */
   children: ReactNode;
   /** فوتر اختیاری */
@@ -100,7 +101,7 @@ interface Props {
 // ═══ کامپوننت اصلی ═══
 export default function SelectSheetShell({
   open, onClose, title, subtitle,
-  onAdd, searchable = false, searchNode, children, footer,
+  onAdd, searchable = false, searchNode, onSearchClear, children, footer,
 }: Props) {
   const [mounted, setMounted] = useState(false);
   const [animating, setAnimating] = useState(false);
@@ -220,7 +221,7 @@ export default function SelectSheetShell({
               </button>
             )}
             {searchable && (
-              <button type="button" onClick={() => setSearchOpen(v => !v)}
+              <button type="button" onClick={() => setSearchOpen(v => { const next = !v; if (!next) onSearchClear?.(); return next; })}
                 aria-label="جستجو" aria-expanded={searchOpen} style={BTN_BASE}>
                 <IconSearch />
               </button>
@@ -234,7 +235,7 @@ export default function SelectSheetShell({
         {/* Search row */}
         {searchable && searchOpen && searchNode && (
           <div style={{
-            padding: '0 10px 8px',
+            padding: '8px 10px',
             borderBottom: '1px solid var(--border)',
             flexShrink: 0,
           }}>{searchNode}</div>

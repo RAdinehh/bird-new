@@ -788,6 +788,7 @@ export default function FlockComparisonPanel({
             : `${fmt.count(otherCandidates.length)} از ${fmt.count(MAX_OTHER_FLOCKS)} گله دیگر`
         }
         searchable={candidates.length > ARCHIVE_FILTER_THRESHOLD}
+        onSearchClear={() => setSearchQuery('')}
         searchNode={
           <div style={{ padding: '4px 2px' }}>
             <input

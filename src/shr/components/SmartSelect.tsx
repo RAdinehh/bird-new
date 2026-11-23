@@ -184,6 +184,7 @@ export default function SmartSelect({
         title={modalTitle}
         subtitle={`${getGlobalFormat().count(options.length)} مورد`}
         searchable={searchable}
+        onSearchClear={() => setQuery('')}
         searchNode={
           <Input
             placeholder="جستجو..."
