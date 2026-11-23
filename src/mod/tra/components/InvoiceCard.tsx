@@ -66,7 +66,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
             ? {
                 ...i,
                 relatedFlockId: '',
-                items: i.items.map(it => it.flockId === flock.id ? { ...it, flockId: '' } : it),
+                items: i.items.map((it: any) => (it.flockId === flock.id || it.existingFlockId === flock.id) ? { ...it, flockId: '', existingFlockId: '' } : it),
               }
             : i
         ),
@@ -74,21 +74,22 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
     }
 
     const firstBirdItem = liveBirdItems[0];
+    const wasLinkedToOther = Boolean(flock.sourceInvoiceId && flock.sourceInvoiceId !== inv.id);
     const flockPatch: Partial<Flock> = {
       sourceInvoiceId: inv.id,
       sourceCategory: (firstBirdItem?.category || inv.category) as any,
     };
     if (!flock.birdId && firstBirdItem?.birdId) flockPatch.birdId = firstBirdItem.birdId;
     if (!flock.breedId && firstBirdItem?.breedId) flockPatch.breedId = firstBirdItem.breedId;
-    if (!flock.purchaseDate && inv.date) flockPatch.purchaseDate = inv.date;
-    if (flock.purchasePrice == null && firstBirdItem?.unitPrice) {
+    if ((!flock.purchaseDate || wasLinkedToOther) && inv.date) flockPatch.purchaseDate = inv.date;
+    if ((flock.purchasePrice == null || wasLinkedToOther) && firstBirdItem?.unitPrice) {
       flockPatch.purchasePrice = firstBirdItem.unitPrice;
     }
 
     // ۱. به‌روزرسانی گله
     updateFlock(flock.id, flockPatch);
 
-    // ۲. به‌روزرسانی فاکتور (ذخیره شناسه گله بدون اجرای cascade مجدد)
+    // ۲. به‌روزرسانی فاکتور (ذخیره شناسه گله در relatedFlockId، flockId و existingFlockId بدون اجرای cascade مجدد)
     useTra.setState(state => ({
       invoices: state.invoices.map(i =>
         i.id === inv.id
@@ -97,7 +98,9 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
               relatedFlockId: flock.id,
               items: i.items.map(it => {
                 const cat = it.category || inv.category;
-                return (cat === 'chick' || cat === 'adult') && it.birdId ? { ...it, flockId: flock.id } : it;
+                return (cat === 'chick' || cat === 'adult') && it.birdId
+                  ? { ...it, flockId: flock.id, existingFlockId: flock.id }
+                  : it;
               }),
             }
           : i
@@ -117,15 +120,22 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
     if (!ok) return;
 
     if (linkedFlock.sourceInvoiceId === inv.id) {
-      updateFlock(linkedFlock.id, { sourceInvoiceId: '', sourceCategory: '' });
+      updateFlock(linkedFlock.id, {
+        sourceInvoiceId: '',
+        sourceCategory: '',
+      });
     }
     useTra.setState(state => ({
       invoices: state.invoices.map(i =>
         i.id === inv.id
           ? {
               ...i,
-              relatedFlockId: '',
-              items: i.items.map(it => it.flockId === linkedFlock.id ? { ...it, flockId: '' } : it),
+              relatedFlockId: i.relatedFlockId === linkedFlock.id ? '' : i.relatedFlockId,
+              items: i.items.map((it: any) =>
+                it.flockId === linkedFlock.id || it.existingFlockId === linkedFlock.id
+                  ? { ...it, flockId: '', existingFlockId: '' }
+                  : it
+              ),
             }
           : i
       ),
@@ -357,7 +367,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
             { ...ACTION_PRESETS.EDIT, onClick: onEdit || (() => {}), hidden: !onEdit },
             { label: 'اتصال دستی', onClick: () => setFlockPickerOpen(true), variant: 'outline', hidden: !(!linkedFlock && hasBirdItems) },
             { label: 'مشاهده گله', onClick: () => { if (linkedFlock) window.location.href = '/flk?focus=' + linkedFlock.id; }, variant: 'outline', hidden: !isFlockActive },
-            { label: 'قطع اتصال', onClick: handleManualUnlink, variant: 'outline', hidden: !linkedFlock },
+            { label: 'قطع اتصال', onClick: handleManualUnlink, variant: 'outline', hidden: !(inv.type === 'purchase' && linkedFlock && inv.disputeStatus !== 'open') },
             { label: 'اختلاف', onClick: onDispute || (() => {}), variant: 'outline', hidden: !onDispute },
             { label: 'بازگشایی', onClick: onReopen || (() => {}), variant: 'outline', hidden: !onReopen },
             { label: inv.type === 'purchase' ? 'بخشش مانده' : 'حذف بدحساب', onClick: onWriteOff || (() => {}), variant: 'danger-outline', hidden: !onWriteOff },
