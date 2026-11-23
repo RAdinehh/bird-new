@@ -4,6 +4,7 @@
 import { useFormat } from '../../shr/units/useFormat';
 
 import { useFab } from '../../shr/hooks/useFab';
+import { useFocusParam } from '../../shr/hooks/useFocusParam';
 import { useState, useMemo, useEffect } from 'react';
 import { useInc, type Device, type DeviceStatus } from './store';
 import { useValidation } from '../../shr/validation/useValidation';
@@ -41,6 +42,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
   const [maintErr, setMaintErr] = useState('');
   const [undoDevice, setUndoDevice] = useState<{ device: any | any[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  useFocusParam();
   const [maintDeviceId, setMaintDeviceId] = useState<string | null>(null);
   const [maintForm, setMaintForm] = useState({ date: '', type: '', cost: '', description: '' });
 

@@ -5,6 +5,7 @@ import { recordHistory } from '../../shr/intelligence';
 import ItemCard from './components/ItemCard';
 import ItemsFormModal from './components/ItemsFormModal';
 import { useFab } from '../../shr/hooks/useFab';
+import { useFocusParam } from '../../shr/hooks/useFocusParam';
 import {
   useWhs, CATEGORY_DEFAULTS,
   UNIT_LABEL, type Item, type ItemCategory, type ItemUnit
@@ -100,6 +101,7 @@ const EQUIP_STATUS: Record<string, string> = { active: 'فعال', repair: 'در
 
 export default function ItemsPage({ active = true }: { active?: boolean } = {}) {
   const fmt = useFormat();
+  useFocusParam();
   const navigate = useNavigate();
   const { items, movements, addItem, updateItem, deleteItem, archiveItem, unarchiveItem } = useWhs();
   const { contacts } = useCtc();

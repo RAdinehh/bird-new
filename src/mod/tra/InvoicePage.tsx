@@ -7,6 +7,7 @@ import { kindForType } from '../hal/api/equipmentCalc';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useInvoiceSelection } from './hooks/useInvoiceSelection';
 import { useFab } from '../../shr/hooks/useFab';
+import { useFocusParam } from '../../shr/hooks/useFocusParam';
 import {
   useTra, CATEGORIES, paidSum, remaining, STATUS_LABEL,
   WORKFLOW_LABEL, calcDueDate, CHECK_STATUS_LABEL, nextWorkflowStatus, workflowTone,
@@ -66,6 +67,18 @@ export default function InvoicePage({ kind, active = true }: { kind: 'purchase' 
   const [transferDate, setTransferDate] = useState('');
   const [transferDateError, setTransferDateError] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
+  const focusId = useFocusParam();
+  useEffect(() => {
+    if (!active || !focusId) return;
+    const inv = _allInvoices.find((x: any) => x.id === focusId);
+    if (!inv) return;
+    const targetTab = inv.type === 'sale' ? 'sales' : 'purchases';
+    if (searchParams.get('tab') !== targetTab) {
+      const next = new URLSearchParams(searchParams);
+      next.set('tab', targetTab);
+      setSearchParams(next, { replace: true });
+    }
+  }, [active, focusId, _allInvoices, searchParams, setSearchParams]);
   const relatedDealIdFilter = searchParams.get('relatedDealId') || '';
   const invoices = useMemo(() => {
     if (!relatedDealIdFilter) return _allInvoices;

@@ -4,6 +4,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useUrlFilter } from '../../shr/hooks/useUrlFilter';
 import { useFab } from '../../shr/hooks/useFab';
+import { useFocusParam } from '../../shr/hooks/useFocusParam';
 import { useValidation } from '../../shr/validation/useValidation';
 import { ZoneSchema } from '../../shr/validation/rules/hal';
 import { useHal, type Zone, type Equipment, type Hall } from './store';
@@ -40,6 +41,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
   const [dupError, setDupError] = useState<string | null>(null);
   const [undoData, setUndoData] = useState<{ item: Zone | Zone[] } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  useFocusParam();
 
   const halls = useMemo(() => {
     const seen = new Set<string>();

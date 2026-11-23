@@ -12,6 +12,7 @@ import { useHal } from '../hal/store';
 import { useEgg } from '../egg/store';
 import { useFormat } from '../../shr/units';
 import { useCarousel } from '../../shr/hooks/useCarousel';
+import { useFocusParam } from '../../shr/hooks/useFocusParam';
 import { useValidation } from '../../shr/validation/useValidation';
 import { useFormErrors } from '../../shr/hooks/useFormErrors';
 import { createDlgSchema } from '../../shr/validation/rules/dlg';
@@ -42,6 +43,7 @@ export default function DailyLogsPage() {
   const { addProduction: _addProduction, updateProduction: _updateProduction, deleteProduction: _deleteProduction, findByLogId: _findByLogId } = useEgg();
 
   const [tab, setTab] = useState<TabId>('today');
+  useFocusParam();
 
   const activeFlocks = useMemo(
     () => flocks.filter(f => f.status === 'active' && !f.paused),

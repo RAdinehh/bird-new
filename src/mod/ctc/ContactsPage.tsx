@@ -7,6 +7,7 @@ import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
 import { useState } from 'react';
 import { useCtc, type Person, type Role, type Gender, type BankAccount, CUSTOMER_TYPES } from './store';
 import { useCarousel } from '../../shr/hooks/useCarousel';
+import { useFocusParam } from '../../shr/hooks/useFocusParam';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import ContactFormModal from './components/ContactFormModal';
@@ -39,6 +40,7 @@ export default function ContactsPage() {
   const fmt = useFormat();
   const { contacts, add, update } = useCtc();
   const [tab, setTab] = useState<TabId>('all');
+  useFocusParam();
   const tabsBarRef = useAutoCenterTab(tab);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<F>(empty);

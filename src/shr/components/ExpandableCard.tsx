@@ -49,7 +49,7 @@ export default function ExpandableCard({
   accent = 'accent', index, icon, iconEmoji = '📋', compact = false,
   title, subtitle, badge, summary, stats, isOpen, onToggle, children,
   id, ms, onTap, headerAction,
-  'data-focus-id': focusId,
+  'data-focus-id': focusId = id,
   variant = 'outer',
   onDelete,
 }: Props) {
