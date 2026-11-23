@@ -54,7 +54,7 @@ export default function ReceivablesPage({ active = true }: { active?: boolean } 
 
   const openInvoices = useMemo(
     () => invoices.filter(i => i.type === kind && remaining(i, allocations) > 0 && i.disputeStatus !== 'open'),
-    [invoices, kind]
+    [invoices, allocations, kind]
   );
 
   const openDeals = useMemo(

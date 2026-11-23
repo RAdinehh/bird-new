@@ -104,7 +104,7 @@ const [, _setTick] = useState(0);
 
   const upcomingDues = useMemo(() => {
     return invoices
-      .filter(i => remaining(i) > 0 && i.dueDate && !i.remindersMuted)
+      .filter(i => remaining(i) > 0 && i.dueDate && !i.remindersMuted && i.disputeStatus !== 'open')
       .map(i => ({ inv: i, days: daysUntilDue(i.dueDate) }))
       .filter(x => x.days !== null && x.days <= 7)
       .sort((a, b) => (a.days ?? 0) - (b.days ?? 0))
@@ -249,7 +249,7 @@ const [, _setTick] = useState(0);
   const profit = salesThisMonth - purchasesThisMonth;
 
   const receivables = useMemo(() =>
-    invoices.filter(i => i.type === 'sale').reduce((a, i) => a + remaining(i), 0),
+    invoices.filter(i => i.type === 'sale' && i.disputeStatus !== 'open').reduce((a, i) => a + remaining(i), 0),
     [invoices]
   );
 

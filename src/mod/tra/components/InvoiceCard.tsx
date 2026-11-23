@@ -1,5 +1,5 @@
 import { useFormat } from '../../../shr/units/useFormat';
-import { Tag, Btn, CardActions } from '../../../shr/components/ui';
+import { Tag, Btn, CardActions, AlertBox } from '../../../shr/components/ui';
 import { ACTION_PRESETS } from '../../../shr/constants/cardActions';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { toFa , formatQty } from '../../../shr/utils/fa';
@@ -87,7 +87,10 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
               {WORKFLOW_LABEL[inv.workflowStatus]}
             </Tag>
           )}
-          {inv.writtenOff && (inv.writtenOffAmount || 0) > 0 && (
+          {inv.disputeStatus === 'open' && (
+              <Tag tone="amber">در اختلاف</Tag>
+            )}
+            {inv.writtenOff && (inv.writtenOffAmount || 0) > 0 && (
               <Tag tone={inv.type === 'purchase' ? 'amber' : 'red'}>
                 {inv.type === 'purchase' ? 'بخشش مانده' : 'حذف بدحساب'}
               </Tag>
@@ -148,6 +151,15 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
             />
           ) : null}
       </RowGrid>
+      {inv.disputeStatus === 'open' && (
+        <AlertBox tone="warn" style={{ marginTop: 'var(--sp-2)' }}>
+          <div style={{ fontWeight: 700 }}>
+            در اختلاف ({inv.disputeReason === 'price' ? 'قیمت' : inv.disputeReason === 'quantity' ? 'تعداد' : inv.disputeReason === 'quality' ? 'کیفیت' : 'سایر'})
+            {inv.disputeOpenedAt ? ` • ${fmt.date(inv.disputeOpenedAt)}` : ''}
+          </div>
+          {inv.disputeNote ? <div style={{ marginTop: 2 }}>{inv.disputeNote}</div> : null}
+        </AlertBox>
+      )}
 
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام</SectionTitle>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>

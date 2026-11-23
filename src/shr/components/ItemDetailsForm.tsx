@@ -286,7 +286,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
         </Grid2>
         {hasIncompatibleBreedsOnly && (
-          <AlertBox tone="warn" icon="⚠️">
+          <AlertBox tone="warn">
             نژادی با کاربرد «{missingPurposeHint}» برای این پرنده ثبت نشده است. لطفاً نژاد جدید بسازید.
           </AlertBox>
         )}
@@ -445,7 +445,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Field>
         </Grid2>
         {hasIncompatibleBreedsOnly && (
-          <AlertBox tone="warn" icon="⚠️">
+          <AlertBox tone="warn">
             نژادی با کاربرد «{missingPurposeHint}» برای این پرنده ثبت نشده است. لطفاً نژاد جدید بسازید.
           </AlertBox>
         )}
@@ -765,7 +765,7 @@ if (category === 'egg' || category === 'fertile_egg') {
         </Field>
       </Grid2>
         {hasIncompatibleBreedsOnly && (
-          <AlertBox tone="warn" icon="⚠️">
+          <AlertBox tone="warn">
             نژادی با کاربرد «{missingPurposeHint}» برای این پرنده ثبت نشده است. لطفاً نژاد جدید بسازید.
           </AlertBox>
         )}

@@ -77,7 +77,7 @@ export default function DisputeModal({ open, onClose, invoice }: Props) {
     <Modal
       open={open}
       onClose={onClose}
-      title="⚠️ ثبت اختلاف"
+      title="ثبت اختلاف"
       size="md"
       footer={
         <BtnRow>
@@ -106,7 +106,7 @@ export default function DisputeModal({ open, onClose, invoice }: Props) {
         />
       </Field>
 
-      <AlertBox tone="warn" icon="⚠️" style={{ marginTop: 'var(--sp-3)' }}>
+      <AlertBox tone="warn" style={{ marginTop: 6 }}>
         بعد از ثبت، این فاکتور از لیست طلبی خارج می‌شود تا مشکل حل شود.
       </AlertBox>
     </Modal>

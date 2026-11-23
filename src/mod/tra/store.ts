@@ -287,6 +287,16 @@ export const useTra = create<State>()(
         }
       },
       markDispute: (invoiceId, reason, note) => {
+        const prev = get().invoices.find(i => i.id === invoiceId);
+        if (!prev) return;
+        if (prev.writtenOff) {
+          showToast('فاکتور حذف بدحساب شده امکان ثبت اختلاف ندارد', 'error');
+          return;
+        }
+        if (remaining(prev, get().allocations) <= 0) {
+          showToast('فاکتور تسویه‌شده امکان ثبت اختلاف ندارد', 'error');
+          return;
+        }
         const today = getTodayJalali();
         set({
           invoices: get().invoices.map(i => i.id === invoiceId ? {
@@ -299,8 +309,14 @@ export const useTra = create<State>()(
             updatedAt: new Date().toISOString(),
           } : i),
         });
+        const hasPendingCheck = (prev.payments || []).some(p => p.method === 'check' && (!p.status || p.status === 'pending'));
+        if (hasPendingCheck) {
+          showToast('توجه: این فاکتور چک پاس‌نشده دارد؛ وضعیت چک را نیز پیگیری کنید', 'warn');
+        }
       },
       resolveDispute: (invoiceId, note) => {
+        const prev = get().invoices.find(i => i.id === invoiceId);
+        if (!prev || prev.disputeStatus !== 'open') return;
         const today = getTodayJalali();
         set({
           invoices: get().invoices.map(i => i.id === invoiceId ? {
@@ -311,6 +327,7 @@ export const useTra = create<State>()(
             updatedAt: new Date().toISOString(),
           } : i),
         });
+        showToast('اختلاف حل شد — فاکتور به لیست طلبی بازگشت', 'success');
       },
       writeOffInvoice: (invoiceId, amount, reason) => {
         const prev = get().invoices.find(i => i.id === invoiceId);

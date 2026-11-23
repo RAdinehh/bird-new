@@ -215,6 +215,17 @@ export function getTraInvoicesConfig(ctx: {
         },
         multi: true,
       },
+      // ═══ ۴.۵ وضعیت اختلاف ═══
+      {
+        key: 'dispute', label: 'اختلاف', kind: 'enum',
+        icon: <IconActivity size={18} />,
+        options: [
+          { value: 'open', label: '⚠️ در اختلاف' },
+          { value: 'resolved', label: '✅ حل‌شده' },
+        ],
+        getValue: (i: Invoice) => i.disputeStatus || '',
+        multi: true,
+      },
       // ═══ ۵. طرف معامله ═══
       {
         key: 'partyId', label: 'طرف معامله', kind: 'enum',
