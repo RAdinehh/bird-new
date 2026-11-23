@@ -438,7 +438,6 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
     if (!inv2) return m;
     for (const it of inv2.items || []) {
       if (!it.birdId) continue;
-      if (it.existingFlockId && prev) continue; // 🆕 اتصال دستی: فقط در ویرایش رد کن تا دوبار شمرده نشود، در ایجاد باید تعداد اضافه شود
       const cat = it.category || inv2.category;
       if (!BIRD_CATS.includes(cat)) continue;
       const k = keyOf(cat, it);
@@ -463,6 +462,12 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           if (transport) patch.deliveryCost = transport;
           const effDate = (inv as any).deliveryDate || inv.date || '';
           if (effDate && !f.purchaseDate) patch.purchaseDate = effDate;
+          if (it.hallId && it.hallId !== f.hallId) {
+            patch.hallId = it.hallId;
+            patch.zoneId = it.zoneId || '';
+          } else if (it.zoneId !== undefined && it.zoneId !== (f.zoneId || '')) {
+            patch.zoneId = it.zoneId;
+          }
           // 🆕 hatchDate sync (existingFlockId)
           if (it.hatchDate && it.hatchDate !== f.hatchDate) {
             patch.hatchDate = it.hatchDate;
@@ -946,3 +951,44 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
   return outItems;
 }
 
+
+export function repairDoubleCountedFlocks(invoices: Invoice[]) {
+  try {
+    const flk = useFlk.getState();
+    if (!flk?.flocks?.length) return;
+    const purchaseTotalsByFlock = new Map<string, number>();
+    for (const inv of invoices || []) {
+      if (inv.type !== 'purchase' || inv.isPreorder) continue;
+      for (const it of inv.items || []) {
+        const cat = it.category || inv.category;
+        if (!BIRD_CATS.includes(cat)) continue;
+        const fid = (inv as any).relatedFlockId || it.flockId || it.existingFlockId || '';
+        if (!fid) continue;
+        const qty = Number(it.healthyCount ?? it.quantity) || 0;
+        if (qty > 0) {
+          purchaseTotalsByFlock.set(fid, (purchaseTotalsByFlock.get(fid) || 0) + qty);
+        }
+      }
+    }
+    for (const f of flk.flocks) {
+      if (!f.sourceInvoiceId) continue;
+      const expectedTotal = purchaseTotalsByFlock.get(f.id);
+      if (!expectedTotal || expectedTotal <= 0) continue;
+      if ((f.initialCount ?? 0) === expectedTotal * 2) {
+        const consumed = Math.max(0, (f.initialCount ?? 0) - (f.currentCount ?? 0));
+        const fixedInitial = expectedTotal;
+        const fixedCurrent = Math.max(0, fixedInitial - consumed);
+        const patch: any = {
+          initialCount: fixedInitial,
+          currentCount: fixedCurrent,
+        };
+        if (!f.genderSplitAt) {
+          patch.unknownCount = fixedCurrent;
+        }
+        flk.update(f.id, patch);
+      }
+    }
+  } catch (e) {
+    console.error('[repairDoubleCountedFlocks]', e);
+  }
+}
