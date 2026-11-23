@@ -85,22 +85,21 @@ export default function EntityLink({
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 5,
-        background: 'var(--accent-soft)',
+        gap: 4,
+        background: 'transparent',
         color: 'var(--accent)',
-        border: '1px solid var(--accent-border)',
-        borderRadius: 8,
-        padding: '2px 8px',
+        border: 'none',
+        padding: 0,
         marginInline: 2,
         fontFamily: 'inherit',
-        fontSize: 'var(--fs-xs)',
-        fontWeight: 700,
+        fontSize: 'inherit',
+        fontWeight: 600,
         lineHeight: 1.4,
-        textDecoration: 'none',
+        textDecoration: 'underline dotted',
+        textUnderlineOffset: 3,
         cursor: 'pointer',
-        verticalAlign: 'middle',
+        verticalAlign: 'baseline',
         maxWidth: '100%',
-        transition: 'background-color 0.15s ease, transform 0.1s ease',
       }}
     >
       <span style={{ fontSize: '1.05em', lineHeight: 1, flexShrink: 0 }}>{conf.icon}</span>
@@ -110,7 +109,6 @@ export default function EntityLink({
           · {getGlobalFormat().code(sub)}
         </span>
       )}
-      <span aria-hidden="true" style={{ fontSize: '0.85em', opacity: 0.75, lineHeight: 1, flexShrink: 0 }}>↗</span>
     </button>
   );
 }
