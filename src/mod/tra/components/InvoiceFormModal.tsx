@@ -457,63 +457,67 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                           </>
                         )}
                   
-                        {(cat === 'chick' || cat === 'adult') && (
-  <div style={{ display: (it.quantity || 0) > 0 ? 'contents' : 'none' }}>
-    <Grid3>
-      <Field label="نر" error={showError(`items.${idx}.maleCount`)} onTouch={() => markTouched(`items.${idx}.maleCount`)}>
-        <NumField placeholder="نر" value={it.maleCount != null && it.maleCount > 0 ? fmt.code(String(it.maleCount)) : ''} onChange={e => {
-          let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
-          if (v !== null && v < 0) v = 0;
-          if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
-          const patch: Record<string, number | null> = { maleCount: v };
-          // 🆕 اتوفیل فقط وقتی که هم نر (v) و هم ماده پر باشند
-          if (v !== null && it.femaleCount != null) {
-            const safeMale = v;
-            const safeFemale = it.femaleCount;
-            patch.unknownCount = Math.max(0, (it.quantity || 0) - safeMale - safeFemale);
-          }
-          updateItem(it.id, patch);
-        }} min={0} max={it.quantity || undefined} />
-      </Field>
-      <Field label="ماده" error={showError(`items.${idx}.femaleCount`)} onTouch={() => markTouched(`items.${idx}.femaleCount`)}>
-        <NumField placeholder="ماده" value={it.femaleCount != null && it.femaleCount > 0 ? fmt.code(String(it.femaleCount)) : ''} onChange={e => {
-          let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
-          if (v !== null && v < 0) v = 0;
-          if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
-          const patch: Record<string, number | null> = { femaleCount: v };
-          // 🆕 اتوفیل فقط وقتی که هم ماده (v) و هم نر پر باشند
-          if (v !== null && it.maleCount != null) {
-            const safeMale = it.maleCount;
-            const safeFemale = v;
-            patch.unknownCount = Math.max(0, (it.quantity || 0) - safeMale - safeFemale);
-          }
-          updateItem(it.id, patch);
-        }} min={0} max={it.quantity || undefined} />
-      </Field>
-      <Field label="نامشخص" hint="برای جنسیت مخلوط" error={showError(`items.${idx}.unknownCount`)} onTouch={() => markTouched(`items.${idx}.unknownCount`)}>
-        <NumField placeholder="نامشخص" value={it.unknownCount != null && it.unknownCount > 0 ? fmt.code(String(it.unknownCount)) : ''} onChange={e => {
-          let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
-          if (v !== null && v < 0) v = 0;
-          if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
-          updateItem(it.id, { unknownCount: v });
-        }} min={0} max={it.quantity || undefined} />
-      </Field>
-    </Grid3>
-    {(() => {
-      const total = (it.maleCount ?? 0) + (it.femaleCount ?? 0) + (it.unknownCount ?? 0);
-      const qty = it.quantity || 0;
-      if (total === 0 && qty === 0) return null;
-      const isMatch = total === qty;
-      return (
-        <div style={{ fontSize: 'var(--fs-xs)', marginTop: 6, textAlign: 'center', fontWeight: 600, color: isMatch ? 'var(--accent)' : 'var(--warn)' }}>
-          {isMatch ? '✅' : '⚠️'} مجموع: {fmt.count(total)} از {fmt.count(qty)}
+                        {(cat === 'chick' || cat === 'adult') && (() => {
+        const sf = !isPurchase && it.flockId ? flocks.find(x => x.id === it.flockId) : undefined;
+        const maxU = sf ? (sf.unknownCount ?? 0) : undefined;
+        return (
+        <div style={{ display: (it.quantity || 0) > 0 ? 'contents' : 'none' }}>
+          <Grid3>
+            <Field label="نر" hint={sf ? `موجود: ${fmt.int(sf.maleCount ?? 0)}` : undefined} error={showError(`items.${idx}.maleCount`)} onTouch={() => markTouched(`items.${idx}.maleCount`)}>
+              <NumField placeholder="نر" value={it.maleCount != null && it.maleCount > 0 ? fmt.code(String(it.maleCount)) : ''} onChange={e => {
+                let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
+                if (v !== null && v < 0) v = 0;
+                if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
+                const patch: Record<string, number | null> = { maleCount: v };
+                if (v !== null && it.femaleCount != null) {
+                  const safeMale = v;
+                  const safeFemale = it.femaleCount;
+                  const rem = Math.max(0, (it.quantity || 0) - safeMale - safeFemale);
+                  patch.unknownCount = sf ? Math.min(rem, maxU ?? 0) : rem;
+                }
+                updateItem(it.id, patch);
+              }} min={0} max={it.quantity || undefined} />
+            </Field>
+            <Field label="ماده" hint={sf ? `موجود: ${fmt.int(sf.femaleCount ?? 0)}` : undefined} error={showError(`items.${idx}.femaleCount`)} onTouch={() => markTouched(`items.${idx}.femaleCount`)}>
+              <NumField placeholder="ماده" value={it.femaleCount != null && it.femaleCount > 0 ? fmt.code(String(it.femaleCount)) : ''} onChange={e => {
+                let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
+                if (v !== null && v < 0) v = 0;
+                if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
+                const patch: Record<string, number | null> = { femaleCount: v };
+                if (v !== null && it.maleCount != null) {
+                  const safeMale = it.maleCount;
+                  const safeFemale = v;
+                  const rem = Math.max(0, (it.quantity || 0) - safeMale - safeFemale);
+                  patch.unknownCount = sf ? Math.min(rem, maxU ?? 0) : rem;
+                }
+                updateItem(it.id, patch);
+              }} min={0} max={it.quantity || undefined} />
+            </Field>
+            <Field label="نامشخص" hint={sf ? `موجود: ${fmt.int(maxU)}` : "جنسیت مخلوط"} error={showError(`items.${idx}.unknownCount`)} onTouch={() => markTouched(`items.${idx}.unknownCount`)}>
+              <NumField placeholder="نامشخص" value={it.unknownCount != null && it.unknownCount > 0 ? fmt.code(String(it.unknownCount)) : ''} onChange={e => {
+                let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
+                if (v !== null && v < 0) v = 0;
+                if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
+                updateItem(it.id, { unknownCount: v });
+              }} min={0} max={maxU !== undefined ? Math.min(it.quantity || 0, maxU) : (it.quantity || undefined)} disabled={sf ? (maxU ?? 0) === 0 : false} />
+            </Field>
+          </Grid3>
+          {(() => {
+            const total = (it.maleCount ?? 0) + (it.femaleCount ?? 0) + (it.unknownCount ?? 0);
+            const qty = it.quantity || 0;
+            if (total === 0 && qty === 0) return null;
+            const isMatch = total === qty;
+            return (
+              <div style={{ fontSize: 'var(--fs-xs)', marginTop: 6, textAlign: 'center', fontWeight: 600, color: isMatch ? 'var(--accent)' : 'var(--warn)' }}>
+                {isMatch ? '✅' : '⚠️'} مجموع: {fmt.count(total)} از {fmt.count(qty)}
+              </div>
+            );
+          })()}
         </div>
-      );
-    })()}
-  </div>
-)}
+        );
+      })()}
 
-{needsWeight && (
+      {needsWeight && (
                           <Field label={weightLabel} hint="لازم برای تبدیل به واحد پایه انبار و محاسبه قیمت">
                             <NumField
                               placeholder="مثلاً ۵۰۰"

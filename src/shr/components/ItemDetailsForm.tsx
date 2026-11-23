@@ -299,7 +299,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               }} placeholder="1405/07/26" />
             </Field>
           )}
-          <Field label="سن (روز)" hint="تاریخ هچ خودکار محاسبه می‌شود">
+          <Field label="سن (روز)" hint={isPurchase ? "تاریخ هچ خودکار محاسبه می‌شود" : undefined}>
             <Input mode="number" value={item.ageDays != null && item.ageDays >= 0 ? String(item.ageDays) : ''} onChange={e => {
               const rawStr = e.target.value.trim();
               const parsed = rawStr === '' ? NaN : Math.round(parseFaNum(rawStr));
@@ -362,7 +362,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
         {/* --- بخش ۳: مقدار --- */}
         <Grid2>
-          <Field label="وزن اولیه (گرم)" hint="حداکثر ۱۰۰ گرم">
+          <Field label={isPurchase ? "وزن اولیه (گرم)" : "میانگین وزن (گرم)"} hint={isPurchase ? "حداکثر ۱۰۰ گرم" : undefined}>
             <Input mode="number" value={item.chickWeight != null && item.chickWeight > 0 ? String(item.chickWeight) : ''} onChange={e => {
               let v = parseFaNum(e.target.value) || null;
               if (v !== null && v > 100) v = 100;
@@ -419,7 +419,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               }} placeholder="1405/07/26" />
             </Field>
           )}
-          <Field label="سن (روز)" hint="تاریخ هچ خودکار محاسبه می‌شود">
+          <Field label="سن (روز)" hint={isPurchase ? "تاریخ هچ خودکار محاسبه می‌شود" : undefined}>
             <Input mode="number" value={item.ageDays != null && item.ageDays >= 0 ? String(item.ageDays) : ''} onChange={e => {
               const rawStr = e.target.value.trim();
               const parsed = rawStr === '' ? NaN : Math.round(parseFaNum(rawStr));

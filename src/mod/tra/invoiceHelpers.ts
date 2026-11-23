@@ -553,8 +553,8 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           if (_safeF > (f.femaleCount ?? 0)) {
             throw new Error(`موجودی ماده کافی نیست: ${f.name} — ماده ${f.femaleCount ?? 0}، درخواستی ${_safeF}`);
           }
-          if ((_safeU + _rem) > (f.unknownCount ?? 0)) {
-            throw new Error(`موجودی نامشخص کافی نیست: ${f.name} — نامشخص ${f.unknownCount ?? 0}، درخواستی ${_safeU + _rem}`);
+          if (_safeU > (f.unknownCount ?? 0)) {
+            throw new Error(`موجودی نامشخص کافی نیست: ${f.name} — نامشخص ${f.unknownCount ?? 0}، درخواستی ${_safeU}`);
           }
           throw new Error(`موجودی برای فروش ${delta} کافی نیست: ${f.name}`);
         }
@@ -635,10 +635,27 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
         if (safeM > 0) patch.maleCount = Math.max(0, (f.maleCount ?? 0) + sign * safeM);
         if (safeF > 0) patch.femaleCount = Math.max(0, (f.femaleCount ?? 0) + sign * safeF);
         if (safeU > 0) patch.unknownCount = Math.max(0, (f.unknownCount ?? 0) + sign * safeU);
-        const rem = delta - safeM - safeF - safeU;
+        let rem = delta - safeM - safeF - safeU;
         if (rem > 0) {
-          const base = (safeU > 0) ? (patch.unknownCount ?? f.unknownCount ?? 0) : (f.unknownCount ?? 0);
-          patch.unknownCount = Math.max(0, base + sign * rem);
+          if (sign > 0) {
+            const base = (safeU > 0) ? (patch.unknownCount ?? f.unknownCount ?? 0) : (f.unknownCount ?? 0);
+            patch.unknownCount = Math.max(0, base + rem);
+          } else {
+            const curU = patch.unknownCount ?? f.unknownCount ?? 0;
+            const takeU = Math.min(curU, rem);
+            if (takeU > 0) { patch.unknownCount = curU - takeU; rem -= takeU; }
+            if (rem > 0) {
+              const curF = patch.femaleCount ?? f.femaleCount ?? 0;
+              const curM = patch.maleCount ?? f.maleCount ?? 0;
+              if (curF >= curM) {
+                const takeF = Math.min(curF, rem); patch.femaleCount = curF - takeF; rem -= takeF;
+                if (rem > 0) patch.maleCount = Math.max(0, curM - rem);
+              } else {
+                const takeM = Math.min(curM, rem); patch.maleCount = curM - takeM; rem -= takeM;
+                if (rem > 0) patch.femaleCount = Math.max(0, curF - rem);
+              }
+            }
+          }
         }
       } else {
         // 🆕 قدم ۵: unsplit — همه در unknown
@@ -651,14 +668,20 @@ export function applyInvoiceFlocks(inv: Invoice, prev?: Invoice): InvoiceItem[] 
           if (nextU >= 0) {
             patch.unknownCount = nextU;
           } else {
-            const rem = -nextU;
+            let rem = -nextU;
             patch.unknownCount = 0;
             const mF = f.maleCount ?? 0;
             const fF = f.femaleCount ?? 0;
             if (fF >= mF) {
-              patch.femaleCount = Math.max(0, fF - rem);
+              const takeF = Math.min(fF, rem);
+              patch.femaleCount = fF - takeF;
+              rem -= takeF;
+              if (rem > 0) patch.maleCount = Math.max(0, mF - rem);
             } else {
-              patch.maleCount = Math.max(0, mF - rem);
+              const takeM = Math.min(mF, rem);
+              patch.maleCount = mF - takeM;
+              rem -= takeM;
+              if (rem > 0) patch.femaleCount = Math.max(0, fF - rem);
             }
           }
         }
