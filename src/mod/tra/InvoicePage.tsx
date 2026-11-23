@@ -544,11 +544,13 @@ return (
             const reason = await showPromptAsync(
               isPurchase ? 'بخشش مانده' : 'حذف بدحساب',
               isPurchase
-                ? `مبلغ ${fmt.money(rem, { withUnit: false })} تومان بخشیده شده و فاکتور تسویه می‌شود.`
+                ? `مبلغ ${fmt.money(rem, { withUnit: false })} تومان بخشیده می‌شود و فاکتور تسویه می‌شود.`
                 : `مبلغ ${fmt.money(rem, { withUnit: false })} تومان از طلب مشتری کسر شده و فاکتور بسته می‌شود.`,
               {
                 label: 'علت',
-                placeholder: isPurchase ? 'مثلاً: تخفیف تسویه / رند کردن فاکتور' : 'مثلاً: وصول نشد — مبلغ کم',
+                placeholder: isPurchase
+                  ? 'مثلاً: تخفیف نقدی یا توافق نهایی هنگام تسویه'
+                  : 'مثلاً: عدم امکان وصول پس از پیگیری یا توافق با مشتری',
                 required: true,
                 multiline: true,
                 rows: 2,
@@ -595,11 +597,13 @@ return (
             const reason = await showPromptAsync(
               isPurchase ? 'بخشش مانده' : 'حذف بدحساب',
               isPurchase
-                ? `مبلغ ${fmt.money(rem, { withUnit: false })} تومان بخشیده شده و فاکتور تسویه می‌شود.`
+                ? `مبلغ ${fmt.money(rem, { withUnit: false })} تومان بخشیده می‌شود و فاکتور تسویه می‌شود.`
                 : `مبلغ ${fmt.money(rem, { withUnit: false })} تومان از طلب مشتری کسر شده و فاکتور بسته می‌شود.`,
               {
                 label: 'علت',
-                placeholder: isPurchase ? 'مثلاً: تخفیف تسویه / رند کردن فاکتور' : 'مثلاً: وصول نشد — مبلغ کم',
+                placeholder: isPurchase
+                  ? 'مثلاً: تخفیف نقدی یا توافق نهایی هنگام تسویه'
+                  : 'مثلاً: عدم امکان وصول پس از پیگیری یا توافق با مشتری',
                 required: true,
                 multiline: true,
                 rows: 2,
