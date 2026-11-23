@@ -246,19 +246,36 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       </Grid2>
 
       
-      {/* قرارداد مرتبط */}
-      <Field label="قرارداد مرتبط" hint="اختیاری — اتصال به معامله خاص (قابل تغییر)">
-        <SmartSelect
-          value={form.relatedDealId || ''}
-          placeholder="— بدون اتصال —"
-          modalTitle="انتخاب قرارداد مرتبط"
-          options={(props.deals || []).map((d: any) => ({
-            value: d.id,
-            label: `${d.dealNumber ? `#${d.dealNumber}` : `#${d.id.slice(0, 6)}`} — ${d.description || '—'}`,
-          }))}
-          onChange={val => setForm(f => ({ ...f, relatedDealId: val }))}
-        />
-      </Field>
+      {/* قرارداد مرتبط — فقط وقتی قرارداد باز مرتبط وجود دارد */}
+      {(() => {
+        const expectedType = isPurchase ? 'purchase' : 'sale';
+        const relevantDeals = (props.deals || []).filter((d: any) => {
+          if (form.relatedDealId && d.id === form.relatedDealId) return true;
+          const dType = d.type || 'sale';
+          if (dType !== expectedType) return false;
+          if (d.status && d.status !== 'active' && d.status !== 'pending' && d.status !== 'open') return false;
+          if (form.partyId && d.partyId && d.partyId !== form.partyId) return false;
+          return true;
+        });
+        if (relevantDeals.length === 0) return null;
+        return (
+          <Field
+            label="قرارداد مرتبط"
+            help="اگر این فاکتور در راستای یک قرارداد یا پیش‌فروش/پیش‌خرید ثبت‌شده صادر می‌شود، آن را انتخاب کنید تا بدهی یا طلب قرارداد دوبار حساب نشود و وضعیت قرارداد تکمیل شود. در معاملات عادی این فیلد را بدون اتصال بگذارید."
+          >
+            <SmartSelect
+              value={form.relatedDealId || ''}
+              placeholder="— بدون اتصال —"
+              modalTitle="انتخاب قرارداد مرتبط"
+              options={relevantDeals.map((d: any) => ({
+                value: d.id,
+                label: `${d.dealNumber ? `#${d.dealNumber}` : `#${d.id.slice(0, 6)}`} — ${d.description || '—'}`,
+              }))}
+              onChange={val => setForm(f => ({ ...f, relatedDealId: val }))}
+            />
+          </Field>
+        );
+      })()}
 
       {form.isPreorder && (
         <Field label={form.relatedSettlementId ? '🔒 تاریخ تحویل' : 'تاریخ تحویل'} hint={form.relatedSettlementId ? '🔒 از تسویه — برای تغییر، تسویه را ویرایش کنید' : undefined} required error={showError('deliveryDate')} onTouch={() => markTouched('deliveryDate')}>
