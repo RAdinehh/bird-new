@@ -1,7 +1,9 @@
 import { useState, useMemo } from 'react';
 import { useFormat } from '../../../shr/units/useFormat';
-import { Modal, Input, Tag } from '../../../shr/components/ui';
+import { Modal, Input, Tag, Btn, BtnRow } from '../../../shr/components/ui';
+import { IconSearch } from '../../../shr/icons';
 import { useFlk } from '../../flk/store';
+import { useBrd } from '../../brd/store';
 import type { Flock } from '../../flk/store';
 
 interface Props {
@@ -14,21 +16,38 @@ interface Props {
 export default function PickFlockModal({ open, onClose, onSelect, invoiceBirdIds = [] }: Props) {
   const fmt = useFormat();
   const { flocks } = useFlk();
+  const birds = useBrd(s => s.birds);
+  const breeds = useBrd(s => s.breeds);
   const [q, setQ] = useState('');
+
+  const birdMap = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const b of (birds || [])) m.set(b.id, b.name);
+    return m;
+  }, [birds]);
+
+  const breedMap = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const b of (breeds || [])) m.set(b.id, b.name);
+    return m;
+  }, [breeds]);
+
+  const allFlocks = flocks || [];
+  const showSearch = allFlocks.length > 6;
 
   const { activeFlocks, archivedFlocks } = useMemo(() => {
     const term = q.trim().toLowerCase();
-    const all = (flocks || []).filter(f => {
+    const filtered = allFlocks.filter(f => {
       if (!term) return true;
-      const bName = (f as any).birdName || '';
+      const bName = (f.birdId && birdMap.get(f.birdId)) || (f as any).birdName || '';
+      const brName = (f.breedId && breedMap.get(f.breedId)) || '';
       return (
         (f.name || '').toLowerCase().includes(term) ||
         bName.toLowerCase().includes(term) ||
-        (f.archivedReason || '').toLowerCase().includes(term)
+        brName.toLowerCase().includes(term)
       );
     });
 
-    // اولویت‌بندی: گله‌های بدون فاکتور و هم‌گونه بالاتر قرار می‌گیرند
     const score = (f: Flock) => {
       let s = 0;
       if (!f.sourceInvoiceId) s += 10;
@@ -36,21 +55,27 @@ export default function PickFlockModal({ open, onClose, onSelect, invoiceBirdIds
       return s;
     };
 
-    const active = all
-      .filter(f => f.status !== 'archived' && f.status !== 'sold')
-      .sort((a, b) => score(b) - score(a));
-
-    const archived = all
-      .filter(f => f.status === 'archived' || f.status === 'sold')
-      .sort((a, b) => score(b) - score(a));
-
-    return { activeFlocks: active, archivedFlocks: archived };
-  }, [flocks, q, invoiceBirdIds]);
+    return {
+      activeFlocks: filtered
+        .filter(f => f.status !== 'archived' && f.status !== 'sold')
+        .sort((a, b) => score(b) - score(a)),
+      archivedFlocks: filtered
+        .filter(f => f.status === 'archived' || f.status === 'sold')
+        .sort((a, b) => score(b) - score(a)),
+    };
+  }, [allFlocks, q, birdMap, breedMap, invoiceBirdIds]);
 
   const renderItem = (f: Flock, isArchived: boolean) => {
-    const birdName = (f as any).birdName || '';
+    const birdName = (f.birdId && birdMap.get(f.birdId)) || (f as any).birdName || '';
+    const breedName = (f.breedId && breedMap.get(f.breedId)) || '';
+    const speciesLabel = [birdName, breedName].filter(Boolean).join(' — ');
     const hasOtherInvoice = !!f.sourceInvoiceId;
-    const speciesMismatch = invoiceBirdIds.length > 0 && f.birdId && !invoiceBirdIds.includes(f.birdId);
+    const speciesMismatch = invoiceBirdIds.length > 0 && !!f.birdId && !invoiceBirdIds.includes(f.birdId);
+
+    const metaParts: string[] = [];
+    if (speciesLabel) metaParts.push(speciesLabel);
+    if (f.currentCount != null) metaParts.push(`${fmt.count(f.currentCount)} پرنده`);
+    if (f.startDate) metaParts.push(`شروع: ${fmt.date(f.startDate)}`);
 
     return (
       <button
@@ -61,36 +86,43 @@ export default function PickFlockModal({ open, onClose, onSelect, invoiceBirdIds
           onClose();
         }}
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 8,
-          width: '100%',
           padding: '10px 12px',
-          background: 'var(--card-solid, #fff)',
+          background: 'var(--card)',
           border: '1px solid var(--border)',
           borderRadius: 'var(--r-md)',
-          cursor: 'pointer',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'stretch',
+          gap: 6,
           textAlign: 'right',
+          cursor: 'pointer',
           fontFamily: 'inherit',
+          color: 'var(--text)',
+          width: '100%',
         }}
       >
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-            <span style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: 'var(--text)' }}>
-              {f.name}
-            </span>
-            {birdName ? <Tag tone="green">{birdName}</Tag> : null}
-            {isArchived ? <Tag tone="gray">آرشیو</Tag> : null}
-            {hasOtherInvoice ? <Tag tone="amber">دارای فاکتور</Tag> : null}
+        {/* ردیف ۱: نام گله + وضعیت */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: 'var(--text)' }}>
+            {f.name}
+          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
             {speciesMismatch ? <Tag tone="red">گونه متفاوت</Tag> : null}
-          </div>
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 4 }}>
-            {f.currentCount != null ? fmt.count(f.currentCount) + ' پرنده' : 'تعداد نامشخص'}
-            {f.startDate ? ` • شروع: ${fmt.date(f.startDate)}` : ''}
-            {isArchived && f.archivedReason ? ` • ${f.archivedReason}` : ''}
+            {hasOtherInvoice ? (
+              <Tag tone="amber">دارای فاکتور</Tag>
+            ) : (
+              <Tag tone="green">بدون فاکتور</Tag>
+            )}
+            {isArchived ? <Tag tone="gray">آرشیو</Tag> : null}
           </div>
         </div>
+
+        {/* ردیف ۲: جزئیات خلاصه */}
+        {metaParts.length > 0 && (
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+            {metaParts.join(' • ')}
+          </div>
+        )}
       </button>
     );
   };
@@ -98,33 +130,45 @@ export default function PickFlockModal({ open, onClose, onSelect, invoiceBirdIds
   const isEmpty = activeFlocks.length === 0 && archivedFlocks.length === 0;
 
   return (
-    <Modal open={open} onClose={onClose} title="اتصال دستی فاکتور به گله">
-      <div style={{ marginBottom: 10 }}>
-        <Input
-          value={q}
-          onChange={e => setQ(e.target.value)}
-          placeholder="جستجوی نام گله یا گونه پرنده..."
-        />
-      </div>
+    <Modal open={open} onClose={onClose} title="🐔 انتخاب گله برای اتصال">
+      {showSearch && (
+        <div style={{ position: 'relative', marginBottom: 10 }}>
+          <div style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted)', pointerEvents: 'none' }}>
+            <IconSearch size={16} />
+          </div>
+          <Input
+            type="search"
+            value={q}
+            onChange={e => setQ(e.target.value)}
+            placeholder="جستجوی نام گله یا گونه پرنده..."
+            style={{ paddingRight: 32 }}
+          />
+        </div>
+      )}
 
       {isEmpty ? (
-        <div style={{ padding: 'var(--sp-8)', textAlign: 'center', color: 'var(--muted)' }}>
-          <div style={{ fontSize: 40, marginBottom: 8 }}>🐔</div>
-          <div>هیچ گله‌ای یافت نشد</div>
+        <div style={{ padding: 'var(--sp-8)', textAlign: 'center', color: 'var(--muted)', fontSize: 'var(--fs-base)' }}>
+          <div style={{ fontSize: 48, marginBottom: 8 }}>🐔</div>
+          <div>هیچ گله‌ای پیدا نشد</div>
+          <div style={{ fontSize: 'var(--fs-sm)', marginTop: 4, opacity: 0.7 }}>
+            ابتدا از بخش گله‌ها، یک گله ثبت کنید
+          </div>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxHeight: 380, overflowY: 'auto' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 380, overflowY: 'auto' }}>
           {activeFlocks.length > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <div style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, color: 'var(--muted)' }}>
-                گله‌های فعال ({fmt.count(activeFlocks.length)})
-              </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {archivedFlocks.length > 0 && (
+                <div style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, color: 'var(--muted)' }}>
+                  گله‌های فعال ({fmt.count(activeFlocks.length)})
+                </div>
+              )}
               {activeFlocks.map(f => renderItem(f, false))}
             </div>
           )}
 
           {archivedFlocks.length > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, color: 'var(--muted)' }}>
                 گله‌های آرشیو شده ({fmt.count(archivedFlocks.length)})
               </div>
@@ -133,6 +177,10 @@ export default function PickFlockModal({ open, onClose, onSelect, invoiceBirdIds
           )}
         </div>
       )}
+
+      <BtnRow>
+        <Btn variant="primary" onClick={onClose}>بستن</Btn>
+      </BtnRow>
     </Modal>
   );
 }
