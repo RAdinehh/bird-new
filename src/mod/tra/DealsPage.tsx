@@ -941,25 +941,29 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
               const DEFAULT_NAMES: Record<string, string> = {
                 chick: 'جوجه یک‌روزه', adult: 'پرنده بالغ', egg: 'تخم خوراکی', fertile_egg: 'تخم نطفه‌دار'
               };
-              setForm(f => ({ ...f, goods: f.goods.map(x => {
-                if (x.id !== g.id) return x;
-                const prevDef = x.category ? (DEFAULT_NAMES[x.category] || '') : '';
-                const shouldUpdate = !x.name.trim() || x.name === prevDef;
-                const newName = shouldUpdate ? (DEFAULT_NAMES[newCat || ''] || '') : x.name;
-                // برای feed/medicine/equipment: اگه نام خالی، خالی بمونه (کاربر خودش تایپ می‌کنه)
-                const keepEmpty = ['feed', 'medicine', 'equipment', 'other'].includes(newCat || '');
-                return { 
-                  ...x, 
-                  category: newCat, 
-                  unit: getDefaultUnit(newCat) as any,
-                  source: undefined,
-                  existingFlockId: undefined,
-                  hatchId: undefined,
-                  stockItemId: undefined,
-                  linkedItemId: undefined,
-                  name: keepEmpty && shouldUpdate ? '' : newName 
-                };
-              }) }));
+              setForm(f => ({
+                ...f,
+                goods: f.goods.map(x => {
+                  if (x.id !== g.id) return x;
+                  const DEFAULT_NAMES: Record<string, string> = {
+                    chick: 'جوجه یک‌روزه', adult: 'پرنده بالغ', egg: 'تخم خوراکی', fertile_egg: 'تخم نطفه‌دار'
+                  };
+                  return {
+                    id: x.id,
+                    category: newCat,
+                    name: DEFAULT_NAMES[newCat || ''] || '',
+                    quantity: 0,
+                    unit: getDefaultUnit(newCat) as any,
+                    estimatedPrice: undefined,
+                    source: undefined,
+                    existingFlockId: undefined,
+                    hatchId: undefined,
+                    linkedItemId: undefined,
+                  };
+                }),
+                deliveries: f.deliveries.filter(d => d.goodId !== g.id),
+                sales: f.sales.filter(sl => sl.goodId !== g.id),
+              }));
             }}>
               <optgroup label="🌱 دام و طیور — پیگیری چند مرحله‌ای">
                 <option value="chick">🐣 جوجه یک‌روزه</option>

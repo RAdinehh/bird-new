@@ -181,33 +181,14 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               label: l,
             }))}
             onChange={newCat => {
-              const newUnit = getUnitForCategory(newCat);
-              const isBirdCat = newCat === 'chick' || newCat === 'adult' || newCat === 'egg' || newCat === 'fertile_egg';
-              const isStockCat = ['feed', 'medicine', 'vaccine', 'herbal'].includes(newCat);
-              const isEquipCat = newCat === 'equipment';
-              const newItems = form.items.map(it => {
-                if (!it.category) {
-                  return {
-                    ...it,
-                    unit: newUnit,
-                    ...(isBirdCat ? (() => {
-                      const curBreed = breeds.find(b => b.id === it.breedId);
-                      const validBreed = curBreed && isBreedAllowedForCategory(curBreed, newCat, isPurchase);
-                      return validBreed ? {} : { breedId: '', flockId: '', existingFlockId: '' };
-                    })() : { birdId: '', breedId: '', flockId: '', existingFlockId: '', hatchId: '', hatchDate: '', ageDays: null, chickWeight: null, liveWeight: null, maleCount: null, femaleCount: null, unknownCount: null }),
-                    ...(isStockCat || isEquipCat ? {} : { stockItemId: '', itemId: '', expiryDate: '', batchNo: '', withdrawalDays: null }),
-                    ...(isBirdCat || isEquipCat ? {} : { hallId: '', zoneId: '' }),
-                    ...(isEquipCat ? {} : { equipmentCategory: '', equipmentType: '', equipmentId: '' }),
-                    ...(newCat === 'other' ? {} : { costType: '' }),
-                  };
-                }
-                return it;
-              });
+              if (newCat === form.category) return;
               const isOther = newCat === 'other';
+              setExpandedItemId(null);
               setForm({
                 ...form,
                 category: newCat,
-                items: newItems,
+                partyId: '',
+                items: [],
                 isPreorder: isOther ? false : form.isPreorder,
                 deliveryDate: isOther ? '' : form.deliveryDate,
                 advanceValue: isOther ? '' : form.advanceValue,
