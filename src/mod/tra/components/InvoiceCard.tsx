@@ -271,8 +271,8 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
               v={inv.disputeReason === 'price' ? 'قیمت' : inv.disputeReason === 'quantity' ? 'تعداد' : inv.disputeReason === 'quality' ? 'کیفیت' : 'سایر'}
             />
             {inv.disputeOpenedAt ? <Row l="تاریخ ثبت" v={fmt.date(inv.disputeOpenedAt)} /> : null}
-            {inv.disputeNote ? <Row l="توضیحات" v={inv.disputeNote} /> : null}
           </RowGrid>
+          {inv.disputeNote ? <Row l="توضیحات" v={inv.disputeNote} /> : null}
         </>
       )}
 
