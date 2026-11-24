@@ -163,7 +163,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
     >
       {/* ====== اطلاعات پایه ====== */}
 
-      <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات پایه</SectionTitle>
+      <SectionTitle first><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات پایه</SectionTitle>
 
       
       <Grid2>
