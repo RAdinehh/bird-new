@@ -65,7 +65,7 @@ export function resolveUomFactor(cat: string, unit: string, unitWeight?: number 
 }
 
 
-/** محاسبه ضریب موثر قیمت بر اساس نسبت واحد مقدار به واحد مبنای قیمت */
+/** محاسبه ضریب تبدیل مقدار به واحد مبنای قیمت (priceUnit) */
 export function resolveItemPriceFactor(
   cat: string,
   unit: string,
@@ -78,7 +78,7 @@ export function resolveItemPriceFactor(
   const units: any[] = catRule?.units || [];
   const unitDef = units.find((u: any) => u.value === unit);
 
-  const qtyFactor = (() => {
+  const qtyToBase = (() => {
     if (unitDef && unitDef.factor !== null && unitDef.factor !== undefined) return Number(unitDef.factor) || 1;
     if (unitWeight && Number(unitWeight) > 0) return Number(unitWeight);
     if ((priceUnit === 'perKg' || priceUnit === 'per_kg') && liveWeight && liveWeight > 0 && quantity && quantity > 0) {
@@ -87,22 +87,30 @@ export function resolveItemPriceFactor(
     return 1;
   })();
 
-  if (!priceUnit || priceUnit === unit || priceUnit === 'perKg' || priceUnit === 'per_kg') {
-    return qtyFactor;
+  const targetPriceUnit = priceUnit || unit;
+  if (!targetPriceUnit || targetPriceUnit === unit) {
+    return 1;
   }
 
-  const priceUnitDef = units.find((u: any) => u.value === priceUnit);
-  if (!priceUnitDef) return qtyFactor;
+  if (targetPriceUnit === 'perKg' || targetPriceUnit === 'per_kg') {
+    if (liveWeight && liveWeight > 0 && quantity && quantity > 0) {
+      return liveWeight / quantity;
+    }
+    return qtyToBase;
+  }
+
+  const priceUnitDef = units.find((u: any) => u.value === targetPriceUnit);
+  if (!priceUnitDef) return 1;
 
   if (priceUnitDef.factor !== null && priceUnitDef.factor !== undefined && Number(priceUnitDef.factor) > 0) {
-    return qtyFactor / Number(priceUnitDef.factor);
+    return qtyToBase / Number(priceUnitDef.factor);
   }
 
   if (unitWeight && Number(unitWeight) > 0) {
-    return qtyFactor / Number(unitWeight);
+    return qtyToBase / Number(unitWeight);
   }
 
-  return qtyFactor;
+  return 1;
 }
 
 export function getUnitForCategory(cat: string): string {
@@ -746,7 +754,10 @@ if (form.id) {
             }
             return 1;
           })();
-          const basePrice = it.unitPrice / effFactor;
+          const priceRel = resolveItemPriceFactor(cat, unitValue, it.unitWeight, it.priceUnit, it.liveWeight, it.quantity);
+            const pricePerBase = (it.unitPrice / priceRel) / effFactor;
+            void pricePerBase;
+            const basePrice = it.unitPrice / effFactor;
           recordHistory(`tra.price_${cat}`, basePrice, {});
         }
         if (it.quantity && it.quantity > 0) recordHistory('tra.quantity', it.quantity, {});

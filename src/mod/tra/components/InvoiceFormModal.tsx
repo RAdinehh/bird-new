@@ -530,7 +530,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       const activePriceUnitLabel = activePriceUnitDef?.label || currentUnitLabel;
       const priceRatio = resolveItemPriceFactor(cat, currentUnit, it.unitWeight, effectivePriceUnit, it.liveWeight, it.quantity);
       const baseQty = (it.quantity || 0) * factor;
-      const liveTotal = (it.quantity || 0) * priceRatio * (it.unitPrice || 0);
+      const liveTotal = Math.round((it.quantity || 0) * priceRatio * (it.unitPrice || 0));
       const baseUnitLabel = uom.baseUnit === 'kg' ? 'کیلوگرم' : uom.baseUnit === 'g' ? 'گرم' : uom.baseUnit === 'ml' ? 'میلی‌لیتر' : uom.baseUnit === 'dose' ? 'دوز' : 'واحد';
       return (
         <>
