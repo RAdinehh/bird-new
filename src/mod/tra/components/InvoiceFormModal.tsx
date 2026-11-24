@@ -67,7 +67,7 @@ const getDescriptionPlaceholder = (cat: string): string => {
   }
 };
 
-const getPricePlaceholder = (_cat: string): string => '';
+const getPricePlaceholder = (_cat: string): string => 'مبلغ';
 
 const getUnitForCategory = (cat: string): string => {
   switch (cat) {
