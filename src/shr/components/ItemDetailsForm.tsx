@@ -2,6 +2,7 @@ import { getGlobalFormat } from '../units/useFormat';
 import { Field, LockedValue, AlertBox, Grid2, Grid3, Input, Select, NumField } from './ui';
 import { isBreedAllowedForCategory, getRequiredPurposeHint } from '../../mod/brd/categoryBreedRules';
 import SmartSelect from './SmartSelect';
+import EntityLink from './EntityLink';
 import { useBrd } from '../../mod/brd/store';
 import { useHal } from '../../mod/hal/store';
 import { useFlk, getAgeDays } from '../../mod/flk/store';
