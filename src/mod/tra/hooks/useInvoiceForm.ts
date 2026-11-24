@@ -64,6 +64,47 @@ export function resolveUomFactor(cat: string, unit: string, unitWeight?: number 
   return unitWeight && unitWeight > 0 ? unitWeight : 1;
 }
 
+
+/** محاسبه ضریب موثر قیمت بر اساس نسبت واحد مقدار به واحد مبنای قیمت */
+export function resolveItemPriceFactor(
+  cat: string,
+  unit: string,
+  unitWeight?: number | null,
+  priceUnit?: string,
+  liveWeight?: number | null,
+  quantity?: number | null
+): number {
+  const catRule = UOM_CATEGORIES[cat];
+  const units: any[] = catRule?.units || [];
+  const unitDef = units.find((u: any) => u.value === unit);
+
+  const qtyFactor = (() => {
+    if (unitDef && unitDef.factor !== null && unitDef.factor !== undefined) return Number(unitDef.factor) || 1;
+    if (unitWeight && Number(unitWeight) > 0) return Number(unitWeight);
+    if ((priceUnit === 'perKg' || priceUnit === 'per_kg') && liveWeight && liveWeight > 0 && quantity && quantity > 0) {
+      return liveWeight / quantity;
+    }
+    return 1;
+  })();
+
+  if (!priceUnit || priceUnit === unit || priceUnit === 'perKg' || priceUnit === 'per_kg') {
+    return qtyFactor;
+  }
+
+  const priceUnitDef = units.find((u: any) => u.value === priceUnit);
+  if (!priceUnitDef) return qtyFactor;
+
+  if (priceUnitDef.factor !== null && priceUnitDef.factor !== undefined && Number(priceUnitDef.factor) > 0) {
+    return qtyFactor / Number(priceUnitDef.factor);
+  }
+
+  if (unitWeight && Number(unitWeight) > 0) {
+    return qtyFactor / Number(unitWeight);
+  }
+
+  return qtyFactor;
+}
+
 export function getUnitForCategory(cat: string): string {
   return UOM_CATEGORIES[cat]?.default || 'pcs';
 }
@@ -109,15 +150,7 @@ export function useInvoiceForm(params: {
       const cat = it.category || form.category;
       const unit = it.unit || 'pcs';
       const unitDef = UOM_CATEGORIES[cat]?.units.find((u: any) => u.value === unit);
-      const factor = (() => {
-        if (unitDef && unitDef.factor !== null) return unitDef.factor;
-        if (it.unitWeight) return it.unitWeight;
-        // 🆕 adult sale perKg: factor = liveWeight / quantity
-        if ((it.priceUnit === 'perKg' || it.priceUnit === 'per_kg') && it.liveWeight && it.liveWeight > 0 && it.quantity && it.quantity > 0) {
-          return it.liveWeight / it.quantity;
-        }
-        return 1;
-      })();
+      const factor = resolveItemPriceFactor(cat, unit, it.unitWeight, it.priceUnit, it.liveWeight, it.quantity);
       const expected = calcItemTotal(it.quantity || 0, it.unitPrice || 0, it.discountType, it.discountValue, factor) + (it.shipping || 0);
       if (Math.abs(expected - (it.total || 0)) > 0.1) {
         changed = true;
@@ -135,15 +168,7 @@ export function useInvoiceForm(params: {
       const cat = it.category || form.category;
       const unit = it.unit || 'pcs';
       const unitDef = UOM_CATEGORIES[cat]?.units.find((u: any) => u.value === unit);
-      const factor = (() => {
-        if (unitDef && unitDef.factor !== null) return unitDef.factor;
-        if (it.unitWeight) return it.unitWeight;
-        // 🆕 adult sale perKg: factor = liveWeight / quantity
-        if ((it.priceUnit === 'perKg' || it.priceUnit === 'per_kg') && it.liveWeight && it.liveWeight > 0 && it.quantity && it.quantity > 0) {
-          return it.liveWeight / it.quantity;
-        }
-        return 1;
-      })();
+      const factor = resolveItemPriceFactor(cat, unit, it.unitWeight, it.priceUnit, it.liveWeight, it.quantity);
       return acc + calcItemTotal(it.quantity || 0, it.unitPrice || 0, it.discountType, it.discountValue, factor) + (it.shipping || 0);
     }, 0),
     [form.items, form.category]
@@ -172,15 +197,16 @@ export function useInvoiceForm(params: {
       const nx = { ...target, ...patch };
       const cat = nx.category || f.category;
       const unit = nx.unit || 'pcs';
-      const unitDef = UOM_CATEGORIES[cat]?.units.find((u: any) => u.value === unit);
-      const factor = (() => {
-        if (unitDef && unitDef.factor !== null) return unitDef.factor;
-        if (nx.unitWeight) return nx.unitWeight;
-        if ((nx.priceUnit === 'perKg' || nx.priceUnit === 'per_kg') && nx.liveWeight && nx.liveWeight > 0 && nx.quantity && nx.quantity > 0) {
-          return nx.liveWeight / nx.quantity;
+      const catUnits: any[] = UOM_CATEGORIES[cat]?.units || [];
+      const unitDef = catUnits.find((u: any) => u.value === unit);
+      if (patch.unit !== undefined && patch.priceUnit === undefined) {
+        const curPriceDef = catUnits.find((u: any) => u.value === nx.priceUnit);
+        const sameDim = curPriceDef && unitDef && curPriceDef.dimension === unitDef.dimension && curPriceDef.factor !== null && unitDef.factor !== null;
+        if (!sameDim && nx.priceUnit !== 'perKg' && nx.priceUnit !== 'per_kg') {
+          nx.priceUnit = unit as any;
         }
-        return 1;
-      })();
+      }
+      const factor = resolveItemPriceFactor(cat, unit, nx.unitWeight, nx.priceUnit, nx.liveWeight, nx.quantity);
       nx.total = calcItemTotal(nx.quantity, nx.unitPrice, nx.discountType, nx.discountValue, factor) + (nx.shipping || 0);
 
       // auto-calc gender counts intelligently for chick/adult
@@ -587,9 +613,28 @@ export function useInvoiceForm(params: {
       }
     }
 
+    const normalizedItems = cleanedItems.map((it: any) => {
+      const cat = it.category || form.category;
+      const unit = it.unit || getUnitForCategory(cat);
+      const pUnit = it.priceUnit || unit;
+      if (pUnit !== unit && it.unitPrice && Number(it.unitPrice) > 0) {
+        const catUnits: any[] = UOM_CATEGORIES[cat]?.units || [];
+        const uDef = catUnits.find((u: any) => u.value === unit);
+        const pDef = catUnits.find((u: any) => u.value === pUnit);
+        if (uDef && pDef && uDef.factor !== null && pDef.factor !== null && Number(pDef.factor) > 0) {
+          const ratioToUnit = Number(uDef.factor) / Number(pDef.factor);
+          return {
+            ...it,
+            unitPrice: Number((Number(it.unitPrice) * ratioToUnit).toFixed(4)),
+            priceUnit: unit,
+          };
+        }
+      }
+      return { ...it, priceUnit: pUnit };
+    });
     const data: any = {
       type: kind, date: form.date, partyId: form.partyId, category: form.category,
-      items: cleanedItems, discount: 0, shipping: 0, total, payments: cleanPayments,
+      items: normalizedItems, discount: 0, shipping: 0, total, payments: cleanPayments,
       dueDate: form.dueDate, relatedFlockId: form.relatedFlockId || '',
       relatedEntryId: '', notes: form.notes.trim(),
       paymentTerms: form.paymentTerms,

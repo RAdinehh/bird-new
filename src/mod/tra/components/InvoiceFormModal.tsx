@@ -23,7 +23,7 @@ import { isBreedAllowedForCategory } from '../../brd/categoryBreedRules';
 import { UNIT_LABEL } from '../../whs/store';
 import type { F } from '../types-invoice';
 import { useCtc } from '../../ctc/store';
-import { UOM_CATEGORIES, type UOMUnit } from '../hooks/useInvoiceForm';
+import { UOM_CATEGORIES, resolveItemPriceFactor, type UOMUnit } from '../hooks/useInvoiceForm';
 import { getTodayJalali } from '../calc';
 
 export interface InvoiceFormModalProps {
@@ -516,29 +516,47 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                           </Field>
                         )}
                         {(() => {
-                          const currentUnitDef = uom.units.find((u: UOMUnit) => u.value === currentUnit);
-                          const currentUnitLabel = currentUnitDef?.label || 'واحد';
-                          const factor = (currentUnitDef && currentUnitDef.factor !== null) ? currentUnitDef.factor : (it.unitWeight || 1);
-                          // ⚠️ factor: از unitDef (ثابت) یا unitWeight (دستی) — برای بسته‌بندی (bag, vial)
-                          const baseQty = (it.quantity || 0) * factor;
-                          const liveTotal = baseQty * (it.unitPrice || 0);
-                          const baseUnitLabel = uom.baseUnit === 'kg' ? 'کیلوگرم' : uom.baseUnit === 'g' ? 'گرم' : uom.baseUnit === 'ml' ? 'میلی‌لیتر' : uom.baseUnit === 'dose' ? 'دوز' : 'واحد';
-                          return (
-                            <>
-                              <Grid2>
-                                <Field label={`قیمت هر ${currentUnitLabel}`} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
-                                  <MoneyField placeholder={getPricePlaceholder(cat)} value={it.unitPrice > 0 ? fmt.code(String(it.unitPrice)) : ''} onChange={e => {
-                                    let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
-                                    if (maxPrice && val > maxPrice) val = maxPrice;
-                                    if (val < 0) val = 0;
-                                    updateItem(it.id, { unitPrice: val });
-                                  }} />
-                                  {it.unitPrice > 0 && <FieldHint fieldPath={`tra.price_${cat}`} value={it.unitPrice} />}
-                                </Field>
-                                <Field label="هزینه حمل این قلم" error={showError(`items.${idx}.shipping`)} onTouch={() => markTouched(`items.${idx}.shipping`)}>
-                                  <MoneyField placeholder="مبلغ هزینه" value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} />
-                                </Field>
-                              </Grid2>
+      const currentUnitDef = uom.units.find((u: UOMUnit) => u.value === currentUnit);
+      const currentUnitLabel = currentUnitDef?.label || 'واحد';
+      const factor = (currentUnitDef && currentUnitDef.factor !== null) ? currentUnitDef.factor : (it.unitWeight || 1);
+      const effectivePriceUnit = String(it.priceUnit || currentUnit || '');
+      const compatiblePriceUnits = uom.units.filter((u: UOMUnit) => {
+        if (!currentUnitDef) return true;
+        if (currentUnitDef.factor === null) return u.value === currentUnit || u.factor !== null;
+        return u.factor !== null && u.dimension === currentUnitDef.dimension;
+      });
+      const priceUnitOptions = compatiblePriceUnits.length > 0 ? compatiblePriceUnits : uom.units;
+      const activePriceUnitDef = priceUnitOptions.find((u: UOMUnit) => u.value === effectivePriceUnit) || currentUnitDef;
+      const activePriceUnitLabel = activePriceUnitDef?.label || currentUnitLabel;
+      const priceRatio = resolveItemPriceFactor(cat, currentUnit, it.unitWeight, effectivePriceUnit, it.liveWeight, it.quantity);
+      const baseQty = (it.quantity || 0) * factor;
+      const liveTotal = (it.quantity || 0) * priceRatio * (it.unitPrice || 0);
+      const baseUnitLabel = uom.baseUnit === 'kg' ? 'کیلوگرم' : uom.baseUnit === 'g' ? 'گرم' : uom.baseUnit === 'ml' ? 'میلی‌لیتر' : uom.baseUnit === 'dose' ? 'دوز' : 'واحد';
+      return (
+        <>
+          <Grid2>
+            <Field label={`قیمت هر ${activePriceUnitLabel}`} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
+              <MoneyField placeholder={getPricePlaceholder(cat)} value={it.unitPrice > 0 ? fmt.code(String(it.unitPrice)) : ''} onChange={e => {
+                let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
+                if (maxPrice && val > maxPrice) val = maxPrice;
+                if (val < 0) val = 0;
+                updateItem(it.id, { unitPrice: val });
+              }} />
+              {it.unitPrice > 0 && <FieldHint fieldPath={`tra.price_${cat}`} value={it.unitPrice} />}
+            </Field>
+            <Field label="قیمت بر حسب">
+              <SmartSelect
+                value={effectivePriceUnit}
+                modalTitle="انتخاب مبنای قیمت"
+                placeholder={undefined}
+                options={priceUnitOptions.map((u: UOMUnit) => ({ value: u.value, label: u.label }))}
+                onChange={val => updateItem(it.id, { priceUnit: val as any })}
+              />
+            </Field>
+          </Grid2>
+          <Field label="هزینه حمل این قلم" error={showError(`items.${idx}.shipping`)} onTouch={() => markTouched(`items.${idx}.shipping`)}>
+            <MoneyField placeholder="مبلغ هزینه" value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} />
+          </Field>
 
                               {it.quantity > 0 && it.unitPrice > 0 && (
                                 <div style={{
