@@ -280,7 +280,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" disabled={!!item.existingFlockId || (!isPurchase && !!item.flockId)} />
             {item.birdId && breedsForBird.length === 0 && (
               <div style={{ color: 'var(--warn)', fontSize: 11, marginTop: 4, fontWeight: 600 }}>
-                ⚠️ این پرنده هنوز نژادی ندارد. ابتدا از بخش «پرنده و نژاد» نژاد تعریف کنید.
+                ⚠️ این پرنده هنوز نژادی ندارد. ابتدا از بخش «پرنده و نژاد» نژادتعریف کنید.
               </div>
             )}
           </Field>
@@ -589,7 +589,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <Field
-          label={`انتخاب ${catLabel} از انبار یا تعریف جدید`}
+          label={`انتخاب ${catLabel} از انبار یاتعریف جدید`}
           error={err('stockItemId')}
           onTouch={touch('stockItemId')}
           required={requiredField}
@@ -617,7 +617,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               });
             }}
             options={[
-              { value: '__new__', label: `➕ تعریف ${catLabel} جدید در انبار` },
+              { value: '__new__', label: `تعریف ${catLabel} جدید در انبار` },
               ...filteredWhs.map(i => ({
                 value: i.id,
                 label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}`,
@@ -655,7 +655,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {!isPurchase && nameFieldJsx}
         <SecTitle icon="🌾" title="اطلاعات دان" />
         {isPurchase ? (
-          renderPurchaseStockSelector('دان', 'انتخاب یا تعریف دان', 'ذرت، کنجاله سویا', feedItems, false)
+          renderPurchaseStockSelector('دان', 'انتخاب یاتعریف دان', 'ذرت، کنجاله سویا', feedItems, false)
         ) : (
           <Field label="کاهش از انبار" error={err('stockItemId')} onTouch={touch('stockItemId')} hint="برای کاهش از موجودی">
             <SmartSelect value={String(item.stockItemId || '')} onChange={v => {
@@ -699,7 +699,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {!isPurchase && nameFieldJsx}
         <SecTitle icon="💊" title="اطلاعات دارو و واکسن" />
         {isPurchase ? (
-          renderPurchaseStockSelector('دارو / واکسن', 'انتخاب یا تعریف دارو و واکسن', 'انروفلوکساسین، تایلوزین', medItems, false)
+          renderPurchaseStockSelector('دارو / واکسن', 'انتخاب یاتعریف دارو و واکسن', 'انروفلوکساسین، تایلوزین', medItems, false)
         ) : (
           <Field label="کاهش از انبار" error={err('stockItemId')} onTouch={touch('stockItemId')} required hint="دارو/واکسن از انبار کاهش می‌یابد">
             <SmartSelect value={String(item.stockItemId || '')} onChange={v => {
@@ -864,7 +864,7 @@ if (category === 'vaccine' || category === 'herbal') {
         {!isPurchase && nameFieldJsx}
         <SecTitle icon="💊" title={category === 'vaccine' ? 'اطلاعات واکسن' : 'اطلاعات داروی گیاهی'} />
         {isPurchase ? (
-          renderPurchaseStockSelector(subLabel, `انتخاب یا تعریف ${subLabel}`, subExample, subItems, false)
+          renderPurchaseStockSelector(subLabel, `انتخاب یاتعریف ${subLabel}`, subExample, subItems, false)
         ) : (
           <Field
             label="کاهش از انبار"
