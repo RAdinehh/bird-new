@@ -436,7 +436,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                                 <SmartSelect
                                   value={currentUnit}
                                   modalTitle="انتخاب واحد"
-                                  placeholder="— انتخاب واحد —"
+                                  placeholder={undefined}
                                   options={uom.units.map((u: UOMUnit) => ({ value: u.value, label: u.label }))}
                                   onChange={val => updateItem(it.id, { unit: val, unitWeight: null })}
                                 />
@@ -526,7 +526,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                           return (
                             <>
                               <Grid2>
-                                <Field label={`قیمت هر ${baseUnitLabel}`} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
+                                <Field label={`قیمت هر ${currentUnitLabel}`} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
                                   <MoneyField placeholder={getPricePlaceholder(cat)} value={it.unitPrice > 0 ? fmt.code(String(it.unitPrice)) : ''} onChange={e => {
                                     let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
                                     if (maxPrice && val > maxPrice) val = maxPrice;
