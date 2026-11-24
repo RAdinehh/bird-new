@@ -196,7 +196,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           category === 'medicine' ? 'آنتی‌بیوتیک، ویتامین' :
           category === 'herbal' ? 'آویشن، پودر سیر' :
           category === 'vaccine' ? 'نیوکاسل، برونشیت' :
-          category === 'equipment' ? 'فن تونلی ۱۲۰' :
+          category === 'equipment' ? 'آبخوری نیپل، هیتر گازی' :
           category === 'chick' ? 'جوجه گوشتی راس' :
           category === 'egg' || category === 'fertile_egg' ? 'تخم نطفه‌دار' :
           category === 'adult' ? 'مرغ مادر' :
@@ -655,7 +655,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {!isPurchase && nameFieldJsx}
         <SecTitle icon="🌾" title="اطلاعات دان" />
         {isPurchase ? (
-          renderPurchaseStockSelector('دان', 'انتخاب یا تعریف دان', 'مثلاً دان استارتر پلت', feedItems, false)
+          renderPurchaseStockSelector('دان', 'انتخاب یا تعریف دان', 'ذرت، کنجاله سویا', feedItems, false)
         ) : (
           <Field label="کاهش از انبار" error={err('stockItemId')} onTouch={touch('stockItemId')} hint="برای کاهش از موجودی">
             <SmartSelect value={String(item.stockItemId || '')} onChange={v => {
@@ -699,7 +699,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {!isPurchase && nameFieldJsx}
         <SecTitle icon="💊" title="اطلاعات دارو و واکسن" />
         {isPurchase ? (
-          renderPurchaseStockSelector('دارو / واکسن', 'انتخاب یا تعریف دارو و واکسن', 'مثلاً انروفلوکساسین ۱۰٪ یا واکسن نیوکاسل', medItems, false)
+          renderPurchaseStockSelector('دارو / واکسن', 'انتخاب یا تعریف دارو و واکسن', 'انروفلوکساسین، تایلوزین', medItems, false)
         ) : (
           <Field label="کاهش از انبار" error={err('stockItemId')} onTouch={touch('stockItemId')} required hint="دارو/واکسن از انبار کاهش می‌یابد">
             <SmartSelect value={String(item.stockItemId || '')} onChange={v => {
@@ -858,7 +858,7 @@ if (category === 'egg' || category === 'fertile_egg') {
 if (category === 'vaccine' || category === 'herbal') {
     const subItems = (whsItems || []).filter(w => w.category === category);
     const subLabel = category === 'vaccine' ? 'واکسن' : 'داروی گیاهی';
-    const subExample = category === 'vaccine' ? 'مثلاً واکسن برونشیت H120' : 'مثلاً عصاره آویشن و اکالیپتوس';
+    const subExample = category === 'vaccine' ? 'واکسن نیوکاسل، برونشیت' : 'عرقیات، سیر';
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {!isPurchase && nameFieldJsx}
