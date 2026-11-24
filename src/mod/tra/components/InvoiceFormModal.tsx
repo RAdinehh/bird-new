@@ -14,7 +14,6 @@ import SmartSelect from '../../../shr/components/SmartSelect';
 import ItemDetailsForm from '../../../shr/components/ItemDetailsForm';
 import { HELP } from '../../../shr/help/helpTexts';
 import { getProfile, FieldHint } from '../../../shr/intelligence';
-import InvoiceSmartSummary from './InvoiceSmartSummary';
 import PaymentsSection from './PaymentsSection';
 import { type CheckStatus , computeUnappliedAdvances} from '../store';
 import { CATEGORIES, generateInstallments, type InvoiceItem, type Payment } from '../store';
@@ -688,7 +687,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
         </>
       )}
 
-      {form.items.length > 0 && total > 0 && <InvoiceSmartSummary form={form} total={total} paid={paid} />}
+      
 
       {/* ====== یادداشت ====== */}
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>

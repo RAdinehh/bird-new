@@ -8,7 +8,6 @@ import {
 import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import ItemDetailsForm from '../../../shr/components/ItemDetailsForm';
-import InvoiceSmartSummary from './InvoiceSmartSummary';
 import { type CheckStatus } from '../store';
 import { CATEGORIES, generateInstallments, type InvoiceItem, type Payment } from '../store';
 import { UNIT_LABEL } from '../../whs/store';
