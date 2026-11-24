@@ -554,14 +554,42 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           <Field label="هزینه حمل این قلم" error={showError(`items.${idx}.shipping`)} onTouch={() => markTouched(`items.${idx}.shipping`)}>
             <MoneyField placeholder="مبلغ هزینه" value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} />
           </Field>
+              {it.quantity > 0 && it.unitPrice > 0 && (
+                <div style={{
+                  marginTop: 'var(--sp-1)',
+                  padding: '10px 12px',
+                  background: 'var(--accent-soft)',
+                  border: '1px dashed var(--accent)',
+                  borderRadius: 'var(--r-md)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '6px'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 600 }}>
+                    <span>
+                      {fmt.num(it.quantity)} {currentUnitLabel}
+                      {factor !== 1 && !currentUnitLabel.includes(baseUnitLabel) ? ` (${fmt.num(baseQty)} ${baseUnitLabel})` : ''}
+                    </span>
+                    <span>× {fmt.money(it.unitPrice, { withUnit: false })} تومان</span>
+                  </div>
+                  <div style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    borderTop: '1px dashed var(--accent)', paddingTop: '6px', marginTop: '2px'
+                  }}>
+                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)' }}>جمع محاسبه‌شده:</span>
+                    <span style={{ fontSize: 'var(--fs-md)', fontWeight: 800, color: 'var(--accent)' }}>
+                      {fmt.money(liveTotal, { withUnit: false })} تومان
+                    </span>
+                  </div>
+                </div>
+              )}
                             </>
                           );
                         })()}
                       </>
                     );
                   })()}
-
-                  <Grid2>
+<Grid2>
                     <Field label="تخفیف این قلم" error={showError(`items.${idx}.discountValue`)} onTouch={() => markTouched(`items.${idx}.discountValue`)}>
                       <MoneyField placeholder="مبلغ" value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: Math.max(0, parseFloat(toEn(e.target.value).replace('٫','.')) || 0) })} min={0} />
                     </Field>
