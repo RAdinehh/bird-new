@@ -67,10 +67,7 @@ const getDescriptionPlaceholder = (cat: string): string => {
   }
 };
 
-const getPricePlaceholder = (_cat: string): string => {
-  // Label قبلاً «قیمت هر {واحد}» نشون می‌ده — placeholder فقط واحد پول
-  return 'تومان';
-};
+const getPricePlaceholder = (_cat: string): string => '';
 
 const getUnitForCategory = (cat: string): string => {
   switch (cat) {
