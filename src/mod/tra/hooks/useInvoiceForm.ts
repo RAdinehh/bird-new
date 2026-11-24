@@ -444,27 +444,46 @@ export function useInvoiceForm(params: {
 
 
     // ─── اعتبارسنجی نرم (Soft Validation) ───
-    const warnings: string[] = [];
+    const unlinkedStockLabels: string[] = [];
+    const missingBreedLabels: string[] = [];
+    const missingFlockLabels: string[] = [];
+
     cleanedItems.forEach((it, idx) => {
-      const cat = it.category || form.category;
-      const label = `قلم ${getGlobalFormat().count(idx + 1)}`;
+      const itemAny = it as any;
+      const cat = itemAny.category || form.category;
+      const numLabel = `قلم ${getGlobalFormat().count(idx + 1)}`;
+      const rawName = itemAny.name || itemAny.itemName || itemAny.title || '';
+      const itemTitle = String(rawName).trim() ? `${numLabel} (${String(rawName).trim()})` : numLabel;
+
       if (kind === 'purchase') {
-        if ((cat === 'chick' || cat === 'adult') && !it.breedId && !it.birdId) {
-          warnings.push(`• ${label} (${cat === 'chick' ? 'جوجه' : 'بالغ'}): نژاد/پرنده انتخاب نشده — گله ساخته نمی‌شود.`);
+        if ((cat === 'chick' || cat === 'adult') && !itemAny.breedId && !itemAny.birdId) {
+          missingBreedLabels.push(itemTitle);
         }
-        if (['feed', 'medicine', 'vaccine', 'herbal'].includes(cat) && !it.itemId && !it.stockItemId) {
-          warnings.push(`• ${label}: به انبار وصل نیست — سیستم به طور خودکار کالای جدید ثبت می‌کند.`);
+        if (['feed', 'medicine', 'vaccine', 'herbal'].includes(cat) && !itemAny.itemId && !itemAny.stockItemId) {
+          unlinkedStockLabels.push(itemTitle);
         }
       } else {
-        if ((cat === 'chick' || cat === 'adult') && !it.flockId) {
-          warnings.push(`• ${label} (${cat === 'chick' ? 'جوجه' : 'بالغ'}): گله مبدا انتخاب نشده — از موجودی گله کم نمی‌شود.`);
+        if ((cat === 'chick' || cat === 'adult') && !itemAny.flockId) {
+          missingFlockLabels.push(itemTitle);
         }
       }
     });
+
+    const warnings: string[] = [];
+    if (unlinkedStockLabels.length > 0) {
+      warnings.push(`${unlinkedStockLabels.join(' و ')} به انبار وصل نیست — کالای جدید به صورت خودکار ثبت و لینک می‌شود.`);
+    }
+    if (missingBreedLabels.length > 0) {
+      warnings.push(`${missingBreedLabels.join(' و ')}: نژاد یا پرنده انتخاب نشده و گله جدید ساخته نمی‌شود.`);
+    }
+    if (missingFlockLabels.length > 0) {
+      warnings.push(`${missingFlockLabels.join(' و ')}: گله مبدا انتخاب نشده و از موجودی گله کم نمی‌شود.`);
+    }
+
     if (warnings.length > 0) {
       const ok = await showConfirmAsync(
         '⚠️ تأیید ذخیره فاکتور',
-        warnings.join('\n') + '\n\nبا تأیید شما، سیستم به طور خودکار کالاهای جدید را در انبار ثبت و لینک می‌کند.\nادامه می‌دهید؟',
+        warnings.join('\n') + '\n\nادامه می‌دهید؟',
         {}
       );
       if (!ok) return;
