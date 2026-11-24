@@ -56,15 +56,15 @@ function isQuietHour(): boolean {
 const toFaDigits = (str: string) =>
   str.replace(/[0-9]/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
 
-const stripLeadingEmojis = (str: string) =>
-  str.replace(/^(?:[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\uFE0F\u200D\u2715\u26A0\u2753\u2705\u{1F6A8}\u2139]\s*)+/u, "");
+const stripEmojis = (str: string) =>
+  str.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\uFE0F\u200D]/gu, "");
 
 const formatDialogText = (raw?: string) => {
   if (!raw) return "";
   return raw
     .split("\n")
     .map((line) => {
-      let out = stripLeadingEmojis(line.trimStart());
+      let out = stripEmojis(line).replace(/\s{2,}/g, " ").trim();
       out = out.replace(/\.+(?=\s*$)/, "");
       return toFaDigits(out);
     })
@@ -240,7 +240,26 @@ export default function DialogHost() {
           boxShadow: 'var(--shadow)',
         }}
       >
-        {config.title && (
+                  <div
+            aria-hidden="true"
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              background: soft,
+              color: color,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 18,
+              fontWeight: 600,
+              flexShrink: 0,
+            }}
+          >
+            {cfg.icon}
+          </div>
+
+{config.title && (
           <div
             id={titleId.current}
             style={{
