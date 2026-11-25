@@ -597,7 +597,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           error={err('stockItemId')}
           onTouch={touch('stockItemId')}
           required={requiredField}
-          hint={isNewMode ? `کالای جدید با نام زیر در انبار ساخته می‌شود` : `موجودی به این کالا در انبار اضافه می‌شود`}
+          hint={isNewMode ? `نام قلم جدید را در فیلد نام وارد کنید` : `موجودی به این کالا در انبار اضافه می‌شود`}
         >
           <SmartSelect
             value={selectValue}
@@ -655,9 +655,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (category === 'feed') {
     const feedItems = (whsItems || []).filter(w => w.category === 'feed');
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="🌾" title="اطلاعات دان" />
         {!isPurchase && nameFieldJsx}
-        <SecTitle icon="🌾" title="اطلاعات دان" />
         {isPurchase ? (
           renderPurchaseStockSelector('دان', 'انتخاب یاتعریف دان', 'ذرت، کنجاله سویا', feedItems, false)
         ) : (
@@ -699,9 +698,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (category === 'medicine') {
     const medItems = (whsItems || []).filter(w => w.category === 'medicine' || w.category === 'vaccine');
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="💊" title="اطلاعات دارو و واکسن" />
         {!isPurchase && nameFieldJsx}
-        <SecTitle icon="💊" title="اطلاعات دارو و واکسن" />
         {isPurchase ? (
           renderPurchaseStockSelector('دارو / واکسن', 'انتخاب یاتعریف دارو و واکسن', 'انروفلوکساسین، تایلوزین', medItems, false)
         ) : (
@@ -872,9 +870,8 @@ if (category === 'vaccine' || category === 'herbal') {
     const subLabel = category === 'vaccine' ? 'واکسن' : 'داروی گیاهی';
     const subExample = category === 'vaccine' ? 'واکسن نیوکاسل، برونشیت' : 'عرقیات، سیر';
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="💊" title={category === 'vaccine' ? 'اطلاعات واکسن' : 'اطلاعات داروی گیاهی'} />
         {!isPurchase && nameFieldJsx}
-        <SecTitle icon="💊" title={category === 'vaccine' ? 'اطلاعات واکسن' : 'اطلاعات داروی گیاهی'} />
         {isPurchase ? (
           renderPurchaseStockSelector(subLabel, `انتخاب یاتعریف ${subLabel}`, subExample, subItems, false)
         ) : (
