@@ -158,7 +158,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
  <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>طرف تجاری</div>
  <RowGrid>
  {e.supplierId && <Row l="تأمین‌کننده"v={<EntityLink type="party"id={e.supplierId} label={supplierNames?.get(e.supplierId) || '—'} />} />}
- {e.sourceInvoiceId && <Row l="فاکتور خرید"v={<EntityLink type="invoice"id={e.sourceInvoiceId} label={invoiceNumbers?.get(e.sourceInvoiceId) || 'فاکتور حذف‌شده'} />} />}
+                {_effectiveInvoiceId && <Row l="فاکتور خرید" v={<EntityLink type="invoice" id={_effectiveInvoiceId} label={_linkedPurchaseInv?.number ? formatInvoiceNumber(_linkedPurchaseInv.number) : (invoiceNumbers?.get(_effectiveInvoiceId) || "\u0641\u0627\u06a9\u062a\u0648\u0631")} />} />}
  {e.warehouseItemId && <Row l="کالای انبار"v={<EntityLink type="item"id={e.warehouseItemId} label={whsItemNames?.get(e.warehouseItemId) || '—'} />} />}
  </RowGrid>
  </>
