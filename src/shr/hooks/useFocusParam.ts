@@ -1,14 +1,3 @@
-/**
- * useFocusParam — خواندن ?focus=xxx از URL و برجسته‌سازی استاندارد کارت هدف
- *
- * رفتار:
- *   - مقدار focus رو از URL می‌خونه
- *   - ارتفاع واقعی هدر و کادر راهنمای بالای تب (HelpBanner) رو محاسبه می‌کنه تا کارت زیر راهنما نمونه
- *   - بررسی می‌کنه آیا کانتینر واقعی اسکرول‌شونده وجود داره و کارت خارج از دید هست یا نه؛ در صفحات بدون اسکرول هیچ جابه‌جایی انجام نمی‌ده
- *   - کلاس .pm-entity-focused رو روی کارت اعمال می‌کنه بدون باز کردن کارت
- *   - بعد از اتمام، focus از URL پاک می‌شه
- */
-
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
@@ -33,9 +22,8 @@ function findScrollableAncestor(el: Element): HTMLElement | null {
 }
 
 function getTopObstructionBottom(targetEl: Element): number {
-  let maxBottom = 64; // حداقل ارتفاع هدر پیش‌فرض
+  let maxBottom = 64;
 
-  // ۱. هدر ثابت بالای صفحه و نوار تب‌ها
   const topBars = document.querySelectorAll('header, [role="tablist"]');
   topBars.forEach((bar) => {
     const r = bar.getBoundingClientRect();
@@ -44,12 +32,10 @@ function getTopObstructionBottom(targetEl: Element): number {
     }
   });
 
-  // ۲. کادر راهنمای بالای تب (اگر داخل پنل/صفحه فعال باز باشد)
   const panelRoot = targetEl.closest('[data-tab-panel]') || targetEl.parentElement?.parentElement || document;
   const banners = panelRoot.querySelectorAll('[data-help-banner], .pm-help-banner, [role="region"][aria-label*="راهنما"]');
   banners.forEach((banner) => {
     const r = banner.getBoundingClientRect();
-    // فقط بنرهایی که بالای کارت هدف و در نیمه بالایی صفحه هستند را لحاظ کن
     if (r.height > 0 && r.top >= 0 && r.top < 260 && r.bottom > maxBottom) {
       maxBottom = r.bottom;
     }
@@ -66,8 +52,11 @@ export function useFocusParam(autoClear = true): string | null {
     if (!focusId) return;
 
     let targetEl: Element | null = null;
+    let rafId = 0;
+    let t2: ReturnType<typeof setTimeout> | null = null;
+    let attempts = 0;
 
-    const t1 = setTimeout(() => {
+    const tryFocus = () => {
       targetEl = document.querySelector(`[data-focus-id="${focusId}"]`);
       if (targetEl) {
         const scrollContainer = findScrollableAncestor(targetEl);
@@ -78,39 +67,45 @@ export function useFocusParam(autoClear = true): string | null {
           const bottomSafe = vh - 24;
 
           if (rect.top < topSafe) {
-            const delta = rect.top - topSafe;
-            scrollContainer.scrollBy({ top: delta, behavior: 'smooth' });
+            scrollContainer.scrollBy({ top: rect.top - topSafe, behavior: 'auto' });
           } else if (rect.bottom > bottomSafe) {
-            const delta = rect.bottom - bottomSafe;
-            scrollContainer.scrollBy({ top: delta, behavior: 'smooth' });
+            scrollContainer.scrollBy({ top: rect.bottom - bottomSafe, behavior: 'auto' });
           }
         }
 
         targetEl.classList.remove('pm-entity-focused');
         void (targetEl as HTMLElement).offsetWidth;
         targetEl.classList.add('pm-entity-focused');
-      }
-    }, 180);
 
-    const t2 = setTimeout(() => {
-      if (targetEl) {
-        targetEl.classList.remove('pm-entity-focused');
+        t2 = setTimeout(() => {
+          if (targetEl) {
+            targetEl.classList.remove('pm-entity-focused');
+          }
+          if (autoClear) {
+            setParams(
+              (prev) => {
+                const next = new URLSearchParams(prev);
+                next.delete('focus');
+                return next;
+              },
+              { replace: true },
+            );
+          }
+        }, 2600);
+        return;
       }
-      if (autoClear) {
-        setParams(
-          (prev) => {
-            const next = new URLSearchParams(prev);
-            next.delete('focus');
-            return next;
-          },
-          { replace: true },
-        );
+
+      if (attempts < 20) {
+        attempts++;
+        rafId = requestAnimationFrame(tryFocus);
       }
-    }, 3400);
+    };
+
+    rafId = requestAnimationFrame(tryFocus);
 
     return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
+      cancelAnimationFrame(rafId);
+      if (t2) clearTimeout(t2);
       if (targetEl) {
         targetEl.classList.remove('pm-entity-focused');
       }
