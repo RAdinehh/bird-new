@@ -1,3 +1,4 @@
+import { createElement } from "react";
 /**
  * ItemCard — کارت نمایش قلم انبار
  */
@@ -8,6 +9,7 @@ import { VET_METHOD_LABEL } from '../../../shr/constants/vetMethods';
 import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { Row, SectionTitle } from '../helpers';
+import EntityLink from '../../../shr/components/EntityLink';
 import { CATEGORY_ICON, CATEGORY_LABEL, UNIT_LABEL, STORAGE_LABEL, stockWarning, expiryWarning, daysToExpiry, getAvgPrice } from '../store';
 import { showConfirmAsync } from '../../../cor/store/dialog';
 import { toastMsg } from '../../../cor/store/toast';
@@ -98,7 +100,8 @@ export default function ItemCard(props: ItemCardProps) {
       {it.minStock > 0 ? <Row l="حداقل موجودی" v={`${fmt.num(it.minStock)} ${(UNIT_LABEL as any)[it.unit]}`} /> : null}
       {it.avgPrice && it.avgPrice > 0 ? <Row l="💰 قیمت میانگین" v={fmt.money(getAvgPrice(it))} /> : null}
       {it.lastPrice > 0 ? <Row l="آخرین قیمت خرید" v={fmt.money(it.lastPrice)} /> : null}
-      {sup ? <Row l="تأمین‌کننده" v={sup.name} /> : null}
+      {sup ? <Row l="تأمین‌کننده" v={createElement(EntityLink, { type: "party", id: sup.id, label: sup.name })} /> : null}
+      {hall ? <Row l="سالن" v={createElement(EntityLink, { type: "hall", id: hall.id, label: hall.name })} /> : null}
 
       {it.currentStock > 0 && it.lastPrice > 0 ? (
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>

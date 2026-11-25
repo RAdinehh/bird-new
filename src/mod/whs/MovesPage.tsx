@@ -1,3 +1,5 @@
+import EntityLink from '../../shr/components/EntityLink';
+import { createElement } from "react";
 import { useFormat } from '../../shr/units/useFormat';
 import { useState, useMemo, useEffect } from 'react';
 import MoveFormModal from './components/MoveFormModal';
@@ -305,12 +307,12 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
                 }
               >
                 <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات گردش</SectionTitle>
-                <Row l="کالا" v={item ? `${CATEGORY_ICON[item.category]} ${item.name}` : '—'} />
+                <Row l="کالا" v={item ? createElement(EntityLink, { type: "item", id: item.id, label: item.name }) : '—'} />
                 <Row l="نوع" v={m.type === 'in' ? 'ورود' : 'خروج'} />
                 <Row l="دلیل" v={MOVEMENT_REASON[m.reason]} />
                 <Row l="تاریخ" v={fmt.date(m.date)} />
                 <Row l="مقدار" v={item ? formatQty(m.quantity, item.unit) : fmt.num(m.quantity)} />
-                {party ? <Row l="طرف معامله" v={party.name} /> : null}
+                {party ? <Row l="طرف معامله" v={createElement(EntityLink, { type: "party", id: party.id, label: party.name })} /> : null}
 
                 {m.unitPrice > 0 ? (
                   <>

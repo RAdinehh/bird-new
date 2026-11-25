@@ -1,3 +1,4 @@
+import { createElement } from "react";
 /**
  * HatchCard.tsx — کارت نتیجه‌ی یک هچ
  */
@@ -7,6 +8,7 @@ import { toFa } from '../../../shr/utils/fa';
 import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard, { StatBox, Dot } from '../../../shr/components/ExpandableCard';
 import { Row } from '../helpers';
+import EntityLink from '../../../shr/components/EntityLink';
 import { costPerChick, type HatchResult } from '../store';
 import { calcChickYield } from '../api/needs';
 import type { Bird } from '../../brd/store';
@@ -67,6 +69,8 @@ export default function HatchCard(props: HatchCardProps) {
 
                 <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> نتیجه هچ</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  {dev ? <Row l="دستگاه" v={createElement(EntityLink, { type: "device", id: dev.id, label: dev.name })} /> : null}
+                  {h.generatedFlockId ? <Row l="گله ایجادشده" v={createElement(EntityLink, { type: "flock", id: h.generatedFlockId, label: 'مشاهده گله' })} /> : null}
                   <Row l="جوجه هچ‌شده" v={fmt.count(h.hatched || 0)} />
                   <Row l="هچ‌نشده" v={fmt.count(h.unhatched || 0)} />
                   {h.deadInShell ? <Row l="مرده در پوسته" v={fmt.count(h.deadInShell)} /> : null}

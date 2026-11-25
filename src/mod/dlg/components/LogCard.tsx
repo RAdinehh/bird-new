@@ -1,3 +1,4 @@
+import { createElement } from "react";
 /**
  * LogCard.tsx — کارت نمایش یک ثبت روزانه
  *
@@ -22,6 +23,7 @@ import { Btn, Tag } from '../../../shr/components/ui';
 import { BadgeOverflow, type BadgeItem } from '../../../shr/components/ui/BadgeOverflow';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { LogSection, Row, LogGroup, LogSubSection, LogItem } from '../helpers';
+import EntityLink from '../../../shr/components/EntityLink';
 import { VET_METHOD_LABEL } from '../../../shr/constants/vetMethods';
 import { GENDER_LABEL, formatWeightGrams, cvText } from '../../../shr/utils/weightHelpers';
 import { calculateWeightMetrics } from '../../../shr/calc';
@@ -176,6 +178,7 @@ export default function LogCard(props: LogCardProps) {
         {l.waterAmount !== null && <span>💧 {fmt.num(l.waterAmount)} لیتر</span>}
       </>}
     >
+      {flock ? <Row l="گله" v={createElement(EntityLink, { type: "flock", id: flock.id, label: flock.name })} /> : null}
       <LogSection title="🌡 محیط">
         <Grid2>
           {l.temperature !== null && <Row l="دما" v={`${fmt.num(l.temperature)} °C`} warn={tIsBad} />}
