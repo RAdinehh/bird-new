@@ -1,3 +1,5 @@
+import { useFlk } from '../flk/store';
+import { useTra } from '../tra/store';
 import EntityLink from '../../shr/components/EntityLink';
 import { createElement } from "react";
 import { useFormat } from '../../shr/units/useFormat';
@@ -47,6 +49,8 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
   const fmt = useFormat();
   const navigate = useNavigate();
   const { items, movements, addMovement, deleteMovement } = useWhs();
+  const { flocks } = useFlk();
+  const { invoices } = useTra();
   const { contacts } = useCtc();
 
   const [open, setOpen] = useState(false);
@@ -281,6 +285,8 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
           {list.map((m, i) => {
             const item = items.find(x => x.id === m.itemId);
             const party = contacts.find(c => c.id === m.partyId);
+            const moveFlock = m.flockId ? flocks.find(f => f.id === m.flockId) : undefined;
+            const moveInv = (m.sourceModule === 'tra' && m.sourceId) ? invoices.find(inv => inv.id === m.sourceId) : undefined;
             const isOpen = !ms.selectionMode && expandedId === m.id;
             const accent = m.type === 'in' ? 'accent' : 'warn';
             const total = m.quantity * m.unitPrice;
@@ -313,6 +319,8 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
                 <Row l="تاریخ" v={fmt.date(m.date)} />
                 <Row l="مقدار" v={item ? formatQty(m.quantity, item.unit) : fmt.num(m.quantity)} />
                 {party ? <Row l="طرف معامله" v={createElement(EntityLink, { type: "party", id: party.id, label: party.name })} /> : null}
+                {moveFlock ? <Row l="گله" v={createElement(EntityLink, { type: "flock", id: moveFlock.id, label: moveFlock.name })} /> : null}
+                {moveInv ? <Row l="فاکتور مبدأ" v={createElement(EntityLink, { type: "invoice", id: moveInv.id, label: moveInv.number ? `فاکتور #${moveInv.number}` : 'مشاهده فاکتور' })} /> : null}
 
                 {m.unitPrice > 0 ? (
                   <>

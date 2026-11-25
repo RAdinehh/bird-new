@@ -1,3 +1,5 @@
+import { createElement } from "react";
+import { useInc } from '../../inc/store';
 /**
  * FlockCard.tsx — کارت نمایش یک گله
  * طراحی: Grid2 برای فیلدهای کوتاه + EntityLink بین‌ماژولی
@@ -439,6 +441,13 @@ export default function FlockCard(props: FlockCardProps) {
           <>
             <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📈 درآمد و سود</div>
             <RowGrid>
+              {f.hatchId && (() => {
+                const incState = useInc.getState();
+                const h = incState.hatches?.find((x) => x.id === f.hatchId);
+                const entry = h ? incState.eggEntries?.find((e) => e.id === h.eggEntryId) : undefined;
+                const dev = entry ? incState.devices?.find((d) => d.id === entry.deviceId) : undefined;
+                return dev ? createElement(Row, { l: 'دستگاه جوجه‌کشی', v: createElement(EntityLink, { type: 'device', id: dev.id, label: dev.name }) }) : null;
+              })()}
               {f.sourceInvoiceId && (
                 <Row l="فاکتور خرید" v={<EntityLink type="invoice" id={f.sourceInvoiceId} label="مشاهده" />} />
               )}

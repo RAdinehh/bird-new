@@ -1,3 +1,5 @@
+import { useWhs } from '../../whs/store';
+import { useHal } from '../../hal/store';
 import { useFormat } from '../../../shr/units/useFormat';
 import { Tag, Btn, CardActions } from '../../../shr/components/ui';
 import { ACTION_PRESETS } from '../../../shr/constants/cardActions';
@@ -215,7 +217,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
     >
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات</SectionTitle>
       <RowGrid>
-        <Row l="فروشنده" v={partyName || '—'} />
+        <Row l={inv.type === 'sale' ? 'خریدار' : 'فروشنده'} v={inv.partyId && partyName ? createElement(EntityLink, { type: 'party', id: inv.partyId, label: partyName }) : (partyName || '—')} />
         <Row l="تاریخ" v={fmt.date(inv.date)} />
         {inv.number ? <Row l="شماره" v={formatInvoiceNumber(inv.number)} /> : null}
         {inv.dueDate ? <Row l="سرسید" v={fmt.date(inv.dueDate)} /> : null}
