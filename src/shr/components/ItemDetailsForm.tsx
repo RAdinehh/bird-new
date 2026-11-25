@@ -220,6 +220,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (category === 'chick') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="🧬" title="اطلاعات گله" />
+          {nameFieldJsx}
         {!isPurchase && (
           <Grid2>
             <Field label="منبع جوجه" hint="جوجه از گله موجود می‌آید یا از هچری">
@@ -260,7 +261,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           </Grid2>
 
         )}
-        {nameFieldJsx}
         {!isPurchase && (item.source || 'flock') === 'hatch' && availableHatches.length === 0 && (
           <div style={{ fontSize: 'var(--fs-xs)', marginTop: 4, fontWeight: 600, color: 'var(--danger)' }}>
             ابتدا از بخش «جوجه‌کشی» یک هچ بسازید
@@ -406,6 +406,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="🐓" title="اطلاعات پرنده بالغ" />
+        {nameFieldJsx}
         {/* در حالت فروش: گله مبدأ بالاترین اولویت سلسله‌مراتبی را دارد */}
         {!isPurchase && (
           <Field label="گله مبدأ" required error={err('flockId')} onTouch={touch('flockId')}>
@@ -446,7 +447,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" disabled={isLocked || !item.birdId} />
           </Field>
         </Grid2>
-        {nameFieldJsx}
         {hasIncompatibleBreedsOnly && (
           <AlertBox tone="warn">
             نژادی با کاربرد «{missingPurposeHint}» برای این پرنده ثبت نشده است. لطفاً نژاد جدید بسازید.
@@ -654,7 +654,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (category === 'feed') {
     const feedItems = (whsItems || []).filter(w => w.category === 'feed');
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="🌾" title="اطلاعات دان" />        {isPurchase ? (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="🌾" title="اطلاعات دان" />
+        {nameFieldJsx}        {isPurchase ? (
           renderPurchaseStockSelector('دان', 'انتخاب یاتعریف دان', 'ذرت، کنجاله سویا', feedItems, false)
         ) : (
           <Field label="کاهش از انبار" error={err('stockItemId')} onTouch={touch('stockItemId')} hint="برای کاهش از موجودی">
@@ -686,7 +687,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               }} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" />
           </Field>
         </Grid2>
-        {!isPurchase && nameFieldJsx}
         {sellerSlot}
       </div>
     );
@@ -696,7 +696,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (category === 'medicine') {
     const medItems = (whsItems || []).filter(w => w.category === 'medicine' || w.category === 'vaccine');
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="💊" title="اطلاعات دارو و واکسن" />        {isPurchase ? (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="💊" title="اطلاعات دارو و واکسن" />
+        {nameFieldJsx}        {isPurchase ? (
           renderPurchaseStockSelector('دارو / واکسن', 'انتخاب یاتعریف دارو و واکسن', 'انروفلوکساسین، تایلوزین', medItems, false)
         ) : (
           <Field label="کاهش از انبار" error={err('stockItemId')} onTouch={touch('stockItemId')} required hint="دارو/واکسن از انبار کاهش می‌یابد">
@@ -724,7 +725,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             </Field>
           )}
         </Grid2>
-        {!isPurchase && nameFieldJsx}
 
         {/* ردیف ۳: برند + شماره بچ */}
         <Grid2>
@@ -752,7 +752,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (category === 'manure' && !isPurchase) {
     const manureItems = (whsItems || []).filter(w => w.category === 'manure');
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="💩" title="اطلاعات کود" />        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} error={err('stockItemId')} onTouch={touch('stockItemId')} required={!isPurchase} hint={isPurchase ? "به موجودی اضافه" : "از موجودی کاهش"}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="💩" title="اطلاعات کود" />
+      {nameFieldJsx}        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} error={err('stockItemId')} onTouch={touch('stockItemId')} required={!isPurchase} hint={isPurchase ? "به موجودی اضافه" : "از موجودی کاهش"}>
           <SmartSelect
             value={String(item.stockItemId || '')}
             onChange={v => {
@@ -829,7 +830,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             />
           </Field>
         </Grid2>
-      {nameFieldJsx}
+        {nameFieldJsx}
         {nameFieldJsx}      </div>
     );
   }
@@ -838,6 +839,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 if (category === 'egg' || category === 'fertile_egg') {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>      <SecTitle icon="🥚" title="اطلاعات تخم" />
+      {nameFieldJsx}
       <Grid2>
         <Field label="نوع پرنده" required error={err('birdId')} onTouch={touch('birdId')}>
           <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" />
@@ -850,7 +852,6 @@ if (category === 'egg' || category === 'fertile_egg') {
           })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" />
         </Field>
       </Grid2>
-        {!isPurchase && nameFieldJsx}
         {hasIncompatibleBreedsOnly && (
           <AlertBox tone="warn">
             نژادی با کاربرد «{missingPurposeHint}» برای این پرنده ثبت نشده است. لطفاً نژاد جدید بسازید.
@@ -866,7 +867,8 @@ if (category === 'vaccine' || category === 'herbal') {
     const subLabel = category === 'vaccine' ? 'واکسن' : 'داروی گیاهی';
     const subExample = category === 'vaccine' ? 'واکسن نیوکاسل، برونشیت' : 'عرقیات، سیر';
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="💊" title={category === 'vaccine' ? 'اطلاعات واکسن' : 'اطلاعات داروی گیاهی'} />        {isPurchase ? (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="💊" title={category === 'vaccine' ? 'اطلاعات واکسن' : 'اطلاعات داروی گیاهی'} />
+      {nameFieldJsx}        {isPurchase ? (
           renderPurchaseStockSelector(subLabel, `انتخاب یاتعریف ${subLabel}`, subExample, subItems, false)
         ) : (
           <Field
@@ -961,6 +963,7 @@ if (category === 'vaccine' || category === 'herbal') {
             }} options={activeFlocks} placeholder="— بدون گله (سربار کل) —" modalTitle="انتخاب گله" />
           </Field>
         </Grid2>
+            {nameFieldJsx}
         {nameFieldJsx}        {ct === 'utilities' && (
           <>
             <Grid2>
@@ -1027,6 +1030,7 @@ if (category === 'vaccine' || category === 'herbal') {
     );
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="💔" title="اطلاعات تخم شکسته" />
+        {nameFieldJsx}
         {/* انتخاب از تولیدات تخم — شکسته */}
         <Field label="انتخاب از تولیدات تخم شکسته" hint="برای پر شدن خودکار مشخصات">
           <SmartSelect
@@ -1069,7 +1073,6 @@ if (category === 'vaccine' || category === 'herbal') {
             <DatePicker value={String(item.eggDate || '')} onChange={v => updateItem({ eggDate: v })} placeholder="1405/07/20" autoToday />
           </Field>
         </Grid2>
-        {nameFieldJsx}
 
         {/* ردیف ۲: تعداد شکسته + تعداد کل */}
         <Grid2>
