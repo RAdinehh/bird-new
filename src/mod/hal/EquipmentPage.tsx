@@ -1,3 +1,4 @@
+import { useFocusParam } from '../../shr/hooks/useFocusParam';
 import { getGlobalFormat } from "../../shr/units/useFormat";
 /**
  * EquipmentPage — تجهیزات
@@ -37,6 +38,7 @@ import { logAction } from '../../cor/logger/auditLog';
 /** دسته‌های مجاز برای هر نوع دارایی */
 export default function EquipmentPage({ active = true }: { active?: boolean } = {}) {
   const { halls, zones, equipment, addEquip, updateEquip, deleteEquip } = useHal();
+  useFocusParam();
   const breedStd = useBreedStandard();
   const { flocks } = useFlk();
   const { contacts: allContacts } = useCtc();

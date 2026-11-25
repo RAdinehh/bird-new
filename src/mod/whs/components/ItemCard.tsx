@@ -142,7 +142,7 @@ export default function ItemCard(props: ItemCardProps) {
           {(() => {
             const linkedEqs = useHal.getState().equipment.filter(eq => eq.warehouseItemId === it.id);
             return linkedEqs.map(eq => (
-              <Row key={eq.id} l="تجهیز متصل" v={createElement(EntityLink, { type: "hall", tab: "equipments", id: eq.id, label: eq.name })} />
+              <Row key={eq.id} l="تجهیز متصل" v={createElement(EntityLink, { type: "hall", tab: 'equip', id: eq.id, label: eq.name })} />
             ));
           })()}
           {it.purchaseDate ? <Row l="تاریخ خرید" v={fmt.date(it.purchaseDate)} /> : null}

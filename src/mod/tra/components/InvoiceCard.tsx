@@ -267,7 +267,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
                 {linkedHall ? <Row l="سالن" v={createElement(EntityLink, { type: 'hall', id: linkedHall.id, label: linkedHall.name })} /> : null}
                 {linkedZone ? <Row l="بخش" v={createElement(EntityLink, { type: 'zone', id: linkedZone.id, label: linkedZone.name })} /> : null}
                 {linkedHatch ? <Row l="هچ" v={createElement(EntityLink, { type: 'device', tab: 'hatches', id: linkedHatch.id, label: `هچ ${fmt.date(linkedHatch.date)}` })} /> : null}
-                {linkedEquip ? <Row l="تجهیز" v={createElement(EntityLink, { type: 'hall', tab: 'equipments', id: linkedEquip.id, label: linkedEquip.name })} /> : null}
+                {linkedEquip ? <Row l="تجهیز" v={createElement(EntityLink, { type: 'hall', tab: 'equip', id: linkedEquip.id, label: linkedEquip.name })} /> : null}
                 <Row l="مقدار" v={`${formatQty(it.quantity, it.unit || 'pcs')} × ${fmt.money(it.unitPrice || 0, { withUnit: false })}`} />
                 <Row l="مبلغ" v={`${fmt.money(it.total, { withUnit: false })} تومان`} />
               </RowGrid>
