@@ -256,7 +256,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
           const linkedHatch = it.hatchId ? hatches.find(h => h.id === it.hatchId) : undefined;
           const linkedEquip = it.equipmentId ? equipment?.find(eq => eq.id === it.equipmentId) : undefined;
           const descNode = createElement('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' } },
-            linkedWhs ? createElement(EntityLink, { type: 'item', id: linkedWhs.id, label: linkedWhs.name }) : (it.description || '—'),
+            linkedWhs ? createElement(EntityLink, { type: 'item', id: linkedWhs.id, label: linkedWhs.name }) : (!linkedItemFlock || (it.description && it.description.trim() !== linkedItemFlock.name.trim()) ? (it.description || '—') : null),
             linkedHall ? createElement(EntityLink, { type: 'hall', id: linkedHall.id, label: linkedHall.name }) : null,
             linkedZone ? createElement(EntityLink, { type: 'zone', id: linkedZone.id, label: linkedZone.name }) : null,
             linkedItemFlock ? createElement(EntityLink, { type: 'flock', id: linkedItemFlock.id, label: linkedItemFlock.name }) : null,
