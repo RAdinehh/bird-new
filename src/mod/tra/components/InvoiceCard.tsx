@@ -164,9 +164,9 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       badge={
         <div style={{ display: 'flex', gap: 'var(--sp-1)' }}>
           {/* اگر workflowStatus=paid، اون با STATUS_LABEL تکراری ئه — نشون نده */}
-          {inv.workflowStatus && inv.workflowStatus !== 'paid' && (
+          {inv.workflowStatus && inv.workflowStatus !== 'paid' && inv.workflowStatus !== 'confirmed' && (
             <Tag tone={workflowTone(inv.workflowStatus)}>
-              {WORKFLOW_LABEL[inv.workflowStatus]}
+              {WORKFLOW_LABEL[inv.workflowStatus].replace(/[\p{Extended_Pictographic}\uFE0F\u200D]+/gu, '').trim()}
             </Tag>
           )}
           {inv.disputeStatus === 'open' && (
