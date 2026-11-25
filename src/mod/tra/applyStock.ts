@@ -40,8 +40,11 @@ function stockKey(it: InvoiceItem): string {
   return String(it.stockItemId || it.description || it.model || '').trim() + '|' + String((it as any).equipmentKind || '');
 }
 
+const NON_STOCK_COST_TYPES = ['transport', 'labor', 'utilities', 'maintenance', 'fuel', 'vet_lab', 'rent'];
+
 function isStockItem(it: InvoiceItem, inv: Invoice): boolean {
   const cat = it.category || inv.category;
+  if (cat === 'other' && NON_STOCK_COST_TYPES.includes(String((it as any).costType || ''))) return false;
   const isStock = STOCK_CATS.includes(cat);
   const isEquipConsumable = cat === 'equipment' && (it as any).equipmentKind === 'consumable';
   return isStock || isEquipConsumable;

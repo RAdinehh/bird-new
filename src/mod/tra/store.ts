@@ -735,8 +735,9 @@ export const useTra = create<State>()(
         for (const it of inv.items || []) {
           const cat = it.category || inv.category;
           const isStock = ['feed', 'medicine', 'vaccine', 'herbal', 'other', 'manure', 'broken', 'egg', 'fertile_egg'].includes(cat);
+          const isServiceCost = cat === 'other' && ['transport', 'labor', 'utilities', 'maintenance', 'fuel', 'vet_lab', 'rent'].includes(String((it as any).costType || ''));
           const isEquipConsumable = cat === 'equipment' && it.equipmentKind === 'consumable';
-          if (!isStock && !isEquipConsumable) continue;
+          if (isServiceCost || (!isStock && !isEquipConsumable)) continue;
           const qty = Number(it.quantity) || 0;
           if (qty <= 0) continue;
           const stockItemId = it.stockItemId;
