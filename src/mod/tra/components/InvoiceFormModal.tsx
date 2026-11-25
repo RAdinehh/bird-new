@@ -437,15 +437,17 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                                 }} min={0} max={getQuantityMax(cat)} />
                               </Field>
                               )}
-                              <Field label="واحد" error={showError(`items.${idx}.unit`)} onTouch={() => markTouched(`items.${idx}.unit`)}>
-                                <SmartSelect
-                                  value={currentUnit}
-                                  modalTitle="انتخاب واحد"
-                                  placeholder={undefined}
-                                  options={uom.units.map((u: UOMUnit) => ({ value: u.value, label: u.label }))}
-                                  onChange={val => updateItem(it.id, { unit: val, unitWeight: null, priceUnit: val as any, ...(val === 'flat' ? { quantity: 1 } : {}) })}
-                                />
-                              </Field>
+                              {uom.units.length > 1 && (
+    <Field label="واحد" error={showError(`items.${idx}.unit`)} onTouch={() => markTouched(`items.${idx}.unit`)}>
+      <SmartSelect
+        value={currentUnit}
+        modalTitle="انتخاب واحد"
+        placeholder={undefined}
+        options={uom.units.map((u: UOMUnit) => ({ value: u.value, label: u.label }))}
+        onChange={val => updateItem(it.id, { unit: val, unitWeight: null, priceUnit: val as any, ...(val === 'flat' ? { quantity: 1 } : {}) })}
+      />
+    </Field>
+  )}
                             </Grid2>
                           </>
                         )}
@@ -559,7 +561,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               }} />
               {it.unitPrice > 0 && <FieldHint fieldPath={`tra.price_${cat}`} value={it.unitPrice} />}
             </Field>
-            {!hidePriceUnit && (
+            {!hidePriceUnit && priceUnitOptions.length > 1 && (
 <Field label="قیمت بر حسب">
               <SmartSelect
                 value={effectivePriceUnit}
