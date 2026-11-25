@@ -1,3 +1,7 @@
+import { useFlk } from '../../flk/store';
+import { useHal } from '../../hal/store';
+import { useTra } from '../../tra/store';
+import { formatInvoiceNumber } from '../../tra/calc';
 import { createElement } from "react";
 /**
  * ItemCard — کارت نمایش قلم انبار
@@ -98,7 +102,7 @@ export default function ItemCard(props: ItemCardProps) {
       <Row l="واحد" v={(UNIT_LABEL as any)[it.unit]} />
       <Row l="موجودی فعلی" v={formatQty(it.currentStock, it.unit)} />
       {it.minStock > 0 ? <Row l="حداقل موجودی" v={`${fmt.num(it.minStock)} ${(UNIT_LABEL as any)[it.unit]}`} /> : null}
-      {it.avgPrice && it.avgPrice > 0 ? <Row l="💰 قیمت میانگین" v={fmt.money(getAvgPrice(it))} /> : null}
+      {it.avgPrice && it.avgPrice > 0 ? <Row l="قیمت میانگین" v={fmt.money(getAvgPrice(it))} /> : null}
       {it.lastPrice > 0 ? <Row l="آخرین قیمت خرید" v={fmt.money(it.lastPrice)} /> : null}
       {sup ? <Row l="تأمین‌کننده" v={createElement(EntityLink, { type: "party", id: sup.id, label: sup.name })} /> : null}
       {hall ? <Row l="سالن" v={createElement(EntityLink, { type: "hall", id: hall.id, label: hall.name })} /> : null}
@@ -134,10 +138,16 @@ export default function ItemCard(props: ItemCardProps) {
 
       {it.category === 'equipment' ? (
         <>
-          <SectionTitle>🔧 اطلاعات تجهیزات</SectionTitle>
+          <SectionTitle>اطلاعات تجهیزات</SectionTitle>
+          {(() => {
+            const linkedEqs = useHal.getState().equipment.filter(eq => eq.warehouseItemId === it.id);
+            return linkedEqs.map(eq => (
+              <Row key={eq.id} l="تجهیز متصل" v={createElement(EntityLink, { type: "hall", tab: "equipments", id: eq.id, label: eq.name })} />
+            ));
+          })()}
           {it.purchaseDate ? <Row l="تاریخ خرید" v={fmt.date(it.purchaseDate)} /> : null}
           {it.purchasePrice ? <Row l="قیمت خرید" v={fmt.money(it.purchasePrice)} /> : null}
-          {hall ? <Row l="سالن" v={hall.name} /> : null}
+          {hall ? <Row l="سالن" v={createElement(EntityLink, { type: "hall", id: hall.id, label: hall.name })} /> : null}
           {it.equipmentStatus ? <Row l="وضعیت" v={EQUIP_STATUS[it.equipmentStatus] || it.equipmentStatus} /> : null}
           {it.warrantyUntil ? <Row l="گارانتی تا" v={fmt.date(it.warrantyUntil)} /> : null}
         </>
@@ -145,19 +155,28 @@ export default function ItemCard(props: ItemCardProps) {
 
       {myMovements.length > 0 ? (
         <>
-          <SectionTitle>📋 آخرین گردش‌ها ({fmt.count(myMovements.length)})</SectionTitle>
-          {myMovements.slice(-3).reverse().map((m) => (
-            <div key={m.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', justifyContent: 'space-between' }}>
-              <span>{m.type === 'in' ? '📥' : '📤'} {formatQty(m.quantity, it.unit)}</span>
-              <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>{fmt.date(m.date)}</span>
-            </div>
-          ))}
+          <SectionTitle>آخرین گردش‌ها ({fmt.count(myMovements.length)})</SectionTitle>
+          {myMovements.slice(-3).reverse().map((m) => {
+            const inv = m.sourceModule === 'tra' && m.sourceId ? useTra.getState().invoices.find(x => x.id === m.sourceId) : undefined;
+            const flkId = (m as any).flockId;
+            const flk = flkId ? useFlk.getState().flocks.find(x => x.id === flkId) : undefined;
+            return (
+              <div key={m.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                  <span>{m.type === 'in' ? 'ورود' : 'خروج'} {formatQty(m.quantity, it.unit)}</span>
+                  {inv ? createElement(EntityLink, { type: 'invoice', id: inv.id, label: formatInvoiceNumber(inv.number) }) : null}
+                  {flk ? createElement(EntityLink, { type: 'flock', id: flk.id, label: flk.name }) : null}
+                </span>
+                <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>{fmt.date(m.date)}</span>
+              </div>
+            );
+          })}
         </>
       ) : null}
 
       {it.notes ? (
         <>
-          <SectionTitle>📝 یادداشت</SectionTitle>
+          <SectionTitle>یادداشت</SectionTitle>
           <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{it.notes}</div>
         </>
       ) : null}

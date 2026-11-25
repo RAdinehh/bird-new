@@ -255,7 +255,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
           const linkedItemFlock = itemFlockId ? flocks.find(f => f.id === itemFlockId) : undefined;
           const linkedHatch = it.hatchId ? hatches.find(h => h.id === it.hatchId) : undefined;
           const invEquips = equipment?.filter(eq => eq.sourceInvoiceId === inv.id) || [];
-          const linkedEquip = (it.equipmentId ? equipment?.find(eq => eq.id === it.equipmentId) : undefined) || invEquips.find(eq => eq.name === it.description || eq.name === (it as any).model) || (invEquips.length === 1 && inv.items.length === 1 ? invEquips[0] : undefined);
+          const linkedEquip = (it.equipmentId ? equipment?.find(eq => eq.id === it.equipmentId) : undefined) || (linkedWhsId ? equipment?.find(eq => eq.warehouseItemId === linkedWhsId) : undefined) || invEquips.find(eq => eq.name === it.description || eq.name === (it as any).model || (it.description && eq.name && (it.description.includes(eq.name) || eq.name.includes(it.description)))) || (invEquips.length === inv.items.length ? invEquips[idx] : (invEquips.length === 1 ? invEquips[0] : undefined));
           const showDesc = !linkedWhs && (!linkedEquip || (it.description && it.description.trim() !== linkedEquip.name.trim())) && (!linkedItemFlock || (it.description && it.description.trim() !== linkedItemFlock.name.trim()));
           return (
             <div key={it.id} >
