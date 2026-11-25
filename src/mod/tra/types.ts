@@ -121,6 +121,11 @@ export interface InvoiceItem extends ItemCategoryFields {
   usageType?: string;
   usageTypes?: string[];
   costType?: string;
+  billId?: string;
+  paymentId?: string;
+  subscriptionNo?: string;
+  refNo?: string;
+  periodLabel?: string;
   equipmentCategory?: string;
   equipmentType?: string;
   equipmentId?: string;

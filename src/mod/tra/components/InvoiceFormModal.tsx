@@ -23,6 +23,7 @@ import { UNIT_LABEL } from '../../whs/store';
 import type { F } from '../types-invoice';
 import { useCtc } from '../../ctc/store';
 import { UOM_CATEGORIES, resolveItemPriceFactor, type UOMUnit } from '../hooks/useInvoiceForm';
+import { getOtherCostConfig } from '../../../shr/units/uom';
 import { getTodayJalali } from '../calc';
 
 export interface InvoiceFormModalProps {
@@ -383,7 +384,13 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                   
 
                   {(() => {
-                    const uom = UOM_CATEGORIES[cat] || UOM_CATEGORIES.other;
+                    const baseUom = UOM_CATEGORIES[cat] || UOM_CATEGORIES.other;
+                    const otherCfg = cat === 'other' ? getOtherCostConfig((it as any).costType) : null;
+                    const filteredUnits = otherCfg
+                      ? baseUom.units.filter((u: UOMUnit) => otherCfg.units.includes(u.value))
+                      : baseUom.units;
+                    const uom = { ...baseUom, units: filteredUnits.length > 0 ? filteredUnits : baseUom.units, default: otherCfg ? otherCfg.defaultUnit : baseUom.default };
+                    const isFlatOther = !!(otherCfg && otherCfg.isFlat);
                     const isSingleUnit = uom.units.length === 1;
                     const currentUnit = it.unit || uom.default;
                     const unitDef = uom.units.find((u: UOMUnit) => u.value === currentUnit);
@@ -395,7 +402,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                       : `مقدار هر واحد (${uom.baseUnit})`;
                                         return (
                       <>
-                        {isSingleUnit ? (
+                        {isFlatOther ? null : isSingleUnit ? (
                           <Grid2>
                                                         {cat !== 'chick' && (
                                                         <Field label="تعداد" required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>

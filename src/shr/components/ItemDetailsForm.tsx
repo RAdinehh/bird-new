@@ -1,4 +1,5 @@
 import { getGlobalFormat } from '../units/useFormat';
+import { getOtherCostConfig } from '../units/uom';
 import { Field, LockedValue, AlertBox, Grid2, Grid3, Input, Select, NumField } from './ui';
 import { isBreedAllowedForCategory, getRequiredPurposeHint } from '../../mod/brd/categoryBreedRules';
 import SmartSelect from './SmartSelect';
@@ -50,6 +51,11 @@ export interface ItemDetailFormData {
   model?: string;
   warrantyMonths?: number | null;
   costType?: string;
+  billId?: string;
+  paymentId?: string;
+  subscriptionNo?: string;
+  refNo?: string;
+  periodLabel?: string;
   stockItemId?: string;
   itemId?: string;
   existingFlockId?: string;
@@ -924,7 +930,17 @@ if (category === 'vaccine' || category === 'herbal') {
       { value: 'rent', label: 'اجاره سالن یا انبار' },
       { value: 'other', label: 'سایر هزینه‌ها' },
     ];
-    const hasExpiry = ['packaging', 'bedding', 'biosecurity', 'other'].includes(String(item.costType || ''));
+    const ct = String(item.costType || '');
+    const hasExpiry = (ct === 'biosecurity' && item.unit !== 'service') || ct === 'other';
+    const refLabels: Record<string, { label: string; placeholder: string }> = {
+      fuel:        { label: 'شماره حواله / سهمیه', placeholder: 'اختیاری' },
+      transport:   { label: 'شماره بارنامه / باسکول', placeholder: 'اختیاری' },
+      bedding:     { label: 'شماره قبض باسکول', placeholder: 'اختیاری' },
+      rent:        { label: 'شماره قرارداد', placeholder: 'اختیاری' },
+      vet_lab:     { label: 'شماره جواب آزمایش / نسخه', placeholder: 'اختیاری' },
+    };
+    const showPeriod = ['utilities', 'labor', 'rent'].includes(ct);
+
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
@@ -933,11 +949,18 @@ if (category === 'vaccine' || category === 'herbal') {
           {isPurchase && (
             <Field label="نوع هزینه" hint="برای گزارش‌های مالی" required error={err('costType')} onTouch={touch('costType')}>
               <SmartSelect
-                value={String(item.costType || '')}
+                value={ct}
                 modalTitle="انتخاب نوع هزینه"
                 placeholder="— انتخاب —"
                 options={COST_TYPES}
-                onChange={v => updateItem({ costType: v })}
+                onChange={v => {
+                  const cfg = getOtherCostConfig(v);
+                  updateItem({
+                    costType: v,
+                    unit: cfg.defaultUnit,
+                    ...(cfg.isFlat ? { quantity: 1 } : {}),
+                  });
+                }}
               />
             </Field>
           )}
@@ -953,6 +976,55 @@ if (category === 'vaccine' || category === 'herbal') {
             }} options={activeFlocks} placeholder="— بدون گله (سربار کل) —" modalTitle="انتخاب گله" />
           </Field>
         </Grid2>
+
+        {ct === 'utilities' && (
+          <>
+            <Grid2>
+              <Field label="شناسه قبض (اختیاری)">
+                <Input value={String(item.billId || '')} onChange={e => updateItem({ billId: e.target.value })} placeholder="مثلاً 1234567890123" />
+              </Field>
+              <Field label="شناسه پرداخت (اختیاری)">
+                <Input value={String(item.paymentId || '')} onChange={e => updateItem({ paymentId: e.target.value })} placeholder="مثلاً 98765432" />
+              </Field>
+            </Grid2>
+            <Grid2>
+              <Field label="شماره اشتراک / کنتور (اختیاری)">
+                <Input value={String(item.subscriptionNo || '')} onChange={e => updateItem({ subscriptionNo: e.target.value })} placeholder="اختیاری" />
+              </Field>
+              <Field label="دوره قبض (اختیاری)">
+                <Input value={String(item.periodLabel || '')} onChange={e => updateItem({ periodLabel: e.target.value })} placeholder="مثلاً آذر ۱۴۰۵" />
+              </Field>
+            </Grid2>
+          </>
+        )}
+
+        {ct === 'maintenance' && (
+          <Field label="سالن مرتبط (اختیاری)">
+            <SmartSelect
+              value={String(item.hallId || '')}
+              onChange={v => updateItem({ hallId: v })}
+              options={halls.map(h => ({ value: h.id, label: h.name }))}
+              placeholder="— انتخاب سالن —"
+              modalTitle="انتخاب سالن"
+            />
+          </Field>
+        )}
+
+        {(refLabels[ct] || (showPeriod && ct !== 'utilities')) && (
+          <Grid2>
+            {refLabels[ct] && (
+              <Field label={refLabels[ct].label}>
+                <Input value={String(item.refNo || '')} onChange={e => updateItem({ refNo: e.target.value })} placeholder={refLabels[ct].placeholder} />
+              </Field>
+            )}
+            {showPeriod && ct !== 'utilities' && (
+              <Field label={ct === 'rent' ? 'دوره اجاره (اختیاری)' : 'دوره کارکرد (اختیاری)'}>
+                <Input value={String(item.periodLabel || '')} onChange={e => updateItem({ periodLabel: e.target.value })} placeholder="مثلاً آذر ۱۴۰۵" />
+              </Field>
+            )}
+          </Grid2>
+        )}
+
         {hasExpiry && (
           <Field label="تاریخ انقضا (اختیاری)">
             <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />

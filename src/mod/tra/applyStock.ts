@@ -17,7 +17,7 @@ const UOM_FACTORS: Record<string, Record<string, number | null>> = {
   herbal: { g: 1, kg: 1000, l: 1000, pack: null },
   vaccine: { dose: 1, vial: null, pack: null },
   manure: { kg: 1, ton: 1000 },
-  other: { pcs: 1, kg: 1, pack: null },
+  other: { pcs: 1, kg: 1, ton: 1000, l: 1, bag: 1, roll: 1, pack: null, service: 1, day: 1, month: 1, bill: 1 },
 };
 function uomBase(cat: string): string { return UOM_BASE[cat] || 'pcs'; }
 function uomFactor(cat: string, unit: string, unitWeight?: number | null): number {
@@ -44,7 +44,8 @@ const NON_STOCK_COST_TYPES = ['transport', 'labor', 'utilities', 'maintenance', 
 
 function isStockItem(it: InvoiceItem, inv: Invoice): boolean {
   const cat = it.category || inv.category;
-  if (cat === 'other' && NON_STOCK_COST_TYPES.includes(String((it as any).costType || ''))) return false;
+  const ct = String((it as any).costType || '');
+  if (cat === 'other' && (NON_STOCK_COST_TYPES.includes(ct) || (ct === 'biosecurity' && it.unit === 'service'))) return false;
   const isStock = STOCK_CATS.includes(cat);
   const isEquipConsumable = cat === 'equipment' && (it as any).equipmentKind === 'consumable';
   return isStock || isEquipConsumable;

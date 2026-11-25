@@ -12,7 +12,7 @@ export type Category =
   | 'chick' | 'adult' | 'fertile_egg' | 'other';
 
 export interface UOMUnit {
-  value: ItemUnit | 'l';   // 'l' کوچک — به‌عنوان alias در ItemUnit هست ولی تایپش نیست
+  value: ItemUnit | 'l' | 'roll' | 'service' | 'day' | 'month' | 'bill';   // 'l' کوچک — به‌عنوان alias در ItemUnit هست ولی تایپش نیست
   label: string;
   factor: number | null;   // null = نیاز به unitWeight دستی
   dimension: 'mass' | 'volume' | 'count';
@@ -117,9 +117,17 @@ export const UOM_RULES: Record<string, UOMRule> = {
   other: {
     baseUnit: 'pcs',
     units: [
-      { value: 'pcs',  label: 'عدد',     factor: 1,    dimension: 'count' },
-      { value: 'kg',   label: 'کیلوگرم', factor: 1,    dimension: 'mass' },
-      { value: 'pack', label: 'بسته',    factor: null, dimension: 'count' },
+      { value: 'pcs',     label: 'عدد',     factor: 1,    dimension: 'count' },
+      { value: 'kg',      label: 'کیلوگرم', factor: 1,    dimension: 'mass' },
+      { value: 'ton',     label: 'تن',      factor: 1000, dimension: 'mass' },
+      { value: 'l',       label: 'لیتر',    factor: 1,    dimension: 'volume' },
+      { value: 'bag',     label: 'کیسه',    factor: 1,    dimension: 'count' },
+      { value: 'roll',    label: 'رول',     factor: 1,    dimension: 'count' },
+      { value: 'pack',    label: 'بسته',    factor: null, dimension: 'count' },
+      { value: 'service', label: 'سرویس',   factor: 1,    dimension: 'count' },
+      { value: 'day',     label: 'روزکار',  factor: 1,    dimension: 'count' },
+      { value: 'month',   label: 'ماه',     factor: 1,    dimension: 'count' },
+      { value: 'bill',    label: 'قبض',     factor: 1,    dimension: 'count' },
     ],
     default: 'pcs',
   },
@@ -149,4 +157,29 @@ export function needsUnitWeight(cat: string | undefined, unit: string): boolean 
 
 export function getUOMUnit(cat: string | undefined, unit: string): UOMUnit | null {
   return getUOM(cat)?.units.find(x => x.value === unit) ?? null;
+}
+
+
+export interface OtherCostConfig {
+  units: string[];
+  defaultUnit: string;
+  isFlat: boolean;
+}
+
+const OTHER_COST_MAP: Record<string, OtherCostConfig> = {
+  fuel:        { units: ['l', 'kg', 'pcs'],                   defaultUnit: 'l',       isFlat: false },
+  bedding:     { units: ['kg', 'bag', 'ton', 'roll', 'service'], defaultUnit: 'kg',      isFlat: false },
+  biosecurity: { units: ['l', 'kg', 'bag', 'pack', 'service'],   defaultUnit: 'l',       isFlat: false },
+  packaging:   { units: ['pcs', 'pack', 'roll', 'kg'],          defaultUnit: 'pcs',     isFlat: false },
+  utilities:   { units: ['bill'],                                defaultUnit: 'bill',    isFlat: true  },
+  labor:       { units: ['day', 'month', 'service', 'pcs'],     defaultUnit: 'day',     isFlat: false },
+  transport:   { units: ['service', 'ton', 'pcs'],              defaultUnit: 'service', isFlat: false },
+  maintenance: { units: ['service'],                             defaultUnit: 'service', isFlat: true  },
+  vet_lab:     { units: ['service', 'pcs'],                     defaultUnit: 'service', isFlat: false },
+  rent:        { units: ['month', 'day', 'service'],            defaultUnit: 'month',   isFlat: false },
+  other:       { units: ['pcs', 'kg', 'l', 'pack', 'service'],   defaultUnit: 'pcs',     isFlat: false },
+};
+
+export function getOtherCostConfig(costType?: string): OtherCostConfig {
+  return OTHER_COST_MAP[String(costType || 'other')] || OTHER_COST_MAP.other;
 }
