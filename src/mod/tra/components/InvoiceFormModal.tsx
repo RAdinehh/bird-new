@@ -406,17 +406,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                       <>
                         {isFlatOther ? null : isSingleUnit ? (
                           <Grid2>
-                                                        {cat !== 'chick' && (
-                                                        <Field label={cat === 'fertile_egg' ? 'تعداد تخم نطفه‌دار' : (otherCfg?.qtyLabel || "تعداد")} required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
-                              <NumField placeholder={cat === 'fertile_egg' ? 'تعداد تخم نطفه‌دار' : (otherCfg?.qtyLabel || "تعداد")} value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
-                                  let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
-                                  const max = getQuantityMax(cat);
-                                  if (max && val > max) val = max;
-                                  if (val < 0) val = 0;
-                                  updateItem(it.id, { quantity: val });
-                                }} min={0} max={getQuantityMax(cat)} />
-                            </Field>
-                            )}
+                                                        
                                                         {(cat === 'chick' || cat === 'adult') && isPurchase && (
                                                           <Field label="تعداد سالم" error={showError(`items.${idx}.healthyCount`)} onTouch={() => markTouched(`items.${idx}.healthyCount`)}>
                                                             <NumField placeholder="تعداد" unit="پرنده" value={it.healthyCount != null && it.healthyCount > 0 ? fmt.code(String(it.healthyCount)) : ''} onChange={e => { const v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || 0; const clamped = v > 0 ? Math.min(v, it.quantity || 0) : null; updateItem(it.id, { healthyCount: clamped }); }} min={0} />
@@ -426,17 +416,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                         ) : (
                           <>
                                                         <Grid2>
-                              {cat !== 'chick' && (
-                              <Field label={cat === 'fertile_egg' ? 'تعداد تخم نطفه‌دار' : (otherCfg?.qtyLabel || "تعداد")} required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
-                                <NumField placeholder={cat === 'fertile_egg' ? 'تعداد تخم نطفه‌دار' : (otherCfg?.qtyLabel || "تعداد")} value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
-                                  let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
-                                  const max = getQuantityMax(cat);
-                                  if (max && val > max) val = max;
-                                  if (val < 0) val = 0;
-                                  updateItem(it.id, { quantity: val });
-                                }} min={0} max={getQuantityMax(cat)} />
-                              </Field>
-                              )}
+                              
                               {uom.units.length > 1 && (
     <Field label="واحد" error={showError(`items.${idx}.unit`)} onTouch={() => markTouched(`items.${idx}.unit`)}>
       <SmartSelect
@@ -552,7 +532,19 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                   }} />
                 </Field>
               ) : (<Grid2>
-            <Field label={`قیمت هر ${activePriceUnitLabel}`} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
+            <Grid2>
+  {cat !== 'chick' && (
+                                                        <Field label={cat === 'fertile_egg' ? 'تعداد تخم نطفه‌دار' : (otherCfg?.qtyLabel || "تعداد")} required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
+                              <NumField placeholder={cat === 'fertile_egg' ? 'تعداد تخم نطفه‌دار' : (otherCfg?.qtyLabel || "تعداد")} value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
+                                  let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
+                                  const max = getQuantityMax(cat);
+                                  if (max && val > max) val = max;
+                                  if (val < 0) val = 0;
+                                  updateItem(it.id, { quantity: val });
+                                }} min={0} max={getQuantityMax(cat)} />
+                            </Field>
+                            )}
+  <Field label={`قیمت هر ${activePriceUnitLabel}`} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
               <MoneyField placeholder={getPricePlaceholder(cat)} value={it.unitPrice > 0 ? fmt.code(String(it.unitPrice)) : ''} onChange={e => {
                 let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
                 if (maxPrice && val > maxPrice) val = maxPrice;
@@ -561,6 +553,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               }} />
               {it.unitPrice > 0 && <FieldHint fieldPath={`tra.price_${cat}`} value={it.unitPrice} />}
             </Field>
+</Grid2>
             {!hidePriceUnit && priceUnitOptions.length > 1 && (
 <Field label="قیمت بر حسب">
               <SmartSelect
