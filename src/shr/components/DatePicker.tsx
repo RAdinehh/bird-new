@@ -5,7 +5,6 @@ import {
 } from 'date-fns-jalali';
 import { Btn, Modal } from './ui';
 import { useFormat } from '../units/useFormat';
-import { formatGregorianFromDate } from '../date/jalali';
 import { useSet } from '../../mod/set/store';
 
 const JALALI_MONTHS = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
@@ -44,6 +43,7 @@ export default function DatePicker({
   autoToday = false,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const [view, setView] = useState<'days' | 'months' | 'years'>('days');
   const [pending, setPending] = useState(value || '');
   const fmt = useFormat();
   const isGregorian = fmt.units.dateFormat === 'gregorian';
@@ -85,6 +85,7 @@ export default function DatePicker({
   useEffect(() => {
     if (!open) return;
     setCursor(parseValueToDate(value) || new Date());
+    setView('days');
   }, [open]);
 
   useEffect(() => {
@@ -100,7 +101,6 @@ export default function DatePicker({
   const borderColor = error ? 'var(--danger)' : warn ? 'var(--warn)' : 'var(--border)';
   const height = compact ? 32 : 38;
 
-  // محاسبات ماه در حالت شمسی یا میلادی
   const months = isGregorian ? GREG_MONTHS : JALALI_MONTHS;
   const weekdays = isGregorian ? GREG_WEEKDAYS : JALALI_WEEKDAYS;
 
@@ -135,14 +135,6 @@ export default function DatePicker({
     };
   }, [cursor, isGregorian]);
 
-  const stepMonth = (delta: number) => {
-    if (!isGregorian) {
-      setCursor(delta > 0 ? addMonths(cursor, 1) : subMonths(cursor, 1));
-    } else {
-      setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + delta, 1));
-    }
-  };
-
   const syncPendingToCursor = (nextCursor: Date) => {
     const base = parseValueToDate(pending) || cursor;
     let nextDate: Date;
@@ -155,8 +147,16 @@ export default function DatePicker({
       const targetDay = Math.min(base.getDate(), maxDay);
       nextDate = new Date(nextCursor.getFullYear(), nextCursor.getMonth(), targetDay);
     }
-    const nextStr = format(nextDate, "yyyy/MM/dd");
+    const nextStr = format(nextDate, 'yyyy/MM/dd');
     if (isInRange(nextStr)) setPending(nextStr);
+  };
+
+  const stepMonth = (delta: number) => {
+    const next = !isGregorian
+      ? (delta > 0 ? addMonths(cursor, 1) : subMonths(cursor, 1))
+      : new Date(cursor.getFullYear(), cursor.getMonth() + delta, 1);
+    setCursor(next);
+    syncPendingToCursor(next);
   };
 
   const changeMonth = (mIdx: number) => {
@@ -165,6 +165,7 @@ export default function DatePicker({
       : new Date(cursor.getFullYear(), mIdx, 1);
     setCursor(next);
     syncPendingToCursor(next);
+    setView('days');
   };
 
   const changeYear = (yr: number) => {
@@ -173,6 +174,7 @@ export default function DatePicker({
       : new Date(yr, cursor.getMonth(), 1);
     setCursor(next);
     syncPendingToCursor(next);
+    setView('days');
   };
 
   const buildDateObj = (day: number): Date => {
@@ -187,7 +189,7 @@ export default function DatePicker({
     setPending(dStr);
   };
 
-  const formatCellDay = (d: Date, dayNum: number) => {
+  const formatCellDay = (_d: Date, dayNum: number) => {
     if (!isGregorian) return fmt.count(dayNum);
     return fmt.raw.digits(String(dayNum), fmt.units.numberFormat);
   };
@@ -256,7 +258,7 @@ export default function DatePicker({
             >✓ تأیید</Btn>
             <div style={{ display: 'flex', gap: 6 }}>
               <Btn
-                onClick={() => { if (isInRange(todayStr)) { setPending(todayStr); setCursor(new Date()); } }}
+                onClick={() => { if (isInRange(todayStr)) { setPending(todayStr); setCursor(new Date()); setView('days'); } }}
                 style={{ flex: 1, height: 34 }}
               >امروز</Btn>
               <Btn
@@ -275,22 +277,38 @@ export default function DatePicker({
             aria-label="ماه قبل"
             style={{ width: 34, height: 34, background: 'var(--btn-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--muted)', cursor: 'pointer', fontSize: 16, fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
           >›</button>
-          <select
-            value={String(month)}
-            onChange={(e) => changeMonth(+e.target.value)}
-            aria-label="ماه"
-            style={{ flex: 1.5, height: 34, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 6px', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, minWidth: 0 }}
+          <button
+            type="button"
+            onClick={() => setView(view === 'months' ? 'days' : 'months')}
+            aria-label="انتخاب ماه"
+            style={{
+              flex: 1.5, height: 34,
+              background: view === 'months' ? 'var(--accent)' : 'var(--input-bg)',
+              color: view === 'months' ? '#fff' : 'var(--text)',
+              border: '1px solid var(--border)', borderRadius: 'var(--r-md)',
+              padding: '0 8px', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700,
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', minWidth: 0,
+            }}
           >
-            {months.map((m, i) => <option key={i} value={i}>{m}</option>)}
-          </select>
-          <select
-            value={String(year)}
-            onChange={(e) => changeYear(+e.target.value)}
-            aria-label="سال"
-            style={{ flex: 1, height: 34, background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 6px', color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700, minWidth: 0 }}
+            <span>{months[month]}</span>
+            <span style={{ fontSize: 11, opacity: 0.75 }}>▾</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setView(view === 'years' ? 'days' : 'years')}
+            aria-label="انتخاب سال"
+            style={{
+              flex: 1, height: 34,
+              background: view === 'years' ? 'var(--accent)' : 'var(--input-bg)',
+              color: view === 'years' ? '#fff' : 'var(--text)',
+              border: '1px solid var(--border)', borderRadius: 'var(--r-md)',
+              padding: '0 8px', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', fontWeight: 700,
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', minWidth: 0,
+            }}
           >
-            {years.map((y) => <option key={y} value={y}>{formatYearOption(y)}</option>)}
-          </select>
+            <span>{formatYearOption(year)}</span>
+            <span style={{ fontSize: 11, opacity: 0.75 }}>▾</span>
+          </button>
           <button
             type="button"
             onClick={() => stepMonth(1)}
@@ -299,64 +317,125 @@ export default function DatePicker({
           >‹</button>
         </div>
 
-        {/* ═══ روزهای هفته ═══ */}
-        <div role="row" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, marginTop: 2 }}>
-          {weekdays.map((w, i) => (
-            <div key={i} role="columnheader" style={{ textAlign: 'center', fontSize: 10, color: (!isGregorian && i === 6) || (isGregorian && i === 0) ? 'var(--danger)' : 'var(--dim)', padding: '2px 0', fontWeight: 700 }}>
-              {w}
+        {/* ═══ نمای انتخاب ماه ═══ */}
+        {view === 'months' && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6, padding: '6px 0' }}>
+            {months.map((m, i) => {
+              const active = i === month;
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => changeMonth(i)}
+                  style={{
+                    height: 38,
+                    background: active ? 'var(--accent)' : 'var(--input-bg)',
+                    color: active ? '#fff' : 'var(--text)',
+                    border: active ? '1px solid var(--accent)' : '1px solid var(--border)',
+                    borderRadius: 'var(--r-md)',
+                    fontFamily: 'inherit',
+                    fontSize: 'var(--fs-sm)',
+                    fontWeight: active ? 700 : 500,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {m}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* ═══ نمای انتخاب سال ═══ */}
+        {view === 'years' && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6, padding: '6px 0', maxHeight: 220, overflowY: 'auto' }}>
+            {years.map((y) => {
+              const active = y === year;
+              return (
+                <button
+                  key={y}
+                  type="button"
+                  onClick={() => changeYear(y)}
+                  style={{
+                    height: 36,
+                    background: active ? 'var(--accent)' : 'var(--input-bg)',
+                    color: active ? '#fff' : 'var(--text)',
+                    border: active ? '1px solid var(--accent)' : '1px solid var(--border)',
+                    borderRadius: 'var(--r-md)',
+                    fontFamily: 'inherit',
+                    fontSize: 'var(--fs-sm)',
+                    fontWeight: active ? 700 : 500,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {formatYearOption(y)}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* ═══ نمای انتخاب روز ═══ */}
+        {view === 'days' && (
+          <>
+            <div role="row" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, marginTop: 2 }}>
+              {weekdays.map((w, i) => (
+                <div key={i} role="columnheader" style={{ textAlign: 'center', fontSize: 10, color: (!isGregorian && i === 6) || (isGregorian && i === 0) ? 'var(--danger)' : 'var(--dim)', padding: '2px 0', fontWeight: 700 }}>
+                  {w}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {/* ═══ روزها ═══ */}
-        <div role="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}>
-          {Array.from({ length: firstCol }).map((_, i) => (
-            <div key={`e-${i}`} aria-hidden="true" />
-          ))}
-          {Array.from({ length: daysInMonth }).map((_, i) => {
-            const day = i + 1;
-            const d = buildDateObj(day);
-            const dayStr = format(d, 'yyyy/MM/dd');
-            const isSelected = dayStr === pending;
-            const isToday = dayStr === todayStr;
-            const isFriday = d.getDay() === 5;
-            const isDisabled = !isInRange(dayStr);
+            <div role="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}>
+              {Array.from({ length: firstCol }).map((_, i) => (
+                <div key={`e-${i}`} aria-hidden="true" />
+              ))}
+              {Array.from({ length: daysInMonth }).map((_, i) => {
+                const day = i + 1;
+                const d = buildDateObj(day);
+                const dayStr = format(d, 'yyyy/MM/dd');
+                const isSelected = dayStr === pending;
+                const isToday = dayStr === todayStr;
+                const isFriday = d.getDay() === 5;
+                const isDisabled = !isInRange(dayStr);
 
-            return (
-              <button
-                key={day}
-                type="button"
-                onClick={() => handleSelect(day)}
-                disabled={isDisabled}
-                aria-label={`${formatCellDay(d, day)} ${months[month]} ${formatYearOption(year)}`}
-                aria-selected={isSelected}
-                aria-current={isToday ? 'date' : undefined}
-                style={{
-                  height: 34,
-                  padding: 0,
-                  background: isSelected ? 'var(--accent)' : 'transparent',
-                  color: isSelected
-                    ? '#fff'
-                    : isDisabled
-                      ? 'var(--dim)'
-                      : isFriday
-                        ? 'var(--danger)'
-                        : 'var(--text)',
-                  border: isToday && !isSelected ? '1px solid var(--accent)' : '1px solid transparent',
-                  borderRadius: 'var(--r-md)',
-                  fontFamily: 'inherit',
-                  fontSize: 'var(--fs-sm)',
-                  fontWeight: isSelected || isToday ? 700 : 500,
-                  cursor: isDisabled ? 'not-allowed' : 'pointer',
-                  opacity: isDisabled ? 0.35 : 1,
-                  transition: noAnim ? 'none' : 'background 0.12s ease',
-                }}
-              >
-                {formatCellDay(d, day)}
-              </button>
-            );
-          })}
-        </div>
+                return (
+                  <button
+                    key={day}
+                    type="button"
+                    onClick={() => handleSelect(day)}
+                    disabled={isDisabled}
+                    aria-label={`${formatCellDay(d, day)} ${months[month]} ${formatYearOption(year)}`}
+                    aria-selected={isSelected}
+                    aria-current={isToday ? 'date' : undefined}
+                    style={{
+                      height: 34,
+                      padding: 0,
+                      background: isSelected ? 'var(--accent)' : 'transparent',
+                      color: isSelected
+                        ? '#fff'
+                        : isDisabled
+                          ? 'var(--dim)'
+                          : isFriday
+                            ? 'var(--danger)'
+                            : 'var(--text)',
+                      border: isToday && !isSelected ? '1px solid var(--accent)' : '1px solid transparent',
+                      borderRadius: 'var(--r-md)',
+                      fontFamily: 'inherit',
+                      fontSize: 'var(--fs-sm)',
+                      fontWeight: isSelected || isToday ? 700 : 500,
+                      cursor: isDisabled ? 'not-allowed' : 'pointer',
+                      opacity: isDisabled ? 0.35 : 1,
+                      transition: noAnim ? 'none' : 'background 0.12s ease',
+                    }}
+                  >
+                    {formatCellDay(d, day)}
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        )}
 
         {/* پیش‌نمایش تاریخ انتخاب‌شده */}
         {pending && (
