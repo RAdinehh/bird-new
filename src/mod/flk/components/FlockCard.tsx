@@ -1,3 +1,4 @@
+import { formatInvoiceNumber } from '../../tra/calc';
 import { createElement } from "react";
 import { useInc } from '../../inc/store';
 /**
@@ -353,7 +354,7 @@ export default function FlockCard(props: FlockCardProps) {
                 ];
               })()}
               {f.sourceInvoiceId && (
-                <Row l="فاکتور خرید" v={(() => { const inv = useTra.getState().invoices.find(x => x.id === f.sourceInvoiceId); return createElement(EntityLink, { type: "invoice", id: f.sourceInvoiceId, label: inv?.number || "مشاهده" }); })()} />
+                <Row l="فاکتور خرید" v={(() => { const inv = useTra.getState().invoices.find(x => x.id === f.sourceInvoiceId); return createElement(EntityLink, { type: "invoice", id: f.sourceInvoiceId, label: inv?.number ? formatInvoiceNumber(inv.number) : "مشاهده" }); })()} />
               )}
 
         {f.initialCount != null && <Row l="تعداد اولیه" v={getGlobalFormat().count(f.initialCount)} />}
