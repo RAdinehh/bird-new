@@ -248,14 +248,15 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
             const w = whsItems.find(x => x.id === m.itemId);
             return w && it.description && (w.name === it.description || it.description.includes(w.name));
           })?.itemId;
-          const linkedWhs = linkedWhsId ? whsItems.find(w => w.id === linkedWhsId) : undefined;
+          const descTrim = (it.description || '').trim();
+          const linkedWhs = (linkedWhsId ? whsItems.find(w => w.id === linkedWhsId) : undefined) || (descTrim ? whsItems.find(w => w.name.trim() === descTrim) : undefined);
           const linkedHall = it.hallId ? halls.find(h => h.id === it.hallId) : undefined;
           const linkedZone = it.zoneId ? zones.find(z => z.id === it.zoneId) : undefined;
           const itemFlockId = it.flockId || it.existingFlockId;
           const linkedItemFlock = itemFlockId ? flocks.find(f => f.id === itemFlockId) : undefined;
           const linkedHatch = it.hatchId ? hatches.find(h => h.id === it.hatchId) : undefined;
           const invEquips = equipment?.filter(eq => eq.sourceInvoiceId === inv.id) || [];
-          const linkedEquip = (it.equipmentId ? equipment?.find(eq => eq.id === it.equipmentId) : undefined) || (linkedWhsId ? equipment?.find(eq => eq.warehouseItemId === linkedWhsId) : undefined) || invEquips.find(eq => eq.name === it.description || eq.name === (it as any).model || (it.description && eq.name && (it.description.includes(eq.name) || eq.name.includes(it.description)))) || (invEquips.length === inv.items.length ? invEquips[idx] : (invEquips.length === 1 ? invEquips[0] : undefined));
+          const linkedEquip = (it.equipmentId ? equipment?.find(eq => eq.id === it.equipmentId) : undefined) || (linkedWhs?.id ? equipment?.find(eq => eq.warehouseItemId === linkedWhs.id) : undefined) || invEquips.find(eq => eq.name === it.description || eq.name === (it as any).model || (descTrim && eq.name && (descTrim.includes(eq.name.trim()) || eq.name.trim().includes(descTrim)))) || (descTrim ? equipment?.find(eq => eq.name.trim() === descTrim || descTrim.includes(eq.name.trim()) || eq.name.trim().includes(descTrim)) : undefined) || (invEquips.length === inv.items.length ? invEquips[idx] : (invEquips.length === 1 ? invEquips[0] : undefined));
           const showDesc = !linkedWhs && (!linkedEquip || (it.description && it.description.trim() !== linkedEquip.name.trim())) && (!linkedItemFlock || (it.description && it.description.trim() !== linkedItemFlock.name.trim()));
           return (
             <div key={it.id} >
