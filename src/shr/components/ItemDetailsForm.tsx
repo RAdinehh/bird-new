@@ -806,7 +806,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       { value: 'feeding', label: 'دانخوری' },
       { value: 'drinking', label: 'آبخوری' },
       { value: 'lighting', label: 'روشنایی و دیمر' },
-      { value: 'cleaning', label: 'شست‌وشو و ضدعفونی' },
+      { value: 'cleaning', label: 'دستگاه و لوازم شست‌وشو' },
       { value: 'weighing', label: 'ترازو و باسکول' },
       { value: 'power', label: 'برق و ژنراتور' },
       { value: 'cage', label: 'قفس و تجهیزات نگهداری' },
@@ -920,7 +920,7 @@ if (category === 'vaccine' || category === 'herbal') {
     const COST_TYPES = [
       { value: 'fuel', label: 'سوخت و گرمایش' },
       { value: 'bedding', label: 'بستر و پوشال' },
-      { value: 'biosecurity', label: 'ضدعفونی و شست‌وشو' },
+      { value: 'biosecurity', label: 'مواد ضدعفونی و بهداشتی' },
       { value: 'vet_lab', label: 'دامپزشکی و آزمایشگاه' },
       { value: 'labor', label: 'دستمزد و کارگر' },
       { value: 'utilities', label: 'قبوض آب، برق، گاز' },
