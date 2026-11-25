@@ -918,21 +918,21 @@ if (category === 'vaccine' || category === 'herbal') {
   // ========== سایر ==========
   if (category === 'other') {
     const COST_TYPES = [
-      { value: 'fuel', label: 'سوخت و گرمایش (گازوئیل/گاز)' },
+      { value: 'fuel', label: 'سوخت و گرمایش' },
       { value: 'bedding', label: 'بستر و پوشال' },
-      { value: 'biosecurity', label: 'ضدعفونی و شست‌وشوی سالن' },
-      { value: 'vet_lab', label: 'خدمات دامپزشکی و آزمایشگاه' },
+      { value: 'biosecurity', label: 'ضدعفونی و شست‌وشو' },
+      { value: 'vet_lab', label: 'دامپزشکی و آزمایشگاه' },
       { value: 'labor', label: 'دستمزد و کارگر' },
-      { value: 'utilities', label: 'قبوض (برق، آب، گاز)' },
+      { value: 'utilities', label: 'قبوض آب، برق، گاز' },
       { value: 'transport', label: 'حمل و نقل' },
       { value: 'maintenance', label: 'تعمیرات و نگهداری' },
-      { value: 'packaging', label: 'بسته‌بندی (شانه، کارتن، کیسه)' },
-      { value: 'rent', label: 'اجاره سالن یا انبار' },
+      { value: 'packaging', label: 'بسته‌بندی' },
+      { value: 'rent', label: 'اجاره سالن و انبار' },
       { value: 'other', label: 'سایر هزینه‌ها' },
     ];
     const ct = String(item.costType || '');
     const otherCfg = getOtherCostConfig(ct);
-    const hasExpiry = (ct === 'biosecurity' && item.unit !== 'service') || ct === 'other';
+    const hasExpiry = (ct === 'biosecurity' && item.unit !== 'flat' && item.unit !== 'service') || (ct === 'other' && item.unit !== 'flat');
     const refLabels: Record<string, { label: string; placeholder: string }> = {
       fuel:        { label: 'شماره حواله / سهمیه', placeholder: 'اختیاری' },
       transport:   { label: 'شماره بارنامه / باسکول', placeholder: 'اختیاری' },

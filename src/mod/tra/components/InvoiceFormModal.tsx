@@ -390,9 +390,11 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                       ? baseUom.units.filter((u: UOMUnit) => otherCfg.units.includes(u.value))
                       : baseUom.units;
                     const uom = { ...baseUom, units: filteredUnits.length > 0 ? filteredUnits : baseUom.units, default: otherCfg ? otherCfg.defaultUnit : baseUom.default };
-                    const isFlatOther = !!(otherCfg && otherCfg.isFlat);
                     const isSingleUnit = uom.units.length === 1;
                     const currentUnit = it.unit || uom.default;
+                    const isFlatOther = !!(otherCfg && otherCfg.isFlat);
+                    const isFlatUnit = !!(otherCfg && currentUnit === 'flat');
+                    const hidePriceUnit = !!(otherCfg && (!otherCfg.showPriceUnit || isFlatUnit));
                     const unitDef = uom.units.find((u: UOMUnit) => u.value === currentUnit);
                     const needsWeight = !!(unitDef && unitDef.factor === null);
                     const weightLabel = currentUnit === 'pack'
@@ -441,7 +443,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                                   modalTitle="انتخاب واحد"
                                   placeholder={undefined}
                                   options={uom.units.map((u: UOMUnit) => ({ value: u.value, label: u.label }))}
-                                  onChange={val => updateItem(it.id, { unit: val, unitWeight: null, priceUnit: val as any })}
+                                  onChange={val => updateItem(it.id, { unit: val, unitWeight: null, priceUnit: val as any, ...(val === 'flat' ? { quantity: 1 } : {}) })}
                                 />
                               </Field>
                             </Grid2>
@@ -538,7 +540,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       const baseUnitLabel = uom.baseUnit === 'kg' ? 'کیلوگرم' : uom.baseUnit === 'g' ? 'گرم' : uom.baseUnit === 'ml' ? 'میلی‌لیتر' : uom.baseUnit === 'dose' ? 'دوز' : 'واحد';
       return (
         <>
-          {isFlatOther ? (
+          {(isFlatOther || isFlatUnit) ? (
                 <Field label={otherCfg?.priceLabel || "مبلغ کل"} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
                   <MoneyField placeholder="مبلغ کل" value={it.unitPrice > 0 ? fmt.code(String(it.unitPrice)) : ''} onChange={e => {
                     let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
@@ -557,7 +559,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               }} />
               {it.unitPrice > 0 && <FieldHint fieldPath={`tra.price_${cat}`} value={it.unitPrice} />}
             </Field>
-            <Field label="قیمت بر حسب">
+            {!hidePriceUnit && (
+<Field label="قیمت بر حسب">
               <SmartSelect
                 value={effectivePriceUnit}
                 modalTitle="انتخاب مبنای قیمت"
@@ -566,6 +569,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                 onChange={val => updateItem(it.id, { priceUnit: val as any })}
               />
             </Field>
+)}
           </Grid2>)}
           {(!otherCfg || otherCfg.showShipping) && (
 <Field label="هزینه حمل این قلم" error={showError(`items.${idx}.shipping`)} onTouch={() => markTouched(`items.${idx}.shipping`)}>
