@@ -1,3 +1,4 @@
+import { findEquipmentPurchaseInvoice } from '../../tra/invoiceLinks';
 import { useTra } from '../../tra/store';
 import { formatInvoiceNumber } from '../../tra/calc';
 import { useFormat } from '../../../shr/units/useFormat';
@@ -47,21 +48,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
   const { e, i, hall, allCustomOpts, isOpen, ms, onToggle, onEdit, onDelete, onRetire, onRestore, onTransfer, onUndo, supplierNames,
         invoiceNumbers, whsItemNames, zoneNames } = props;
   const _allInvoices = useTra(st => st.invoices);
-  const _linkedPurchaseInv = (() => {
-    if (e.sourceInvoiceId) {
-      const byId = _allInvoices.find(inv => inv.id === e.sourceInvoiceId);
-      if (byId) return byId;
-    }
-    const eqName = (e.name || "").trim();
-    return _allInvoices.find(inv =>
-      inv.type === "purchase" &&
-      (inv.items || []).some((it: any) =>
-        it.equipmentId === e.id ||
-        (e.warehouseItemId && (it.itemId === e.warehouseItemId || it.stockItemId === e.warehouseItemId)) ||
-        ((it.category === "equipment" || inv.category === "equipment") && eqName && (it.description || "").trim() === eqName)
-      )
-    );
-  })();
+  const _linkedPurchaseInv = findEquipmentPurchaseInvoice(_allInvoices, e);
   const _effectiveInvoiceId = _linkedPurchaseInv?.id;
 
   const _cm = allCustomOpts.find(o => o.key.startsWith('hal.equip.type.') && o.name === e.type);

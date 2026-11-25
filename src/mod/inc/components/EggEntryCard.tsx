@@ -1,3 +1,6 @@
+import { useTra } from '../../tra/store';
+import { formatInvoiceNumber } from '../../tra/calc';
+import { findEggEntryPurchaseInvoice } from '../../tra/invoiceLinks';
 /**
  * EggEntryCard.tsx — کارت نمایش یک ورودی تخم
  */
@@ -102,12 +105,16 @@ export default function EggEntryCard(props: EggEntryCardProps) {
           return <Row l="کاهش وزن نمونه" v={(inRange ? '✅ ' : '⚠️ ') + fmt.num(pct) + '٪'} />;
         })()}
         <Row l="تاریخ ورود" v={fmt.date(e.entryDate)} />
-        {e.sourceInvoiceId && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)' }}>
-            <span style={{ color: 'var(--muted)', fontWeight: 600 }}>فاکتور خرید</span>
-            <EntityLink type="invoice" id={e.sourceInvoiceId} label="مشاهده" />
-          </div>
-        )}
+        {(() => {
+          const _inv = findEggEntryPurchaseInvoice(useTra.getState().invoices, e);
+          if (!_inv) return null;
+          return (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)' }}>
+              <span style={{ color: 'var(--muted)', fontWeight: 600 }}>فاکتور خرید</span>
+              
+            </div>
+          );
+        })()}
         {(() => {
           const st = needEggStorageDays(age);
           if (!st) return null;

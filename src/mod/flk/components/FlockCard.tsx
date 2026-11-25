@@ -1,3 +1,4 @@
+import { findFlockPurchaseInvoice } from '../../tra/invoiceLinks';
 import { formatInvoiceNumber } from '../../tra/calc';
 import { createElement } from "react";
 import { useInc } from '../../inc/store';
@@ -185,7 +186,9 @@ export default function FlockCard(props: FlockCardProps) {
 
   const allBadges: Array<{ key: string; node: React.ReactNode }> = [];
 
-  if (!isArchived && !f.sourceInvoiceId && !f.hatchId) {
+  const _linkedPurchaseInv = findFlockPurchaseInvoice(useTra.getState().invoices, f);
+  const _effectiveInvoiceId = _linkedPurchaseInv?.id;
+  if (!isArchived && !_effectiveInvoiceId && !f.hatchId) {
     allBadges.push({
       key: 'no-source',
       node: (
@@ -353,8 +356,8 @@ export default function FlockCard(props: FlockCardProps) {
                   dev ? createElement(Row, { key: 'dev', l: 'دستگاه جوجه‌کشی', v: createElement(EntityLink, { type: 'device', id: dev.id, label: dev.name }) }) : null
                 ];
               })()}
-              {f.sourceInvoiceId && (
-                <Row l="فاکتور خرید" v={(() => { const inv = useTra.getState().invoices.find(x => x.id === f.sourceInvoiceId); return createElement(EntityLink, { type: "invoice", id: f.sourceInvoiceId, label: inv?.number ? formatInvoiceNumber(inv.number) : "مشاهده" }); })()} />
+              {_effectiveInvoiceId && (
+                <Row l="فاکتور خرید" v={createElement(EntityLink, { type: "invoice", id: _effectiveInvoiceId, label: _linkedPurchaseInv?.number ? formatInvoiceNumber(_linkedPurchaseInv.number) : "مشاهده" })} />
               )}
 
         {f.initialCount != null && <Row l="تعداد اولیه" v={getGlobalFormat().count(f.initialCount)} />}
