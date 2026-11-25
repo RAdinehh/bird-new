@@ -143,14 +143,36 @@ export default function DatePicker({
     }
   };
 
+  const syncPendingToCursor = (nextCursor: Date) => {
+    const base = parseValueToDate(pending) || cursor;
+    let nextDate: Date;
+    if (!isGregorian) {
+      const maxDay = getDate(endOfMonth(nextCursor));
+      const targetDay = Math.min(getDate(base), maxDay);
+      nextDate = setDate(startOfMonth(nextCursor), targetDay);
+    } else {
+      const maxDay = new Date(nextCursor.getFullYear(), nextCursor.getMonth() + 1, 0).getDate();
+      const targetDay = Math.min(base.getDate(), maxDay);
+      nextDate = new Date(nextCursor.getFullYear(), nextCursor.getMonth(), targetDay);
+    }
+    const nextStr = format(nextDate, "yyyy/MM/dd");
+    if (isInRange(nextStr)) setPending(nextStr);
+  };
+
   const changeMonth = (mIdx: number) => {
-    if (!isGregorian) setCursor(setMonth(cursor, mIdx));
-    else setCursor(new Date(cursor.getFullYear(), mIdx, 1));
+    const next = !isGregorian
+      ? setMonth(startOfMonth(cursor), mIdx)
+      : new Date(cursor.getFullYear(), mIdx, 1);
+    setCursor(next);
+    syncPendingToCursor(next);
   };
 
   const changeYear = (yr: number) => {
-    if (!isGregorian) setCursor(setYear(cursor, yr));
-    else setCursor(new Date(yr, cursor.getMonth(), 1));
+    const next = !isGregorian
+      ? setYear(startOfMonth(cursor), yr)
+      : new Date(yr, cursor.getMonth(), 1);
+    setCursor(next);
+    syncPendingToCursor(next);
   };
 
   const buildDateObj = (day: number): Date => {
