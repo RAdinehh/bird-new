@@ -794,18 +794,21 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   // ========== تجهیزات ==========
   if (category === 'equipment') {
     const EQUIP_CATEGORIES = [
-      { value: 'heating', label: 'گرمایشی' },
-      { value: 'cooling', label: 'سرمایشی' },
-      { value: 'ventilation', label: 'تهویه' },
-      { value: 'feeding', label: 'تغذیه' },
-      { value: 'watering', label: 'آبخوری' },
-      { value: 'lighting', label: 'روشنایی' },
+      { value: 'heating', label: 'گرمایش و مادر مصنوعی' },
+      { value: 'cooling', label: 'سرمایش و مه‌پاش' },
+      { value: 'ventilation', label: 'تهویه و هواکش' },
+      { value: 'feeding', label: 'دانخوری' },
+      { value: 'drinking', label: 'آبخوری' },
+      { value: 'lighting', label: 'روشنایی و دیمر' },
+      { value: 'cleaning', label: 'شست‌وشو و ضدعفونی' },
+      { value: 'weighing', label: 'ترازو و باسکول' },
+      { value: 'power', label: 'برق و ژنراتور' },
       { value: 'cage', label: 'قفس و تجهیزات نگهداری' },
-      { value: 'other', label: 'سایر' },
+      { value: 'other', label: 'سایر تجهیزات' },
     ];
-    const EQUIP_TYPES = [
-      { value: 'asset', label: 'دارایی ثابت (Asset)' },
-      { value: 'consumable', label: 'مصرفی (Consumable)' },
+    const EQUIP_KINDS = [
+      { value: 'asset', label: 'تجهیز دائمی (سرمایه‌ای)' },
+      { value: 'consumable', label: 'تجهیز مصرفی (ورود به انبار)' },
     ];
 
     return (
@@ -814,20 +817,29 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         <SecTitle icon="⚙️" title="مشخصات تجهیزات" />
         <Grid2>
           <Field label="دسته تجهیزات" required error={err('equipmentCategory')} onTouch={touch('equipmentCategory')}>
-            <SmartSelect value={String(item.equipmentCategory || '')} modalTitle="انتخاب دسته‌بندی تجهیز" placeholder="— انتخاب —" options={EQUIP_CATEGORIES.map((c: any) => ({ value: c.value, label: c.label }))} onChange={v => updateItem({ equipmentCategory: v, equipmentType: '' })} />
+            <SmartSelect
+              value={String(item.equipmentCategory || '')}
+              modalTitle="انتخاب دسته‌بندی تجهیز"
+              placeholder="— انتخاب —"
+              options={EQUIP_CATEGORIES}
+              onChange={v => updateItem({ equipmentCategory: v, equipmentType: '' })}
+            />
           </Field>
-          <Field label="نوع تجهیز" required error={err('equipmentType')} onTouch={touch('equipmentType')}>
-            <Select value={String(item.equipmentType || '')} onChange={e => updateItem({ equipmentType: e.target.value })}>
-              <option value="">— انتخاب —</option>
-              {EQUIP_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-            </Select>
+          <Field label="نوع تجهیز" required error={err('equipmentKind')} onTouch={touch('equipmentKind')}>
+            <SmartSelect
+              value={String(item.equipmentKind || item.equipmentType || '')}
+              modalTitle="انتخاب نوع تجهیز"
+              placeholder="— انتخاب —"
+              options={EQUIP_KINDS}
+              onChange={v => updateItem({ equipmentKind: v, equipmentType: v })}
+            />
           </Field>
         </Grid2>
       </div>
     );
   }
 
-// ========== تخم (خرید) و تخم نطفه‌دار (فروش) ==========
+  // ========== تخم (خرید) و تخم نطفه‌دار (فروش) ==========
 if (category === 'egg' || category === 'fertile_egg') {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -899,39 +911,53 @@ if (category === 'vaccine' || category === 'herbal') {
 
   // ========== سایر ==========
   if (category === 'other') {
+    const COST_TYPES = [
+      { value: 'fuel', label: 'سوخت و گرمایش (گازوئیل/گاز)' },
+      { value: 'bedding', label: 'بستر و پوشال' },
+      { value: 'biosecurity', label: 'ضدعفونی و شست‌وشوی سالن' },
+      { value: 'vet_lab', label: 'خدمات دامپزشکی و آزمایشگاه' },
+      { value: 'labor', label: 'دستمزد و کارگر' },
+      { value: 'utilities', label: 'قبوض (برق، آب، گاز)' },
+      { value: 'transport', label: 'حمل و نقل' },
+      { value: 'maintenance', label: 'تعمیرات و نگهداری' },
+      { value: 'packaging', label: 'بسته‌بندی (شانه، کارتن، کیسه)' },
+      { value: 'rent', label: 'اجاره سالن یا انبار' },
+      { value: 'other', label: 'سایر هزینه‌ها' },
+    ];
+    const hasExpiry = ['packaging', 'bedding', 'biosecurity', 'other'].includes(String(item.costType || ''));
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
         <SecTitle icon="📋" title="اطلاعات هزینه" />
         <Grid2>
           {isPurchase && (
-          <Field label="نوع هزینه" hint="برای گزارش‌های مالی" required error={err('costType')} onTouch={touch('costType')}>
-            <Select value={String(item.costType || '')} onChange={e => updateItem({ costType: e.target.value })}>
-              <option value="">— انتخاب —</option>
-              <option value="transport">حمل و نقل</option>
-              <option value="labor">دستمزد</option>
-              <option value="utilities">قبوض</option>
-              <option value="maintenance">تعمیرات</option>
-              <option value="packaging">بسته‌بندی</option>
-              <option value="other">سایر</option>
-            </Select>
-          </Field>
+            <Field label="نوع هزینه" hint="برای گزارش‌های مالی" required error={err('costType')} onTouch={touch('costType')}>
+              <SmartSelect
+                value={String(item.costType || '')}
+                modalTitle="انتخاب نوع هزینه"
+                placeholder="— انتخاب —"
+                options={COST_TYPES}
+                onChange={v => updateItem({ costType: v })}
+              />
+            </Field>
           )}
-          <Field label="گله مقصد (اختیاری)" hint="سرشکن هزینه">
+          <Field label="گله مقصد (اختیاری)" hint="سرشکن هزینه روی گله">
             <SmartSelect value={String(item.flockId || '')} onChange={v => {
-                const f = flocks.find(x => x.id === v);
-                updateItem({
-                  flockId: v,
-                  birdId: f?.birdId || item.birdId,
-                  breedId: f?.breedId || item.breedId,
-                  ageDays: f ? getAgeDays(f) : item.ageDays,
-                });
-              }} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" />
+              const f = flocks.find(x => x.id === v);
+              updateItem({
+                flockId: v,
+                birdId: f?.birdId || item.birdId,
+                breedId: f?.breedId || item.breedId,
+                ageDays: f ? getAgeDays(f) : item.ageDays,
+              });
+            }} options={activeFlocks} placeholder="— بدون گله (سربار کل) —" modalTitle="انتخاب گله" />
           </Field>
         </Grid2>
-        <Field label="تاریخ انقضا (اختیاری)">
-          <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
-        </Field>
+        {hasExpiry && (
+          <Field label="تاریخ انقضا (اختیاری)">
+            <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
+          </Field>
+        )}
         {sellerSlot}
       </div>
     );

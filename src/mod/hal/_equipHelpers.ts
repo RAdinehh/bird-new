@@ -5,7 +5,7 @@ import { getEquipUnit } from './equipUnits';
 import type { Equipment } from './store';
 
 export const TYPES_BY_CATEGORY: Record<string, string[]> = {
-  ventilation: ['fan_tunnel', 'fan_ceiling', 'air_inlet', 'cooling_pad'],
+  ventilation: ['fan_tunnel', 'fan_ceiling', 'air_inlet'],
   feeding:     ['feeder_chick_tray', 'feeder_manual', 'feeder_pan', 'feeder_chain', 'feeder_tube', 'feeder_bucket'],  // 🆕 chick_feeder + chick_tray اضافه شدن
   drinking:    ['nipple', 'cup', 'trough', 'fountain_drinker', 'drinker_capsule', 'drinker_auto_hanging'],
   heating:     ['radiant_brooder', 'jet_heater', 'duct_heater'],
@@ -79,7 +79,7 @@ export const PLACEHOLDER_BY_TYPE: Record<string, string> = {
   trough:            'آبخوری ناودانی',
   fountain_drinker:  'آبخوری کله‌قندی ۳ لیتری',
   // گرمایش
-  radiant_brooder:   'هیتر مادون قرمز',
+  radiant_brooder:   'مادر مصنوعی / هیتر تابشی',
   jet_heater:        'جت هیتر ۵۰ کیلووات',
   duct_heater:       'هیتر کانالی',
   // روشنایی
@@ -99,7 +99,7 @@ export const PLACEHOLDER_BY_TYPE: Record<string, string> = {
   electrical_panel:  'تابلو برق اصلی',
   cable:             'کابل ۳×۲.۵',
   // جانبی
-  camera:            'دوربین دام',
+  camera:            'دوربین مداربسته سالن',
   sensor:            'سنسور دما',
   scale:             'ترازو دیجیتال آویز',
   // تصفیه آب
@@ -116,10 +116,10 @@ export const PLACEHOLDER_BY_TYPE: Record<string, string> = {
   sprayer:           'سم‌پاش ۲۰ لیتری',
   flame_gun:         'شعله‌افکن',
   // ابزار دستی
-  shovel:            'بیل نانوایی',
+  shovel:            'بیل بستر',
   wheelbarrow:       'فرقون',
   rake:              'شن‌کش',
-  feed_scoop:        'ملاقه دان',
+  feed_scoop:        'پیمانه دان',
   broom:             'جارو صنعتی',
   bucket:            'سطل ۱۰ لیتری',
   // وزن‌کشی
