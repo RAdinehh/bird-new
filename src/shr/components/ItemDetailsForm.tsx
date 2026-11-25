@@ -836,6 +836,7 @@ if (category === 'egg' || category === 'fertile_egg') {
           })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" />
         </Field>
       </Grid2>
+        {nameFieldJsx}
         {hasIncompatibleBreedsOnly && (
           <AlertBox tone="warn">
             نژادی با کاربرد «{missingPurposeHint}» برای این پرنده ثبت نشده است. لطفاً نژاد جدید بسازید.
