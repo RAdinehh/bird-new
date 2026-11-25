@@ -220,7 +220,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (category === 'chick') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="🧬" title="اطلاعات گله" />
-          {nameFieldJsx}
         {!isPurchase && (
           <Grid2>
             <Field label="منبع جوجه" hint="جوجه از گله موجود می‌آید یا از هچری">
@@ -259,8 +258,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             </Field>
           )}
           </Grid2>
-
         )}
+          {nameFieldJsx}
         {!isPurchase && (item.source || 'flock') === 'hatch' && availableHatches.length === 0 && (
           <div style={{ fontSize: 'var(--fs-xs)', marginTop: 4, fontWeight: 600, color: 'var(--danger)' }}>
             ابتدا از بخش «جوجه‌کشی» یک هچ بسازید
@@ -406,7 +405,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="🐓" title="اطلاعات پرنده بالغ" />
-        {nameFieldJsx}
         {/* در حالت فروش: گله مبدأ بالاترین اولویت سلسله‌مراتبی را دارد */}
         {!isPurchase && (
           <Field label="گله مبدأ" required error={err('flockId')} onTouch={touch('flockId')}>
@@ -447,6 +445,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" disabled={isLocked || !item.birdId} />
           </Field>
         </Grid2>
+        {nameFieldJsx}
         {hasIncompatibleBreedsOnly && (
           <AlertBox tone="warn">
             نژادی با کاربرد «{missingPurposeHint}» برای این پرنده ثبت نشده است. لطفاً نژاد جدید بسازید.
@@ -631,21 +630,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           />
         </Field>
 
-        {isNewMode && (
-          <Field
-            label={`نام ${catLabel} جدید (برای ثبت در انبار)`}
-            required
-            error={err('description')}
-            onTouch={touch('description')}
-            hint="این نام به عنوان کالای جدید در انبار ثبت و ذخیره می‌شود"
-          >
-            <Input
-              placeholder={placeholderExample}
-              value={String(item.description || '')}
-              onChange={e => updateItem({ description: e.target.value })}
-            />
-          </Field>
-        )}
+        
       </div>
     );
   };
@@ -839,7 +824,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 if (category === 'egg' || category === 'fertile_egg') {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>      <SecTitle icon="🥚" title="اطلاعات تخم" />
-      {nameFieldJsx}
       <Grid2>
         <Field label="نوع پرنده" required error={err('birdId')} onTouch={touch('birdId')}>
           <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" />
@@ -1030,7 +1014,6 @@ if (category === 'vaccine' || category === 'herbal') {
     );
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="💔" title="اطلاعات تخم شکسته" />
-        {nameFieldJsx}
         {/* انتخاب از تولیدات تخم — شکسته */}
         <Field label="انتخاب از تولیدات تخم شکسته" hint="برای پر شدن خودکار مشخصات">
           <SmartSelect
@@ -1073,6 +1056,7 @@ if (category === 'vaccine' || category === 'herbal') {
             <DatePicker value={String(item.eggDate || '')} onChange={v => updateItem({ eggDate: v })} placeholder="1405/07/20" autoToday />
           </Field>
         </Grid2>
+        {nameFieldJsx}
 
         {/* ردیف ۲: تعداد شکسته + تعداد کل */}
         <Grid2>
