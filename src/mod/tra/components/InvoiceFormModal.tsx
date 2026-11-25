@@ -407,8 +407,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                         {isFlatOther ? null : isSingleUnit ? (
                           <Grid2>
                                                         {cat !== 'chick' && (
-                                                        <Field label={otherCfg?.qtyLabel || "تعداد"} required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
-                              <NumField placeholder={otherCfg?.qtyLabel || "تعداد"} value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
+                                                        <Field label={cat === 'fertile_egg' ? 'تعداد تخم نطفه‌دار' : (otherCfg?.qtyLabel || "تعداد")} required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
+                              <NumField placeholder={cat === 'fertile_egg' ? 'تعداد تخم نطفه‌دار' : (otherCfg?.qtyLabel || "تعداد")} value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
                                   let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
                                   const max = getQuantityMax(cat);
                                   if (max && val > max) val = max;
@@ -427,8 +427,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                           <>
                                                         <Grid2>
                               {cat !== 'chick' && (
-                              <Field label={otherCfg?.qtyLabel || "تعداد"} required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
-                                <NumField placeholder={otherCfg?.qtyLabel || "تعداد"} value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
+                              <Field label={cat === 'fertile_egg' ? 'تعداد تخم نطفه‌دار' : (otherCfg?.qtyLabel || "تعداد")} required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
+                                <NumField placeholder={cat === 'fertile_egg' ? 'تعداد تخم نطفه‌دار' : (otherCfg?.qtyLabel || "تعداد")} value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
                                   let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
                                   const max = getQuantityMax(cat);
                                   if (max && val > max) val = max;
