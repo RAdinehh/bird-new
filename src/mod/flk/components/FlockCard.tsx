@@ -353,7 +353,7 @@ export default function FlockCard(props: FlockCardProps) {
                 ];
               })()}
               {f.sourceInvoiceId && (
-                <Row l="فاکتور خرید" v={createElement(EntityLink, { type: "invoice", id: f.sourceInvoiceId, label: "مشاهده" })} />
+                <Row l="فاکتور خرید" v={(() => { const inv = useTra.getState().invoices.find(x => x.id === f.sourceInvoiceId); return createElement(EntityLink, { type: "invoice", id: f.sourceInvoiceId, label: inv?.number || "مشاهده" }); })()} />
               )}
 
         {f.initialCount != null && <Row l="تعداد اولیه" v={getGlobalFormat().count(f.initialCount)} />}
