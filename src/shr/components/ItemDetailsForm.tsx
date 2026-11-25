@@ -259,6 +259,11 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           )}
           </Grid2>
         )}
+          {hasIncompatibleBreedsOnly && (
+          <AlertBox tone="warn">
+            نژادی با کاربرد «{missingPurposeHint}» برای این پرنده ثبت نشده است. لطفاً نژاد جدید بسازید.
+          </AlertBox>
+        )}
           {nameFieldJsx}
         {!isPurchase && (item.source || 'flock') === 'hatch' && availableHatches.length === 0 && (
           <div style={{ fontSize: 'var(--fs-xs)', marginTop: 4, fontWeight: 600, color: 'var(--danger)' }}>
@@ -289,11 +294,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             )}
           </Field>
         </Grid2>
-        {hasIncompatibleBreedsOnly && (
-          <AlertBox tone="warn">
-            نژادی با کاربرد «{missingPurposeHint}» برای این پرنده ثبت نشده است. لطفاً نژاد جدید بسازید.
-          </AlertBox>
-        )}
+        
 
         {/* ردیف ۲: تاریخ هچ + سن */}
         <Grid2>
