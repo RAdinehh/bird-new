@@ -136,34 +136,34 @@ export default function BreedCard({
         {fcrValue != null && <span>📊 FCR: <b style={{ color: 'var(--text)' }}>{fmt.num(fcrValue)}</b></span>}
       </>}
     >
-      {relevantFields.length > 0 && (
-        <>
-          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
-            <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> مشخصات
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
-            {relevantFields.map((f, i) => (
-              <StatRow key={i} label={`${f.icon} ${f.label}`} value={f.value} />
-            ))}
-          </div>
-        </>
-      )}
+ {relevantFields.length >0 && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>
+ <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>مشخصات
+ </div>
+ <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+ {relevantFields.map((f, i) =>(
+ <StatRow key={i} label={`${f.icon} ${f.label}`} value={f.value} />
+ ))}
+ </div>
+ </>
+ )}
 
-      {/* 📚 منبع استاندارد */}
-      {stdData?.source && (
-        <StandardInfoBox
-          variant="inline"
-          source={stdData.source}
-          publishYear={stdData.publishYear}
-        />
-      )}
+ {/* منبع استاندارد */}
+ {stdData?.source && (
+ <StandardInfoBox
+ variant="inline"
+ source={stdData.source}
+ publishYear={stdData.publishYear}
+ />
+ )}
 
-      <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-        <CardActions actions={[
-          { ...ACTION_PRESETS.EDIT, onClick: () => onEdit(b) },
-          { ...ACTION_PRESETS.DELETE, onClick: handleDelete }
-        ]} />
-      </div>
-    </ExpandableCard>
+ <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
+ <CardActions actions={[
+ { ...ACTION_PRESETS.EDIT, onClick: () =>onEdit(b) },
+ { ...ACTION_PRESETS.DELETE, onClick: handleDelete }
+ ]} />
+ </div>
+ </ExpandableCard>
   );
 }

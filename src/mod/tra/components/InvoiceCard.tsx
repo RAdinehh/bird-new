@@ -219,204 +219,204 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
         </>
       }
     >
-      <SectionTitle>اطلاعات</SectionTitle>
-      <RowGrid>
-        <Row l={inv.type === 'sale' ? 'خریدار' : 'فروشنده'} v={inv.partyId && partyName ? createElement(EntityLink, { type: 'party', id: inv.partyId, label: partyName }) : (partyName || '—')} />
-        <Row l="تاریخ" v={fmt.date(inv.date)} />
-        {inv.number ? <Row l="شماره" v={formatInvoiceNumber(inv.number)} /> : null}
-        {inv.dueDate ? <Row l="سرسید" v={fmt.date(inv.dueDate)} /> : null}
-            {linkedFlock ? (
-              <Row
-                l="گله متصل"
-                v={createElement(EntityLink, { type: 'flock', id: linkedFlock.id, label: linkedFlock.name })}
-              />
-            ) : null}
-        {inv.isPreorder && inv.deliveryDate ? <Row l="تحویل" v={fmt.date(inv.deliveryDate)} /> : null}
-          {inv.writtenOff && (inv.writtenOffAmount || 0) > 0 ? (
-            <Row
-              l={inv.type === 'purchase' ? 'بخشش مانده' : 'حذف بدحساب'}
-              v={`${fmt.money(inv.writtenOffAmount || 0, { withUnit: false })} تومان${inv.writtenOffReason ? ` (${inv.writtenOffReason})` : ''}${inv.writtenOffAt ? ` • ${fmt.date(inv.writtenOffAt)}` : ''}`}
-            />
-          ) : null}
-      </RowGrid>
+ <SectionTitle>اطلاعات</SectionTitle>
+ <RowGrid>
+ <Row l={inv.type === 'sale'? 'خریدار': 'فروشنده'} v={inv.partyId && partyName ? createElement(EntityLink, { type: 'party', id: inv.partyId, label: partyName }) : (partyName || '—')} />
+ <Row l="تاریخ"v={fmt.date(inv.date)} />
+ {inv.number ? <Row l="شماره"v={formatInvoiceNumber(inv.number)} />: null}
+ {inv.dueDate ? <Row l="سرسید"v={fmt.date(inv.dueDate)} />: null}
+ {linkedFlock ? (
+ <Row
+ l="گله متصل"
+ v={createElement(EntityLink, { type: 'flock', id: linkedFlock.id, label: linkedFlock.name })}
+ />
+ ) : null}
+ {inv.isPreorder && inv.deliveryDate ? <Row l="تحویل"v={fmt.date(inv.deliveryDate)} />: null}
+ {inv.writtenOff && (inv.writtenOffAmount || 0) >0 ? (
+ <Row
+ l={inv.type === 'purchase'? 'بخشش مانده': 'حذف بدحساب'}
+ v={`${fmt.money(inv.writtenOffAmount || 0, { withUnit: false })} تومان${inv.writtenOffReason ? `(${inv.writtenOffReason})`: ''}${inv.writtenOffAt ? `• ${fmt.date(inv.writtenOffAt)}`: ''}`}
+ />
+ ) : null}
+ </RowGrid>
 
-      <SectionTitle>اقلام</SectionTitle>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)' }}>
-        {inv.items.map((it, idx) => {
-          const invMovements = whsMovements.filter(m => (m.sourceModule === 'tra' && m.sourceId === inv.id) || (it.movementId && m.id === it.movementId));
-          const linkedWhsId = it.itemId || it.stockItemId || (it.movementId ? whsMovements.find(m => m.id === it.movementId)?.itemId : undefined) || invMovements.find(m => {
-            const w = whsItems.find(x => x.id === m.itemId);
-            return w && it.description && (w.name === it.description || it.description.includes(w.name));
-          })?.itemId;
-          const descTrim = (it.description || '').trim();
-          const linkedWhs = (linkedWhsId ? whsItems.find(w => w.id === linkedWhsId) : undefined) || (descTrim ? whsItems.find(w => w.name.trim() === descTrim) : undefined);
-          const linkedHall = it.hallId ? halls.find(h => h.id === it.hallId) : undefined;
-          const linkedZone = it.zoneId ? zones.find(z => z.id === it.zoneId) : undefined;
-          const itemFlockId = it.flockId || it.existingFlockId;
-          const linkedItemFlock = itemFlockId ? flocks.find(f => f.id === itemFlockId) : undefined;
-          const linkedHatch = it.hatchId ? hatches.find(h => h.id === it.hatchId) : undefined;
-          const invEquips = equipment?.filter(eq => eq.sourceInvoiceId === inv.id) || [];
-          const linkedEquip = (it.equipmentId ? equipment?.find(eq => eq.id === it.equipmentId) : undefined) || (linkedWhs?.id ? equipment?.find(eq => eq.warehouseItemId === linkedWhs.id) : undefined) || invEquips.find(eq => eq.name === it.description || eq.name === (it as any).model || (descTrim && eq.name && (descTrim.includes(eq.name.trim()) || eq.name.trim().includes(descTrim)))) || (descTrim ? equipment?.find(eq => eq.name.trim() === descTrim || descTrim.includes(eq.name.trim()) || eq.name.trim().includes(descTrim)) : undefined) || (invEquips.length === inv.items.length ? invEquips[idx] : (invEquips.length === 1 ? invEquips[0] : undefined));
-          const showDesc = !linkedWhs && (!linkedEquip || (it.description && it.description.trim() !== linkedEquip.name.trim())) && (!linkedItemFlock || (it.description && it.description.trim() !== linkedItemFlock.name.trim()));
-          return (
-            <div key={it.id} >
-              <RowGrid>
-                {linkedWhs ? <Row l="کالا" v={createElement(EntityLink, { type: 'item', id: linkedWhs.id, label: linkedWhs.name })} /> : null}
-                {showDesc ? <Row l="شرح" v={it.description || '—'} /> : null}
-                {linkedItemFlock && linkedItemFlock.id !== linkedFlock?.id ? <Row l="گله" v={createElement(EntityLink, { type: 'flock', id: linkedItemFlock.id, label: linkedItemFlock.name })} /> : null}
-                {linkedHall ? <Row l="سالن" v={createElement(EntityLink, { type: 'hall', id: linkedHall.id, label: linkedHall.name })} /> : null}
-                {linkedZone ? <Row l="بخش" v={createElement(EntityLink, { type: 'zone', id: linkedZone.id, label: linkedZone.name })} /> : null}
-                {linkedHatch ? <Row l="هچ" v={createElement(EntityLink, { type: 'device', tab: 'hatches', id: linkedHatch.id, label: `هچ ${fmt.date(linkedHatch.date)}` })} /> : null}
-                {linkedEquip ? <Row l="تجهیز" v={createElement(EntityLink, { type: 'hall', tab: 'equip', id: linkedEquip.id, label: linkedEquip.name })} /> : null}
-                <Row l="مقدار" v={`${formatQty(it.quantity, it.unit || 'pcs')} × ${fmt.money(it.unitPrice || 0, { withUnit: false })}`} />
-                <Row l="مبلغ" v={`${fmt.money(it.total, { withUnit: false })} تومان`} />
-              </RowGrid>
-            </div>
-          );
-        })}
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-        <span>جمع کل:</span>
-        <span>{fmt.money(inv.total, { withUnit: false })} تومان</span>
-      </div>
+ <SectionTitle>اقلام</SectionTitle>
+ <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)'}}>
+ {inv.items.map((it, idx) =>{
+ const invMovements = whsMovements.filter(m =>(m.sourceModule === 'tra'&& m.sourceId === inv.id) || (it.movementId && m.id === it.movementId));
+ const linkedWhsId = it.itemId || it.stockItemId || (it.movementId ? whsMovements.find(m =>m.id === it.movementId)?.itemId : undefined) || invMovements.find(m =>{
+ const w = whsItems.find(x =>x.id === m.itemId);
+ return w && it.description && (w.name === it.description || it.description.includes(w.name));
+ })?.itemId;
+ const descTrim = (it.description || '').trim();
+ const linkedWhs = (linkedWhsId ? whsItems.find(w =>w.id === linkedWhsId) : undefined) || (descTrim ? whsItems.find(w =>w.name.trim() === descTrim) : undefined);
+ const linkedHall = it.hallId ? halls.find(h =>h.id === it.hallId) : undefined;
+ const linkedZone = it.zoneId ? zones.find(z =>z.id === it.zoneId) : undefined;
+ const itemFlockId = it.flockId || it.existingFlockId;
+ const linkedItemFlock = itemFlockId ? flocks.find(f =>f.id === itemFlockId) : undefined;
+ const linkedHatch = it.hatchId ? hatches.find(h =>h.id === it.hatchId) : undefined;
+ const invEquips = equipment?.filter(eq =>eq.sourceInvoiceId === inv.id) || [];
+ const linkedEquip = (it.equipmentId ? equipment?.find(eq =>eq.id === it.equipmentId) : undefined) || (linkedWhs?.id ? equipment?.find(eq =>eq.warehouseItemId === linkedWhs.id) : undefined) || invEquips.find(eq =>eq.name === it.description || eq.name === (it as any).model || (descTrim && eq.name && (descTrim.includes(eq.name.trim()) || eq.name.trim().includes(descTrim)))) || (descTrim ? equipment?.find(eq =>eq.name.trim() === descTrim || descTrim.includes(eq.name.trim()) || eq.name.trim().includes(descTrim)) : undefined) || (invEquips.length === inv.items.length ? invEquips[idx] : (invEquips.length === 1 ? invEquips[0] : undefined));
+ const showDesc = !linkedWhs && (!linkedEquip || (it.description && it.description.trim() !== linkedEquip.name.trim())) && (!linkedItemFlock || (it.description && it.description.trim() !== linkedItemFlock.name.trim()));
+ return (
+ <div key={it.id} >
+ <RowGrid>
+ {linkedWhs ? <Row l="کالا"v={createElement(EntityLink, { type: 'item', id: linkedWhs.id, label: linkedWhs.name })} />: null}
+ {showDesc ? <Row l="شرح"v={it.description || '—'} />: null}
+ {linkedItemFlock && linkedItemFlock.id !== linkedFlock?.id ? <Row l="گله"v={createElement(EntityLink, { type: 'flock', id: linkedItemFlock.id, label: linkedItemFlock.name })} />: null}
+ {linkedHall ? <Row l="سالن"v={createElement(EntityLink, { type: 'hall', id: linkedHall.id, label: linkedHall.name })} />: null}
+ {linkedZone ? <Row l="بخش"v={createElement(EntityLink, { type: 'zone', id: linkedZone.id, label: linkedZone.name })} />: null}
+ {linkedHatch ? <Row l="هچ"v={createElement(EntityLink, { type: 'device', tab: 'hatches', id: linkedHatch.id, label: `هچ ${fmt.date(linkedHatch.date)}`})} />: null}
+ {linkedEquip ? <Row l="تجهیز"v={createElement(EntityLink, { type: 'hall', tab: 'equip', id: linkedEquip.id, label: linkedEquip.name })} />: null}
+ <Row l="مقدار"v={`${formatQty(it.quantity, it.unit || 'pcs')} × ${fmt.money(it.unitPrice || 0, { withUnit: false })}`} />
+ <Row l="مبلغ"v={`${fmt.money(it.total, { withUnit: false })} تومان`} />
+ </RowGrid>
+ </div>
+ );
+ })}
+ </div>
+ <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+ <span>جمع کل:</span>
+ <span>{fmt.money(inv.total, { withUnit: false })} تومان</span>
+ </div>
 
-      {inv.installments && inv.installments.length > 0 && (() => {
-        const totalCount = inv.installments.length;
-        const paidCount = inv.installments.filter(x => x.status === 'paid').length;
-        const overdueCount = inv.installments.filter(x => x.status === 'overdue').length;
-        return (
-          <>
-            <SectionTitle>
-              اقساط — {fmt.count(paidCount)} از {fmt.count(totalCount)} پرداخت شده
-            </SectionTitle>
-            {overdueCount > 0 && (
-              <div style={{
-                padding: 'var(--pad-tight)', background: 'var(--danger-soft)',
-                color: 'var(--danger)', borderRadius: 'var(--r-sm)',
-                fontSize: 'var(--fs-xs)', fontWeight: 600, textAlign: 'center',
-                marginBottom: 'var(--sp-1)',
-              }}>
-                ⚠️ {fmt.count(overdueCount)} قسط معوق
-              </div>
-            )}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
-              {inv.installments.map(inst => {
-                const tone = inst.status === 'paid' ? 'green' : inst.status === 'overdue' ? 'red' : 'amber';
-                const label = inst.status === 'paid' ? 'پرداخت شده' : inst.status === 'overdue' ? 'معوق' : 'در انتظار';
-                const isPartial = inst.paidAmount !== undefined && inst.paidAmount > 0 && inst.paidAmount < (inst.amount || 0);
-                return (
-                  <div key={inst.id} style={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    padding: 'var(--pad-tight) var(--pad-normal)',
-                    background: 'var(--input-bg)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--r-sm)',
-                    gap: 'var(--sp-2)',
-                  }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
-                      <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
-                        قسط {fmt.count(inst.number)}
-                      </span>
-                      <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)' }}>
-                        سرسید: {fmt.date(inst.dueDate)}
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-                      <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
-                        {fmt.money(inst.amount || 0, { withUnit: false })} تومان
-                      </span>
-                      {isPartial && (
-                        <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--accent)' }}>
-                          پرداخت: {fmt.money(inst.paidAmount || 0, { withUnit: false })} تومان
-                        </span>
-                      )}
-                      <Tag tone={tone}>{label}</Tag>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </>
-        );
-      })()}
+ {inv.installments && inv.installments.length >0 && (() =>{
+ const totalCount = inv.installments.length;
+ const paidCount = inv.installments.filter(x =>x.status === 'paid').length;
+ const overdueCount = inv.installments.filter(x =>x.status === 'overdue').length;
+ return (
+ <>
+ <SectionTitle>
+ اقساط — {fmt.count(paidCount)} از {fmt.count(totalCount)} پرداخت شده
+ </SectionTitle>
+ {overdueCount >0 && (
+ <div style={{
+ padding: 'var(--pad-tight)', background: 'var(--danger-soft)',
+ color: 'var(--danger)', borderRadius: 'var(--r-sm)',
+ fontSize: 'var(--fs-xs)', fontWeight: 600, textAlign: 'center',
+ marginBottom: 'var(--sp-1)',
+ }}>
+ {fmt.count(overdueCount)} قسط معوق
+ </div>
+ )}
+ <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)'}}>
+ {inv.installments.map(inst =>{
+ const tone = inst.status === 'paid'? 'green': inst.status === 'overdue'? 'red': 'amber';
+ const label = inst.status === 'paid'? 'پرداخت شده': inst.status === 'overdue'? 'معوق': 'در انتظار';
+ const isPartial = inst.paidAmount !== undefined && inst.paidAmount >0 && inst.paidAmount < (inst.amount || 0);
+ return (
+ <div key={inst.id} style={{
+ display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+ padding: 'var(--pad-tight) var(--pad-normal)',
+ background: 'var(--input-bg)',
+ border: '1px solid var(--border)',
+ borderRadius: 'var(--r-sm)',
+ gap: 'var(--sp-2)',
+ }}>
+ <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0 }}>
+ <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)'}}>
+ قسط {fmt.count(inst.number)}
+ </span>
+ <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)'}}>
+ سرسید: {fmt.date(inst.dueDate)}
+ </span>
+ </div>
+ <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+ <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)'}}>
+ {fmt.money(inst.amount || 0, { withUnit: false })} تومان
+ </span>
+ {isPartial && (
+ <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--accent)'}}>
+ پرداخت: {fmt.money(inst.paidAmount || 0, { withUnit: false })} تومان
+ </span>
+ )}
+ <Tag tone={tone}>{label}</Tag>
+ </div>
+ </div>
+ );
+ })}
+ </div>
+ </>
+ );
+ })()}
 
-      {inv.payments && inv.payments.length > 0 && (
-        <>
-          <SectionTitle>پرداخت‌ها</SectionTitle>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)' }}>
-            {inv.payments.map(p => (
-              <div key={p.id}>
-                <RowGrid>
-                  <Row l="روش" v={p.method === 'cash' ? 'نقدی' : p.method === 'card' ? 'کارت' : 'چک'} />
-                  <Row l="تاریخ" v={fmt.date(p.date)} />
-                  <Row l="مبلغ" v={fmt.money(p.amount, { withUnit: false }) + ' تومان'} />
-                  {p.method === 'check' && p.checkNo ? <Row l="شماره چک" v={p.checkNo} /> : null}
-                  {p.method === 'check' && p.bank ? <Row l="بانک" v={p.bank} /> : null}
-                  {p.method === 'check' ? <Row l="وضعیت چک" v={CHECK_STATUS_LABEL[p.status || 'pending']} /> : null}
-                </RowGrid>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
+ {inv.payments && inv.payments.length >0 && (
+ <>
+ <SectionTitle>پرداخت‌ها</SectionTitle>
+ <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)'}}>
+ {inv.payments.map(p =>(
+ <div key={p.id}>
+ <RowGrid>
+ <Row l="روش"v={p.method === 'cash'? 'نقدی': p.method === 'card'? 'کارت': 'چک'} />
+ <Row l="تاریخ"v={fmt.date(p.date)} />
+ <Row l="مبلغ"v={fmt.money(p.amount, { withUnit: false }) + 'تومان'} />
+ {p.method === 'check'&& p.checkNo ? <Row l="شماره چک"v={p.checkNo} />: null}
+ {p.method === 'check'&& p.bank ? <Row l="بانک"v={p.bank} />: null}
+ {p.method === 'check'? <Row l="وضعیت چک"v={CHECK_STATUS_LABEL[p.status || 'pending']} />: null}
+ </RowGrid>
+ </div>
+ ))}
+ </div>
+ </>
+ )}
 
-      {inv.isPreorder && (
-        <Btn
-          variant="primary"
-          size="sm"
-          full
-          onClick={() => {
-            updateInvoice(inv.id, { 
-              isPreorder: false, 
-              workflowStatus: 'received',
-              receivedAt: new Date().toISOString()
-            });
-          }}
-          style={{ marginBottom: 8 }}
-        >
-          📦 تحویل گرفتم (ایجاد گله و موجودی)
-        </Btn>
-      )}
-{inv.disputeStatus === 'open' && (
-        <>
-          <SectionTitle>یادداشت اختلاف</SectionTitle>
-          <RowGrid>
-            <Row
-              l="علت اختلاف"
-              v={inv.disputeReason === 'price' ? 'قیمت' : inv.disputeReason === 'quantity' ? 'تعداد' : inv.disputeReason === 'quality' ? 'کیفیت' : 'سایر'}
-            />
-            {inv.disputeOpenedAt ? <Row l="تاریخ ثبت" v={fmt.date(inv.disputeOpenedAt)} /> : null}
-          </RowGrid>
-          {inv.disputeNote ? <Row l="توضیحات" v={inv.disputeNote} /> : null}
-        </>
-      )}
+ {inv.isPreorder && (
+ <Btn
+ variant="primary"
+ size="sm"
+ full
+ onClick={() =>{
+ updateInvoice(inv.id, { 
+ isPreorder: false, 
+ workflowStatus: 'received',
+ receivedAt: new Date().toISOString()
+ });
+ }}
+ style={{ marginBottom: 8 }}
+ >
+ تحویل گرفتم (ایجاد گله و موجودی)
+ </Btn>
+ )}
+{inv.disputeStatus === 'open'&& (
+ <>
+ <SectionTitle>یادداشت اختلاف</SectionTitle>
+ <RowGrid>
+ <Row
+ l="علت اختلاف"
+ v={inv.disputeReason === 'price'? 'قیمت': inv.disputeReason === 'quantity'? 'تعداد': inv.disputeReason === 'quality'? 'کیفیت': 'سایر'}
+ />
+ {inv.disputeOpenedAt ? <Row l="تاریخ ثبت"v={fmt.date(inv.disputeOpenedAt)} />: null}
+ </RowGrid>
+ {inv.disputeNote ? <Row l="توضیحات"v={inv.disputeNote} />: null}
+ </>
+ )}
 
-      {(onEdit || nextWorkflowStatus(inv.workflowStatus) || onReopen || linkedFlock || onDispute || onResolveDispute || onWriteOff) && (() => {
-        const nextWs = nextWorkflowStatus(inv.workflowStatus);
-        const skipCashReceived = (String(inv.paymentTerms) === 'cash' || String(inv.paymentTerms) === 'card') && nextWs === 'received';
-        const hasBirdItems = inv.type === 'purchase' && !inv.isPreorder && liveBirdItems.length > 0;
-        const isFlockArchived = !!(linkedFlock && (linkedFlock.status === 'archived' || linkedFlock.status === 'sold'));
+ {(onEdit || nextWorkflowStatus(inv.workflowStatus) || onReopen || linkedFlock || onDispute || onResolveDispute || onWriteOff) && (() =>{
+ const nextWs = nextWorkflowStatus(inv.workflowStatus);
+ const skipCashReceived = (String(inv.paymentTerms) === 'cash'|| String(inv.paymentTerms) === 'card') && nextWs === 'received';
+ const hasBirdItems = inv.type === 'purchase'&& !inv.isPreorder && liveBirdItems.length >0;
+ const isFlockArchived = !!(linkedFlock && (linkedFlock.status === 'archived'|| linkedFlock.status === 'sold'));
 
-        return (
-          <CardActions actions={[
-            { label: nextWs === 'confirmed' ? 'ثبت نهایی' : nextWs === 'received' ? 'کالا رسید' : 'پرداخت کردم', onClick: onTransferClick, variant: 'primary', hidden: !nextWs || skipCashReceived },
-            { label: 'حل شد', onClick: onResolveDispute || (() => {}), variant: 'primary', hidden: !onResolveDispute },
-            { ...ACTION_PRESETS.RESTORE, onClick: () => { if (linkedFlock) { restore(linkedFlock.id); toastMsg.success('گله با موفقیت بازیابی شد'); } }, hidden: !isFlockArchived },
-            { ...ACTION_PRESETS.EDIT, onClick: onEdit || (() => {}), hidden: !onEdit },
-            { label: 'اتصال دستی', onClick: () => setFlockPickerOpen(true), variant: 'outline', hidden: !(!linkedFlock && hasBirdItems) },
-            { label: 'قطع اتصال', onClick: handleManualUnlink, variant: 'outline', hidden: !(inv.type === 'purchase' && linkedFlock && inv.disputeStatus !== 'open') },
-            { label: 'اختلاف', onClick: onDispute || (() => {}), variant: 'outline', hidden: !onDispute },
-            { label: 'بازگشایی', onClick: onReopen || (() => {}), variant: 'outline', hidden: !onReopen },
-            { label: inv.type === 'purchase' ? 'بخشش مانده' : 'حذف بدحساب', onClick: onWriteOff || (() => {}), variant: 'danger-outline', hidden: !onWriteOff },
-          ]} />
-        );
-      })()}
+ return (
+ <CardActions actions={[
+ { label: nextWs === 'confirmed'? 'ثبت نهایی': nextWs === 'received'? 'کالا رسید': 'پرداخت کردم', onClick: onTransferClick, variant: 'primary', hidden: !nextWs || skipCashReceived },
+ { label: 'حل شد', onClick: onResolveDispute || (() =>{}), variant: 'primary', hidden: !onResolveDispute },
+ { ...ACTION_PRESETS.RESTORE, onClick: () =>{ if (linkedFlock) { restore(linkedFlock.id); toastMsg.success('گله با موفقیت بازیابی شد'); } }, hidden: !isFlockArchived },
+ { ...ACTION_PRESETS.EDIT, onClick: onEdit || (() =>{}), hidden: !onEdit },
+ { label: 'اتصال دستی', onClick: () =>setFlockPickerOpen(true), variant: 'outline', hidden: !(!linkedFlock && hasBirdItems) },
+ { label: 'قطع اتصال', onClick: handleManualUnlink, variant: 'outline', hidden: !(inv.type === 'purchase'&& linkedFlock && inv.disputeStatus !== 'open') },
+ { label: 'اختلاف', onClick: onDispute || (() =>{}), variant: 'outline', hidden: !onDispute },
+ { label: 'بازگشایی', onClick: onReopen || (() =>{}), variant: 'outline', hidden: !onReopen },
+ { label: inv.type === 'purchase'? 'بخشش مانده': 'حذف بدحساب', onClick: onWriteOff || (() =>{}), variant: 'danger-outline', hidden: !onWriteOff },
+ ]} />
+ );
+ })()}
 
-      <PickFlockModal 
-        open={flockPickerOpen} 
-        onClose={() => setFlockPickerOpen(false)} 
-        onSelect={handleManualLink} 
-      />
-    </ExpandableCard>
+ <PickFlockModal 
+ open={flockPickerOpen} 
+ onClose={() =>setFlockPickerOpen(false)} 
+ onSelect={handleManualLink} 
+ />
+ </ExpandableCard>
   );
 }

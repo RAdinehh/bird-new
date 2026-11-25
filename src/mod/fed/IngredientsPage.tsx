@@ -327,71 +327,71 @@ export default function IngredientsPage({ active = true }: { active?: boolean })
                   </>
                 }
               >
-                <SectionTitle>🥗 ترکیبات</SectionTitle>
-                <Grid2>
-                  <Row l="پروتئین" v={`${fmt.num(it.protein)} ٪`} />
-                  <Row l="انرژی" v={`${fmt.num(it.energy)} kcal`} />
-                </Grid2>
-                <Grid2>
-                  <Row l="چربی" v={`${fmt.num(it.fat)} ٪`} />
-                  <Row l="فیبر" v={`${fmt.num(it.fiber)} ٪`} />
-                </Grid2>
-                <Grid2>
-                  <Row l="کلسیم" v={`${fmt.num(it.calcium)} ٪`} />
-                  <Row l="فسفر" v={`${fmt.num(it.phosphorus)} ٪`} />
-                </Grid2>
-                <Grid2>
-                  <Row l="متیونین" v={`${fmt.num(it.methionine)} ٪`} />
-                  <Row l="لیزین" v={`${fmt.num(it.lysine)} ٪`} />
-                </Grid2>
+ <SectionTitle>ترکیبات</SectionTitle>
+ <Grid2>
+ <Row l="پروتئین"v={`${fmt.num(it.protein)} ٪`} />
+ <Row l="انرژی"v={`${fmt.num(it.energy)} kcal`} />
+ </Grid2>
+ <Grid2>
+ <Row l="چربی"v={`${fmt.num(it.fat)} ٪`} />
+ <Row l="فیبر"v={`${fmt.num(it.fiber)} ٪`} />
+ </Grid2>
+ <Grid2>
+ <Row l="کلسیم"v={`${fmt.num(it.calcium)} ٪`} />
+ <Row l="فسفر"v={`${fmt.num(it.phosphorus)} ٪`} />
+ </Grid2>
+ <Grid2>
+ <Row l="متیونین"v={`${fmt.num(it.methionine)} ٪`} />
+ <Row l="لیزین"v={`${fmt.num(it.lysine)} ٪`} />
+ </Grid2>
 
-                {(it.minPercent > 0 || it.maxPercent > 0) && (
-                  <>
-                    <SectionTitle>⚖ محدوده استفاده</SectionTitle>
-                    {it.minPercent > 0 && <Row l="حداقل" v={`${fmt.num(it.minPercent)} ٪`} />}
-                    {it.maxPercent > 0 && <Row l="حداکثر" v={`${fmt.num(it.maxPercent)} ٪`} />}
-                  </>
-                )}
+ {(it.minPercent >0 || it.maxPercent >0) && (
+ <>
+ <SectionTitle>محدوده استفاده</SectionTitle>
+ {it.minPercent >0 && <Row l="حداقل"v={`${fmt.num(it.minPercent)} ٪`} />}
+ {it.maxPercent >0 && <Row l="حداکثر"v={`${fmt.num(it.maxPercent)} ٪`} />}
+ </>
+ )}
 
-                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی و انبار</SectionTitle>
-                {livePrice > 0 && <Row l="قیمت انبار" v={`${fmt.money(livePrice)} ت/kg`} />}
-                {!livePrice && it.price > 0 && <Row l="قیمت دستی" v={`${fmt.money(it.price)} ت/kg`} />}
-                {stockItem ? (
-                  <Row l="کالای انبار" v={`${stockItem.name} (${fmt.num(stockItem.currentStock)} ${UNIT_LABEL[stockItem.unit]})`} />
-                ) : (
-                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)',
-                     padding: 'var(--pad-tight)', background: 'var(--warn-soft)',
-                     borderRadius: 'var(--r-sm)' }}>
-                    ⚠️ به انبار وصل نیست — موقع مصرف، موجودی کم نمیشه
-                  </div>
-                )}
+ <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>مالی و انبار</SectionTitle>
+ {livePrice >0 && <Row l="قیمت انبار"v={`${fmt.money(livePrice)} ت/kg`} />}
+ {!livePrice && it.price >0 && <Row l="قیمت دستی"v={`${fmt.money(it.price)} ت/kg`} />}
+ {stockItem ? (
+ <Row l="کالای انبار"v={`${stockItem.name} (${fmt.num(stockItem.currentStock)} ${UNIT_LABEL[stockItem.unit]})`} />
+ ) : (
+ <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)',
+ padding: 'var(--pad-tight)', background: 'var(--warn-soft)',
+ borderRadius: 'var(--r-sm)'}}>
+ به انبار وصل نیست — موقع مصرف، موجودی کم نمیشه
+ </div>
+ )}
 
-                {it.notes && (
-                  <>
-                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                       padding: 'var(--pad-normal)', background: 'var(--input-bg)',
-                       borderRadius: 'var(--r-sm)' }}>{it.notes}</div>
-                  </>
-                )}
+ {it.notes && (
+ <>
+ <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>یادداشت</SectionTitle>
+ <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
+ padding: 'var(--pad-normal)', background: 'var(--input-bg)',
+ borderRadius: 'var(--r-sm)'}}>{it.notes}</div>
+ </>
+ )}
 
-                <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-                  <Btn size="sm" onClick={() => openEdit(it)} style={{ flex: 1 }}>ویرایش مقادیر</Btn>
-                  {it.isCore ? (
-                    <Btn size="sm" onClick={() => toggleHide(it)} style={{ flex: 1 }}>
-                      {it.isHidden ? '👁️ نمایش' : '👁️‍🗨️ پنهان'}
-                    </Btn>
-                  ) : (
-                    <Btn size="sm" onClick={async () => {
-                          const ok = await showConfirmAsync('تأیید حذف', 'این ماده از تمام جیره‌ها هم حذف می‌شود حذف شود؟', { danger: true });
-                          if (!ok) return;
-                          deleteIngredient(it.id);
-                          logAction('delete', 'fed', 'حذف از جیره‌نویسی');
-                          toastMsg.deleted(it.name)
-                        }} style={{ flex: 1 }}>حذف</Btn>
-                  )}
-                </div>
-              </ExpandableCard>
+ <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
+ <Btn size="sm"onClick={() =>openEdit(it)} style={{ flex: 1 }}>ویرایش مقادیر</Btn>
+ {it.isCore ? (
+ <Btn size="sm"onClick={() =>toggleHide(it)} style={{ flex: 1 }}>
+ {it.isHidden ? 'نمایش': 'پنهان'}
+ </Btn>
+ ) : (
+ <Btn size="sm"onClick={async () =>{
+ const ok = await showConfirmAsync('تأیید حذف', 'این ماده از تمام جیره‌ها هم حذف می‌شود حذف شود؟', { danger: true });
+ if (!ok) return;
+ deleteIngredient(it.id);
+ logAction('delete', 'fed', 'حذف از جیره‌نویسی');
+ toastMsg.deleted(it.name)
+ }} style={{ flex: 1 }}>حذف</Btn>
+ )}
+ </div>
+ </ExpandableCard>
             );
           })}
         </>

@@ -54,127 +54,127 @@ export default function DeviceCard({
                   <StatBox icon="🛠" label="تعمیر" value={fmt.count(logs.length)} />
                 </>}
               >
-                {caps.length > 0 && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> ظرفیت</div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                      {caps.map(c => (
-                        <div key={c.birdName} style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
-                          <span>{c.birdName}</span>
-                          <span style={{ fontWeight: 600 }}>{c.capacity ? fmt.count(c.capacity) : '—'}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
+ {caps.length >0 && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>ظرفیت</div>
+ <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+ {caps.map(c =>(
+ <div key={c.birdName} style={{ padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)'}}>
+ <span>{c.birdName}</span>
+ <span style={{ fontWeight: 600 }}>{c.capacity ? fmt.count(c.capacity) : '—'}</span>
+ </div>
+ ))}
+ </div>
+ </>
+ )}
 
-                {(d.purchasedAt || d.price || d.warranty) && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی</div>
-                    {d.price && <Row l="قیمت" v={fmt.money(d.price)} />}
-                    {d.purchasedAt && <Row l="تاریخ خرید" v={fmt.date(d.purchasedAt)} />}
-                    {d.warranty && <Row l="گارانتی" v={fmt.int(d.warranty) + ' ماه'} />}
-                    {w && w.expired && (
-                      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, padding: '4px 8px', background: 'var(--danger-soft)', borderRadius: 'var(--r-sm)', textAlign: 'center' }}>
-                        ⏰ اتمام گارانتی شده ({fmt.date(w.end)})
-                      </div>
-                    )}
-                  </>
-                )}
+ {(d.purchasedAt || d.price || d.warranty) && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>مالی</div>
+ {d.price && <Row l="قیمت"v={fmt.money(d.price)} />}
+ {d.purchasedAt && <Row l="تاریخ خرید"v={fmt.date(d.purchasedAt)} />}
+ {d.warranty && <Row l="گارانتی"v={fmt.int(d.warranty) + 'ماه'} />}
+ {w && w.expired && (
+ <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, padding: '4px 8px', background: 'var(--danger-soft)', borderRadius: 'var(--r-sm)', textAlign: 'center'}}>
+ اتمام گارانتی شده ({fmt.date(w.end)})
+ </div>
+ )}
+ </>
+ )}
 
-                {(d.temp != null || d.humidity != null || d.estCurrent != null || d.co2Current != null || d.o2Current != null) && (
-                <>
-                  <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🌡 پایش زنده</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    {d.temp != null && <Row l="دما محیط" v={fmt.num(d.temp) + '°C'} />}
-                    {d.humidity != null && <Row l="رطوبت" v={fmt.num(d.humidity) + '٪'} />}
-                    {d.estCurrent != null && <Row l="EST (پوسته تخم)" v={fmt.num(d.estCurrent) + '°C'} />}
-                    {d.co2Current != null && <Row l="CO₂" v={fmt.num(d.co2Current) + '٪'} />}
-                    {d.o2Current != null && <Row l="O₂" v={fmt.num(d.o2Current) + '٪'} />}
-                    {d.turningCurrent && <Row l="چرخش" v={d.turningCurrent === 'on' ? '🔄 روشن' : d.turningCurrent === 'off' ? '⏸ قطع' : '🤖 خودکار'} />}
-                  </div>
-                  <Btn size="sm" full onClick={onRecordReading}>📊 ثبت قرائت</Btn>
+ {(d.temp != null || d.humidity != null || d.estCurrent != null || d.co2Current != null || d.o2Current != null) && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>پایش زنده</div>
+ <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+ {d.temp != null && <Row l="دما محیط"v={fmt.num(d.temp) + '°C'} />}
+ {d.humidity != null && <Row l="رطوبت"v={fmt.num(d.humidity) + '٪'} />}
+ {d.estCurrent != null && <Row l="EST (پوسته تخم)"v={fmt.num(d.estCurrent) + '°C'} />}
+ {d.co2Current != null && <Row l="CO₂"v={fmt.num(d.co2Current) + '٪'} />}
+ {d.o2Current != null && <Row l="O₂"v={fmt.num(d.o2Current) + '٪'} />}
+ {d.turningCurrent && <Row l="چرخش"v={d.turningCurrent === 'on'? 'روشن': d.turningCurrent === 'off'? 'قطع': 'خودکار'} />}
+ </div>
+ <Btn size="sm"full onClick={onRecordReading}>ثبت قرائت</Btn>
 
-                  {(d.readings || []).length > 0 && (
-                    <>
-                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}>
-                        📈 روند ({(d.readings || []).length} قرائت)
-                      </div>
-                      <Select value={chartMetric} onChange={(e: any) => setChartMetric(e.target.value as 'temp' | 'humidity' | 'est' | 'co2' | 'o2')}>
-                        <option value="temp">دما محیط (°C)</option>
-                        <option value="humidity">رطوبت (٪)</option>
-                        <option value="est">EST (°C)</option>
-                        <option value="co2">CO₂ (٪)</option>
-                        <option value="o2">O₂ (٪)</option>
-                      </Select>
-                      <LineChart
-                        data={(d.readings || []).slice(-30).map((r: { date: string; temp?: number | null; humidity?: number | null; est?: number | null; co2?: number | null; o2?: number | null }) => ({
-                          label: r.date.slice(5),
-                          value: r[chartMetric] ?? 0,
-                        }))}
-                        color="var(--accent)"
-                        height={140}
-                      />
-                    </>
-                  )}
-                </>
-              )}
+ {(d.readings || []).length >0 && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}>
+ روند ({(d.readings || []).length} قرائت)
+ </div>
+ <Select value={chartMetric} onChange={(e: any) =>setChartMetric(e.target.value as 'temp'| 'humidity'| 'est'| 'co2'| 'o2')}>
+ <option value="temp">دما محیط (°C)</option>
+ <option value="humidity">رطوبت (٪)</option>
+ <option value="est">EST (°C)</option>
+ <option value="co2">CO₂ (٪)</option>
+ <option value="o2">O₂ (٪)</option>
+ </Select>
+ <LineChart
+ data={(d.readings || []).slice(-30).map((r: { date: string; temp?: number | null; humidity?: number | null; est?: number | null; co2?: number | null; o2?: number | null }) =>({
+ label: r.date.slice(5),
+ value: r[chartMetric] ?? 0,
+ }))}
+ color="var(--accent)"
+ height={140}
+ />
+ </>
+ )}
+ </>
+ )}
 
-              <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🛠 تعمیرات</div>
-                {logs.length === 0 ? (
-                  <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 8, textAlign: 'center' }}>تعمیری ثبت نشده</div>
-                ) : (
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 4 }}>
-                    {logs.slice().reverse().slice(0, 6).map((m: any) => (
-                      <div key={m.id} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' as any, fontSize: 'var(--fs-sm)', padding: '8px 24px 8px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', position: 'relative' }}>
-                        <button
-                          type="button"
-                          onClick={() => onRemoveMaintenance(m.id)}
-                          title="حذف"
-                          aria-label="حذف"
-                          style={{
-                            position: 'absolute',
-                            top: 3,
-                            left: 3,
-                            background: 'var(--danger-soft)',
-                            border: '1px solid var(--danger)',
-                            color: 'var(--danger)',
-                            cursor: 'pointer',
-                            borderRadius: 'var(--r-sm)',
-                            fontSize: 12,
-                            lineHeight: 1,
-                            padding: '2px 5px',
-                            fontWeight: 700,
-                            minWidth: 18,
-                            height: 36,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontFamily: 'inherit',
-                          }}
-                        >✕</button>
-                        <span style={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.type}</span>
-                        <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{fmt.date(m.date)}</span>
-                        {m.cost ? <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600 }}>{fmt.money(m.cost)}</span> : null}
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <Btn size="sm" full onClick={onAddMaintenance}>+ ثبت تعمیر</Btn>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>تعمیرات</div>
+ {logs.length === 0 ? (
+ <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', padding: 8, textAlign: 'center'}}>تعمیری ثبت نشده</div>
+ ) : (
+ <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 4 }}>
+ {logs.slice().reverse().slice(0, 6).map((m: any) =>(
+ <div key={m.id} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)'as any, fontSize: 'var(--fs-sm)', padding: '8px 24px 8px 8px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', position: 'relative'}}>
+ <button
+ type="button"
+ onClick={() =>onRemoveMaintenance(m.id)}
+ title="حذف"
+ aria-label="حذف"
+ style={{
+ position: 'absolute',
+ top: 3,
+ left: 3,
+ background: 'var(--danger-soft)',
+ border: '1px solid var(--danger)',
+ color: 'var(--danger)',
+ cursor: 'pointer',
+ borderRadius: 'var(--r-sm)',
+ fontSize: 12,
+ lineHeight: 1,
+ padding: '2px 5px',
+ fontWeight: 700,
+ minWidth: 18,
+ height: 36,
+ display: 'flex',
+ alignItems: 'center',
+ justifyContent: 'center',
+ fontFamily: 'inherit',
+ }}
+ >✕</button>
+ <span style={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{m.type}</span>
+ <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)'}}>{fmt.date(m.date)}</span>
+ {m.cost ? <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 600 }}>{fmt.money(m.cost)}</span>: null}
+ </div>
+ ))}
+ </div>
+ )}
+ <Btn size="sm"full onClick={onAddMaintenance}>+ ثبت تعمیر</Btn>
 
-                {d.notes && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 8, background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{d.notes}</div>
-                  </>
-                )}
+ {d.notes && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>یادداشت</div>
+ <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 8, background: 'var(--input-bg)', borderRadius: 'var(--r-sm)'}}>{d.notes}</div>
+ </>
+ )}
 
-                <div style={{ display: 'flex', gap: 'var(--sp-2)' as any, paddingTop: 4 }}>
-                  <CardActions actions={[
-                    { ...ACTION_PRESETS.EDIT, onClick: onEdit },
-                    { ...ACTION_PRESETS.DELETE, onClick: onDelete }
-                  ]} />
-                </div>
-              </ExpandableCard>
+ <div style={{ display: 'flex', gap: 'var(--sp-2)'as any, paddingTop: 4 }}>
+ <CardActions actions={[
+ { ...ACTION_PRESETS.EDIT, onClick: onEdit },
+ { ...ACTION_PRESETS.DELETE, onClick: onDelete }
+ ]} />
+ </div>
+ </ExpandableCard>
   );
 }

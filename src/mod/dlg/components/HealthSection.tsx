@@ -125,42 +125,42 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
      onToggle={() => setExpandedId(expandedId === 'd-' + d.id ? null : 'd-' + d.id)}
      onDelete={() => setForm(f => ({ ...f, deaths: f.deaths.filter(x => x.id !== d.id) }))}
     >
-      
-      {expandedId === 'd-' + d.id && (<>
-      <Grid2>
-       <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-        <Field label="تعداد" error={showError('deathsCount') || showError('deaths')} onTouch={() => markTouched('deathsCount')}>
-         <NumField placeholder="۰" value={d.count ? String(d.count) : ''}
-          onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, count: parseInt(toEn(e.target.value)) || 0 } : x) }))}
-          min={0} max={flockAliveCount || undefined} unit="پرنده" />
-        </Field>
-        <FieldHint fieldPath="dlg.deathsCount" value={d.count ?? 0} context={{ currentCount: flockAliveCount }} />
-       </div>
-       <Field label="علت">
-        <SmartSelect
-         value={d.cause || ''}
-         onChange={val => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, cause: val } : x) }))}
-         options={causeOptions}
-         placeholder="— انتخاب کنید —"
-         modalTitle="علت تلفات"
-        />
-       </Field>
-      </Grid2>
-      {isSexed && (
-       <Field label="جنسیت تلفات">
-        <Select value={d.sex || 'unknown'} onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, sex: e.target.value as 'male' | 'female' | 'unknown' } : x) }))}>
-         <option value="male">نر</option>
-         <option value="female">ماده</option>
-         <option value="unknown">نامشخص</option>
-        </Select>
-       </Field>
-      )}
-      <Field label="توضیحات">
-       <Textarea rows={2} placeholder="جزئیات..." value={d.notes || ''}
-        onChange={e => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, notes: e.target.value } : x) }))} />
-      </Field>
-      </>)}
-     </ExpandableCard>
+ 
+ {expandedId === 'd-'+ d.id && (<>
+ <Grid2>
+ <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
+ <Field label="تعداد"error={showError('deathsCount') || showError('deaths')} onTouch={() =>markTouched('deathsCount')}>
+ <NumField placeholder="۰"value={d.count ? String(d.count) : ''}
+ onChange={e =>setForm(f =>({ ...f, deaths: f.deaths.map(x =>x.id === d.id ? { ...x, count: parseInt(toEn(e.target.value)) || 0 } : x) }))}
+ min={0} max={flockAliveCount || undefined} unit="پرنده"/>
+ </Field>
+ <FieldHint fieldPath="dlg.deathsCount"value={d.count ?? 0} context={{ currentCount: flockAliveCount }} />
+ </div>
+ <Field label="علت">
+ <SmartSelect
+ value={d.cause || ''}
+ onChange={val =>setForm(f =>({ ...f, deaths: f.deaths.map(x =>x.id === d.id ? { ...x, cause: val } : x) }))}
+ options={causeOptions}
+ placeholder="— انتخاب کنید —"
+ modalTitle="علت تلفات"
+ />
+ </Field>
+ </Grid2>
+ {isSexed && (
+ <Field label="جنسیت تلفات">
+ <Select value={d.sex || 'unknown'} onChange={e =>setForm(f =>({ ...f, deaths: f.deaths.map(x =>x.id === d.id ? { ...x, sex: e.target.value as 'male'| 'female'| 'unknown'} : x) }))}>
+ <option value="male">نر</option>
+ <option value="female">ماده</option>
+ <option value="unknown">نامشخص</option>
+ </Select>
+ </Field>
+ )}
+ <Field label="توضیحات">
+ <Textarea rows={2} placeholder="جزئیات..."value={d.notes || ''}
+ onChange={e =>setForm(f =>({ ...f, deaths: f.deaths.map(x =>x.id === d.id ? { ...x, notes: e.target.value } : x) }))} />
+ </Field>
+ </>)}
+ </ExpandableCard>
     ))}
 
    {vaccineEnabled && (<>
@@ -176,107 +176,107 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
      onToggle={() => setExpandedId(expandedId === 'v-' + v.id ? null : 'v-' + v.id)}
      onDelete={() => setForm(f => ({ ...f, vaccines: f.vaccines.filter(x => x.id !== v.id) }))}
     >
-      
-      {expandedId === 'v-' + v.id && (<>
-      {vaccineItems.length > 0 && (
-        <Field label={<>از انبار <Tag tone="blue">{fmt.count(vaccineItems.length)} نوع</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)">
-          <SmartSelect
-            value={v.itemId || ''}
-            onChange={id => setForm(f => ({
-          ...f,
-          vaccines: f.vaccines.map(x => {
-            if (x.id !== v.id) return x;
-            const newItem = vaccineItems.find(w => w.id === id);
-            const autoDose = newItem?.usageTypes?.includes('water') ? newItem.dosePerLiter : newItem?.usageTypes?.includes('feed') ? newItem.dosePerKgFeed : newItem?.dosePerBird;
-            const doseUnit = newItem?.usageTypes?.includes('water') ? `${getDoseUnit(newItem?.unit)}/L` : newItem?.usageTypes?.includes('feed') ? `${getDoseUnit(newItem?.unit)}/kg` : `${getDoseUnit(newItem?.unit)}/پرنده`;
-            return { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null, unit: newItem?.unit || x.unit, name: newItem ? newItem.name : x.name, dose: autoDose ? String(autoDose) : x.dose };
-          })
-        }))}
-            options={vaccineItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}` }))}
-            placeholder="— متصل نکن —"
-            modalTitle="انتخاب از انبار"
-          />
-        </Field>
-      )}
-      <Grid2>
-        <Field label="نام واکسن" required>
-          <Input placeholder="مثلاً نیوکاسل" value={v.name} onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, name: e.target.value } : x) }))} />
-        </Field>
-        <Field label="روش مصرف">
-          <SmartSelect
-            value={v.method || ''}
-            onChange={val => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, method: val } : x) }))}
-            options={getAllowedMethods(vaccineItems.find(w => w.id === v.itemId)).map(o => ({ value: o.value, label: o.label }))}
-            placeholder="انتخاب روش"
-            modalTitle="روش مصرف"
-          />
-        </Field>
-      </Grid2>
-      {(() => {
-        const opts = buildUnitOptions(v.itemId, vaccineItems);
-        const hasSub = opts.length > 1;
-        const vaccineItemCalc = vaccineItems.find(w => w.id === v.itemId);
-        const vCalc = vaccineItemCalc ? calculateHealthDose({
-          route: ((v.method === 'drinking_water' ? 'water' : v.method === 'injection' ? 'injectable' : v.method) || '') as HealthRoute,
-          waterAmountL: parseFloat(toEn(form.waterAmount)) || 0,
-          aliveCount: flockAliveCount || 0,
-          dosePerBirdMl: vaccineItemCalc.dosePerBird ?? null,
-          dosePerLiter: vaccineItemCalc.dosePerLiter ?? null,
-          feedAmountKg: getTotalFeedKg(form),
-          dosePerKgFeed: vaccineItemCalc.dosePerKgFeed ?? null,
-        }) : null;
-        const qtyField = v.itemId ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          
-          <QuantityUnitInput
-            error={showError(`vaccines.${i}.quantity`)}
-            onTouch={() => markTouched(`vaccines.${i}.quantity`)}
-            value={v.quantity || ''}
-            onChange={val => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, quantity: parseFloat(toEn(val).replace('٫','.')) || 0 } : x) }))}
-            unit={v.unit || (vaccineItems.find(w => w.id === v.itemId)?.unit) || 'pcs'}
-            onUnitChange={u => {
-              const fct = opts.find((o: UnitOption) => o.value === u)?.factor || 1;
-              setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, unit: u, factor: fct } : x) }));
-            }}
-            options={opts}
-          />
-          {vCalc?.hasData && (
-            <FieldHint
-              fieldPath="dlg.dose"
-              value={v.quantity || ''}
-              context={{
-                expected: vCalc.requiredMl ?? undefined,
-                expectedLabel: 'نیاز محاسبه‌شده',
-                expectedSource: 'context',
-                flockSize: flockAliveCount,
-              }}
-            />
-          )}
-          </div>
+ 
+ {expandedId === 'v-'+ v.id && (<>
+ {vaccineItems.length >0 && (
+ <Field label={<>از انبار <Tag tone="blue">{fmt.count(vaccineItems.length)} نوع</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)">
+ <SmartSelect
+ value={v.itemId || ''}
+ onChange={id =>setForm(f =>({
+ ...f,
+ vaccines: f.vaccines.map(x =>{
+ if (x.id !== v.id) return x;
+ const newItem = vaccineItems.find(w =>w.id === id);
+ const autoDose = newItem?.usageTypes?.includes('water') ? newItem.dosePerLiter : newItem?.usageTypes?.includes('feed') ? newItem.dosePerKgFeed : newItem?.dosePerBird;
+ const doseUnit = newItem?.usageTypes?.includes('water') ? `${getDoseUnit(newItem?.unit)}/L`: newItem?.usageTypes?.includes('feed') ? `${getDoseUnit(newItem?.unit)}/kg`: `${getDoseUnit(newItem?.unit)}/پرنده`;
+ return { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null, unit: newItem?.unit || x.unit, name: newItem ? newItem.name : x.name, dose: autoDose ? String(autoDose) : x.dose };
+ })
+ }))}
+ options={vaccineItems.map(w =>({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}`}))}
+ placeholder="— متصل نکن —"
+ modalTitle="انتخاب از انبار"
+ />
+ </Field>
+ )}
+ <Grid2>
+ <Field label="نام واکسن"required>
+ <Input placeholder="مثلاً نیوکاسل"value={v.name} onChange={e =>setForm(f =>({ ...f, vaccines: f.vaccines.map(x =>x.id === v.id ? { ...x, name: e.target.value } : x) }))} />
+ </Field>
+ <Field label="روش مصرف">
+ <SmartSelect
+ value={v.method || ''}
+ onChange={val =>setForm(f =>({ ...f, vaccines: f.vaccines.map(x =>x.id === v.id ? { ...x, method: val } : x) }))}
+ options={getAllowedMethods(vaccineItems.find(w =>w.id === v.itemId)).map(o =>({ value: o.value, label: o.label }))}
+ placeholder="انتخاب روش"
+ modalTitle="روش مصرف"
+ />
+ </Field>
+ </Grid2>
+ {(() =>{
+ const opts = buildUnitOptions(v.itemId, vaccineItems);
+ const hasSub = opts.length >1;
+ const vaccineItemCalc = vaccineItems.find(w =>w.id === v.itemId);
+ const vCalc = vaccineItemCalc ? calculateHealthDose({
+ route: ((v.method === 'drinking_water'? 'water': v.method === 'injection'? 'injectable': v.method) || '') as HealthRoute,
+ waterAmountL: parseFloat(toEn(form.waterAmount)) || 0,
+ aliveCount: flockAliveCount || 0,
+ dosePerBirdMl: vaccineItemCalc.dosePerBird ?? null,
+ dosePerLiter: vaccineItemCalc.dosePerLiter ?? null,
+ feedAmountKg: getTotalFeedKg(form),
+ dosePerKgFeed: vaccineItemCalc.dosePerKgFeed ?? null,
+ }) : null;
+ const qtyField = v.itemId ? (
+ <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+ 
+ <QuantityUnitInput
+ error={showError(`vaccines.${i}.quantity`)}
+ onTouch={() =>markTouched(`vaccines.${i}.quantity`)}
+ value={v.quantity || ''}
+ onChange={val =>setForm(f =>({ ...f, vaccines: f.vaccines.map(x =>x.id === v.id ? { ...x, quantity: parseFloat(toEn(val).replace('٫','.')) || 0 } : x) }))}
+ unit={v.unit || (vaccineItems.find(w =>w.id === v.itemId)?.unit) || 'pcs'}
+ onUnitChange={u =>{
+ const fct = opts.find((o: UnitOption) =>o.value === u)?.factor || 1;
+ setForm(f =>({ ...f, vaccines: f.vaccines.map(x =>x.id === v.id ? { ...x, unit: u, factor: fct } : x) }));
+ }}
+ options={opts}
+ />
+ {vCalc?.hasData && (
+ <FieldHint
+ fieldPath="dlg.dose"
+ value={v.quantity || ''}
+ context={{
+ expected: vCalc.requiredMl ?? undefined,
+ expectedLabel: 'نیاز محاسبه‌شده',
+ expectedSource: 'context',
+ flockSize: flockAliveCount,
+ }}
+ />
+ )}
+ </div>
 
-        ) : null;
-        const doseField = (
-          <Field label={<>دوز <HelpIcon text={"**دوز چیست؟**\nدوز، نسخه یا دستور مصرف دامپزشک است (مثلاً ۵ سی‌سی در ۱ لیتر آب).\n\n**تفاوت با مقدار مصرفی:**\n«مقدار مصرفی» کل مقداری است که از انبار کسر می‌شود (مثلاً ۵۰ سی‌سی)."} /></>}>
-            <Input
-              placeholder="مثلاً ۰.۵"
-              value={v.dose}
-              onChange={e => setForm(f => ({ ...f, vaccines: f.vaccines.map(x => x.id === v.id ? { ...x, dose: e.target.value } : x) }))}
-              unit={getDoseUnitForMethod(v.method, vaccineItems.find(w => w.id === v.itemId)?.unit)}
-            />
-          </Field>
-        );
-        const vCalcMsg = vCalc ? (
-          <div style={{ fontSize: 'var(--fs-xs)', color: vCalc.hasData ? 'var(--accent)' : 'var(--muted)', fontWeight: 600, marginTop: 8, textAlign: 'center' }}>
-            {vCalc.hasData ? `💡 نیاز محاسبه‌شده: ${fmt.num(vCalc.requiredMl ?? 0)} میلی‌لیتر (${vCalc.reason})` : !v.method ? 'ℹ️ لطفاً برای محاسبه خودکار، روش مصرف را انتخاب کنید.' : `ℹ️ ${vCalc.reason}`}
-          </div>
-        ) : null;
+ ) : null;
+ const doseField = (
+ <Field label={<>دوز <HelpIcon text={"**دوز چیست؟**\nدوز، نسخه یا دستور مصرف دامپزشک است (مثلاً ۵ سی‌سی در ۱ لیتر آب).\n\n**تفاوت با مقدار مصرفی:**\n«مقدار مصرفی» کل مقداری است که از انبار کسر می‌شود (مثلاً ۵۰ سی‌سی)."} /></>}>
+ <Input
+ placeholder="مثلاً ۰.۵"
+ value={v.dose}
+ onChange={e =>setForm(f =>({ ...f, vaccines: f.vaccines.map(x =>x.id === v.id ? { ...x, dose: e.target.value } : x) }))}
+ unit={getDoseUnitForMethod(v.method, vaccineItems.find(w =>w.id === v.itemId)?.unit)}
+ />
+ </Field>
+ );
+ const vCalcMsg = vCalc ? (
+ <div style={{ fontSize: 'var(--fs-xs)', color: vCalc.hasData ? 'var(--accent)': 'var(--muted)', fontWeight: 600, marginTop: 8, textAlign: 'center'}}>
+ {vCalc.hasData ? `نیاز محاسبه‌شده: ${fmt.num(vCalc.requiredMl ?? 0)} میلی‌لیتر (${vCalc.reason})`: !v.method ? 'لطفاً برای محاسبه خودکار، روش مصرف را انتخاب کنید.': `${vCalc.reason}`}
+ </div>
+ ) : null;
 
-        if (!qtyField) return <><Grid2>{doseField}</Grid2>{vCalcMsg}</>;
-        if (hasSub) return <>{qtyField}<Grid2>{doseField}</Grid2>{vCalcMsg}</>;
-        return <><Grid2>{qtyField}{doseField}</Grid2>{vCalcMsg}</>;
-      })()}
-    </>)}
-     </ExpandableCard>
+ if (!qtyField) return <><Grid2>{doseField}</Grid2>{vCalcMsg}</>;
+ if (hasSub) return <>{qtyField}<Grid2>{doseField}</Grid2>{vCalcMsg}</>;
+ return <><Grid2>{qtyField}{doseField}</Grid2>{vCalcMsg}</>;
+ })()}
+ </>)}
+ </ExpandableCard>
     ))}
    </>)}
 
@@ -297,127 +297,127 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
      onToggle={() => setExpandedId(expandedId === 'm-' + m.id ? null : 'm-' + m.id)}
      onDelete={() => setForm(f => ({ ...f, medications: f.medications.filter(x => x.id !== m.id) }))}
     >
-      
-      {expandedId === 'm-' + m.id && (<>
-      {medicineItems.length > 0 && (
-        <Field label={<>از انبار <Tag tone="red">{fmt.count(chemicalItems.length)} شیمیایی</Tag> <Tag tone="green">{fmt.count(herbalItems.length)} گیاهی</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)">
-          <SmartSelect
-            value={m.itemId || ''}
-            onChange={id => setForm(f => ({
-              ...f,
-              medications: f.medications.map(x => {
-                if (x.id !== m.id) return x;
-                const newItem = medicineItems.find(w => w.id === id);
-                const autoDose = newItem?.usageTypes?.includes('water') ? newItem.dosePerLiter : newItem?.usageTypes?.includes('feed') ? newItem.dosePerKgFeed : newItem?.dosePerBird;
-                const doseUnit = newItem?.usageTypes?.includes('water') ? `${getDoseUnit(newItem?.unit)}/L` : newItem?.usageTypes?.includes('feed') ? `${getDoseUnit(newItem?.unit)}/kg` : `${getDoseUnit(newItem?.unit)}/پرنده`;
-                return {
-                  ...x,
-                  itemId: id,
-                  quantity: id ? (x.quantity ?? 0) : null,
-                  unit: newItem?.unit || x.unit,
-                  name: newItem ? newItem.name : x.name,
-                  dose: autoDose ? String(autoDose) : x.dose,
-                  withdrawalDays: newItem ? newItem.withdrawalDays : x.withdrawalDays
-                };
-              })
-            }))}
-            options={medicineItems.map(w => ({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}`, group: w.category === 'herbal' ? 'herbal' : 'chemical' }))}
-            groupLabels={{ chemical: '💊 شیمیایی', herbal: '🌿 گیاهی' }}
-            groupIcons={{ chemical: '💊', herbal: '🌿' }}
-            placeholder="— متصل نکن —"
-            modalTitle="انتخاب از انبار"
-          />
-        </Field>
-      )}
-      <Grid2>
-        <Field label="نام">
-          <Input placeholder="نام دارو" value={m.name} onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, name: e.target.value } : x) }))} />
-        </Field>
-        <Field label="روش مصرف">
-          <SmartSelect
-            value={m.method || ''}
-            onChange={val => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, method: val } : x) }))}
-            options={getAllowedMethods(medicineItems.find(w => w.id === m.itemId)).map(o => ({ value: o.value, label: o.label }))}
-            placeholder="انتخاب روش"
-            modalTitle="روش مصرف"
-          />
-        </Field>
-      </Grid2>
-      {(() => {
-        const opts = buildUnitOptions(m.itemId, medicineItems);
-        const hasSub = opts.length > 1;
-        const medItemCalc = medicineItems.find(w => w.id === m.itemId);
-        const mCalc = medItemCalc ? calculateHealthDose({
-          route: ((m.method === 'drinking_water' ? 'water' : m.method === 'injection' ? 'injectable' : m.method) || '') as HealthRoute,
-          waterAmountL: parseFloat(toEn(form.waterAmount)) || 0,
-          aliveCount: flockAliveCount || 0,
-          dosePerBirdMl: medItemCalc.dosePerBird ?? null,
-          dosePerLiter: medItemCalc.dosePerLiter ?? null,
-          feedAmountKg: getTotalFeedKg(form),
-          dosePerKgFeed: medItemCalc.dosePerKgFeed ?? null,
-        }) : null;
-        const qtyField = m.itemId ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          
-          <QuantityUnitInput
-            error={showError(`medications.${i}.quantity`)}
-            onTouch={() => markTouched(`medications.${i}.quantity`)}
-            value={m.quantity || ''}
-            onChange={val => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, quantity: parseFloat(toEn(val).replace('٫','.')) || 0 } : x) }))}
-            unit={m.unit || selectedItem?.unit || 'pcs'}
-            onUnitChange={u => {
-              const fct = opts.find((o: UnitOption) => o.value === u)?.factor || 1;
-              setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, unit: u, factor: fct } : x) }));
-            }}
-            options={opts}
-          />
-          {mCalc?.hasData && (
-            <FieldHint
-              fieldPath="dlg.dose"
-              value={m.quantity || ''}
-              context={{
-                expected: mCalc.requiredMl ?? undefined,
-                expectedLabel: 'نیاز محاسبه‌شده',
-                expectedSource: 'context',
-                flockSize: flockAliveCount,
-              }}
-            />
-          )}
-          </div>
+ 
+ {expandedId === 'm-'+ m.id && (<>
+ {medicineItems.length >0 && (
+ <Field label={<>از انبار <Tag tone="red">{fmt.count(chemicalItems.length)} شیمیایی</Tag><Tag tone="green">{fmt.count(herbalItems.length)} گیاهی</Tag></>} autoFrom="انبار (مصرف کسر می‌شه)">
+ <SmartSelect
+ value={m.itemId || ''}
+ onChange={id =>setForm(f =>({
+ ...f,
+ medications: f.medications.map(x =>{
+ if (x.id !== m.id) return x;
+ const newItem = medicineItems.find(w =>w.id === id);
+ const autoDose = newItem?.usageTypes?.includes('water') ? newItem.dosePerLiter : newItem?.usageTypes?.includes('feed') ? newItem.dosePerKgFeed : newItem?.dosePerBird;
+ const doseUnit = newItem?.usageTypes?.includes('water') ? `${getDoseUnit(newItem?.unit)}/L`: newItem?.usageTypes?.includes('feed') ? `${getDoseUnit(newItem?.unit)}/kg`: `${getDoseUnit(newItem?.unit)}/پرنده`;
+ return {
+ ...x,
+ itemId: id,
+ quantity: id ? (x.quantity ?? 0) : null,
+ unit: newItem?.unit || x.unit,
+ name: newItem ? newItem.name : x.name,
+ dose: autoDose ? String(autoDose) : x.dose,
+ withdrawalDays: newItem ? newItem.withdrawalDays : x.withdrawalDays
+ };
+ })
+ }))}
+ options={medicineItems.map(w =>({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}`, group: w.category === 'herbal'? 'herbal': 'chemical'}))}
+ groupLabels={{ chemical: 'شیمیایی', herbal: 'گیاهی'}}
+ groupIcons={{ chemical: '', herbal: ''}}
+ placeholder="— متصل نکن —"
+ modalTitle="انتخاب از انبار"
+ />
+ </Field>
+ )}
+ <Grid2>
+ <Field label="نام">
+ <Input placeholder="نام دارو"value={m.name} onChange={e =>setForm(f =>({ ...f, medications: f.medications.map(x =>x.id === m.id ? { ...x, name: e.target.value } : x) }))} />
+ </Field>
+ <Field label="روش مصرف">
+ <SmartSelect
+ value={m.method || ''}
+ onChange={val =>setForm(f =>({ ...f, medications: f.medications.map(x =>x.id === m.id ? { ...x, method: val } : x) }))}
+ options={getAllowedMethods(medicineItems.find(w =>w.id === m.itemId)).map(o =>({ value: o.value, label: o.label }))}
+ placeholder="انتخاب روش"
+ modalTitle="روش مصرف"
+ />
+ </Field>
+ </Grid2>
+ {(() =>{
+ const opts = buildUnitOptions(m.itemId, medicineItems);
+ const hasSub = opts.length >1;
+ const medItemCalc = medicineItems.find(w =>w.id === m.itemId);
+ const mCalc = medItemCalc ? calculateHealthDose({
+ route: ((m.method === 'drinking_water'? 'water': m.method === 'injection'? 'injectable': m.method) || '') as HealthRoute,
+ waterAmountL: parseFloat(toEn(form.waterAmount)) || 0,
+ aliveCount: flockAliveCount || 0,
+ dosePerBirdMl: medItemCalc.dosePerBird ?? null,
+ dosePerLiter: medItemCalc.dosePerLiter ?? null,
+ feedAmountKg: getTotalFeedKg(form),
+ dosePerKgFeed: medItemCalc.dosePerKgFeed ?? null,
+ }) : null;
+ const qtyField = m.itemId ? (
+ <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+ 
+ <QuantityUnitInput
+ error={showError(`medications.${i}.quantity`)}
+ onTouch={() =>markTouched(`medications.${i}.quantity`)}
+ value={m.quantity || ''}
+ onChange={val =>setForm(f =>({ ...f, medications: f.medications.map(x =>x.id === m.id ? { ...x, quantity: parseFloat(toEn(val).replace('٫','.')) || 0 } : x) }))}
+ unit={m.unit || selectedItem?.unit || 'pcs'}
+ onUnitChange={u =>{
+ const fct = opts.find((o: UnitOption) =>o.value === u)?.factor || 1;
+ setForm(f =>({ ...f, medications: f.medications.map(x =>x.id === m.id ? { ...x, unit: u, factor: fct } : x) }));
+ }}
+ options={opts}
+ />
+ {mCalc?.hasData && (
+ <FieldHint
+ fieldPath="dlg.dose"
+ value={m.quantity || ''}
+ context={{
+ expected: mCalc.requiredMl ?? undefined,
+ expectedLabel: 'نیاز محاسبه‌شده',
+ expectedSource: 'context',
+ flockSize: flockAliveCount,
+ }}
+ />
+ )}
+ </div>
 
-        ) : null;
-        const doseField = (
-          <Field label={<>دوز <HelpIcon text={"**دوز چیست؟**\nدوز، نسخه یا دستور مصرف دامپزشک است (مثلاً ۵ سی‌سی در ۱ لیتر آب).\n\n**تفاوت با مقدار مصرفی:**\n«مقدار مصرفی» کل مقداری است که از انبار کسر می‌شود (مثلاً ۵۰ سی‌سی)."} /></>}>
-            <Input
-              placeholder="مثلاً ۰.۵"
-              value={m.dose}
-              onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, dose: e.target.value } : x) }))}
-              unit={getDoseUnitForMethod(m.method, medicineItems.find(w => w.id === m.itemId)?.unit)}
-            />
-          </Field>
-        );
-        const withdrawalField = !isHerbal ? (
-          <Field label={<>دوره پرهیز (روز) <HelpIcon text={"**دوره پرهیز:**\nچند روز بعد از مصرف، گوشت و تخم قابل فروش نیست و باید از فروش خودداری شود.\n\n**مثال:** اگر دوره پرهیز ۷ روز باشد، تخم‌های تولیدی تا ۷ روز قابل فروش نیستند."} /></>}>
-            <NumField
-              placeholder="مثلاً ۷"
-              value={m.withdrawalDays !== null && m.withdrawalDays !== undefined ? String(m.withdrawalDays) : ''}
-              onChange={e => setForm(f => ({ ...f, medications: f.medications.map(x => x.id === m.id ? { ...x, withdrawalDays: e.target.value === '' ? null : (parseInt(toEn(e.target.value)) || null) } : x) }))}
-              unit="روز" min={0}
-            />
-          </Field>
-        ) : null;
-        const mCalcMsg = mCalc ? (
-          <div style={{ fontSize: 'var(--fs-xs)', color: mCalc.hasData ? 'var(--accent)' : 'var(--muted)', fontWeight: 600, marginTop: 8, textAlign: 'center' }}>
-            {mCalc.hasData ? `💡 نیاز محاسبه‌شده: ${fmt.num(mCalc.requiredMl ?? 0)} میلی‌لیتر (${mCalc.reason})` : !m.method ? 'ℹ️ لطفاً برای محاسبه خودکار، روش مصرف را انتخاب کنید.' : `ℹ️ ${mCalc.reason}`}
-          </div>
-        ) : null;
+ ) : null;
+ const doseField = (
+ <Field label={<>دوز <HelpIcon text={"**دوز چیست؟**\nدوز، نسخه یا دستور مصرف دامپزشک است (مثلاً ۵ سی‌سی در ۱ لیتر آب).\n\n**تفاوت با مقدار مصرفی:**\n«مقدار مصرفی» کل مقداری است که از انبار کسر می‌شود (مثلاً ۵۰ سی‌سی)."} /></>}>
+ <Input
+ placeholder="مثلاً ۰.۵"
+ value={m.dose}
+ onChange={e =>setForm(f =>({ ...f, medications: f.medications.map(x =>x.id === m.id ? { ...x, dose: e.target.value } : x) }))}
+ unit={getDoseUnitForMethod(m.method, medicineItems.find(w =>w.id === m.itemId)?.unit)}
+ />
+ </Field>
+ );
+ const withdrawalField = !isHerbal ? (
+ <Field label={<>دوره پرهیز (روز) <HelpIcon text={"**دوره پرهیز:**\nچند روز بعد از مصرف، گوشت و تخم قابل فروش نیست و باید از فروش خودداری شود.\n\n**مثال:** اگر دوره پرهیز ۷ روز باشد، تخم‌های تولیدی تا ۷ روز قابل فروش نیستند."} /></>}>
+ <NumField
+ placeholder="مثلاً ۷"
+ value={m.withdrawalDays !== null && m.withdrawalDays !== undefined ? String(m.withdrawalDays) : ''}
+ onChange={e =>setForm(f =>({ ...f, medications: f.medications.map(x =>x.id === m.id ? { ...x, withdrawalDays: e.target.value === ''? null : (parseInt(toEn(e.target.value)) || null) } : x) }))}
+ unit="روز"min={0}
+ />
+ </Field>
+ ) : null;
+ const mCalcMsg = mCalc ? (
+ <div style={{ fontSize: 'var(--fs-xs)', color: mCalc.hasData ? 'var(--accent)': 'var(--muted)', fontWeight: 600, marginTop: 8, textAlign: 'center'}}>
+ {mCalc.hasData ? `نیاز محاسبه‌شده: ${fmt.num(mCalc.requiredMl ?? 0)} میلی‌لیتر (${mCalc.reason})`: !m.method ? 'لطفاً برای محاسبه خودکار، روش مصرف را انتخاب کنید.': `${mCalc.reason}`}
+ </div>
+ ) : null;
 
-        if (!qtyField) return <><Grid2>{doseField}{withdrawalField}</Grid2>{mCalcMsg}</>;
-        if (hasSub) return <>{qtyField}<Grid2>{doseField}{withdrawalField}</Grid2>{mCalcMsg}</>;
-        return <><Grid2>{qtyField}{doseField}</Grid2>{withdrawalField}{mCalcMsg}</>;
-      })()}
-    </>)}
-     </ExpandableCard>
+ if (!qtyField) return <><Grid2>{doseField}{withdrawalField}</Grid2>{mCalcMsg}</>;
+ if (hasSub) return <>{qtyField}<Grid2>{doseField}{withdrawalField}</Grid2>{mCalcMsg}</>;
+ return <><Grid2>{qtyField}{doseField}</Grid2>{withdrawalField}{mCalcMsg}</>;
+ })()}
+ </>)}
+ </ExpandableCard>
      );
     })}
    </>)}

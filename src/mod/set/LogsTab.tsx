@@ -191,35 +191,35 @@ export default function LogsTab() {
                     onToggle={() => setExpandedId(isOpen ? null : entry.id)}
                     stats={<><span style={{ color: 'var(--' + tone + ')', fontWeight: 700 }}>{label}</span></>}
                   >
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🔖 ماژول</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-                      {entry.module}
-                    </div>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>ماژول</div>
+ <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)'}}>
+ {entry.module}
+ </div>
 
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> نوع فعالیت</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-                      {label}
-                    </div>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>نوع فعالیت</div>
+ <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)'}}>
+ {label}
+ </div>
 
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}>💬 خلاصه</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', lineHeight: 1.7, wordBreak: 'break-word' }}>
-                      {entry.summary}
-                    </div>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}>خلاصه</div>
+ <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', lineHeight: 1.7, wordBreak: 'break-word'}}>
+ {entry.summary}
+ </div>
 
-                    {entry.details ? (
-                      <>
-                        <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}>📎 جزئیات</div>
-                        <div style={{ fontSize: 'var(--fs-xs)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', wordBreak: 'break-word' }}>
-                          {entry.details}
-                        </div>
-                      </>
-                    ) : null}
+ {entry.details ? (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}>جزئیات</div>
+ <div style={{ fontSize: 'var(--fs-xs)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', wordBreak: 'break-word'}}>
+ {entry.details}
+ </div>
+ </>
+ ) : null}
 
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}>⏰ زمان</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-                      {timeStr}
-                    </div>
-                  </ExpandableCard>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}>زمان</div>
+ <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)'}}>
+ {timeStr}
+ </div>
+ </ExpandableCard>
                 );
               })}
 
@@ -258,52 +258,52 @@ export default function LogsTab() {
                     onToggle={() => setExpandedId(isOpen ? null : log.id)}
                     stats={<><span style={{ color: 'var(--warn)', fontWeight: 700 }}>{log.type}</span></>}
                   >
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>⏰ زمان</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-                      {timeStr}
-                    </div>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>زمان</div>
+ <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)'}}>
+ {timeStr}
+ </div>
 
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> نوع</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-                      {log.type}
-                    </div>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>نوع</div>
+ <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)'}}>
+ {log.type}
+ </div>
 
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}>💬 پیام</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--danger-soft)', color: 'var(--danger)', borderRadius: 'var(--r-sm)', lineHeight: 1.7, wordBreak: 'break-word' }}>
-                      {log.message}
-                    </div>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}>پیام</div>
+ <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--danger-soft)', color: 'var(--danger)', borderRadius: 'var(--r-sm)', lineHeight: 1.7, wordBreak: 'break-word'}}>
+ {log.message}
+ </div>
 
-                    {log.componentStack ? (
-                      <>
-                        <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}>🌳 Stack کامپوننت</div>
-                        <div style={{
-                          fontSize: 12,
-                          fontFamily: 'monospace',
-                          padding: 'var(--pad-normal)',
-                          background: 'var(--input-bg)',
-                          borderRadius: 'var(--r-sm)',
-                          color: 'var(--muted)',
-                          maxHeight: 150,
-                          overflowY: 'auto',
-                          direction: 'ltr',
-                          textAlign: 'left',
-                          whiteSpace: 'pre-wrap',
-                          wordBreak: 'break-word',
-                        }}>
-                          {log.componentStack.slice(0, 800)}
-                        </div>
-                      </>
-                    ) : null}
+ {log.componentStack ? (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}>Stack کامپوننت</div>
+ <div style={{
+ fontSize: 12,
+ fontFamily: 'monospace',
+ padding: 'var(--pad-normal)',
+ background: 'var(--input-bg)',
+ borderRadius: 'var(--r-sm)',
+ color: 'var(--muted)',
+ maxHeight: 150,
+ overflowY: 'auto',
+ direction: 'ltr',
+ textAlign: 'left',
+ whiteSpace: 'pre-wrap',
+ wordBreak: 'break-word',
+ }}>
+ {log.componentStack.slice(0, 800)}
+ </div>
+ </>
+ ) : null}
 
-                    {log.url ? (
-                      <>
-                        <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}>🔗 URL</div>
-                        <div style={{ fontSize: 'var(--fs-xs)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', direction: 'ltr', textAlign: 'left', wordBreak: 'break-all' }}>
-                          {log.url}
-                        </div>
-                      </>
-                    ) : null}
-                  </ExpandableCard>
+ {log.url ? (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginTop: 4 }}>URL</div>
+ <div style={{ fontSize: 'var(--fs-xs)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', direction: 'ltr', textAlign: 'left', wordBreak: 'break-all'}}>
+ {log.url}
+ </div>
+ </>
+ ) : null}
+ </ExpandableCard>
                 );
               })}
 

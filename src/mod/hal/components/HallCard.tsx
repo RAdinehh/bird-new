@@ -129,108 +129,108 @@ export default function HallCard(props: HallCardProps) {
         {totalBirds > 0 && <span>پرنده: <b style={{ color: 'var(--text)' }}>{fmt.int(totalBirds)}</b></span>}
       </>}
     >
-      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📐 ابعاد و ظرفیت</div>
-      <RowGrid>
-        <Row l="مساحت" v={`${fmt.num(area)} م²`} />
-        <Row l="حجم" v={`${fmt.code(volume.toFixed(1))} م³`} />
-        <Row l="ظرفیت" v={h.capacity ? `${fmt.int(h.capacity)} پرنده` : '—'} />
-        {realCapacity && !h.capacity && (
-          <Row l="ظرفیت پیشنهادی" v={`~${fmt.int(realCapacity)}`} accent />
-        )}
-      </RowGrid>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>ابعاد و ظرفیت</div>
+ <RowGrid>
+ <Row l="مساحت"v={`${fmt.num(area)} م²`} />
+ <Row l="حجم"v={`${fmt.code(volume.toFixed(1))} م³`} />
+ <Row l="ظرفیت"v={h.capacity ? `${fmt.int(h.capacity)} پرنده`: '—'} />
+ {realCapacity && !h.capacity && (
+ <Row l="ظرفیت پیشنهادی"v={`~${fmt.int(realCapacity)}`} accent />
+ )}
+ </RowGrid>
 
-      {(h.birdId || h.breedId || h.responsibleId) && (
-        <>
-          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🏷 هویت</div>
-          <RowGrid>
-            {h.birdId && <Row l="پرنده" v={<EntityLink type="bird" id={h.birdId} label={birdNames?.get(h.birdId) || '—'} />} />}
-            {h.breedId && <Row l="نژاد" v={<EntityLink type="breed" id={h.breedId} label={breedNames?.get(h.breedId) || '—'} badge badgeBg="var(--purple-soft)" />} />}
-            {h.responsibleId && <Row l="مسئول" v={<EntityLink type="party" id={h.responsibleId} label={workerNames?.get(h.responsibleId) || '—'} />} />}
-            {h.responsibleId && <div />}
-          </RowGrid>
-        </>
-      )}
+ {(h.birdId || h.breedId || h.responsibleId) && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>هویت</div>
+ <RowGrid>
+ {h.birdId && <Row l="پرنده"v={<EntityLink type="bird"id={h.birdId} label={birdNames?.get(h.birdId) || '—'} />} />}
+ {h.breedId && <Row l="نژاد"v={<EntityLink type="breed"id={h.breedId} label={breedNames?.get(h.breedId) || '—'} badge badgeBg="var(--purple-soft)"/>} />}
+ {h.responsibleId && <Row l="مسئول"v={<EntityLink type="party"id={h.responsibleId} label={workerNames?.get(h.responsibleId) || '—'} />} />}
+ {h.responsibleId && <div />}
+ </RowGrid>
+ </>
+ )}
 
-      {hallFlocks.length > 0 && (
-        <>
-          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🐔 گله‌های فعال ({fmt.int(hallFlocks.length)})</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {hallFlocks.map((fl: Flock) => (
-              <Row key={fl.id} l={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{fl.paused ? '⏸ ' : ''}<EntityLink type="flock" id={fl.id} label={fl.name} /></span>} v={`${fmt.int(fl.currentCount || fl.initialCount || 0)} پرنده`} />
-            ))}
-            <Row l="جمع کل" v={`${fmt.int(totalBirds)} پرنده`} accent />
-          </div>
-        </>
-      )}
+ {hallFlocks.length >0 && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>گله‌های فعال ({fmt.int(hallFlocks.length)})</div>
+ <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+ {hallFlocks.map((fl: Flock) =>(
+ <Row key={fl.id} l={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{fl.paused ? '': ''}<EntityLink type="flock"id={fl.id} label={fl.name} /></span>} v={`${fmt.int(fl.currentCount || fl.initialCount || 0)} پرنده`} />
+ ))}
+ <Row l="جمع کل"v={`${fmt.int(totalBirds)} پرنده`} accent />
+ </div>
+ </>
+ )}
 
-      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🌡 شرایط محیطی</div>
-      <RowGrid>
-        <Row l="دمای هدف" v={__dynTemp != null ? fmt.temp(__dynTemp) : '—'} />
-        <Row l="رطوبت هدف" v={__dynHum != null ? `${fmt.num(__dynHum, { decimals: 0 })}٪` : '—'} />
-      </RowGrid>
-      <RowWithStatus l="تهویه"
-          v={
-            totalAirflow > 0
-              ? `${fmt.int(airChanges)} بار/ساعت`
-              : (h.ventilation && h.ventilation > 0)
-                ? `${fmt.int(h.ventilation)} m³/h`
-                : 'ثبت نشده'
-          }
-          icon={totalAirflow > 0 ? airIcon : undefined}
-          hint={totalAirflow > 0 ? airAdvice : undefined} />
-        <RowWithStatus l="روشنایی"
-          v={
-            totalLightW > 0
-              ? `${fmt.int(lux)} لوکس`
-              : (h.light && h.light > 0)
-                ? `${fmt.int(h.light)} لوکس`
-                : 'ثبت نشده'
-          }
-          icon={totalLightW > 0 ? lightIcon : undefined}
-          hint={totalLightW > 0 ? lightAdvice : undefined} />
-      {h.systemNotes && (
-        <>
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>📝 یادداشت سیستم‌ها</div>
-          <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{h.systemNotes}</div>
-        </>
-      )}
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>شرایط محیطی</div>
+ <RowGrid>
+ <Row l="دمای هدف"v={__dynTemp != null ? fmt.temp(__dynTemp) : '—'} />
+ <Row l="رطوبت هدف"v={__dynHum != null ? `${fmt.num(__dynHum, { decimals: 0 })}٪`: '—'} />
+ </RowGrid>
+ <RowWithStatus l="تهویه"
+ v={
+ totalAirflow >0
+ ? `${fmt.int(airChanges)} بار/ساعت`
+ : (h.ventilation && h.ventilation >0)
+ ? `${fmt.int(h.ventilation)} m³/h`
+ : 'ثبت نشده'
+ }
+ icon={totalAirflow >0 ? airIcon : undefined}
+ hint={totalAirflow >0 ? airAdvice : undefined} />
+ <RowWithStatus l="روشنایی"
+ v={
+ totalLightW >0
+ ? `${fmt.int(lux)} لوکس`
+ : (h.light && h.light >0)
+ ? `${fmt.int(h.light)} لوکس`
+ : 'ثبت نشده'
+ }
+ icon={totalLightW >0 ? lightIcon : undefined}
+ hint={totalLightW >0 ? lightAdvice : undefined} />
+ {h.systemNotes && (
+ <>
+ <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, paddingTop: 4 }}>یادداشت سیستم‌ها</div>
+ <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)'}}>{h.systemNotes}</div>
+ </>
+ )}
 
-      {(h.builtAt || h.lastSanitizedAt || equipValue > 0) && (
-        <>
-          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📅 زمان‌ها و ارزش</div>
-          <RowGrid>
-            {h.builtAt && <Row l="تاریخ ساخت" v={fmt.date(h.builtAt)} />}
-            {h.lastSanitizedAt && <Row l="آخرین ضدعفونی" v={fmt.date(h.lastSanitizedAt)} />}
-          </RowGrid>
-          {h.sanitizeNotes && <Row l="روش ضدعفونی" v={h.sanitizeNotes} />}
-          {equipValue > 0 && <Row l="ارزش تجهیزات" v={fmt.money(equipValue)} accent />}
-        </>
-      )}
+ {(h.builtAt || h.lastSanitizedAt || equipValue >0) && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>زمان‌ها و ارزش</div>
+ <RowGrid>
+ {h.builtAt && <Row l="تاریخ ساخت"v={fmt.date(h.builtAt)} />}
+ {h.lastSanitizedAt && <Row l="آخرین ضدعفونی"v={fmt.date(h.lastSanitizedAt)} />}
+ </RowGrid>
+ {h.sanitizeNotes && <Row l="روش ضدعفونی"v={h.sanitizeNotes} />}
+ {equipValue >0 && <Row l="ارزش تجهیزات"v={fmt.money(equipValue)} accent />}
+ </>
+ )}
 
-      {h.address && (
-        <>
-          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📍 آدرس</div>
-          <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{h.address}</div>
-        </>
-      )}
+ {h.address && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>آدرس</div>
+ <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)'}}>{h.address}</div>
+ </>
+ )}
 
-      {h.notes && (
-        <>
-          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
-          <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{h.notes}</div>
-        </>
-      )}
+ {h.notes && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>یادداشت</div>
+ <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)'}}>{h.notes}</div>
+ </>
+ )}
 
-      <HallEquipSection hallId={h.id}
-        needInput={{ birdCount: totalBirds, ageDays: flockAgeDays, areaM2: area, volumeM3: volume, standard: flockStandard, litterType: h.litterType }}
-        legacy={{ ventilationSystem: h.ventilationSystem, feederType: h.feederType, drinkerType: h.drinkerType, litterType: h.litterType }} />
+ <HallEquipSection hallId={h.id}
+ needInput={{ birdCount: totalBirds, ageDays: flockAgeDays, areaM2: area, volumeM3: volume, standard: flockStandard, litterType: h.litterType }}
+ legacy={{ ventilationSystem: h.ventilationSystem, feederType: h.feederType, drinkerType: h.drinkerType, litterType: h.litterType }} />
 
-      <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-1)' }}>
-        <CardActions actions={[
-          { ...ACTION_PRESETS.EDIT, onClick: onEdit },
-          { ...ACTION_PRESETS.DELETE, onClick: handleDelete }
-        ]} />
-      </div>
-    </ExpandableCard>
+ <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-1)'}}>
+ <CardActions actions={[
+ { ...ACTION_PRESETS.EDIT, onClick: onEdit },
+ { ...ACTION_PRESETS.DELETE, onClick: handleDelete }
+ ]} />
+ </div>
+ </ExpandableCard>
   );
 }

@@ -138,65 +138,65 @@ export default function BirdCard({
         </>
       }
     >
-      {aggregate && (
-        <>
-          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
-            <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> خلاصه
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
-            <StatRow label="🧬 کل نژاد" value={fmt.count(aggregate.total)} />
-            {aggregate.nativeCount > 0 && (
-              <StatRow label="🌾 بومی" value={fmt.count(aggregate.nativeCount)} />
-            )}
-            {aggregate.industrialCount > 0 && (
-              <StatRow label="🏭 صنعتی" value={fmt.count(aggregate.industrialCount)} />
-            )}
-            {aggregate.fancyCount > 0 && (
-              <StatRow label="🎨 تزئینی" value={fmt.count(aggregate.fancyCount)} />
-            )}
-            {aggregate.fcrMin != null && aggregate.fcrMax != null && (
-              <StatRow
-                label="📊 FCR"
-                value={aggregate.fcrMin === aggregate.fcrMax
-                  ? fmt.num(aggregate.fcrMin)
-                  : `${fmt.num(aggregate.fcrMin)} - ${fmt.num(aggregate.fcrMax)}`}
-              />
-            )}
-          </div>
-        </>
-      )}
+ {aggregate && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>
+ <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>خلاصه
+ </div>
+ <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+ <StatRow label="کل نژاد"value={fmt.count(aggregate.total)} />
+ {aggregate.nativeCount >0 && (
+ <StatRow label="بومی"value={fmt.count(aggregate.nativeCount)} />
+ )}
+ {aggregate.industrialCount >0 && (
+ <StatRow label="صنعتی"value={fmt.count(aggregate.industrialCount)} />
+ )}
+ {aggregate.fancyCount >0 && (
+ <StatRow label="تزئینی"value={fmt.count(aggregate.fancyCount)} />
+ )}
+ {aggregate.fcrMin != null && aggregate.fcrMax != null && (
+ <StatRow
+ label="FCR"
+ value={aggregate.fcrMin === aggregate.fcrMax
+ ? fmt.num(aggregate.fcrMin)
+ : `${fmt.num(aggregate.fcrMin)} - ${fmt.num(aggregate.fcrMax)}`}
+ />
+ )}
+ </div>
+ </>
+ )}
 
-      {birdBreeds.length > 0 && (
-        <>
-          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
-            <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🧬</span> نژادهای این پرنده
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
-            {birdBreeds.map(bd => createElement(StatRow, {
-              key: bd.id,
-              label: createElement(EntityLink, { type: "breed", id: bd.id, label: getBreedDisplayName(bd, customStandards) }),
-              value: bd.fcr ? `FCR ${fmt.num(bd.fcr)}` : "—"
-            }))}
-          </div>
-        </>
-      )}
+ {birdBreeds.length >0 && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>
+ <span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>نژادهای این پرنده
+ </div>
+ <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+ {birdBreeds.map(bd =>createElement(StatRow, {
+ key: bd.id,
+ label: createElement(EntityLink, { type: "breed", id: bd.id, label: getBreedDisplayName(bd, customStandards) }),
+ value: bd.fcr ? `FCR ${fmt.num(bd.fcr)}`: "—"
+ }))}
+ </div>
+ </>
+ )}
 
-      {/* 📖 کادر استاندارد متصل */}
-      {hasAnyStandard ? (
-        <StandardInfoBox
-          title={displayLabel}
-          source={displayStd?.source}
-          publishYear={displayStd?.publishYear}
-          badge="متصل"
-        />
-      ) : null}
+ {/* کادر استاندارد متصل */}
+ {hasAnyStandard ? (
+ <StandardInfoBox
+ title={displayLabel}
+ source={displayStd?.source}
+ publishYear={displayStd?.publishYear}
+ badge="متصل"
+ />
+ ) : null}
 
-      <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-        <CardActions actions={[
-          { ...ACTION_PRESETS.EDIT, onClick: () => onEdit(b) },
-          { ...ACTION_PRESETS.DELETE, onClick: handleDelete }
-        ]} />
-      </div>
-    </ExpandableCard>
+ <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
+ <CardActions actions={[
+ { ...ACTION_PRESETS.EDIT, onClick: () =>onEdit(b) },
+ { ...ACTION_PRESETS.DELETE, onClick: handleDelete }
+ ]} />
+ </div>
+ </ExpandableCard>
   );
 }

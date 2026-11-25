@@ -310,303 +310,303 @@ export default function FlockCard(props: FlockCardProps) {
       </>}
     >
 
-      {!isArchived && (
-        <LifecycleBar
-          type={f.type}
-          ageDays={ageDays}
-          endOfCycleDay={f.endOfCycleDay ?? null}
-          layingStartDay={f.layingStartDay ?? null}
-        />
-      )}
+ {!isArchived && (
+ <LifecycleBar
+ type={f.type}
+ ageDays={ageDays}
+ endOfCycleDay={f.endOfCycleDay ?? null}
+ layingStartDay={f.layingStartDay ?? null}
+ />
+ )}
 
-      
+ 
 
-      {(bird || breed) && (
-        <>
-          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🐔 پرنده و نژاد</div>
-          <RowGrid>
-            {bird && <Row l="پرنده" v={<EntityLink type="bird" id={bird.id} label={bird.name} />} />}
-            {breed && <Row l="نژاد" v={<EntityLink type="breed" id={breed.id} label={breed.name} badge badgeBg="var(--purple-soft)" />} />}
-            {!breed && f.breedKind === 'mixed' && f.breedLabel && (
-              <Row l="نژاد" v={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 'var(--fs-sm)', fontWeight: 700, padding: '3px 8px', borderRadius: 'var(--r-sm)', background: 'var(--dim-soft, var(--input-bg))', color: 'var(--muted)' }}>🔀 {f.breedLabel} <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 400, color: 'var(--dim)' }}>(مختلط)</span></span>} />
-            )}
-          </RowGrid>
-        </>
-      )}
+ {(bird || breed) && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>پرنده و نژاد</div>
+ <RowGrid>
+ {bird && <Row l="پرنده"v={<EntityLink type="bird"id={bird.id} label={bird.name} />} />}
+ {breed && <Row l="نژاد"v={<EntityLink type="breed"id={breed.id} label={breed.name} badge badgeBg="var(--purple-soft)"/>} />}
+ {!breed && f.breedKind === 'mixed'&& f.breedLabel && (
+ <Row l="نژاد"v={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 'var(--fs-sm)', fontWeight: 700, padding: '3px 8px', borderRadius: 'var(--r-sm)', background: 'var(--dim-soft, var(--input-bg))', color: 'var(--muted)'}}>{f.breedLabel} <span style={{ fontSize: 'var(--fs-xs)', fontWeight: 400, color: 'var(--dim)'}}>(مختلط)</span></span>} />
+ )}
+ </RowGrid>
+ </>
+ )}
 
-      {(hall || zone) && (
-        <>
-          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📍 مکان</div>
-          <RowGrid>
-            {hall && <Row l="سالن" v={<EntityLink type="hall" id={hall.id} label={hall.name} />} />}
-            {zone && <Row l="بخش" v={<EntityLink type="zone" id={zone.id} label={zone.name} />} />}
-          </RowGrid>
-        </>
-      )}
+ {(hall || zone) && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>مکان</div>
+ <RowGrid>
+ {hall && <Row l="سالن"v={<EntityLink type="hall"id={hall.id} label={hall.name} />} />}
+ {zone && <Row l="بخش"v={<EntityLink type="zone"id={zone.id} label={zone.name} />} />}
+ </RowGrid>
+ </>
+ )}
 
-      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📊 مشخصات</div>
-      <RowGrid>
-              {f.hatchId && (() => {
-                const incState = useInc.getState();
-                const h = incState.hatches?.find((x) => x.id === f.hatchId);
-                const entry = h ? incState.eggEntries?.find((e) => e.id === h.eggEntryId) : undefined;
-                const dev = entry ? incState.devices?.find((d) => d.id === entry.deviceId) : undefined;
-                return [
-                  h ? createElement(Row, { key: 'hatch', l: 'هچ مبدأ', v: createElement(EntityLink, { type: 'device', tab: 'hatches', id: h.id, label: h.date ? `هچ ${h.date}` : 'مشاهده هچ' }) }) : null,
-                  dev ? createElement(Row, { key: 'dev', l: 'دستگاه جوجه‌کشی', v: createElement(EntityLink, { type: 'device', id: dev.id, label: dev.name }) }) : null
-                ];
-              })()}
-              {_effectiveInvoiceId && (
-                <Row l="فاکتور خرید" v={createElement(EntityLink, { type: "invoice", id: _effectiveInvoiceId, label: _linkedPurchaseInv?.number ? formatInvoiceNumber(_linkedPurchaseInv.number) : "مشاهده" })} />
-              )}
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>مشخصات</div>
+ <RowGrid>
+ {f.hatchId && (() =>{
+ const incState = useInc.getState();
+ const h = incState.hatches?.find((x) =>x.id === f.hatchId);
+ const entry = h ? incState.eggEntries?.find((e) =>e.id === h.eggEntryId) : undefined;
+ const dev = entry ? incState.devices?.find((d) =>d.id === entry.deviceId) : undefined;
+ return [
+ h ? createElement(Row, { key: 'hatch', l: 'هچ مبدأ', v: createElement(EntityLink, { type: 'device', tab: 'hatches', id: h.id, label: h.date ? `هچ ${h.date}`: 'مشاهده هچ'}) }) : null,
+ dev ? createElement(Row, { key: 'dev', l: 'دستگاه جوجه‌کشی', v: createElement(EntityLink, { type: 'device', id: dev.id, label: dev.name }) }) : null
+ ];
+ })()}
+ {_effectiveInvoiceId && (
+ <Row l="فاکتور خرید"v={createElement(EntityLink, { type: "invoice", id: _effectiveInvoiceId, label: _linkedPurchaseInv?.number ? formatInvoiceNumber(_linkedPurchaseInv.number) : "مشاهده"})} />
+ )}
 
-        {f.initialCount != null && <Row l="تعداد اولیه" v={getGlobalFormat().count(f.initialCount)} />}
-        {f.initialCount != null && (() => {
-          const evs = ((f as any).events || []).filter((e: any) => !e.revoked);
-          const evSales = evs.filter((e: any) => e.type === 'sell').reduce((s: number, e: any) => s + (e.count || 0), 0);
-          const evDeaths = evs.filter((e: any) => e.type === 'death' || e.type === 'cull').reduce((s: number, e: any) => s + (e.count || 0), 0);
-          const unmatched = Math.max(0, (f.initialCount ?? 0) - (f.currentCount ?? 0) - evSales - evDeaths - consignmentCount);
-          return (
-            <>
-              {evDeaths > 0 && <Row l="تلفات" v={`${fmt.int(evDeaths)} (${getGlobalFormat().num((evDeaths / (f.initialCount || 1)) * 100)}٪)`} />}
-              {evSales > 0 && <Row l="فروش" v={fmt.int(evSales)} />}
-              {consignmentCount > 0 && <Row l="در دست طرف" v={fmt.int(consignmentCount)} />}
-              {unmatched > 0 && <Row l="تعدیل نامشخص" v={`${fmt.int(unmatched)} (بررسی کنید)`} accent />}
-            </>
-          );
-        })()}
-        {f.type === 'breeder' && ((f.maleCount ?? 0) + (f.femaleCount ?? 0) + (f.unknownCount ?? 0) > 0) && (
-          <>
-            {(f.maleCount ?? 0) > 0 && <Row l="تعداد نر" v={fmt.int(f.maleCount)} />}
-            {(f.femaleCount ?? 0) > 0 && <Row l="تعداد ماده" v={fmt.int(f.femaleCount)} />}
-            {(f.unknownCount ?? 0) > 0 && <Row l="جنسیت نامشخص" v={fmt.int(f.unknownCount)} />}
-            {f.maleCount != null && f.femaleCount != null && f.maleCount > 0 && f.femaleCount > 0 && (
-              <Row l="نسبت نر/ماده" v={sexRatio(f.maleCount, f.femaleCount)} />
-            )}
-          </>
-        )}
-        <Row l="منبع" v={SOURCE_LABEL[f.source] || '—'} />
-        {f.endOfCycleDay && <Row l="چرخه زندگی" v={`${fmt.int(f.endOfCycleDay)} روز`} />}
-        {(() => {
-          if (f.type !== 'layer' && f.type !== 'breeder') return null;
-          const layStart = f.layingStartDay || DEFAULT_LAYING_START;
-          const fromStd = !f.layingStartDay;
-          return <Row l="سن تخم‌گذاری" v={`${fmt.int(layStart)} روز${fromStd ? ' (استاندارد)' : ''}`} />;
-        })()}
-        {vaccineEnabled && f.vaccineScheduleId && (() => {
-          const sch = getSchedule(f.vaccineScheduleId);
-          if (!sch) return null;
-          return <Row l="برنامه واکسن" v={`${sch.label} • ${getGlobalFormat().count(sch.items.length)} مرحله`} />;
-        })()}
-      </RowGrid>
+ {f.initialCount != null && <Row l="تعداد اولیه"v={getGlobalFormat().count(f.initialCount)} />}
+ {f.initialCount != null && (() =>{
+ const evs = ((f as any).events || []).filter((e: any) =>!e.revoked);
+ const evSales = evs.filter((e: any) =>e.type === 'sell').reduce((s: number, e: any) =>s + (e.count || 0), 0);
+ const evDeaths = evs.filter((e: any) =>e.type === 'death'|| e.type === 'cull').reduce((s: number, e: any) =>s + (e.count || 0), 0);
+ const unmatched = Math.max(0, (f.initialCount ?? 0) - (f.currentCount ?? 0) - evSales - evDeaths - consignmentCount);
+ return (
+ <>
+ {evDeaths >0 && <Row l="تلفات"v={`${fmt.int(evDeaths)} (${getGlobalFormat().num((evDeaths / (f.initialCount || 1)) * 100)}٪)`} />}
+ {evSales >0 && <Row l="فروش"v={fmt.int(evSales)} />}
+ {consignmentCount >0 && <Row l="در دست طرف"v={fmt.int(consignmentCount)} />}
+ {unmatched >0 && <Row l="تعدیل نامشخص"v={`${fmt.int(unmatched)} (بررسی کنید)`} accent />}
+ </>
+ );
+ })()}
+ {f.type === 'breeder'&& ((f.maleCount ?? 0) + (f.femaleCount ?? 0) + (f.unknownCount ?? 0) >0) && (
+ <>
+ {(f.maleCount ?? 0) >0 && <Row l="تعداد نر"v={fmt.int(f.maleCount)} />}
+ {(f.femaleCount ?? 0) >0 && <Row l="تعداد ماده"v={fmt.int(f.femaleCount)} />}
+ {(f.unknownCount ?? 0) >0 && <Row l="جنسیت نامشخص"v={fmt.int(f.unknownCount)} />}
+ {f.maleCount != null && f.femaleCount != null && f.maleCount >0 && f.femaleCount >0 && (
+ <Row l="نسبت نر/ماده"v={sexRatio(f.maleCount, f.femaleCount)} />
+ )}
+ </>
+ )}
+ <Row l="منبع"v={SOURCE_LABEL[f.source] || '—'} />
+ {f.endOfCycleDay && <Row l="چرخه زندگی"v={`${fmt.int(f.endOfCycleDay)} روز`} />}
+ {(() =>{
+ if (f.type !== 'layer'&& f.type !== 'breeder') return null;
+ const layStart = f.layingStartDay || DEFAULT_LAYING_START;
+ const fromStd = !f.layingStartDay;
+ return <Row l="سن تخم‌گذاری"v={`${fmt.int(layStart)} روز${fromStd ? '(استاندارد)': ''}`} />;
+ })()}
+ {vaccineEnabled && f.vaccineScheduleId && (() =>{
+ const sch = getSchedule(f.vaccineScheduleId);
+ if (!sch) return null;
+ return <Row l="برنامه واکسن"v={`${sch.label} • ${getGlobalFormat().count(sch.items.length)} مرحله`} />;
+ })()}
+ </RowGrid>
 
-      {(f.hatchDate || f.purchaseDate || f.startDate) && (
-        <>
-          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📅 تاریخ‌ها</div>
-          <RowGrid>
-            {f.hatchDate && <Row l="هچ" v={getGlobalFormat().date(f.hatchDate)} />}
-            {f.purchaseDate && <Row l="خرید" v={getGlobalFormat().date(f.purchaseDate)} />}
-            {f.startDate && <Row l="شروع" v={getGlobalFormat().date(f.startDate)} />}
-          </RowGrid>
-        </>
-      )}
+ {(f.hatchDate || f.purchaseDate || f.startDate) && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>تاریخ‌ها</div>
+ <RowGrid>
+ {f.hatchDate && <Row l="هچ"v={getGlobalFormat().date(f.hatchDate)} />}
+ {f.purchaseDate && <Row l="خرید"v={getGlobalFormat().date(f.purchaseDate)} />}
+ {f.startDate && <Row l="شروع"v={getGlobalFormat().date(f.startDate)} />}
+ </RowGrid>
+ </>
+ )}
 
-      {(costs.total > 0 || consumption.totalCost > 0) && (
-        <>
-          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>💰 هزینه‌ها</div>
-          <RowGrid>
-            {costs.birdCost > 0 && <Row l="قیمت پرنده‌ها" v={fmt.money(costs.birdCost)} />}
-            {costs.delivery > 0 && <Row l="هزینه حمل" v={fmt.money(costs.delivery)} />}
-            {costs.other > 0 && <Row l="سایر" v={fmt.money(costs.other)} />}
-            {dealType === 'rent' && costs.rentOwed > 0 && (
-              <>
-                <Row l={`اجاره انباشته (${rentPeriodLabel[dealData.rentPeriod || 'monthly'] || 'ماهانه'})`} v={fmt.money(costs.rentOwed)} />
-                {costs.rentInfo.paid > 0 && (
-                  <Row l="پرداخت‌شده" v={fmt.money(costs.rentInfo.paid)} />
-                )}
-                {costs.rentInfo.outstanding > 0 && (
-                  <Row l="بدهی اجاره" v={fmt.money(costs.rentInfo.outstanding)} />
-                )}
-              </>
-            )}
-            {consumption.totalCost > 0 && (
-              <>
-                <Row l="هزینه ثابت" v={fmt.money(costs.grandTotalOwed)} />
-                <Row l="مصرف انبار" v={fmt.money(consumption.totalCost)} />
-              </>
-            )}
-            {costs.rentOwed > 0 ? (
-              <>
-                <Row l="جمع خرید" v={fmt.money(costs.purchaseTotal)} />
-                <Row l="هزینه کل (با اجاره)" v={fmt.money(totalCost)} accent />
-              </>
-            ) : (
-              <Row l={consumption.totalCost > 0 ? "هزینه کل" : "جمع کل"} v={fmt.money(totalCost)} accent />
-            )}
-            {totalCost > 0 && !hasConsignmentLosses && (f.currentCount || 0) > 0 && <Row l="هر پرنده" v={fmt.money(Math.round(totalCost / (f.currentCount || 1)))} accent />}
-          </RowGrid>
-        </>
-      )}
+ {(costs.total >0 || consumption.totalCost >0) && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>هزینه‌ها</div>
+ <RowGrid>
+ {costs.birdCost >0 && <Row l="قیمت پرنده‌ها"v={fmt.money(costs.birdCost)} />}
+ {costs.delivery >0 && <Row l="هزینه حمل"v={fmt.money(costs.delivery)} />}
+ {costs.other >0 && <Row l="سایر"v={fmt.money(costs.other)} />}
+ {dealType === 'rent'&& costs.rentOwed >0 && (
+ <>
+ <Row l={`اجاره انباشته (${rentPeriodLabel[dealData.rentPeriod || 'monthly'] || 'ماهانه'})`} v={fmt.money(costs.rentOwed)} />
+ {costs.rentInfo.paid >0 && (
+ <Row l="پرداخت‌شده"v={fmt.money(costs.rentInfo.paid)} />
+ )}
+ {costs.rentInfo.outstanding >0 && (
+ <Row l="بدهی اجاره"v={fmt.money(costs.rentInfo.outstanding)} />
+ )}
+ </>
+ )}
+ {consumption.totalCost >0 && (
+ <>
+ <Row l="هزینه ثابت"v={fmt.money(costs.grandTotalOwed)} />
+ <Row l="مصرف انبار"v={fmt.money(consumption.totalCost)} />
+ </>
+ )}
+ {costs.rentOwed >0 ? (
+ <>
+ <Row l="جمع خرید"v={fmt.money(costs.purchaseTotal)} />
+ <Row l="هزینه کل (با اجاره)"v={fmt.money(totalCost)} accent />
+ </>
+ ) : (
+ <Row l={consumption.totalCost >0 ? "هزینه کل": "جمع کل"} v={fmt.money(totalCost)} accent />
+ )}
+ {totalCost >0 && !hasConsignmentLosses && (f.currentCount || 0) >0 && <Row l="هر پرنده"v={fmt.money(Math.round(totalCost / (f.currentCount || 1)))} accent />}
+ </RowGrid>
+ </>
+ )}
 
-      {(() => {
-        const revenue = invoiceRevenue;
-        if (revenue === 0) return null;
-        const profit = revenue - totalCost;
-        const roi = totalCost > 0 ? (profit / totalCost) * 100 : 0;
-        const isProfit = profit >= 0;
-        const color = isProfit ? 'var(--accent)' : 'var(--danger)';
-        return (
-          <>
-            <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📈 درآمد و سود</div>
-            <RowGrid>
-              {f.hatchId && (() => {
-                const incState = useInc.getState();
-                const h = incState.hatches?.find((x) => x.id === f.hatchId);
-                const entry = h ? incState.eggEntries?.find((e) => e.id === h.eggEntryId) : undefined;
-                const dev = entry ? incState.devices?.find((d) => d.id === entry.deviceId) : undefined;
-                return [
-                  h ? createElement(Row, { key: 'hatch', l: 'هچ مبدأ', v: createElement(EntityLink, { type: 'device', tab: 'hatches', id: h.id, label: h.date ? `هچ ${h.date}` : 'مشاهده هچ' }) }) : null,
-                  dev ? createElement(Row, { key: 'dev', l: 'دستگاه جوجه‌کشی', v: createElement(EntityLink, { type: 'device', id: dev.id, label: dev.name }) }) : null
-                ];
-              })()}
-              {f.sourceInvoiceId && (
-                <Row l="فاکتور خرید" v={<EntityLink type="invoice" id={f.sourceInvoiceId} label="مشاهده" />} />
-              )}
-              <Row l="فروش کل" v={fmt.money(revenue)} />
-              <Row l="هزینه ثابت" v={fmt.money(costs.grandTotalOwed)} />
-              {consumption.totalCost > 0 && (
-                <Row l="مصرف انبار" v={fmt.money(consumption.totalCost)} />
-              )}
-              <Row l="هزینه کل" v={fmt.money(totalCost)} />
-              <Row l={isProfit ? 'سود خالص' : 'زیان'} v={fmt.money(Math.abs(profit))} accent={isProfit} />
-              {totalCost > 0 && <Row l="ROI" v={`${getGlobalFormat().num(roi)}٪`} />}
-              {dealType === 'partnership' && partnerShare > 0 && (
-                <>
-                  <Row l={`سهم شریک (${getGlobalFormat().count(partnerShare)}٪)`} v={fmt.money(Math.round(profit * partnerShare / 100))} />
-                  <Row l={`سهم شما (${getGlobalFormat().count(myShare)}٪)`} v={fmt.money(Math.round(profit * myShare / 100))} accent={isProfit} />
-                </>
-              )}
-            </RowGrid>
-          </>
-        );
-      })()}
+ {(() =>{
+ const revenue = invoiceRevenue;
+ if (revenue === 0) return null;
+ const profit = revenue - totalCost;
+ const roi = totalCost >0 ? (profit / totalCost) * 100 : 0;
+ const isProfit = profit >= 0;
+ const color = isProfit ? 'var(--accent)': 'var(--danger)';
+ return (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>درآمد و سود</div>
+ <RowGrid>
+ {f.hatchId && (() =>{
+ const incState = useInc.getState();
+ const h = incState.hatches?.find((x) =>x.id === f.hatchId);
+ const entry = h ? incState.eggEntries?.find((e) =>e.id === h.eggEntryId) : undefined;
+ const dev = entry ? incState.devices?.find((d) =>d.id === entry.deviceId) : undefined;
+ return [
+ h ? createElement(Row, { key: 'hatch', l: 'هچ مبدأ', v: createElement(EntityLink, { type: 'device', tab: 'hatches', id: h.id, label: h.date ? `هچ ${h.date}`: 'مشاهده هچ'}) }) : null,
+ dev ? createElement(Row, { key: 'dev', l: 'دستگاه جوجه‌کشی', v: createElement(EntityLink, { type: 'device', id: dev.id, label: dev.name }) }) : null
+ ];
+ })()}
+ {f.sourceInvoiceId && (
+ <Row l="فاکتور خرید"v={<EntityLink type="invoice"id={f.sourceInvoiceId} label="مشاهده"/>} />
+ )}
+ <Row l="فروش کل"v={fmt.money(revenue)} />
+ <Row l="هزینه ثابت"v={fmt.money(costs.grandTotalOwed)} />
+ {consumption.totalCost >0 && (
+ <Row l="مصرف انبار"v={fmt.money(consumption.totalCost)} />
+ )}
+ <Row l="هزینه کل"v={fmt.money(totalCost)} />
+ <Row l={isProfit ? 'سود خالص': 'زیان'} v={fmt.money(Math.abs(profit))} accent={isProfit} />
+ {totalCost >0 && <Row l="ROI"v={`${getGlobalFormat().num(roi)}٪`} />}
+ {dealType === 'partnership'&& partnerShare >0 && (
+ <>
+ <Row l={`سهم شریک (${getGlobalFormat().count(partnerShare)}٪)`} v={fmt.money(Math.round(profit * partnerShare / 100))} />
+ <Row l={`سهم شما (${getGlobalFormat().count(myShare)}٪)`} v={fmt.money(Math.round(profit * myShare / 100))} accent={isProfit} />
+ </>
+ )}
+ </RowGrid>
+ </>
+ );
+ })()}
 
-      <FlockValueSection flock={f} />
+ <FlockValueSection flock={f} />
 
-      {f.mergedInfo && (f.mergedInfo.sources?.length || 0) >= 2 && (() => {
-        const _all = f.mergedInfo.sources || [];
-        const _total = _all.reduce((s: number, x: any) => s + (x.count || 0), 0);
-        const _count = _all.length;
-        return (
-          <>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>گله ادغام‌شده</span>
-                <HelpIcon text={HELP.flk.merged} />
-                <span style={{
-                  fontSize: 'var(--fs-2xs)',
-                  color: 'var(--muted)',
-                  background: 'var(--input-bg)',
-                  border: '1px solid var(--border)',
-                  padding: '1px 6px',
-                  borderRadius: 4,
-                  fontWeight: 600,
-                }}>از {getGlobalFormat().count(_count)} گله</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setUnmergeOpen(true)}
-                title="بازگردانی گله"
-                style={{
-                  width: 28, height: 28,
-                  background: 'var(--btn-bg)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--r-sm)',
-                  cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 14, color: 'var(--text)',
-                  fontFamily: 'inherit', padding: 0,
-                }}
-              >♻️</button>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-1)' }}>
-              {_all.map((s: any) => (
-                <Row key={s.flockId} l={s.flockName} v={`${fmt.int(s.count || 0)} پرنده`} />
-              ))}
-            </div>
-          </>
-        );
-      })()}
+ {f.mergedInfo && (f.mergedInfo.sources?.length || 0) >= 2 && (() =>{
+ const _all = f.mergedInfo.sources || [];
+ const _total = _all.reduce((s: number, x: any) =>s + (x.count || 0), 0);
+ const _count = _all.length;
+ return (
+ <>
+ <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}>
+ <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+ <span style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>گله ادغام‌شده</span>
+ <HelpIcon text={HELP.flk.merged} />
+ <span style={{
+ fontSize: 'var(--fs-2xs)',
+ color: 'var(--muted)',
+ background: 'var(--input-bg)',
+ border: '1px solid var(--border)',
+ padding: '1px 6px',
+ borderRadius: 4,
+ fontWeight: 600,
+ }}>از {getGlobalFormat().count(_count)} گله</span>
+ </div>
+ <button
+ type="button"
+ onClick={() =>setUnmergeOpen(true)}
+ title="بازگردانی گله"
+ style={{
+ width: 28, height: 28,
+ background: 'var(--btn-bg)',
+ border: '1px solid var(--border)',
+ borderRadius: 'var(--r-sm)',
+ cursor: 'pointer',
+ display: 'flex', alignItems: 'center', justifyContent: 'center',
+ fontSize: 14, color: 'var(--text)',
+ fontFamily: 'inherit', padding: 0,
+ }}
+ ></button>
+ </div>
+ <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-1)'}}>
+ {_all.map((s: any) =>(
+ <Row key={s.flockId} l={s.flockName} v={`${fmt.int(s.count || 0)} پرنده`} />
+ ))}
+ </div>
+ </>
+ );
+ })()}
 
-      {(() => {
-        const cons = computeFlockConsumption(f.id, whsMovements, whsItems);
-        const hasAnyQty = cons.feed.total > 0 || cons.medicine.total > 0 || cons.vaccine.total > 0 || cons.other.total > 0;
-        if (!hasAnyQty && cons.totalCost === 0) return null;
-        return (
-          <>
-            <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', display: 'flex', alignItems: 'center', gap: 4 }}>
-              📦 مصرف انبار
-              <HelpIcon text={HELP.flk.consumption} />
-            </div>
-            <RowGrid>
-              {cons.feed.total > 0 && <Row l="دان" v={`${fmt.int(cons.feed.total)} کیلو`} />}
-              {cons.medicine.total > 0 && <Row l="دارو" v={cons.medicine.cost > 0 ? fmt.money(cons.medicine.cost) : `${fmt.int(cons.medicine.total)}`} />}
-              {cons.herbal.total > 0 && <Row l="دارو گیاهی" v={cons.herbal.cost > 0 ? fmt.money(cons.herbal.cost) : `${fmt.int(cons.herbal.total)}`} />}
-              {cons.vaccine.total > 0 && <Row l="واکسن" v={cons.vaccine.cost > 0 ? fmt.money(cons.vaccine.cost) : `${fmt.int(cons.vaccine.total)}`} />}
-              {cons.other.total > 0 && <Row l="سایر" v={cons.other.cost > 0 ? fmt.money(cons.other.cost) : `${fmt.int(cons.other.total)}`} />}
-              {cons.totalCost > 0 && <Row l="جمع هزینه" v={fmt.money(cons.totalCost)} accent />}
-              {cons.totalCost === 0 && hasAnyQty && (
-                <Row l="جمع مصرف" v="قیمت‌ها در انبار ثبت نشده" accent />
-              )}
-            </RowGrid>
-          </>
-        );
-      })()}
+ {(() =>{
+ const cons = computeFlockConsumption(f.id, whsMovements, whsItems);
+ const hasAnyQty = cons.feed.total >0 || cons.medicine.total >0 || cons.vaccine.total >0 || cons.other.total >0;
+ if (!hasAnyQty && cons.totalCost === 0) return null;
+ return (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', display: 'flex', alignItems: 'center', gap: 4 }}>
+ مصرف انبار
+ <HelpIcon text={HELP.flk.consumption} />
+ </div>
+ <RowGrid>
+ {cons.feed.total >0 && <Row l="دان"v={`${fmt.int(cons.feed.total)} کیلو`} />}
+ {cons.medicine.total >0 && <Row l="دارو"v={cons.medicine.cost >0 ? fmt.money(cons.medicine.cost) : `${fmt.int(cons.medicine.total)}`} />}
+ {cons.herbal.total >0 && <Row l="دارو گیاهی"v={cons.herbal.cost >0 ? fmt.money(cons.herbal.cost) : `${fmt.int(cons.herbal.total)}`} />}
+ {cons.vaccine.total >0 && <Row l="واکسن"v={cons.vaccine.cost >0 ? fmt.money(cons.vaccine.cost) : `${fmt.int(cons.vaccine.total)}`} />}
+ {cons.other.total >0 && <Row l="سایر"v={cons.other.cost >0 ? fmt.money(cons.other.cost) : `${fmt.int(cons.other.total)}`} />}
+ {cons.totalCost >0 && <Row l="جمع هزینه"v={fmt.money(cons.totalCost)} accent />}
+ {cons.totalCost === 0 && hasAnyQty && (
+ <Row l="جمع مصرف"v="قیمت‌ها در انبار ثبت نشده"accent />
+ )}
+ </RowGrid>
+ </>
+ );
+ })()}
 
-      {isArchived && f.archivedReason && (
-        <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', color: 'var(--warn)' }}>
-          <b>دلیل آرشیو:</b> {f.archivedReason}
-        </div>
-      )}
+ {isArchived && f.archivedReason && (
+ <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-sm)', color: 'var(--warn)'}}>
+ <b>دلیل آرشیو:</b>{f.archivedReason}
+ </div>
+ )}
 
-      {f.notes && (
-        <>
-          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
-          <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{f.notes}</div>
-        </>
-      )}
+ {f.notes && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>یادداشت</div>
+ <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)'}}>{f.notes}</div>
+ </>
+ )}
 
-      {isArchived ? (
-        <CardActions actions={[
-          { ...ACTION_PRESETS.RESTORE, onClick: onRestore },
-          { ...ACTION_PRESETS.DELETE, onClick: onDelete }
-        ]} />
-      ) : (
-        <>
-          <CardActions actions={[
-            { ...ACTION_PRESETS.EDIT, onClick: handleEditGuard, priority: 10 },
-            { label: 'تفکیک جنسیت', onClick: () => setSexingOpen(true), variant: 'outline', hidden: f.type === 'broiler', group: 'sexing', priority: 20 },
-            { label: 'سابقه تفکیک', onClick: () => setSexingHistoryOpen(true), variant: 'outline', hidden: (f.sexingEvents?.length || 0) === 0, group: 'sexing', priority: 20 },
-            { label: 'ثبت دان/آب', onClick: () => setConsumptionOpen(true), variant: 'outline', priority: 30 },
-            { ...ACTION_PRESETS.HISTORY, onClick: () => setHistoryOpen(true), priority: 40 },
-            { label: 'گروه‌ها', onClick: onOpenGroups, variant: 'outline', priority: 70 },
-            { label: f.hidden ? 'نمایان' : 'پنهان', onClick: onToggleHidden, variant: 'outline', priority: 80 },
-            { label: f.paused ? 'فعال' : 'غیرفعال', onClick: onTogglePaused, variant: 'outline', priority: 90 }
-          ]} />
-        </>
-      )}
+ {isArchived ? (
+ <CardActions actions={[
+ { ...ACTION_PRESETS.RESTORE, onClick: onRestore },
+ { ...ACTION_PRESETS.DELETE, onClick: onDelete }
+ ]} />
+ ) : (
+ <>
+ <CardActions actions={[
+ { ...ACTION_PRESETS.EDIT, onClick: handleEditGuard, priority: 10 },
+ { label: 'تفکیک جنسیت', onClick: () =>setSexingOpen(true), variant: 'outline', hidden: f.type === 'broiler', group: 'sexing', priority: 20 },
+ { label: 'سابقه تفکیک', onClick: () =>setSexingHistoryOpen(true), variant: 'outline', hidden: (f.sexingEvents?.length || 0) === 0, group: 'sexing', priority: 20 },
+ { label: 'ثبت دان/آب', onClick: () =>setConsumptionOpen(true), variant: 'outline', priority: 30 },
+ { ...ACTION_PRESETS.HISTORY, onClick: () =>setHistoryOpen(true), priority: 40 },
+ { label: 'گروه‌ها', onClick: onOpenGroups, variant: 'outline', priority: 70 },
+ { label: f.hidden ? 'نمایان': 'پنهان', onClick: onToggleHidden, variant: 'outline', priority: 80 },
+ { label: f.paused ? 'فعال': 'غیرفعال', onClick: onTogglePaused, variant: 'outline', priority: 90 }
+ ]} />
+ </>
+ )}
 
-      <FlockHistoryModal
-        open={historyOpen}
-        onClose={() => setHistoryOpen(false)}
-        flock={f}
-      />
-          <UnmergeFlocksModal open={unmergeOpen} onClose={() => setUnmergeOpen(false)} targetFlockId={f.id} />
-      <SexingModal open={sexingOpen} onClose={() => setSexingOpen(false)} flock={f} />
-      <SexingHistoryModal open={sexingHistoryOpen} onClose={() => setSexingHistoryOpen(false)} flock={f} />
-      <ConsumptionFormModal open={consumptionOpen} onClose={() => setConsumptionOpen(false)} flock={f} />
-      <MergedEditBlockModal open={editBlockOpen} onClose={() => setEditBlockOpen(false)} onUnmerge={() => setUnmergeOpen(true)} flockName={f.name} />
-    </ExpandableCard>
+ <FlockHistoryModal
+ open={historyOpen}
+ onClose={() =>setHistoryOpen(false)}
+ flock={f}
+ />
+ <UnmergeFlocksModal open={unmergeOpen} onClose={() =>setUnmergeOpen(false)} targetFlockId={f.id} />
+ <SexingModal open={sexingOpen} onClose={() =>setSexingOpen(false)} flock={f} />
+ <SexingHistoryModal open={sexingHistoryOpen} onClose={() =>setSexingHistoryOpen(false)} flock={f} />
+ <ConsumptionFormModal open={consumptionOpen} onClose={() =>setConsumptionOpen(false)} flock={f} />
+ <MergedEditBlockModal open={editBlockOpen} onClose={() =>setEditBlockOpen(false)} onUnmerge={() =>setUnmergeOpen(true)} flockName={f.name} />
+ </ExpandableCard>
     
     </>
   );

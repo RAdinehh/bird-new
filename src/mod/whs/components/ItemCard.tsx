@@ -97,106 +97,106 @@ export default function ItemCard(props: ItemCardProps) {
         {it.lastPrice > 0 ? <span>ارزش: <b style={{ color: 'var(--text)' }}>{fmt.money(it.currentStock * getAvgPrice(it))}</b></span> : null}
       </>}
     >
-      <SectionTitle>📦 مشخصات قلم</SectionTitle>
-      <Row l="دسته" v={(CATEGORY_LABEL as any)[it.category]} />
-      <Row l="واحد" v={(UNIT_LABEL as any)[it.unit]} />
-      <Row l="موجودی فعلی" v={formatQty(it.currentStock, it.unit)} />
-      {it.minStock > 0 ? <Row l="حداقل موجودی" v={`${fmt.num(it.minStock)} ${(UNIT_LABEL as any)[it.unit]}`} /> : null}
-      {it.avgPrice && it.avgPrice > 0 ? <Row l="قیمت میانگین" v={fmt.money(getAvgPrice(it))} /> : null}
-      {it.lastPrice > 0 ? <Row l="آخرین قیمت خرید" v={fmt.money(it.lastPrice)} /> : null}
-      {sup ? <Row l="تأمین‌کننده" v={createElement(EntityLink, { type: "party", id: sup.id, label: sup.name })} /> : null}
-      {hall ? <Row l="سالن" v={createElement(EntityLink, { type: "hall", id: hall.id, label: hall.name })} /> : null}
+ <SectionTitle>مشخصات قلم</SectionTitle>
+ <Row l="دسته"v={(CATEGORY_LABEL as any)[it.category]} />
+ <Row l="واحد"v={(UNIT_LABEL as any)[it.unit]} />
+ <Row l="موجودی فعلی"v={formatQty(it.currentStock, it.unit)} />
+ {it.minStock >0 ? <Row l="حداقل موجودی"v={`${fmt.num(it.minStock)} ${(UNIT_LABEL as any)[it.unit]}`} />: null}
+ {it.avgPrice && it.avgPrice >0 ? <Row l="قیمت میانگین"v={fmt.money(getAvgPrice(it))} />: null}
+ {it.lastPrice >0 ? <Row l="آخرین قیمت خرید"v={fmt.money(it.lastPrice)} />: null}
+ {sup ? <Row l="تأمین‌کننده"v={createElement(EntityLink, { type: "party", id: sup.id, label: sup.name })} />: null}
+ {hall ? <Row l="سالن"v={createElement(EntityLink, { type: "hall", id: hall.id, label: hall.name })} />: null}
 
-      {it.currentStock > 0 && it.lastPrice > 0 ? (
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-          <span>ارزش موجودی:</span>
-          <span>{fmt.money(it.currentStock * getAvgPrice(it))}</span>
-        </div>
-      ) : null}
+ {it.currentStock >0 && it.lastPrice >0 ? (
+ <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+ <span>ارزش موجودی:</span>
+ <span>{fmt.money(it.currentStock * getAvgPrice(it))}</span>
+ </div>
+ ) : null}
 
-      {(it.category === 'medicine' || it.category === 'vaccine') ? (
-        <>
-          <SectionTitle>💊 اطلاعات دارویی</SectionTitle>
-          {it.expireDate ? <Row l="تاریخ انقضا" v={fmt.date(it.expireDate)} /> : null}
-          {days !== null ? (
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: days < 0 ? 'var(--danger-soft)' : days <= 30 ? 'var(--warn-soft)' : 'var(--input-bg)', color: days < 0 ? 'var(--danger)' : days <= 30 ? 'var(--warn)' : 'var(--muted)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-              <span>وضعیت انقضا:</span>
-              <span>{days < 0 ? `${fmt.day(Math.abs(days))} روز گذشته` : `${fmt.day(days)} روز مانده`}</span>
-            </div>
-          ) : null}
-          {it.withdrawalDays !== null && it.withdrawalDays !== undefined ? <Row l="دوره منع مصرف" v={`${fmt.day(it.withdrawalDays)} روز`} /> : null}
-          {it.storage ? <Row l="نگهداری" v={(STORAGE_LABEL as any)[it.storage] || it.storage} /> : null}
-          {(() => {
-    const arr: string[] = (it as any).usageTypes || ((it as any).usageType ? [(it as any).usageType] : []);
-    if (arr.length === 0) return null;
-    return <Row l="نوع مصرف" v={arr.map((t: string) => VET_METHOD_LABEL[t] || t).join(' • ')} />;
-  })()}
-          {it.dosePerBird ? <Row l="دوز هر پرنده" v={`${fmt.num(it.dosePerBird)} ml`} /> : null}
-          {it.productionDate ? <Row l="تاریخ تولید" v={fmt.date(it.productionDate)} /> : null}
-        </>
-      ) : null}
+ {(it.category === 'medicine'|| it.category === 'vaccine') ? (
+ <>
+ <SectionTitle>اطلاعات دارویی</SectionTitle>
+ {it.expireDate ? <Row l="تاریخ انقضا"v={fmt.date(it.expireDate)} />: null}
+ {days !== null ? (
+ <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: days < 0 ? 'var(--danger-soft)': days <= 30 ? 'var(--warn-soft)': 'var(--input-bg)', color: days < 0 ? 'var(--danger)': days <= 30 ? 'var(--warn)': 'var(--muted)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+ <span>وضعیت انقضا:</span>
+ <span>{days < 0 ? `${fmt.day(Math.abs(days))} روز گذشته`: `${fmt.day(days)} روز مانده`}</span>
+ </div>
+ ) : null}
+ {it.withdrawalDays !== null && it.withdrawalDays !== undefined ? <Row l="دوره منع مصرف"v={`${fmt.day(it.withdrawalDays)} روز`} />: null}
+ {it.storage ? <Row l="نگهداری"v={(STORAGE_LABEL as any)[it.storage] || it.storage} />: null}
+ {(() =>{
+ const arr: string[] = (it as any).usageTypes || ((it as any).usageType ? [(it as any).usageType] : []);
+ if (arr.length === 0) return null;
+ return <Row l="نوع مصرف"v={arr.map((t: string) =>VET_METHOD_LABEL[t] || t).join('• ')} />;
+ })()}
+ {it.dosePerBird ? <Row l="دوز هر پرنده"v={`${fmt.num(it.dosePerBird)} ml`} />: null}
+ {it.productionDate ? <Row l="تاریخ تولید"v={fmt.date(it.productionDate)} />: null}
+ </>
+ ) : null}
 
-      {it.category === 'equipment' ? (
-        <>
-          <SectionTitle>اطلاعات تجهیزات</SectionTitle>
-          {(() => {
-            const linkedEqs = useHal.getState().equipment.filter(eq => eq.warehouseItemId === it.id);
-            return linkedEqs.map(eq => (
-              <Row key={eq.id} l="تجهیز متصل" v={createElement(EntityLink, { type: "hall", tab: 'equip', id: eq.id, label: eq.name })} />
-            ));
-          })()}
-          {it.purchaseDate ? <Row l="تاریخ خرید" v={fmt.date(it.purchaseDate)} /> : null}
-          {it.purchasePrice ? <Row l="قیمت خرید" v={fmt.money(it.purchasePrice)} /> : null}
-          {hall ? <Row l="سالن" v={createElement(EntityLink, { type: "hall", id: hall.id, label: hall.name })} /> : null}
-          {it.equipmentStatus ? <Row l="وضعیت" v={EQUIP_STATUS[it.equipmentStatus] || it.equipmentStatus} /> : null}
-          {it.warrantyUntil ? <Row l="گارانتی تا" v={fmt.date(it.warrantyUntil)} /> : null}
-        </>
-      ) : null}
+ {it.category === 'equipment'? (
+ <>
+ <SectionTitle>اطلاعات تجهیزات</SectionTitle>
+ {(() =>{
+ const linkedEqs = useHal.getState().equipment.filter(eq =>eq.warehouseItemId === it.id);
+ return linkedEqs.map(eq =>(
+ <Row key={eq.id} l="تجهیز متصل"v={createElement(EntityLink, { type: "hall", tab: 'equip', id: eq.id, label: eq.name })} />
+ ));
+ })()}
+ {it.purchaseDate ? <Row l="تاریخ خرید"v={fmt.date(it.purchaseDate)} />: null}
+ {it.purchasePrice ? <Row l="قیمت خرید"v={fmt.money(it.purchasePrice)} />: null}
+ {hall ? <Row l="سالن"v={createElement(EntityLink, { type: "hall", id: hall.id, label: hall.name })} />: null}
+ {it.equipmentStatus ? <Row l="وضعیت"v={EQUIP_STATUS[it.equipmentStatus] || it.equipmentStatus} />: null}
+ {it.warrantyUntil ? <Row l="گارانتی تا"v={fmt.date(it.warrantyUntil)} />: null}
+ </>
+ ) : null}
 
-      {myMovements.length > 0 ? (
-        <>
-          <SectionTitle>آخرین گردش‌ها ({fmt.count(myMovements.length)})</SectionTitle>
-          {myMovements.slice(-3).reverse().map((m) => {
-            const inv = m.sourceModule === 'tra' && m.sourceId ? useTra.getState().invoices.find(x => x.id === m.sourceId) : undefined;
-            const flkId = (m as any).flockId;
-            const flk = flkId ? useFlk.getState().flocks.find(x => x.id === flkId) : undefined;
-            return (
-              <div key={m.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                  <span>{m.type === 'in' ? 'ورود' : 'خروج'} {formatQty(m.quantity, it.unit)}</span>
-                  {inv ? createElement(EntityLink, { type: 'invoice', id: inv.id, label: formatInvoiceNumber(inv.number) }) : null}
-                  {flk ? createElement(EntityLink, { type: 'flock', id: flk.id, label: flk.name }) : null}
-                </span>
-                <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>{fmt.date(m.date)}</span>
-              </div>
-            );
-          })}
-        </>
-      ) : null}
+ {myMovements.length >0 ? (
+ <>
+ <SectionTitle>آخرین گردش‌ها ({fmt.count(myMovements.length)})</SectionTitle>
+ {myMovements.slice(-3).reverse().map((m) =>{
+ const inv = m.sourceModule === 'tra'&& m.sourceId ? useTra.getState().invoices.find(x =>x.id === m.sourceId) : undefined;
+ const flkId = (m as any).flockId;
+ const flk = flkId ? useFlk.getState().flocks.find(x =>x.id === flkId) : undefined;
+ return (
+ <div key={m.id} style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, flexWrap: 'wrap'}}>
+ <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap'}}>
+ <span>{m.type === 'in'? 'ورود': 'خروج'} {formatQty(m.quantity, it.unit)}</span>
+ {inv ? createElement(EntityLink, { type: 'invoice', id: inv.id, label: formatInvoiceNumber(inv.number) }) : null}
+ {flk ? createElement(EntityLink, { type: 'flock', id: flk.id, label: flk.name }) : null}
+ </span>
+ <span style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)'}}>{fmt.date(m.date)}</span>
+ </div>
+ );
+ })}
+ </>
+ ) : null}
 
-      {it.notes ? (
-        <>
-          <SectionTitle>یادداشت</SectionTitle>
-          <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{it.notes}</div>
-        </>
-      ) : null}
+ {it.notes ? (
+ <>
+ <SectionTitle>یادداشت</SectionTitle>
+ <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)'}}>{it.notes}</div>
+ </>
+ ) : null}
 
-      <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-        <CardActions actions={(() => {
-          const hasMovements = myMovements && myMovements.length > 0;
-          const baseActions = [
-            { ...ACTION_PRESETS.CORRECT, onClick: onAdjust },
-            { ...ACTION_PRESETS.EDIT, onClick: onEdit },
-          ];
-          if (it.archived) {
-            return [...baseActions, { ...ACTION_PRESETS.RESTORE, onClick: () => onUnarchive?.() }];
-          }
-          if (hasMovements) {
-            return [...baseActions, { ...ACTION_PRESETS.ARCHIVE, onClick: handleArchive }];
-          }
-          return [...baseActions, { ...ACTION_PRESETS.DELETE, onClick: handleDelete }];
-        })()} />
-      </div>
-    </ExpandableCard>
+ <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
+ <CardActions actions={(() =>{
+ const hasMovements = myMovements && myMovements.length >0;
+ const baseActions = [
+ { ...ACTION_PRESETS.CORRECT, onClick: onAdjust },
+ { ...ACTION_PRESETS.EDIT, onClick: onEdit },
+ ];
+ if (it.archived) {
+ return [...baseActions, { ...ACTION_PRESETS.RESTORE, onClick: () =>onUnarchive?.() }];
+ }
+ if (hasMovements) {
+ return [...baseActions, { ...ACTION_PRESETS.ARCHIVE, onClick: handleArchive }];
+ }
+ return [...baseActions, { ...ACTION_PRESETS.DELETE, onClick: handleDelete }];
+ })()} />
+ </div>
+ </ExpandableCard>
   );
 }

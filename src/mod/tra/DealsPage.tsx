@@ -579,120 +579,120 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   </>
                 }
               >
-                {(d.dealNumber || d.startDate || d.settlementType) && (
-                  <>
-                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات قرارداد</SectionTitle>
-                    <Grid2>
-                      {d.dealNumber ? <Row l="شماره قرارداد" v={fmt.code(d.dealNumber)} /> : null}
-                      {d.startDate ? <Row l="دوره" v={d.endDate ? `${fmt.date(d.startDate)} تا ${fmt.date(d.endDate)}` : fmt.date(d.startDate)} /> : null}
-                      {d.settlementType ? <Row l="نوع تسویه" v={d.settlementType === 'percent' ? 'کمیسیون درصدی' : d.settlementType === 'barter' ? 'تهاتر مستقیم' : d.settlementType} /> : null}
-                      {d.settlementValue ? <Row l="مقدار تسویه" v={fmt.num(d.settlementValue)} /> : null}
-                    </Grid2>
-                  </>
-                )}
+ {(d.dealNumber || d.startDate || d.settlementType) && (
+ <>
+ <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>اطلاعات قرارداد</SectionTitle>
+ <Grid2>
+ {d.dealNumber ? <Row l="شماره قرارداد"v={fmt.code(d.dealNumber)} />: null}
+ {d.startDate ? <Row l="دوره"v={d.endDate ? `${fmt.date(d.startDate)} تا ${fmt.date(d.endDate)}`: fmt.date(d.startDate)} />: null}
+ {d.settlementType ? <Row l="نوع تسویه"v={d.settlementType === 'percent'? 'کمیسیون درصدی': d.settlementType === 'barter'? 'تهاتر مستقیم': d.settlementType} />: null}
+ {d.settlementValue ? <Row l="مقدار تسویه"v={fmt.num(d.settlementValue)} />: null}
+ </Grid2>
+ </>
+ )}
 
-                {(d.goods && d.goods.length > 0) && (
-                  <>
-                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> کالاها و موجودی</SectionTitle>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      {d.goods.map(g => {
-                        const out = (d.deliveries || []).filter(dv => dv.goodId === g.id && dv.type === 'out').reduce((s, dv) => s + (Number(dv.quantity) || 0), 0);
-                        const ret = (d.deliveries || []).filter(dv => dv.goodId === g.id && dv.type === 'return').reduce((s, dv) => s + (Number(dv.quantity) || 0), 0);
-                        const loss = (d.deliveries || []).filter(dv => dv.goodId === g.id && dv.type === 'loss').reduce((s, dv) => s + (Number(dv.quantity) || 0), 0);
-                        const delivered = out - ret - loss;
-                        const sold = (d.sales || []).filter(s => s.goodId === g.id).reduce((s, x) => s + (Number(x.quantity) || 0), 0);
-                        const inHand = delivered - sold;
-                        return (
-                          <Row key={g.id} l={g.name} v={`تحویل: ${fmt.count(delivered)} | فروش: ${fmt.count(sold)} | مانده: ${fmt.count(inHand)}`} />
-                        );
-                      })}
-                    </div>
-                  </>
-                )}
+ {(d.goods && d.goods.length >0) && (
+ <>
+ <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>کالاها و موجودی</SectionTitle>
+ <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+ {d.goods.map(g =>{
+ const out = (d.deliveries || []).filter(dv =>dv.goodId === g.id && dv.type === 'out').reduce((s, dv) =>s + (Number(dv.quantity) || 0), 0);
+ const ret = (d.deliveries || []).filter(dv =>dv.goodId === g.id && dv.type === 'return').reduce((s, dv) =>s + (Number(dv.quantity) || 0), 0);
+ const loss = (d.deliveries || []).filter(dv =>dv.goodId === g.id && dv.type === 'loss').reduce((s, dv) =>s + (Number(dv.quantity) || 0), 0);
+ const delivered = out - ret - loss;
+ const sold = (d.sales || []).filter(s =>s.goodId === g.id).reduce((s, x) =>s + (Number(x.quantity) || 0), 0);
+ const inHand = delivered - sold;
+ return (
+ <Row key={g.id} l={g.name} v={`تحویل: ${fmt.count(delivered)} | فروش: ${fmt.count(sold)} | مانده: ${fmt.count(inHand)}`} />
+ );
+ })}
+ </div>
+ </>
+ )}
 
-                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> خلاصه مالی</SectionTitle>
-                <Grid2>
-                  <Row l="فروش کل" v={fmt.money((d.sales || []).reduce((s, x) => s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)), 0))} />
-                  <Row l="دریافت‌شده" v={fmt.money((d.payments || []).filter(p => p.direction === 'in').reduce((s, p) => s + (Number(p.amount) || 0), 0))} />
-                </Grid2>
-                                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 6 }}>
-                                          <button type="button" onClick={(e) => { e.stopPropagation(); setPrintDeal(d); }}
-                                            style={{ padding: '6px 12px', background: 'var(--btn-bg)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', fontFamily: 'inherit', fontSize: 'var(--fs-xs)', fontWeight: 600, cursor: 'pointer' }}>
-                                            🖨️ چاپ قرارداد
-                                          </button>
-                                        </div>
+ <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>خلاصه مالی</SectionTitle>
+ <Grid2>
+ <Row l="فروش کل"v={fmt.money((d.sales || []).reduce((s, x) =>s + ((Number(x.quantity) || 0) * (Number(x.unitPrice) || 0)), 0))} />
+ <Row l="دریافت‌شده"v={fmt.money((d.payments || []).filter(p =>p.direction === 'in').reduce((s, p) =>s + (Number(p.amount) || 0), 0))} />
+ </Grid2>
+ <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 6 }}>
+ <button type="button"onClick={(e) =>{ e.stopPropagation(); setPrintDeal(d); }}
+ style={{ padding: '6px 12px', background: 'var(--btn-bg)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', fontFamily: 'inherit', fontSize: 'var(--fs-xs)', fontWeight: 600, cursor: 'pointer'}}>
+ چاپ قرارداد
+ </button>
+ </div>
 
-                {(d.payments || []).length > 0 && (
-                  <>
-                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💳</span> پرداخت‌ها</SectionTitle>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
-                      {(d.payments || []).map(p => (
-                        <Row
-                          key={p.id}
-                          l={`${p.direction === 'in' ? '📥 دریافت' : '📤 پرداخت'} • ${p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک'} • ${fmt.date(p.date)}`}
-                          v={fmt.money(p.amount || 0, { withUnit: false }) + ' تومان'}
-                        />
-                      ))}
-                    </div>
-                  </>
-                )}
+ {(d.payments || []).length >0 && (
+ <>
+ <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>پرداخت‌ها</SectionTitle>
+ <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)'}}>
+ {(d.payments || []).map(p =>(
+ <Row
+ key={p.id}
+ l={`${p.direction === 'in'? 'دریافت': 'پرداخت'} • ${p.method === 'cash'? 'نقدی': p.method === 'card'? 'کارت': 'چک'} • ${fmt.date(p.date)}`}
+ v={fmt.money(p.amount || 0, { withUnit: false }) + 'تومان'}
+ />
+ ))}
+ </div>
+ </>
+ )}
 
-                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> توضیحات</SectionTitle>
-                <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{d.description}</div>
+ <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>توضیحات</SectionTitle>
+ <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)'}}>{d.description}</div>
 
-                {d.notes ? (
-                  <>
-                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{d.notes}</div>
-                  </>
-                ) : null}
-                {(() => {
-                  const dealSettlements = settlements.filter(s => s.dealId === d.id);
-                  if (dealSettlements.length === 0) return null;
-                  return (
-                    <>
-                      <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> تسویه‌های دوره‌ای ({fmt.count(dealSettlements.length)})</SectionTitle>
-                      {dealSettlements.map((st: any) => {
-                        const statusLabel = st.status === 'draft' ? 'پیش‌نویس' : st.status === 'confirmed' ? 'تأییدشده' : 'فاکتور شده';
-                        const statusTone: 'amber' | 'info' | 'green' = st.status === 'draft' ? 'amber' : st.status === 'confirmed' ? 'info' : 'green';
-                        const netTxt = fmt.money(Number(st.netPayable || 0));
-                        return (
-                          <div
-                            key={st.id}
-                            onClick={(e) => { e.stopPropagation(); setViewSettlement({ settlement: st, deal: d }); }}
-                            style={{ cursor: 'pointer' }}
-                          >
-                            <Row
-                              l={`${fmt.date(st.periodStart)} — ${fmt.date(st.periodEnd)}`}
-                              v={
-                                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                                  <span style={{ fontWeight: 700, color: 'var(--accent)' }}>خالص: {netTxt} ت</span>
-                                  <Tag tone={statusTone}>{statusLabel}</Tag>
-                                </div>
-                              }
-                            />
-                          </div>
-                        );
-                      })}
-                    </>
-                  );
-                })()}
-                
-                <CardActions actions={[
-                  {
-                    label: d.status === 'open' ? 'تسویه شد' : 'بازگشایی',
-                    variant: d.status === 'open' ? 'outline' : 'primary',
-                    onClick: () => d.status === 'open' ? updateDeal(d.id, { status: 'settled' }) : handleReopenDeal(d),
-                  },
-                  {
-                    label: 'تسویه',
-                    variant: 'outline',
-                    onClick: () => { setSettlementDeal(d); setSettlementOpen(true); },
-                  },
-                  { ...ACTION_PRESETS.EDIT, hidden: d.status !== 'open', onClick: () => openEdit(d) },
-                  { ...ACTION_PRESETS.DELETE, onClick: () => { void handleDeleteFromCard(d); } },
-                ]} />
-              </ExpandableCard>
+ {d.notes ? (
+ <>
+ <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>یادداشت</SectionTitle>
+ <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)'}}>{d.notes}</div>
+ </>
+ ) : null}
+ {(() =>{
+ const dealSettlements = settlements.filter(s =>s.dealId === d.id);
+ if (dealSettlements.length === 0) return null;
+ return (
+ <>
+ <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>تسویه‌های دوره‌ای ({fmt.count(dealSettlements.length)})</SectionTitle>
+ {dealSettlements.map((st: any) =>{
+ const statusLabel = st.status === 'draft'? 'پیش‌نویس': st.status === 'confirmed'? 'تأییدشده': 'فاکتور شده';
+ const statusTone: 'amber'| 'info'| 'green'= st.status === 'draft'? 'amber': st.status === 'confirmed'? 'info': 'green';
+ const netTxt = fmt.money(Number(st.netPayable || 0));
+ return (
+ <div
+ key={st.id}
+ onClick={(e) =>{ e.stopPropagation(); setViewSettlement({ settlement: st, deal: d }); }}
+ style={{ cursor: 'pointer'}}
+ >
+ <Row
+ l={`${fmt.date(st.periodStart)} — ${fmt.date(st.periodEnd)}`}
+ v={
+ <div style={{ display: 'flex', gap: 6, alignItems: 'center'}}>
+ <span style={{ fontWeight: 700, color: 'var(--accent)'}}>خالص: {netTxt} ت</span>
+ <Tag tone={statusTone}>{statusLabel}</Tag>
+ </div>
+ }
+ />
+ </div>
+ );
+ })}
+ </>
+ );
+ })()}
+ 
+ <CardActions actions={[
+ {
+ label: d.status === 'open'? 'تسویه شد': 'بازگشایی',
+ variant: d.status === 'open'? 'outline': 'primary',
+ onClick: () =>d.status === 'open'? updateDeal(d.id, { status: 'settled'}) : handleReopenDeal(d),
+ },
+ {
+ label: 'تسویه',
+ variant: 'outline',
+ onClick: () =>{ setSettlementDeal(d); setSettlementOpen(true); },
+ },
+ { ...ACTION_PRESETS.EDIT, hidden: d.status !== 'open', onClick: () =>openEdit(d) },
+ { ...ACTION_PRESETS.DELETE, onClick: () =>{ void handleDeleteFromCard(d); } },
+ ]} />
+ </ExpandableCard>
             );
           })}
         </>

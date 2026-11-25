@@ -910,46 +910,46 @@ export default function ArchivePage() {
                   </>
                 }
               >
-                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات گله</SectionTitle>
-                <Row l="پرنده" v={bird?.name || '—'} />
-                <Row l="نژاد" v={breed?.name || '—'} />
-                <Row l="سالن" v={hall?.name || '—'} />
-                <Row l="نوع" v={f.type === 'layer' ? 'تخم‌گذار' : f.type === 'broiler' ? 'گوشتی' : 'مادر'} />
-                <Row l="منبع" v={SOURCE_LABEL[f.source] || '—'} />
-                <Row l="تعداد اولیه" v={f.initialCount ? fmt.count(f.initialCount) : '—'} />
-                {f.currentCount ? <Row l="تعداد نهایی" v={fmt.count(f.currentCount)} /> : null}
-                <Row l="سن نهایی" v={fmt.day(ageDays) + ' روز (' + formatAge(ageDays) + ')'} />
+ <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>اطلاعات گله</SectionTitle>
+ <Row l="پرنده"v={bird?.name || '—'} />
+ <Row l="نژاد"v={breed?.name || '—'} />
+ <Row l="سالن"v={hall?.name || '—'} />
+ <Row l="نوع"v={f.type === 'layer'? 'تخم‌گذار': f.type === 'broiler'? 'گوشتی': 'مادر'} />
+ <Row l="منبع"v={SOURCE_LABEL[f.source] || '—'} />
+ <Row l="تعداد اولیه"v={f.initialCount ? fmt.count(f.initialCount) : '—'} />
+ {f.currentCount ? <Row l="تعداد نهایی"v={fmt.count(f.currentCount)} />: null}
+ <Row l="سن نهایی"v={fmt.day(ageDays) + 'روز ('+ formatAge(ageDays) + ')'} />
 
-                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> تاریخ‌ها</SectionTitle>
-                {f.hatchDate ? <Row l="هچ" v={fmt.date(f.hatchDate)} /> : null}
-                {f.purchaseDate ? <Row l="خرید" v={fmt.date(f.purchaseDate)} /> : null}
-                {f.startDate ? <Row l="شروع" v={fmt.date(f.startDate)} /> : null}
+ <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>تاریخ‌ها</SectionTitle>
+ {f.hatchDate ? <Row l="هچ"v={fmt.date(f.hatchDate)} />: null}
+ {f.purchaseDate ? <Row l="خرید"v={fmt.date(f.purchaseDate)} />: null}
+ {f.startDate ? <Row l="شروع"v={fmt.date(f.startDate)} />: null}
 
-                {costs.total > 0 ? (
-                  <>
-                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> هزینه‌ها</SectionTitle>
-                    <Row l="جمع کل" v={fmt.money(costs.total)} />
-                    {costs.perBird > 0 ? <Row l="هر پرنده" v={fmt.money(Math.round(costs.perBird))} /> : null}
-                  </>
-                ) : null}
+ {costs.total >0 ? (
+ <>
+ <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>هزینه‌ها</SectionTitle>
+ <Row l="جمع کل"v={fmt.money(costs.total)} />
+ {costs.perBird >0 ? <Row l="هر پرنده"v={fmt.money(Math.round(costs.perBird))} />: null}
+ </>
+ ) : null}
 
-                {f.notes ? (
-                  <>
-                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{f.notes}</div>
-                  </>
-                ) : null}
+ {f.notes ? (
+ <>
+ <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>یادداشت</SectionTitle>
+ <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)'}}>{f.notes}</div>
+ </>
+ ) : null}
 
-                <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-                  <Btn size="sm" onClick={async () => { await restore(f.id); setExpandedId(null); setArcTick(t => t + 1); toastMsg.saved('گله بازیابی شد'); }} style={{ flex: 1 }}>🔄 بازیابی</Btn>
-                  <Btn size="sm" onClick={async () => {
-                          const ok = await showConfirmAsync('حذف نهایی گله', 'حذف کامل «' + f.name + '»؟\n\nاین عمل قابل بازگشت نیست. برای همیشه پاک می‌شود.', { danger: true, confirmText: 'حذف کن' });
-                          if (!ok) return;
-                          remove(f.id);
-                          toastMsg.deleted('گله')
-                        }} style={{ flex: 1 }}>🗑 حذف نهایی</Btn>
-                </div>
-              </ExpandableCard>
+ <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
+ <Btn size="sm"onClick={async () =>{ await restore(f.id); setExpandedId(null); setArcTick(t =>t + 1); toastMsg.saved('گله بازیابی شد'); }} style={{ flex: 1 }}>بازیابی</Btn>
+ <Btn size="sm"onClick={async () =>{
+ const ok = await showConfirmAsync('حذف نهایی گله', 'حذف کامل «'+ f.name + '»؟\n\nاین عمل قابل بازگشت نیست. برای همیشه پاک می‌شود.', { danger: true, confirmText: 'حذف کن'});
+ if (!ok) return;
+ remove(f.id);
+ toastMsg.deleted('گله')
+ }} style={{ flex: 1 }}>حذف نهایی</Btn>
+ </div>
+ </ExpandableCard>
             );
           })}
         </>

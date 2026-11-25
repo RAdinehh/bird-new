@@ -281,75 +281,75 @@ export default function FormulasPage({ active = true }: { active?: boolean }) {
                   </>
                 }
               >
-                <SectionTitle>🥗 مواد تشکیل‌دهنده</SectionTitle>
-                {f.lines.map(line => {
-                  const ing = ingredients.find(x => x.id === line.ingredientId);
-                  if (ing === undefined) return null;
-                  return (
-                    <div key={line.id} style={{ display: 'flex', justifyContent: 'space-between',
-                       fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                       borderRadius: 'var(--r-sm)' }}>
-                      <span>{ing.name}</span>
-                      <span style={{ fontWeight: 600 }}>{fmt.num(line.percent)}٪</span>
-                    </div>
-                  );
-                })}
+ <SectionTitle>مواد تشکیل‌دهنده</SectionTitle>
+ {f.lines.map(line =>{
+ const ing = ingredients.find(x =>x.id === line.ingredientId);
+ if (ing === undefined) return null;
+ return (
+ <div key={line.id} style={{ display: 'flex', justifyContent: 'space-between',
+ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
+ borderRadius: 'var(--r-sm)'}}>
+ <span>{ing.name}</span>
+ <span style={{ fontWeight: 600 }}>{fmt.num(line.percent)}٪</span>
+ </div>
+ );
+ })}
 
-                <div style={{ display: 'flex', justifyContent: 'space-between',
-                   fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)',
-                   color: 'var(--accent)', borderRadius: 'var(--r-sm)',
-                   fontWeight: 700 }}>
-                  <span>مجموع:</span>
-                  <span>{fmt.num(total)}٪</span>
-                </div>
+ <div style={{ display: 'flex', justifyContent: 'space-between',
+ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)',
+ color: 'var(--accent)', borderRadius: 'var(--r-sm)',
+ fontWeight: 700 }}>
+ <span>مجموع:</span>
+ <span>{fmt.num(total)}٪</span>
+ </div>
 
-                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> مواد مغذی</SectionTitle>
-                <Grid2>
-                  <Row l="پروتئین" v={`${fmt.num(n.protein)} ٪`} />
-                  <Row l="انرژی" v={`${fmt.num(n.energy)} kcal`} />
-                </Grid2>
-                <Grid2>
-                  <Row l="کلسیم" v={`${fmt.num(n.calcium)} ٪`} />
-                  <Row l="فسفر" v={`${fmt.num(n.phosphorus)} ٪`} />
-                </Grid2>
-                <Grid2>
-                  <Row l="متیونین" v={`${fmt.num(n.methionine)} ٪`} />
-                  <Row l="لیزین" v={`${fmt.num(n.lysine)} ٪`} />
-                </Grid2>
+ <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>مواد مغذی</SectionTitle>
+ <Grid2>
+ <Row l="پروتئین"v={`${fmt.num(n.protein)} ٪`} />
+ <Row l="انرژی"v={`${fmt.num(n.energy)} kcal`} />
+ </Grid2>
+ <Grid2>
+ <Row l="کلسیم"v={`${fmt.num(n.calcium)} ٪`} />
+ <Row l="فسفر"v={`${fmt.num(n.phosphorus)} ٪`} />
+ </Grid2>
+ <Grid2>
+ <Row l="متیونین"v={`${fmt.num(n.methionine)} ٪`} />
+ <Row l="لیزین"v={`${fmt.num(n.lysine)} ٪`} />
+ </Grid2>
 
-                {n.price > 0 ? (
-                  <>
-                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی</SectionTitle>
-                    <div style={{ display: 'flex', justifyContent: 'space-between',
-                       fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)',
-                       color: 'var(--accent)', borderRadius: 'var(--r-sm)',
-                       fontWeight: 700 }}>
-                      <span>هزینه هر کیلوگرم:</span>
-                      <span>{fmt.money(n.price)} ت</span>
-                    </div>
-                  </>
-                ) : null}
+ {n.price >0 ? (
+ <>
+ <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>مالی</SectionTitle>
+ <div style={{ display: 'flex', justifyContent: 'space-between',
+ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)',
+ color: 'var(--accent)', borderRadius: 'var(--r-sm)',
+ fontWeight: 700 }}>
+ <span>هزینه هر کیلوگرم:</span>
+ <span>{fmt.money(n.price)} ت</span>
+ </div>
+ </>
+ ) : null}
 
-                {f.notes ? (
-                  <>
-                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                       padding: 'var(--pad-normal)', background: 'var(--input-bg)',
-                       borderRadius: 'var(--r-sm)' }}>{f.notes}</div>
-                  </>
-                ) : null}
+ {f.notes ? (
+ <>
+ <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>یادداشت</SectionTitle>
+ <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
+ padding: 'var(--pad-normal)', background: 'var(--input-bg)',
+ borderRadius: 'var(--r-sm)'}}>{f.notes}</div>
+ </>
+ ) : null}
 
-                <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-                  <Btn size="sm" onClick={() => openEdit(f)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={async () => {
-                          const ok = await showConfirmAsync('تأیید حذف', 'این فرمول حذف شود؟', { danger: true });
-                          if (!ok) return;
-                          deleteFormula(f.id);
-                          logAction('delete', 'fed', 'حذف از جیره‌نویسی');
-                          toastMsg.deleted(f.name)
-                        }} style={{ flex: 1 }}>حذف</Btn>
-                </div>
-              </ExpandableCard>
+ <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
+ <Btn size="sm"onClick={() =>openEdit(f)} style={{ flex: 1 }}>ویرایش</Btn>
+ <Btn size="sm"onClick={async () =>{
+ const ok = await showConfirmAsync('تأیید حذف', 'این فرمول حذف شود؟', { danger: true });
+ if (!ok) return;
+ deleteFormula(f.id);
+ logAction('delete', 'fed', 'حذف از جیره‌نویسی');
+ toastMsg.deleted(f.name)
+ }} style={{ flex: 1 }}>حذف</Btn>
+ </div>
+ </ExpandableCard>
             );
           })}
         </>

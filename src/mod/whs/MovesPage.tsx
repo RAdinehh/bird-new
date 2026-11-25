@@ -312,49 +312,49 @@ export default function MovesPage({ active = true }: { active?: boolean } = {}) 
                   </>
                 }
               >
-                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات گردش</SectionTitle>
-                <Row l="کالا" v={item ? createElement(EntityLink, { type: "item", id: item.id, label: item.name }) : '—'} />
-                <Row l="نوع" v={m.type === 'in' ? 'ورود' : 'خروج'} />
-                <Row l="دلیل" v={MOVEMENT_REASON[m.reason]} />
-                <Row l="تاریخ" v={fmt.date(m.date)} />
-                <Row l="مقدار" v={item ? formatQty(m.quantity, item.unit) : fmt.num(m.quantity)} />
-                {party ? <Row l="طرف معامله" v={createElement(EntityLink, { type: "party", id: party.id, label: party.name })} /> : null}
-                {moveFlock ? <Row l="گله" v={createElement(EntityLink, { type: "flock", id: moveFlock.id, label: moveFlock.name })} /> : null}
-                {moveInv ? <Row l="فاکتور مبدأ" v={createElement(EntityLink, { type: "invoice", id: moveInv.id, label: moveInv.number ? `فاکتور #${moveInv.number}` : 'مشاهده فاکتور' })} /> : null}
+ <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>اطلاعات گردش</SectionTitle>
+ <Row l="کالا"v={item ? createElement(EntityLink, { type: "item", id: item.id, label: item.name }) : '—'} />
+ <Row l="نوع"v={m.type === 'in'? 'ورود': 'خروج'} />
+ <Row l="دلیل"v={MOVEMENT_REASON[m.reason]} />
+ <Row l="تاریخ"v={fmt.date(m.date)} />
+ <Row l="مقدار"v={item ? formatQty(m.quantity, item.unit) : fmt.num(m.quantity)} />
+ {party ? <Row l="طرف معامله"v={createElement(EntityLink, { type: "party", id: party.id, label: party.name })} />: null}
+ {moveFlock ? <Row l="گله"v={createElement(EntityLink, { type: "flock", id: moveFlock.id, label: moveFlock.name })} />: null}
+ {moveInv ? <Row l="فاکتور مبدأ"v={createElement(EntityLink, { type: "invoice", id: moveInv.id, label: moveInv.number ? `فاکتور #${moveInv.number}`: 'مشاهده فاکتور'})} />: null}
 
-                {m.unitPrice > 0 ? (
-                  <>
-                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی</SectionTitle>
-                    <Row l="قیمت واحد" v={fmt.money(m.unitPrice)} />
-                    <div style={{ display: 'flex', justifyContent: 'space-between',
-                       fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)',
-                       background: 'var(--accent-soft)', color: 'var(--accent)',
-                       borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-                      <span>جمع کل:</span>
-                      <span>{fmt.money(total)}</span>
-                    </div>
-                  </>
-                ) : null}
+ {m.unitPrice >0 ? (
+ <>
+ <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>مالی</SectionTitle>
+ <Row l="قیمت واحد"v={fmt.money(m.unitPrice)} />
+ <div style={{ display: 'flex', justifyContent: 'space-between',
+ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)',
+ background: 'var(--accent-soft)', color: 'var(--accent)',
+ borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+ <span>جمع کل:</span>
+ <span>{fmt.money(total)}</span>
+ </div>
+ </>
+ ) : null}
 
-                {m.notes ? (
-                  <>
-                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                       padding: 'var(--pad-normal)', background: 'var(--input-bg)',
-                       borderRadius: 'var(--r-sm)' }}>{m.notes}</div>
-                  </>
-                ) : null}
+ {m.notes ? (
+ <>
+ <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>یادداشت</SectionTitle>
+ <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
+ padding: 'var(--pad-normal)', background: 'var(--input-bg)',
+ borderRadius: 'var(--r-sm)'}}>{m.notes}</div>
+ </>
+ ) : null}
 
-                <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-                  <Btn size="sm" onClick={() => openEdit(m)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={async () => {
-                    const idToDel = m.id; const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true }); if (!ok) return; const item = movements.find((x) => x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() => setUndoData((cur) => cur && !Array.isArray(cur.item) && cur.item.id === item.id ? null : cur), 6000); } deleteMovement(idToDel);
-                    logAction('delete', 'whs', 'حذف از انبار');
-                    const itemName = item ? (items.find(x => x.id === item.itemId)?.name || 'گردش') : 'گردش';
-                    toastMsg.deleted(itemName)
-                    }} style={{ flex: 1 }}>حذف</Btn>
-                </div>
-              </ExpandableCard>
+ <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
+ <Btn size="sm"onClick={() =>openEdit(m)} style={{ flex: 1 }}>ویرایش</Btn>
+ <Btn size="sm"onClick={async () =>{
+ const idToDel = m.id; const ok = await showConfirmAsync('تأیید حذف', 'این مورد حذف شود؟', { danger: true }); if (!ok) return; const item = movements.find((x) =>x.id === idToDel); if (item) { setUndoData({ item }); setTimeout(() =>setUndoData((cur) =>cur && !Array.isArray(cur.item) && cur.item.id === item.id ? null : cur), 6000); } deleteMovement(idToDel);
+ logAction('delete', 'whs', 'حذف از انبار');
+ const itemName = item ? (items.find(x =>x.id === item.itemId)?.name || 'گردش') : 'گردش';
+ toastMsg.deleted(itemName)
+ }} style={{ flex: 1 }}>حذف</Btn>
+ </div>
+ </ExpandableCard>
             );
           })}
         </>

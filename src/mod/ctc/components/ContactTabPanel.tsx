@@ -236,129 +236,129 @@ export default function ContactTabPanel({ tab, active, onEdit, onAdd }: Props) {
                   {p.roles.includes('supplier') && p.supplierTypes.length > 0 ? <span>کالاها: <b style={{ color: 'var(--text)' }}>{fmt.count(p.supplierTypes.length)}</b></span> : null}
                 </>}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📞 اطلاعات تماس</div>
-                  <div style={{ display: 'flex', gap: 4 }}>
-                    <CopyBtn text={formatContactSection(p)} />
-                    <ShareBtn title={`تماس ${p.name}`} text={formatContactSection(p)} />
-                  </div>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <Row l="تلفن اصلی" v={p.phone || '—'} />
-                  {p.phone2 && <Row l="تلفن دوم" v={p.phone2} />}
-                  {p.email && <Row l="ایمیل" v={p.email} />}
-                  {p.nationalId && <Row l="کد ملی" v={p.nationalId} />}
-                </div>
+ <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>اطلاعات تماس</div>
+ <div style={{ display: 'flex', gap: 4 }}>
+ <CopyBtn text={formatContactSection(p)} />
+ <ShareBtn title={`تماس ${p.name}`} text={formatContactSection(p)} />
+ </div>
+ </div>
+ <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+ <Row l="تلفن اصلی"v={p.phone || '—'} />
+ {p.phone2 && <Row l="تلفن دوم"v={p.phone2} />}
+ {p.email && <Row l="ایمیل"v={p.email} />}
+ {p.nationalId && <Row l="کد ملی"v={p.nationalId} />}
+ </div>
 
-                {(p.city || p.address) && (
-                  <>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📍 آدرس</div>
-                      <div style={{ display: 'flex', gap: 4 }}>
-                        <CopyBtn text={formatAddressSection(p)} />
-                        <ShareBtn title={`آدرس ${p.name}`} text={formatAddressSection(p)} />
-                      </div>
-                    </div>
-                    <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)',
-                       background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', lineHeight: 1.7 }}>
-                      {p.city && <div>{p.city}</div>}
-                      {p.address && <div style={{ color: 'var(--muted)' }}>{p.address}</div>}
-                    </div>
-                  </>
-                )}
+ {(p.city || p.address) && (
+ <>
+ <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>آدرس</div>
+ <div style={{ display: 'flex', gap: 4 }}>
+ <CopyBtn text={formatAddressSection(p)} />
+ <ShareBtn title={`آدرس ${p.name}`} text={formatAddressSection(p)} />
+ </div>
+ </div>
+ <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)',
+ background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', lineHeight: 1.7 }}>
+ {p.city && <div>{p.city}</div>}
+ {p.address && <div style={{ color: 'var(--muted)'}}>{p.address}</div>}
+ </div>
+ </>
+ )}
 
-                {p.bankAccount && (p.bankAccount.bank || p.bankAccount.accountHolder || p.bankAccount.accountNumber || p.bankAccount.cardNumber || p.bankAccount.shaba) && (
-                  <>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🏦 اطلاعات بانکی</div>
-                      <div style={{ display: 'flex', gap: 4 }}>
-                        <CopyBtn text={formatBankSection(p)} />
-                        <ShareBtn title={`بانک ${p.name}`} text={formatBankSection(p)} />
-                      </div>
-                    </div>
-                    <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
-                      {formatBankSection(p)}
-                    </div>
-                  </>
-                )}
+ {p.bankAccount && (p.bankAccount.bank || p.bankAccount.accountHolder || p.bankAccount.accountNumber || p.bankAccount.cardNumber || p.bankAccount.shaba) && (
+ <>
+ <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>اطلاعات بانکی</div>
+ <div style={{ display: 'flex', gap: 4 }}>
+ <CopyBtn text={formatBankSection(p)} />
+ <ShareBtn title={`بانک ${p.name}`} text={formatBankSection(p)} />
+ </div>
+ </div>
+ <div style={{ fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', lineHeight: 1.7, whiteSpace: 'pre-wrap'}}>
+ {formatBankSection(p)}
+ </div>
+ </>
+ )}
 
-                {p.roles.includes('customer') && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🛒 اطلاعات مشتری</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      <Row l="نوع" v={CUSTOMER_TYPES.find(x => x[0] === p.customerType)?.[1] || '—'} />
-                      {p.trustScore && <Row l="اعتبار" v={`${fmt.num(p.trustScore)} از ۱۰`} />}
-                      {p.defaultDiscount && <Row l="تخفیف پیش‌فرض" v={`${fmt.num(p.defaultDiscount)}٪`} />}
-                    </div>
-                  </>
-                )}
+ {p.roles.includes('customer') && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>اطلاعات مشتری</div>
+ <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+ <Row l="نوع"v={CUSTOMER_TYPES.find(x =>x[0] === p.customerType)?.[1] || '—'} />
+ {p.trustScore && <Row l="اعتبار"v={`${fmt.num(p.trustScore)} از ۱۰`} />}
+ {p.defaultDiscount && <Row l="تخفیف پیش‌فرض"v={`${fmt.num(p.defaultDiscount)}٪`} />}
+ </div>
+ </>
+ )}
 
-                {p.roles.includes('supplier') && p.supplierTypes.length > 0 && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📦 کالاهای فروشنده</div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                      {p.supplierTypes.map(t => (
-                        <span key={t} style={{
-                          padding: '4px 10px', background: 'var(--accent-soft)',
-                          color: 'var(--accent)', borderRadius: 6, fontSize: 'var(--fs-xs)',
-                          fontWeight: 600,
-                        }}>
-                          {SUPPLIER_TYPES.find(x => x[0] === t)?.[1] || t}
-                        </span>
-                      ))}
-                    </div>
-                  </>
-                )}
+ {p.roles.includes('supplier') && p.supplierTypes.length >0 && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>کالاهای فروشنده</div>
+ <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+ {p.supplierTypes.map(t =>(
+ <span key={t} style={{
+ padding: '4px 10px', background: 'var(--accent-soft)',
+ color: 'var(--accent)', borderRadius: 6, fontSize: 'var(--fs-xs)',
+ fontWeight: 600,
+ }}>
+ {SUPPLIER_TYPES.find(x =>x[0] === t)?.[1] || t}
+ </span>
+ ))}
+ </div>
+ </>
+ )}
 
-                {p.roles.includes('worker') && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>👷 اطلاعات کارگر</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      {p.position && <Row l="سمت" v={p.position} />}
-                      {p.startDate && <Row l="تاریخ شروع" v={fmt.date(p.startDate)} />}
-                      {p.salaryAmount && <Row l={`حقوق ${SALARY_TYPES.find(x => x[0] === p.salaryType)?.[1] || ''}`} v={fmt.money(p.salaryAmount)} />}
-                      {p.insurance && <Row l="بیمه" v="دارد" accent />}
-                    </div>
-                  </>
-                )}
+ {p.roles.includes('worker') && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>اطلاعات کارگر</div>
+ <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+ {p.position && <Row l="سمت"v={p.position} />}
+ {p.startDate && <Row l="تاریخ شروع"v={fmt.date(p.startDate)} />}
+ {p.salaryAmount && <Row l={`حقوق ${SALARY_TYPES.find(x =>x[0] === p.salaryType)?.[1] || ''}`} v={fmt.money(p.salaryAmount)} />}
+ {p.insurance && <Row l="بیمه"v="دارد"accent />}
+ </div>
+ </>
+ )}
 
-                {p.notes && (
-                  <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                       padding: 'var(--pad-normal)', background: 'var(--input-bg)',
-                       borderRadius: 'var(--r-sm)' }}>{p.notes}</div>
-                  </>
-                )}
+ {p.notes && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>یادداشت</div>
+ <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
+ padding: 'var(--pad-normal)', background: 'var(--input-bg)',
+ borderRadius: 'var(--r-sm)'}}>{p.notes}</div>
+ </>
+ )}
 
-                <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-1)' }}>
-                  <Btn size="sm" onClick={async (e) => { e.stopPropagation(); const ok = await copyText(formatFullContact(p)); if (ok) toastMsg.success('همه کپی شد'); else toastMsg.error('کپی نشد'); }} style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                    </svg>
-                    کپی همه
-                  </Btn>
-                  <Btn size="sm" onClick={async (e) => { e.stopPropagation(); const r = await shareText({ title: p.name, text: formatFullContact(p) }); if (r.status === 'shared') toastMsg.success('ارسال شد'); else if (r.status === 'copied') toastMsg.info('کپی شد — paste کنید'); else if (r.status === 'failed') toastMsg.error('ناموفق'); }} style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                      <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
-                    </svg>
-                    اشتراک
-                  </Btn>
-                </div>
-                <div style={{ display: 'flex', gap: 'var(--sp-2)' }}>
-                  <Btn size="sm" onClick={() => onEdit(p)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={async () => {
-                    const ok = await showConfirmAsync('تأیید حذف', 'این مخاطب حذف شود؟', { danger: true });
-                    if (!ok) return;
-                    setUndoData({ item: p });
-                    setTimeout(() => setUndoData((cur) => cur && !Array.isArray(cur.item) && cur.item.id === p.id ? null : cur), 6000);
-                    remove(p.id);
-                    logAction('delete', 'ctc', 'حذف از مخاطبین');
-                    toastMsg.deleted('مخاطب');
-                  }} style={{ flex: 1 }}>حذف</Btn>
-                </div>
-              </ExpandableCard>
+ <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-1)'}}>
+ <Btn size="sm"onClick={async (e) =>{ e.stopPropagation(); const ok = await copyText(formatFullContact(p)); if (ok) toastMsg.success('همه کپی شد'); else toastMsg.error('کپی نشد'); }} style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+ <svg width="14"height="14"viewBox="0 0 24 24"fill="none"stroke="currentColor"strokeWidth="2"strokeLinecap="round"strokeLinejoin="round"aria-hidden="true">
+ <rect x="9"y="9"width="13"height="13"rx="2"ry="2"/>
+ <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+ </svg>
+ کپی همه
+ </Btn>
+ <Btn size="sm"onClick={async (e) =>{ e.stopPropagation(); const r = await shareText({ title: p.name, text: formatFullContact(p) }); if (r.status === 'shared') toastMsg.success('ارسال شد'); else if (r.status === 'copied') toastMsg.info('کپی شد — paste کنید'); else if (r.status === 'failed') toastMsg.error('ناموفق'); }} style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+ <svg width="14"height="14"viewBox="0 0 24 24"fill="currentColor"aria-hidden="true">
+ <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
+ </svg>
+ اشتراک
+ </Btn>
+ </div>
+ <div style={{ display: 'flex', gap: 'var(--sp-2)'}}>
+ <Btn size="sm"onClick={() =>onEdit(p)} style={{ flex: 1 }}>ویرایش</Btn>
+ <Btn size="sm"onClick={async () =>{
+ const ok = await showConfirmAsync('تأیید حذف', 'این مخاطب حذف شود؟', { danger: true });
+ if (!ok) return;
+ setUndoData({ item: p });
+ setTimeout(() =>setUndoData((cur) =>cur && !Array.isArray(cur.item) && cur.item.id === p.id ? null : cur), 6000);
+ remove(p.id);
+ logAction('delete', 'ctc', 'حذف از مخاطبین');
+ toastMsg.deleted('مخاطب');
+ }} style={{ flex: 1 }}>حذف</Btn>
+ </div>
+ </ExpandableCard>
             );
           })}
         </>

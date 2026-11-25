@@ -129,26 +129,26 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
        onToggle={() => setExpandedId(expandedId === w.id ? null : w.id)}
        onDelete={() => { setForm(f => ({ ...f, weightSamples: f.weightSamples.filter(x => x.id !== w.id) })); if (expandedId === w.id) setExpandedId(null); }}
       >
-      
-      {expandedId === w.id && (<>
-       <Grid2>
-        <Field label="وزن (گرم)" error={showError(`weightSamples.${i}.weight`)}>
-         <NumField placeholder="۰" value={w.weight} onBlur={() => markTouched(`weightSamples.${i}.weight`)} onChange={e => setForm(f => ({ ...f, weightSamples: f.weightSamples.map(x => x.id === w.id ? { ...x, weight: e.target.value } : x) }))} unit="گرم" min={0} />
-        </Field>
-        <Field label="جنسیت">
-         <Select value={form.weightGender} onChange={e => setForm({ ...form, weightGender: e.target.value as any })}>
-          <option value="">— نامشخص —</option>
-          <option value="male">نر</option>
-          <option value="female">ماده</option>
-          <option value="mixed">مخلوط</option>
-         </Select>
-        </Field>
-       </Grid2>
-       <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>
-        {renderSummary()}
-       </div>
-      </>)}
-     </ExpandableCard>
+ 
+ {expandedId === w.id && (<>
+ <Grid2>
+ <Field label="وزن (گرم)"error={showError(`weightSamples.${i}.weight`)}>
+ <NumField placeholder="۰"value={w.weight} onBlur={() =>markTouched(`weightSamples.${i}.weight`)} onChange={e =>setForm(f =>({ ...f, weightSamples: f.weightSamples.map(x =>x.id === w.id ? { ...x, weight: e.target.value } : x) }))} unit="گرم"min={0} />
+ </Field>
+ <Field label="جنسیت">
+ <Select value={form.weightGender} onChange={e =>setForm({ ...form, weightGender: e.target.value as any })}>
+ <option value="">— نامشخص —</option>
+ <option value="male">نر</option>
+ <option value="female">ماده</option>
+ <option value="mixed">مخلوط</option>
+ </Select>
+ </Field>
+ </Grid2>
+ <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)'}}>
+ {renderSummary()}
+ </div>
+ </>)}
+ </ExpandableCard>
     ))}
 
     

@@ -280,44 +280,44 @@ export default function RequirementsPage({ active = true }: { active?: boolean }
                   </>
                 }
               >
-                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🐔</span> مشخصات</SectionTitle>
-                <Row l="نوع پرنده" v={r.birdType} />
-                <Row l="مرحله" v={stageLabel} />
+ <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>مشخصات</SectionTitle>
+ <Row l="نوع پرنده"v={r.birdType} />
+ <Row l="مرحله"v={stageLabel} />
 
-                <SectionTitle>🥗 نیازهای مغذی</SectionTitle>
-                <Grid2>
-                  <Row l="پروتئین خام" v={`${fmt.num(r.protein)} ٪`} />
-                  <Row l="انرژی" v={`${fmt.num(r.energy)} kcal/kg`} />
-                </Grid2>
-                <Grid2>
-                  <Row l="کلسیم" v={`${fmt.num(r.calcium)} ٪`} />
-                  <Row l="فسفر" v={`${fmt.num(r.phosphorus)} ٪`} />
-                </Grid2>
-                <Grid2>
-                  <Row l="متیونین" v={`${fmt.num(r.methionine)} ٪`} />
-                  <Row l="لیزین" v={`${fmt.num(r.lysine)} ٪`} />
-                </Grid2>
+ <SectionTitle>نیازهای مغذی</SectionTitle>
+ <Grid2>
+ <Row l="پروتئین خام"v={`${fmt.num(r.protein)} ٪`} />
+ <Row l="انرژی"v={`${fmt.num(r.energy)} kcal/kg`} />
+ </Grid2>
+ <Grid2>
+ <Row l="کلسیم"v={`${fmt.num(r.calcium)} ٪`} />
+ <Row l="فسفر"v={`${fmt.num(r.phosphorus)} ٪`} />
+ </Grid2>
+ <Grid2>
+ <Row l="متیونین"v={`${fmt.num(r.methionine)} ٪`} />
+ <Row l="لیزین"v={`${fmt.num(r.lysine)} ٪`} />
+ </Grid2>
 
-                {r.notes ? (
-                  <>
-                    <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                       padding: 'var(--pad-normal)', background: 'var(--input-bg)',
-                       borderRadius: 'var(--r-sm)' }}>{r.notes}</div>
-                  </>
-                ) : null}
+ {r.notes ? (
+ <>
+ <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}></span>یادداشت</SectionTitle>
+ <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
+ padding: 'var(--pad-normal)', background: 'var(--input-bg)',
+ borderRadius: 'var(--r-sm)'}}>{r.notes}</div>
+ </>
+ ) : null}
 
-                <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-                  <Btn size="sm" onClick={() => openEdit(r)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={async () => {
-                          const ok = await showConfirmAsync('تأیید حذف', 'این نیاز حذف شود؟', { danger: true });
-                          if (!ok) return;
-                          deleteRequirement(r.id);
-                          logAction('delete', 'fed', 'حذف از جیره‌نویسی');
-                          toastMsg.deleted((r as any).name || (r as any).label || 'نیاز')
-                        }} style={{ flex: 1 }}>حذف</Btn>
-                </div>
-              </ExpandableCard>
+ <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
+ <Btn size="sm"onClick={() =>openEdit(r)} style={{ flex: 1 }}>ویرایش</Btn>
+ <Btn size="sm"onClick={async () =>{
+ const ok = await showConfirmAsync('تأیید حذف', 'این نیاز حذف شود؟', { danger: true });
+ if (!ok) return;
+ deleteRequirement(r.id);
+ logAction('delete', 'fed', 'حذف از جیره‌نویسی');
+ toastMsg.deleted((r as any).name || (r as any).label || 'نیاز')
+ }} style={{ flex: 1 }}>حذف</Btn>
+ </div>
+ </ExpandableCard>
             );
           })}
         </>

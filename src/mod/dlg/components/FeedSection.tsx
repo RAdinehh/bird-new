@@ -252,116 +252,116 @@ export default function FeedSection({ form, setForm }: Props) {
        onToggle={() => setExpandedSourceId(isExpanded ? null : src.id)}
        onDelete={() => removeSource(idx)}
       >
-      
-      {/* Header */}
-      
+ 
+ {/* Header */}
+ 
 
-      {/* Body */}
-      {isExpanded && (
-       <>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr', gap: 8, alignItems: 'end' }}>
-         <Field label={<>انتخاب منبع <HelpIcon text="**منطق انتخاب منبع:** شما می‌توانید در یک وعده، هم از **جیره آماده** و هم از **دان تکی** (مثل ذرت یا کنجاله) استفاده کنید. اگر جیره انتخاب کنید، سیستم به‌طور خودکار مواد اولیه آن جیره را بر اساس درصدهایش از انبار کسر می‌کند. اگر دان تکی انتخاب کنید، فقط همان آیتم از انبار کم می‌شود." /></>}>
-          <SmartSelect
-           value={src.refId ? (src.type === 'formula' ? 'f:' : 'i:') + src.refId : ''}
-           onChange={val => {
-            if (val.startsWith('f:')) updateSource(idx, { type: 'formula', refId: val.slice(2), displayUnit: undefined, displayValue: undefined });
-            else if (val.startsWith('i:')) updateSource(idx, { type: 'item', refId: val.slice(2), displayUnit: undefined, displayValue: undefined });
-            else updateSource(idx, { type: 'item', refId: '', displayUnit: undefined, displayValue: undefined });
-           }}
-           options={[
-            ...formulas.map(f => ({ value: 'f:' + f.id, label: f.name, subtitle: `${fmt.count(f.lines.length)} ماده`, group: 'formula' })),
-            ...feedItems.map(it => ({ value: 'i:' + it.id, label: it.name, subtitle: `موجودی ${fmt.num(it.currentStock)} ${UNIT_LABEL[it.unit]}`, group: 'item' })),
-           ]}
-           groupLabels={{ formula: 'جیره‌ها', item: 'دان تکی' }}
-           groupIcons={{ formula: '📋', item: '🌾' }}
-           placeholder="انتخاب..."
-           modalTitle="انتخاب منبع"
-          />
-         </Field>
-         <QuantityUnitInput layout="grid"
-            label="مقدار"
-            value={src.displayValue !== undefined ? src.displayValue : (src.quantity > 0 ? src.quantity : '')}
-            unit={src.displayUnit || 'kg'}
-            options={getFeedUnitOpts(src, feedItems)}
-            onChange={val => {
-              const numVal = parseFloat(toEn(val).replace('٫','.')) || 0;
-              const opts = getFeedUnitOpts(src, feedItems);
-              const factor = opts.find(o => o.value === (src.displayUnit || 'kg'))?.factor || 1;
-              updateSource(idx, { displayValue: numVal, quantity: numVal * factor });
-            }}
-            onUnitChange={u => {
-              const opts = getFeedUnitOpts(src, feedItems);
-              const factor = opts.find(o => o.value === u)?.factor || 1;
-              const qtyKg = src.quantity;
-              updateSource(idx, { displayUnit: u, displayValue: factor > 0 ? qtyKg / factor : qtyKg });
-            }}
-          />
-        </div>
+ {/* Body */}
+ {isExpanded && (
+ <>
+ <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr', gap: 8, alignItems: 'end'}}>
+ <Field label={<>انتخاب منبع <HelpIcon text="**منطق انتخاب منبع:** شما می‌توانید در یک وعده، هم از **جیره آماده** و هم از **دان تکی** (مثل ذرت یا کنجاله) استفاده کنید. اگر جیره انتخاب کنید، سیستم به‌طور خودکار مواد اولیه آن جیره را بر اساس درصدهایش از انبار کسر می‌کند. اگر دان تکی انتخاب کنید، فقط همان آیتم از انبار کم می‌شود."/></>}>
+ <SmartSelect
+ value={src.refId ? (src.type === 'formula'? 'f:': 'i:') + src.refId : ''}
+ onChange={val =>{
+ if (val.startsWith('f:')) updateSource(idx, { type: 'formula', refId: val.slice(2), displayUnit: undefined, displayValue: undefined });
+ else if (val.startsWith('i:')) updateSource(idx, { type: 'item', refId: val.slice(2), displayUnit: undefined, displayValue: undefined });
+ else updateSource(idx, { type: 'item', refId: '', displayUnit: undefined, displayValue: undefined });
+ }}
+ options={[
+ ...formulas.map(f =>({ value: 'f:'+ f.id, label: f.name, subtitle: `${fmt.count(f.lines.length)} ماده`, group: 'formula'})),
+ ...feedItems.map(it =>({ value: 'i:'+ it.id, label: it.name, subtitle: `موجودی ${fmt.num(it.currentStock)} ${UNIT_LABEL[it.unit]}`, group: 'item'})),
+ ]}
+ groupLabels={{ formula: 'جیره‌ها', item: 'دان تکی'}}
+ groupIcons={{ formula: '', item: ''}}
+ placeholder="انتخاب..."
+ modalTitle="انتخاب منبع"
+ />
+ </Field>
+ <QuantityUnitInput layout="grid"
+ label="مقدار"
+ value={src.displayValue !== undefined ? src.displayValue : (src.quantity >0 ? src.quantity : '')}
+ unit={src.displayUnit || 'kg'}
+ options={getFeedUnitOpts(src, feedItems)}
+ onChange={val =>{
+ const numVal = parseFloat(toEn(val).replace('٫','.')) || 0;
+ const opts = getFeedUnitOpts(src, feedItems);
+ const factor = opts.find(o =>o.value === (src.displayUnit || 'kg'))?.factor || 1;
+ updateSource(idx, { displayValue: numVal, quantity: numVal * factor });
+ }}
+ onUnitChange={u =>{
+ const opts = getFeedUnitOpts(src, feedItems);
+ const factor = opts.find(o =>o.value === u)?.factor || 1;
+ const qtyKg = src.quantity;
+ updateSource(idx, { displayUnit: u, displayValue: factor >0 ? qtyKg / factor : qtyKg });
+ }}
+ />
+ </div>
 
-        {f && (
-         <div style={{ padding: 8, background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 2 }}>مواد اولیه جیره:</div>
-          {f.lines.length === 0 && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)' }}>⚠️ این جیره خطی ندارد</div>}
-          {f.lines.map((line, lineIdx) => {
-           const ing = ingredients.find(i => i.id === line.ingredientId);
-           if (!ing) return null;
-           const stockItem = whsItems.find(x => x.id === ing.stockItemId);
-           const need = src.quantity > 0 ? (line.percent / 100) * src.quantity : 0;
-           const after = stockItem ? stockItem.currentStock - need : 0;
-           const unavailable = stockItem && after < 0;
-           const unitLabelIng = UNIT_LABEL[stockItem?.unit || 'kg'] || 'کیلوگرم';
-           const isLast = lineIdx === f.lines.length - 1;
+ {f && (
+ <div style={{ padding: 8, background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+ <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 2 }}>مواد اولیه جیره:</div>
+ {f.lines.length === 0 && <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)'}}>این جیره خطی ندارد</div>}
+ {f.lines.map((line, lineIdx) =>{
+ const ing = ingredients.find(i =>i.id === line.ingredientId);
+ if (!ing) return null;
+ const stockItem = whsItems.find(x =>x.id === ing.stockItemId);
+ const need = src.quantity >0 ? (line.percent / 100) * src.quantity : 0;
+ const after = stockItem ? stockItem.currentStock - need : 0;
+ const unavailable = stockItem && after < 0;
+ const unitLabelIng = UNIT_LABEL[stockItem?.unit || 'kg'] || 'کیلوگرم';
+ const isLast = lineIdx === f.lines.length - 1;
 
-           return (
-            <div key={line.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-xs)', padding: '6px 0', borderBottom: isLast ? 'none' : '1px dashed var(--border)' }}>
-             <span style={{ color: 'var(--text)' }}>
-              • {ing.name} <span style={{ color: 'var(--muted)' }}>({fmt.num(line.percent)}٪)</span>
-             </span>
-              <span style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-               {stockItem && (
-                <span style={{ padding: '2px 6px', borderRadius: 'var(--r-sm)', background: unavailable ? 'var(--danger-soft)' : 'var(--success-soft)', color: unavailable ? 'var(--danger)' : 'var(--success)', border: unavailable ? '1px solid var(--danger-border)' : '1px solid var(--success-border)', fontSize: 'var(--fs-2xs)', fontWeight: 700, minWidth: 70, textAlign: 'center' }}>
-                 موجودی: {fmt.num(stockItem.currentStock)}
-                </span>
-               )}
-               <span style={{ color: unavailable ? 'var(--danger)' : 'var(--text)', fontWeight: 700, minWidth: 60, textAlign: 'left' }}>
-                {need > 0 ? `${fmt.code(need.toFixed(1))} ${unitLabelIng}` : '—'}
-               </span>
-              </span>
-            </div>
-           );
-          })}
-         </div>
-        )}
+ return (
+ <div key={line.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 'var(--fs-xs)', padding: '6px 0', borderBottom: isLast ? 'none': '1px dashed var(--border)'}}>
+ <span style={{ color: 'var(--text)'}}>
+ • {ing.name} <span style={{ color: 'var(--muted)'}}>({fmt.num(line.percent)}٪)</span>
+ </span>
+ <span style={{ display: 'flex', gap: 4, alignItems: 'center'}}>
+ {stockItem && (
+ <span style={{ padding: '2px 6px', borderRadius: 'var(--r-sm)', background: unavailable ? 'var(--danger-soft)': 'var(--success-soft)', color: unavailable ? 'var(--danger)': 'var(--success)', border: unavailable ? '1px solid var(--danger-border)': '1px solid var(--success-border)', fontSize: 'var(--fs-2xs)', fontWeight: 700, minWidth: 70, textAlign: 'center'}}>
+ موجودی: {fmt.num(stockItem.currentStock)}
+ </span>
+ )}
+ <span style={{ color: unavailable ? 'var(--danger)': 'var(--text)', fontWeight: 700, minWidth: 60, textAlign: 'left'}}>
+ {need >0 ? `${fmt.code(need.toFixed(1))} ${unitLabelIng}`: '—'}
+ </span>
+ </span>
+ </div>
+ );
+ })}
+ </div>
+ )}
 
-        {it && (() => {
-         const remaining = it.currentStock - src.quantity;
-         const warn = remaining < it.minStock;
-         const unitLabelIng = UNIT_LABEL[it.unit] || '';
-         return (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '8px 12px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)' }}>
-           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)' }}>
-            <span style={{ color: 'var(--muted)' }}>موجودی انبار:</span>
-            <span style={{ fontWeight: 700, color: 'var(--text)' }}>{fmt.num(it.currentStock)} {unitLabelIng}</span>
-           </div>
-           {src.quantity > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)' }}>
-             <span style={{ color: 'var(--muted)' }}>مانده پس از مصرف:</span>
-             <span style={{ fontWeight: 700, color: warn ? 'var(--danger)' : 'var(--accent)' }}>
-              {fmt.code(remaining)} {unitLabelIng}
-             </span>
-            </div>
-           )}
-           {warn && (
-            <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--warn)', marginTop: 2 }}>
-             ⚠️ موجودی کافی نیست
-            </div>
-           )}
-          </div>
-         );
-        })()}
-       </>
-      )}
-     </ExpandableCard>
+ {it && (() =>{
+ const remaining = it.currentStock - src.quantity;
+ const warn = remaining < it.minStock;
+ const unitLabelIng = UNIT_LABEL[it.unit] || '';
+ return (
+ <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '8px 12px', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', border: '1px solid var(--border)'}}>
+ <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)'}}>
+ <span style={{ color: 'var(--muted)'}}>موجودی انبار:</span>
+ <span style={{ fontWeight: 700, color: 'var(--text)'}}>{fmt.num(it.currentStock)} {unitLabelIng}</span>
+ </div>
+ {src.quantity >0 && (
+ <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-xs)'}}>
+ <span style={{ color: 'var(--muted)'}}>مانده پس از مصرف:</span>
+ <span style={{ fontWeight: 700, color: warn ? 'var(--danger)': 'var(--accent)'}}>
+ {fmt.code(remaining)} {unitLabelIng}
+ </span>
+ </div>
+ )}
+ {warn && (
+ <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--warn)', marginTop: 2 }}>
+ موجودی کافی نیست
+ </div>
+ )}
+ </div>
+ );
+ })()}
+ </>
+ )}
+ </ExpandableCard>
     );
    })}
 

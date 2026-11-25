@@ -121,41 +121,41 @@ export default function FlockPickerSheet({ open, onClose, flocks, logs, todayStr
                 else setExpandedFlockId(isExpanded ? null : flock.id);
               }}
             >
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, paddingTop: 8 }}>
-                {/* دکمه ثبت جدید در سمت راست */}
-                <button
-                  type="button"
-                  onClick={() => { onAdd(flock.id); onClose(); }}
-                  style={{
-                    flex: '1 1 calc(50% - 6px)', minWidth: 110,
-                    padding: '8px 10px', background: 'var(--accent)',
-                    border: '1px solid var(--accent)', borderRadius: 'var(--r-sm)',
-                    color: '#fff', fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
-                    fontWeight: 600, cursor: 'pointer',
-                  }}
-                >
-                  ➕ ثبت جدید
-                </button>
+ <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, paddingTop: 8 }}>
+ {/* دکمه ثبت جدید در سمت راست */}
+ <button
+ type="button"
+ onClick={() =>{ onAdd(flock.id); onClose(); }}
+ style={{
+ flex: '1 1 calc(50% - 6px)', minWidth: 110,
+ padding: '8px 10px', background: 'var(--accent)',
+ border: '1px solid var(--accent)', borderRadius: 'var(--r-sm)',
+ color: '#fff', fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
+ fontWeight: 600, cursor: 'pointer',
+ }}
+ >
+ ثبت جدید
+ </button>
 
-                {/* دکمه‌های ویرایش در سمت چپ */}
-                {existingLogs.map(log => (
-                  <button
-                    key={log.id}
-                    type="button"
-                    onClick={() => { onEdit(log); onClose(); }}
-                    style={{
-                      flex: '1 1 calc(50% - 6px)', minWidth: 110,
-                      padding: '8px 10px', background: 'var(--card)',
-                      border: '1px solid var(--border)', borderRadius: 'var(--r-sm)',
-                      color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
-                      cursor: 'pointer', fontWeight: 600,
-                    }}
-                  >
-                    ✏️ {fmt.code(log.entryTime || '—')}
-                  </button>
-                ))}
-              </div>
-            </ExpandableCard>
+ {/* دکمه‌های ویرایش در سمت چپ */}
+ {existingLogs.map(log =>(
+ <button
+ key={log.id}
+ type="button"
+ onClick={() =>{ onEdit(log); onClose(); }}
+ style={{
+ flex: '1 1 calc(50% - 6px)', minWidth: 110,
+ padding: '8px 10px', background: 'var(--card)',
+ border: '1px solid var(--border)', borderRadius: 'var(--r-sm)',
+ color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
+ cursor: 'pointer', fontWeight: 600,
+ }}
+ >
+ {fmt.code(log.entryTime || '—')}
+ </button>
+ ))}
+ </div>
+ </ExpandableCard>
           );
         })}
       </div>

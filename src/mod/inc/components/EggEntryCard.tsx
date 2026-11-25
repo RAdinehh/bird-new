@@ -88,95 +88,95 @@ export default function EggEntryCard(props: EggEntryCardProps) {
         <StatBox icon="📊" label="پیشرفت" value={fmt.int(Math.min(100, Math.round(age / Math.max(1, totalDays) * 100))) + '٪'} tone="accent" />
       </>}
     >
-      {(() => {
-        const lbl = hatchWindow ? 'پنجره هچ باز است' : locked ? 'در Lock-down' : ('روز ' + fmt.day(age) + ' از ' + fmt.day(totalDays));
-        return <ProgressTracker current={age} target={totalDays} label={lbl} unit="روز" color={hatchWindow ? 'purple' : locked ? 'warn' : 'accent'} />;
-      })()}
+ {(() =>{
+ const lbl = hatchWindow ? 'پنجره هچ باز است': locked ? 'در Lock-down': ('روز '+ fmt.day(age) + 'از '+ fmt.day(totalDays));
+ return <ProgressTracker current={age} target={totalDays} label={lbl} unit="روز"color={hatchWindow ? 'purple': locked ? 'warn': 'accent'} />;
+ })()}
 
-      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📋 مشخصات</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <Row l="دستگاه" v={dev?.name || '—'} />
-        <Row l="پرنده" v={(bird?.name || '—') + (breed ? ' • ' + breed.name : '')} />
-        <Row l="تعداد" v={fmt.count(e.count || 0) + ' تخم'} />
-        {e.sampleWeightInitial && e.sampleWeightCurrent && (() => {
-          const pct = calcWeightLossPct(e.sampleWeightInitial, e.sampleWeightCurrent);
-          if (pct === null) return null;
-          const inRange = pct >= 11 && pct <= 13;
-          return <Row l="کاهش وزن نمونه" v={(inRange ? '✅ ' : '⚠️ ') + fmt.num(pct) + '٪'} />;
-        })()}
-        <Row l="تاریخ ورود" v={fmt.date(e.entryDate)} />
-        {(() => {
-          const _inv = findEggEntryPurchaseInvoice(useTra.getState().invoices, e);
-          if (!_inv) return null;
-          return (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)' }}>
-              <span style={{ color: 'var(--muted)', fontWeight: 600 }}>فاکتور خرید</span>
-              
-            </div>
-          );
-        })()}
-        {(() => {
-          const st = needEggStorageDays(age);
-          if (!st) return null;
-          const icon = st.level === 'ok' ? '✅' : st.level === 'warn' ? '⚠️' : '🔴';
-          return <Row l="ذخیره در انبار" v={`${icon} ${fmt.day(st.value)} روز`} />;
-        })()}
-        <Row l="هچ پیش‌بینی" v={fmt.date(expectedHatch)} />
-        {(() => {
-          const std = standard;
-          const exp = std ? getExpectedTempHumidity(std, age) : null;
-          if (!exp) return null;
-          return <Row l={`🌡 هدف امروز (روز ${fmt.day(age)})`} v={`${fmt.num(exp.temp)}°C / ${fmt.num(exp.humidity)}٪`} />;
-        })()}
-        {e.trayNumbers && <Row l="طبقات" v={e.trayNumbers} />}
-        <Row l="وضعیت" v={(ENTRY_STATUS_LABEL as any)[e.status]} />
-      </div>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>مشخصات</div>
+ <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+ <Row l="دستگاه"v={dev?.name || '—'} />
+ <Row l="پرنده"v={(bird?.name || '—') + (breed ? '• '+ breed.name : '')} />
+ <Row l="تعداد"v={fmt.count(e.count || 0) + 'تخم'} />
+ {e.sampleWeightInitial && e.sampleWeightCurrent && (() =>{
+ const pct = calcWeightLossPct(e.sampleWeightInitial, e.sampleWeightCurrent);
+ if (pct === null) return null;
+ const inRange = pct >= 11 && pct <= 13;
+ return <Row l="کاهش وزن نمونه"v={(inRange ? '': '') + fmt.num(pct) + '٪'} />;
+ })()}
+ <Row l="تاریخ ورود"v={fmt.date(e.entryDate)} />
+ {(() =>{
+ const _inv = findEggEntryPurchaseInvoice(useTra.getState().invoices, e);
+ if (!_inv) return null;
+ return (
+ <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--pad-tight)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)'}}>
+ <span style={{ color: 'var(--muted)', fontWeight: 600 }}>فاکتور خرید</span>
+ 
+ </div>
+ );
+ })()}
+ {(() =>{
+ const st = needEggStorageDays(age);
+ if (!st) return null;
+ const icon = st.level === 'ok'? '': st.level === 'warn'? '': '';
+ return <Row l="ذخیره در انبار"v={`${icon} ${fmt.day(st.value)} روز`} />;
+ })()}
+ <Row l="هچ پیش‌بینی"v={fmt.date(expectedHatch)} />
+ {(() =>{
+ const std = standard;
+ const exp = std ? getExpectedTempHumidity(std, age) : null;
+ if (!exp) return null;
+ return <Row l={`هدف امروز (روز ${fmt.day(age)})`} v={`${fmt.num(exp.temp)}°C / ${fmt.num(exp.humidity)}٪`} />;
+ })()}
+ {e.trayNumbers && <Row l="طبقات"v={e.trayNumbers} />}
+ <Row l="وضعیت"v={(ENTRY_STATUS_LABEL as any)[e.status]} />
+ </div>
 
-      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🤝 منبع</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <Row l="نوع" v={(DEAL_LABEL as any)[e.dealType]} />
-        {e.dealType === 'own' && (e as any).flockId && <Row l="گله" v={(flocks.find((f) => f.id === (e as any).flockId)?.name) || '—'} />}
-        {e.dealType === 'purchase' && sellerName && <Row l="فروشنده" v={String(sellerName)} />}
-        {e.dealType === 'partnership' && partnerName && <Row l="شریک" v={String(partnerName)} />}
-        {e.dealType === 'partnership' && e.dealData.partnerPercent && <Row l="درصد شریک" v={fmt.num(e.dealData.partnerPercent) + '٪'} />}
-        {e.dealType === 'rent' && lessorName && <Row l="اجاره‌دهنده" v={String(lessorName)} />}
-        {e.dealType === 'rent' && e.dealData.rentAmount && <Row l="اجاره" v={fmt.money(Number(e.dealData.rentAmount))} />}
-        {e.dealType === 'consignment' && consigneeName && <Row l="امانت‌دار" v={String(consigneeName)} />}
-        {(e as any).dealStatus === 'withdrawn' && (
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, padding: '4px 8px', background: 'var(--danger-soft)', borderRadius: 'var(--r-sm)' }}>
-            ⚠️ کنار کشیده {((e as any).dealWithdrawnAt ? ' (' + fmt.date((e as any).dealWithdrawnAt) + ')' : '')}
-          </div>
-        )}
-      </div>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>منبع</div>
+ <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+ <Row l="نوع"v={(DEAL_LABEL as any)[e.dealType]} />
+ {e.dealType === 'own'&& (e as any).flockId && <Row l="گله"v={(flocks.find((f) =>f.id === (e as any).flockId)?.name) || '—'} />}
+ {e.dealType === 'purchase'&& sellerName && <Row l="فروشنده"v={String(sellerName)} />}
+ {e.dealType === 'partnership'&& partnerName && <Row l="شریک"v={String(partnerName)} />}
+ {e.dealType === 'partnership'&& e.dealData.partnerPercent && <Row l="درصد شریک"v={fmt.num(e.dealData.partnerPercent) + '٪'} />}
+ {e.dealType === 'rent'&& lessorName && <Row l="اجاره‌دهنده"v={String(lessorName)} />}
+ {e.dealType === 'rent'&& e.dealData.rentAmount && <Row l="اجاره"v={fmt.money(Number(e.dealData.rentAmount))} />}
+ {e.dealType === 'consignment'&& consigneeName && <Row l="امانت‌دار"v={String(consigneeName)} />}
+ {(e as any).dealStatus === 'withdrawn'&& (
+ <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--danger)', fontWeight: 700, padding: '4px 8px', background: 'var(--danger-soft)', borderRadius: 'var(--r-sm)'}}>
+ کنار کشیده {((e as any).dealWithdrawnAt ? '('+ fmt.date((e as any).dealWithdrawnAt) + ')': '')}
+ </div>
+ )}
+ </div>
 
-      {(e.unitPrice || e.totalPrice || (e as any).shippingCost) && (
-        <>
-          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>💰 مالی</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {e.unitPrice && <Row l="قیمت هر تخم" v={fmt.money(e.unitPrice)} />}
-            {(e as any).shippingCost && <Row l="هزینه حمل" v={fmt.money((e as any).shippingCost)} />}
-            {e.totalPrice && (
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', color: 'var(--text)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-                <span>جمع تخم:</span><span>{fmt.money(e.totalPrice)}</span>
-              </div>
-            )}
-          </div>
-        </>
-      )}
+ {(e.unitPrice || e.totalPrice || (e as any).shippingCost) && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>مالی</div>
+ <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+ {e.unitPrice && <Row l="قیمت هر تخم"v={fmt.money(e.unitPrice)} />}
+ {(e as any).shippingCost && <Row l="هزینه حمل"v={fmt.money((e as any).shippingCost)} />}
+ {e.totalPrice && (
+ <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--input-bg)', color: 'var(--text)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+ <span>جمع تخم:</span><span>{fmt.money(e.totalPrice)}</span>
+ </div>
+ )}
+ </div>
+ </>
+ )}
 
-      {e.notes && (
-        <>
-          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
-          <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{e.notes}</div>
-        </>
-      )}
+ {e.notes && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>یادداشت</div>
+ <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)'}}>{e.notes}</div>
+ </>
+ )}
 
-      <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-        <CardActions actions={[
-          { ...ACTION_PRESETS.EDIT, onClick: onEdit },
-          { ...ACTION_PRESETS.DELETE, onClick: onDelete }
-        ]} />
-      </div>
-    </ExpandableCard>
+ <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
+ <CardActions actions={[
+ { ...ACTION_PRESETS.EDIT, onClick: onEdit },
+ { ...ACTION_PRESETS.DELETE, onClick: onDelete }
+ ]} />
+ </div>
+ </ExpandableCard>
   );
 }

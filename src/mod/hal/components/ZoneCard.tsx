@@ -47,42 +47,42 @@ export default function ZoneCard({
         {z.capacity && <span>ظرفیت: <b style={{ color: 'var(--text)' }}>{fmt.count(z.capacity)}</b></span>}
       </>}
     >
-      <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🗂 مشخصات بخش</div>
-      <RowGrid>
-        <Row l="سالن" v={hall ? <EntityLink type="hall" id={hall.id} label={hall.name} /> : '—'} />
-        <Row l="ظرفیت" v={z.capacity ? `${fmt.count(z.capacity)} پرنده` : '—'} />
-      </RowGrid>
-      {flocks.length > 0 && (
-        <>
-          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🐔 گله‌های این بخش ({fmt.count(flocks.length)})</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
-            {flocks.map((fl) => (
-              <div key={fl.id} style={{ display: 'flex', justifyContent: 'space-between',
-                 fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
-                 borderRadius: 'var(--r-sm)' }}>
-                <span style={{ fontWeight: 600 }}>
-                  <EntityLink type="flock" id={fl.id} label={fl.name} />
-                </span>
-                <span style={{ color: 'var(--muted)' }}>{fmt.count(fl.currentCount || fl.initialCount || 0)} پرنده</span>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-      {z.notes && (
-        <>
-          <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📝 یادداشت</div>
-          <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-             padding: 'var(--pad-normal)', background: 'var(--input-bg)',
-             borderRadius: 'var(--r-sm)' }}>{z.notes}</div>
-        </>
-      )}
-      <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-1)' }}>
-        <CardActions actions={[
-          { ...ACTION_PRESETS.EDIT, onClick: onEdit },
-          { ...ACTION_PRESETS.DELETE, onClick: onDelete }
-        ]} />
-      </div>
-    </ExpandableCard>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>مشخصات بخش</div>
+ <RowGrid>
+ <Row l="سالن"v={hall ? <EntityLink type="hall"id={hall.id} label={hall.name} />: '—'} />
+ <Row l="ظرفیت"v={z.capacity ? `${fmt.count(z.capacity)} پرنده`: '—'} />
+ </RowGrid>
+ {flocks.length >0 && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>گله‌های این بخش ({fmt.count(flocks.length)})</div>
+ <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)'}}>
+ {flocks.map((fl) =>(
+ <div key={fl.id} style={{ display: 'flex', justifyContent: 'space-between',
+ fontSize: 'var(--fs-sm)', padding: 'var(--pad-tight)', background: 'var(--input-bg)',
+ borderRadius: 'var(--r-sm)'}}>
+ <span style={{ fontWeight: 600 }}>
+ <EntityLink type="flock"id={fl.id} label={fl.name} />
+ </span>
+ <span style={{ color: 'var(--muted)'}}>{fmt.count(fl.currentCount || fl.initialCount || 0)} پرنده</span>
+ </div>
+ ))}
+ </div>
+ </>
+ )}
+ {z.notes && (
+ <>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>یادداشت</div>
+ <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
+ padding: 'var(--pad-normal)', background: 'var(--input-bg)',
+ borderRadius: 'var(--r-sm)'}}>{z.notes}</div>
+ </>
+ )}
+ <div style={{ display: 'flex', gap: 'var(--sp-2)', paddingTop: 'var(--sp-1)'}}>
+ <CardActions actions={[
+ { ...ACTION_PRESETS.EDIT, onClick: onEdit },
+ { ...ACTION_PRESETS.DELETE, onClick: onDelete }
+ ]} />
+ </div>
+ </ExpandableCard>
   );
 }

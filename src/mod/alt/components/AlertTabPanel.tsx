@@ -163,49 +163,49 @@ export default function AlertTabPanel({ tab, active: isActive }: Props) {
                 badge={<Tag tone={a.level === 'critical' ? 'red' : a.level === 'important' ? 'amber' : 'blue'}>{LEVEL_LABEL[a.level]}</Tag>}
                 stats={<><span>{a.message}</span></>}
               >
-                <SectionTitle>📋 جزئیات</SectionTitle>
-                <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
-                   padding: 'var(--pad-normal)', background: 'var(--input-bg)',
-                   borderRadius: 'var(--r-sm)' }}>
-                  {a.message}
-                </div>
+ <SectionTitle>جزئیات</SectionTitle>
+ <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
+ padding: 'var(--pad-normal)', background: 'var(--input-bg)',
+ borderRadius: 'var(--r-sm)'}}>
+ {a.message}
+ </div>
 
-                <SectionTitle>🔍 اطلاعات</SectionTitle>
-                <Row l="سطح" v={LEVEL_LABEL[a.level]} />
-                <Row l="دسته" v={CATEGORY_LABEL[a.category]} />
-                <Row l="منبع" v={a.source} />
-                <Row l="تاریخ هشدار" v={fmt.date(a.date)} />
-                {a.status === 'snoozed' && a.snoozeUntil ? (
-                  <Row l="به تعویق تا" v={fmt.date(a.snoozeUntil)} />
-                ) : null}
+ <SectionTitle>اطلاعات</SectionTitle>
+ <Row l="سطح"v={LEVEL_LABEL[a.level]} />
+ <Row l="دسته"v={CATEGORY_LABEL[a.category]} />
+ <Row l="منبع"v={a.source} />
+ <Row l="تاریخ هشدار"v={fmt.date(a.date)} />
+ {a.status === 'snoozed'&& a.snoozeUntil ? (
+ <Row l="به تعویق تا"v={fmt.date(a.snoozeUntil)} />
+ ) : null}
 
-                <div style={{ display: 'flex', gap: 6, paddingTop: 4, flexWrap: 'wrap' }}>
-                  {a.status === 'active' ? (
-                    <>
-                      <Btn size="sm" onClick={() => { dismiss(a.id); setExpandedId(null); }} style={{ flex: 1 }}>✓ بستن</Btn>
-                      <Btn size="sm" onClick={() => setSnoozeId(a.id)} style={{ flex: 1 }}>⏰ تعویق</Btn>
-                    </>
-                  ) : a.status === 'snoozed' ? (
-                    <>
-                      <Btn size="sm" onClick={() => { dismiss(a.id); setExpandedId(null); }} style={{ flex: 1 }}>✓ بستن</Btn>
-                      <Btn size="sm" onClick={() => restore(a.id)} style={{ flex: 1 }}>🔄 فعال</Btn>
-                    </>
-                  ) : (
-                    <>
-                      <Btn size="sm" onClick={() => restore(a.id)} style={{ flex: 1 }}>🔄 بازیابی</Btn>
-                      <Btn size="sm" onClick={async () => {
-                        const ok = await showConfirmAsync('تأیید حذف', 'این هشدار حذف شود؟', { danger: true });
-                        if (!ok) return;
-                        setUndoData({ item: a });
-                        setTimeout(() => setUndoData((cur) => cur && cur.item.id === a.id ? null : cur), 6000);
-                        remove(a.id);
-                        logAction('delete', 'alt', 'حذف از هشدارها');
-                        toastMsg.deleted('هشدار');
-                      }} style={{ flex: 1 }}>🗑 حذف</Btn>
-                    </>
-                  )}
-                </div>
-              </ExpandableCard>
+ <div style={{ display: 'flex', gap: 6, paddingTop: 4, flexWrap: 'wrap'}}>
+ {a.status === 'active'? (
+ <>
+ <Btn size="sm"onClick={() =>{ dismiss(a.id); setExpandedId(null); }} style={{ flex: 1 }}>✓ بستن</Btn>
+ <Btn size="sm"onClick={() =>setSnoozeId(a.id)} style={{ flex: 1 }}>تعویق</Btn>
+ </>
+ ) : a.status === 'snoozed'? (
+ <>
+ <Btn size="sm"onClick={() =>{ dismiss(a.id); setExpandedId(null); }} style={{ flex: 1 }}>✓ بستن</Btn>
+ <Btn size="sm"onClick={() =>restore(a.id)} style={{ flex: 1 }}>فعال</Btn>
+ </>
+ ) : (
+ <>
+ <Btn size="sm"onClick={() =>restore(a.id)} style={{ flex: 1 }}>بازیابی</Btn>
+ <Btn size="sm"onClick={async () =>{
+ const ok = await showConfirmAsync('تأیید حذف', 'این هشدار حذف شود؟', { danger: true });
+ if (!ok) return;
+ setUndoData({ item: a });
+ setTimeout(() =>setUndoData((cur) =>cur && cur.item.id === a.id ? null : cur), 6000);
+ remove(a.id);
+ logAction('delete', 'alt', 'حذف از هشدارها');
+ toastMsg.deleted('هشدار');
+ }} style={{ flex: 1 }}>حذف</Btn>
+ </>
+ )}
+ </div>
+ </ExpandableCard>
             );
           })}
         </>

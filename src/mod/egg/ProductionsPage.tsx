@@ -366,49 +366,49 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
                   </>
                 }
               >
-                <SectionTitle>📊 آمار تخم‌گذاری</SectionTitle>
-                {p.eatingCount > 0 && <Row l="🥚 تخم خوراکی" v={fmt.count(p.eatingCount)} />}
-                {p.fertileCount > 0 && <Row l="🌱 تخم نطفه‌دار" v={fmt.count(p.fertileCount)} />}
-                <Row l="تخم سالم" v={fmt.count(healthy2)} />
-                <Row l="تخم شکسته" v={fmt.count(p.brokenCount)} />
-                {p.softCount > 0 ? <Row l="تخم نرم" v={fmt.count(p.softCount)} /> : null}
-                {p.dirtyCount > 0 ? <Row l="تخم کثیف" v={fmt.count(p.dirtyCount)} /> : null}
-                <Row l="جمع کل" v={fmt.count((p.totalCount || 0) + (p.brokenCount || 0) + (p.softCount || 0) + (p.dirtyCount || 0))} />
+ <SectionTitle>آمار تخم‌گذاری</SectionTitle>
+ {p.eatingCount >0 && <Row l="تخم خوراکی"v={fmt.count(p.eatingCount)} />}
+ {p.fertileCount >0 && <Row l="تخم نطفه‌دار"v={fmt.count(p.fertileCount)} />}
+ <Row l="تخم سالم"v={fmt.count(healthy2)} />
+ <Row l="تخم شکسته"v={fmt.count(p.brokenCount)} />
+ {p.softCount >0 ? <Row l="تخم نرم"v={fmt.count(p.softCount)} />: null}
+ {p.dirtyCount >0 ? <Row l="تخم کثیف"v={fmt.count(p.dirtyCount)} />: null}
+ <Row l="جمع کل"v={fmt.count((p.totalCount || 0) + (p.brokenCount || 0) + (p.softCount || 0) + (p.dirtyCount || 0))} />
 
-                {rate > 0 ? (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
-                    <span>نرخ تخم‌گذاری (Hen-Day):</span>
-                    <span>{fmt.code(rate.toFixed(1))}٪</span>
-                  </div>
-                ) : null}
+ {rate >0 ? (
+ <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
+ <span>نرخ تخم‌گذاری (Hen-Day):</span>
+ <span>{fmt.code(rate.toFixed(1))}٪</span>
+ </div>
+ ) : null}
 
-                {p.avgWeight ? (
-                  <>
-                    <SectionTitle>⚖ وزن</SectionTitle>
-                    <Row l="وزن میانگین" v={fmt.num(p.avgWeight) + ' گرم'} />
-                  </>
-                ) : null}
+ {p.avgWeight ? (
+ <>
+ <SectionTitle>وزن</SectionTitle>
+ <Row l="وزن میانگین"v={fmt.num(p.avgWeight) + 'گرم'} />
+ </>
+ ) : null}
 
-                {p.notes ? (
-                  <>
-                    <SectionTitle>📝 یادداشت</SectionTitle>
-                    <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)' }}>{p.notes}</div>
-                  </>
-                ) : null}
+ {p.notes ? (
+ <>
+ <SectionTitle>یادداشت</SectionTitle>
+ <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7, padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)'}}>{p.notes}</div>
+ </>
+ ) : null}
 
-                <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
-                  <Btn size="sm" onClick={() => openEdit(p)} style={{ flex: 1 }}>ویرایش</Btn>
-                  <Btn size="sm" onClick={async () => {
-                    const ok = await showConfirmAsync('تأیید حذف', 'این تخم‌گذاری حذف شود؟', { danger: true });
-                    if (!ok) return;
-                    setUndoData({ item: p });
-                    setTimeout(() => setUndoData((cur: any) => cur && cur.item.id === p.id ? null : cur), 6000);
-                    deleteProduction(p.id);
-                    logAction('delete', 'egg', 'حذف از تخم‌ها');
-                    toastMsg.deleted('تخم‌گذاری ' + (p.date || ''))
-                  }} style={{ flex: 1 }}>حذف</Btn>
-                </div>
-              </ExpandableCard>
+ <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
+ <Btn size="sm"onClick={() =>openEdit(p)} style={{ flex: 1 }}>ویرایش</Btn>
+ <Btn size="sm"onClick={async () =>{
+ const ok = await showConfirmAsync('تأیید حذف', 'این تخم‌گذاری حذف شود؟', { danger: true });
+ if (!ok) return;
+ setUndoData({ item: p });
+ setTimeout(() =>setUndoData((cur: any) =>cur && cur.item.id === p.id ? null : cur), 6000);
+ deleteProduction(p.id);
+ logAction('delete', 'egg', 'حذف از تخم‌ها');
+ toastMsg.deleted('تخم‌گذاری '+ (p.date || ''))
+ }} style={{ flex: 1 }}>حذف</Btn>
+ </div>
+ </ExpandableCard>
             );
           })}
           
