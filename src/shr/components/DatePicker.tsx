@@ -107,7 +107,7 @@ export default function DatePicker({
   const { year, month, daysInMonth, firstCol, years } = useMemo(() => {
     if (!isGregorian) {
       const cy = getYear(new Date());
-      const yrList = Array.from({ length: 31 }, (_, i) => cy - 15 + i);
+      const minY = cy - 15; const maxY = Math.max(cy + 15, 1440); const yrList = Array.from({ length: maxY - minY + 1 }, (_, i) => minY + i);
       const y = getYear(cursor);
       const m = getMonth(cursor);
       const mStart = startOfMonth(cursor);
@@ -121,7 +121,7 @@ export default function DatePicker({
       };
     }
     const cy = new Date().getFullYear();
-    const yrList = Array.from({ length: 31 }, (_, i) => cy - 15 + i);
+    const minY = cy - 15; const maxY = Math.max(cy + 15, 2061); const yrList = Array.from({ length: maxY - minY + 1 }, (_, i) => minY + i);
     const y = cursor.getFullYear();
     const m = cursor.getMonth();
     const first = new Date(y, m, 1);
