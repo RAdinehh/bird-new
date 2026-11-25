@@ -1,3 +1,5 @@
+import { useTra } from '../../tra/store';
+import { formatInvoiceNumber } from '../../tra/calc';
 import { useFormat } from '../../../shr/units/useFormat';
 import { useNavigate } from 'react-router-dom';
 /**
@@ -44,6 +46,24 @@ export default function EquipmentCard(props: EquipmentCardProps) {
   const navigate = useNavigate();
   const { e, i, hall, allCustomOpts, isOpen, ms, onToggle, onEdit, onDelete, onRetire, onRestore, onTransfer, onUndo, supplierNames,
         invoiceNumbers, whsItemNames, zoneNames } = props;
+  const _allInvoices = useTra(st => st.invoices);
+  const _linkedPurchaseInv = (() => {
+    if (e.sourceInvoiceId) {
+      const byId = _allInvoices.find(inv => inv.id === e.sourceInvoiceId);
+      if (byId) return byId;
+    }
+    const eqName = (e.name || "").trim();
+    return _allInvoices.find(inv =>
+      inv.type === "purchase" &&
+      (inv.items || []).some((it: any) =>
+        it.equipmentId === e.id ||
+        (e.warehouseItemId && (it.itemId === e.warehouseItemId || it.stockItemId === e.warehouseItemId)) ||
+        ((it.category === "equipment" || inv.category === "equipment") && eqName && (it.description || "").trim() === eqName)
+      )
+    );
+  })();
+  const _effectiveInvoiceId = _linkedPurchaseInv?.id;
+
   const _cm = allCustomOpts.find(o => o.key.startsWith('hal.equip.type.') && o.name === e.type);
   const _isDeleted = _cm ? _cm.hidden === true : false;
   const meta = EQUIP_LABELS[e.type] || (_cm ? { name: _cm.name, icon: _cm.icon } : { name: 'سایر', icon: '🔧' });
@@ -146,9 +166,9 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                 )}
 
                 {/* 🤝 طرف تجاری */}
-                {(e.supplierId || e.sourceInvoiceId || e.warehouseItemId) && (
+                {(e.supplierId || _effectiveInvoiceId || e.warehouseItemId) && (
                   <>
-                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>🤝 طرف تجاری</div>
+                    <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>طرف تجاری</div>
                     <RowGrid>
                       {e.supplierId && <Row l="تأمین‌کننده" v={<EntityLink type="party" id={e.supplierId} label={supplierNames?.get(e.supplierId) || '—'} />} />}
                       {e.sourceInvoiceId && <Row l="فاکتور خرید" v={<EntityLink type="invoice" id={e.sourceInvoiceId} label={invoiceNumbers?.get(e.sourceInvoiceId) || 'فاکتور حذف‌شده'} />} />}
@@ -280,7 +300,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
         actions={[
           {
             ...ACTION_PRESETS.RECORD_INVOICE,
-            hidden: !(e.unitPrice && e.unitPrice > 0 && !e.sourceInvoiceId && e.status !== 'retired'),
+            hidden: !(e.unitPrice && e.unitPrice > 0 && !_effectiveInvoiceId && e.status !== 'retired'),
             onClick: () => {
               const params = new URLSearchParams({
                 tab: 'purchases',
