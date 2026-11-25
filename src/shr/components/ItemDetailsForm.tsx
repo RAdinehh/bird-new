@@ -591,7 +591,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <Field
-          label={`انتخاب ${catLabel} از انبار یاتعریف جدید`}
+          label={`انتخاب ${catLabel} از انبار یا تعریف جدید`}
           error={err('stockItemId')}
           onTouch={touch('stockItemId')}
           required={requiredField}
@@ -641,7 +641,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="🌾" title="اطلاعات دان" />
         {nameFieldJsx}        {isPurchase ? (
-          renderPurchaseStockSelector('دان', 'انتخاب یاتعریف دان', 'ذرت، کنجاله سویا', feedItems, false)
+          renderPurchaseStockSelector('دان', 'انتخاب یا تعریف دان', 'ذرت، کنجاله سویا', feedItems, false)
         ) : (
           <Field label="کاهش از انبار" error={err('stockItemId')} onTouch={touch('stockItemId')} hint="برای کاهش از موجودی">
             <SmartSelect value={String(item.stockItemId || '')} onChange={v => {
@@ -683,7 +683,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="💊" title="اطلاعات دارو و واکسن" />
         {nameFieldJsx}        {isPurchase ? (
-          renderPurchaseStockSelector('دارو / واکسن', 'انتخاب یاتعریف دارو و واکسن', 'انروفلوکساسین، تایلوزین', medItems, false)
+          renderPurchaseStockSelector('دارو / واکسن', 'انتخاب یا تعریف دارو و واکسن', 'انروفلوکساسین، تایلوزین', medItems, false)
         ) : (
           <Field label="کاهش از انبار" error={err('stockItemId')} onTouch={touch('stockItemId')} required hint="دارو/واکسن از انبار کاهش می‌یابد">
             <SmartSelect value={String(item.stockItemId || '')} onChange={v => {
@@ -853,7 +853,7 @@ if (category === 'vaccine' || category === 'herbal') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="💊" title={category === 'vaccine' ? 'اطلاعات واکسن' : 'اطلاعات داروی گیاهی'} />
       {nameFieldJsx}        {isPurchase ? (
-          renderPurchaseStockSelector(subLabel, `انتخاب یاتعریف ${subLabel}`, subExample, subItems, false)
+          renderPurchaseStockSelector(subLabel, `انتخاب یا تعریف ${subLabel}`, subExample, subItems, false)
         ) : (
           <Field
             label="کاهش از انبار"
