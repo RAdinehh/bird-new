@@ -36,6 +36,9 @@ interface Props {
 }
 
 export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTransferClick, onReopen, onEdit, onDispute, onResolveDispute, onWriteOff, index }: Props) {
+  const { items: whsItems, movements: whsMovements } = useWhs();
+  const { halls, zones, equipment } = useHal();
+  const { hatches } = useInc();
   const fmt = useFormat();
   const { updateInvoice, allocations } = useTra();
   const { flocks, restore, update: updateFlock } = useFlk();
@@ -239,9 +242,30 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
 
       <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام</SectionTitle>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
-        {inv.items.map(it => (
-          <Row key={it.id} l={`${it.description || '—'} • ${formatQty(it.quantity, it.unit || 'pcs')} × ${fmt.money(it.unitPrice || 0, { withUnit: false })} تومان`} v={`${fmt.money(it.total, { withUnit: false })} تومان`} />
-        ))}
+        {inv.items.map(it => {
+          const invMovements = whsMovements.filter(m => (m.sourceModule === 'tra' && m.sourceId === inv.id) || (it.movementId && m.id === it.movementId));
+          const linkedWhsId = it.itemId || it.stockItemId || (it.movementId ? whsMovements.find(m => m.id === it.movementId)?.itemId : undefined) || invMovements.find(m => {
+            const w = whsItems.find(x => x.id === m.itemId);
+            return w && it.description && (w.name === it.description || it.description.includes(w.name));
+          })?.itemId;
+          const linkedWhs = linkedWhsId ? whsItems.find(w => w.id === linkedWhsId) : undefined;
+          const linkedHall = it.hallId ? halls.find(h => h.id === it.hallId) : undefined;
+          const linkedZone = it.zoneId ? zones.find(z => z.id === it.zoneId) : undefined;
+          const itemFlockId = it.flockId || it.existingFlockId;
+          const linkedItemFlock = itemFlockId ? flocks.find(f => f.id === itemFlockId) : undefined;
+          const linkedHatch = it.hatchId ? hatches.find(h => h.id === it.hatchId) : undefined;
+          const linkedEquip = it.equipmentId ? equipment?.find(eq => eq.id === it.equipmentId) : undefined;
+          const descNode = createElement('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' } },
+            linkedWhs ? createElement(EntityLink, { type: 'item', id: linkedWhs.id, label: linkedWhs.name }) : (it.description || '—'),
+            linkedHall ? createElement(EntityLink, { type: 'hall', id: linkedHall.id, label: linkedHall.name }) : null,
+            linkedZone ? createElement(EntityLink, { type: 'zone', id: linkedZone.id, label: linkedZone.name }) : null,
+            linkedItemFlock ? createElement(EntityLink, { type: 'flock', id: linkedItemFlock.id, label: linkedItemFlock.name }) : null,
+            linkedHatch ? createElement(EntityLink, { type: 'device', tab: 'hatches', id: linkedHatch.id, label: `هچ ${fmt.date(linkedHatch.date)}` }) : null,
+            linkedEquip ? createElement(EntityLink, { type: 'hall', tab: 'equipments', id: linkedEquip.id, label: linkedEquip.name }) : null,
+            `• ${formatQty(it.quantity, it.unit || 'pcs')} × ${fmt.money(it.unitPrice || 0, { withUnit: false })} تومان`
+          );
+          return createElement(Row, { key: it.id, l: descNode, v: `${fmt.money(it.total, { withUnit: false })} تومان` });
+        })}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
         <span>جمع کل:</span>

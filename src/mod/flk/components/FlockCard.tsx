@@ -342,6 +342,20 @@ export default function FlockCard(props: FlockCardProps) {
 
       <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>📊 مشخصات</div>
       <RowGrid>
+              {f.hatchId && (() => {
+                const incState = useInc.getState();
+                const h = incState.hatches?.find((x) => x.id === f.hatchId);
+                const entry = h ? incState.eggEntries?.find((e) => e.id === h.eggEntryId) : undefined;
+                const dev = entry ? incState.devices?.find((d) => d.id === entry.deviceId) : undefined;
+                return [
+                  h ? createElement(Row, { key: 'hatch', l: 'هچ مبدأ', v: createElement(EntityLink, { type: 'device', tab: 'hatches', id: h.id, label: h.date ? `هچ ${h.date}` : 'مشاهده هچ' }) }) : null,
+                  dev ? createElement(Row, { key: 'dev', l: 'دستگاه جوجه‌کشی', v: createElement(EntityLink, { type: 'device', id: dev.id, label: dev.name }) }) : null
+                ];
+              })()}
+              {f.sourceInvoiceId && (
+                <Row l="فاکتور خرید" v={createElement(EntityLink, { type: "invoice", id: f.sourceInvoiceId, label: "مشاهده" })} />
+              )}
+
         {f.initialCount != null && <Row l="تعداد اولیه" v={getGlobalFormat().count(f.initialCount)} />}
         {f.initialCount != null && (() => {
           const evs = ((f as any).events || []).filter((e: any) => !e.revoked);
