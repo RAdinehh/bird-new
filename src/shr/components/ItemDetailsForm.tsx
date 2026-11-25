@@ -219,9 +219,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   // ========== جوجه یک‌روزه ==========
   if (category === 'chick') {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="🧬" title="اطلاعات گله" />
         {nameFieldJsx}
-        <SecTitle icon="🧬" title="اطلاعات گله" />
 
         {!isPurchase && (
           <Grid2>
@@ -406,9 +405,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     const isLocked = !!item.existingFlockId || isSaleLocked;
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="🐓" title="اطلاعات پرنده بالغ" />
         {nameFieldJsx}
-        <SecTitle icon="🐓" title="اطلاعات پرنده بالغ" />
 
         {/* در حالت فروش: گله مبدأ بالاترین اولویت سلسله‌مراتبی را دارد */}
         {!isPurchase && (
@@ -759,10 +757,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (category === 'manure' && !isPurchase) {
     const manureItems = (whsItems || []).filter(w => w.category === 'manure');
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {nameFieldJsx}
-        <SecTitle icon="💩" title="اطلاعات کود" />
-        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} error={err('stockItemId')} onTouch={touch('stockItemId')} required={!isPurchase} hint={isPurchase ? "به موجودی اضافه" : "از موجودی کاهش"}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="💩" title="اطلاعات کود" />        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} error={err('stockItemId')} onTouch={touch('stockItemId')} required={!isPurchase} hint={isPurchase ? "به موجودی اضافه" : "از موجودی کاهش"}>
           <SmartSelect
             value={String(item.stockItemId || '')}
             onChange={v => {
@@ -818,9 +813,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     ];
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {nameFieldJsx}
-        <SecTitle icon="⚙️" title="مشخصات تجهیزات" />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="⚙️" title="مشخصات تجهیزات" />        {nameFieldJsx}
         <Grid2>
           <Field label="دسته تجهیزات" required error={err('equipmentCategory')} onTouch={touch('equipmentCategory')}>
             <SmartSelect
@@ -841,6 +834,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             />
           </Field>
         </Grid2>
+        {nameFieldJsx}
       </div>
     );
   }
@@ -943,10 +937,7 @@ if (category === 'vaccine' || category === 'herbal') {
     const showPeriod = ['utilities', 'labor', 'rent'].includes(ct);
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {nameFieldJsx}
-        <SecTitle icon="📋" title={ct ? otherCfg.sectionTitle : 'مشخصات قلم'} />
-        <Grid2>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="📋" title={ct ? otherCfg.sectionTitle : 'مشخصات قلم'} />        <Grid2>
           {isPurchase && (
             <Field label="زیرمجموعه" help={"**سوخت و گرمایش** گازوئیل، گاز و کپسول (هزینه جاری)\n**بستر و پوشال** پوشال، کلش و خاک‌اره (ورود به انبار)\n**ضدعفونی و شست‌وشو** مواد ضدعفونی (ورود به انبار) یا شست‌وشوی مقطوع سالن\n**دامپزشکی و آزمایشگاه** ویزیت دامپزشک، کالبدگشایی و آزمایش‌ها\n**دستمزد و کارگر** کارگر روزمزد، ماهانه یا کنتراتی\n**قبوض آب، برق، گاز** قبوض دوره‌ای با ثبت مبلغ کل\n**حمل و نقل** کرایه بار (دربستی، تنی یا کیلومتری)\n**تعمیرات و نگهداری** تعمیر تجهیزات و تأسیسات سالن\n**بسته‌بندی** شانه، کارتن، کیسه و رول (ورود به انبار)\n**اجاره سالن و انبار** اجاره ماهانه یا روزانه\n**سایر هزینه‌ها** سایر اقلام و هزینه‌های متفرقه فارم"} required error={err('costType')} onTouch={touch('costType')}>
               <SmartSelect
@@ -979,6 +970,7 @@ if (category === 'vaccine' || category === 'herbal') {
             }} options={activeFlocks} placeholder="— بدون گله (سربار کل) —" modalTitle="انتخاب گله" />
           </Field>
         </Grid2>
+        {nameFieldJsx}
 
         {ct === 'utilities' && (
           <>
@@ -1045,9 +1037,8 @@ if (category === 'vaccine' || category === 'herbal') {
       (w.category === 'egg' && (w.name === 'تخم مصرفی' || w.name === 'تخم شکسته'))
     );
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="💔" title="اطلاعات تخم شکسته" />
         {nameFieldJsx}
-        <SecTitle icon="💔" title="اطلاعات تخم شکسته" />
 
         {/* انتخاب از تولیدات تخم — شکسته */}
         <Field label="انتخاب از تولیدات تخم شکسته" hint="برای پر شدن خودکار مشخصات">
