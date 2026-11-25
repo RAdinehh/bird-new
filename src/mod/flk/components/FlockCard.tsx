@@ -446,7 +446,10 @@ export default function FlockCard(props: FlockCardProps) {
                 const h = incState.hatches?.find((x) => x.id === f.hatchId);
                 const entry = h ? incState.eggEntries?.find((e) => e.id === h.eggEntryId) : undefined;
                 const dev = entry ? incState.devices?.find((d) => d.id === entry.deviceId) : undefined;
-                return dev ? createElement(Row, { l: 'دستگاه جوجه‌کشی', v: createElement(EntityLink, { type: 'device', id: dev.id, label: dev.name }) }) : null;
+                return [
+                  h ? createElement(Row, { key: 'hatch', l: 'هچ مبدأ', v: createElement(EntityLink, { type: 'device', tab: 'hatches', id: h.id, label: h.date ? `هچ ${h.date}` : 'مشاهده هچ' }) }) : null,
+                  dev ? createElement(Row, { key: 'dev', l: 'دستگاه جوجه‌کشی', v: createElement(EntityLink, { type: 'device', id: dev.id, label: dev.name }) }) : null
+                ];
               })()}
               {f.sourceInvoiceId && (
                 <Row l="فاکتور خرید" v={<EntityLink type="invoice" id={f.sourceInvoiceId} label="مشاهده" />} />
