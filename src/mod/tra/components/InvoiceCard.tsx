@@ -257,7 +257,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
           const linkedEquip = it.equipmentId ? equipment?.find(eq => eq.id === it.equipmentId) : undefined;
           const showDesc = !linkedWhs && (!linkedItemFlock || (it.description && it.description.trim() !== linkedItemFlock.name.trim()));
           return (
-            <div key={it.id} style={idx > 0 ? { borderTop: '1px dashed var(--border)', paddingTop: 'var(--sp-2)' } : undefined}>
+            <div key={it.id} >
               <RowGrid>
                 {linkedWhs ? <Row l="کالا" v={createElement(EntityLink, { type: 'item', id: linkedWhs.id, label: linkedWhs.name })} /> : null}
                 {showDesc ? <Row l="شرح" v={it.description || '—'} /> : null}
@@ -342,18 +342,17 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       {inv.payments && inv.payments.length > 0 && (
         <>
           <SectionTitle>💳 پرداخت‌ها</SectionTitle>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)' }}>
             {inv.payments.map(p => (
               <div key={p.id}>
-                <Row
-                  l={`${p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک'} • ${fmt.date(p.date)}`}
-                  v={fmt.money(p.amount, { withUnit: false }) + ' تومان'}
-                />
-                {p.method === 'check' && (
-                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', padding: '2px 8px' }}>
-                    چک {p.checkNo} • {p.bank} • {CHECK_STATUS_LABEL[p.status || 'pending']}
-                  </div>
-                )}
+                <RowGrid>
+                  <Row l="روش" v={p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک'} />
+                  <Row l="تاریخ" v={fmt.date(p.date)} />
+                  <Row l="مبلغ" v={fmt.money(p.amount, { withUnit: false }) + ' تومان'} />
+                  {p.method === 'check' && p.checkNo ? <Row l="شماره چک" v={p.checkNo} /> : null}
+                  {p.method === 'check' && p.bank ? <Row l="بانک" v={p.bank} /> : null}
+                  {p.method === 'check' ? <Row l="وضعیت چک" v={CHECK_STATUS_LABEL[p.status || 'pending']} /> : null}
+                </RowGrid>
               </div>
             ))}
           </div>
