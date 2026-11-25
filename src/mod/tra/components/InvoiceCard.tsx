@@ -219,7 +219,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
         </>
       }
     >
-      <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات</SectionTitle>
+      <SectionTitle>اطلاعات</SectionTitle>
       <RowGrid>
         <Row l={inv.type === 'sale' ? 'خریدار' : 'فروشنده'} v={inv.partyId && partyName ? createElement(EntityLink, { type: 'party', id: inv.partyId, label: partyName }) : (partyName || '—')} />
         <Row l="تاریخ" v={fmt.date(inv.date)} />
@@ -231,7 +231,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
                 v={createElement(EntityLink, { type: 'flock', id: linkedFlock.id, label: linkedFlock.name })}
               />
             ) : null}
-        {inv.isPreorder && inv.deliveryDate ? <Row l="📅 تحویل" v={fmt.date(inv.deliveryDate)} /> : null}
+        {inv.isPreorder && inv.deliveryDate ? <Row l="تحویل" v={fmt.date(inv.deliveryDate)} /> : null}
           {inv.writtenOff && (inv.writtenOffAmount || 0) > 0 ? (
             <Row
               l={inv.type === 'purchase' ? 'بخشش مانده' : 'حذف بدحساب'}
@@ -240,7 +240,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
           ) : null}
       </RowGrid>
 
-      <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📦</span> اقلام</SectionTitle>
+      <SectionTitle>اقلام</SectionTitle>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)' }}>
         {inv.items.map((it, idx) => {
           const invMovements = whsMovements.filter(m => (m.sourceModule === 'tra' && m.sourceId === inv.id) || (it.movementId && m.id === it.movementId));
@@ -254,14 +254,15 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
           const itemFlockId = it.flockId || it.existingFlockId;
           const linkedItemFlock = itemFlockId ? flocks.find(f => f.id === itemFlockId) : undefined;
           const linkedHatch = it.hatchId ? hatches.find(h => h.id === it.hatchId) : undefined;
-          const linkedEquip = it.equipmentId ? equipment?.find(eq => eq.id === it.equipmentId) : undefined;
-          const showDesc = !linkedWhs && (!linkedItemFlock || (it.description && it.description.trim() !== linkedItemFlock.name.trim()));
+          const invEquips = equipment?.filter(eq => eq.sourceInvoiceId === inv.id) || [];
+          const linkedEquip = (it.equipmentId ? equipment?.find(eq => eq.id === it.equipmentId) : undefined) || invEquips.find(eq => eq.name === it.description || eq.name === (it as any).model) || (invEquips.length === 1 && inv.items.length === 1 ? invEquips[0] : undefined);
+          const showDesc = !linkedWhs && (!linkedEquip || (it.description && it.description.trim() !== linkedEquip.name.trim())) && (!linkedItemFlock || (it.description && it.description.trim() !== linkedItemFlock.name.trim()));
           return (
             <div key={it.id} >
               <RowGrid>
                 {linkedWhs ? <Row l="کالا" v={createElement(EntityLink, { type: 'item', id: linkedWhs.id, label: linkedWhs.name })} /> : null}
                 {showDesc ? <Row l="شرح" v={it.description || '—'} /> : null}
-                {linkedItemFlock ? <Row l="گله" v={createElement(EntityLink, { type: 'flock', id: linkedItemFlock.id, label: linkedItemFlock.name })} /> : null}
+                {linkedItemFlock && linkedItemFlock.id !== linkedFlock?.id ? <Row l="گله" v={createElement(EntityLink, { type: 'flock', id: linkedItemFlock.id, label: linkedItemFlock.name })} /> : null}
                 {linkedHall ? <Row l="سالن" v={createElement(EntityLink, { type: 'hall', id: linkedHall.id, label: linkedHall.name })} /> : null}
                 {linkedZone ? <Row l="بخش" v={createElement(EntityLink, { type: 'zone', id: linkedZone.id, label: linkedZone.name })} /> : null}
                 {linkedHatch ? <Row l="هچ" v={createElement(EntityLink, { type: 'device', tab: 'hatches', id: linkedHatch.id, label: `هچ ${fmt.date(linkedHatch.date)}` })} /> : null}
@@ -285,7 +286,6 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
         return (
           <>
             <SectionTitle>
-              <span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span>
               اقساط — {fmt.count(paidCount)} از {fmt.count(totalCount)} پرداخت شده
             </SectionTitle>
             {overdueCount > 0 && (
@@ -341,12 +341,12 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
 
       {inv.payments && inv.payments.length > 0 && (
         <>
-          <SectionTitle>💳 پرداخت‌ها</SectionTitle>
+          <SectionTitle>پرداخت‌ها</SectionTitle>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)' }}>
             {inv.payments.map(p => (
               <div key={p.id}>
                 <RowGrid>
-                  <Row l="روش" v={p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک'} />
+                  <Row l="روش" v={p.method === 'cash' ? 'نقدی' : p.method === 'card' ? 'کارت' : 'چک'} />
                   <Row l="تاریخ" v={fmt.date(p.date)} />
                   <Row l="مبلغ" v={fmt.money(p.amount, { withUnit: false }) + ' تومان'} />
                   {p.method === 'check' && p.checkNo ? <Row l="شماره چک" v={p.checkNo} /> : null}
