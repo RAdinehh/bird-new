@@ -405,8 +405,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                         {isFlatOther ? null : isSingleUnit ? (
                           <Grid2>
                                                         {cat !== 'chick' && (
-                                                        <Field label="تعداد" required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
-                              <NumField placeholder="تعداد" value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
+                                                        <Field label={otherCfg?.qtyLabel || "تعداد"} required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
+                              <NumField placeholder={otherCfg?.qtyLabel || "تعداد"} value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
                                   let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
                                   const max = getQuantityMax(cat);
                                   if (max && val > max) val = max;
@@ -425,8 +425,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                           <>
                                                         <Grid2>
                               {cat !== 'chick' && (
-                              <Field label="تعداد" required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
-                                <NumField placeholder="تعداد" value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
+                              <Field label={otherCfg?.qtyLabel || "تعداد"} required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
+                                <NumField placeholder={otherCfg?.qtyLabel || "تعداد"} value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
                                   let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
                                   const max = getQuantityMax(cat);
                                   if (max && val > max) val = max;
@@ -441,7 +441,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                                   modalTitle="انتخاب واحد"
                                   placeholder={undefined}
                                   options={uom.units.map((u: UOMUnit) => ({ value: u.value, label: u.label }))}
-                                  onChange={val => updateItem(it.id, { unit: val, unitWeight: null })}
+                                  onChange={val => updateItem(it.id, { unit: val, unitWeight: null, priceUnit: val as any })}
                                 />
                               </Field>
                             </Grid2>
@@ -522,7 +522,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       const currentUnitDef = uom.units.find((u: UOMUnit) => u.value === currentUnit);
       const currentUnitLabel = currentUnitDef?.label || 'واحد';
       const factor = (currentUnitDef && currentUnitDef.factor !== null) ? currentUnitDef.factor : (it.unitWeight || 1);
-      const effectivePriceUnit = String(it.priceUnit || currentUnit || '');
+      const rawPriceUnit = String(it.priceUnit || currentUnit || '');
+      const effectivePriceUnit = uom.units.some((u: UOMUnit) => u.value === rawPriceUnit) ? rawPriceUnit : currentUnit;
       const compatiblePriceUnits = uom.units.filter((u: UOMUnit) => {
         if (!currentUnitDef) return true;
         if (currentUnitDef.factor === null) return u.value === currentUnit || u.factor !== null;
@@ -537,7 +538,16 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       const baseUnitLabel = uom.baseUnit === 'kg' ? 'کیلوگرم' : uom.baseUnit === 'g' ? 'گرم' : uom.baseUnit === 'ml' ? 'میلی‌لیتر' : uom.baseUnit === 'dose' ? 'دوز' : 'واحد';
       return (
         <>
-          <Grid2>
+          {isFlatOther ? (
+                <Field label={otherCfg?.priceLabel || "مبلغ کل"} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
+                  <MoneyField placeholder="مبلغ کل" value={it.unitPrice > 0 ? fmt.code(String(it.unitPrice)) : ''} onChange={e => {
+                    let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
+                    if (maxPrice && val > maxPrice) val = maxPrice;
+                    if (val < 0) val = 0;
+                    updateItem(it.id, { unitPrice: val, quantity: 1 });
+                  }} />
+                </Field>
+              ) : (<Grid2>
             <Field label={`قیمت هر ${activePriceUnitLabel}`} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
               <MoneyField placeholder={getPricePlaceholder(cat)} value={it.unitPrice > 0 ? fmt.code(String(it.unitPrice)) : ''} onChange={e => {
                 let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
@@ -556,10 +566,12 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                 onChange={val => updateItem(it.id, { priceUnit: val as any })}
               />
             </Field>
-          </Grid2>
-          <Field label="هزینه حمل این قلم" error={showError(`items.${idx}.shipping`)} onTouch={() => markTouched(`items.${idx}.shipping`)}>
+          </Grid2>)}
+          {(!otherCfg || otherCfg.showShipping) && (
+<Field label="هزینه حمل این قلم" error={showError(`items.${idx}.shipping`)} onTouch={() => markTouched(`items.${idx}.shipping`)}>
             <MoneyField placeholder="مبلغ هزینه" value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} />
           </Field>
+)}
               {it.quantity > 0 && it.unitPrice > 0 && (
                 <div style={{
                   marginTop: 'var(--sp-1)',

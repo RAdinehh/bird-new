@@ -164,20 +164,24 @@ export interface OtherCostConfig {
   units: string[];
   defaultUnit: string;
   isFlat: boolean;
+  sectionTitle: string;
+  qtyLabel: string;
+  priceLabel?: string;
+  showShipping: boolean;
 }
 
 const OTHER_COST_MAP: Record<string, OtherCostConfig> = {
-  fuel:        { units: ['l', 'kg', 'pcs'],                   defaultUnit: 'l',       isFlat: false },
-  bedding:     { units: ['kg', 'bag', 'ton', 'roll', 'service'], defaultUnit: 'kg',      isFlat: false },
-  biosecurity: { units: ['l', 'kg', 'bag', 'pack', 'service'],   defaultUnit: 'l',       isFlat: false },
-  packaging:   { units: ['pcs', 'pack', 'roll', 'kg'],          defaultUnit: 'pcs',     isFlat: false },
-  utilities:   { units: ['bill'],                                defaultUnit: 'bill',    isFlat: true  },
-  labor:       { units: ['day', 'month', 'service', 'pcs'],     defaultUnit: 'day',     isFlat: false },
-  transport:   { units: ['service', 'ton', 'pcs'],              defaultUnit: 'service', isFlat: false },
-  maintenance: { units: ['service'],                             defaultUnit: 'service', isFlat: true  },
-  vet_lab:     { units: ['service', 'pcs'],                     defaultUnit: 'service', isFlat: false },
-  rent:        { units: ['month', 'day', 'service'],            defaultUnit: 'month',   isFlat: false },
-  other:       { units: ['pcs', 'kg', 'l', 'pack', 'service'],   defaultUnit: 'pcs',     isFlat: false },
+  fuel:        { units: ['l', 'kg', 'pcs'],                   defaultUnit: 'l',       isFlat: false, sectionTitle: 'مشخصات سوخت و گرمایش',    qtyLabel: 'مقدار',         showShipping: true  },
+  bedding:     { units: ['kg', 'bag', 'ton', 'roll', 'service'], defaultUnit: 'kg',      isFlat: false, sectionTitle: 'مشخصات بستر و پوشال',     qtyLabel: 'مقدار',         showShipping: true  },
+  biosecurity: { units: ['l', 'kg', 'bag', 'pack', 'service'],   defaultUnit: 'l',       isFlat: false, sectionTitle: 'مشخصات ضدعفونی و شست‌وشو', qtyLabel: 'مقدار',         showShipping: true  },
+  packaging:   { units: ['pcs', 'pack', 'roll', 'kg'],          defaultUnit: 'pcs',     isFlat: false, sectionTitle: 'مشخصات بسته‌بندی',        qtyLabel: 'تعداد',         showShipping: true  },
+  utilities:   { units: ['bill'],                                defaultUnit: 'bill',    isFlat: true,  sectionTitle: 'اطلاعات قبض',             qtyLabel: 'تعداد',         priceLabel: 'مبلغ کل قبض',   showShipping: false },
+  labor:       { units: ['day', 'month', 'service', 'pcs'],     defaultUnit: 'day',     isFlat: false, sectionTitle: 'اطلاعات دستمزد و کارگر',  qtyLabel: 'مدت / تعداد',   showShipping: false },
+  transport:   { units: ['service', 'ton', 'pcs'],              defaultUnit: 'service', isFlat: false, sectionTitle: 'اطلاعات حمل و نقل',       qtyLabel: 'تعداد سرویس',   showShipping: false },
+  maintenance: { units: ['service'],                             defaultUnit: 'service', isFlat: true,  sectionTitle: 'اطلاعات تعمیرات و نگهداری', qtyLabel: 'تعداد',        priceLabel: 'مبلغ کل تعمیر', showShipping: false },
+  vet_lab:     { units: ['service', 'pcs'],                     defaultUnit: 'service', isFlat: false, sectionTitle: 'اطلاعات دامپزشکی و آزمایشگاه', qtyLabel: 'تعداد نوبت', showShipping: false },
+  rent:        { units: ['month', 'day', 'service'],            defaultUnit: 'month',   isFlat: false, sectionTitle: 'اطلاعات اجاره',           qtyLabel: 'مدت',           showShipping: false },
+  other:       { units: ['pcs', 'kg', 'l', 'pack', 'service'],   defaultUnit: 'pcs',     isFlat: false, sectionTitle: 'مشخصات قلم',              qtyLabel: 'تعداد / مقدار', showShipping: true  },
 };
 
 export function getOtherCostConfig(costType?: string): OtherCostConfig {

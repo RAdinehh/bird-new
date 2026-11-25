@@ -931,6 +931,7 @@ if (category === 'vaccine' || category === 'herbal') {
       { value: 'other', label: 'سایر هزینه‌ها' },
     ];
     const ct = String(item.costType || '');
+    const otherCfg = getOtherCostConfig(ct);
     const hasExpiry = (ct === 'biosecurity' && item.unit !== 'service') || ct === 'other';
     const refLabels: Record<string, { label: string; placeholder: string }> = {
       fuel:        { label: 'شماره حواله / سهمیه', placeholder: 'اختیاری' },
@@ -944,13 +945,13 @@ if (category === 'vaccine' || category === 'herbal') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {nameFieldJsx}
-        <SecTitle icon="📋" title="اطلاعات هزینه" />
+        <SecTitle icon="📋" title={ct ? otherCfg.sectionTitle : 'مشخصات قلم'} />
         <Grid2>
           {isPurchase && (
-            <Field label="نوع هزینه" hint="برای گزارش‌های مالی" required error={err('costType')} onTouch={touch('costType')}>
+            <Field label="زیرمجموعه" hint="نوع کالا یا خدمت" required error={err('costType')} onTouch={touch('costType')}>
               <SmartSelect
                 value={ct}
-                modalTitle="انتخاب نوع هزینه"
+                modalTitle="انتخاب زیرمجموعه"
                 placeholder="— انتخاب —"
                 options={COST_TYPES}
                 onChange={v => {
@@ -958,6 +959,8 @@ if (category === 'vaccine' || category === 'herbal') {
                   updateItem({
                     costType: v,
                     unit: cfg.defaultUnit,
+                    priceUnit: cfg.defaultUnit,
+                    ...(!cfg.showShipping ? { shipping: 0 } : {}),
                     ...(cfg.isFlat ? { quantity: 1 } : {}),
                   });
                 }}
