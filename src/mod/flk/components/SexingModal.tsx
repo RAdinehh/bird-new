@@ -249,7 +249,7 @@ export default function SexingModal({ open, onClose, flock }: Props) {
         <DatePicker value={date} onChange={setDate} />
       </Field>
 
-      <Field label="یادداشت (اختیاری)">
+      <Field label="یادداشت">
         <Input value={note} onChange={e => setNote(e.target.value)} placeholder="توضیحات" />
       </Field>
 

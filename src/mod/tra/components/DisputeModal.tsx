@@ -96,7 +96,7 @@ export default function DisputeModal({ open, onClose, invoice }: Props) {
         </div>
       </Field>
 
-      <Field label="یادداشت (اختیاری)">
+      <Field label="یادداشت">
         <Textarea
           value={note}
           onChange={e => setNote(e.target.value)}

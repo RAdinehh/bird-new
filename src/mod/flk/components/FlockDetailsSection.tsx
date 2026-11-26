@@ -49,7 +49,7 @@ export default function FlockDetailsSection({ form, setForm, showError, markTouc
           <DatePicker value={form.purchaseDate} onChange={v => !(isSourceLinked && form.sourceInvoiceId) && setForm({ ...form, purchaseDate: v })} placeholder="انتخاب تاریخ" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.purchaseDate, jalaliBounds(18))} disabled={isSourceLinked} />
         </Field>
         
-        <Field label="تاریخ شروع نگهداری" hint="اگه دقیق نمی‌دونی" error={showError('startDate')} onTouch={() => markTouched('startDate')}>
+        <Field label="تاریخ شروع" hint="اگه دقیق نمی‌دونی" error={showError('startDate')} onTouch={() => markTouched('startDate')}>
           <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="انتخاب تاریخ" min={jalaliBounds(24).min} max={jalaliBounds(24).max} warn={checkDateBounds(form.startDate, jalaliBounds(24))} />
         </Field>
       </Grid2>

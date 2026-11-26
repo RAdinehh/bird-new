@@ -489,13 +489,13 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
           </div>
         )}
 
-        <Field label="دلیل (مشترک برای همه فیلدها)">
+        <Field label="دلیل اصلاح">
           <Select value={reason} onChange={e => setReason(e.target.value)}>
             {REASONS.map(r => <option key={r} value={r}>{r}</option>)}
           </Select>
         </Field>
 
-        <Field label="توضیح (اختیاری)">
+        <Field label="توضیحات">
           <Input value={notes} onChange={e => setNotes(e.target.value)} placeholder="توضیحات" />
         </Field>
       </div>

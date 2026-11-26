@@ -308,7 +308,7 @@ export default function FlocksModal(props: FlocksModalProps) {
         <Grid2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
             <Field
-              label="سن شروع تخم‌گذاری (روز)" error={showError('layingStartDay')} onTouch={() => markTouched('layingStartDay')}
+              label="سن تخم‌گذاری (روز)" error={showError('layingStartDay')} onTouch={() => markTouched('layingStartDay')}
               autoFrom={layingFromStd && formStd?.biology?.layingStartDay ? 'استاندارد نژاد (' + fmt.count(formStd.biology.layingStartDay) + ' روز)' : undefined}
             >
               <NumField
@@ -325,7 +325,7 @@ export default function FlocksModal(props: FlocksModalProps) {
           <div style={{ display: (parseInt(toEn(form.initialCount)) || 0) > 0 ? 'contents' : 'none' }}>
 <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
             <Field
-              label="سن پایان چرخه (روز)" error={showError('endOfCycleDay')} onTouch={() => markTouched('endOfCycleDay')}
+              label="پایان چرخه (روز)" error={showError('endOfCycleDay')} onTouch={() => markTouched('endOfCycleDay')}
               hint={form.endOfCycleDay ? undefined : 'خالی = از استاندارد نژاد'}
             >
               <NumField

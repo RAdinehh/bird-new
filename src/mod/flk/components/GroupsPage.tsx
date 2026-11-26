@@ -407,7 +407,7 @@ export default function GroupsPage({ open, onClose }: Props) {
             </Select>
           </Field>
 
-<Field label="گروه والد (اختیاری)" hint="برای ساختار تودرتو">
+<Field label="گروه والد" hint="برای ساختار تودرتو">
             <SmartSelect
               value={form.parentGroupId}
               placeholder="— بدون والد —"
@@ -430,7 +430,7 @@ export default function GroupsPage({ open, onClose }: Props) {
           )}
 
 
-          <Field label="توضیحات (اختیاری)" hint="چی این گروه رو از بقیه جدا می‌کنه؟">
+          <Field label="توضیحات" hint="چی این گروه رو از بقیه جدا می‌کنه؟">
             <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="توضیحات" rows={2} />
           </Field>
 

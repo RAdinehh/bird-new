@@ -145,7 +145,7 @@ export default function RetireEquipModal({ open, onClose, equipment, onConfirm }
                 />
               </Field>
               {contacts.length > 0 ? (
-                <Field label="خریدار (طرف حساب)" required={createInvoice}>
+                <Field label="خریدار" required={createInvoice}>
                   <SmartSelect
                     value={partyId}
                     placeholder="— انتخاب —"
@@ -155,7 +155,7 @@ export default function RetireEquipModal({ open, onClose, equipment, onConfirm }
                   />
                 </Field>
               ) : (
-                <Field label="خریدار (اختیاری)">
+                <Field label="خریدار">
                   <Input
                     placeholder="نام"
                     value={buyer}
@@ -193,7 +193,7 @@ export default function RetireEquipModal({ open, onClose, equipment, onConfirm }
           <DatePicker value={soldAt} onChange={setSoldAt} placeholder="انتخاب تاریخ" autoToday />
         </Field>
 
-        <Field label="یادداشت (اختیاری)">
+        <Field label="یادداشت">
           <Input
             placeholder="توضیحات"
             value={note}

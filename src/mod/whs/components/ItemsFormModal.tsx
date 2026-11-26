@@ -89,7 +89,7 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
           </Field>
         </Grid2>
 
-        <Field label="واحدهای فرعی (اختیاری)" hint="تعریف واحد فرعی و ضریب تبدیل به واحد پایه">
+        <Field label="واحدهای فرعی" hint="تعریف واحد فرعی و ضریب تبدیل به واحد پایه">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {(form.subUnits || []).map((su: any, idx: number) => (
               <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: 6, paddingBottom: 8, borderBottom: '1px dashed var(--border)' }}>
@@ -133,7 +133,7 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
                 <NumField placeholder="۰" unit={(UNIT_LABEL as any)[form.unit] || 'عدد'} value={form.minStock} onChange={e => setForm({ ...form, minStock: e.target.value })} min={0} />
               </Field>
             </Grid2>
-            <Field label="قیمت موجودی اولیه" hint="اختیاری — برای محاسبه قیمت میانگین" error={showError?.('lastPrice')} onTouch={() => markTouched?.('lastPrice')}>
+            <Field label="قیمت اولیه" hint="اختیاری — برای محاسبه قیمت میانگین" error={showError?.('lastPrice')} onTouch={() => markTouched?.('lastPrice')}>
               <MoneyField placeholder="۰" value={form.initialPrice} onChange={e => setForm({ ...form, initialPrice: e.target.value })} />
             </Field>
           </>
@@ -221,7 +221,7 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
 
                 {(form.usageTypes || []).includes('water') && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-                    <Field label="دوز در هر لیتر آب" hint="ml/L" error={showError?.('dosePerLiter')} onTouch={() => markTouched?.('dosePerLiter')}>
+                    <Field label="دوز در لیتر آب" hint="ml/L" error={showError?.('dosePerLiter')} onTouch={() => markTouched?.('dosePerLiter')}>
                       <NumField placeholder="۰.۵" value={form.dosePerLiter || ''} onChange={e => setForm({ ...form, dosePerLiter: e.target.value })} unit="ml/L" min={0} />
                     </Field>
                     {!showError?.('dosePerLiter') && <FieldHint fieldPath="whs.dosePerLiter" value={form.dosePerLiter || ''} />}
@@ -230,7 +230,7 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
 
                 {(form.usageTypes || []).includes('feed') && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-                    <Field label="دوز در هر کیلوگرم دان" hint="ml/kg" error={showError?.('dosePerKgFeed')} onTouch={() => markTouched?.('dosePerKgFeed')}>
+                    <Field label="دوز در کیلو دان" hint="ml/kg" error={showError?.('dosePerKgFeed')} onTouch={() => markTouched?.('dosePerKgFeed')}>
                       <NumField placeholder="۰.۵" value={form.dosePerKgFeed} onChange={e => setForm({ ...form, dosePerKgFeed: e.target.value })} unit="ml/kg" min={0} />
                     </Field>
                   </div>

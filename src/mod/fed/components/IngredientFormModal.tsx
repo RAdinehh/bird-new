@@ -31,7 +31,7 @@ export default function IngredientFormModal(props: Props) {
         footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
         {!form.id && (
-          <Field label="انتخاب سریع از کتابخانه" hint="یکی از مواد پیش‌فرض را انتخاب کنید">
+          <Field label="انتخاب از کتابخانه" hint="یکی از مواد پیش‌فرض را انتخاب کنید">
             <Select value={form.standardKey} onChange={e => pickFromLibrary(e.target.value)}>
               <option value="">— انتخاب از کتابخانه (اختیاری) —</option>
               {INGREDIENT_STANDARDS.map(s => (
@@ -53,7 +53,7 @@ export default function IngredientFormModal(props: Props) {
               )}
             </Select>
           </Field>
-          <Field label="قیمت دستی (اختیاری)" hint="اگر پر شود، بر قیمت انبار اولویت دارد">
+          <Field label="قیمت دستی" hint="اگر پر شود، بر قیمت انبار اولویت دارد">
             <MoneyField placeholder="۰" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} />
           </Field>
         </Grid2>

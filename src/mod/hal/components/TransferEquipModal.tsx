@@ -139,7 +139,7 @@ export default function TransferEquipModal({ open, onClose, equipment, halls, zo
           </Field>
         </Grid2>
 
-        <Field label="یادداشت (اختیاری)">
+        <Field label="یادداشت">
           <Input
             value={note}
             onChange={e => setNote(e.target.value)}

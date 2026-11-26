@@ -413,7 +413,7 @@ export default function FeedSection({ form, setForm }: Props) {
      <div style={{ padding: 'var(--pad-normal)', background: 'var(--info-soft)', border: '1px solid var(--info)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-xs)', color: 'var(--info)', fontWeight: 600 }}>
       💡 سیستم {WATER_SYSTEM_LABEL[form.waterMethod as 'nipple' | 'trough' | 'tank']} — مقدار تخمینی روزانه را وارد کنید
      </div>
-     <Field label="مقدار آب مصرفی (تخمینی)" required={isWaterAuto}>
+     <Field label="آب مصرفی" required={isWaterAuto}>
       <NumField placeholder="۱۰۰" value={form.waterAmount} onChange={e => setForm({ ...form, waterAmount: e.target.value })} unit="L" min={0} />
      </Field>
      <FieldHint fieldPath="dlg.waterAmount" value={form.waterAmount} context={{ flockSize: flockSize || undefined }} />

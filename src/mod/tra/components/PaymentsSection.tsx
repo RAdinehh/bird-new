@@ -88,7 +88,7 @@ export default function PaymentsSection({
                       <option value="amount">مبلغ (ت)</option>
                     </Select>
                   </Field>
-                  <Field label="مقدار پیش‌پرداخت" help="مبلغی که در همان لحظه خرید پرداخت می‌شود. این مبلغ از کل فاکتور کسر شده و باقی‌مانده بین اقساط تقسیم می‌شود">
+                  <Field label="پیش‌پرداخت" help="مبلغی که در همان لحظه خرید پرداخت می‌شود. این مبلغ از کل فاکتور کسر شده و باقی‌مانده بین اقساط تقسیم می‌شود">
                     <NumField placeholder="۰" value={form.advanceValue} onChange={e => setForm(f => ({ ...f, advanceValue: e.target.value}))} unit={form.advanceType === 'percent' ? '٪' : 'تومان'} min={0} />
                   </Field>
                 </Grid2>

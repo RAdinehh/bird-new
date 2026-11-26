@@ -188,18 +188,18 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
               onChange={(val: string) => setForm({ ...form, barterPartyId: val })}
             />
             </Field>
-            <Field label="ارزش ریالی تهاتر" error={showError?.('barterValue')} onTouch={() => markTouched?.('barterValue')}>
+            <Field label="مبلغ تهاتر" error={showError?.('barterValue')} onTouch={() => markTouched?.('barterValue')}>
               <MoneyField placeholder="مبلغ معادل" value={form.barterValue || ''} onChange={e => setForm({ ...form, barterValue: e.target.value })} />
             </Field>
           </Grid2>
-          <Field label="شرح کالا/خدمات معاوضی">
+          <Field label="شرح تهاتر">
             <input type="text" value={form.barterDescription || ''} onChange={e => setForm({ ...form, barterDescription: e.target.value })} placeholder="شرح کالای تهاتری" style={{ width: '100%', height: 38, padding: '0 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-base)', fontFamily: 'inherit', textAlign: 'right', boxSizing: 'border-box' }} />
           </Field>
           <Grid2>
-            <Field label="تاریخ شروع تهاتر" error={showError?.('barterStartDate')} onTouch={() => markTouched?.('barterStartDate')}>
+            <Field label="شروع تهاتر" error={showError?.('barterStartDate')} onTouch={() => markTouched?.('barterStartDate')}>
               <DatePicker value={form.barterStartDate || ''} onChange={v => setForm({ ...form, barterStartDate: v })} placeholder="از تاریخ" autoToday />
             </Field>
-            <Field label="تاریخ پایان تهاتر" error={showError?.('barterEndDate') || (form.barterStartDate && form.barterEndDate && form.barterStartDate >= form.barterEndDate ? 'باید بعد از شروع باشد' : undefined)} onTouch={() => markTouched?.('barterEndDate')}>
+            <Field label="پایان تهاتر" error={showError?.('barterEndDate') || (form.barterStartDate && form.barterEndDate && form.barterStartDate >= form.barterEndDate ? 'باید بعد از شروع باشد' : undefined)} onTouch={() => markTouched?.('barterEndDate')}>
               <DatePicker value={form.barterEndDate || ''} onChange={v => setForm({ ...form, barterEndDate: v })} placeholder="تا تاریخ" min={form.barterStartDate} />
             </Field>
           </Grid2>
@@ -209,7 +209,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
       {form.dealType === 'rent' && (
         <>
           <Grid2>
-            <Field label="موجر (اجاره‌دهنده)" error={showError?.('lessorId')} onTouch={() => markTouched?.('lessorId')} required help={HELP.flk.ownership.lessor}>
+            <Field label="اجاره‌دهنده" error={showError?.('lessorId')} onTouch={() => markTouched?.('lessorId')} required help={HELP.flk.ownership.lessor}>
               <SmartSelect
               value={form.lessorId || ''}
               placeholder="— انتخاب —"
@@ -321,7 +321,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
       )}
 
       {relevantDeals.length > 0 && (
-        <Field label="لینک به قرارداد (اختیاری)" hint="قرارداد مالی موجود در tra">
+        <Field label="قرارداد مرتبط" hint="قرارداد مالی موجود در tra">
           <SmartSelect
             value={form.dealId || ''}
             placeholder="— بدون لینک —"

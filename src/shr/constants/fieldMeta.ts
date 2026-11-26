@@ -55,12 +55,12 @@ export const FIELD_META = {
       modalTitle: 'انتخاب گله مقصد',
     },
     destinationOptional: {
-      label: 'گله مقصد (اختیاری)',
+      label: 'گله مقصد',
       placeholder: '— بدون گله (سربار کل) —',
       modalTitle: 'انتخاب گله مقصد',
     },
     attachExisting: {
-      label: 'اتصال به گله موجود',
+      label: 'گله موجود',
       placeholder: '— ایجاد گله جدید —',
       modalTitle: 'انتخاب گله',
     },
@@ -89,7 +89,7 @@ export const FIELD_META = {
       modalTitle: 'انتخاب سالن استقرار',
     },
     relatedOptional: {
-      label: 'سالن مرتبط (اختیاری)',
+      label: 'سالن مرتبط',
       placeholder: SELECT_PLACEHOLDER,
       modalTitle: 'انتخاب سالن مرتبط',
     },
@@ -101,7 +101,7 @@ export const FIELD_META = {
       modalTitle: 'انتخاب بخش',
     },
     destinationOptional: {
-      label: 'بخش مقصد (اختیاری)',
+      label: 'بخش مقصد',
       placeholder: SELECT_PLACEHOLDER,
       modalTitle: 'انتخاب بخش مقصد',
     },

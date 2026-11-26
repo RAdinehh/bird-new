@@ -89,7 +89,7 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
             <Field label="نام" required><Input placeholder="نام" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
             <Field label="تلفن"><PhoneField placeholder="۰۹..." value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} /></Field>
             {(form.roles || []).includes('customer') && (
-              <Field label="سقف اعتبار (تومان)" hint="خالی = بدون سقف">
+              <Field label="سقف اعتبار" hint="خالی = بدون سقف">
                 <Input
                   mode="number"
                   placeholder="۰"

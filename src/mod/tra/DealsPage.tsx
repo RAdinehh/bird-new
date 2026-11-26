@@ -850,7 +850,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
             {Number(form.value) > 0 && <FieldHint fieldPath="tra.deal.value" value={form.value} />}
           </Field>
           {form.settlementType !== 'barter' ? (
-            <Field label="مهلت پرداخت (سرسید)" hint="تاریخی که طرف باید پول را پرداخت کند" error={showError?.('dueDate')} onTouch={() => markTouched?.('dueDate')}>
+            <Field label="مهلت پرداخت" hint="تاریخی که طرف باید پول را پرداخت کند" error={showError?.('dueDate')} onTouch={() => markTouched?.('dueDate')}>
               <DatePicker value={form.dueDate} onChange={v => setForm({...form, dueDate: v})} autoToday />
             </Field>
           ) : <div />}
@@ -867,7 +867,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
             </Select>
           </Field>
           {form.settlementType && form.settlementType !== 'barter' && (
-          <Field label={form.settlementType === 'percent' ? 'درصد کمیسیون طرف' : 'مقدار تسویه'} error={showError?.('settlementValue')} onTouch={() => markTouched?.('settlementValue')}>
+          <Field label={form.settlementType === 'percent' ? 'درصد کمیسیون' : 'مقدار تسویه'} error={showError?.('settlementValue')} onTouch={() => markTouched?.('settlementValue')}>
             {form.settlementType === 'percent' ? (
               <PercentField
                 placeholder="۱۰"

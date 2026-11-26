@@ -456,7 +456,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                           ) : null;
 
                           const flatPriceField = (
-                            <Field label={otherCfg?.priceLabel || "مبلغ کل"} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
+                            <Field label={otherCfg?.priceLabel || "مبلغ"} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
                               <MoneyField placeholder="مبلغ" value={it.unitPrice > 0 ? fmt.code(String(it.unitPrice)) : ''} onChange={e => {
                                 let val = parseFloat(toEn(e.target.value).replace('٫', '.')) || 0;
                                 if (maxPrice && val > maxPrice) val = maxPrice;
@@ -467,7 +467,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                           );
 
                           const qtyField = (
-                            <Field label={cat === 'fertile_egg' ? 'تعداد تخم نطفه‌دار' : (otherCfg?.qtyLabel || "تعداد")} required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
+                            <Field label={otherCfg?.qtyLabel || "تعداد"} required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
                               <NumField placeholder={otherCfg?.qtyLabel === 'مدت' ? 'مدت' : otherCfg?.qtyLabel === 'مقدار' ? 'مقدار' : 'تعداد'} value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
                                 let val = parseFloat(toEn(e.target.value).replace('٫', '.')) || 0;
                                 const max = getQuantityMax(cat);
@@ -503,19 +503,19 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                           );
 
                           const shippingField = (
-                            <Field label="هزینه حمل این قلم" error={showError(`items.${idx}.shipping`)} onTouch={() => markTouched(`items.${idx}.shipping`)}>
+                            <Field label="هزینه حمل" error={showError(`items.${idx}.shipping`)} onTouch={() => markTouched(`items.${idx}.shipping`)}>
                               <MoneyField placeholder="هزینه" value={it.shipping && it.shipping > 0 ? fmt.code(String(it.shipping)) : ''} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫', '.')) || 0 })} min={0} />
                             </Field>
                           );
 
                           const discountField = (
-                            <Field label="تخفیف این قلم" error={showError(`items.${idx}.discountValue`)} onTouch={() => markTouched(`items.${idx}.discountValue`)}>
+                            <Field label="تخفیف" error={showError(`items.${idx}.discountValue`)} onTouch={() => markTouched(`items.${idx}.discountValue`)}>
                               <MoneyField placeholder="تخفیف" value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: Math.max(0, parseFloat(toEn(e.target.value).replace('٫','.')) || 0) })} min={0} />
                             </Field>
                           );
 
                           const totalField = (
-                            <Field label="مبلغ کل این قلم">
+                            <Field label="مبلغ کل">
                               <div style={{ height: 38, display: 'flex', alignItems: 'center', fontWeight: 800, color: 'var(--accent)', direction: 'rtl', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', justifyContent: 'flex-end' }}>
                                 {it.total > 0 ? `${fmt.money(it.total, { withUnit: false })} تومان` : ''}
                               </div>

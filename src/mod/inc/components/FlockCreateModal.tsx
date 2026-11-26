@@ -129,10 +129,10 @@ export default function FlockCreateModal(props: FlockCreateModalProps) {
             💰 هزینه‌های تخم خریداری‌شده
           </div>
           <Grid2>
-            <Field label="قیمت هر تخم (تومان)">
+            <Field label="قیمت هر تخم">
               <Input type="text" inputMode="numeric" dir="ltr" placeholder="۰" value={form.unitPrice ?? ''} onChange={e => setForm({ ...form, unitPrice: e.target.value })} />
             </Field>
-            <Field label="هزینه حمل (تومان)">
+            <Field label="هزینه حمل">
               <Input type="text" inputMode="numeric" dir="ltr" placeholder="۰" value={form.shippingCost ?? ''} onChange={e => setForm({ ...form, shippingCost: e.target.value })} />
             </Field>
           </Grid2>
@@ -156,7 +156,7 @@ export default function FlockCreateModal(props: FlockCreateModalProps) {
       ) : null}
 
       {sourceData && sourceData.layingStartDay ? (
-        <Field label="سن شروع تخم‌گذاری (روز)" hint="🔹 از استاندارد نژاد — قابل ویرایش">
+        <Field label="سن تخم‌گذاری (روز)" hint="🔹 از استاندارد نژاد — قابل ویرایش">
           <Input type="text" inputMode="numeric" placeholder="۰" value={form.layingStartDay ?? ''} onChange={e => setForm({ ...form, layingStartDay: e.target.value })} />
         </Field>
       ) : null}
