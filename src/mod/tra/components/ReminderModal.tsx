@@ -253,7 +253,7 @@ ${farmName} 🐔`;
           <button type="button" onClick={handleCopy} title="کپی" style={{ width: 32, height: 32, borderRadius: 'var(--r-sm)', background: 'var(--btn-bg)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>📋</button>
         </div>
       </div>
-        <Textarea value={message} onChange={e => setMessage(e.target.value)} rows={isMessageExpanded ? 8 : 4} maxHeight={isMessageExpanded ? 240 : 120} />
+        <Textarea placeholder="متن پیام یادآوری" value={message} onChange={e => setMessage(e.target.value)} rows={isMessageExpanded ? 8 : 4} maxHeight={isMessageExpanded ? 240 : 120} />
         <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: 4 }}>
           <button type="button" onClick={() => setIsMessageExpanded(v => !v)} style={{ background: 'transparent', border: 'none', color: 'var(--muted)', fontSize: 'var(--fs-xs)', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline', textUnderlineOffset: 2, padding: 0 }}>
             {isMessageExpanded ? 'بستن' : 'باز کردن'}
@@ -316,7 +316,7 @@ ${farmName} 🐔`;
         <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 500, color: 'var(--muted)' }}>یادداشت داخلی (اختیاری)</span>
       </div>
       <div>
-        <Input value={note} onChange={e => setNote(e.target.value)} placeholder="توضیح دلخواه" />
+        <Input value={note} onChange={e => setNote(e.target.value)} placeholder="توضیحات اختیاری" />
       </div>
     </Modal>
   );

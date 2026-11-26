@@ -114,7 +114,7 @@ export default function FormModal(props: FormModalProps) {
       <Field label="یادداشت">
         <Textarea
           rows={3}
-          placeholder="توضیحات، شرایط جوی، رفتار گله..."
+          placeholder="توضیحات اختیاری"
           value={form.notes}
           onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
         />

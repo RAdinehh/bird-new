@@ -156,7 +156,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
  </Field>
  )}
  <Field label="توضیحات">
- <Textarea rows={2} placeholder="جزئیات..."value={d.notes || ''}
+ <Textarea rows={2} placeholder="توضیحات اختیاری"value={d.notes || ''}
  onChange={e =>setForm(f =>({ ...f, deaths: f.deaths.map(x =>x.id === d.id ? { ...x, notes: e.target.value } : x) }))} />
  </Field>
  </>)}

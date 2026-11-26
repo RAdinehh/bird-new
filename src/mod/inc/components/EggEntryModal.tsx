@@ -337,7 +337,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginBottom: 8 }}>🥚 مشخصات تخم</div>
           <Grid2>
             <Field label="پرنده" required>
-              <SmartSelect value={currentRow.birdId} onChange={v => setCurrentRow(f => ({ ...f, birdId: v, breedId: '' }))} options={birds.map(c => ({ value: c.id, label: c.name }))} placeholder="—" modalTitle="انتخاب پرنده" />
+              <SmartSelect value={currentRow.birdId} onChange={v => setCurrentRow(f => ({ ...f, birdId: v, breedId: '' }))} options={birds.map(c => ({ value: c.id, label: c.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" />
             </Field>
             <Field label="نژاد">
               <Select value={currentRow.breedId}
@@ -369,15 +369,15 @@ export default function EggEntryModal(props: EggEntryModalProps) {
               />
             </div>
             <Field label="طبقات (Tray)">
-              <Input placeholder="۱-۲-۳" dir="ltr" value={currentRow.trayNumbers} onChange={e => setCurrentRow(f => ({ ...f, trayNumbers: e.target.value }))} />
+              <Input placeholder="شماره شانه‌ها" dir="ltr" value={currentRow.trayNumbers} onChange={e => setCurrentRow(f => ({ ...f, trayNumbers: e.target.value }))} />
             </Field>
           </Grid2>
           <Grid2>
             <Field label="وزن نمونه اولیه" hint="گرم">
-              <NumField placeholder="۶۵" value={currentRow.sampleWeightInitial} onChange={e => setCurrentRow(f => ({ ...f, sampleWeightInitial: e.target.value }))} unit="گرم" min={20} max={100} />
+              <NumField placeholder="۰" value={currentRow.sampleWeightInitial} onChange={e => setCurrentRow(f => ({ ...f, sampleWeightInitial: e.target.value }))} unit="گرم" min={20} max={100} />
             </Field>
             <Field label="وزن نمونه فعلی" hint="گرم">
-              <NumField placeholder="۵۷" value={currentRow.sampleWeightCurrent} onChange={e => setCurrentRow(f => ({ ...f, sampleWeightCurrent: e.target.value }))} unit="گرم" min={20} max={100} />
+              <NumField placeholder="۰" value={currentRow.sampleWeightCurrent} onChange={e => setCurrentRow(f => ({ ...f, sampleWeightCurrent: e.target.value }))} unit="گرم" min={20} max={100} />
             </Field>
           </Grid2>
           {(() => {
@@ -434,7 +434,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
         )}
 
         <Field label="یادداشت">
-          <Textarea placeholder="..." value={currentRow.notes} onChange={e => setCurrentRow(f => ({ ...f, notes: e.target.value }))} />
+          <Textarea placeholder="توضیحات اختیاری" value={currentRow.notes} onChange={e => setCurrentRow(f => ({ ...f, notes: e.target.value }))} />
         </Field>
 
         <div style={{ display: 'flex', gap: 6 }}>

@@ -351,7 +351,7 @@ export default function FlocksModal(props: FlocksModalProps) {
           error={showError('initialCount')}
           onTouch={() => markTouched('initialCount')}
         >
-          <NumField placeholder="۸۵۰" disabled={isSourceLinked} value={form.initialCount} onChange={e => {
+          <NumField placeholder="۰" disabled={isSourceLinked} value={form.initialCount} onChange={e => {
             if (isSourceLinked) return;
             const v = e.target.value;
             setForm(f => ({
@@ -362,7 +362,7 @@ export default function FlocksModal(props: FlocksModalProps) {
           }} unit="پرنده" min={1} max={100000} />
         </Field>
         <Field label="تعداد فعلی" hint="اگه خالی بمونه = تعداد اولیه" error={showError('currentCount')} onTouch={() => markTouched('currentCount')}>
-          <NumField placeholder="۸۳۲" value={form.currentCount} onChange={e => {
+          <NumField placeholder="۰" value={form.currentCount} onChange={e => {
             const ccStr = e.target.value;
             const cc = parseInt(toEn(ccStr)) || 0;
             const m = parseInt(toEn(form.maleCount || '0')) || 0;
@@ -380,7 +380,7 @@ export default function FlocksModal(props: FlocksModalProps) {
           <Grid3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
               <Field label="تعداد نر">
-                <NumField placeholder="۸۰" value={form.maleCount} onChange={e => {
+                <NumField placeholder="۰" value={form.maleCount} onChange={e => {
                   const maleRaw = parseInt(toEn(e.target.value || '0')) || 0;
                   const female = parseInt(toEn(form.femaleCount || '0')) || 0;
                   const cc = parseInt(toEn(form.currentCount || form.initialCount || '0')) || 0;
@@ -396,7 +396,7 @@ export default function FlocksModal(props: FlocksModalProps) {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
               <Field label="تعداد ماده" error={showError('femaleCount')} onTouch={() => markTouched('femaleCount')}>
-                <NumField placeholder="۸۰۰" value={form.femaleCount} onChange={e => {
+                <NumField placeholder="۰" value={form.femaleCount} onChange={e => {
                   const femaleRaw = parseInt(toEn(e.target.value || '0')) || 0;
                   const male = parseInt(toEn(form.maleCount || '0')) || 0;
                   const cc = parseInt(toEn(form.currentCount || form.initialCount || '0')) || 0;

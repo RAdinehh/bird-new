@@ -181,7 +181,7 @@ export default function FormulaFormModal(props: Props) {
     </Select>
 
     <Field label="یادداشت">
-      <Textarea placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+      <Textarea placeholder="توضیحات اختیاری" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
      </Field>
 
     <ErrorBox>{err}</ErrorBox>

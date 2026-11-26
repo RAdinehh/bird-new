@@ -68,7 +68,7 @@ export default function DeferModal({ deferModal, onClose, deferDate, setDeferDat
             onTouch={() => markTouched('deferReason')}
           >
             <Input 
-              placeholder="..." 
+              placeholder="علت تعویق سررسید" 
               value={deferReason} 
               onChange={e => setDeferReason(e.target.value)} 
             />

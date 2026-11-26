@@ -55,7 +55,7 @@ export default function MaintenanceModal(props: MaintenanceModalProps) {
         </Field>
         <Field label="توضیحات">
           <Textarea
-            placeholder="جزئیات..."
+            placeholder="توضیحات اختیاری"
             value={form.description}
             onChange={e => setForm({ ...form, description: e.target.value })}
           />

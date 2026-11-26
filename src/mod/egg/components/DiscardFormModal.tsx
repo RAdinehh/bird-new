@@ -99,7 +99,7 @@ export default function DiscardFormModal(props: Props) {
       <Field label="یادداشت">
         <Textarea
           rows={2}
-          placeholder="..."
+          placeholder="توضیحات اختیاری"
           value={form.notes}
           onChange={e => setForm({ ...form, notes: e.target.value })}
         />

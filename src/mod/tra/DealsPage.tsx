@@ -792,7 +792,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
 
         <Grid2>
           <Field label="شماره قرارداد" error={showError?.('dealNumber')} onTouch={() => markTouched?.('dealNumber')}>
-            <Input placeholder="۱۴۰۴-۰۰۱" value={form.dealNumber} onChange={e => setForm({...form, dealNumber: e.target.value})} />
+            <Input placeholder="شماره قرارداد" value={form.dealNumber} onChange={e => setForm({...form, dealNumber: e.target.value})} />
           </Field>
           <Field label="نوع معامله" required help={HELP.tra.deal.type} error={showError?.('type')} onTouch={() => markTouched?.('type')}>
             <Select value={form.type} onChange={e => {
@@ -826,7 +826,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
         </Grid2>
 
         <Field label="توضیحات" required error={showError?.('description')} onTouch={() => markTouched?.('description')}>
-          <Textarea placeholder="توضیح معامله..." value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
+          <Textarea placeholder="توضیحات اختیاری" value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
         </Field>
 
         {/* ═══ 📅 محدوده زمانی ═══ */}
@@ -876,7 +876,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
               />
             ) : (
               <MoneyField
-                placeholder="۵۰۰۰۰۰۰"
+                placeholder="۰"
                 value={form.settlementValue}
                 onChange={e => setForm({...form, settlementValue: e.target.value})}
                 min={0}
@@ -901,7 +901,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
 
           {form.type === 'partnership' && (
             <Field label="درصد" hint="۰ تا ۱۰۰" error={showError?.('percent')} onTouch={() => markTouched?.('percent')}>
-              <PercentField placeholder="۱۰" value={form.percent} onChange={e => setForm({...form, percent: e.target.value})} />
+              <PercentField placeholder="۰" value={form.percent} onChange={e => setForm({...form, percent: e.target.value})} />
             </Field>
           )}
         </Grid2>
@@ -1185,7 +1185,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
             </Field>
           <Grid2>
             <Field label="مقدار" required error={showError?.(`goods.${gi}.quantity`)} onTouch={() => markTouched?.(`goods.${gi}.quantity`)}>
-              <NumField placeholder="۱۰۰۰" value={String(g.quantity || '')} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={1} max={(() => { const cap = getSourceInfo(g)?.available; return cap !== undefined ? Math.max(cap, g.quantity || 0) : 1_000_000; })()} />
+              <NumField placeholder="۰" value={String(g.quantity || '')} onChange={e => setForm(f => ({ ...f, goods: f.goods.map(x => x.id === g.id ? { ...x, quantity: Number(toEn(e.target.value)) || 0 } : x) }))} min={1} max={(() => { const cap = getSourceInfo(g)?.available; return cap !== undefined ? Math.max(cap, g.quantity || 0) : 1_000_000; })()} />
               {(() => {
                 const srcInfo = getSourceInfo(g);
                 if (!srcInfo) return null;
@@ -1253,7 +1253,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   <DatePicker value={dv.date} onChange={v => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, date: v } : x) }))} autoToday />
                 </Field>
                 <Field label="ساعت" hint="برای تمایز چند تحویل هم‌روز" error={showError?.(`deliveries.${di}.time`)} onTouch={() => markTouched?.(`deliveries.${di}.time`)}>
-                  <TimePicker value={dv.time || ''} onChange={v => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, time: v } : x) }))} />
+                  <TimePicker placeholder="انتخاب ساعت" value={dv.time || ''} onChange={v => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, time: v } : x) }))} />
                 </Field>
               </Grid2>
               <Grid2>
@@ -1276,7 +1276,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                 </Field>
               </Grid2>
               <Field label="مقدار" required error={showError?.(`deliveries.${di}.quantity`)} onTouch={() => markTouched?.(`deliveries.${di}.quantity`)}>
-                <NumField placeholder="۵۰۰" value={String(dv.quantity || '')} onChange={e => {
+                <NumField placeholder="۰" value={String(dv.quantity || '')} onChange={e => {
                   const raw = Number(toEn(e.target.value)) || 0;
                   const good = form.goods.find(x => x.id === dv.goodId);
                   const cap = good ? computeDeliveryCap(good, form.deliveries, dv.id) : raw;
@@ -1371,7 +1371,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                 </Grid2>
                 <Grid2>
                   <Field label="مقدار" required error={showError?.(`sales.${si}.quantity`)} onTouch={() => markTouched?.(`sales.${si}.quantity`)}>
-                    <NumField placeholder="۳۰۰" value={String(s.quantity || '')} onChange={e => {
+                    <NumField placeholder="۰" value={String(s.quantity || '')} onChange={e => {
                       const raw = Number(toEn(e.target.value)) || 0;
                       const cap = computeSaleCap(s.goodId, form.deliveries, form.sales, s.id);
                       const val = Math.min(raw, cap);
@@ -1388,7 +1388,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                     {Number(s.quantity) > 0 && <FieldHint fieldPath="tra.deal.quantity" value={s.quantity} />}
                   </Field>
                   <Field label="قیمت هر واحد" required error={showError?.(`sales.${si}.unitPrice`)} onTouch={() => markTouched?.(`sales.${si}.unitPrice`)}>
-                    <NumField placeholder="۲۰۰۰۰" value={String(s.unitPrice || '')} onChange={e => setForm(f => ({ ...f, sales: f.sales.map(x => x.id === s.id ? { ...x, unitPrice: Number(toEn(e.target.value)) || 0 } : x) }))} unit="تومان" min={0} max={1_000_000_000_000} />
+                    <NumField placeholder="۰" value={String(s.unitPrice || '')} onChange={e => setForm(f => ({ ...f, sales: f.sales.map(x => x.id === s.id ? { ...x, unitPrice: Number(toEn(e.target.value)) || 0 } : x) }))} unit="تومان" min={0} max={1_000_000_000_000} />
                     {Number(s.unitPrice) > 0 && <FieldHint fieldPath="tra.deal.unitPrice" value={s.unitPrice} />}
                   </Field>
                 </Grid2>
@@ -1431,7 +1431,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
               <DatePicker value={p.date} onChange={v => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, date: v } : x) }))} autoToday />
             </Field>
             <Field label="مبلغ" required error={showError?.(`payments.${pi}.amount`)} onTouch={() => markTouched?.(`payments.${pi}.amount`)}>
-              <MoneyField showWords={false} placeholder="مبلغ" value={p.amount > 0 ? fmt.raw.digits(String(p.amount), fmt.units.numberFormat) : ''} onChange={e => { 
+              <MoneyField showWords={false} placeholder="۰" value={p.amount > 0 ? fmt.raw.digits(String(p.amount), fmt.units.numberFormat) : ''} onChange={e => { 
                 const raw = parseFloat(toEn(e.target.value).replace('٫', '.')) || 0; 
                 const cap = computePaymentCap(calc.myShare, form.payments, p.id);
                 const val = (p.direction === 'in') ? Math.min(raw, cap) : raw;
@@ -1484,10 +1484,10 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   <>
                     <Grid2>
                       <Field label="شماره چک" required error={showError?.(`payments.${pi}.checkNo`)} onTouch={() => markTouched?.(`payments.${pi}.checkNo`)}>
-                        <Input value={p.checkNo || ''} onChange={e => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, checkNo: e.target.value } : x) }))} placeholder="۱۲۳۴۵۶" />
+                        <Input value={p.checkNo || ''} onChange={e => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, checkNo: e.target.value } : x) }))} placeholder="شماره چک" />
                       </Field>
                       <Field label="بانک">
-                        <Input value={p.bank || ''} onChange={e => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, bank: e.target.value } : x) }))} placeholder="ملی..." />
+                        <Input value={p.bank || ''} onChange={e => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, bank: e.target.value } : x) }))} placeholder="نام بانک" />
                       </Field>
                     </Grid2>
                     <Field label="سرسید چک">
@@ -1496,7 +1496,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                   </>
                 )}
                 <Field label="توضیحات">
-                  <Input value={p.notes || ''} onChange={e => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, notes: e.target.value } : x) }))} placeholder="..." />
+                  <Input value={p.notes || ''} onChange={e => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, notes: e.target.value } : x) }))} placeholder="توضیحات اختیاری" />
                 </Field>
         </div>
       ))}
@@ -1588,7 +1588,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
       )}
 
       <Field label="یادداشت" error={showError?.('notes')} onTouch={() => markTouched?.('notes')}>
-            <Textarea placeholder="توضیحات..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
+            <Textarea placeholder="توضیحات اختیاری" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
           </Field>
 
         {err && <ErrorBox>{err}</ErrorBox>}

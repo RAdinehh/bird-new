@@ -187,7 +187,7 @@ export default function ProductionFormModal(props: Props) {
         {!vErrors.avgWeight && <FieldHint fieldPath="egg.avgWeight" value={form.avgWeight} context={{ species: (selectedFlock as any)?.birdKind }} />}
 
         <Field label="یادداشت">
-            <Textarea placeholder="..." value={form.notes} onChange={(e: any) => setForm({ ...form, notes: e.target.value })} />
+            <Textarea placeholder="توضیحات اختیاری" value={form.notes} onChange={(e: any) => setForm({ ...form, notes: e.target.value })} />
           </Field>
 
         <ErrorBox>{err}</ErrorBox>

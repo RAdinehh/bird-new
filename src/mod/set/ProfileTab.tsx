@@ -107,7 +107,7 @@ export default function ProfileTab() {
         <Grid2>
           <Field label="کد پستی">
             <DigitField
-              placeholder="۱۲۳۴۵۶۷۸۹۰"
+              placeholder="کد ملی ۱۰ رقمی"
               maxLength={10}
               value={farm.postalCode}
               onChange={e => updateSection('farm', { postalCode: e.target.value })}
@@ -169,7 +169,7 @@ export default function ProfileTab() {
             maxLength={16}
             value={bank.cardNo}
             onChange={e => updateSection('bank', { cardNo: e.target.value })}
-            placeholder="۶۰۳۷..."
+            placeholder="شماره کارت ۱۶ رقمی"
           />
         </Field>
         <Field label="شماره شبا">
@@ -177,7 +177,7 @@ export default function ProfileTab() {
             value={bank.sheba}
             onChange={e => updateSection('bank', { sheba: e.target.value })}
             dir="ltr"
-            placeholder="IR..."
+            placeholder="شماره شبا"
           />
         </Field>
       </SettingsGroup>

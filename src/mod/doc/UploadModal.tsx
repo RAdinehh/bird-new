@@ -175,7 +175,7 @@ export default function UploadModal({ open, onClose, onUploaded, prefillType, pr
 
       {/* یادداشت */}
       <Field label="یادداشت">
-            <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="..." />
+            <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="توضیحات اختیاری" />
           </Field>
 
       <ErrorBox>{err}</ErrorBox>

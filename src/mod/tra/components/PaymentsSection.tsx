@@ -89,7 +89,7 @@ export default function PaymentsSection({
                     </Select>
                   </Field>
                   <Field label="مقدار پیش‌پرداخت" help="مبلغی که در همان لحظه خرید پرداخت می‌شود. این مبلغ از کل فاکتور کسر شده و باقی‌مانده بین اقساط تقسیم می‌شود">
-                    <NumField placeholder="۵۰۰,۰۰۰" value={form.advanceValue} onChange={e => setForm(f => ({ ...f, advanceValue: e.target.value}))} unit={form.advanceType === 'percent' ? '٪' : 'تومان'} min={0} />
+                    <NumField placeholder="۰" value={form.advanceValue} onChange={e => setForm(f => ({ ...f, advanceValue: e.target.value}))} unit={form.advanceType === 'percent' ? '٪' : 'تومان'} min={0} />
                   </Field>
                 </Grid2>
               )}
@@ -123,10 +123,10 @@ export default function PaymentsSection({
                   </div>
                   <Grid2>
                     <Field label="تخفیف نقدی (٪)" hint="پرداخت زودتر" help="اگر مشتری مبلغ فاکتور را زودتر از موعد سررسید پرداخت کند، این درصد از مبلغ کل کسر می‌شود (برای نمونه ۲٪ تخفیف برای پرداخت تا ۱۰ روز).">
-                      <NumField placeholder="۲" value={form.cashDiscountPct || ''} onChange={e => setForm(f => ({ ...f, cashDiscountPct: e.target.value}))} unit="٪" min={0} max={100} />
+                      <NumField placeholder="۰" value={form.cashDiscountPct || ''} onChange={e => setForm(f => ({ ...f, cashDiscountPct: e.target.value}))} unit="٪" min={0} max={100} />
                     </Field>
                     <Field label="مهلت (روز)" hint="از تاریخ فاکتور" help="مدت زمانی که مشتری فرصت دارد با استفاده از تخفیف نقدی پرداخت کند. اگر پرداخت بعد از این مهلت انجام شود، تخفیف اعمال نمی‌شود">
-                      <NumField placeholder="۱۰" value={form.cashDiscountDays || ''} onChange={e => setForm(f => ({ ...f, cashDiscountDays: e.target.value}))} unit="روز" min={0} />
+                      <NumField placeholder="۰" value={form.cashDiscountDays || ''} onChange={e => setForm(f => ({ ...f, cashDiscountDays: e.target.value}))} unit="روز" min={0} />
                     </Field>
                   </Grid2>
                   {form.cashDiscountPct && form.cashDiscountDays && total > 0 && (
@@ -140,7 +140,7 @@ export default function PaymentsSection({
               {form.paymentTerms === 'installment' && (
                 <Grid2>
                   <Field label="تعداد اقساط" required help="تعداد دفعاتی که مبلغ باقی‌مانده پرداخت می‌شود (برای نمونه با عدد ۴، مبلغ به ۴ قسط تقسیم می‌شود).">
-                    <NumField placeholder="۱۲" value={form.installmentCount} onChange={e => {
+                    <NumField placeholder="۰" value={form.installmentCount} onChange={e => {
                     const newVal = e.target.value;
                     const cnt = parseInt(toEn(newVal)) || 0;
                     const gap = parseInt(toEn(form.installmentGapDays)) || 30;
@@ -155,7 +155,7 @@ export default function PaymentsSection({
                   }} unit="قسط" min={0} />
                   </Field>
                   <Field label="فاصله" required help="فاصله زمانی بین هر قسط به روز (برای نمونه ۳۰ روز برای پرداخت ماهانه). تاریخ قسط‌ها به صورت خودکار محاسبه می‌شود.">
-                    <NumField placeholder="۳۰" value={form.installmentGapDays} onChange={e => {
+                    <NumField placeholder="۰" value={form.installmentGapDays} onChange={e => {
                     const newVal = e.target.value;
                     const cnt = parseInt(toEn(form.installmentCount)) || 0;
                     const gap = parseInt(toEn(newVal)) || 30;
@@ -271,7 +271,7 @@ export default function PaymentsSection({
                               <DatePicker value={p.date} onChange={v => updatePayment(p.id, { date: v })} min={toEn(form.date)} autoToday />
                             </Field>
                             <Field label="مبلغ" error={showError?.('payments.' + idx + '.amount')} onTouch={() => markTouched?.('payments.' + idx + '.amount')}>
-                              <MoneyField showWords={false} placeholder="مبلغ" value={p.amount > 0 ? fmt.code(String(p.amount)) : ''} onChange={e => { const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0; const val = (p.type !== 'refund' && rem > 0) ? Math.min(raw, rem) : raw; updatePayment(p.id, { amount: val }); }} />
+                              <MoneyField showWords={false} placeholder="۰" value={p.amount > 0 ? fmt.code(String(p.amount)) : ''} onChange={e => { const raw = parseFloat(toEn(e.target.value).replace('٫','.')) || 0; const val = (p.type !== 'refund' && rem > 0) ? Math.min(raw, rem) : raw; updatePayment(p.id, { amount: val }); }} />
                               <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginTop: 4, padding: '0 4px', gap: 4 }}>
                                 <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>{rem > 0 && p.type !== 'refund' ? `باقی‌مانده: ${fmt.money(rem, { withUnit: false })} تومان` : ''}</span>
                                 {rem > 0 && p.type !== 'refund' && (<button type="button" onClick={() => updatePayment(p.id, { amount: (p.amount || 0) + rem })} style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: 'var(--fs-xs)', fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline', whiteSpace: 'nowrap' }}>تسویه کل</button>)}

@@ -105,7 +105,7 @@ export default function ZoneFormModal({
           }
         >
           <NumField
-            placeholder="۱۰۰۰"
+            placeholder="۰"
             value={form.capacity}
             onChange={e => { onErrorClear?.(); setForm({ ...form, capacity: e.target.value }); }}
             unit="پرنده"

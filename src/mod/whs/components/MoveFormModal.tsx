@@ -158,7 +158,7 @@ export default function MoveFormModal(props: Props) {
         )}
 
         <Field label="یادداشت" error={showError?.('notes')} onTouch={() => markTouched?.('notes')}>
-            <Textarea placeholder="..." value={form.notes} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setForm({ ...form, notes: e.target.value })} />
+            <Textarea placeholder="توضیحات اختیاری" value={form.notes} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setForm({ ...form, notes: e.target.value })} />
           </Field>
 
         {err && <ErrorBox>{err}</ErrorBox>}

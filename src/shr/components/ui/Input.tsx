@@ -27,6 +27,7 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
   const rawVal = isEditing ? localValue : parentValueStr;
   const fmt = useFormat();
   const displayValue = rawVal === '' ? '' : fmt.code(rawVal);
+  const resolvedPlaceholder = rest.placeholder ?? (effectiveMode === 'number' ? '۰' : undefined);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let v = e.target.value;
@@ -140,8 +141,8 @@ export function MoneyField({ value, showWords = true, ...props }: Omit<InputProp
     : '';
   return <Input mode="number" inputMode="numeric" unit="تومان" min={0} showWords={showWords} value={displayValue} {...props} />;
 }
-export function PhoneField({ maxLength = 11, ...props }: Omit<InputProps, 'unit' | 'inputMode'> & { maxLength?: number }) {
-  return <Input dir="ltr" inputMode="numeric" maxLength={maxLength} {...props} />;
+export function PhoneField({ maxLength = 11, placeholder = '۰۹...', ...props }: Omit<InputProps, 'unit' | 'inputMode'> & { maxLength?: number }) {
+  return <Input dir="ltr" inputMode="numeric" maxLength={maxLength} placeholder={placeholder} {...props} />;
 }
 export function DigitField({ maxLength, ...props }: Omit<InputProps, 'unit' | 'inputMode' | 'mode' | 'min' | 'max'> & { maxLength: number }) {
   return <Input dir="ltr" inputMode="numeric" maxLength={maxLength} {...props} />;

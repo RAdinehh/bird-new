@@ -66,7 +66,7 @@ export default function HerbalForm({ item, updateItem }: { item: any; updateItem
           <Input
             value={h.customForm || ''}
             onChange={e => setH({ customForm: e.target.value })}
-            placeholder="چوب دارچین یا مخلوط گیاهان"
+            placeholder="ترکیبات مؤثر"
           />
         </Field>
       )}

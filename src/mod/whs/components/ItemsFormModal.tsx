@@ -44,7 +44,7 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
       >
         <Grid2>
           <Field label="نام قلم" required error={showError?.('name')} onTouch={() => markTouched?.('name')}>
-            <Input placeholder="ذرت، نیوکاسل، ویتامین..." value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+            <Input placeholder="نام کالا" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
           </Field>
           <Field label="تأمین‌کننده" hint="فقط فروشنده‌ها">
             <SmartSelect
@@ -264,7 +264,7 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
                 </Select>
               </Field>
               <Field label="برند">
-                <Input value={form.brand || ''} onChange={e => setForm({ ...form, brand: e.target.value })} placeholder="پیشگامان" />
+                <Input value={form.brand || ''} onChange={e => setForm({ ...form, brand: e.target.value })} placeholder="نام برند" />
               </Field>
             </Grid2>
             <Grid2>
@@ -362,7 +362,7 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
         )}
 
         <Field label="یادداشت" error={showError?.('notes')} onTouch={() => markTouched?.('notes')}>
-            <Textarea placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+            <Textarea placeholder="توضیحات اختیاری" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
           </Field>
 
         {err && <ErrorBox>{err}</ErrorBox>}

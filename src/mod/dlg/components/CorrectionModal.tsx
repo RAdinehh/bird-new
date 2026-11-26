@@ -496,7 +496,7 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
         </Field>
 
         <Field label="توضیح (اختیاری)">
-          <Input value={notes} onChange={e => setNotes(e.target.value)} placeholder="..." />
+          <Input value={notes} onChange={e => setNotes(e.target.value)} placeholder="توضیحات اختیاری" />
         </Field>
       </div>
     </Modal>

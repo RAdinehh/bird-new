@@ -104,19 +104,19 @@ export default function DeviceFormModal(props: DeviceFormModalProps) {
         <SectionTitle>🌡 پایش زنده</SectionTitle>
         <Grid2>
           <Field label="EST فعلی" hint="دمای پوسته تخم">
-            <NumField placeholder="۳۷.۸" value={form.estCurrent} onChange={e => setForm({...form, estCurrent: e.target.value})} unit="°C" min={30} max={45} />
+            <NumField placeholder="۰" value={form.estCurrent} onChange={e => setForm({...form, estCurrent: e.target.value})} unit="°C" min={30} max={45} />
           </Field>
           <Field label="CO₂ فعلی">
-            <NumField placeholder="۰.۴" value={form.co2Current} onChange={e => setForm({...form, co2Current: e.target.value})} unit="٪" min={0} max={5} />
+            <NumField placeholder="۰" value={form.co2Current} onChange={e => setForm({...form, co2Current: e.target.value})} unit="٪" min={0} max={5} />
           </Field>
         </Grid2>
         <Grid2>
           <Field label="O₂ فعلی">
-            <NumField placeholder="۲۰.۹" value={form.o2Current} onChange={e => setForm({...form, o2Current: e.target.value})} unit="٪" min={15} max={25} />
+            <NumField placeholder="۰" value={form.o2Current} onChange={e => setForm({...form, o2Current: e.target.value})} unit="٪" min={15} max={25} />
           </Field>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
             <Field label="دما محیط">
-              <NumField placeholder="۳۷.۵" value={form.temp} onChange={e => setForm({...form, temp: e.target.value})} unit="°C" min={30} max={45} />
+              <NumField placeholder="۰" value={form.temp} onChange={e => setForm({...form, temp: e.target.value})} unit="°C" min={30} max={45} />
             </Field>
             <FieldHint fieldPath="inc.temperature" value={form.temp} />
           </div>
@@ -130,7 +130,7 @@ export default function DeviceFormModal(props: DeviceFormModalProps) {
             </Select>
           </Field>
           <Field label="رطوبت فعلی">
-            <NumField placeholder="۵۵" value={form.humidity} onChange={e => setForm({...form, humidity: e.target.value})} unit="٪" min={30} max={90} />
+            <NumField placeholder="۰" value={form.humidity} onChange={e => setForm({...form, humidity: e.target.value})} unit="٪" min={30} max={90} />
           </Field>
         </Grid2>
 
@@ -145,7 +145,7 @@ export default function DeviceFormModal(props: DeviceFormModalProps) {
         </Grid2>
         <Grid2>
           <Field label="گارانتی (ماه)">
-            <NumField placeholder="۲۴" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} max={120} />
+            <NumField placeholder="۰" value={form.warranty} onChange={e => setForm({...form, warranty: e.target.value})} unit="ماه" min={0} max={120} />
           </Field>
           <Field label="هزینه جانبی" hint="نصب، حمل">
             <MoneyField placeholder="۰" value={form.extraCost} onChange={e => setForm({...form, extraCost: e.target.value})} />
@@ -158,7 +158,7 @@ export default function DeviceFormModal(props: DeviceFormModalProps) {
         )}
 
         <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
-        <Input placeholder="..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
+        <Input placeholder="توضیحات اختیاری" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
 
         <ErrorBox>{err}</ErrorBox>
       </Modal>

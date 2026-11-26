@@ -89,7 +89,7 @@ export default function AddEventModal({ open, onClose, prefillDate }: Props) {
 
       <Field label="یادداشت">
             <Textarea
-          placeholder="..."
+          placeholder="توضیحات اختیاری"
           value={notes}
           onChange={e => setNotes(e.target.value)}
         />

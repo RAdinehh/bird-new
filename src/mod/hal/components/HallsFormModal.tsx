@@ -254,9 +254,9 @@ export default function HallsFormModal(props: HallsFormModalProps) {
         </Grid2>
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>📐 ابعاد و ظرفیت</div>
         <Grid3>
-          <Field label="طول" required error={vErrors.length}><NumField placeholder="۱۰" value={form.length} onChange={e => setForm({...form, length: e.target.value})} unit="m" min={1} max={500} /></Field>
-          <Field label="عرض" required error={vErrors.width}><NumField placeholder="۵" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" min={1} max={200} /></Field>
-          <Field label="ارتفاع" required error={vErrors.height}><NumField placeholder="۳" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" min={1} max={20} /></Field>
+          <Field label="طول" required error={vErrors.length}><NumField placeholder="۰" value={form.length} onChange={e => setForm({...form, length: e.target.value})} unit="m" min={1} max={500} /></Field>
+          <Field label="عرض" required error={vErrors.width}><NumField placeholder="۰" value={form.width} onChange={e => setForm({...form, width: e.target.value})} unit="m" min={1} max={200} /></Field>
+          <Field label="ارتفاع" required error={vErrors.height}><NumField placeholder="۰" value={form.height} onChange={e => setForm({...form, height: e.target.value})} unit="m" min={1} max={20} /></Field>
         </Grid3>
         {(() => {
           const cap = parseFloat(toEn(form.capacity)) || 0;
@@ -273,7 +273,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
           return (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-2)', alignItems: 'start' }}>
               <Field label="ظرفیت" autoFrom={autoFields.has("capacity") ? "استاندارد" : undefined} error={vErrors.capacity} warning={warnMsg} autoHideMs={0}>
-                <NumField placeholder="۵۰۰۰" value={form.capacity} onChange={e => { setForm({...form, capacity: e.target.value}); clearAuto("capacity"); }} unit="پرنده" min={0} />
+                <NumField placeholder="۰" value={form.capacity} onChange={e => { setForm({...form, capacity: e.target.value}); clearAuto("capacity"); }} unit="پرنده" min={0} />
               </Field>
               <Field label={<span style={{ visibility: 'hidden' }}>محاسبه</span>}>
                 {calcCap != null ? (
@@ -331,11 +331,11 @@ export default function HallsFormModal(props: HallsFormModalProps) {
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)' }}>🌡 شرایط محیطی</div>
           <Grid2>
           <Field label="دمای هدف" autoFrom={autoFields.has("targetTemp") ? (currentBreedName ? `استاندارد «${currentBreedName}»` : 'استاندارد') : undefined} help={HELP.hal.targetTemp} error={vErrors.targetTemp}>
-            <TempFormField noLabel placeholder="۲۲" value={form.targetTemp} onChange={(v: string) => { setForm({...form, targetTemp: v}); clearAuto("targetTemp"); }} />
+            <TempFormField noLabel placeholder="۰" value={form.targetTemp} onChange={(v: string) => { setForm({...form, targetTemp: v}); clearAuto("targetTemp"); }} />
             <OverrideHint {...tempHint} />
           </Field>
           <Field label="رطوبت هدف" autoFrom={autoFields.has("targetHumidity") ? (currentBreedName ? `استاندارد «${currentBreedName}»` : 'استاندارد') : undefined} help={HELP.hal.targetHumidity} error={vErrors.targetHumidity}>
-            <NumField placeholder="۶۰" value={form.targetHumidity} onChange={e => { setForm({...form, targetHumidity: e.target.value}); clearAuto("targetHumidity"); }} unit="٪" min={0} max={100} />
+            <NumField placeholder="۰" value={form.targetHumidity} onChange={e => { setForm({...form, targetHumidity: e.target.value}); clearAuto("targetHumidity"); }} unit="٪" min={0} max={100} />
             <OverrideHint {...humHint} />
           </Field>
         </Grid2>
@@ -350,7 +350,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)', marginTop: 4 }}>📝 یادداشت و آدرس</div>
         <Field label="آدرس سالن"><Input placeholder="شهرک صنعتی، خیابان، پلاک" value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
         <Field label="یادداشت">
-            <Textarea placeholder="توضیحات اختیاری، نکات مهم" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
+            <Textarea placeholder="توضیحات اختیاری" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
           </Field>
         <ErrorBox>{err}</ErrorBox>
       </Modal>

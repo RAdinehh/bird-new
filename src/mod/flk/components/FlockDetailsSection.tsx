@@ -50,7 +50,7 @@ export default function FlockDetailsSection({ form, setForm, showError, markTouc
         </Field>
         
         <Field label="تاریخ شروع نگهداری" hint="اگه دقیق نمی‌دونی" error={showError('startDate')} onTouch={() => markTouched('startDate')}>
-          <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="اختیاری" min={jalaliBounds(24).min} max={jalaliBounds(24).max} warn={checkDateBounds(form.startDate, jalaliBounds(24))} />
+          <DatePicker value={form.startDate} onChange={v => setForm({ ...form, startDate: v })} placeholder="انتخاب تاریخ" min={jalaliBounds(24).min} max={jalaliBounds(24).max} warn={checkDateBounds(form.startDate, jalaliBounds(24))} />
         </Field>
       </Grid2>
 
@@ -132,7 +132,7 @@ export default function FlockDetailsSection({ form, setForm, showError, markTouc
 
       <div style={dividerStyle}>📝 یادداشت</div>
       <Field label="یادداشت">
-        <Textarea placeholder="..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+        <Textarea placeholder="توضیحات اختیاری" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
       </Field>
     </>
   );

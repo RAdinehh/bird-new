@@ -310,7 +310,7 @@ export default function HatchEntryRow(props: HatchEntryRowProps) {
             <Textarea
               value={d.notes || ''}
               onChange={ev => onUpdate({ notes: ev.target.value })}
-              placeholder="..."
+              placeholder="توضیحات اختیاری"
             />
           </Field>
 

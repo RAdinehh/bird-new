@@ -501,7 +501,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       {needsWeight && (
                           <Field label={weightLabel} hint="لازم برای تبدیل به واحد پایه انبار و محاسبه قیمت">
                             <NumField
-                              placeholder="۵۰۰"
+                              placeholder="۰"
                               value={it.unitWeight != null && it.unitWeight > 0 ? fmt.code(String(it.unitWeight)) : ''}
                               onChange={e => updateItem(it.id, { unitWeight: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })}
                               min={0}
