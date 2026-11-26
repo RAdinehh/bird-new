@@ -264,7 +264,6 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             نژادی با کاربرد «{missingPurposeHint}» برای این پرنده ثبت نشده است. لطفاً نژاد جدید بسازید.
           </AlertBox>
         )}
-          {nameFieldJsx}
         {!isPurchase && (item.source || 'flock') === 'hatch' && availableHatches.length === 0 && (
           <div style={{ fontSize: 'var(--fs-xs)', marginTop: 4, fontWeight: 600, color: 'var(--danger)' }}>
             ابتدا از بخش «جوجه‌کشی» یک هچ بسازید
@@ -296,7 +295,9 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         </Grid2>
         
 
-        {/* ردیف ۲: تاریخ هچ + سن */}
+        {nameFieldJsx}
+
+          {/* ردیف ۲: تاریخ هچ + سن */}
         <Grid2>
           {isPurchase ? (
             <Field label="تاریخ هچ" required error={err('hatchDate')} onTouch={touch('hatchDate')} hint={category === 'chick' && (item.ageDays ?? 0) > 14 ? '💡 سن بیش از ۱۴ روز (گله دوره قبل یا نیمچه)' : undefined}>
@@ -446,12 +447,12 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" disabled={isLocked || !item.birdId} />
           </Field>
         </Grid2>
-        {nameFieldJsx}
         {hasIncompatibleBreedsOnly && (
           <AlertBox tone="warn">
             نژادی با کاربرد «{missingPurposeHint}» برای این پرنده ثبت نشده است. لطفاً نژاد جدید بسازید.
           </AlertBox>
         )}
+        {nameFieldJsx}
 
         <Grid2>
           {isLocked ? (
@@ -816,8 +817,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             />
           </Field>
         </Grid2>
-        {nameFieldJsx}
-        {nameFieldJsx}      </div>
+      </div>
     );
   }
 
@@ -837,12 +837,12 @@ if (category === 'egg' || category === 'fertile_egg') {
           })} placeholder="— انتخاب —" modalTitle="انتخاب نژاد" />
         </Field>
       </Grid2>
-        {nameFieldJsx}
         {hasIncompatibleBreedsOnly && (
           <AlertBox tone="warn">
             نژادی با کاربرد «{missingPurposeHint}» برای این پرنده ثبت نشده است. لطفاً نژاد جدید بسازید.
           </AlertBox>
         )}
+        {nameFieldJsx}
     </div>
   );
 }
@@ -949,8 +949,7 @@ if (category === 'vaccine' || category === 'herbal') {
             }} options={activeFlocks} placeholder="— بدون گله (سربار کل) —" modalTitle="انتخاب گله" />
           </Field>
         </Grid2>
-            {nameFieldJsx}
-        {nameFieldJsx}        {ct === 'utilities' && (
+            {nameFieldJsx}        {ct === 'utilities' && (
           <>
             <Grid2>
               <Field label="شناسه قبض (اختیاری)">
