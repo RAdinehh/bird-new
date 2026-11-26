@@ -191,7 +191,7 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
               return {
                 value: k,
                 label: v.name,
-                icon: <EquipmentIcon type={k} size={22} weight="duotone" color={getCategoryColor(pickerCat)} />,
+                icon: EQUIP_LABELS[k]?.icon || "feeder",
               };
             })}
             customKey={'hal.equip.type.' + pickerCat}

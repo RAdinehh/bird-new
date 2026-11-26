@@ -31,6 +31,7 @@ import { getGlobalFormat } from '../units/useFormat';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { IconBadge, EquipmentIcon } from '../icons/equipment';
+import { OptionIcon } from './OptionIcon';
 
 // ═══ آیکون‌ها ═══
 const IconClose = () => (
@@ -382,7 +383,7 @@ export function SheetGroup({ title, icon, count, children }: GroupProps) {
             width: 16, height: 16, flexShrink: 0,
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 13, lineHeight: 1,
-          }}>{icon}</span>
+          }}><OptionIcon icon={icon} size={24} /></span>
         )}
         <span style={{ flex: 1 }}>{title}</span>
         {count != null && (
@@ -425,7 +426,7 @@ export function SheetItem({ icon, equipType, category, title, subtitle, selected
       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
       fontSize: 18, lineHeight: 1,
     }}>
-      {icon}
+      <OptionIcon icon={icon} size={24} />
     </span>
   ) : null;
 

@@ -101,7 +101,7 @@ export default function TransferEquipModal({ open, onClose, equipment, halls, zo
             value={toHallId}
             placeholder="— انتخاب —"
             modalTitle="انتخاب سالن مقصد"
-            options={halls.filter((h) => !h.archived).map((h) => ({ value: String(h.id), label: String(h.name), icon: '🏭' }))}
+            options={halls.filter((h) => !h.archived).map((h) => ({ value: String(h.id), label: String(h.name), icon: 'hall' }))}
             onChange={(val: string) => {
               setToHallId(val);
               setToZoneId('');
@@ -117,7 +117,7 @@ export default function TransferEquipModal({ open, onClose, equipment, halls, zo
               modalTitle="انتخاب بخش مقصد"
               options={zonesForTarget
                 .filter((z) => !(isSameHall && z.id === equipment.zoneId))
-                .map((z) => ({ value: String(z.id), label: String(z.name) }))}
+                .map((z) => ({ value: String(z.id), label: String(z.name), icon: 'zone' }))}
               onChange={(val: string) => setToZoneId(val)}
             />
           </Field>

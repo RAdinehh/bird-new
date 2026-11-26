@@ -2,6 +2,7 @@
  * EquipmentKpiCards — ۳ کارت KPI بالای لیست تجهیزات
  * الگو: FOUNDATION-PATTERNS ب۲۲ (KPI Cards)
  */
+import { OptionIcon } from '../../../shr/components/OptionIcon';
 import { useFormat } from '../../../shr/units/useFormat';
 
 import { toFa } from '../../../shr/utils/fa';
@@ -14,7 +15,7 @@ interface Props {
 }
 
 interface KpiCardProps {
-  icon: string;
+  icon: string | React.ReactNode;
   label: string;
   value: string;
   tone: 'accent' | 'warn' | 'danger';
@@ -42,7 +43,7 @@ function KpiCard({ icon, label, value, tone }: KpiCardProps) {
           background: soft, color,
           fontSize: 'var(--fs-sm)',
           flexShrink: 0,
-        }}>{icon}</span>
+        }}><OptionIcon icon={icon} size={24} /></span>
         <span style={{
           fontSize: 'var(--fs-2xs)',
           opacity: 0.9,
@@ -89,7 +90,7 @@ export default function EquipmentKpiCards({ total, categories, totalValue, needR
         tone="accent"
       />
       <KpiCard
-        icon="💰"
+        icon="cash"
         label="ارزش کل"
         value={valueText}
         tone="accent"

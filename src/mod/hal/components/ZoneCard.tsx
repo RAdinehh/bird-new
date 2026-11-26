@@ -36,7 +36,7 @@ export default function ZoneCard({
       ms={ms}
       accent="purple"
       index={fmt.count(index + 1)}
-      iconEmoji="🗂"
+      iconEmoji="zone"
       title={z.name}
       subtitle=""
       isOpen={isOpen}

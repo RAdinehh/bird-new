@@ -224,7 +224,7 @@ export default function ExpandableCard({
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 18, flexShrink: 0, position: 'relative',
           }}>
-            <OptionIcon icon={iconEmoji} size={compact ? 20 : 24} />
+            <OptionIcon icon={iconEmoji} size={compact ? 22 : 26} />
             {index !== undefined && index !== '' && (
               <span style={{
                 position: 'absolute', top: -4, left: -4, width: 18, height: 18, borderRadius: '50%',

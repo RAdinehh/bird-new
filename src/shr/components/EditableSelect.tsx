@@ -9,6 +9,7 @@
  *   - ویرایش/حذف داخل آیتم‌های سفارشی
  *   - جستجو فقط اگه > ۵ آیتم
  */
+import { OptionIcon } from './OptionIcon';
 import { getGlobalFormat } from '../units/useFormat';
 
 
@@ -168,7 +169,7 @@ export default function EditableSelect({
           </span>
         ) : current ? (
           <>
-            {current.icon && <span style={{ display: 'inline-flex', flexShrink: 0 }}>{current.icon}</span>}
+            {current.icon ? <OptionIcon icon={current.icon as any} size={20} /> : null}
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{current.label}</span>
           </>
         ) : (

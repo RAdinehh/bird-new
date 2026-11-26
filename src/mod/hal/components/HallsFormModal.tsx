@@ -1,3 +1,4 @@
+import { getSmartIconByText } from '../../../shr/icons/AppIcons';
 /**
  * HallsFormModal — فرم افزودن/ویرایش سالن
  */
@@ -210,7 +211,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
             <SmartSelect
               value={form.responsibleId || ''}
               onChange={v => setForm({...form, responsibleId: v})}
-              options={workers.map((w: Person) => ({ value: w.id, label: w.name, subtitle: w.phone }))}
+              options={workers.map((w: Person) => ({ value: w.id, label: w.name, subtitle: w.phone, icon: '👤' }))}
               placeholder="— انتخاب —"
               modalTitle="انتخاب مسئول"
             />
@@ -221,7 +222,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
               <SmartSelect
                 value={form.birdId || ''}
                 onChange={v => setForm({...form, birdId: v, breedId: ''})}
-                options={birds.map((b: Bird) => ({ value: b.id, label: b.name }))}
+                options={birds.map((b: Bird) => ({ value: b.id, label: b.name, icon: getSmartIconByText(b.name) }))}
                 placeholder="— انتخاب —"
                 modalTitle="انتخاب پرنده"
               />
@@ -244,6 +245,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                     value: b.id,
                     label: b.name,
                     subtitle: purposeLabels.length > 0 ? purposeLabels.join('، ') : undefined,
+                    icon: '🧬',
                   };
                 })}
                 emptyMode="select"

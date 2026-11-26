@@ -1,32 +1,37 @@
 import React from 'react';
-import { AppIcon, AppIconKey, isValidIconKey } from '../icons/AppIcons';
+import { AppIcon, isValidIconKey } from '../icons/AppIcons';
 
-export interface OptionIconProps {
-  icon?: React.ReactNode | AppIconKey;
+interface OptionIconProps {
+  icon?: string | React.ReactNode;
   size?: number;
   color?: string;
   style?: React.CSSProperties;
 }
 
-export function OptionIcon({ icon, size = 19, color = 'currentColor', style }: OptionIconProps) {
+export function OptionIcon({ icon, size = 22, color = 'currentColor', style }: OptionIconProps) {
   if (!icon) return null;
 
-  if (typeof icon === 'string' && isValidIconKey(icon)) {
+  if (typeof icon === 'string') {
+    const trimmed = icon.trim();
+    if (typeof trimmed === 'string' && isValidIconKey(trimmed)) {
+      return <AppIcon name={trimmed} size={size} style={style} />;
+    }
     return (
       <span
         aria-hidden="true"
         style={{
-          width: size,
-          height: size,
-          color: color,
-          flexShrink: 0,
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
+          width: size,
+          height: size,
+          fontSize: Math.round(size * 0.9),
+          lineHeight: 1,
+          flexShrink: 0,
           ...style,
         }}
       >
-        <AppIcon name={icon} size={size} />
+        {trimmed}
       </span>
     );
   }
@@ -35,13 +40,13 @@ export function OptionIcon({ icon, size = 19, color = 'currentColor', style }: O
     <span
       aria-hidden="true"
       style={{
-        fontSize: typeof icon === 'string' ? size : undefined,
-        lineHeight: 1,
-        color: color,
-        flexShrink: 0,
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
+        width: size,
+        height: size,
+        color,
+        flexShrink: 0,
         ...style,
       }}
     >

@@ -1,5 +1,6 @@
 import { getGlobalFormat } from '../../units/useFormat';
 import React from 'react';
+import { OptionIcon } from '../OptionIcon';
 import { toFa } from '../../utils/fa';
 
 export type KpiTone = 'accent' | 'warn' | 'danger' | 'info' | 'purple';
@@ -42,7 +43,7 @@ export function KpiCard({
         alignItems: 'center', justifyContent: 'center',
         gap: 4, textAlign: 'center', minHeight: 118,
       }}>
-        <span style={{ fontSize: '1.8em', lineHeight: 1, marginBottom: 2 }}>{icon}</span>
+        <OptionIcon icon={icon} size={26} style={{ marginBottom: 2 }} />
         <div style={{ fontSize: 'var(--fs-xs)', color: c.fg, fontWeight: 700 }}>{label}</div>
         <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--text)', fontVariantNumeric: 'tabular-nums', lineHeight: 1.15 }}>{displayValue}</div>
         {sub && <div style={{ fontSize: '10px', color: 'var(--muted)', lineHeight: 1.3 }}>{sub}</div>}
@@ -63,7 +64,7 @@ export function KpiCard({
         width: 30, height: 30, borderRadius: 9, background: c.bg,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: 16, lineHeight: 1, flexShrink: 0,
-      }}>{icon}</div>
+      }}><OptionIcon icon={icon} size={24} /></div>
       <div style={{
         fontSize: 11, color: 'var(--muted)', fontWeight: 600,
         whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%',

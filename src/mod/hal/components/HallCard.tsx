@@ -101,7 +101,7 @@ export default function HallCard(props: HallCardProps) {
   };
 
   return (
-    <ExpandableCard key={h.id} id={h.id} ms={ms} accent="accent" index={fmt.int(i + 1)} iconEmoji="🏭"
+    <ExpandableCard key={h.id} id={h.id} ms={ms} accent="accent" index={fmt.int(i + 1)} iconEmoji="hall"
       title={h.name + (h.code ? ` • ${h.code}` : '')}
       subtitle={h.length ? `${fmt.num(h.length)}×${fmt.num(h.width || 0)}×${fmt.num(h.height || 0)} متر` : 'ابعاد وارد نشده'}
       isOpen={isOpen} onToggle={onToggle}
