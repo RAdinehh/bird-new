@@ -280,8 +280,10 @@ export default function SelectSheetShell({
         <div style={{ position: 'relative', flex: 1, display: 'flex', minHeight: 0 }}>
           <ScrollIndicator visible={showIndicator} />
           <div ref={bodyRef} onScroll={checkScroll} style={{
-            padding: flush ? 0 : 10, overflowY: 'auto', flex: 1,
-            display: 'flex', flexDirection: 'column', gap: flush ? 0 : 10,
+            padding: placement === 'center' ? '8px 10px' : (flush ? 0 : 10),
+            overflowY: 'auto', flex: 1,
+            display: 'flex', flexDirection: 'column',
+            gap: placement === 'center' ? 6 : (flush ? 0 : 10),
             overscrollBehavior: 'contain',
             scrollbarWidth: 'thin',
             scrollbarColor: 'var(--scroll-thumb, rgba(142,142,147,.5)) transparent',
@@ -327,17 +329,19 @@ const BTN_SEARCH_ACTIVE: React.CSSProperties = {
   background: 'var(--accent-soft, rgba(22, 163, 74, 0.08))',
 };
 const BTN_CLEAR: React.CSSProperties = {
-  height: 40,
-  padding: '0 12px',
-  borderRadius: 10,
-  border: '1px solid color-mix(in srgb, var(--danger, #dc2626) 25%, transparent)',
-  background: 'color-mix(in srgb, var(--danger, #dc2626) 8%, transparent)',
+  height: 34,
+  padding: '0 10px',
+  borderRadius: 9,
+  border: '1px solid color-mix(in srgb, var(--danger, #dc2626) 22%, transparent)',
+  background: 'transparent',
   color: 'var(--danger, #dc2626)',
   fontFamily: 'inherit',
   fontSize: 'var(--fs-xs, 11.5px)',
-  fontWeight: 700,
+  fontWeight: 600,
   cursor: 'pointer',
-  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   flexShrink: 0,
 };
 

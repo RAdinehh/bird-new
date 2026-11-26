@@ -141,7 +141,7 @@ export default function SmartSelect({
         open={open}
         onClose={handleClose}
         placement={isShortList ? 'center' : 'bottom'}
-        flush={!hasGroups}
+        flush={!hasGroups && !isShortList}
         title={modalTitle}
         subtitle={isShortList ? undefined : `${getGlobalFormat().count(options.length)} مورد`}
         onClear={canClear ? () => onChange('') : undefined}
