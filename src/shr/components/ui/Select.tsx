@@ -116,7 +116,7 @@ export function Select({
     setQuery("");
   };
 
-  const handlePick = (val: string) => {
+  const emitChange = (val: string) => {
     if (!isControlled) setInternalVal(val);
     if (onChange) {
       const target = { value: val, name: name ?? "", id: id ?? "" } as HTMLSelectElement;
@@ -129,6 +129,10 @@ export function Select({
         stopPropagation: () => {},
       } as unknown as React.ChangeEvent<HTMLSelectElement>);
     }
+    };
+
+  const handlePick = (val: string) => {
+    emitChange(val);
     handleClose();
   };
 
@@ -185,7 +189,7 @@ export function Select({
         flush={!hasGroups}
         title={resolvedTitle}
         subtitle={isShortList ? undefined : `${getGlobalFormat().count(options.length)} مورد`}
-        onClear={canClear ? () => handlePick("") : undefined}
+        onClear={canClear ? () => emitChange("") : undefined}
         searchable={searchable}
         onSearchClear={() => setQuery("")}
         searchNode={

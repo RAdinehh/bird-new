@@ -144,7 +144,7 @@ export default function SmartSelect({
         flush={!hasGroups}
         title={modalTitle}
         subtitle={isShortList ? undefined : `${getGlobalFormat().count(options.length)} مورد`}
-        onClear={canClear ? () => handlePick('') : undefined}
+        onClear={canClear ? () => onChange('') : undefined}
         searchable={searchable}
         onSearchClear={() => setQuery('')}
         searchNode={
