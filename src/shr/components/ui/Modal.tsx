@@ -298,7 +298,7 @@ export function Modal({
         {/* Header */}
         <div
           style={{
-            padding: 'calc(10px + env(safe-area-inset-top)) 14px 10px',
+            padding: 'calc(12px + env(safe-area-inset-top)) 16px 12px',
             borderBottom: '1px solid var(--border)',
             display: 'flex',
             alignItems: 'center',
@@ -308,7 +308,7 @@ export function Modal({
         >
           <div
             id={titleId.current}
-            style={{ flex: 1, fontSize: 'var(--fs-lg)', fontWeight: 700 }}
+            style={{ flex: 1, minWidth: 0, fontSize: 'var(--fs-lg, 16px)', fontWeight: 700, color: 'var(--text)', lineHeight: 1.35 }}
           >
             {title}
           </div>

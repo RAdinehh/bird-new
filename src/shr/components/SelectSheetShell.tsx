@@ -241,13 +241,13 @@ export default function SelectSheetShell({
 `}</style>
         {/* Header RTL */}
         <div style={{
-          padding: '14px 16px',
-    borderBottom: '1px solid color-mix(in srgb, var(--border) 75%, transparent)',
+          padding: '12px 16px',
+          borderBottom: '1px solid var(--border)',
     display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0,
         }}>
           <div style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>
             <div id="sss-title" style={{
-              fontSize: 'var(--fs-lg, 16px)', fontWeight: 800,
+              fontSize: 'var(--fs-lg, 16px)', fontWeight: 700, color: 'var(--text)', lineHeight: 1.35,
               whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
             }}>{title}</div>
             {subtitle && (
