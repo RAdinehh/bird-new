@@ -370,7 +370,7 @@ export function SheetGroup({ title, icon, count, children }: GroupProps) {
       flexShrink: 0,
     }}>
       <div style={{
-        display: 'flex', alignItems: 'center', gap: 8,
+        display: 'flex', alignItems: 'center', gap: 6,
         padding: '10px 16px',
         minHeight: 38,
         background: 'var(--card-solid)',
@@ -437,7 +437,7 @@ export function SheetItem({ icon, equipType, category, title, subtitle, selected
       onClick={onClick}
       aria-selected={selected}
       style={{
-        display: 'flex', alignItems: 'center', gap: 12,
+        display: 'flex', alignItems: 'center', gap: 6,
         padding: subtitle ? '9px 16px' : '11px 16px',
         minHeight: subtitle ? 46 : 44,
         background: selected ? 'var(--accent-soft, rgba(22, 163, 74, 0.09))' : 'var(--card-solid)',
