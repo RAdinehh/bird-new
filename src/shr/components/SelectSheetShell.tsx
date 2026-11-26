@@ -194,7 +194,7 @@ export default function SelectSheetShell({
         onClick={(e) => e.stopPropagation()}
         style={{
           background: 'var(--card-solid)',
-          borderRadius: placement === 'center' ? 'var(--r-2xl, 18px)' : 'var(--r-2xl, 20px) var(--r-2xl, 20px) 0 0',
+          borderRadius: placement === 'center' ? 'var(--r-lg, 14px)' : 'var(--r-lg, 16px) var(--r-lg, 16px) 0 0',
           width: '100%',
           maxWidth: placement === 'center' ? 440 : 540,
           maxHeight: placement === 'center' ? '72dvh' : '70dvh',
