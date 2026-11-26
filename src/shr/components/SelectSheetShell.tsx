@@ -201,7 +201,7 @@ export default function SelectSheetShell({
           display: 'flex', flexDirection: 'column',
           overflow: 'hidden',
           border: placement === 'center' ? '1px solid var(--border)' : 'none',
-          boxShadow: placement === 'center' ? '0 24px 54px rgba(0, 0, 0, 0.26)' : undefined,
+          boxShadow: placement === 'center' ? 'var(--shadow, 0 8px 24px rgba(15, 23, 42, 0.12))' : '0 -6px 24px rgba(0, 0, 0, 0.14)',
           transform: placement === 'center'
             ? (animating ? 'scale(1)' : 'scale(0.96)')
             : (animating ? `translateY(${dragY}px)` : 'translateY(100%)'),
@@ -280,10 +280,10 @@ export default function SelectSheetShell({
         <div style={{ position: 'relative', flex: 1, display: 'flex', minHeight: 0 }}>
           <ScrollIndicator visible={showIndicator} />
           <div ref={bodyRef} onScroll={checkScroll} style={{
-            padding: placement === 'center' ? '8px 10px' : (flush ? 0 : 10),
+            padding: flush ? 0 : 10,
             overflowY: 'auto', flex: 1,
             display: 'flex', flexDirection: 'column',
-            gap: placement === 'center' ? 6 : (flush ? 0 : 10),
+            gap: flush ? 0 : 10,
             overscrollBehavior: 'contain',
             scrollbarWidth: 'thin',
             scrollbarColor: 'var(--scroll-thumb, rgba(142,142,147,.5)) transparent',
@@ -430,7 +430,7 @@ export function SheetItem({ icon, equipType, category, title, subtitle, selected
         minHeight: 50,
         background: selected ? 'var(--accent-soft, rgba(22, 163, 74, 0.09))' : 'var(--card-solid)',
         border: 'none',
-        borderBottom: '1px solid color-mix(in srgb, var(--border) 60%, transparent)',
+        borderBottom: '1px solid var(--border)',
         fontFamily: 'inherit',
         width: '100%', textAlign: 'right',
         cursor: disabled ? 'not-allowed' : 'pointer',
