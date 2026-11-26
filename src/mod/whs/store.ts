@@ -524,7 +524,7 @@ export const CATEGORY_DEFAULTS: Record<ItemCategory, {
 };
 
 export const UNIT_LABEL: Record<ItemUnit, string> = {
-  kg: 'کیلوگرم', g: 'گرم', L: 'لیتر', l: 'لیتر', ml: 'میلی‌لیتر',
+  kg: 'کیلوگرم', g: 'گرم', l: 'لیتر', L: 'لیتر', ml: 'میلی‌لیتر',
   pcs: 'عدد', vial: 'ویال', pack: 'بسته', ton: 'تن', bag: 'کیسه', dose: 'دوز'
 };
 

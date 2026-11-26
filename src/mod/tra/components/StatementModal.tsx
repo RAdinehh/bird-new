@@ -428,7 +428,7 @@ export default function StatementModal({ open, onClose, kind }: Props) {
       size="lg"
       footer={
         <ModalFooter actions={[
-          { label: '📄 چاپ / PDF', role: 'primary', onClick: handlePrint, disabled: !partyId || lines.length === 0 },
+          { label: 'چاپ / PDF', role: 'primary', onClick: handlePrint, disabled: !partyId || lines.length === 0 },
           { label: 'بستن', role: 'secondary', onClick: onClose },
         ]} />
       }
