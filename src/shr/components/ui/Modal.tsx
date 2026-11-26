@@ -299,7 +299,7 @@ export function Modal({
         <div
           style={{
             padding: 'calc(12px + env(safe-area-inset-top)) 16px 12px',
-            borderBottom: '1px solid var(--border)',
+            borderBottom: '1.5px solid color-mix(in srgb, var(--border) 68%, var(--muted))',
             display: 'flex',
             alignItems: 'center',
             gap: 10,

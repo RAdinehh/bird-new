@@ -192,7 +192,7 @@ export default function EditableSelect({
     opts: EditableOption[],
     customsList: CustomOption[],
   ) => {
-    if (!useEnhancedUI) {
+    if (!useEnhancedUI || opts.length === 0 || customsList.length === 0) {
       // لیست تخت
       return (
         <>

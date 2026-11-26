@@ -81,7 +81,7 @@ export default function SmartSelect({
   }, [filtered]);
 
   const groupKeys = Object.keys(grouped);
-  const hasGroups = groupKeys.length > 1 || (groupKeys.length === 1 && groupKeys[0] !== '_flat');
+  const hasGroups = groupKeys.length > 1;
   const searchable = !isShortList && options.length > 5;
 
   const handleClose = () => {

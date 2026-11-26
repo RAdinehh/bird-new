@@ -106,7 +106,7 @@ export function Select({
   }, [filtered]);
 
   const groupKeys = Object.keys(grouped);
-  const hasGroups = groupKeys.length > 1 || (groupKeys.length === 1 && groupKeys[0] !== "_flat");
+  const hasGroups = groupKeys.length > 1;
 
   const borderColor = error ? "var(--danger)" : warn ? "var(--warn)" : "var(--border)";
   const resolvedTitle = modalTitle || rest["aria-label"] || "انتخاب";

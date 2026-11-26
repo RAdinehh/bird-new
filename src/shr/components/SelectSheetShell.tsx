@@ -229,20 +229,20 @@ export default function SelectSheetShell({
         <style>{`
   .sss-item { position: relative; border-bottom: none !important; }
   .sss-item:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    left: 16px;
-    right: 16px;
-    bottom: 0;
-    height: 1px;
-    background: color-mix(in srgb, var(--border) 70%, transparent);
-    pointer-events: none;
-  }
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 1px;
+            background: var(--border);
+            pointer-events: none;
+          }
 `}</style>
         {/* Header RTL */}
         <div style={{
           padding: '12px 16px',
-          borderBottom: '1px solid var(--border)',
+          borderBottom: '1.5px solid color-mix(in srgb, var(--border) 68%, var(--muted))',
     display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0,
         }}>
           <div style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>
@@ -363,34 +363,32 @@ export function SheetGroup({ title, icon, count, children }: GroupProps) {
   return (
     <div style={{
       background: 'var(--card-solid)',
-      border: '1px solid var(--border)',
-      borderRadius: 10, overflow: 'hidden',
+      borderTop: '1px solid var(--border)',
+      borderBottom: '1px solid var(--border)',
+      overflow: 'hidden',
       flexShrink: 0,
     }}>
       <div style={{
-        display: 'flex', alignItems: 'center', gap: 8,
-        padding: '9px 14px',
-        background: 'var(--group-bg, #f2f2f7)',
-        fontSize: 'var(--fs-sm, 11px)', fontWeight: 700,
-        color: 'var(--group-text, #6d6d72)',
-        letterSpacing: '.3px',
-        borderBottom: '1px solid var(--border)',
-        position: 'relative',
+        display: 'flex', alignItems: 'center', gap: 7,
+        padding: '8px 16px',
+        background: 'color-mix(in srgb, var(--accent) 6%, var(--card-solid))',
+        fontSize: 'var(--fs-xs, 11.5px)', fontWeight: 800,
+        color: 'var(--accent)',
+        borderBottom: '1px solid color-mix(in srgb, var(--accent) 18%, var(--border))',
       }}>
-        <span aria-hidden="true" style={{
-          position: 'absolute', right: 0, top: 0, bottom: 0,
-          width: 3, background: 'var(--group-text, #6d6d72)', opacity: .35,
-        }} />
         {icon && (
           <span style={{
             width: 16, height: 16, flexShrink: 0,
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 14, lineHeight: 1,
+            fontSize: 13, lineHeight: 1,
           }}>{icon}</span>
         )}
         <span style={{ flex: 1 }}>{title}</span>
         {count != null && (
-          <span style={{ fontSize: 10, fontWeight: 600, opacity: .75 }}>
+          <span style={{
+            fontSize: 10.5, fontWeight: 700,
+            color: 'var(--muted)',
+          }}>
             {getGlobalFormat().count(count)} مورد
           </span>
         )}

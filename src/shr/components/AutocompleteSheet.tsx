@@ -262,8 +262,9 @@ export default function AutocompleteSheet({
           </div>
         ) : (
           <>
-            {Object.entries(grouped).map(([key, g]) => (
-              <SheetGroup key={key} title={g.label || '—'} icon={g.icon} count={g.items.length}>
+            {Object.keys(grouped).length > 1 ? (
+            Object.entries(grouped).map(([key, g]) => (
+              <SheetGroup key={key} title={g.label || 'سایر'} icon={g.icon} count={g.items.length}>
                 {g.items.map(opt => (
                   <SheetItem
                     key={opt.value}
@@ -274,7 +275,18 @@ export default function AutocompleteSheet({
                   />
                 ))}
               </SheetGroup>
-            ))}
+            ))
+          ) : (
+            toShow.map(opt => (
+              <SheetItem
+                key={opt.value}
+                icon={opt.icon}
+                title={opt.label}
+                selected={opt.label.trim().toLowerCase() === value.trim().toLowerCase()}
+                onClick={() => handlePick(opt)}
+              />
+            ))
+          )}
 
             {!isSearching && remaining > 0 && (
               <button type="button" onClick={handleShowMore} style={BTN_MORE}>
