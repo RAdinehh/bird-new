@@ -119,7 +119,7 @@ export default function SmartSelect({
           color: current ? 'var(--text)' : 'var(--dim)',
           opacity: disabled ? 0.55 : 1,
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          gap: 8, minWidth: 0, outline: 'none',
+          gap: 6, minWidth: 0, outline: 'none',
         }}
       >
         <span style={{

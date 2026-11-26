@@ -55,7 +55,7 @@ export default function HallEquipCatCard({ cat, count, tone, pct, onClick }: Pro
       }}
     >
       {/* Header: آیکون + label + emoji */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         <span style={{
           width: 28, height: 28, borderRadius: 'var(--r-sm)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',

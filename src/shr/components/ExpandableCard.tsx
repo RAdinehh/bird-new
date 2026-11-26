@@ -217,7 +217,7 @@ export default function ExpandableCard({
           touchAction: 'pan-x pan-y',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div style={{
             width: compact ? 34 : 42, height: compact ? 34 : 42, borderRadius: 'var(--r-md)',
             background: soft, color: color,
