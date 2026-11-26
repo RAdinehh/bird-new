@@ -53,7 +53,7 @@ export default function Header({ title }: { title: string }) {
     <button
       onClick={onClick}
       style={{
-        width: 34, height: 34,
+        width: 32, height: 32,
         borderRadius: 'var(--r-md)',
         background: 'var(--btn-bg)',
         border: '1px solid var(--border)',
