@@ -226,21 +226,33 @@ export default function SelectSheetShell({
         </div>
         )}
 
+        <style>{`
+  .sss-item { position: relative; border-bottom: none !important; }
+  .sss-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 0;
+    height: 1px;
+    background: color-mix(in srgb, var(--border) 70%, transparent);
+    pointer-events: none;
+  }
+`}</style>
         {/* Header RTL */}
         <div style={{
-          padding: '8px 10px',
-          borderBottom: '1px solid var(--border)',
-          display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0,
+          padding: '14px 16px',
+    borderBottom: '1px solid color-mix(in srgb, var(--border) 75%, transparent)',
+    display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0,
         }}>
           <div style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>
             <div id="sss-title" style={{
-              fontSize: 'var(--fs-md, 13.5px)', fontWeight: 700,
+              fontSize: 'var(--fs-lg, 16px)', fontWeight: 800,
               whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
             }}>{title}</div>
             {subtitle && (
               <div style={{
-                fontSize: 'var(--fs-xs, 10px)', color: 'var(--muted)',
-                fontWeight: 500, marginTop: 1,
+                fontSize: 'var(--fs-xs, 11.5px)', color: 'var(--muted)', fontWeight: 500, marginTop: 2,
               }}>{subtitle}</div>
             )}
           </div>
@@ -419,7 +431,7 @@ export function SheetItem({ icon, equipType, category, title, subtitle, selected
   ) : null;
 
   return (
-    <button
+    <button className="sss-item"
       type="button"
       disabled={disabled}
       onClick={onClick}
