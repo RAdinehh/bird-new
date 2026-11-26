@@ -118,10 +118,18 @@ export default function SelectSheetShell({
   useEffect(() => {
     if (!searchOpen) return;
     const t = setTimeout(() => {
-      searchWrapRef.current?.querySelector<HTMLInputElement>('input')?.focus();
+      const input = searchWrapRef.current?.querySelector<HTMLInputElement>('input');
+      input?.focus();
+      input?.scrollIntoView({ block: 'nearest' });
     }, 40);
     return () => clearTimeout(t);
   }, [searchOpen]);
+
+  useEffect(() => {
+    if (!searchOpen || !bodyRef.current) return;
+    bodyRef.current.scrollTop = 0;
+    checkScroll();
+  }, [searchOpen, children]);
   const startY = useRef(0);
 
   // باز/بسته
@@ -170,9 +178,11 @@ export default function SelectSheetShell({
     <div
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       style={{
-        position: 'fixed', inset: 0, zIndex: 10000,
+        position: 'fixed', inset: 0, width: '100%', height: '100dvh', zIndex: 10000,
         background: 'var(--overlay)',
-        display: 'flex', alignItems: placement === 'center' ? 'center' : 'flex-end', justifyContent: 'center', padding: placement === 'center' ? '20px 18px' : 0, boxSizing: 'border-box',
+        display: 'flex', alignItems: placement === 'center' ? 'center' : 'flex-end', justifyContent: 'center',
+        padding: placement === 'center' ? '20px 18px' : 0,
+        boxSizing: 'border-box',
         opacity: animating ? 1 : 0,
         transition: 'opacity .2s ease',
       }}
@@ -187,7 +197,7 @@ export default function SelectSheetShell({
           borderRadius: placement === 'center' ? 'var(--r-2xl, 18px)' : 'var(--r-2xl, 20px) var(--r-2xl, 20px) 0 0',
           width: '100%',
           maxWidth: placement === 'center' ? 440 : 540,
-          maxHeight: placement === 'center' ? '72vh' : '70vh',
+          maxHeight: placement === 'center' ? '72dvh' : '70dvh',
           display: 'flex', flexDirection: 'column',
           overflow: 'hidden',
           border: placement === 'center' ? '1px solid var(--border)' : 'none',
