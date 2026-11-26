@@ -265,7 +265,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               modalTitle="انتخاب قرارداد مرتبط"
               options={relevantDeals.map((d: any) => ({
                 value: d.id,
-                label: `${d.dealNumber ? `#${d.dealNumber}` : `#${d.id.slice(0, 6)}`} — ${d.description || '—'}`,
+                label: d.dealNumber ? `#${d.dealNumber}` : `#${d.id.slice(0, 6)}`,
+                subtitle: d.description || undefined,
               }))}
               onChange={val => setForm(f => ({ ...f, relatedDealId: val }))}
             />

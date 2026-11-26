@@ -84,7 +84,8 @@ export default function MergeFlocksModal({ open, onClose, flockIds, onMergeGroup
       const typeLbl = _TYPE_LBL[f0.type] || f0.type;
       return {
         key, flocks,
-        label: `${kindLbl} — ${typeLbl}`,
+        label: kindLbl,
+        subtitle: typeLbl,
         color: GROUP_COLORS[idx % GROUP_COLORS.length],
       };
     });

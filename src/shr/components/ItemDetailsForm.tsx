@@ -245,7 +245,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 const age = computeAgeFromHatch(h.date);
                 updateItem({ hatchId: v, source: 'hatch', flockId: h.generatedFlockId || '', birdId: f?.birdId || item.birdId, breedId: f?.breedId || item.breedId, ageDays: age, hatchDate: h.date, maleCount: h.maleCount, femaleCount: h.femaleCount, unknownCount: h.unknownCount, description: item.description || `جوجه از هچ ${h.date}` });
                 setHatchOverride(false);
-              }} options={availableHatches.map(h => ({ value: h.id, label: `${getGlobalFormat().date(h.date)} — ${getGlobalFormat().count(h.hatched)} جوجه` }))} placeholder={FIELD_META.hatch.origin.placeholder} modalTitle={FIELD_META.hatch.origin.modalTitle} />
+              }} options={availableHatches.map(h => ({ value: h.id, label: getGlobalFormat().date(h.date), subtitle: `${getGlobalFormat().count(h.hatched)} جوجه` }))} placeholder={FIELD_META.hatch.origin.placeholder} modalTitle={FIELD_META.hatch.origin.modalTitle} />
             </Field>
           ) : (
             <Field label="گله مبدأ" required error={err('flockId')} onTouch={touch('flockId')}>
@@ -284,7 +284,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
               const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
               const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
-              return { value: b.id, label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name };
+              return { value: b.id, label: b.name, subtitle: purposeLabels.length > 0 ? purposeLabels.join('، ') : undefined };
             })} placeholder="— انتخاب —" modalTitle={FIELD_META.breed.modalTitle} disabled={!!item.existingFlockId || (!isPurchase && !!item.flockId)} />
             {item.birdId && breedsForBird.length === 0 && (
               <div style={{ color: 'var(--warn)', fontSize: 11, marginTop: 4, fontWeight: 600 }}>
@@ -367,7 +367,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 const isLinked = Boolean(item.flockId && item.flockId === f.id);
                 return {
                   value: f.id,
-                  label: `${isLinked ? '🟢 ' : ''}${f.name}${meta ? ` — ${meta}` : ''}`,
+                  label: `${isLinked ? '🟢 ' : ''}${f.name}`,
+                  subtitle: meta || undefined,
                 };
               })} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله" />
           </Field>
@@ -426,7 +427,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               }}
               options={flocks.filter(f => f.status === 'active' && (f.currentCount ?? 0) > 0).map(f => {
                 const b = birds.find(x => x.id === f.birdId);
-                return { value: f.id, label: `${f.name} — ${b ? `${b.name} · ` : ''}${getGlobalFormat().count(f.currentCount ?? 0)} پرنده · ${getGlobalFormat().int(getAgeDays(f))} روز` };
+                return { value: f.id, label: f.name, subtitle: `${b ? `${b.name} · ` : ''}${getGlobalFormat().count(f.currentCount ?? 0)} پرنده · ${getGlobalFormat().int(getAgeDays(f))} روز` };
               })}
               placeholder={FIELD_META.flock.origin.placeholder}
               modalTitle="انتخاب گله مبدأ"
@@ -443,7 +444,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
               const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
               const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
-              return { value: b.id, label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name };
+              return { value: b.id, label: b.name, subtitle: purposeLabels.length > 0 ? purposeLabels.join('، ') : undefined };
             })} placeholder="— انتخاب —" modalTitle={FIELD_META.breed.modalTitle} disabled={isLocked || !item.birdId} />
           </Field>
         </Grid2>
@@ -517,7 +518,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 const isLinked = Boolean(item.flockId && item.flockId === f.id);
                 return {
                   value: f.id,
-                  label: `${isLinked ? '🟢 ' : ''}${f.name}${meta ? ` — ${meta}` : ''}`,
+                  label: `${isLinked ? '🟢 ' : ''}${f.name}`,
+                  subtitle: meta || undefined,
                 };
               })} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله مبدأ" />
             </Field>
@@ -624,7 +626,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               { value: '__new__', label: `تعریف ${catLabel} جدید در انبار` },
               ...filteredWhs.map(i => ({
                 value: i.id,
-                label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}`,
+                label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`,
               })),
             ]}
             placeholder={undefined}
@@ -655,7 +657,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 unitPrice: wItem?.lastPrice || item.unitPrice,
                 description: wItem?.name || item.description,
               });
-            }} options={feedItems.map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب —" modalTitle="انتخاب کالای انبار" />
+            }} options={feedItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب —" modalTitle="انتخاب کالای انبار" />
           </Field>
         )}
         <Grid2>
@@ -697,7 +699,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 unitPrice: wItem?.lastPrice || item.unitPrice,
                 description: wItem?.name || item.description,
               });
-            }} options={medItems.map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب —" modalTitle="انتخاب دارو یا واکسن" />
+            }} options={medItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب —" modalTitle="انتخاب دارو یا واکسن" />
           </Field>
         )}
 
@@ -753,7 +755,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 description: wItem?.name || item.description,
               });
             }}
-            options={manureItems.map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))}
+            options={manureItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}` }))}
             placeholder="— انتخاب —"
             modalTitle="انتخاب کالای کود"
           />
@@ -834,7 +836,7 @@ if (category === 'egg' || category === 'fertile_egg') {
           <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
             const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
             const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
-            return { value: b.id, label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name };
+            return { value: b.id, label: b.name, subtitle: purposeLabels.length > 0 ? purposeLabels.join('، ') : undefined };
           })} placeholder="— انتخاب —"
             disabled={!item.birdId} modalTitle={FIELD_META.breed.modalTitle} />
         </Field>
@@ -879,7 +881,7 @@ if (category === 'vaccine' || category === 'herbal') {
                   description: wItem?.name || item.description,
                 });
               }}
-              options={subItems.map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))}
+              options={subItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}` }))}
               placeholder="— انتخاب —"
               modalTitle={category === 'vaccine' ? 'انتخاب واکسن' : 'انتخاب داروی گیاهی'}
             />
@@ -1035,7 +1037,7 @@ if (category === 'vaccine' || category === 'herbal') {
             }}
             options={(productions || []).filter(prod => (prod.brokenCount || 0) > 0).map(prod => ({
               value: prod.id,
-              label: `${prod.date} — ${prod.brokenCount} عدد`
+              label: prod.date, subtitle: `${prod.brokenCount} عدد`
             }))}
             placeholder="— انتخاب از تولیدات —"
             modalTitle="انتخاب از تولیدات تخم شکسته"
@@ -1083,7 +1085,7 @@ if (category === 'vaccine' || category === 'herbal') {
                 description: wItem?.name || item.description,
               });
             }}
-            options={brokenItems.map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))}
+            options={brokenItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}` }))}
             placeholder="— انتخاب —"
             modalTitle="انتخاب کالای تخم شکسته"
           />

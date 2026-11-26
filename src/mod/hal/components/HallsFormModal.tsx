@@ -242,7 +242,8 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                   const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
                   return {
                     value: b.id,
-                    label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name,
+                    label: b.name,
+                    subtitle: purposeLabels.length > 0 ? purposeLabels.join('، ') : undefined,
                   };
                 })}
                 emptyMode="select"

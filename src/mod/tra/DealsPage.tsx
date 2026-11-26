@@ -1306,7 +1306,8 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                       const linkedGoodName = form.goods.find(g => g.id === x.goodId)?.name || '—';
                       return {
                         value: x.id,
-                        label: `تحویل #${fmt.count(idx + 1)} — ${linkedGoodName} (${fmt.count(x.quantity || 0)})`,
+                        label: `تحویل #${fmt.count(idx + 1)}`,
+                        subtitle: `${linkedGoodName} (${fmt.count(x.quantity || 0)})`,
                       };
                     })}
                     onChange={val => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, linkedDeliveryId: val || undefined } : x) }))}
