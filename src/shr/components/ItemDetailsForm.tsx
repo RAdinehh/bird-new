@@ -814,6 +814,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               modalTitle="انتخاب نوع تجهیز"
               placeholder="— انتخاب —"
               options={EQUIP_KINDS}
+              disabled={!item.equipmentCategory}
               onChange={v => updateItem({ equipmentKind: v, equipmentType: v })}
             />
           </Field>
@@ -835,7 +836,8 @@ if (category === 'egg' || category === 'fertile_egg') {
             const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
             const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
             return { value: b.id, label: purposeLabels.length > 0 ? `${b.name} — ${purposeLabels.join('، ')}` : b.name };
-          })} placeholder="— انتخاب —" modalTitle={FIELD_META.breed.modalTitle} />
+          })} placeholder="— انتخاب —"
+            disabled={!item.birdId} modalTitle={FIELD_META.breed.modalTitle} />
         </Field>
       </Grid2>
         {hasIncompatibleBreedsOnly && (
