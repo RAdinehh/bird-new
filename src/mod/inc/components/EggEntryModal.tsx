@@ -206,7 +206,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
         </Field>
 
         {currentRow.dealType === 'own' && (
-          <Field label="انتخاب گله" required>
+          <Field label="گله" required>
             {(() => {
               const activeFlocks = flocks.filter((fl) => fl.status === 'active' && !fl.paused);
               const readyFlocks = activeFlocks.filter((fl) => {

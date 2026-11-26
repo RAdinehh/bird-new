@@ -222,11 +222,11 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 value={form.birdId || ''}
                 onChange={v => setForm({...form, birdId: v, breedId: ''})}
                 options={birds.map((b: Bird) => ({ value: b.id, label: b.name }))}
-                placeholder="— انتخاب پرنده —"
+                placeholder="— انتخاب —"
                 modalTitle="انتخاب پرنده"
               />
             </Field>
-            <Field label="نژاد پرنده" required error={vErrors.breedId}>
+            <Field label="نژاد" required error={vErrors.breedId}>
               <DependentSelect
                 value={form.breedId}
                 onChange={v => setForm({...form, breedId: v})}
@@ -246,7 +246,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                   };
                 })}
                 emptyMode="select"
-                placeholder="— انتخاب نژاد —"
+                placeholder="— انتخاب —"
                 modalTitle="انتخاب نژاد"
                 hideInternalError
               />

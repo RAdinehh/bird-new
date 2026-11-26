@@ -338,7 +338,7 @@ export default function RequirementsPage({ active = true }: { active?: boolean }
         </Field>
 
         <Grid2>
-          <Field label="نوع پرنده">
+          <Field label="پرنده">
             <Input placeholder="مرغ" value={form.birdType} onChange={e => setForm({ ...form, birdType: e.target.value })} />
           </Field>
           <Field label="مرحله">

@@ -1,3 +1,4 @@
+import { FIELD_META } from '../../../shr/constants/fieldMeta';
 /**
  * InvoiceFormModal — فرم ثبت/ویرایش فاکتور (طراحی تمیز و استاندارد)
  */
@@ -172,7 +173,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             value={form.category}
             disabled={!!form.relatedSettlementId}
             modalTitle="انتخاب دسته"
-            placeholder="— انتخاب دسته —"
+            placeholder={FIELD_META.category.placeholder}
             options={(isPurchase ? CATEGORIES.purchase : CATEGORIES.sale).map(([v, l]: [string, string]) => ({
               value: v,
               label: l,
@@ -221,7 +222,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                 value={form.partyId}
                 onChange={v => setForm(f => ({ ...f, partyId: v}))}
                 options={parties.map(cc => ({ value: cc.id, label: cc.name, subtitle: cc.phone || undefined }))} 
-                placeholder="— انتخاب کنید —" 
+                placeholder={FIELD_META.category.placeholder} 
                 modalTitle={isPurchase ? 'انتخاب فروشنده' : 'انتخاب مشتری'}
                 disabled={isPartyLocked}
               />
@@ -556,10 +557,10 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               );
 
               const priceUnitField = (
-                <Field label="قیمت بر حسب">
+                <Field label={FIELD_META.priceUnit.label}>
                   <SmartSelect
                     value={effectivePriceUnit}
-                    modalTitle="انتخاب مبنای قیمت"
+                    modalTitle={FIELD_META.priceUnit.modalTitle}
                     placeholder={undefined}
                     options={priceUnitOptions.map((u: UOMUnit) => ({ value: u.value, label: u.label }))}
                     onChange={val => updateItem(it.id, { priceUnit: val as any })}
