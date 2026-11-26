@@ -408,7 +408,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                             isSingleUnit ? (
                               (cat === 'chick' || cat === 'adult') && isPurchase ? (
                                 <Field label="تعداد سالم" error={showError(`items.${idx}.healthyCount`)} onTouch={() => markTouched(`items.${idx}.healthyCount`)}>
-                                  <NumField placeholder="تعداد" unit="پرنده" value={it.healthyCount != null && it.healthyCount > 0 ? fmt.code(String(it.healthyCount)) : ''} onChange={e => { const v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || 0; const clamped = v > 0 ? Math.min(v, it.quantity || 0) : null; updateItem(it.id, { healthyCount: clamped }); }} min={0} />
+                                  <NumField placeholder="تعداد سالم" unit="پرنده" value={it.healthyCount != null && it.healthyCount > 0 ? fmt.code(String(it.healthyCount)) : ''} onChange={e => { const v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || 0; const clamped = v > 0 ? Math.min(v, it.quantity || 0) : null; updateItem(it.id, { healthyCount: clamped }); }} min={0} />
                                 </Field>
                               ) : null
                             ) : (
@@ -522,7 +522,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
               const flatPriceField = (
                 <Field label={otherCfg?.priceLabel || "مبلغ کل"} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
-                  <MoneyField placeholder="مبلغ کل" value={it.unitPrice > 0 ? fmt.code(String(it.unitPrice)) : ''} onChange={e => {
+                  <MoneyField placeholder={otherCfg?.priceLabel || "مبلغ کل"} value={it.unitPrice > 0 ? fmt.code(String(it.unitPrice)) : ''} onChange={e => {
                     let val = parseFloat(toEn(e.target.value).replace('٫', '.')) || 0;
                     if (maxPrice && val > maxPrice) val = maxPrice;
                     if (val < 0) val = 0;
@@ -545,7 +545,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
               const unitPriceField = (
                 <Field label={`قیمت هر ${activePriceUnitLabel}`} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
-                  <MoneyField placeholder={getPricePlaceholder(cat)} value={it.unitPrice > 0 ? fmt.code(String(it.unitPrice)) : ''} onChange={e => {
+                  <MoneyField placeholder={`قیمت هر ${activePriceUnitLabel}`} value={it.unitPrice > 0 ? fmt.code(String(it.unitPrice)) : ''} onChange={e => {
                     let val = parseFloat(toEn(e.target.value).replace('٫', '.')) || 0;
                     if (maxPrice && val > maxPrice) val = maxPrice;
                     if (val < 0) val = 0;
@@ -569,7 +569,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
               const shippingField = (
                 <Field label="هزینه حمل این قلم" error={showError(`items.${idx}.shipping`)} onTouch={() => markTouched(`items.${idx}.shipping`)}>
-                  <MoneyField placeholder="مبلغ هزینه" value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫', '.')) || 0 })} min={0} />
+                  <MoneyField placeholder="هزینه حمل" value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫', '.')) || 0 })} min={0} />
                 </Field>
               );
 
@@ -645,7 +645,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                   })()}
 <Grid2>
                     <Field label="تخفیف این قلم" error={showError(`items.${idx}.discountValue`)} onTouch={() => markTouched(`items.${idx}.discountValue`)}>
-                      <MoneyField placeholder="مبلغ" value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: Math.max(0, parseFloat(toEn(e.target.value).replace('٫','.')) || 0) })} min={0} />
+                      <MoneyField placeholder="مبلغ تخفیف" value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: Math.max(0, parseFloat(toEn(e.target.value).replace('٫','.')) || 0) })} min={0} />
                     </Field>
                     <Field label="مبلغ کل این قلم">
                       <div style={{ height: 38, display: 'flex', alignItems: 'center', fontWeight: 800, color: 'var(--accent)', direction: 'rtl', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', justifyContent: 'flex-end' }}>

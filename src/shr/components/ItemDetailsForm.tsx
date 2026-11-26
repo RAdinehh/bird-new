@@ -254,7 +254,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 const age = computeAgeFromHatch(f?.hatchDate);
                 updateItem({ flockId: v, source: 'flock', hatchId: '', birdId: f?.birdId || item.birdId, breedId: f?.breedId || item.breedId, ageDays: age != null ? age : (f ? getAgeDays(f) : item.ageDays), hatchDate: f?.hatchDate || item.hatchDate });
                 setHatchOverride(false);
-              }} options={flocksForItem(item)} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" />
+              }} options={flocksForItem(item)} placeholder="— انتخاب گله —" modalTitle="انتخاب گله مبدأ" />
             </Field>
           )}
           </Grid2>
@@ -278,7 +278,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* --- بخش ۱: هویت پرنده --- */}
         <Grid2>
           <Field label="نوع پرنده" required error={err('birdId')} onTouch={touch('birdId')}>
-            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" disabled={!!item.existingFlockId || (!isPurchase && !!item.flockId)} />
+            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نوع پرنده" disabled={!!item.existingFlockId || (!isPurchase && !!item.flockId)} />
           </Field>
           <Field label="نژاد" required error={err('breedId')} onTouch={touch('breedId')}>
             <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
@@ -377,10 +377,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {isPurchase && (
           <Grid2>
             <Field label="سالن مقصد">
-              <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.filter(h => !h.archived).map(h => ({ value: h.id, label: h.name }))} placeholder="— انتخاب —" modalTitle="انتخاب سالن" />
+              <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.filter(h => !h.archived).map(h => ({ value: h.id, label: h.name }))} placeholder="— انتخاب —" modalTitle="انتخاب سالن مقصد" />
             </Field>
             <Field label="بخش مقصد (اختیاری)">
-              <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId && !z.archived).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب —" disabled={!item.hallId} modalTitle="انتخاب بخش" />
+              <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId && !z.archived).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب —" disabled={!item.hallId} modalTitle="انتخاب بخش مقصد" />
             </Field>
           </Grid2>
         )}
@@ -437,7 +437,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* --- بخش ۱: هویت مشتق‌شده از گله --- */}
         <Grid2>
           <Field label="نوع پرنده" required error={err('birdId')} onTouch={touch('birdId')} lockedFrom={isSaleLocked ? "گله" : undefined}>
-            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" disabled={isLocked} />
+            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نوع پرنده" disabled={isLocked} />
           </Field>
           <Field label="نژاد" required error={err('breedId')} onTouch={touch('breedId')} lockedFrom={isSaleLocked ? "گله" : undefined}>
             <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
@@ -519,15 +519,15 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                   value: f.id,
                   label: `${isLinked ? '🟢 ' : ''}${f.name}${meta ? ` — ${meta}` : ''}`,
                 };
-              })} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله" />
+              })} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله مبدأ" />
             </Field>
 
             <Grid2>
               <Field label="سالن مقصد">
-                <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.filter(h => !h.archived).map(h => ({ value: h.id, label: h.name }))} placeholder="— انتخاب —" modalTitle="انتخاب سالن" />
+                <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.filter(h => !h.archived).map(h => ({ value: h.id, label: h.name }))} placeholder="— انتخاب —" modalTitle="انتخاب سالن مقصد" />
               </Field>
               <Field label="بخش مقصد (اختیاری)">
-                <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId && !z.archived).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب —" disabled={!item.hallId} modalTitle="انتخاب بخش" />
+                <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId && !z.archived).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب —" disabled={!item.hallId} modalTitle="انتخاب بخش مقصد" />
               </Field>
             </Grid2>
           </>
@@ -538,10 +538,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="وزن زنده کل (کیلوگرم)" hint="برای محاسبه قیمت">
             <Input mode="number" value={item.liveWeight != null && item.liveWeight > 0 ? String(item.liveWeight) : ''} onChange={e => updateItem({ liveWeight: parseFaNum(e.target.value) || null })} unit="kg" min={0} placeholder="مثلاً ۱۲۰۰" />
           </Field>
-          <Field label="واحد قیمت">
+          <Field label="قیمت بر حسب">
             <SmartSelect
               value={String(item.priceUnit || 'perBird')}
-              modalTitle="انتخاب واحد قیمت"
+              modalTitle="انتخاب مبنای قیمت"
               options={[
                 { value: 'perBird', label: 'به ازای هر پرنده' },
                 { value: 'perKg', label: 'به ازای هر کیلوگرم' },
@@ -697,7 +697,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 unitPrice: wItem?.lastPrice || item.unitPrice,
                 description: wItem?.name || item.description,
               });
-            }} options={medItems.map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب از انبار —" modalTitle="انتخاب دارو یا واکسن" />
+            }} options={medItems.map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب کالای انبار —" modalTitle="انتخاب دارو یا واکسن" />
           </Field>
         )}
 
@@ -767,7 +767,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                   breedId: f?.breedId || item.breedId,
                   ageDays: f ? getAgeDays(f) : item.ageDays,
                 });
-              }} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله" />
+              }} options={activeFlocks} placeholder="— بدون گله —" modalTitle="انتخاب گله مبدأ" />
         </Field>
         {sellerSlot}
       </div>
@@ -801,7 +801,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           <Field label="دسته تجهیزات" required error={err('equipmentCategory')} onTouch={touch('equipmentCategory')}>
             <SmartSelect
               value={String(item.equipmentCategory || '')}
-              modalTitle="انتخاب دسته‌بندی تجهیز"
+              modalTitle="انتخاب دسته تجهیزات"
               placeholder="— انتخاب —"
               options={EQUIP_CATEGORIES}
               onChange={v => updateItem({ equipmentCategory: v, equipmentType: '' })}
@@ -827,7 +827,7 @@ if (category === 'egg' || category === 'fertile_egg') {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>      <SecTitle icon="🥚" title="اطلاعات تخم" />
       <Grid2>
         <Field label="نوع پرنده" required error={err('birdId')} onTouch={touch('birdId')}>
-          <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" />
+          <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle="انتخاب نوع پرنده" />
         </Field>
         <Field label="نژاد" required error={err('breedId')} onTouch={touch('breedId')}>
           <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
@@ -1051,7 +1051,7 @@ if (category === 'vaccine' || category === 'herbal') {
                   breedId: f?.breedId || item.breedId,
                   ageDays: f ? getAgeDays(f) : item.ageDays,
                 });
-              }} options={activeFlocks} placeholder="— انتخاب گله —" modalTitle="انتخاب گله" />
+              }} options={activeFlocks} placeholder="— انتخاب گله —" modalTitle="انتخاب گله مبدأ" />
           </Field>
           <Field label="تاریخ تولید تخم">
             <DatePicker value={String(item.eggDate || '')} onChange={v => updateItem({ eggDate: v })} placeholder="1405/07/20" autoToday />
