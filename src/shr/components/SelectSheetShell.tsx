@@ -235,14 +235,14 @@ export default function SelectSheetShell({
             right: 0;
             bottom: 0;
             height: 1px;
-            background: var(--border);
+            background: color-mix(in srgb, var(--border) 38%, transparent);
             pointer-events: none;
           }
 `}</style>
         {/* Header RTL */}
         <div style={{
           padding: '12px 16px',
-          borderBottom: '1.5px solid color-mix(in srgb, var(--border) 68%, var(--muted))',
+          borderBottom: '1px solid color-mix(in srgb, var(--border) 50%, transparent)',
     display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0,
         }}>
           <div style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>
@@ -363,8 +363,8 @@ export function SheetGroup({ title, icon, count, children }: GroupProps) {
   return (
     <div style={{
       background: 'var(--card-solid)',
-      borderTop: '1px solid var(--border)',
-      borderBottom: '1px solid var(--border)',
+      borderTop: '1px solid color-mix(in srgb, var(--border) 42%, transparent)',
+      borderBottom: '1px solid color-mix(in srgb, var(--border) 42%, transparent)',
       overflow: 'hidden',
       flexShrink: 0,
     }}>
@@ -440,7 +440,7 @@ export function SheetItem({ icon, equipType, category, title, subtitle, selected
         minHeight: 50,
         background: selected ? 'var(--accent-soft, rgba(22, 163, 74, 0.09))' : 'var(--card-solid)',
         border: 'none',
-        borderBottom: '1px solid var(--border)',
+        borderBottom: 'none',
         fontFamily: 'inherit',
         width: '100%', textAlign: 'right',
         cursor: disabled ? 'not-allowed' : 'pointer',
