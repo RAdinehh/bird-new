@@ -3,6 +3,7 @@ import type { Bird } from './store';
 import BirdNameField, { type BirdPresetPick } from './BirdNameField';
 import { Btn, BtnRow, Field, Modal, ErrorBox } from '../../shr/components/ui';
 import { OptionIcon } from '../../shr/components/OptionIcon';
+import { toFa } from '../../shr/utils/fa';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
 import { resolveStandard } from './_display-values';
 import { DEFAULT_SPECIES } from './species';
@@ -149,20 +150,20 @@ export default function BirdForm({ open, onClose, form, setForm, error, showErro
             gridTemplateColumns: '1fr 1fr',
             gap: 6,
           }}>
-            <StatBox icon="🧬" label="تعداد نژاد" value={`${stats.total} نژاد`} />
+            <StatBox icon="🧬" label="تعداد نژاد" value={toFa(`${stats.total} نژاد`)} />
             <StatBox
               icon="⏱"
               label="بازه سن"
               value={
                 stats.minAge != null
-                  ? `${stats.minAge}–${stats.maxAge} روز`
+                  ? toFa(`${stats.minAge}–${stats.maxAge} روز`)
                   : '—'
               }
             />
-            <StatBox icon="🌾" label="بومی" value={`${stats.native} نژاد`} />
-            <StatBox icon="🏭" label="صنعتی" value={`${stats.industrial} نژاد`} />
+            <StatBox icon="🌾" label="بومی" value={toFa(`${stats.native} نژاد`)} />
+            <StatBox icon="🏭" label="صنعتی" value={toFa(`${stats.industrial} نژاد`)} />
             {stats.fancy > 0 && (
-              <StatBox icon="🦚" label="تزئینی" value={`${stats.fancy} نژاد`} />
+              <StatBox icon="🦚" label="تزئینی" value={toFa(`${stats.fancy} نژاد`)} />
             )}
           </div>
         </div>
