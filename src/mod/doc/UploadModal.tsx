@@ -162,7 +162,7 @@ export default function UploadModal({ open, onClose, onUploaded, prefillType, pr
           <Input
             value={linkedId}
             onChange={e => setLinkedId(e.target.value)}
-            placeholder="شناسه رکورد"
+            placeholder="شناسه"
             dir="ltr"
           />
         </Field>
@@ -175,7 +175,7 @@ export default function UploadModal({ open, onClose, onUploaded, prefillType, pr
 
       {/* یادداشت */}
       <Field label="یادداشت">
-            <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="توضیحات اختیاری" />
+            <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="توضیحات" />
           </Field>
 
       <ErrorBox>{err}</ErrorBox>

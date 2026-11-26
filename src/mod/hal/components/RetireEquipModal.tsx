@@ -157,7 +157,7 @@ export default function RetireEquipModal({ open, onClose, equipment, onConfirm }
               ) : (
                 <Field label="خریدار (اختیاری)">
                   <Input
-                    placeholder="نام خریدار"
+                    placeholder="نام"
                     value={buyer}
                     onChange={e => setBuyer(e.target.value)}
                   />
@@ -195,7 +195,7 @@ export default function RetireEquipModal({ open, onClose, equipment, onConfirm }
 
         <Field label="یادداشت (اختیاری)">
           <Input
-            placeholder={reason === 'scrap' ? 'علت اسقاط یا خرابی' : 'توضیحات فروش یا خروج'}
+            placeholder="توضیحات"
             value={note}
             onChange={e => setNote(e.target.value)}
           />

@@ -64,7 +64,7 @@ export default function AddEventModal({ open, onClose, prefillDate }: Props) {
     >
       <Field label="عنوان" required>
         <Input
-          placeholder="عنوان رویداد"
+          placeholder="عنوان"
           value={title}
           onChange={e => setTitle(e.target.value)}
         />
@@ -89,7 +89,7 @@ export default function AddEventModal({ open, onClose, prefillDate }: Props) {
 
       <Field label="یادداشت">
             <Textarea
-          placeholder="توضیحات اختیاری"
+          placeholder="توضیحات"
           value={notes}
           onChange={e => setNotes(e.target.value)}
         />

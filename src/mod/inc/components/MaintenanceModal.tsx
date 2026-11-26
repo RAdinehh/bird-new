@@ -41,7 +41,7 @@ export default function MaintenanceModal(props: MaintenanceModalProps) {
         </Field>
         <Field label="نوع تعمیر" required>
           <Input
-            placeholder="تعویض فن..."
+            placeholder="شرح"
             value={form.type}
             onChange={e => setForm({ ...form, type: e.target.value })}
           />
@@ -55,7 +55,7 @@ export default function MaintenanceModal(props: MaintenanceModalProps) {
         </Field>
         <Field label="توضیحات">
           <Textarea
-            placeholder="توضیحات اختیاری"
+            placeholder="توضیحات"
             value={form.description}
             onChange={e => setForm({ ...form, description: e.target.value })}
           />

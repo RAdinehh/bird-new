@@ -256,7 +256,7 @@ export default function BreedNameField({
       onSubmit={handleCustom}
       hideCustom
       options={options}
-      placeholder={parentBirdName ? `نام نژاد ${parentBirdName}` : 'نام نژاد'}
+      placeholder="نام"
       title={title}
       error={error}
       hideInternalError={hideInternalError}

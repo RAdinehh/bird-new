@@ -201,7 +201,7 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
 
         <Field label="نام تجهیز" required error={err}>
           <Input
-            placeholder="نام تجهیز"
+            placeholder="نام"
             value={pickerName}
             onChange={e => setPickerName(e.target.value)}
           />

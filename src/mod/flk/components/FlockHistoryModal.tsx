@@ -549,7 +549,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>توضیح (اختیاری)</span>
-              <input type="text" value={notes} onChange={e => setNotes(e.target.value)} placeholder="علت اصلاح" style={{ background: '#ffffff', border: '1px solid var(--warn)', borderRadius: 'var(--r-md)', height: 40, padding: '0 var(--sp-3)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', color: 'var(--text)', outline: 'none', width: '100%' }} />
+              <input type="text" value={notes} onChange={e => setNotes(e.target.value)} placeholder="علت" style={{ background: '#ffffff', border: '1px solid var(--warn)', borderRadius: 'var(--r-md)', height: 40, padding: '0 var(--sp-3)', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', color: 'var(--text)', outline: 'none', width: '100%' }} />
             </div>
           </div>
 

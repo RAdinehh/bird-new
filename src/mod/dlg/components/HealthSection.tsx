@@ -156,7 +156,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
  </Field>
  )}
  <Field label="توضیحات">
- <Textarea rows={2} placeholder="توضیحات اختیاری"value={d.notes || ''}
+ <Textarea rows={2} placeholder="توضیحات"value={d.notes || ''}
  onChange={e =>setForm(f =>({ ...f, deaths: f.deaths.map(x =>x.id === d.id ? { ...x, notes: e.target.value } : x) }))} />
  </Field>
  </>)}
@@ -200,7 +200,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
  )}
  <Grid2>
  <Field label="نام واکسن"required>
- <Input placeholder="نام واکسن"value={v.name} onChange={e =>setForm(f =>({ ...f, vaccines: f.vaccines.map(x =>x.id === v.id ? { ...x, name: e.target.value } : x) }))} />
+ <Input placeholder="نام"value={v.name} onChange={e =>setForm(f =>({ ...f, vaccines: f.vaccines.map(x =>x.id === v.id ? { ...x, name: e.target.value } : x) }))} />
  </Field>
  <Field label="روش مصرف">
  <SmartSelect
@@ -331,7 +331,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
  )}
  <Grid2>
  <Field label="نام">
- <Input placeholder="نام دارو"value={m.name} onChange={e =>setForm(f =>({ ...f, medications: f.medications.map(x =>x.id === m.id ? { ...x, name: e.target.value } : x) }))} />
+ <Input placeholder="نام"value={m.name} onChange={e =>setForm(f =>({ ...f, medications: f.medications.map(x =>x.id === m.id ? { ...x, name: e.target.value } : x) }))} />
  </Field>
  <Field label="روش مصرف">
  <SmartSelect

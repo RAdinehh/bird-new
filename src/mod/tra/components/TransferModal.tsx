@@ -31,7 +31,7 @@ export default function TransferModal(props: TransferModalProps) {
           <Field label="تاریخ" error={dateError}><DatePicker value={transferDate} onChange={v => setTransferDate(v)} autoToday /></Field>
           {(transferModal.to === 'received' || transferModal.to === 'paid') && (
             <Field label="یادداشت">
-              <Textarea placeholder="توضیحات اختیاری" value={transferNote} onChange={e => setTransferNote(e.target.value)} />
+              <Textarea placeholder="توضیحات" value={transferNote} onChange={e => setTransferNote(e.target.value)} />
             </Field>
           )}
         </>

@@ -262,7 +262,7 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
               <input
                 value={checkNo}
                 onChange={e => setCheckNo(e.target.value)}
-                placeholder="شماره چک"
+                placeholder="شماره"
                 style={{
                   width: '100%', padding: '10px 12px',
                   background: 'var(--input-bg)', border: '1px solid var(--border)',
@@ -276,7 +276,7 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
               <input
                 value={bank}
                 onChange={e => setBank(e.target.value)}
-                placeholder="نام بانک"
+                placeholder="بانک"
                 style={{
                   width: '100%', padding: '10px 12px',
                   background: 'var(--input-bg)', border: '1px solid var(--border)',
@@ -296,7 +296,7 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
         <input
           value={notes}
           onChange={e => setNotes(e.target.value)}
-          placeholder="توضیحات اختیاری"
+          placeholder="توضیحات"
           style={{
             width: '100%', padding: '10px 12px',
             background: 'var(--input-bg)', border: '1px solid var(--border)',

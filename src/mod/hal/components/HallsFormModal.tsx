@@ -193,7 +193,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
         <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', marginBottom: 8 }}>🏷 هویت و مدیریت</div>
         <Grid2>
           <Field label="نام سالن" required error={vErrors.name}>
-            <Input placeholder="شمالی" value={form.name} onChange={e => { onErrorClear?.(); setForm({...form, name: e.target.value}); }} />
+            <Input placeholder="نام" value={form.name} onChange={e => { onErrorClear?.(); setForm({...form, name: e.target.value}); }} />
           </Field>
           <Field label="وضعیت سالن" help={HELP.hal.status}>
             <Select value={form.status || 'empty'} onChange={e => setForm({...form, status: e.target.value})}>
@@ -348,9 +348,9 @@ export default function HallsFormModal(props: HallsFormModalProps) {
           <Input placeholder="سرکه سیب ۵٪" value={form.sanitizeNotes || ''} onChange={e => setForm({...form, sanitizeNotes: e.target.value})} />
         </Field>
         <div style={{ paddingTop: 8, fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)', marginTop: 4 }}>📝 یادداشت و آدرس</div>
-        <Field label="آدرس سالن"><Input placeholder="شهرک صنعتی، خیابان، پلاک" value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
+        <Field label="آدرس سالن"><Input placeholder="آدرس" value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
         <Field label="یادداشت">
-            <Textarea placeholder="توضیحات اختیاری" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
+            <Textarea placeholder="توضیحات" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
           </Field>
         <ErrorBox>{err}</ErrorBox>
       </Modal>

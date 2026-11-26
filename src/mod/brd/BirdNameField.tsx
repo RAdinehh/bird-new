@@ -130,7 +130,7 @@ export default function BirdNameField({ value, onChange, onPick, error, openMana
         onSubmit={handleCustomText}
         hideCustom
         options={options}
-        placeholder="نام پرنده"
+        placeholder="نام"
         title="انتخاب پرنده"
         error={error}
         hideInternalError

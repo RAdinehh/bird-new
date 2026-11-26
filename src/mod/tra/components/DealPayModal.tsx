@@ -214,7 +214,7 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
               <input
                 value={checkNo}
                 onChange={e => setCheckNo(e.target.value)}
-                placeholder="شماره چک"
+                placeholder="شماره"
                 style={{
                   width: '100%',
                   padding: 'var(--pad-normal)',
@@ -231,7 +231,7 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
               <input
                 value={bank}
                 onChange={e => setBank(e.target.value)}
-                placeholder="نام بانک"
+                placeholder="بانک"
                 style={{
                   width: '100%',
                   padding: 'var(--pad-normal)',
@@ -252,7 +252,7 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
       )}
 
       <Field label="توضیحات">
-        <Textarea placeholder="توضیحات اختیاری" value={notes} onChange={e => setNotes(e.target.value)} />
+        <Textarea placeholder="توضیحات" value={notes} onChange={e => setNotes(e.target.value)} />
       </Field>
 
       <BtnRow>

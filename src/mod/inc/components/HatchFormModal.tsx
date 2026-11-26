@@ -275,7 +275,7 @@ function EditFields({ data: d, update }: { data: HatchRowData; update: (p: Parti
       )}
 
       <Field label="یادداشت">
-        <Textarea value={d.notes || ''} onChange={ev => update({ notes: ev.target.value })} placeholder="توضیحات اختیاری" />
+        <Textarea value={d.notes || ''} onChange={ev => update({ notes: ev.target.value })} placeholder="توضیحات" />
       </Field>
     </>
   );

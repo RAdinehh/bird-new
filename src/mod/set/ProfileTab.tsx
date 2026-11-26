@@ -25,7 +25,7 @@ export default function ProfileTab() {
             <Input
               value={user.name}
               onChange={e => updateSection('user', { name: e.target.value })}
-              placeholder="نام شما"
+              placeholder="نام"
             />
           </Field>
           <Field label="نقش">
@@ -64,7 +64,7 @@ export default function ProfileTab() {
           <Input
             value={farm.name}
             onChange={e => updateSection('farm', { name: e.target.value })}
-            placeholder="نام مجموعه یا مزرعه"
+            placeholder="نام"
           />
         </Field>
         <Grid2>
@@ -82,7 +82,7 @@ export default function ProfileTab() {
           </Field>
           <Field label="شماره پروانه">
             <Input
-              placeholder="کد واحد"
+              placeholder="کد"
               value={farm.licenseNo}
               onChange={e => updateSection('farm', { licenseNo: e.target.value })}
               dir="ltr"
@@ -92,7 +92,7 @@ export default function ProfileTab() {
         <Grid2>
           <Field label="استان">
             <Input
-              placeholder="نام شهر"
+              placeholder="شهر"
               value={farm.province}
               onChange={e => updateSection('farm', { province: e.target.value })}
             />
@@ -107,7 +107,7 @@ export default function ProfileTab() {
         <Grid2>
           <Field label="کد پستی">
             <DigitField
-              placeholder="کد ملی ۱۰ رقمی"
+              placeholder="کد ملی"
               maxLength={10}
               value={farm.postalCode}
               onChange={e => updateSection('farm', { postalCode: e.target.value })}
@@ -131,7 +131,7 @@ export default function ProfileTab() {
           <Input
             value={farm.address}
             onChange={e => updateSection('farm', { address: e.target.value })}
-            placeholder="آدرس کامل"
+            placeholder="آدرس"
           />
         </Field>
       </SettingsGroup>
@@ -153,12 +153,12 @@ export default function ProfileTab() {
             <Input
               value={bank.bankName}
               onChange={e => updateSection('bank', { bankName: e.target.value })}
-              placeholder="نام بانک"
+              placeholder="بانک"
             />
           </Field>
           <Field label="صاحب حساب">
             <Input
-              placeholder="نام صاحب حساب"
+              placeholder="نام"
               value={bank.accountHolder}
               onChange={e => updateSection('bank', { accountHolder: e.target.value })}
             />
@@ -169,7 +169,7 @@ export default function ProfileTab() {
             maxLength={16}
             value={bank.cardNo}
             onChange={e => updateSection('bank', { cardNo: e.target.value })}
-            placeholder="شماره کارت ۱۶ رقمی"
+            placeholder="شماره"
           />
         </Field>
         <Field label="شماره شبا">
@@ -177,7 +177,7 @@ export default function ProfileTab() {
             value={bank.sheba}
             onChange={e => updateSection('bank', { sheba: e.target.value })}
             dir="ltr"
-            placeholder="شماره شبا"
+            placeholder="شبا"
           />
         </Field>
       </SettingsGroup>

@@ -24,7 +24,7 @@ export const COMMON_PLACEHOLDERS = {
   dateFrom: 'از تاریخ',
   dateTo: 'تا تاریخ',
   time: 'انتخاب ساعت',
-  notes: 'توضیحات اختیاری',
+  notes: 'توضیحات',
 } as const;
 
 export const FIELD_META = {
@@ -148,7 +148,7 @@ export const FIELD_META = {
   // فیلدهای پویا (وابسته به واحد یا جهت معامله)
   unitPrice: (unitLabel: string) => ({
     label: `قیمت هر ${unitLabel}`,
-    placeholder: `قیمت هر ${unitLabel}`,
+    placeholder: 'قیمت',
   }),
   flockByDirection: (isPurchase: boolean) =>
     isPurchase ? FIELD_META.flock.destination : FIELD_META.flock.origin,

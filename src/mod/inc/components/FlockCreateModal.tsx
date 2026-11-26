@@ -64,7 +64,7 @@ export default function FlockCreateModal(props: FlockCreateModalProps) {
       {err && <ErrorBox>{err}</ErrorBox>}
       <Field label="نام گله" required>
         <Input
-          placeholder="نام گله"
+          placeholder="نام"
           value={form.name}
           onChange={e => setForm({ ...form, name: e.target.value })}
         />

@@ -334,12 +334,12 @@ export default function RequirementsPage({ active = true }: { active?: boolean }
         footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
         <Field label="نام نیاز" required>
-          <Input placeholder="نام جیره یا استاندارد" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+          <Input placeholder="نام" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
         </Field>
 
         <Grid2>
           <Field label="پرنده">
-            <Input placeholder="نام پرنده" value={form.birdType} onChange={e => setForm({ ...form, birdType: e.target.value })} />
+            <Input placeholder="پرنده" value={form.birdType} onChange={e => setForm({ ...form, birdType: e.target.value })} />
           </Field>
           <Field label="مرحله">
             <Select value={form.stage} onChange={e => setForm({ ...form, stage: e.target.value })}>
@@ -371,7 +371,7 @@ export default function RequirementsPage({ active = true }: { active?: boolean }
         </Grid2>
 
         <Field label="یادداشت">
-            <Textarea placeholder="توضیحات اختیاری" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+            <Textarea placeholder="توضیحات" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
           </Field>
 
         <ErrorBox>{err}</ErrorBox>

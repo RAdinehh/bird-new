@@ -126,7 +126,7 @@ export default function ManualEventCard({ event, onChanged }: Props) {
         footer={<BtnRow><Btn variant="primary" onClick={handleSave}>ذخیره</Btn><Btn onClick={() => setEditOpen(false)}>لغو</Btn></BtnRow>}
       >
         <Field label="عنوان" required>
-          <Input placeholder="عنوان رویداد" value={title} onChange={e => setTitle(e.target.value)} />
+          <Input placeholder="عنوان" value={title} onChange={e => setTitle(e.target.value)} />
         </Field>
         <Grid2>
           <Field label="تاریخ" required>
@@ -142,7 +142,7 @@ export default function ManualEventCard({ event, onChanged }: Props) {
           </Select>
         </Field>
         <Field label="یادداشت">
-            <Textarea placeholder="توضیحات اختیاری" value={notes} onChange={e => setNotes(e.target.value)} />
+            <Textarea placeholder="توضیحات" value={notes} onChange={e => setNotes(e.target.value)} />
           </Field>
       </Modal>
 

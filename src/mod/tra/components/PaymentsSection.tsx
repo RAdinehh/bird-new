@@ -281,8 +281,8 @@ export default function PaymentsSection({
                           {p.method === 'check' && (
                             <>
                               <Grid2>
-                                <Field label="شماره چک" error={showError?.('payments.' + idx + '.checkNo')} onTouch={() => markTouched?.('payments.' + idx + '.checkNo')}><Input placeholder="شماره چک" value={p.checkNo} onChange={e => updatePayment(p.id, { checkNo: e.target.value })} dir="ltr" /></Field>
-                                <Field label="بانک" error={showError?.('payments.' + idx + '.bank')} onTouch={() => markTouched?.('payments.' + idx + '.bank')}><Input placeholder="نام بانک" value={p.bank} onChange={e => updatePayment(p.id, { bank: e.target.value })} /></Field>
+                                <Field label="شماره چک" error={showError?.('payments.' + idx + '.checkNo')} onTouch={() => markTouched?.('payments.' + idx + '.checkNo')}><Input placeholder="شماره" value={p.checkNo} onChange={e => updatePayment(p.id, { checkNo: e.target.value })} dir="ltr" /></Field>
+                                <Field label="بانک" error={showError?.('payments.' + idx + '.bank')} onTouch={() => markTouched?.('payments.' + idx + '.bank')}><Input placeholder="بانک" value={p.bank} onChange={e => updatePayment(p.id, { bank: e.target.value })} /></Field>
                               </Grid2>
                               <Grid2>
                                 <Field label="سرسید" error={showError?.('payments.' + idx + '.dueDate')} onTouch={() => markTouched?.('payments.' + idx + '.dueDate')}><DatePicker value={p.dueDate} onChange={v => updatePayment(p.id, { dueDate: v })}  autoToday /></Field>

@@ -158,7 +158,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
             <Input placeholder={getPlaceholderForType(form.type)} value={form.name} onChange={e => { onErrorClear?.(); setForm({...form, name: e.target.value}); }} />
           </Field>
           <Field label="برند">
-            <Input placeholder="نام برند" value={form.brand || ''} onChange={e => setForm({...form, brand: e.target.value})} />
+            <Input placeholder="برند" value={form.brand || ''} onChange={e => setForm({...form, brand: e.target.value})} />
           </Field>
         </Grid2>
 

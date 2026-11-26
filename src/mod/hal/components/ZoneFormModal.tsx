@@ -117,7 +117,7 @@ export default function ZoneFormModal({
 
       <Field label="یادداشت">
         <Textarea
-          placeholder="توضیحات اختیاری"
+          placeholder="توضیحات"
           value={form.notes}
           onChange={e => setForm({ ...form, notes: e.target.value })}
         />

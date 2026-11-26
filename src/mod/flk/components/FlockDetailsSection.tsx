@@ -132,7 +132,7 @@ export default function FlockDetailsSection({ form, setForm, showError, markTouc
 
       <div style={dividerStyle}>📝 یادداشت</div>
       <Field label="یادداشت">
-        <Textarea placeholder="توضیحات اختیاری" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+        <Textarea placeholder="توضیحات" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
       </Field>
     </>
   );

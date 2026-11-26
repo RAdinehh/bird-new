@@ -86,7 +86,7 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
             </Field>
           )}
           <Grid2>
-            <Field label="نام" required><Input placeholder="نام و نام خانوادگی" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
+            <Field label="نام" required><Input placeholder="نام" value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></Field>
             <Field label="تلفن"><PhoneField placeholder="۰۹..." value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} /></Field>
             {(form.roles || []).includes('customer') && (
               <Field label="سقف اعتبار (تومان)" hint="خالی = بدون سقف">
@@ -126,8 +126,8 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
             )}
           </Grid2>
           <Grid2>
-            <Field label="کد ملی"><DigitField maxLength={10} placeholder="کد ملی ۱۰ رقمی" value={form.nationalId} onChange={e => setForm({...form, nationalId: e.target.value})} /></Field>
-            <Field label="آدرس"><Input placeholder="آدرس کامل" value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
+            <Field label="کد ملی"><DigitField maxLength={10} placeholder="کد ملی" value={form.nationalId} onChange={e => setForm({...form, nationalId: e.target.value})} /></Field>
+            <Field label="آدرس"><Input placeholder="آدرس" value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></Field>
           </Grid2>
 
           <Field label="جنسیت" hint="برای پیام‌های محترمانه (یادآوری، صورت‌حساب)">
@@ -233,7 +233,7 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
                 dir="ltr"
                 inputMode="tel"
                 maxLength={20}
-                placeholder="شماره حساب"
+                placeholder="شماره"
                 value={form.bankAccount?.accountNumber || ''}
                 onChange={e => {
                   const v = toEn(e.target.value).replace(/\D/g, '').slice(0, 20);
@@ -253,7 +253,7 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
                 dir="ltr"
                 inputMode="tel"
                 maxLength={16}
-                placeholder="شماره کارت ۱۶ رقمی"
+                placeholder="شماره"
                 value={form.bankAccount?.cardNumber || ''}
                 onChange={e => {
                   const v = toEn(e.target.value).replace(/\D/g, '').slice(0, 16);
@@ -284,7 +284,7 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
             <Input
               dir="ltr"
               maxLength={26}
-              placeholder="شماره شبا"
+              placeholder="شبا"
               value={form.bankAccount?.shaba || ''}
               onChange={e => {
                 const raw = toEn(e.target.value).toUpperCase();
@@ -302,7 +302,7 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
           </Field>
 
           <Field label="یادداشت">
-            <Textarea placeholder="توضیحات اختیاری" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
+            <Textarea placeholder="توضیحات" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
           </Field>
           <ErrorBox>{err}</ErrorBox>
         </Modal>

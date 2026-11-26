@@ -44,7 +44,7 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
       >
         <Grid2>
           <Field label="نام قلم" required error={showError?.('name')} onTouch={() => markTouched?.('name')}>
-            <Input placeholder="نام کالا" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+            <Input placeholder="نام" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
           </Field>
           <Field label="تأمین‌کننده" hint="فقط فروشنده‌ها">
             <SmartSelect
@@ -95,7 +95,7 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
               <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: 6, paddingBottom: 8, borderBottom: '1px dashed var(--border)' }}>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   <div style={{ flex: 1 }}>
-                    <Input placeholder="نام واحد فرعی" value={su.name} onChange={e => {
+                    <Input placeholder="نام" value={su.name} onChange={e => {
                       const newSubs = (form.subUnits || []).map((s: any, i: number) => i === idx ? { ...s, name: e.target.value } : s);
                       setForm({ ...form, subUnits: newSubs });
                     }} />
@@ -264,7 +264,7 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
                 </Select>
               </Field>
               <Field label="برند">
-                <Input value={form.brand || ''} onChange={e => setForm({ ...form, brand: e.target.value })} placeholder="نام برند" />
+                <Input value={form.brand || ''} onChange={e => setForm({ ...form, brand: e.target.value })} placeholder="برند" />
               </Field>
             </Grid2>
             <Grid2>
@@ -362,7 +362,7 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
         )}
 
         <Field label="یادداشت" error={showError?.('notes')} onTouch={() => markTouched?.('notes')}>
-            <Textarea placeholder="توضیحات اختیاری" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+            <Textarea placeholder="توضیحات" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
           </Field>
 
         {err && <ErrorBox>{err}</ErrorBox>}

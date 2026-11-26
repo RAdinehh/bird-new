@@ -42,7 +42,7 @@ export default function IngredientFormModal(props: Props) {
         )}
 
         <Field label="نام ماده" required>
-          <Input placeholder="نام ماده اولیه" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+          <Input placeholder="نام" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
         </Field>
 
         <Grid2>
@@ -98,7 +98,7 @@ export default function IngredientFormModal(props: Props) {
         </Field>
 
         <Field label="یادداشت">
-            <Textarea placeholder="توضیحات اختیاری" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+            <Textarea placeholder="توضیحات" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
           </Field>
 
         <ErrorBox>{err}</ErrorBox>

@@ -369,7 +369,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
               />
             </div>
             <Field label="طبقات (Tray)">
-              <Input placeholder="شماره شانه‌ها" dir="ltr" value={currentRow.trayNumbers} onChange={e => setCurrentRow(f => ({ ...f, trayNumbers: e.target.value }))} />
+              <Input placeholder="شماره" dir="ltr" value={currentRow.trayNumbers} onChange={e => setCurrentRow(f => ({ ...f, trayNumbers: e.target.value }))} />
             </Field>
           </Grid2>
           <Grid2>
@@ -434,7 +434,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
         )}
 
         <Field label="یادداشت">
-          <Textarea placeholder="توضیحات اختیاری" value={currentRow.notes} onChange={e => setCurrentRow(f => ({ ...f, notes: e.target.value }))} />
+          <Textarea placeholder="توضیحات" value={currentRow.notes} onChange={e => setCurrentRow(f => ({ ...f, notes: e.target.value }))} />
         </Field>
 
         <div style={{ display: 'flex', gap: 6 }}>

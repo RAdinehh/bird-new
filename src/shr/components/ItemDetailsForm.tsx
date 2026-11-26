@@ -201,10 +201,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         placeholder={
           category === 'feed' ? 'ذرت، سویا، کنجاله' :
           category === 'medicine' ? 'آنتی‌بیوتیک، ویتامین' :
-          category === 'herbal' ? 'آویشن، پودر سیر' :
+          category === 'herbal' ? 'نام' :
           category === 'vaccine' ? 'نیوکاسل، برونشیت' :
           category === 'equipment' ? 'آبخوری نیپل، هیتر گازی' :
-          category === 'chick' ? 'جوجه گوشتی راس' :
+          category === 'chick' ? 'نام' :
           category === 'egg' || category === 'fertile_egg' ? 'تخم نطفه‌دار' :
           category === 'adult' ? 'مرغ مادر' :
           category === 'manure' ? 'کود مرغی' :
@@ -717,10 +717,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* ردیف ۳: برند + شماره بچ */}
         <Grid2>
           <Field label="برند / سازنده">
-            <Input value={String(item.brand || '')} onChange={e => updateItem({ brand: e.target.value })} placeholder="نام برند" />
+            <Input value={String(item.brand || '')} onChange={e => updateItem({ brand: e.target.value })} placeholder="برند" />
           </Field>
           <Field label="شماره بچ (اختیاری)" hint="اگر خالی بماند، خودکار ساخته می‌شود">
-            <Input value={String(item.batchNo || '')} onChange={e => updateItem({ batchNo: e.target.value })} placeholder="شماره بچ" />
+            <Input value={String(item.batchNo || '')} onChange={e => updateItem({ batchNo: e.target.value })} placeholder="شماره" />
           </Field>
         </Grid2>
 
@@ -956,10 +956,10 @@ if (category === 'vaccine' || category === 'herbal') {
           <>
             <Grid2>
               <Field label="شناسه قبض (اختیاری)">
-                <Input value={String(item.billId || '')} onChange={e => updateItem({ billId: e.target.value })} placeholder="شناسه قبض" />
+                <Input value={String(item.billId || '')} onChange={e => updateItem({ billId: e.target.value })} placeholder="شناسه" />
               </Field>
               <Field label="شناسه پرداخت (اختیاری)">
-                <Input value={String(item.paymentId || '')} onChange={e => updateItem({ paymentId: e.target.value })} placeholder="شناسه پرداخت" />
+                <Input value={String(item.paymentId || '')} onChange={e => updateItem({ paymentId: e.target.value })} placeholder="شناسه" />
               </Field>
             </Grid2>
             <Grid2>
@@ -967,7 +967,7 @@ if (category === 'vaccine' || category === 'herbal') {
                 <Input value={String(item.subscriptionNo || '')} onChange={e => updateItem({ subscriptionNo: e.target.value })} placeholder="اختیاری" />
               </Field>
               <Field label="دوره قبض (اختیاری)">
-                <Input value={String(item.periodLabel || '')} onChange={e => updateItem({ periodLabel: e.target.value })} placeholder="نام دوره" />
+                <Input value={String(item.periodLabel || '')} onChange={e => updateItem({ periodLabel: e.target.value })} placeholder="دوره" />
               </Field>
             </Grid2>
           </>

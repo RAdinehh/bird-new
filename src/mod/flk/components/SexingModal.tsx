@@ -250,7 +250,7 @@ export default function SexingModal({ open, onClose, flock }: Props) {
       </Field>
 
       <Field label="یادداشت (اختیاری)">
-        <Input value={note} onChange={e => setNote(e.target.value)} placeholder="توضیحات اختیاری" />
+        <Input value={note} onChange={e => setNote(e.target.value)} placeholder="توضیحات" />
       </Field>
 
       <div style={{

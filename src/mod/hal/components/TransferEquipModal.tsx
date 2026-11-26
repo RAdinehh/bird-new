@@ -143,7 +143,7 @@ export default function TransferEquipModal({ open, onClose, equipment, halls, zo
           <Input
             value={note}
             onChange={e => setNote(e.target.value)}
-            placeholder="توضیحات اختیاری"
+            placeholder="توضیحات"
           />
         </Field>
       </div>

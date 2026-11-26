@@ -156,11 +156,11 @@ export default function InvoicePayModal({ open, onClose, invoice }: Props) {
         <>
           <Grid2>
             <Field label="شماره چک" required error={showError('checkNo')} onTouch={() => markTouched('checkNo')}>
-              <input value={checkNo} onChange={e => setCheckNo(e.target.value)} placeholder="شماره چک"
+              <input value={checkNo} onChange={e => setCheckNo(e.target.value)} placeholder="شماره"
                 style={{ width: '100%', padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)', fontFamily: 'inherit', boxSizing: 'border-box' }} />
             </Field>
             <Field label="بانک">
-              <input value={bank} onChange={e => setBank(e.target.value)} placeholder="نام بانک"
+              <input value={bank} onChange={e => setBank(e.target.value)} placeholder="بانک"
                 style={{ width: '100%', padding: 'var(--pad-normal)', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)', fontFamily: 'inherit', boxSizing: 'border-box' }} />
             </Field>
           </Grid2>
@@ -171,7 +171,7 @@ export default function InvoicePayModal({ open, onClose, invoice }: Props) {
       )}
 
       <Field label="توضیحات">
-        <Textarea placeholder="توضیحات اختیاری" value={notes} onChange={e => setNotes(e.target.value)} />
+        <Textarea placeholder="توضیحات" value={notes} onChange={e => setNotes(e.target.value)} />
       </Field>
 
       <BtnRow>

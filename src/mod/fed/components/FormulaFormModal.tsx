@@ -47,7 +47,7 @@ export default function FormulaFormModal(props: Props) {
     footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
    >
     <Field label="نام جیره" required>
-     <Input placeholder="نام جیره" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+     <Input placeholder="نام" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
     </Field>
 
     <Grid2>
@@ -181,7 +181,7 @@ export default function FormulaFormModal(props: Props) {
     </Select>
 
     <Field label="یادداشت">
-      <Textarea placeholder="توضیحات اختیاری" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+      <Textarea placeholder="توضیحات" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
      </Field>
 
     <ErrorBox>{err}</ErrorBox>

@@ -149,7 +149,7 @@ export default function FlocksModal(props: FlocksModalProps) {
       <Grid2>
   <Field label="نام گله" required error={showError('name')} onTouch={() => markTouched('name')}>
     <Input
-      placeholder="نام گله"
+      placeholder="نام"
       value={form.name}
       onChange={e => setForm({ ...form, name: e.target.value })}
     />
@@ -223,7 +223,7 @@ export default function FlocksModal(props: FlocksModalProps) {
             <Input
               value={form.breedLabel || ''}
               onChange={e => !isSourceLinked && setForm(f => ({ ...f, breedLabel: e.target.value }))}
-              placeholder="نام نژاد"
+              placeholder="نژاد"
             disabled={isSourceLinked && !!form.breedId}
             />
           ) : (

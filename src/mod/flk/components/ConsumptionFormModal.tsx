@@ -136,7 +136,7 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
         <Textarea
           value={notes}
           onChange={e => setNotes(e.target.value)}
-          placeholder="توضیحات اختیاری"
+          placeholder="توضیحات"
           rows={2}
         />
       </Field>

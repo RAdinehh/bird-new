@@ -44,7 +44,7 @@ export default function DeviceFormModal(props: DeviceFormModalProps) {
             : undefined
         }>
           <Input
-            placeholder="نام یا شماره دستگاه"
+            placeholder="نام"
             value={form.name}
             onChange={e => setForm({...form, name: e.target.value})}
             error={form.name && devices.some(x => x.id !== form.id && x.name.trim() === form.name.trim()) ? ' ' : undefined}
@@ -158,7 +158,7 @@ export default function DeviceFormModal(props: DeviceFormModalProps) {
         )}
 
         <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📝</span> یادداشت</SectionTitle>
-        <Input placeholder="توضیحات اختیاری" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
+        <Input placeholder="توضیحات" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
 
         <ErrorBox>{err}</ErrorBox>
       </Modal>

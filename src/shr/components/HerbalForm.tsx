@@ -40,7 +40,7 @@ export default function HerbalForm({ item, updateItem }: { item: any; updateItem
       </div>
 
       <Field label="نام دوا" required>
-        <Input value={h.name} onChange={e => setH({ name: e.target.value })} placeholder="نام گیاه دارویی" />
+        <Input value={h.name} onChange={e => setH({ name: e.target.value })} placeholder="نام" />
       </Field>
 
       <Grid2>
@@ -66,7 +66,7 @@ export default function HerbalForm({ item, updateItem }: { item: any; updateItem
           <Input
             value={h.customForm || ''}
             onChange={e => setH({ customForm: e.target.value })}
-            placeholder="ترکیبات مؤثر"
+            placeholder="ترکیبات"
           />
         </Field>
       )}
