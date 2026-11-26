@@ -148,7 +148,7 @@ export default function AppearanceTab() {
                 color: i === 0 ? 'var(--accent)' : 'var(--dim)',
                 fontWeight: i === 0 ? 600 : 400
               }}>
-                <span style={{ fontSize: 'var(--fs-md)' }}>{m ? m.icon : '❓'}</span>
+                <span style={{ fontSize: 'var(--fs-md)' }}>{m ? m.icon : undefined}</span>
                 <span style={{ fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
                   {m ? m.name : '—'}
                 </span>

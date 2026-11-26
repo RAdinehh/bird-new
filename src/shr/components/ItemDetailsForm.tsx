@@ -227,8 +227,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 value={String(item.source || 'flock')}
                 modalTitle="انتخاب منبع جوجه"
                 options={[
-                  { value: 'flock', label: '🐔 از گله موجود' },
-                  { value: 'hatch', label: '🥚 از هچری' },
+                  { value: 'flock', label: 'از گله موجود' },
+                  { value: 'hatch', label: 'از هچری' },
                 ]}
                 onChange={v => {
                   const ns = v as 'flock' | 'hatch';

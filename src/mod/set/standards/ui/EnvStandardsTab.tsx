@@ -174,7 +174,7 @@ export default function EnvStandardsTab() {
       // species جدید — با kind یکتا
       const slug = birdName.trim().toLowerCase().replace(/\s+/g, '-');
       finalKind = 'custom-' + slug + '-' + Date.now().toString(36);
-      addSpecies({ kind: finalKind, nameFa: birdName.trim(), icon: '🐦' });
+      addSpecies({ kind: finalKind, nameFa: birdName.trim(), icon: undefined });
     } else {
       finalKind = detectedKind;
     }

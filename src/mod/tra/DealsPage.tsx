@@ -73,7 +73,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
         const typeLabel = f.type === 'layer' ? 'تخم‌گذار' : f.type === 'broiler' ? 'گوشتی' : 'مادر';
         return {
           available: computeGoodsCap(g, form.id || 'new', deals, Number(f.currentCount || 0), form.id ? undefined : form.goods),
-          label: 'گله ' + f.name,
+          label: 'گله' + f.name,
           rows: [
             ['نوع', typeLabel],
             ['سن', `${getGlobalFormat().day(age)} روز`],
@@ -88,7 +88,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       if (h) {
         return {
           available: computeGoodsCap(g, form.id || 'new', deals, Number(h.hatched || 0), form.id ? undefined : form.goods),
-          label: 'هچ ' + h.date,
+          label: 'هچ' + h.date,
           rows: [
             ['تاریخ هچ', getGlobalFormat().date(h.date)],
             ['هچ موفق', `${getGlobalFormat().count(h.hatched || 0)} جوجه`],
@@ -102,7 +102,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       if (it) {
         return {
           available: Number(it.currentStock || 0),
-          label: 'انبار ' + it.name,
+          label: 'انبار' + it.name,
           rows: [
             ['واحد', resolveUnitLabel(it.unit) || it.unit],
             ['قیمت آخرین', (it.lastPrice || 0) > 0 ? getGlobalFormat().money(Number(it.lastPrice)) : '—'],
@@ -115,7 +115,7 @@ export default function DealsPage({ active = true }: { active?: boolean } = {}) 
       if (it) {
         return {
           available: Number(it.currentStock || 0),
-          label: 'انبار ' + it.name,
+          label: 'انبار' + it.name,
           rows: [
             ['واحد', resolveUnitLabel(it.unit) || it.unit],
           ] as Array<[string, string]>,

@@ -185,7 +185,7 @@ export default function FlockTabPanel({
     },
     ...(tab !== 'archived' ? { onCustomAction: {
       label: 'ادغام',
-      icon: '🔗',
+      icon: undefined,
       action: (ids) => {
         const active = ids.filter(id => {
           const f = flocks.find(x => x.id === id);
@@ -203,7 +203,7 @@ export default function FlockTabPanel({
       {
         key: 'vaccine',
         label: 'واکسن',
-        icon: '💉',
+        icon: undefined,
         action: async (ids) => {
           const { showPromptAsync } = await import('../../../cor/store/dialog');
           const note = await showPromptAsync(
@@ -232,7 +232,7 @@ export default function FlockTabPanel({
       {
         key: 'feed',
         label: 'دان',
-        icon: '📦',
+        icon: undefined,
         action: async (ids) => {
           const { showPromptAsync } = await import('../../../cor/store/dialog');
           const note = await showPromptAsync(
@@ -261,7 +261,7 @@ export default function FlockTabPanel({
       {
         key: 'pdf',
         label: 'PDF',
-        icon: '📄',
+        icon: undefined,
         action: (ids) => {
           const selectedFlocks = ids.map(id => flocks.find(f => f.id === id)).filter(Boolean) as Flock[];
           const lines = ['# گزارش گروهی گله‌ها', '', 'تعداد: ' + getGlobalFormat().count(ids.length), ''];

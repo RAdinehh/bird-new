@@ -18,22 +18,22 @@ import { v4 as uuid } from 'uuid';
 import { applyCorrections } from '../api/applyCorrections';
 
 const CORRECTABLE_FIELDS = [
-  { key: 'temperatureMin', label: '🌡 حداقل دما',    unit: '°C' },
-  { key: 'temperatureMax', label: '🌡 حداکثر دما',   unit: '°C' },
-  { key: 'humidityMin',    label: '💧 حداقل رطوبت',  unit: '٪' },
-  { key: 'humidityMax',    label: '💧 حداکثر رطوبت', unit: '٪' },
-  { key: 'feedDelivered',  label: '🌾 دان داده',     unit: 'kg' },
-  { key: 'feedRemaining',  label: '🌾 دان باقی',     unit: 'kg' },
-  { key: 'waterAmount',    label: '💧 آب',           unit: 'L' },
-  { key: 'deathsCount',    label: '💀 تلفات',        unit: '' },
-  { key: 'eatingEggs',     label: '🥚 خوراکی',       unit: 'عدد' },
-  { key: 'fertileEggs',    label: '🌱 نطفه‌دار',     unit: 'عدد' },
-  { key: 'brokenEggs',     label: '💔 شکسته',        unit: 'عدد' },
-  { key: 'otherEggs',      label: '📦 سایر',         unit: 'عدد' },
-  { key: 'feedWaste',      label: '🌾 هدر رفته',     unit: 'kg' },
-  { key: 'waterFillCount', label: '💧 دفعات آب',     unit: 'نوبت' },
-  { key: 'waterFillVolume',label: '💧 حجم هر نوبت',  unit: 'L' },
-  { key: 'weightGender',   label: '⚖️ جنسیت وزن',   unit: '' },
+  { key: 'temperatureMin', label: 'حداقل دما',    unit: '°C' },
+  { key: 'temperatureMax', label: 'حداکثر دما',   unit: '°C' },
+  { key: 'humidityMin',    label: 'حداقل رطوبت',  unit: '٪' },
+  { key: 'humidityMax',    label: 'حداکثر رطوبت', unit: '٪' },
+  { key: 'feedDelivered',  label: 'دان داده',     unit: 'kg' },
+  { key: 'feedRemaining',  label: 'دان باقی',     unit: 'kg' },
+  { key: 'waterAmount',    label: 'آب',           unit: 'L' },
+  { key: 'deathsCount',    label: 'تلفات',        unit: '' },
+  { key: 'eatingEggs',     label: 'خوراکی',       unit: 'عدد' },
+  { key: 'fertileEggs',    label: 'نطفه‌دار',     unit: 'عدد' },
+  { key: 'brokenEggs',     label: 'شکسته',        unit: 'عدد' },
+  { key: 'otherEggs',      label: 'سایر',         unit: 'عدد' },
+  { key: 'feedWaste',      label: 'هدر رفته',     unit: 'kg' },
+  { key: 'waterFillCount', label: 'دفعات آب',     unit: 'نوبت' },
+  { key: 'waterFillVolume',label: 'حجم هر نوبت',  unit: 'L' },
+  { key: 'weightGender',   label: 'جنسیت وزن',   unit: '' },
 ] as const;
 
 const FIELD_GROUPS = [

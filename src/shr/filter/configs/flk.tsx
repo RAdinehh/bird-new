@@ -49,7 +49,7 @@ export function getFlkFlocksConfig(ctx: {
         key: 'ready', label: 'آماده تخم‌گذاری', kind: 'enum',
         icon: <IconChart size={18} />,
         options: [
-          { value: 'ready', label: '✅ آماده' },
+          { value: 'ready', label: 'آماده' },
           { value: 'near',  label: '⏳ نزدیک' },
           { value: 'far',   label: '○ دور' },
         ],
@@ -66,9 +66,9 @@ export function getFlkFlocksConfig(ctx: {
         key: 'type', label: 'نوع گله', kind: 'enum',
         icon: <IconTag size={18} />,
         options: [
-          { value: 'layer', label: '🥚 تخم‌گذار' },
-          { value: 'broiler', label: '🍗 گوشتی' },
-          { value: 'breeder', label: '🧬 مادر' },
+          { value: 'layer', label: 'تخم‌گذار' },
+          { value: 'broiler', label: 'گوشتی' },
+          { value: 'breeder', label: 'مادر' },
         ],
         getValue: (f: Flock) => f.type || '',
         multi: true,

@@ -87,7 +87,6 @@ export const UOM_RULES: Record<string, UOMRule> = {
     units: [
       { value: 'pcs', label: 'عدد',     factor: 1, dimension: 'count' },
       { value: 'kg',  label: 'کیلوگرم', factor: 1, dimension: 'mass' },
-      { value: 'L',   label: 'لیتر',    factor: 1, dimension: 'volume' },
     ],
     default: 'pcs',
   },

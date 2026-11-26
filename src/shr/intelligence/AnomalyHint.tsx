@@ -5,9 +5,9 @@ import type { Warning } from './types';
 import { formatWarning, formatWarningDetail } from './formatWarning';
 
 const TONES = {
-  yellow: { bg: 'var(--warn-soft)', color: 'var(--warn)', icon: '⚠️' },
-  orange: { bg: 'var(--warn-soft)', color: 'var(--warn)', icon: '🟠' },
-  red:    { bg: 'var(--danger-soft)', color: 'var(--danger)', icon: '🔴' },
+  yellow: { bg: 'var(--warn-soft)', color: 'var(--warn)', icon: undefined },
+  orange: { bg: 'var(--warn-soft)', color: 'var(--warn)', icon: undefined },
+  red:    { bg: 'var(--danger-soft)', color: 'var(--danger)', icon: undefined },
 } as const;
 
 export function AnomalyHint({ warning }: { warning: Warning | null }) {

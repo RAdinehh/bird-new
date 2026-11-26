@@ -86,9 +86,9 @@ export default function ArchivePage({ active = true }: Props = {}) {
   };
 
   const segmented: { id: Seg; label: string; count: number }[] = [
-    { id: 'halls', label: '🏭 سالن‌ها', count: archivedHalls.length },
-    { id: 'zones', label: '📦 بخش‌ها', count: archivedZones.length },
-    { id: 'equip', label: '🔧 تجهیزات', count: archivedEquip.length },
+    { id: 'halls', label: 'سالن‌ها', count: archivedHalls.length },
+    { id: 'zones', label: 'بخش‌ها', count: archivedZones.length },
+    { id: 'equip', label: 'تجهیزات', count: archivedEquip.length },
   ];
 
   return (

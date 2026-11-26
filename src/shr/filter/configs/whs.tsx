@@ -84,8 +84,8 @@ export function getWhsMovesConfig(ctx: { items: Item[] }): FilterConfig<Movement
         key: 'type', label: 'نوع', kind: 'enum',
         icon: <IconActivity size={18} />,
         options: [
-          { value: 'in', label: 'ورود', icon: '📥' },
-          { value: 'out', label: 'خروج', icon: '📤' },
+          { value: 'in', label: 'ورود', icon: undefined },
+          { value: 'out', label: 'خروج', icon: undefined },
         ],
         getValue: (m: Movement) => m.type,
       },
@@ -154,10 +154,10 @@ export function getWhsWarningsConfig(): FilterConfig<Item> {
         key: 'warnKind', label: 'نوع هشدار', kind: 'enum',
         icon: <IconActivity size={18} />,
         options: [
-          { value: 'expired', label: 'منقضی', icon: '⛔' },
-          { value: 'critical', label: 'تمام‌شده', icon: '🔴' },
+          { value: 'expired', label: 'منقضی', icon: undefined },
+          { value: 'critical', label: 'تمام‌شده', icon: undefined },
           { value: 'soon', label: 'نزدیک انقضا', icon: '⏰' },
-          { value: 'low', label: 'موجودی کم', icon: '⚠' },
+          { value: 'low', label: 'موجودی کم', icon: undefined },
         ],
         getValue: (it: Item) => {
           const exp = it.expireDate ? expiryWarning(it) : 'ok';

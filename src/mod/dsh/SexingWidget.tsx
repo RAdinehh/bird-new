@@ -33,9 +33,9 @@ export default function SexingWidget({ nav, activeFlocks }: Props) {
   if (stats.total === 0) return null;
 
   const items = [
-    { count: stats.overdue, label: 'گذشته از موعد', color: 'danger' as const, icon: '🔴' },
-    { count: stats.thisWeek, label: 'این هفته', color: 'warn' as const, icon: '🟠' },
-    { count: stats.twoWeeks, label: '۲ هفته آینده', color: 'info' as const, icon: '🟡' },
+    { count: stats.overdue, label: 'گذشته از موعد', color: 'danger' as const, icon: undefined },
+    { count: stats.thisWeek, label: 'این هفته', color: 'warn' as const, icon: undefined },
+    { count: stats.twoWeeks, label: '۲ هفته آینده', color: 'info' as const, icon: undefined },
   ].filter(x => x.count > 0);
 
   return (

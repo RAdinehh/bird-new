@@ -39,7 +39,7 @@ export default function ComparePage() {
       const purchases = chunk.reduce((a, m) => a + purchasesInMonth(invoices, m), 0);
       const eggs = chunk.reduce((a, m) => a + eggsInMonth(productions, m).healthy, 0);
       quarters.push({
-        label: 'دوره ' + (quarters.length + 1),
+        label: 'دوره' + (quarters.length + 1),
         sales, purchases, eggs
       });
     }

@@ -172,8 +172,8 @@ export function getTraInvoicesConfig(ctx: {
         key: 'type', label: 'نوع فاکتور', kind: 'enum',
         icon: <IconTag size={18} />,
         options: [
-          { value: 'purchase', label: '📥 خرید' },
-          { value: 'sale', label: '📤 فروش' },
+          { value: 'purchase', label: 'خرید' },
+          { value: 'sale', label: 'فروش' },
         ],
         getValue: (i: Invoice) => i.type || '',
         multi: true,
@@ -220,8 +220,8 @@ export function getTraInvoicesConfig(ctx: {
         key: 'dispute', label: 'اختلاف', kind: 'enum',
         icon: <IconActivity size={18} />,
         options: [
-          { value: 'open', label: '⚠️ در اختلاف' },
-          { value: 'resolved', label: '✅ حل‌شده' },
+          { value: 'open', label: 'در اختلاف' },
+          { value: 'resolved', label: 'حل‌شده' },
         ],
         getValue: (i: Invoice) => i.disputeStatus || '',
         multi: true,

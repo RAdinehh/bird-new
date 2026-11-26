@@ -167,8 +167,8 @@ export function getHalEquipmentConfig(ctx: {
         key: 'kind', label: 'نوع', kind: 'enum',
         icon: <IconPackage size={18} />,
         options: [
-          { value: 'asset', label: '🏭 دارایی ثابت' },
-          { value: 'consumable', label: '📦 مصرفی' },
+          { value: 'asset', label: 'دارایی ثابت' },
+          { value: 'consumable', label: 'مصرفی' },
         ],
         getValue: (e: Equipment) => kindForType(e.type),
       },

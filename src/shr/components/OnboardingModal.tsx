@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Btn } from './ui';
 
 const TYPES = [
-  { id: 'layer', label: 'تخم‌گذار', icon: '🥚' },
-  { id: 'broiler', label: 'گوشتی', icon: '🍗' },
-  { id: 'breeder', label: 'مادر', icon: '🐣' },
-  { id: 'hatchery', label: 'جوجه‌کشی', icon: '🥚' },
+  { id: 'layer', label: 'تخم‌گذار', icon: undefined },
+  { id: 'broiler', label: 'گوشتی', icon: undefined },
+  { id: 'breeder', label: 'مادر', icon: undefined },
+  { id: 'hatchery', label: 'جوجه‌کشی', icon: undefined },
 ];
 
 export default function OnboardingModal({ onClose, onFinish }: { onClose: () => void; onFinish: (t: string) => void }) {

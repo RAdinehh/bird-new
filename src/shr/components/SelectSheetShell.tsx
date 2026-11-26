@@ -369,12 +369,13 @@ export function SheetGroup({ title, icon, count, children }: GroupProps) {
       flexShrink: 0,
     }}>
       <div style={{
-        display: 'flex', alignItems: 'center', gap: 7,
-        padding: '8px 16px',
-        background: 'color-mix(in srgb, var(--accent) 6%, var(--card-solid))',
-        fontSize: 'var(--fs-xs, 11.5px)', fontWeight: 800,
+        display: 'flex', alignItems: 'center', gap: 8,
+        padding: '10px 16px',
+        minHeight: 38,
+        background: 'color-mix(in srgb, var(--accent) 5%, var(--card-solid))',
+        fontSize: 'var(--fs-sm, 12px)', fontWeight: 700,
         color: 'var(--accent)',
-        borderBottom: '1px solid color-mix(in srgb, var(--accent) 18%, var(--border))',
+        borderBottom: '1px solid color-mix(in srgb, var(--accent) 16%, var(--border))',
       }}>
         {icon && (
           <span style={{
@@ -386,7 +387,7 @@ export function SheetGroup({ title, icon, count, children }: GroupProps) {
         <span style={{ flex: 1 }}>{title}</span>
         {count != null && (
           <span style={{
-            fontSize: 10.5, fontWeight: 700,
+            fontSize: 'var(--fs-xs, 11px)', fontWeight: 600,
             color: 'var(--muted)',
           }}>
             {getGlobalFormat().count(count)} مورد
@@ -436,8 +437,8 @@ export function SheetItem({ icon, equipType, category, title, subtitle, selected
       aria-selected={selected}
       style={{
         display: 'flex', alignItems: 'center', gap: 12,
-        padding: subtitle ? '11px 16px' : '13px 16px',
-        minHeight: 50,
+        padding: subtitle ? '9px 16px' : '11px 16px',
+        minHeight: subtitle ? 46 : 44,
         background: selected ? 'var(--accent-soft, rgba(22, 163, 74, 0.09))' : 'var(--card-solid)',
         border: 'none',
         borderBottom: 'none',
@@ -452,7 +453,7 @@ export function SheetItem({ icon, equipType, category, title, subtitle, selected
     >
       {actions && <span style={{ display: 'flex', gap: 2, flexShrink: 0 }}>{actions}</span>}
       {iconNode}
-      <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 1 }}>
         <span style={{
           fontSize: 'var(--fs-base, 13.5px)',
           fontWeight: selected ? 700 : 500,

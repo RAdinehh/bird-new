@@ -33,10 +33,10 @@ export const EMPTY_BREED_FORM: BreedFormData = {
 };
 
 const PURPOSE_OPTIONS = [
-  { key: 'layer',      label: 'تخم‌گذار', icon: '🥚' },
-  { key: 'breeder',    label: 'مادر',     icon: '🐣' },
-  { key: 'broiler',    label: 'گوشتی',    icon: '🍗' },
-  { key: 'ornamental', label: 'تزئینی',   icon: '🎨' },
+  { key: 'layer',      label: 'تخم‌گذار', icon: undefined },
+  { key: 'breeder',    label: 'مادر',     icon: undefined },
+  { key: 'broiler',    label: 'گوشتی',    icon: undefined },
+  { key: 'ornamental', label: 'تزئینی',   icon: undefined },
 ];
 
 const BreedFormSchema = z.object({
