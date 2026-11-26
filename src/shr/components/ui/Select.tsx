@@ -2,7 +2,7 @@
  * components/ui/Select.tsx — انتخاب‌گر یکپارچه روی SelectSheetShell (بدون منوی بومی اندروید)
  *
  * سازگار با API استاندارد <Select><option ... /></Select>:
- *   - ۱ تا ۴ گزینه → SelectSheetShell با placement="center" (وسط صفحه، بدون هدر اضافه)
+ *   - ۱ تا ۴ گزینه → SelectSheetShell با placement="center" (وسط صفحه)
  *   - ۵ گزینه و بالاتر → SelectSheetShell با placement="bottom" (شیت از پایین)
  */
 import React, { useMemo, useState } from "react";
@@ -16,6 +16,8 @@ interface ParsedOption {
   disabled?: boolean;
   group?: string;
 }
+
+const GENERIC_EMPTY_LABELS = new Set(["— انتخاب —", "— انتخاب کنید —", "انتخاب", "انتخاب کنید"]);
 
 function extractText(node: React.ReactNode): string {
   if (node == null || typeof node === "boolean") return "";
@@ -72,11 +74,20 @@ export function Select({
   const isControlled = value !== undefined;
   const currentVal = String(isControlled ? (value ?? "") : internalVal);
 
-  const options = useMemo(() => parseOptions(children), [children]);
-  const currentOption = options.find((o) => o.value === currentVal) ?? options[0];
+  const rawOptions = useMemo(() => parseOptions(children), [children]);
+  const genericEmpty = useMemo(
+    () => rawOptions.find((o) => o.value === "" && GENERIC_EMPTY_LABELS.has(o.label)),
+    [rawOptions],
+  );
+  const options = useMemo(
+    () => (genericEmpty ? rawOptions.filter((o) => o !== genericEmpty) : rawOptions),
+    [rawOptions, genericEmpty],
+  );
 
+  const currentOption = rawOptions.find((o) => o.value === currentVal) ?? rawOptions[0];
   const isShortList = options.length <= 4;
   const searchable = !isShortList && options.length > 5;
+  const canClear = !required && !!genericEmpty && currentVal !== "";
 
   const filtered = useMemo(() => {
     if (!query.trim()) return options;
@@ -171,8 +182,10 @@ export function Select({
         open={open}
         onClose={handleClose}
         placement={isShortList ? "center" : "bottom"}
+        flush={!hasGroups}
         title={resolvedTitle}
         subtitle={isShortList ? undefined : `${getGlobalFormat().count(options.length)} مورد`}
+        onClear={canClear ? () => handlePick("") : undefined}
         searchable={searchable}
         onSearchClear={() => setQuery("")}
         searchNode={
@@ -185,7 +198,6 @@ export function Select({
       >
         {filtered.length === 0 ? (
           <div style={{ padding: "32px 12px", textAlign: "center", color: "var(--muted)", fontSize: "var(--fs-base)" }}>
-            <div style={{ fontSize: 28, marginBottom: 6, opacity: 0.5 }}>🔍</div>
             <div>چیزی پیدا نشد</div>
           </div>
         ) : hasGroups ? (
@@ -196,26 +208,22 @@ export function Select({
                   key={`${o.value}-${idx}`}
                   title={o.label}
                   selected={currentVal === o.value}
+                  disabled={o.disabled}
                   onClick={() => !o.disabled && handlePick(o.value)}
                 />
               ))}
             </SheetGroup>
           ))
         ) : (
-          <div style={{
-            border: "1px solid var(--border)",
-            borderRadius: "var(--r-lg, 12px)",
-            overflow: "hidden",
-          }}>
-            {filtered.map((o, idx) => (
-              <SheetItem
-                key={`${o.value}-${idx}`}
-                title={o.label}
-                selected={currentVal === o.value}
-                onClick={() => !o.disabled && handlePick(o.value)}
-              />
-            ))}
-          </div>
+          filtered.map((o, idx) => (
+            <SheetItem
+              key={`${o.value}-${idx}`}
+              title={o.label}
+              selected={currentVal === o.value}
+              disabled={o.disabled}
+              onClick={() => !o.disabled && handlePick(o.value)}
+            />
+          ))
         )}
       </SelectSheetShell>
     </>

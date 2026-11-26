@@ -97,12 +97,15 @@ interface Props {
   /** فوتر اختیاری */
   footer?: ReactNode;
   placement?: 'bottom' | 'center';
+  onClear?: () => void;
+  clearLabel?: string;
+  flush?: boolean;
 }
 
 // ═══ کامپوننت اصلی ═══
 export default function SelectSheetShell({
   open, onClose, title, subtitle,
-  onAdd, searchable = false, searchNode, onSearchClear, children, footer, placement = 'bottom',
+  onAdd, searchable = false, searchNode, onSearchClear, children, footer, placement = 'bottom', onClear, clearLabel = 'پاک کردن', flush = false,
 }: Props) {
   const [mounted, setMounted] = useState(false);
   const [animating, setAnimating] = useState(false);
@@ -110,6 +113,15 @@ export default function SelectSheetShell({
   const [showIndicator, setShowIndicator] = useState(false);
   const [dragY, setDragY] = useState(0);
   const bodyRef = useRef<HTMLDivElement>(null);
+  const searchWrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!searchOpen) return;
+    const t = setTimeout(() => {
+      searchWrapRef.current?.querySelector<HTMLInputElement>('input')?.focus();
+    }, 40);
+    return () => clearTimeout(t);
+  }, [searchOpen]);
   const startY = useRef(0);
 
   // باز/بسته
@@ -161,6 +173,8 @@ export default function SelectSheetShell({
       style={{
         position: 'fixed', inset: 0, zIndex: 10000,
         background: 'var(--overlay)',
+        backdropFilter: 'blur(3px)',
+        WebkitBackdropFilter: 'blur(3px)',
         display: 'flex', alignItems: placement === 'center' ? 'center' : 'flex-end', justifyContent: 'center', padding: placement === 'center' ? '0 8px' : 0, boxSizing: 'border-box',
         opacity: animating ? 1 : 0,
         transition: 'opacity .2s ease',
@@ -222,6 +236,11 @@ export default function SelectSheetShell({
             )}
           </div>
           <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+            {onClear && (
+              <button type="button" onClick={onClear} style={BTN_CLEAR}>
+                {clearLabel}
+              </button>
+            )}
             {onAdd && (
               <button type="button" onClick={onAdd} aria-label="افزودن" style={BTN_ADD}>
                 <IconPlus />
@@ -229,7 +248,7 @@ export default function SelectSheetShell({
             )}
             {searchable && (
               <button type="button" onClick={() => setSearchOpen(v => { const next = !v; if (!next) onSearchClear?.(); return next; })}
-                aria-label="جستجو" aria-expanded={searchOpen} style={BTN_BASE}>
+                aria-label="جستجو" aria-expanded={searchOpen} style={searchOpen ? BTN_SEARCH_ACTIVE : BTN_BASE}>
                 <IconSearch />
               </button>
             )}
@@ -241,7 +260,7 @@ export default function SelectSheetShell({
 
         {/* Search row */}
         {searchable && searchOpen && searchNode && (
-          <div style={{
+          <div ref={searchWrapRef} style={{
             padding: '8px 10px',
             borderBottom: '1px solid var(--border)',
             flexShrink: 0,
@@ -252,8 +271,8 @@ export default function SelectSheetShell({
         <div style={{ position: 'relative', flex: 1, display: 'flex', minHeight: 0 }}>
           <ScrollIndicator visible={showIndicator} />
           <div ref={bodyRef} onScroll={checkScroll} style={{
-            padding: 10, overflowY: 'auto', flex: 1,
-            display: 'flex', flexDirection: 'column', gap: 10,
+            padding: flush ? 0 : 10, overflowY: 'auto', flex: 1,
+            display: 'flex', flexDirection: 'column', gap: flush ? 0 : 10,
             overscrollBehavior: 'contain',
             scrollbarWidth: 'thin',
             scrollbarColor: 'var(--scroll-thumb, rgba(142,142,147,.5)) transparent',
@@ -291,6 +310,26 @@ const BTN_ADD: React.CSSProperties = {
   ...BTN_BASE,
   color: 'var(--accent)',
   borderColor: 'var(--accent-border)',
+};
+const BTN_SEARCH_ACTIVE: React.CSSProperties = {
+  ...BTN_BASE,
+  color: 'var(--accent)',
+  borderColor: 'var(--accent)',
+  background: 'var(--accent-soft, rgba(22, 163, 74, 0.08))',
+};
+const BTN_CLEAR: React.CSSProperties = {
+  height: 40,
+  padding: '0 12px',
+  borderRadius: 10,
+  border: '1px solid color-mix(in srgb, var(--danger, #dc2626) 25%, transparent)',
+  background: 'color-mix(in srgb, var(--danger, #dc2626) 8%, transparent)',
+  color: 'var(--danger, #dc2626)',
+  fontFamily: 'inherit',
+  fontSize: 'var(--fs-xs, 11.5px)',
+  fontWeight: 700,
+  cursor: 'pointer',
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  flexShrink: 0,
 };
 
 // ═══ سرگروه ═══
@@ -340,17 +379,18 @@ export function SheetGroup({ title, icon, count, children }: GroupProps) {
 interface ItemProps {
   /** آیکون آماده (ReactNode) */
   icon?: ReactNode;
-  /** 🆕 نوع تجهیز — اگه داده بشه، آیکون از EquipmentIcon میاد */
+  /** نوع تجهیز — اگه داده بشه، آیکون از EquipmentIcon میاد */
   equipType?: string;
-  /** 🆕 دسته — برای رنگ IconBadge */
+  /** دسته — برای رنگ IconBadge */
   category?: string;
   title: string;
+  subtitle?: string;
   selected?: boolean;
+  disabled?: boolean;
   onClick?: () => void;
   actions?: ReactNode;
 }
-export function SheetItem({ icon, equipType, category, title, selected, onClick, actions }: ItemProps) {
-  // آیکون: اگه equipType داده شده، IconBadge + EquipmentIcon
+export function SheetItem({ icon, equipType, category, title, subtitle, selected, disabled, onClick, actions }: ItemProps) {
   const iconNode = equipType ? (
     <IconBadge category={category} size="sm">
       <EquipmentIcon type={equipType} size={16} color="currentColor" />
@@ -368,29 +408,53 @@ export function SheetItem({ icon, equipType, category, title, selected, onClick,
   return (
     <button
       type="button"
+      disabled={disabled}
       onClick={onClick}
       aria-selected={selected}
       style={{
         display: 'flex', alignItems: 'center', gap: 12,
-        padding: '10px 12px', minHeight: 52,
-        background: 'var(--card-solid)',
+        padding: subtitle ? '11px 16px' : '13px 16px',
+        minHeight: 50,
+        background: selected ? 'var(--accent-soft, rgba(22, 163, 74, 0.09))' : 'var(--card-solid)',
         border: 'none',
-        borderBottom: '1px solid var(--border)',
+        borderBottom: '1px solid color-mix(in srgb, var(--border) 60%, transparent)',
         fontFamily: 'inherit',
-        fontSize: 'var(--fs-base, 12.5px)',
         width: '100%', textAlign: 'right',
-        color: 'var(--text)', fontWeight: 600,
-        cursor: 'pointer', position: 'relative',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.45 : 1,
+        position: 'relative',
         flexShrink: 0,
+        transition: 'background .12s ease',
       }}
     >
       {actions && <span style={{ display: 'flex', gap: 2, flexShrink: 0 }}>{actions}</span>}
       {iconNode}
-      <span style={{ flex: 1, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-        {title}
+      <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <span style={{
+          fontSize: 'var(--fs-base, 13.5px)',
+          fontWeight: selected ? 700 : 500,
+          color: selected ? 'var(--accent)' : 'var(--text)',
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        }}>
+          {title}
+        </span>
+        {subtitle && (
+          <span style={{
+            fontSize: 'var(--fs-xs, 11px)',
+            fontWeight: 400,
+            color: 'var(--muted)',
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+          }}>
+            {subtitle}
+          </span>
+        )}
       </span>
       {selected && (
-        <span style={{ color: 'var(--accent)', fontSize: 16, fontWeight: 900, flexShrink: 0 }}>✓</span>
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="var(--accent)" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"
+          style={{ flexShrink: 0 }}>
+          <path d="M20 6 9 17l-5-5" />
+        </svg>
       )}
     </button>
   );

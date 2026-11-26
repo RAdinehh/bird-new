@@ -60,8 +60,7 @@ export default function SmartSelect({
 
   const isShortList = options.length <= autoThreshold;
   const current = options.find(o => o.value === value);
-  const hasEmptyOption = options.some(o => o.value === '');
-  const showClearOption = !required && !!placeholder && !hasEmptyOption;
+  const canClear = !required && !!value;
 
   const filtered = useMemo(() => {
     if (!query.trim()) return options;
@@ -144,8 +143,10 @@ export default function SmartSelect({
         open={open}
         onClose={handleClose}
         placement={isShortList ? 'center' : 'bottom'}
+        flush={!hasGroups}
         title={modalTitle}
         subtitle={isShortList ? undefined : `${getGlobalFormat().count(options.length)} مورد`}
+        onClear={canClear ? () => handlePick('') : undefined}
         searchable={searchable}
         onSearchClear={() => setQuery('')}
         searchNode={
@@ -161,82 +162,62 @@ export default function SmartSelect({
             padding: '32px 12px', textAlign: 'center',
             color: 'var(--muted)', fontSize: 'var(--fs-base)',
           }}>
-            <div style={{ fontSize: 28, marginBottom: 6, opacity: 0.5 }}>🔍</div>
             <div>چیزی پیدا نشد</div>
           </div>
         ) : hasGroups ? (
-          <>
-            {showClearOption && !query.trim() && (
-              <SheetItem
-                title={placeholder}
-                selected={!value}
-                onClick={() => handlePick('')}
-              />
-            )}
-            {groupKeys.map(gKey => (
-              <SheetGroup
-                key={gKey}
-                title={groupLabels[gKey] || gKey}
-                icon={groupIcons[gKey] || undefined}
-                count={grouped[gKey].length}
-              >
-                {grouped[gKey].map(o => (
-                  <SheetItem
-                    key={o.value}
-                    icon={o.icon}
-                    title={o.subtitle ? `${o.label} — ${o.subtitle}` : o.label}
-                    selected={value === o.value}
-                    onClick={() => !o.disabled && handlePick(o.value)}
-                  />
-                ))}
-              </SheetGroup>
-            ))}
-          </>
-        ) : (
-          <>
-            <div style={{
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--r-lg, 12px)',
-              overflow: 'hidden',
-            }}>
-              {showClearOption && !query.trim() && (
-                <SheetItem
-                  title={placeholder}
-                  selected={!value}
-                  onClick={() => handlePick('')}
-                />
-              )}
-              {filtered.slice(0, visibleCount).map(o => (
+          groupKeys.map(gKey => (
+            <SheetGroup
+              key={gKey}
+              title={groupLabels[gKey] || gKey}
+              icon={groupIcons[gKey] || undefined}
+              count={grouped[gKey].length}
+            >
+              {grouped[gKey].map(o => (
                 <SheetItem
                   key={o.value}
-                  icon={o.icon}
-                  title={o.subtitle ? `${o.label} — ${o.subtitle}` : o.label}
+                  title={o.label}
+                  subtitle={o.subtitle}
                   selected={value === o.value}
+                  disabled={o.disabled}
                   onClick={() => !o.disabled && handlePick(o.value)}
                 />
               ))}
-            </div>
+            </SheetGroup>
+          ))
+        ) : (
+          <>
+            {filtered.slice(0, visibleCount).map(o => (
+              <SheetItem
+                key={o.value}
+                title={o.label}
+                subtitle={o.subtitle}
+                selected={value === o.value}
+                disabled={o.disabled}
+                onClick={() => !o.disabled && handlePick(o.value)}
+              />
+            ))}
             {visibleCount < filtered.length && (
-              <button
-                type="button"
-                onClick={() => setVisibleCount(c => c + 10)}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  background: 'var(--input-bg)',
-                  border: '1px dashed var(--border)',
-                  borderRadius: 'var(--r-md)',
-                  color: 'var(--text)',
-                  fontFamily: 'inherit',
-                  fontSize: 'var(--fs-sm)',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  marginTop: 4,
-                }}
-              >
-                + نمایش {getGlobalFormat().count(Math.min(10, filtered.length - visibleCount))} مورد بیشتر
-                ({getGlobalFormat().count(filtered.length - visibleCount)} باقی‌مانده)
-              </button>
+              <div style={{ padding: '10px 16px' }}>
+                <button
+                  type="button"
+                  onClick={() => setVisibleCount(c => c + 10)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    background: 'var(--input-bg)',
+                    border: '1px dashed var(--border)',
+                    borderRadius: 'var(--r-md)',
+                    color: 'var(--text)',
+                    fontFamily: 'inherit',
+                    fontSize: 'var(--fs-sm)',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  + نمایش {getGlobalFormat().count(Math.min(10, filtered.length - visibleCount))} مورد بیشتر
+                  ({getGlobalFormat().count(filtered.length - visibleCount)} باقی‌مانده)
+                </button>
+              </div>
             )}
           </>
         )}
