@@ -1,5 +1,5 @@
 /** components/ui/Input.tsx */
-import { getGlobalFormat } from '../../units/useFormat';
+import { getGlobalFormat, useFormat } from '../../units/useFormat';
 
 import React, { useRef, useEffect, useState } from 'react';
 import { formatNumWhileTyping, numberToWords, parseFaNum, toFa } from '../../utils/fa';
@@ -25,7 +25,8 @@ export function Input({ unit, error, warn, mode = 'text', showWords, min, max, a
   const [localValue, setLocalValue] = React.useState<string>('');
   const parentValueStr = (value === undefined || value === null) ? '' : String(value);
   const rawVal = isEditing ? localValue : parentValueStr;
-  const displayValue = rawVal === '' ? '' : getGlobalFormat().code(rawVal);
+  const fmt = useFormat();
+  const displayValue = rawVal === '' ? '' : fmt.code(rawVal);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let v = e.target.value;

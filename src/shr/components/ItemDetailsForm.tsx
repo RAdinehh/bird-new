@@ -186,7 +186,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         category === 'feed' ? (isPurchase ? 'نام دان (خرید)' : 'نام دان (فروش)') :
         category === 'vaccine' ? (isPurchase ? 'نام واکسن (خرید)' : 'نام واکسن (فروش)') :
         category === 'equipment' ? (isPurchase ? 'نام تجهیز (خرید)' : 'نام تجهیز (فروش)') :
-        category === 'chick' ? (isPurchase ? 'نام جوجه (خرید)' : 'نام جوجه (فروش)') :
+        category === 'chick' ? 'نام جوجه' :
         category === 'egg' || category === 'fertile_egg' ? (isPurchase ? 'نام تخم (خرید)' : 'نام تخم (فروش)') :
         category === 'adult' ? (isPurchase ? 'نام پرنده (خرید)' : 'نام پرنده (فروش)') :
         category === 'manure' ? 'نام کود' :
@@ -204,7 +204,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           category === 'herbal' ? 'آویشن، پودر سیر' :
           category === 'vaccine' ? 'نیوکاسل، برونشیت' :
           category === 'equipment' ? 'آبخوری نیپل، هیتر گازی' :
-          category === 'chick' ? 'جوجه گوشتی راس' :
+          category === 'chick' ? 'مثلاً جوجه گوشتی راس ۳۰۸' :
           category === 'egg' || category === 'fertile_egg' ? 'تخم نطفه‌دار' :
           category === 'adult' ? 'مرغ مادر' :
           category === 'manure' ? 'کود مرغی' :
@@ -220,7 +220,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   // ========== جوجه یک‌روزه ==========
   if (category === 'chick') {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="🧬" title="اطلاعات گله" />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="🐣" title="اطلاعات جوجه یک‌روزه" />
         {!isPurchase && (
           <Grid2>
             <Field label="منبع جوجه" hint="جوجه از گله موجود می‌آید یا از هچری">
@@ -246,7 +246,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 const age = computeAgeFromHatch(h.date);
                 updateItem({ hatchId: v, source: 'hatch', flockId: h.generatedFlockId || '', birdId: f?.birdId || item.birdId, breedId: f?.breedId || item.breedId, ageDays: age, hatchDate: h.date, maleCount: h.maleCount, femaleCount: h.femaleCount, unknownCount: h.unknownCount, description: item.description || `جوجه از هچ ${h.date}` });
                 setHatchOverride(false);
-              }} options={availableHatches.map(h => ({ value: h.id, label: `${h.date} — ${h.hatched} جوجه` }))} placeholder={FIELD_META.hatch.origin.placeholder} modalTitle={FIELD_META.hatch.origin.modalTitle} />
+              }} options={availableHatches.map(h => ({ value: h.id, label: `${getGlobalFormat().date(h.date)} — ${getGlobalFormat().count(h.hatched)} جوجه` }))} placeholder={FIELD_META.hatch.origin.placeholder} modalTitle={FIELD_META.hatch.origin.modalTitle} />
             </Field>
           ) : (
             <Field label="گله مبدأ" required error={err('flockId')} onTouch={touch('flockId')}>
@@ -289,7 +289,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
             })} placeholder="— انتخاب —" modalTitle={FIELD_META.breed.modalTitle} disabled={!!item.existingFlockId || (!isPurchase && !!item.flockId)} />
             {item.birdId && breedsForBird.length === 0 && (
               <div style={{ color: 'var(--warn)', fontSize: 11, marginTop: 4, fontWeight: 600 }}>
-                ⚠️ این پرنده هنوز نژادی ندارد. ابتدا از بخش «پرنده و نژاد» نژادتعریف کنید.
+                ⚠️ برای این پرنده هنوز نژادی ثبت نشده است. ابتدا از بخش «پرنده و نژاد» نژاد تعریف کنید.
               </div>
             )}
           </Field>
@@ -301,11 +301,11 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
           {/* ردیف ۲: تاریخ هچ + سن */}
         <Grid2>
           {isPurchase ? (
-            <Field label="تاریخ هچ" required error={err('hatchDate')} onTouch={touch('hatchDate')} hint={category === 'chick' && (item.ageDays ?? 0) > 14 ? '💡 سن بیش از ۱۴ روز (گله دوره قبل یا نیمچه)' : undefined}>
+            <Field label="تاریخ هچ" required error={err('hatchDate')} onTouch={touch('hatchDate')} hint={category === 'chick' && (item.ageDays ?? 0) > 14 ? '💡 سن بیش از ۱۴ روز است (گله دوره قبل یا نیمچه)' : undefined}>
               <DatePicker value={String(item.hatchDate || '')} onChange={v => {
                 const age = computeAgeFromHatch(v);
                 updateItem({ hatchDate: v, ageDays: age });
-              }} placeholder="1405/07/26" />
+              }} placeholder="۱۴۰۵/۰۷/۲۶" />
             </Field>
           ) : (item.flockId || item.hatchId) && !hatchOverride ? (
             <Field label="تاریخ هچ" locked>
@@ -316,7 +316,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               <DatePicker value={String(item.hatchDate || '')} onChange={v => {
                 const age = computeAgeFromHatch(v);
                 updateItem({ hatchDate: v, ageDays: age });
-              }} placeholder="1405/07/26" />
+              }} placeholder="۱۴۰۵/۰۷/۲۶" />
             </Field>
           )}
           {!isPurchase && (item.flockId || item.hatchId) && !hatchOverride ? (
@@ -324,7 +324,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               <LockedValue value={item.ageDays != null && item.ageDays >= 0 ? `${getGlobalFormat().int(item.ageDays)} روز` : '—'} />
             </Field>
           ) : (
-            <Field label="سن (روز)" hint={isPurchase ? "تاریخ هچ خودکار محاسبه می‌شود" : undefined}>
+            <Field label="سن (روز)" hint={isPurchase ? "با وارد کردن سن، تاریخ هچ خودکار محاسبه می‌شود" : undefined}>
               <Input mode="number" value={item.ageDays != null && item.ageDays >= 0 ? String(item.ageDays) : ''} onChange={e => {
                 const rawStr = e.target.value.trim();
                 const parsed = rawStr === '' ? NaN : Math.round(parseFaNum(rawStr));
@@ -337,14 +337,14 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 } else {
                   updateItem({ ageDays: null });
                 }
-              }} unit="روز" min={0} placeholder="مثلاً ۹۰" />
+              }} unit="روز" min={0} placeholder="مثلاً ۱" />
             </Field>
           )}
         </Grid2>
 
         {/* ردیف ۳: منبع (هچ/گله) */}
         {isPurchase && (
-          <Field label="اتصال به گله موجود" hint="اتصال به گله دستی">
+          <Field label="اتصال به گله موجود" hint="اختیاری — در صورت خالی ماندن، گله جدید ساخته می‌شود">
             <SmartSelect value={String(item.existingFlockId || '')} onChange={v => {
                 const f = flocks.find(x => x.id === v);
                 if (f) {
@@ -388,12 +388,12 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
         {/* --- بخش ۳: مقدار --- */}
         <Grid2>
-          <Field label={isPurchase ? "وزن اولیه (گرم)" : "میانگین وزن (گرم)"} hint={isPurchase ? "حداکثر ۱۰۰ گرم" : undefined}>
-            <Input mode="number" value={item.chickWeight != null && item.chickWeight > 0 ? String(item.chickWeight) : ''} onChange={e => {
+          <Field label={isPurchase ? "وزن اولیه (گرم)" : "میانگین وزن (گرم)"} hint={isPurchase ? "بازه استاندارد ۲۰ تا ۱۰۰ گرم" : "میانگین وزن هر قطعه به گرم"}>
+            <Input mode="number" placeholder="مثلاً ۴۲" value={item.chickWeight != null && item.chickWeight > 0 ? toFa(item.chickWeight) : ''} onChange={e => {
               let v = parseFaNum(e.target.value) || null;
               if (isPurchase && v !== null && v > 100) v = 100;
               updateItem({ chickWeight: v });
-            }} unit="g" min={isPurchase ? 20 : 0} max={isPurchase ? 100 : 50000} />
+            }} unit="گرم" min={isPurchase ? 20 : 0} max={isPurchase ? 100 : 50000} />
           </Field>
           {quantityField}
         </Grid2>
@@ -465,7 +465,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               <DatePicker value={String(item.hatchDate || '')} onChange={v => {
                 const age = computeAgeFromHatch(v);
                 updateItem({ hatchDate: v, ageDays: age });
-              }} placeholder="1405/07/26" />
+              }} placeholder="۱۴۰۵/۰۷/۲۶" />
             </Field>
           )}
           {isLocked ? (
@@ -537,7 +537,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* --- بخش ۳: مقدار و فروش --- */}
         <Grid2>
           <Field label="وزن زنده کل (کیلوگرم)" hint="برای محاسبه قیمت">
-            <Input mode="number" value={item.liveWeight != null && item.liveWeight > 0 ? String(item.liveWeight) : ''} onChange={e => updateItem({ liveWeight: parseFaNum(e.target.value) || null })} unit="kg" min={0} placeholder="مثلاً ۱۲۰۰" />
+            <Input mode="number" value={item.liveWeight != null && item.liveWeight > 0 ? String(item.liveWeight) : ''} onChange={e => updateItem({ liveWeight: parseFaNum(e.target.value) || null })} unit="کیلوگرم" min={0} placeholder="مثلاً ۱٬۲۰۰" />
           </Field>
           <Field label="قیمت بر حسب">
             <SmartSelect

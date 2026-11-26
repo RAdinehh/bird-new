@@ -198,7 +198,7 @@ export default function DatePicker({
     return fmt.raw.digits(String(yr), fmt.units.numberFormat);
   };
 
-  const displayTriggerText = value ? fmt.date(value) : placeholder;
+  const displayTriggerText = value ? fmt.date(value) : fmt.raw.digits(placeholder, fmt.units.numberFormat);
 
   return (
     <>
