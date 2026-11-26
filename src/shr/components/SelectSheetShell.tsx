@@ -173,8 +173,6 @@ export default function SelectSheetShell({
       style={{
         position: 'fixed', inset: 0, zIndex: 10000,
         background: 'var(--overlay)',
-        backdropFilter: 'blur(3px)',
-        WebkitBackdropFilter: 'blur(3px)',
         display: 'flex', alignItems: placement === 'center' ? 'center' : 'flex-end', justifyContent: 'center', padding: placement === 'center' ? '0 8px' : 0, boxSizing: 'border-box',
         opacity: animating ? 1 : 0,
         transition: 'opacity .2s ease',

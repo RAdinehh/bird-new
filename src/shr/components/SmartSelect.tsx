@@ -3,7 +3,7 @@
  *
  * هر دو حالت از یک پوسته واحد (SelectSheetShell) استفاده می‌کنند:
  *   - ۱ تا ۴ گزینه (options.length <= autoThreshold) → placement="center" (وسط صفحه)
- *   - ۵ گزینه و بالاتر → placement="bottom" (شیت از پایین)
+ *   - ۵ گزینه و بالاتر → placement="bottom" (شیت از پایین با اسکرول روان)
  */
 import { useState, useMemo } from 'react';
 import { Input } from './ui';
@@ -52,7 +52,6 @@ export default function SmartSelect({
 }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const [visibleCount, setVisibleCount] = useState(10);
 
   const borderColor = error ? 'var(--danger)' : warn ? 'var(--warn)' : 'var(--border)';
   const height = customHeight ?? (compact ? 32 : 38);
@@ -88,7 +87,6 @@ export default function SmartSelect({
   const handleClose = () => {
     setOpen(false);
     setQuery('');
-    setVisibleCount(10);
   };
 
   const handlePick = (val: string) => {
@@ -101,7 +99,7 @@ export default function SmartSelect({
       <button
         type="button"
         disabled={disabled}
-        onClick={() => { if (disabled) return; setOpen(true); setQuery(''); setVisibleCount(10); }}
+        onClick={() => { if (disabled) return; setOpen(true); setQuery(''); }}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={required ? `${placeholder} (اجباری)` : placeholder}
@@ -153,7 +151,7 @@ export default function SmartSelect({
           <Input
             placeholder="جستجو..."
             value={query}
-            onChange={e => { const v = e.target.value; setQuery(v); setVisibleCount(v.trim() ? 9999 : 10); }}
+            onChange={e => setQuery(e.target.value)}
           />
         }
       >
@@ -185,41 +183,16 @@ export default function SmartSelect({
             </SheetGroup>
           ))
         ) : (
-          <>
-            {filtered.slice(0, visibleCount).map(o => (
-              <SheetItem
-                key={o.value}
-                title={o.label}
-                subtitle={o.subtitle}
-                selected={value === o.value}
-                disabled={o.disabled}
-                onClick={() => !o.disabled && handlePick(o.value)}
-              />
-            ))}
-            {visibleCount < filtered.length && (
-              <div style={{ padding: '10px 16px' }}>
-                <button
-                  type="button"
-                  onClick={() => setVisibleCount(c => c + 10)}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    background: 'var(--input-bg)',
-                    border: '1px dashed var(--border)',
-                    borderRadius: 'var(--r-md)',
-                    color: 'var(--text)',
-                    fontFamily: 'inherit',
-                    fontSize: 'var(--fs-sm)',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                  }}
-                >
-                  + نمایش {getGlobalFormat().count(Math.min(10, filtered.length - visibleCount))} مورد بیشتر
-                  ({getGlobalFormat().count(filtered.length - visibleCount)} باقی‌مانده)
-                </button>
-              </div>
-            )}
-          </>
+          filtered.map(o => (
+            <SheetItem
+              key={o.value}
+              title={o.label}
+              subtitle={o.subtitle}
+              selected={value === o.value}
+              disabled={o.disabled}
+              onClick={() => !o.disabled && handlePick(o.value)}
+            />
+          ))
         )}
       </SelectSheetShell>
     </div>
