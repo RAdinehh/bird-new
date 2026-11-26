@@ -242,7 +242,7 @@ export default function SelectSheetShell({
         {/* Header RTL */}
         <div style={{
           padding: '12px 16px',
-          borderBottom: '1px solid color-mix(in srgb, var(--border) 50%, transparent)',
+          borderBottom: '1px solid color-mix(in srgb, var(--border) 80%, transparent)',
     display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0,
         }}>
           <div style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>
