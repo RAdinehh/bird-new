@@ -53,33 +53,33 @@ function getRelevantFields(stdData: any, purposes: string[]): Array<{ icon: stri
   // 🥚 layer/breeder
   if (hasLayer) {
     if (stdData.biology?.cullDay) {
-      fields.push({ icon: '⏱', label: 'چرخه', value: `${getGlobalFormat().count(stdData.biology.cullDay)} روز` });
+      fields.push({ icon: '', label: 'چرخه', value: `${getGlobalFormat().count(stdData.biology.cullDay)} روز` });
     }
     if (stdData.biology?.layingStartDay) {
-      fields.push({ icon: '📅', label: 'شروع تخم', value: `روز ${getGlobalFormat().count(stdData.biology.layingStartDay)}` });
+      fields.push({ icon: '', label: 'شروع تخم', value: `روز ${getGlobalFormat().count(stdData.biology.layingStartDay)}` });
     }
     if (stdData.production?.eggsPerYear) {
-      fields.push({ icon: '🥚', label: 'تخم/سال', value: getGlobalFormat().count(stdData.production.eggsPerYear) });
+      fields.push({ icon: '', label: 'تخم/سال', value: getGlobalFormat().count(stdData.production.eggsPerYear) });
     }
     if (stdData.production?.fertilityPct) {
-      fields.push({ icon: '🐣', label: 'باروری', value: `${getGlobalFormat().num(stdData.production.fertilityPct)}٪` });
+      fields.push({ icon: '', label: 'باروری', value: `${getGlobalFormat().num(stdData.production.fertilityPct)}٪` });
     }
   }
 
   // 🍗 broiler
   if (hasBroiler) {
     if (stdData.biology?.cullDay && !hasLayer) {
-      fields.push({ icon: '⏱', label: 'چرخه', value: `${getGlobalFormat().count(stdData.biology.cullDay)} روز` });
+      fields.push({ icon: '', label: 'چرخه', value: `${getGlobalFormat().count(stdData.biology.cullDay)} روز` });
     }
     if (stdData.growth?.finalWeightG) {
-      fields.push({ icon: '⚖️', label: 'وزن بلوغ', value: `${getGlobalFormat().num(stdData.growth.finalWeightG / 1000)} کیلو` });
+      fields.push({ icon: '', label: 'وزن بلوغ', value: `${getGlobalFormat().num(stdData.growth.finalWeightG / 1000)} کیلو` });
     }
     if (stdData.growth?.weightByAge?.length) {
       const last = stdData.growth.weightByAge[stdData.growth.weightByAge.length - 1];
-      if (last?.adgG) fields.push({ icon: '📈', label: 'ADG', value: `${getGlobalFormat().num(last.adgG)} گرم` });
+      if (last?.adgG) fields.push({ icon: '', label: 'ADG', value: `${getGlobalFormat().num(last.adgG)} گرم` });
     }
     if (stdData.mortalityTotalPct) {
-      fields.push({ icon: '💀', label: 'تلفات', value: `${getGlobalFormat().num(stdData.mortalityTotalPct)}٪` });
+      fields.push({ icon: '', label: 'تلفات', value: `${getGlobalFormat().num(stdData.mortalityTotalPct)}٪` });
     }
   }
 
@@ -143,7 +143,7 @@ export default function BreedCard({
  </div>
  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
  {relevantFields.map((f, i) =>(
- <StatRow key={i} label={`${f.icon} ${f.label}`} value={f.value} />
+ <StatRow key={i} label={f.icon ? `${f.icon} ${f.label}` : f.label} value={f.value} />
  ))}
  </div>
  </>
