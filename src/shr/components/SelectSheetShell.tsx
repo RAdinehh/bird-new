@@ -34,20 +34,20 @@ import { IconBadge, EquipmentIcon } from '../icons/equipment';
 
 // ═══ آیکون‌ها ═══
 const IconClose = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
     stroke="currentColor" strokeWidth="2" strokeLinecap="round">
     <path d="M18 6 6 18M6 6l12 12" />
   </svg>
 );
 const IconSearch = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
     stroke="currentColor" strokeWidth="2" strokeLinecap="round">
     <circle cx="11" cy="11" r="8" />
     <path d="m21 21-4.35-4.35" />
   </svg>
 );
 const IconPlus = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
     stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
     <path d="M12 5v14M5 12h14" />
   </svg>
@@ -309,7 +309,7 @@ export default function SelectSheetShell({
 
 // ═══ دکمه‌ها ═══
 const BTN_BASE: React.CSSProperties = {
-  width: 32, height: 32, borderRadius: 'var(--r-md, 8px)',
+  width: 36, height: 36, borderRadius: 'var(--r-md, 9px)',
   border: '1px solid var(--border)',
   background: 'transparent',
   color: 'var(--muted)',
@@ -329,7 +329,7 @@ const BTN_SEARCH_ACTIVE: React.CSSProperties = {
   background: 'var(--accent-soft, rgba(22, 163, 74, 0.08))',
 };
 const BTN_CLEAR: React.CSSProperties = {
-  height: 32,
+  height: 36,
   padding: '0 10px',
   borderRadius: 9,
   border: '1px solid color-mix(in srgb, var(--danger, #dc2626) 22%, transparent)',

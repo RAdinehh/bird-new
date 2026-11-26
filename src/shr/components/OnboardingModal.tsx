@@ -24,7 +24,7 @@ export default function OnboardingModal({ onClose, onFinish }: { onClose: () => 
       <div style={{ background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-2xl)', width: '100%', maxWidth: 420, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid var(--border)' }}>
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700 }}>مرحله {step + 1} از {total}</div>
-          <button onClick={onClose} aria-label="بستن" style={{ width: 32, height: 32, borderRadius: 'var(--r-md)', background: 'var(--btn-bg)', border: '1px solid var(--border)', color: 'var(--muted)', cursor: 'pointer', fontSize: 14, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontFamily: 'inherit' }}>✕</button>
+          <button onClick={onClose} aria-label="بستن" style={{ width: 36, height: 36, borderRadius: 'var(--r-md)', background: 'var(--btn-bg)', border: '1px solid var(--border)', color: 'var(--muted)', cursor: 'pointer', fontSize: 15, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontFamily: 'inherit' }}>✕</button>
         </div>
         <div style={{ padding: '24px 20px', display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center' }}>
           <div style={{ fontSize: 56, width: 100, height: 100, background: 'var(--accent-soft)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{step === 0 ? '👋' : step === 1 ? '🐔' : '✨'}</div>

@@ -89,7 +89,7 @@ export default function PinSetupModal({ open, onClose, onDone }: {
             {step === 'done' && '✅ انجام شد'}
           </div>
           <button onClick={handleClose} aria-label="بستن"
-            style={{ width: 32, height: 32, borderRadius: 'var(--r-md)', background: 'var(--btn-bg)', border: '1px solid var(--border)', color: 'var(--muted)', cursor: 'pointer', fontSize: 14, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontFamily: 'inherit' }}>
+            style={{ width: 36, height: 36, borderRadius: 'var(--r-md)', background: 'var(--btn-bg)', border: '1px solid var(--border)', color: 'var(--muted)', cursor: 'pointer', fontSize: 15, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontFamily: 'inherit' }}>
             ✕
           </button>
         </div>

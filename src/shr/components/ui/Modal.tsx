@@ -318,8 +318,8 @@ export function Modal({
             onClick={onClose}
             aria-label="بستن"
             style={{
-              width: 32,
-              height: 32,
+              width: 36,
+              height: 36,
               borderRadius: 'var(--r-md)',
               background: 'var(--btn-bg)',
               border: '1px solid var(--border)',
