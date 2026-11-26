@@ -24,10 +24,10 @@ export default function VaccineForm({ item, updateItem }: { item: any; updateIte
 
       <Grid2>
         <Field label="نام واکسن" required>
-          <Input value={v.name} onChange={e => setV({ name: e.target.value })} placeholder="مثلاً: نیوکاسل" />
+          <Input value={v.name} onChange={e => setV({ name: e.target.value })} placeholder=": نیوکاسل" />
         </Field>
         <Field label="بیماری هدف">
-          <Input value={v.targetDisease} onChange={e => setV({ targetDisease: e.target.value })} placeholder="مثلاً: Newcastle" />
+          <Input value={v.targetDisease} onChange={e => setV({ targetDisease: e.target.value })} placeholder=": Newcastle" />
         </Field>
       </Grid2>
 

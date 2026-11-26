@@ -241,7 +241,7 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
       <Grid2>
         <Field label="مبلغ کل" required>
           <MoneyField
-            placeholder="مثلاً ۵٬۰۰۰٬۰۰۰"
+            placeholder="۵٬۰۰۰٬۰۰۰"
             value={amount}
             onChange={e => setAmount(e.target.value)}
           />
@@ -262,7 +262,7 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
               <input
                 value={checkNo}
                 onChange={e => setCheckNo(e.target.value)}
-                placeholder="مثلاً ۰۰۱"
+                placeholder="۰۰۱"
                 style={{
                   width: '100%', padding: '10px 12px',
                   background: 'var(--input-bg)', border: '1px solid var(--border)',
@@ -276,7 +276,7 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
               <input
                 value={bank}
                 onChange={e => setBank(e.target.value)}
-                placeholder="مثلاً ملی"
+                placeholder="ملی"
                 style={{
                   width: '100%', padding: '10px 12px',
                   background: 'var(--input-bg)', border: '1px solid var(--border)',

@@ -382,7 +382,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                     quantityField={
                       cat === 'chick' && (UOM_CATEGORIES[cat] || UOM_CATEGORIES.other).units.length === 1 ? (
                         <Field label="تعداد" required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
-                          <NumField placeholder="مثلاً ۱٬۰۰۰" unit="پرنده" value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
+                          <NumField placeholder="تعداد" unit="پرنده" value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
                             let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
                             const max = getQuantityMax(cat);
                             if (max && val > max) val = max;
@@ -420,7 +420,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                             isSingleUnit ? (
                               (cat === 'chick' || cat === 'adult') && isPurchase ? (
                                 <Field label="تعداد سالم" error={showError(`items.${idx}.healthyCount`)} onTouch={() => markTouched(`items.${idx}.healthyCount`)}>
-                                  <NumField placeholder="مثلاً ۹۹۰" unit="پرنده" value={it.healthyCount != null && it.healthyCount > 0 ? fmt.code(String(it.healthyCount)) : ''} onChange={e => { const v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || 0; const clamped = v > 0 ? Math.min(v, it.quantity || 0) : null; updateItem(it.id, { healthyCount: clamped }); }} min={0} />
+                                  <NumField placeholder="تعداد سالم" unit="پرنده" value={it.healthyCount != null && it.healthyCount > 0 ? fmt.code(String(it.healthyCount)) : ''} onChange={e => { const v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || 0; const clamped = v > 0 ? Math.min(v, it.quantity || 0) : null; updateItem(it.id, { healthyCount: clamped }); }} min={0} />
                                 </Field>
                               ) : null
                             ) : (
@@ -501,7 +501,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
       {needsWeight && (
                           <Field label={weightLabel} hint="لازم برای تبدیل به واحد پایه انبار و محاسبه قیمت">
                             <NumField
-                              placeholder="مثلاً ۵۰۰"
+                              placeholder="۵۰۰"
                               value={it.unitWeight != null && it.unitWeight > 0 ? fmt.code(String(it.unitWeight)) : ''}
                               onChange={e => updateItem(it.id, { unitWeight: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })}
                               min={0}
@@ -581,7 +581,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
 
               const shippingField = (
                 <Field label="هزینه حمل این قلم" error={showError(`items.${idx}.shipping`)} onTouch={() => markTouched(`items.${idx}.shipping`)}>
-                  <MoneyField placeholder="مثلاً ۵۰۰٬۰۰۰" value={it.shipping && it.shipping > 0 ? fmt.code(String(it.shipping)) : ''} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫', '.')) || 0 })} min={0} />
+                  <MoneyField placeholder="هزینه حمل" value={it.shipping && it.shipping > 0 ? fmt.code(String(it.shipping)) : ''} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫', '.')) || 0 })} min={0} />
                 </Field>
               );
 

@@ -29,16 +29,16 @@ export default function ChemicalForm({ item, updateItem }: { item: any; updateIt
 
       <Grid2>
         <Field label="نام دارو" required>
-          <Input value={c.name} onChange={e => setC({ name: e.target.value })} placeholder="مثلاً: انروفلوکساسین" />
+          <Input value={c.name} onChange={e => setC({ name: e.target.value })} placeholder=": انروفلوکساسین" />
         </Field>
         <Field label="ماده مؤثره" required>
-          <Input value={c.activeIngredient} onChange={e => setC({ activeIngredient: e.target.value })} placeholder="مثلاً: Enrofloxacin" />
+          <Input value={c.activeIngredient} onChange={e => setC({ activeIngredient: e.target.value })} placeholder=": Enrofloxacin" />
         </Field>
       </Grid2>
 
       <Grid2>
         <Field label="قدرت">
-          <Input value={c.strength} onChange={e => setC({ strength: e.target.value })} placeholder="مثلاً: ۱۰٪" />
+          <Input value={c.strength} onChange={e => setC({ strength: e.target.value })} placeholder=": ۱۰٪" />
         </Field>
         <Field label="شکل دارویی">
           <Select value={c.form} onChange={e => setC({ form: e.target.value })}>

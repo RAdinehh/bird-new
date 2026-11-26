@@ -310,7 +310,7 @@ export default function EditableSelect({
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       <Field label="نام">
         <Input
-          placeholder="مثلاً — آبخوری نیپل استیل"
+          placeholder="— آبخوری نیپل استیل"
           value={formName}
           onChange={e => setFormName(e.target.value)}
         />
