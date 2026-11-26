@@ -340,7 +340,8 @@ export default function EggEntryModal(props: EggEntryModalProps) {
               <SmartSelect value={currentRow.birdId} onChange={v => setCurrentRow(f => ({ ...f, birdId: v, breedId: '' }))} options={birds.map(c => ({ value: c.id, label: c.name }))} placeholder="—" modalTitle="انتخاب پرنده" />
             </Field>
             <Field label="نژاد">
-              <Select value={currentRow.breedId} onChange={e => setCurrentRow(f => ({ ...f, breedId: e.target.value }))}>
+              <Select value={currentRow.breedId}
+                disabled={!currentRow.birdId} onChange={e => setCurrentRow(f => ({ ...f, breedId: e.target.value }))}>
                 <option value="">—</option>
                 {breedsForBird.map(b => {
                   const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };

@@ -94,6 +94,7 @@ export default function FlockCreateModal(props: FlockCreateModalProps) {
         <Field label="بخش">
           <Select
             value={form.zoneId}
+            disabled={!form.hallId}
             onChange={e => setForm({ ...form, zoneId: e.target.value })}
           >
             <option value="">—</option>
