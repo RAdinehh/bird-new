@@ -86,8 +86,8 @@ export const EQUIP_LABELS: Record<string, { name: string; icon: string }> = {
   litter_roll:          { name: 'رول کاغذی', icon: '📜' },
   litter_rice_hull:     { name: 'سبوس برنج', icon: '🌾' },
   litter_straw:         { name: 'کاه و کلش', icon: 'litter_straw' },
-  litter_sand:          { name: 'ماسه', icon: '🏖' },
-  litter_peat:          { name: 'پیت ماس', icon: '🟫' },
+  litter_sand:          { name: 'ماسه', icon: '🪨' },
+  litter_peat:          { name: 'پیت ماس', icon: '🌱' },
   // آب‌رسانی
   water_tank:   { name: 'مخزن آب', icon: 'water_system' },
   water_filter: { name: 'فیلتر آب', icon: '🔵' },
@@ -99,20 +99,20 @@ export const EQUIP_LABELS: Record<string, { name: string; icon: string }> = {
   // توزین
   bird_scale:     { name: 'ترازوی پرنده', icon: 'scale' },
   feed_scale:     { name: 'ترازوی دان', icon: 'scale' },
-  platform_scale: { name: 'باسکول کفه‌ای', icon: '🏗' },
+  platform_scale: { name: 'باسکول کفه‌ای', icon: '⚖️' },
   // شستشو
   pressure_washer: { name: 'واش‌پرس', icon: '💦' },
-  sprayer:         { name: 'سمپاش', icon: '🧴' },
+  sprayer:         { name: 'سمپاش', icon: '🚿' },
   flame_gun:       { name: 'شعله‌افکن', icon: '🔥' },
   // ایمنی
   fire_extinguisher: { name: 'کپسول آتش‌نشانی', icon: '🧯' },
-  smoke_detector:    { name: 'دتکتور دود', icon: '🔔' },
+  smoke_detector:    { name: 'دتکتور دود', icon: '🚨' },
   emergency_light:   { name: 'چراغ اضطراری', icon: '🔦' },
   first_aid:         { name: 'کمک‌های اولیه', icon: '🩹' },
   // ابزار دستی
   wheelbarrow: { name: 'فرغون', icon: '🚛' },
-  shovel:      { name: 'بیل', icon: '🧹' },
-  rake:        { name: 'چنگک', icon: '🪣' },
+  shovel:      { name: 'بیل', icon: '⛏️' },
+  rake:        { name: 'چنگک', icon: '🔱' },
   feed_scoop:  { name: 'پیمانه دان', icon: '🥄' },
   broom:       { name: 'جارو', icon: '🧹' },
   bucket:      { name: 'سطل', icon: '🪣' },

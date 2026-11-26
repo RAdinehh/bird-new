@@ -244,7 +244,7 @@ export default function SelectSheetShell({
         <div style={{
           padding: '12px 16px',
           borderBottom: '1px solid color-mix(in srgb, var(--border) 80%, transparent)',
-    display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0,
+    display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0,
         }}>
           <div style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>
             <div id="sss-title" style={{

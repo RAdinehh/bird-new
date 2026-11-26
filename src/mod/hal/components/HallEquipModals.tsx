@@ -74,7 +74,7 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
         open={!!detailCat}
         onClose={() => setDetailCat(null)}
         title={
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <span style={{
               width: 30, height: 30, borderRadius: 'var(--r-sm)',
               background: 'var(--input-bg)',
