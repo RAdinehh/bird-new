@@ -404,35 +404,29 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                       : `مقدار هر واحد (${uom.baseUnit})`;
                                         return (
                       <>
-                        {isFlatOther ? null : isSingleUnit ? (
-                          <Grid2>
-                                                        
-                                                        {(cat === 'chick' || cat === 'adult') && isPurchase && (
-                                                          <Field label="تعداد سالم" error={showError(`items.${idx}.healthyCount`)} onTouch={() => markTouched(`items.${idx}.healthyCount`)}>
-                                                            <NumField placeholder="تعداد" unit="پرنده" value={it.healthyCount != null && it.healthyCount > 0 ? fmt.code(String(it.healthyCount)) : ''} onChange={e => { const v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || 0; const clamped = v > 0 ? Math.min(v, it.quantity || 0) : null; updateItem(it.id, { healthyCount: clamped }); }} min={0} />
-                                                          </Field>
-                                                        )}
-                          </Grid2>
-                        ) : (
-                          <>
-                                                        <Grid2>
-                              
-                              {uom.units.length > 1 && (
-    <Field label="واحد" error={showError(`items.${idx}.unit`)} onTouch={() => markTouched(`items.${idx}.unit`)}>
-      <SmartSelect
-        value={currentUnit}
-        modalTitle="انتخاب واحد"
-        placeholder={undefined}
-        options={uom.units.map((u: UOMUnit) => ({ value: u.value, label: u.label }))}
-        onChange={val => updateItem(it.id, { unit: val, unitWeight: null, priceUnit: val as any, ...(val === 'flat' ? { quantity: 1 } : {}) })}
-      />
-    </Field>
-  )}
-                            </Grid2>
-                          </>
-                        )}
-                  
-                        {(cat === 'chick' || cat === 'adult') && (() => {
+                        {!isFlatOther && (
+                            isSingleUnit ? (
+                              (cat === 'chick' || cat === 'adult') && isPurchase ? (
+                                <Field label="تعداد سالم" error={showError(`items.${idx}.healthyCount`)} onTouch={() => markTouched(`items.${idx}.healthyCount`)}>
+                                  <NumField placeholder="تعداد" unit="پرنده" value={it.healthyCount != null && it.healthyCount > 0 ? fmt.code(String(it.healthyCount)) : ''} onChange={e => { const v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || 0; const clamped = v > 0 ? Math.min(v, it.quantity || 0) : null; updateItem(it.id, { healthyCount: clamped }); }} min={0} />
+                                </Field>
+                              ) : null
+                            ) : (
+                              uom.units.length > 1 ? (
+                                <Field label="واحد" error={showError(`items.${idx}.unit`)} onTouch={() => markTouched(`items.${idx}.unit`)}>
+                                  <SmartSelect
+                                    value={currentUnit}
+                                    modalTitle="انتخاب واحد"
+                                    placeholder={undefined}
+                                    options={uom.units.map((u: UOMUnit) => ({ value: u.value, label: u.label }))}
+                                    onChange={val => updateItem(it.id, { unit: val, unitWeight: null, priceUnit: val as any, ...(val === 'flat' ? { quantity: 1 } : {}) })}
+                                  />
+                                </Field>
+                              ) : null
+                            )
+                          )}
+
+                          {(cat === 'chick' || cat === 'adult') && (() => {
         const sf = !isPurchase && it.flockId ? flocks.find(x => x.id === it.flockId) : undefined;
         const maxU = sf ? (sf.unknownCount ?? 0) : undefined;
         return (
@@ -531,42 +525,54 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                     updateItem(it.id, { unitPrice: val, quantity: 1 });
                   }} />
                 </Field>
-              ) : (<Grid2>
-            <Grid2>
-  {cat !== 'chick' && (
-                                                        <Field label={cat === 'fertile_egg' ? 'تعداد تخم نطفه‌دار' : (otherCfg?.qtyLabel || "تعداد")} required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
-                              <NumField placeholder={cat === 'fertile_egg' ? 'تعداد تخم نطفه‌دار' : (otherCfg?.qtyLabel || "تعداد")} value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
-                                  let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
-                                  const max = getQuantityMax(cat);
-                                  if (max && val > max) val = max;
-                                  if (val < 0) val = 0;
-                                  updateItem(it.id, { quantity: val });
-                                }} min={0} max={getQuantityMax(cat)} />
-                            </Field>
-                            )}
-  <Field label={`قیمت هر ${activePriceUnitLabel}`} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
-              <MoneyField placeholder={getPricePlaceholder(cat)} value={it.unitPrice > 0 ? fmt.code(String(it.unitPrice)) : ''} onChange={e => {
-                let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
-                if (maxPrice && val > maxPrice) val = maxPrice;
-                if (val < 0) val = 0;
-                updateItem(it.id, { unitPrice: val });
-              }} />
-              {it.unitPrice > 0 && <FieldHint fieldPath={`tra.price_${cat}`} value={it.unitPrice} />}
-            </Field>
-</Grid2>
-            {!hidePriceUnit && priceUnitOptions.length > 1 && (
-<Field label="قیمت بر حسب">
-              <SmartSelect
-                value={effectivePriceUnit}
-                modalTitle="انتخاب مبنای قیمت"
-                placeholder={undefined}
-                options={priceUnitOptions.map((u: UOMUnit) => ({ value: u.value, label: u.label }))}
-                onChange={val => updateItem(it.id, { priceUnit: val as any })}
-              />
-            </Field>
-)}
-          </Grid2>)}
-          {(!otherCfg || otherCfg.showShipping) && (
+              ) : (
+                <>
+                  {cat !== 'chick' ? (
+                    <Grid2>
+                      <Field label={cat === 'fertile_egg' ? 'تعداد تخم نطفه‌دار' : (otherCfg?.qtyLabel || "تعداد")} required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
+                        <NumField placeholder={cat === 'fertile_egg' ? 'تعداد تخم نطفه‌دار' : (otherCfg?.qtyLabel || "تعداد")} value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
+                          let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
+                          const max = getQuantityMax(cat);
+                          if (max && val > max) val = max;
+                          if (val < 0) val = 0;
+                          updateItem(it.id, { quantity: val });
+                        }} min={0} max={getQuantityMax(cat)} />
+                      </Field>
+                      <Field label={`قیمت هر ${activePriceUnitLabel}`} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
+                        <MoneyField placeholder={getPricePlaceholder(cat)} value={it.unitPrice > 0 ? fmt.code(String(it.unitPrice)) : ''} onChange={e => {
+                          let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
+                          if (maxPrice && val > maxPrice) val = maxPrice;
+                          if (val < 0) val = 0;
+                          updateItem(it.id, { unitPrice: val });
+                        }} />
+                        {it.unitPrice > 0 && <FieldHint fieldPath={`tra.price_${cat}`} value={it.unitPrice} />}
+                      </Field>
+                    </Grid2>
+                  ) : (
+                    <Field label={`قیمت هر ${activePriceUnitLabel}`} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
+                      <MoneyField placeholder={getPricePlaceholder(cat)} value={it.unitPrice > 0 ? fmt.code(String(it.unitPrice)) : ''} onChange={e => {
+                        let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
+                        if (maxPrice && val > maxPrice) val = maxPrice;
+                        if (val < 0) val = 0;
+                        updateItem(it.id, { unitPrice: val });
+                      }} />
+                      {it.unitPrice > 0 && <FieldHint fieldPath={`tra.price_${cat}`} value={it.unitPrice} />}
+                    </Field>
+                  )}
+                  {!hidePriceUnit && priceUnitOptions.length > 1 && (
+                    <Field label="قیمت بر حسب">
+                      <SmartSelect
+                        value={effectivePriceUnit}
+                        modalTitle="انتخاب مبنای قیمت"
+                        placeholder={undefined}
+                        options={priceUnitOptions.map((u: UOMUnit) => ({ value: u.value, label: u.label }))}
+                        onChange={val => updateItem(it.id, { priceUnit: val as any })}
+                      />
+                    </Field>
+                  )}
+                </>
+              )}
+              {(!otherCfg || otherCfg.showShipping) && (
 <Field label="هزینه حمل این قلم" error={showError(`items.${idx}.shipping`)} onTouch={() => markTouched(`items.${idx}.shipping`)}>
             <MoneyField placeholder="مبلغ هزینه" value={String(it.shipping || '')} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })} min={0} />
           </Field>
