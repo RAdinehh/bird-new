@@ -145,7 +145,7 @@ export default function SmartSelect({
         onClose={handleClose}
         placement={isShortList ? 'center' : 'bottom'}
         title={modalTitle}
-        subtitle={`${getGlobalFormat().count(options.length)} مورد`}
+        subtitle={isShortList ? undefined : `${getGlobalFormat().count(options.length)} مورد`}
         searchable={searchable}
         onSearchClear={() => setQuery('')}
         searchNode={
@@ -194,7 +194,11 @@ export default function SmartSelect({
           </>
         ) : (
           <>
-            <SheetGroup title="" count={filtered.length}>
+            <div style={{
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--r-lg, 12px)',
+              overflow: 'hidden',
+            }}>
               {showClearOption && !query.trim() && (
                 <SheetItem
                   title={placeholder}
@@ -211,7 +215,7 @@ export default function SmartSelect({
                   onClick={() => !o.disabled && handlePick(o.value)}
                 />
               ))}
-            </SheetGroup>
+            </div>
             {visibleCount < filtered.length && (
               <button
                 type="button"
