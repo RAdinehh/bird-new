@@ -1,4 +1,3 @@
-import { getSmartIconByText } from '../../../shr/icons/AppIcons';
 /**
  * HallsFormModal — فرم افزودن/ویرایش سالن
  */
@@ -222,7 +221,15 @@ export default function HallsFormModal(props: HallsFormModalProps) {
               <SmartSelect
                 value={form.birdId || ''}
                 onChange={v => setForm({...form, birdId: v, breedId: ''})}
-                options={birds.map((b: Bird) => ({ value: b.id, label: b.name, icon: getSmartIconByText(b.name) }))}
+                options={birds.map((b: Bird) => {
+                  const t = `${b.name || ''} ${(b as any).birdKind || ''}`.toLowerCase();
+                  let emoji = '🐔';
+                  if (t.includes('اردک') || t.includes('duck')) emoji = '🦆';
+                  else if (t.includes('بوقلمون') || t.includes('turkey')) emoji = '🦃';
+                  else if (t.includes('بلدرچین') || t.includes('quail')) emoji = '🐦';
+                  else if (t.includes('غاز') || t.includes('goose')) emoji = '🦢';
+                  return { value: b.id, label: b.name, icon: emoji };
+                })}
                 placeholder="— انتخاب —"
                 modalTitle="انتخاب پرنده"
               />
