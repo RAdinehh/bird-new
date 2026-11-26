@@ -14,7 +14,8 @@ export function OptionIcon({ icon, size = 22, color = 'currentColor', style }: O
   if (typeof icon === 'string') {
     const trimmed = icon.trim();
     if (typeof trimmed === 'string' && isValidIconKey(trimmed)) {
-      return <AppIcon name={trimmed} size={size} style={style} />;
+      const scaledSize = Math.round(size * 1.12);
+      return <AppIcon name={trimmed} size={scaledSize} style={style} />;
     }
     return (
       <span

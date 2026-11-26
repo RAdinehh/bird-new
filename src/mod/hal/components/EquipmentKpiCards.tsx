@@ -37,13 +37,13 @@ function KpiCard({ icon, label, value, tone }: KpiCardProps) {
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         <span style={{
-          width: 22, height: 22,
+          width: 24, height: 24,
           borderRadius: 'var(--r-sm)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           background: soft, color,
-          fontSize: 'var(--fs-sm)',
+          overflow: 'hidden',
           flexShrink: 0,
-        }}><OptionIcon icon={icon} size={24} /></span>
+        }}><OptionIcon icon={icon} size={16} /></span>
         <span style={{
           fontSize: 'var(--fs-2xs)',
           opacity: 0.9,
