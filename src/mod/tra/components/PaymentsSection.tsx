@@ -1,4 +1,5 @@
 import { useFormat } from '../../../shr/units/useFormat';
+import { scrollToFocusId } from '../../../shr/utils/scrollToFocusId';
 import React, { useState, useEffect } from 'react';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import {
@@ -39,6 +40,14 @@ export default function PaymentsSection({
   showError, markTouched,
 }: Props) {
   const fmt = useFormat();
+  const prevPaymentsLenRef = React.useRef(form.payments.length);
+  React.useEffect(() => {
+    if (form.payments.length > prevPaymentsLenRef.current && form.payments.length > 0) {
+      const lastPay = form.payments[form.payments.length - 1];
+      if (lastPay?.id) scrollToFocusId(`tra-payment-${lastPay.id}`);
+    }
+    prevPaymentsLenRef.current = form.payments.length;
+  }, [form.payments]);
   return (
     <>
 <SectionTitle><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💳</span> پرداخت و تسویه</SectionTitle>
@@ -222,7 +231,8 @@ export default function PaymentsSection({
                   const isExpanded = expandedPaymentId === p.id;
                   const methodLabel = p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک';
                   return (
-                    <div key={p.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${isExpanded ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', marginBottom: 8 }}>
+                    <div key={p.id}
+                    data-focus-id={`tra-payment-${p.id}`} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${isExpanded ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', marginBottom: 8 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: isExpanded ? 'default' : 'pointer' }} onClick={() => setExpandedPaymentId(isExpanded ? null : p.id)}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                           <span style={{ fontSize: 'var(--fs-base)', fontWeight: 800, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

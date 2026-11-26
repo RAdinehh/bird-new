@@ -2,6 +2,7 @@
  * DealsPage — معاملات خاص
  */
 import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
+import { scrollToFocusId } from '../../shr/utils/scrollToFocusId';
 
 import { useState, useMemo , useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
@@ -1417,7 +1418,8 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
       </div>
 
       {form.payments.map((p, pi) => (
-        <div key={p.id} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div key={p.id}
+        data-focus-id={`tra-deal-payment-${p.id}`} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: 'var(--fs-xs)', color: p.direction === 'in' ? 'var(--accent)' : 'var(--warn)', fontWeight: 700 }}>
               {p.direction === 'in' ? '↑ دریافت' : '↓ پرداخت'} {fmt.count(pi + 1)}
@@ -1498,7 +1500,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                 </Field>
         </div>
       ))}
-      <button type="button" onClick={() => setForm(f => ({ ...f, payments: [...f.payments, { id: crypto.randomUUID(), date: form.date || '', amount: 0, direction: 'in', method: 'cash', notes: '' }] }))} style={{ background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--accent, var(--text))', fontFamily: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', height: 40, padding: 0, boxSizing: 'border-box', fontSize: 'var(--fs-sm)', fontWeight: 600, marginTop: 4 }}>+ {form.payments.length === 0 ? 'افزودن اولین پرداخت' : 'افزودن پرداخت دیگر'}</button>
+      <button type="button" onClick={() => { const newId = crypto.randomUUID(); setForm(f => ({ ...f, payments: [...f.payments, { id: newId, date: form.date || '', amount: 0, direction: 'in', method: 'cash', notes: '' }] })); scrollToFocusId(`tra-deal-payment-${newId}`); }} style={{ background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', color: 'var(--accent, var(--text))', fontFamily: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', height: 40, padding: 0, boxSizing: 'border-box', fontSize: 'var(--fs-sm)', fontWeight: 600, marginTop: 4 }}>+ {form.payments.length === 0 ? 'افزودن اولین پرداخت' : 'افزودن پرداخت دیگر'}</button>
         </>
       )}
 

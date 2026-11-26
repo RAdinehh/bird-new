@@ -1,4 +1,5 @@
 import { FIELD_META } from '../../../shr/constants/fieldMeta';
+import { scrollToFocusId } from '../../../shr/utils/scrollToFocusId';
 /**
  * InvoiceFormModal — فرم ثبت/ویرایش فاکتور (طراحی تمیز و استاندارد)
  */
@@ -108,6 +109,15 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
     save, addItem, updateItem, removeItem,
     addPayment, updatePayment, removePayment,
   } = props;
+
+  const prevItemsLenRef = React.useRef(form.items.length);
+  React.useEffect(() => {
+    if (form.items.length > prevItemsLenRef.current && form.items.length > 0) {
+      const lastItem = form.items[form.items.length - 1];
+      if (lastItem?.id) scrollToFocusId(`tra-item-${lastItem.id}`);
+    }
+    prevItemsLenRef.current = form.items.length;
+  }, [form.items]);
 
   // 🆕 Local showError identity (vErrors prop is already filtered by saveAttempted in parent)
   const showError = (f: string) => vErrors[f];
@@ -297,7 +307,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
           const maxPrice = priceProfile && typeof priceProfile.hardMax === 'number' ? priceProfile.hardMax : undefined;
           
           return (
-            <div key={it.id} style={{ 
+            <div key={it.id}
+              data-focus-id={`tra-item-${it.id}`} style={{ 
               background: 'var(--card-solid)',
               border: `1px solid ${isExpanded ? 'var(--accent)' : 'var(--border)'}`, 
               borderRadius: 'var(--r-md)', 
