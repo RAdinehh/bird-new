@@ -96,12 +96,13 @@ interface Props {
   children: ReactNode;
   /** فوتر اختیاری */
   footer?: ReactNode;
+  placement?: 'bottom' | 'center';
 }
 
 // ═══ کامپوننت اصلی ═══
 export default function SelectSheetShell({
   open, onClose, title, subtitle,
-  onAdd, searchable = false, searchNode, onSearchClear, children, footer,
+  onAdd, searchable = false, searchNode, onSearchClear, children, footer, placement = 'bottom',
 }: Props) {
   const [mounted, setMounted] = useState(false);
   const [animating, setAnimating] = useState(false);
@@ -160,7 +161,7 @@ export default function SelectSheetShell({
       style={{
         position: 'fixed', inset: 0, zIndex: 10000,
         background: 'var(--overlay)',
-        display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+        display: 'flex', alignItems: placement === 'center' ? 'center' : 'flex-end', justifyContent: 'center', padding: placement === 'center' ? '0 8px' : 0, boxSizing: 'border-box',
         opacity: animating ? 1 : 0,
         transition: 'opacity .2s ease',
       }}
@@ -172,17 +173,22 @@ export default function SelectSheetShell({
         onClick={(e) => e.stopPropagation()}
         style={{
           background: 'var(--card-solid)',
-          borderTopLeftRadius: 'var(--r-2xl, 20px)',
-          borderTopRightRadius: 'var(--r-2xl, 20px)',
+          borderRadius: placement === 'center' ? 'var(--r-2xl, 20px)' : 'var(--r-2xl, 20px) var(--r-2xl, 20px) 0 0',
           width: '100%', maxWidth: 540,
-          maxHeight: '70vh',
+          maxHeight: placement === 'center' ? '80vh' : '70vh',
           display: 'flex', flexDirection: 'column',
           overflow: 'hidden',
-          transform: animating ? `translateY(${dragY}px)` : 'translateY(100%)',
-          transition: dragY === 0 ? 'transform .22s cubic-bezier(.16,1,.3,1)' : 'none',
+          boxShadow: placement === 'center' ? '0 16px 40px rgba(0,0,0,0.22)' : undefined,
+          transform: placement === 'center'
+            ? (animating ? 'scale(1)' : 'scale(0.96)')
+            : (animating ? `translateY(${dragY}px)` : 'translateY(100%)'),
+          transition: placement === 'center'
+            ? 'transform .2s cubic-bezier(.16,1,.3,1)'
+            : (dragY === 0 ? 'transform .22s cubic-bezier(.16,1,.3,1)' : 'none'),
         }}
       >
         {/* Drag handle */}
+        {placement !== 'center' && (
         <div
           onTouchStart={onTS}
           onTouchMove={onTM}
@@ -195,6 +201,7 @@ export default function SelectSheetShell({
         >
           <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--border)' }} />
         </div>
+        )}
 
         {/* Header RTL */}
         <div style={{
