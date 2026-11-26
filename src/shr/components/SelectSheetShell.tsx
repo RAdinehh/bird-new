@@ -165,13 +165,49 @@ export default function SelectSheetShell({
   };
   const onTE = () => { if (dragY > 100) onClose(); setDragY(0); };
 
+  const [vpBox, setVpBox] = useState<{ top: number; height: number } | null>(null);
+
+  useEffect(() => {
+    if (!mounted || typeof window === 'undefined') {
+      setVpBox(null);
+      return;
+    }
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    const updateBox = () => {
+      const keyboardOpen = vv.height < window.innerHeight - 90;
+      if (!keyboardOpen) {
+        setVpBox(null);
+        return;
+      }
+      setVpBox({
+        top: Math.max(0, Math.round(vv.offsetTop)),
+        height: Math.max(180, Math.round(vv.height)),
+      });
+    };
+
+    updateBox();
+    vv.addEventListener('resize', updateBox);
+    vv.addEventListener('scroll', updateBox);
+    return () => {
+      vv.removeEventListener('resize', updateBox);
+      vv.removeEventListener('scroll', updateBox);
+    };
+  }, [mounted]);
+
   if (!mounted) return null;
 
   const sheet = (
     <div
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       style={{
-        position: 'fixed', inset: 0, zIndex: 10000,
+        position: 'fixed',
+        top: vpBox ? `${vpBox.top}px` : 0,
+        left: 0,
+        right: 0,
+        height: vpBox ? `${vpBox.height}px` : '100dvh',
+        zIndex: 10000,
         background: 'var(--overlay)',
         display: 'flex', alignItems: placement === 'center' ? 'center' : 'flex-end', justifyContent: 'center', padding: placement === 'center' ? '20px 18px' : 0, boxSizing: 'border-box',
         opacity: animating ? 1 : 0,
@@ -188,7 +224,9 @@ export default function SelectSheetShell({
           borderRadius: placement === 'center' ? 'var(--r-2xl, 18px)' : 'var(--r-2xl, 20px) var(--r-2xl, 20px) 0 0',
           width: '100%',
           maxWidth: placement === 'center' ? 440 : 540,
-          maxHeight: placement === 'center' ? '72vh' : '70vh',
+          maxHeight: vpBox
+            ? `${Math.max(140, vpBox.height - 12)}px`
+            : placement === 'center' ? '72vh' : '70vh',
           display: 'flex', flexDirection: 'column',
           overflow: 'hidden',
           border: placement === 'center' ? '1px solid var(--border)' : 'none',
