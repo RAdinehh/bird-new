@@ -818,7 +818,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
               value={form.partyId}
               onChange={v => setForm({...form, partyId: v})}
               options={contacts.filter(c => c.roles?.includes('customer') || c.roles?.includes('supplier')).map(c => ({ value: c.id, label: c.name, subtitle: c.phone || undefined }))}
-              placeholder="— انتخاب کنید —"
+              placeholder="— انتخاب —"
               modalTitle="انتخاب طرف معامله"
             />
           </Field>

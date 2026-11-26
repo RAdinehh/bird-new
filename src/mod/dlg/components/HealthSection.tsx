@@ -141,7 +141,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
  value={d.cause || ''}
  onChange={val =>setForm(f =>({ ...f, deaths: f.deaths.map(x =>x.id === d.id ? { ...x, cause: val } : x) }))}
  options={causeOptions}
- placeholder="— انتخاب کنید —"
+ placeholder="— انتخاب —"
  modalTitle="علت تلفات"
  />
  </Field>

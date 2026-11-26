@@ -219,7 +219,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
               return (
                 <SmartSelect
                   value={currentRow.flockId}
-                  placeholder="— انتخاب گله —"
+                  placeholder="— انتخاب —"
                   modalTitle="انتخاب گله"
                   options={readyFlocks.map((fl) => {
                     const brd = birds.find((b) => b.id === fl.birdId);

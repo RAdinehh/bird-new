@@ -198,7 +198,7 @@ export default function BreedForm({
                 }}
                 error={errors.birdId?.message}
                 options={birds.map(c => ({ value: c.id, label: c.name }))}
-                placeholder="— انتخاب کنید —"
+                placeholder="— انتخاب —"
                 modalTitle="انتخاب پرنده"
               />
             )}

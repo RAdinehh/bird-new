@@ -211,7 +211,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
               value={form.responsibleId || ''}
               onChange={v => setForm({...form, responsibleId: v})}
               options={workers.map((w: Person) => ({ value: w.id, label: w.name, subtitle: w.phone }))}
-              placeholder="— انتخاب کنید —"
+              placeholder="— انتخاب —"
               modalTitle="انتخاب مسئول"
             />
           </Field>

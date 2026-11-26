@@ -60,7 +60,7 @@ export default function ZoneFormModal({
           value={form.hallId}
           onChange={v => setForm((f) => ({ ...f, hallId: v }))}
           options={halls.map(c => ({ value: c.id, label: c.name }))}
-          placeholder="— انتخاب کنید —"
+          placeholder="— انتخاب —"
           modalTitle="انتخاب سالن"
         />
       </Field>

@@ -60,7 +60,7 @@ export default function ProductionFormModal(props: Props) {
           <Field label="گله" required>
             <SmartSelect
               value={form.flockId}
-              placeholder="— انتخاب گله —"
+              placeholder="— انتخاب —"
               modalTitle="انتخاب گله"
               options={activeFlocks.map((f) => ({ value: String(f.id), label: String(f.name) }))}
               onChange={(val: string) => setForm({ ...form, flockId: val })}

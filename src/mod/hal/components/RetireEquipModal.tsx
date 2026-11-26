@@ -148,7 +148,7 @@ export default function RetireEquipModal({ open, onClose, equipment, onConfirm }
                 <Field label="خریدار (طرف حساب)" required={createInvoice}>
                   <SmartSelect
                     value={partyId}
-                    placeholder="— انتخاب طرف حساب —"
+                    placeholder="— انتخاب —"
                     modalTitle="انتخاب خریدار"
                     options={contacts.map(c => ({ value: String(c.id), label: String(c.name) }))}
                     onChange={(val: string) => setPartyId(val)}

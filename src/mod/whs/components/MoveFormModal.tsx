@@ -89,7 +89,7 @@ export default function MoveFormModal(props: Props) {
             groupIcons={Object.fromEntries(
               Object.entries(CATEGORY_ICON).map(([k, v]) => [k, v])
             ) as Record<string, string>}
-            placeholder="— انتخاب کالا —"
+            placeholder="— انتخاب —"
             modalTitle="انتخاب کالای انبار"
           />
         </Field>

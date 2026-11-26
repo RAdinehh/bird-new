@@ -60,7 +60,7 @@ export default function FormulaFormModal(props: Props) {
         label: c.name,
         subtitle: (r => r.name)(c),
        }))}
-       placeholder="— انتخاب کنید —"
+       placeholder="— انتخاب —"
        modalTitle="انتخاب نیاز"
       />
      </Field>
@@ -109,7 +109,7 @@ export default function FormulaFormModal(props: Props) {
          <>
          <SmartSelect
          value={line.ingredientId}
-         placeholder="— انتخاب ماده —"
+         placeholder="— انتخاب —"
          modalTitle="انتخاب ماده اولیه"
          options={available.map((i) => ({ value: String(i.id), label: String(i.name), subtitle: fmt.num(i.protein) + "٪ پروتئین" }))}
          onChange={(val: string) => updateLine(line.id, { ingredientId: val })}

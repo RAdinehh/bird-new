@@ -220,7 +220,7 @@ export default function FlocksModal(props: FlocksModalProps) {
             value={form.birdId}
             onChange={v => !isSourceLinked && setForm(f => ({ ...f, birdId: v, breedId: '' }))}
             options={birds.map(c => ({ value: c.id, label: c.name }))}
-            placeholder="— انتخاب کنید —"
+            placeholder="— انتخاب —"
             modalTitle="انتخاب پرنده"
             disabled={isSourceLinked}
           />
@@ -262,7 +262,7 @@ export default function FlocksModal(props: FlocksModalProps) {
                 return { value: b.id, label: `${b.name}${suffix}` };
               })}
               emptyListMessage="این پرنده هنوز نژادی ندارد — از بخش «پرنده و نژاد» اضافه کنید"
-              placeholder="— انتخاب نژاد —"
+              placeholder="— انتخاب —"
               modalTitle="انتخاب نژاد"
             />
           )}
@@ -289,7 +289,7 @@ export default function FlocksModal(props: FlocksModalProps) {
             value={form.hallId}
             onChange={v => setForm(f => ({ ...f, hallId: v, zoneId: '' }))}
             options={halls.map(c => ({ value: c.id, label: c.name }))}
-            placeholder="— انتخاب کنید —"
+            placeholder="— انتخاب —"
             modalTitle="انتخاب سالن"
           />
         </Field>

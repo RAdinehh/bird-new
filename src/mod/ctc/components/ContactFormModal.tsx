@@ -209,7 +209,7 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
                 ]}
                 groupLabels={{ gov: 'دولتی', private: 'خصوصی', other: 'سایر' }}
                 groupIcons={{ gov: '🏛', private: '🏦', other: '📋' }}
-                placeholder="— انتخاب بانک —"
+                placeholder="— انتخاب —"
                 modalTitle="انتخاب بانک"
               />
             </Field>

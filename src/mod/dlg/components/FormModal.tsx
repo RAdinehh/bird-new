@@ -79,7 +79,7 @@ export default function FormModal(props: FormModalProps) {
             value: f.id, label: f.name,
             subtitle: f.currentCount ? `${fmt.count(f.currentCount)} پرنده` : undefined,
           }))}
-          placeholder="— انتخاب گله —"
+          placeholder="— انتخاب —"
           modalTitle="انتخاب گله"
             disabled={Boolean(form.id)}
         />

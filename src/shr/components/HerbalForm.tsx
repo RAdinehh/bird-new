@@ -55,7 +55,7 @@ export default function HerbalForm({ item, updateItem }: { item: any; updateItem
             value={h.form}
             onChange={v => setH({ form: v as MedicineForm })}
             options={Object.entries(FORM_LABEL).map(([k, v]) => ({ value: k, label: v }))}
-            placeholder="— انتخاب کنید —"
+            placeholder="— انتخاب —"
             modalTitle="انتخاب نوع دوا"
           />
         </Field>
@@ -103,7 +103,7 @@ export default function HerbalForm({ item, updateItem }: { item: any; updateItem
             value={h.useMethod}
             onChange={v => setH({ useMethod: v as MedicineUseMethod })}
             options={Object.entries(USE_METHOD_LABEL).map(([k, v]) => ({ value: k, label: v }))}
-            placeholder="— انتخاب کنید —"
+            placeholder="— انتخاب —"
             modalTitle="انتخاب نحوه مصرف"
           />
         </Field>

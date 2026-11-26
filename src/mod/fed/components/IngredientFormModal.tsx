@@ -92,7 +92,7 @@ export default function IngredientFormModal(props: Props) {
                 label: c.name,
                 subtitle: (i => i.name)(c),
               }))}
-              placeholder="— انتخاب کنید —"
+              placeholder="— انتخاب —"
               modalTitle="انتخاب کالا"
             />
         </Field>

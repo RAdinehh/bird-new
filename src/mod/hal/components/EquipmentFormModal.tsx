@@ -68,7 +68,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               value={form.hallId}
               onChange={v => setForm((f) => ({ ...f, hallId: v, zoneId: '' }))}
               options={halls.map(c => ({ value: c.id, label: c.name }))}
-              placeholder="— انتخاب کنید —"
+              placeholder="— انتخاب —"
               modalTitle="انتخاب سالن"
             />
           </Field>
@@ -115,7 +115,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                 label: v.name,
                 icon: v.icon,
               }))}
-              placeholder="— انتخاب دسته —"
+              placeholder="— انتخاب —"
               modalTitle="انتخاب دسته"
             />
           </Field>
@@ -168,7 +168,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               value={form.supplierId || ''}
               onChange={v => setForm({...form, supplierId: v})}
               options={suppliers.map((s: Person) => ({ value: s.id, label: s.name, subtitle: s.phone }))}
-              placeholder="— انتخاب کنید —"
+              placeholder="— انتخاب —"
               modalTitle="انتخاب تأمین‌کننده"
             />
           </Field>

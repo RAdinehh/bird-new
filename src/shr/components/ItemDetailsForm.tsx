@@ -656,7 +656,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 unitPrice: wItem?.lastPrice || item.unitPrice,
                 description: wItem?.name || item.description,
               });
-            }} options={feedItems.map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب کالای انبار —" modalTitle="انتخاب کالای انبار" />
+            }} options={feedItems.map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب —" modalTitle="انتخاب کالای انبار" />
           </Field>
         )}
         <Grid2>
@@ -698,7 +698,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 unitPrice: wItem?.lastPrice || item.unitPrice,
                 description: wItem?.name || item.description,
               });
-            }} options={medItems.map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب کالای انبار —" modalTitle="انتخاب دارو یا واکسن" />
+            }} options={medItems.map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب —" modalTitle="انتخاب دارو یا واکسن" />
           </Field>
         )}
 
@@ -755,7 +755,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               });
             }}
             options={manureItems.map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))}
-            placeholder="— انتخاب کالای انبار —"
+            placeholder="— انتخاب —"
             modalTitle="انتخاب کالای کود"
           />
         </Field>
@@ -879,7 +879,7 @@ if (category === 'vaccine' || category === 'herbal') {
                 });
               }}
               options={subItems.map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))}
-              placeholder="— انتخاب کالای انبار —"
+              placeholder="— انتخاب —"
               modalTitle={category === 'vaccine' ? 'انتخاب واکسن' : 'انتخاب داروی گیاهی'}
             />
           </Field>
@@ -1083,7 +1083,7 @@ if (category === 'vaccine' || category === 'herbal') {
               });
             }}
             options={brokenItems.map(i => ({ value: i.id, label: `${i.name} — موجودی ${formatQty(i.currentStock, i.unit)}` }))}
-            placeholder="— انتخاب کالای انبار —"
+            placeholder="— انتخاب —"
             modalTitle="انتخاب کالای تخم شکسته"
           />
         </Field>
