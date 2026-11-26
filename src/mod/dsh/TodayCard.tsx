@@ -47,7 +47,7 @@ export default function TodayCard({
       <>
         <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> امروز در یک نگاه</SectionTitle>
         <MiniEmpty
-          icon="🐔"
+          icon="flock"
           title="هنوز گله‌ای ثبت نشده"
           hint="برای شروع، از بخش گله‌ها اولین گله خود را اضافه کنید"
         />
@@ -196,7 +196,7 @@ export default function TodayCard({
                 <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> امروز در یک نگاه</SectionTitle>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4 }}>
                   <KpiCard
-                    icon="🥚"
+                    icon="egg"
                     label="تخم امروز"
                     value={eggsToday}
                     unit="عدد"
@@ -204,7 +204,7 @@ export default function TodayCard({
                     onClick={() => nav('/egg')}
                   />
                   <KpiCard
-                    icon="💀"
+                    icon="mortality"
                     label="تلفات امروز"
                     value={deathsToday}
                     unit="پرنده"
@@ -212,7 +212,7 @@ export default function TodayCard({
                     onClick={() => nav('/dlg')}
                   />
                   <KpiCard
-                    icon="🌾"
+                    icon="feed"
                     label="دان امروز"
                     value={feedToday}
                     unit="kg"
@@ -220,7 +220,7 @@ export default function TodayCard({
                     onClick={() => nav('/dlg')}
                   />
                   <KpiCard
-                    icon="🌡"
+                    icon="climate"
                     label="دمای سالن"
                     value={tempToday}
                     unit={tempToday > 0 ? '°C' : 'ثبت نشده'}
@@ -229,7 +229,7 @@ export default function TodayCard({
                     onClick={() => nav('/dlg')}
                   />
                   <KpiCard
-                    icon="🌾"
+                    icon="feed"
                     label="دان/پرنده"
                     value={feedPerBirdGrams}
                     unit="گرم در روز"
@@ -238,7 +238,7 @@ export default function TodayCard({
                     onClick={() => nav('/dlg')}
                   />
                   <KpiCard
-                    icon="💧"
+                    icon="water"
                     label="آب/پرنده"
                     value={waterPerBirdMl}
                     unit="میلی‌لیتر در روز"
@@ -247,7 +247,7 @@ export default function TodayCard({
                     onClick={() => nav('/dlg')}
                   />
                             <KpiCard
-              icon="🥚"
+              icon="egg"
               label="تخم شکسته"
               value={brokenToday}
               unit="عدد"
@@ -255,7 +255,7 @@ export default function TodayCard({
               onClick={() => nav('/egg')}
             />
             <KpiCard
-              icon="💧"
+              icon="water"
               label="آب مصرفی"
               value={waterToday}
               unit="لیتر"
@@ -263,7 +263,7 @@ export default function TodayCard({
               onClick={() => nav('/dlg')}
             />
             <KpiCard
-              icon="💦"
+              icon="water"
               label="رطوبت سالن"
               value={humidToday}
               unit={humidToday > 0 ? '٪' : 'ثبت نشده'}

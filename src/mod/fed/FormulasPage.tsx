@@ -202,7 +202,7 @@ export default function FormulasPage({ active = true }: { active?: boolean }) {
     <PageContainer>
       <HelpBanner
         id="fed-formulas-guide"
-        icon="🧪"
+        icon="feed"
         title="راهنمای فرمول‌های جیره"
         description="ترکیب اقلام خوراکی و نسبت‌های جیره را بسازید و ارزش غذایی نهایی را با نیازهای دوره مقایسه کنید."
         tone="info"
@@ -267,7 +267,7 @@ export default function FormulasPage({ active = true }: { active?: boolean }) {
                 ms={ms}
                 accent={f.status === 'active' ? 'accent' : f.status === 'archived' ? 'dim' : 'warn'}
                 index={fmt.count(i + 1)}
-                iconEmoji="🌾"
+                iconEmoji="feed"
                 title={f.name}
                 subtitle={`${req ? req.name : '—'} • ${fmt.date(f.date)}`}
                 isOpen={isOpen}

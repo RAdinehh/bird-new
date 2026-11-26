@@ -67,7 +67,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
             <SmartSelect
               value={form.hallId}
               onChange={v => setForm((f) => ({ ...f, hallId: v, zoneId: '' }))}
-              options={halls.map(c => ({ value: c.id, label: c.name }))}
+              options={halls.map(c => ({ value: c.id, label: c.name, icon: '🏭' }))}
               placeholder="— انتخاب —"
               modalTitle="انتخاب سالن"
             />
@@ -78,7 +78,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               onChange={v => setForm((f) => ({ ...f, zoneId: v }))}
               parentValue={form.hallId}
               parentLabel="سالن"
-              options={zones.filter((z: Zone) => z.hallId === form.hallId).map((z: Zone) => ({ value: z.id, label: z.name }))}
+              options={zones.filter((z: Zone) => z.hallId === form.hallId).map((z: Zone) => ({ value: z.id, label: z.name, icon: '🗂' }))}
               emptyListMessage="این سالن هنوز بخشی ندارد — از تب «بخش‌ها» اضافه کنید"
               emptyMode="select"
               placeholder="— بدون بخش —"

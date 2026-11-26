@@ -100,7 +100,7 @@ export default function FinancialPage() {
       <PageContainer>
       <HelpBanner
         id="rep-financial-guide"
-        icon="💰"
+        icon="cash"
         title="راهنمای گزارش مالی"
         description="جمع فروش و خرید، جریان نقدی، مطالبات و بدهی‌ها و سهم اقلام پرهزینه را در بازه‌های زمانی مختلف مشاهده و خروجی بگیرید."
         tone="info"
@@ -119,7 +119,7 @@ export default function FinancialPage() {
     <PageContainer>
       <HelpBanner
         id="rep-financial-guide"
-        icon="💰"
+        icon="cash"
         title="راهنمای گزارش مالی"
         description="جمع فروش و خرید، جریان نقدی، مطالبات و بدهی‌ها و سهم اقلام پرهزینه را در بازه‌های زمانی مختلف مشاهده و خروجی بگیرید."
         tone="info"

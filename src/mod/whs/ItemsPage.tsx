@@ -418,7 +418,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
       )}
         <HelpBanner
           id="items-intro"
-          icon="📦"
+          icon="inventory"
           title="اینجا فقط کالاها تعریف می‌شوند"
           description="موجودی و قیمت از اینجا مدیریت می‌شود. برای ثبت خرید از فروشنده به بخش «معاملات → خرید» بروید. برای ضایعات یا اصلاح دستی به «انبار → ورود/خروج» بروید."
           tone="info"

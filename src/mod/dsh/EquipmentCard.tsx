@@ -77,7 +77,7 @@ export default function EquipmentCard({ nav }: Props) {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 8 }}>
         <KpiCard
-          icon="💰"
+          icon="cash"
           label="ارزش تجهیزات"
           value={stats.totalValue}
           unit="تومان"

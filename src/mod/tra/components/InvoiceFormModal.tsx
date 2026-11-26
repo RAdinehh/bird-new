@@ -231,7 +231,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               <SmartSelect
                 value={form.partyId}
                 onChange={v => setForm(f => ({ ...f, partyId: v}))}
-                options={parties.map(cc => ({ value: cc.id, label: cc.name, subtitle: cc.phone || undefined }))} 
+                options={parties.map(cc => ({ value: cc.id, label: cc.name, subtitle: cc.phone || undefined, icon: '👤' }))} 
                 placeholder={FIELD_META.category.placeholder} 
                 modalTitle={isPurchase ? 'انتخاب فروشنده' : 'انتخاب مشتری'}
                 disabled={isPartyLocked}

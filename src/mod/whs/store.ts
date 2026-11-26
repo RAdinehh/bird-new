@@ -281,11 +281,9 @@ export const useWhs = create<State>()(
         // ⚠️ حرکات انبار حفظ می‌شوند — تاریخچه نباید پاک شود
       }),
       archiveItem: (id) => set({
-        items: get().items.map(x => x.id === id ? { ...x, archived: true } : x),
-      }),
+        items: get().items.map(x => x.id === id ? { ...x, archived: true } : x) }),
       unarchiveItem: (id) => set({
-        items: get().items.map(x => x.id === id ? { ...x, archived: false } : x),
-      }),
+        items: get().items.map(x => x.id === id ? { ...x, archived: false } : x) }),
       getItemMovements: (id) => get().movements.filter(m => m.itemId === id),
 
       addMovement: (m) => {
@@ -369,8 +367,7 @@ export const useWhs = create<State>()(
             date: mv.date || mv.createdAt,
             archivedAt: Date.now(),
             reason: 'age' as const,
-            log: mv as any,
-          });
+            log: mv as any });
         }
 
         const remaining = state.movements.filter(m => !idSet.has(m.id));
@@ -385,8 +382,7 @@ export const useWhs = create<State>()(
             stockByLocation: recalc.byLoc,
             currentStock: recalc.total,
             avgPrice: recalcAvg.avg,
-            updatedAt: now(),
-          };
+            updatedAt: now() };
         });
 
         set({ movements: remaining, items: nextItems });
@@ -424,8 +420,7 @@ export const useWhs = create<State>()(
             stockByLocation: recalc.byLoc,
             currentStock: recalc.total,
             avgPrice: recalcAvg.avg,
-            updatedAt: now(),
-          };
+            updatedAt: now() };
         });
 
         set({ movements: mergedMoves, items: nextItems });
@@ -459,8 +454,7 @@ export const useWhs = create<State>()(
             return {
               ...it,
               stockByLocation: it.stockByLocation ?? { stock: it.currentStock ?? 0 },
-              initialStockByLocation: it.initialStockByLocation ?? { stock: it.initialStock ?? it.currentStock ?? 0 },
-            };
+              initialStockByLocation: it.initialStockByLocation ?? { stock: it.initialStock ?? it.currentStock ?? 0 } };
           });
         }
         if (Array.isArray(p.movements)) {
@@ -470,8 +464,7 @@ export const useWhs = create<State>()(
           });
         }
         return persisted;
-      },
-    }
+      } }
   )
 );
 
@@ -520,11 +513,10 @@ export const CATEGORY_DEFAULTS: Record<ItemCategory, {
   equipment:  { unit: getBaseUnit('equipment'),  storage: 'room',   needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: true,  title: '' },
   consumable: { unit: getBaseUnit('consumable'),  storage: 'room',   needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '' },
   manure:     { unit: getBaseUnit('manure'),   storage: 'room', needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: 'اطلاعات کود' },
-  broken:     { unit: getBaseUnit('broken'),  storage: 'room', needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: 'تخم شکسته' },
-};
+  broken:     { unit: getBaseUnit('broken'),  storage: 'room', needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: 'تخم شکسته' } };
 
 export const UNIT_LABEL: Record<ItemUnit, string> = {
-  kg: 'کیلوگرم', g: 'گرم', l: 'لیتر', L: 'لیتر', ml: 'میلی‌لیتر',
+  kg: 'کیلوگرم', g: 'گرم', l: 'لیتر', L: 'لیتر',  ml: 'میلی‌لیتر',
   pcs: 'عدد', vial: 'ویال', pack: 'بسته', ton: 'تن', bag: 'کیسه', dose: 'دوز'
 };
 
@@ -535,8 +527,7 @@ export const MOVEMENT_REASON: Record<MovementReason, string> = {
   gift: '🎁 هدیه',
   loss: '⚠️ ضایعات',
   adjustment: '🔄 اصلاح',
-  return: '↩️ برگشت',
-};
+  return: '↩️ برگشت' };
 
 export const STORAGE_LABEL: Record<string, string> = {
   fridge: 'یخچال (۲-۸°)',

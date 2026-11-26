@@ -149,7 +149,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
               value={form.partnerId || ''}
               placeholder="— انتخاب —"
               modalTitle="انتخاب شریک"
-              options={contacts.map((c) => ({ value: String(c.id), label: String(c.name) }))}
+              options={contacts.map((c) => ({ value: String(c.id), label: String(c.name), icon: '👤' }))}
               onChange={(val: string) => setForm({ ...form, partnerId: val })}
             />
           </Field>
@@ -170,7 +170,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
               value={form.consignorId || ''}
               placeholder="— انتخاب —"
               modalTitle="انتخاب امانت‌دهنده"
-              options={contacts.map((c) => ({ value: String(c.id), label: String(c.name) }))}
+              options={contacts.map((c) => ({ value: String(c.id), label: String(c.name), icon: '👤' }))}
               onChange={(val: string) => setForm({ ...form, consignorId: val })}
             />
         </Field>
@@ -184,7 +184,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
               value={form.barterPartyId || ''}
               placeholder="— انتخاب —"
               modalTitle="انتخاب طرف تهاتر"
-              options={contacts.map((c) => ({ value: String(c.id), label: String(c.name) }))}
+              options={contacts.map((c) => ({ value: String(c.id), label: String(c.name), icon: '👤' }))}
               onChange={(val: string) => setForm({ ...form, barterPartyId: val })}
             />
             </Field>
@@ -214,7 +214,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
               value={form.lessorId || ''}
               placeholder="— انتخاب —"
               modalTitle="انتخاب موجر"
-              options={contacts.map((c) => ({ value: String(c.id), label: String(c.name) }))}
+              options={contacts.map((c) => ({ value: String(c.id), label: String(c.name), icon: '👤' }))}
               onChange={(val: string) => setForm({ ...form, lessorId: val })}
             />
             </Field>

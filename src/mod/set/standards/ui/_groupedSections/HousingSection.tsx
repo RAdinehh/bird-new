@@ -26,7 +26,7 @@ export default function HousingSection({ std, def, updateBird, overrides, setOve
 
   return (
     <SettingsGroup
-      icon="🏠"
+      icon="hall"
       title="تأسیسات"
       help={HELP.set.standards.housing}
       subtitle={subtitle}

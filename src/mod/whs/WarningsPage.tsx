@@ -88,11 +88,11 @@ export default function WarningsPage() {
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
           <StatBox icon="⛔" label="منقضی" value={fmt.count(expired.length)} tone={expired.length > 0 ? 'danger' : 'default'} />
           <Dot />
-          <StatBox icon="🔴" label="تمام‌شده" value={fmt.count(criticalStock.length)} tone={criticalStock.length > 0 ? 'danger' : 'default'} />
+          <StatBox icon="📭" label="تمام‌شده" value={fmt.count(criticalStock.length)} tone={criticalStock.length > 0 ? 'danger' : 'default'} />
           <Dot />
-          <StatBox icon="⏰" label="نزدیک انقضا" value={fmt.count(expiringSoon.length)} tone={expiringSoon.length > 0 ? 'warn' : 'default'} />
+          <StatBox icon="⏳" label="نزدیک انقضا" value={fmt.count(expiringSoon.length)} tone={expiringSoon.length > 0 ? 'warn' : 'default'} />
           <Dot />
-          <StatBox icon="⚠" label="کم" value={fmt.count(lowStock.length)} tone={lowStock.length > 0 ? 'warn' : 'default'} />
+          <StatBox icon="📉" label="کم" value={fmt.count(lowStock.length)} tone={lowStock.length > 0 ? 'warn' : 'default'} />
         </div>
       </div>
 
@@ -109,7 +109,7 @@ export default function WarningsPage() {
       {criticalStock.length > 0 ? (
         <WarningGroup
           title="موجودی تمام‌شده"
-          icon="🔴"
+          icon="📭"
           color="red"
           items={criticalStock}
           renderLine={(it) => `موجودی صفر — حداقل ${fmt.num(it.minStock)} ${UNIT_LABEL[it.unit]}`}
@@ -119,7 +119,7 @@ export default function WarningsPage() {
       {expiringSoon.length > 0 ? (
         <WarningGroup
           title="نزدیک انقضا"
-          icon="⏰"
+          icon="⏳"
           color="amber"
           items={expiringSoon}
           renderLine={(it) => `${fmt.day(daysToExpiry(it.expireDate) || 0)} روز تا انقضا`}
@@ -129,7 +129,7 @@ export default function WarningsPage() {
       {lowStock.length > 0 ? (
         <WarningGroup
           title="موجودی کم"
-          icon="⚠"
+          icon="📉"
           color="amber"
           items={lowStock}
           renderLine={(it) => `${fmt.num(it.currentStock)} ${UNIT_LABEL[it.unit]} — حداقل ${fmt.num(it.minStock)}`}

@@ -23,7 +23,7 @@ export default function EnvironmentSection({ std, def, updateBird }: SectionProp
 
   return (
     <SettingsGroup
-      icon="🌡"
+      icon="climate"
       title="محیط"
       help={HELP.set.standards.environment}
       subtitle={subtitle}

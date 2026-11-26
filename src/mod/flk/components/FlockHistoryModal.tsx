@@ -41,7 +41,7 @@ const TYPE_INFO: Record<FlockEventType, { icon: string; label: string; tone: str
   sell:       { icon: '💰', label: 'فروش',    tone: 'var(--purple)' },
   death:      { icon: '💀', label: 'تلفات',   tone: 'var(--danger)' },
   transfer:   { icon: '🔄', label: 'انتقال',  tone: 'var(--info)' },
-  correction: { icon: '',   label: 'اصلاح',   tone: 'var(--warn)' },
+  correction: { icon: '✏️', label: 'اصلاح',   tone: 'var(--warn)' },
   cull:       { icon: '🗑',  label: 'حذف',    tone: 'var(--warn)' },
 };
 

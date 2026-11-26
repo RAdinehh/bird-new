@@ -30,7 +30,7 @@ export default function ProductionSection({ std, def, updateBird, overrides, set
 
   return (
     <SettingsGroup
-      icon="🥚"
+      icon="egg"
       title="تولید"
       help={HELP.set.standards.production}
       subtitle={subtitle}

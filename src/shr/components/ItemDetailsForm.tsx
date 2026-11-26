@@ -1,3 +1,4 @@
+import { AppIconKey } from '../icons/AppIcons';
 import { FIELD_META } from '../constants/fieldMeta';
 import { getGlobalFormat } from '../units/useFormat';
 import { getOtherCostConfig } from '../units/uom';
@@ -219,7 +220,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   // ========== جوجه یک‌روزه ==========
   if (category === 'chick') {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="🐣" title="اطلاعات جوجه یک‌روزه" />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="hatch" title="اطلاعات جوجه یک‌روزه" />
         {!isPurchase && (
           <Grid2>
             <Field label="منبع جوجه" hint="جوجه از گله موجود می‌آید یا از هچری">
@@ -245,7 +246,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 const age = computeAgeFromHatch(h.date);
                 updateItem({ hatchId: v, source: 'hatch', flockId: h.generatedFlockId || '', birdId: f?.birdId || item.birdId, breedId: f?.breedId || item.breedId, ageDays: age, hatchDate: h.date, maleCount: h.maleCount, femaleCount: h.femaleCount, unknownCount: h.unknownCount, description: item.description || `جوجه از هچ ${h.date}` });
                 setHatchOverride(false);
-              }} options={availableHatches.map(h => ({ value: h.id, label: getGlobalFormat().date(h.date), subtitle: `${getGlobalFormat().count(h.hatched)} جوجه` }))} placeholder={FIELD_META.hatch.origin.placeholder} modalTitle={FIELD_META.hatch.origin.modalTitle} />
+              }} options={availableHatches.map(h => ({ value: h.id, label: getGlobalFormat().date(h.date), subtitle: `${getGlobalFormat().count(h.hatched)} جوجه`, icon: '🐣' }))} placeholder={FIELD_META.hatch.origin.placeholder} modalTitle={FIELD_META.hatch.origin.modalTitle} />
             </Field>
           ) : (
             <Field label="گله مبدأ" required error={err('flockId')} onTouch={touch('flockId')}>
@@ -278,7 +279,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* --- بخش ۱: هویت پرنده --- */}
         <Grid2>
           <Field label={FIELD_META.bird.label} required error={err('birdId')} onTouch={touch('birdId')}>
-            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle={FIELD_META.bird.modalTitle} disabled={!!item.existingFlockId || (!isPurchase && !!item.flockId)} />
+            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map((b: any) => ({ value: b.id, label: b.name, icon: ((b.name || '').includes('اردک') ? 'duck' : (b.name || '').includes('بوقلمون') ? 'turkey' : 'chicken') as AppIconKey }))} placeholder="— انتخاب —" modalTitle={FIELD_META.bird.modalTitle} disabled={!!item.existingFlockId || (!isPurchase && !!item.flockId)} />
           </Field>
           <Field label={FIELD_META.breed.label} required error={err('breedId')} onTouch={touch('breedId')}>
             <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
@@ -378,10 +379,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {isPurchase && (
           <Grid2>
             <Field label="سالن مقصد">
-              <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.filter(h => !h.archived).map(h => ({ value: h.id, label: h.name }))} placeholder="— انتخاب —" modalTitle="انتخاب سالن مقصد" />
+              <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.filter(h => !h.archived).map(h => ({ value: h.id, label: h.name, icon: 'hall' }))} placeholder="— انتخاب —" modalTitle="انتخاب سالن مقصد" />
             </Field>
             <Field label="بخش مقصد">
-              <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId && !z.archived).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب —" disabled={!item.hallId} modalTitle="انتخاب بخش مقصد" />
+              <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId && !z.archived).map(z => ({ value: z.id, label: z.name, icon: 'zone' }))} placeholder="— انتخاب —" disabled={!item.hallId} modalTitle="انتخاب بخش مقصد" />
             </Field>
           </Grid2>
         )}
@@ -407,7 +408,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     const isLocked = !!item.existingFlockId || isSaleLocked;
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="🐓" title="اطلاعات پرنده بالغ" />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="chicken" title="اطلاعات پرنده بالغ" />
         {/* در حالت فروش: گله مبدأ بالاترین اولویت سلسله‌مراتبی را دارد */}
         {!isPurchase && (
           <Field label="گله مبدأ" required error={err('flockId')} onTouch={touch('flockId')}>
@@ -438,7 +439,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* --- بخش ۱: هویت مشتق‌شده از گله --- */}
         <Grid2>
           <Field label={FIELD_META.bird.label} required error={err('birdId')} onTouch={touch('birdId')} lockedFrom={isSaleLocked ? "گله" : undefined}>
-            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle={FIELD_META.bird.modalTitle} disabled={isLocked} />
+            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map((b: any) => ({ value: b.id, label: b.name, icon: ((b.name || '').includes('اردک') ? 'duck' : (b.name || '').includes('بوقلمون') ? 'turkey' : 'chicken') as AppIconKey }))} placeholder="— انتخاب —" modalTitle={FIELD_META.bird.modalTitle} disabled={isLocked} />
           </Field>
           <Field label={FIELD_META.breed.label} required error={err('breedId')} onTouch={touch('breedId')} lockedFrom={isSaleLocked ? "گله" : undefined}>
             <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
@@ -526,10 +527,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
             <Grid2>
               <Field label="سالن مقصد">
-                <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.filter(h => !h.archived).map(h => ({ value: h.id, label: h.name }))} placeholder="— انتخاب —" modalTitle="انتخاب سالن مقصد" />
+                <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.filter(h => !h.archived).map(h => ({ value: h.id, label: h.name, icon: 'hall' }))} placeholder="— انتخاب —" modalTitle="انتخاب سالن مقصد" />
               </Field>
               <Field label="بخش مقصد">
-                <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId && !z.archived).map(z => ({ value: z.id, label: z.name }))} placeholder="— انتخاب —" disabled={!item.hallId} modalTitle="انتخاب بخش مقصد" />
+                <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId && !z.archived).map(z => ({ value: z.id, label: z.name, icon: 'zone' }))} placeholder="— انتخاب —" disabled={!item.hallId} modalTitle="انتخاب بخش مقصد" />
               </Field>
             </Grid2>
           </>
@@ -643,7 +644,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (category === 'feed') {
     const feedItems = (whsItems || []).filter(w => w.category === 'feed');
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="🌾" title="اطلاعات دان" />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="feed" title="اطلاعات دان" />
         {nameFieldJsx}        {isPurchase ? (
           renderPurchaseStockSelector('دان', 'انتخاب یا تعریف دان', 'ذرت، کنجاله سویا', feedItems, false)
         ) : (
@@ -657,7 +658,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 unitPrice: wItem?.lastPrice || item.unitPrice,
                 description: wItem?.name || item.description,
               });
-            }} options={feedItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب —" modalTitle="انتخاب کالای انبار" />
+            }} options={feedItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`, icon: '📦' }))} placeholder="— انتخاب —" modalTitle="انتخاب کالای انبار" />
           </Field>
         )}
         <Grid2>
@@ -685,7 +686,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (category === 'medicine') {
     const medItems = (whsItems || []).filter(w => w.category === 'medicine' || w.category === 'vaccine');
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="💊" title="اطلاعات دارو و واکسن" />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="meds" title="اطلاعات دارو و واکسن" />
         {nameFieldJsx}        {isPurchase ? (
           renderPurchaseStockSelector('دارو / واکسن', 'انتخاب یا تعریف دارو و واکسن', 'انروفلوکساسین، تایلوزین', medItems, false)
         ) : (
@@ -699,7 +700,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 unitPrice: wItem?.lastPrice || item.unitPrice,
                 description: wItem?.name || item.description,
               });
-            }} options={medItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}` }))} placeholder="— انتخاب —" modalTitle="انتخاب دارو یا واکسن" />
+            }} options={medItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`, icon: '📦' }))} placeholder="— انتخاب —" modalTitle="انتخاب دارو یا واکسن" />
           </Field>
         )}
 
@@ -755,7 +756,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 description: wItem?.name || item.description,
               });
             }}
-            options={manureItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}` }))}
+            options={manureItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`, icon: '📦' }))}
             placeholder="— انتخاب —"
             modalTitle="انتخاب کالای کود"
           />
@@ -827,10 +828,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   // ========== تخم (خرید) و تخم نطفه‌دار (فروش) ==========
 if (category === 'egg' || category === 'fertile_egg') {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>      <SecTitle icon="🥚" title="اطلاعات تخم" />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>      <SecTitle icon="egg" title="اطلاعات تخم" />
       <Grid2>
         <Field label={FIELD_META.bird.label} required error={err('birdId')} onTouch={touch('birdId')}>
-          <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map(b => ({ value: b.id, label: b.name }))} placeholder="— انتخاب —" modalTitle={FIELD_META.bird.modalTitle} />
+          <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map((b: any) => ({ value: b.id, label: b.name, icon: ((b.name || '').includes('اردک') ? 'duck' : (b.name || '').includes('بوقلمون') ? 'turkey' : 'chicken') as AppIconKey }))} placeholder="— انتخاب —" modalTitle={FIELD_META.bird.modalTitle} />
         </Field>
         <Field label={FIELD_META.breed.label} required error={err('breedId')} onTouch={touch('breedId')}>
           <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
@@ -857,7 +858,7 @@ if (category === 'vaccine' || category === 'herbal') {
     const subLabel = category === 'vaccine' ? 'واکسن' : 'داروی گیاهی';
     const subExample = category === 'vaccine' ? 'واکسن نیوکاسل، برونشیت' : 'عرقیات، سیر';
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="💊" title={category === 'vaccine' ? 'اطلاعات واکسن' : 'اطلاعات داروی گیاهی'} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="meds" title={category === 'vaccine' ? 'اطلاعات واکسن' : 'اطلاعات داروی گیاهی'} />
       {nameFieldJsx}        {isPurchase ? (
           renderPurchaseStockSelector(subLabel, `انتخاب یا تعریف ${subLabel}`, subExample, subItems, false)
         ) : (
@@ -881,7 +882,7 @@ if (category === 'vaccine' || category === 'herbal') {
                   description: wItem?.name || item.description,
                 });
               }}
-              options={subItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}` }))}
+              options={subItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`, icon: '📦' }))}
               placeholder="— انتخاب —"
               modalTitle={category === 'vaccine' ? 'انتخاب واکسن' : 'انتخاب داروی گیاهی'}
             />
@@ -1085,7 +1086,7 @@ if (category === 'vaccine' || category === 'herbal') {
                 description: wItem?.name || item.description,
               });
             }}
-            options={brokenItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}` }))}
+            options={brokenItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`, icon: '📦' }))}
             placeholder="— انتخاب —"
             modalTitle="انتخاب کالای تخم شکسته"
           />

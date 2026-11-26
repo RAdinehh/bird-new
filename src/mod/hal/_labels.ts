@@ -10,16 +10,16 @@ import type {
 } from './store';
 
 export const CATEGORY_LABELS: Record<EquipmentCategory, { name: string; icon: string }> = {
-  ventilation:     { name: 'تهویه', icon: '🌀' },
-  feeding:         { name: 'دانخوری', icon: '🍽' },
-  drinking:        { name: 'آبخوری', icon: '🚰' },
+  ventilation:     { name: 'تهویه', icon: 'ventilation' },
+  feeding:         { name: 'دانخوری', icon: 'feeder' },
+  drinking:        { name: 'آبخوری', icon: 'drinker' },
   heating:         { name: 'گرمایش', icon: '🔥' },
   lighting:        { name: 'روشنایی', icon: '💡' },
-  litter:          { name: 'بستر', icon: '🛏' },
+  litter:          { name: 'بستر', icon: 'litter' },
   cooling:         { name: 'سرمایش', icon: '🧊' },
-  water_treatment: { name: 'آب‌رسانی', icon: '💦' },
-  power:           { name: 'برق', icon: '⚡' },
-  weighing:        { name: 'توزین', icon: '⚖️' },
+  water_treatment: { name: 'آب‌رسانی', icon: 'water_system' },
+  power:           { name: 'برق', icon: 'power' },
+  weighing:        { name: 'توزین', icon: 'scale' },
   cleaning:        { name: 'شستشو', icon: '🧽' },
   safety:          { name: 'ایمنی', icon: '🚨' },
   hand_tools:      { name: 'ابزار دستی', icon: '🛠' },
@@ -27,8 +27,8 @@ export const CATEGORY_LABELS: Record<EquipmentCategory, { name: string; icon: st
 };
 
 export const KIND_LABELS: Record<EquipmentKind, { name: string; icon: string }> = {
-  asset: { name: 'دارایی ثابت', icon: '🏭' },
-  consumable: { name: 'مصرفی', icon: '📦' },
+  asset: { name: 'دارایی ثابت', icon: 'hall' },
+  consumable: { name: 'مصرفی', icon: 'inventory' },
 };
 
 export const STATUS_LABELS: Record<EquipmentStatus, { name: string; icon: string; tone: string }> = {
@@ -50,22 +50,22 @@ export const UNIT_LABELS_EQ: Record<EquipmentUnit, string> = {
 
 export const EQUIP_LABELS: Record<string, { name: string; icon: string }> = {
   // تهویه
-  fan_tunnel:   { name: 'فن تونلی', icon: '🌀' },
+  fan_tunnel:   { name: 'فن تونلی', icon: 'ventilation' },
   fan_ceiling:  { name: 'فن سقفی', icon: '💨' },
   air_inlet:    { name: 'دریچه اینلت', icon: '🪟' },
   cooling_pad:  { name: 'پد سلولزی', icon: '❄' },
   // دانخوری
-  feeder_chick_tray: { name: 'سینی جوجه', icon: '📥' },
-  feeder_pan:        { name: 'دانخوری بشقابی', icon: '🥣' },
-  feeder_chain:      { name: 'دانخوری زنجیری', icon: '⛓' },
-  feeder_tube:       { name: 'دانخوری لوله‌ای', icon: '🥤' },
-  feeder_bucket:     { name: 'دانخوری سطلی', icon: '🪣' },
+  feeder_chick_tray: { name: 'سینی جوجه', icon: 'feeder_tray' },
+  feeder_pan:        { name: 'دانخوری بشقابی', icon: 'feeder' },
+  feeder_chain:      { name: 'دانخوری زنجیری', icon: 'feeder_chain' },
+  feeder_tube:       { name: 'دانخوری لوله‌ای', icon: 'feeder_tube' },
+  feeder_bucket:     { name: 'دانخوری سطلی', icon: 'feeder_bucket' },
   feeder_manual:     { name: 'دانخوری دستی', icon: '🪣' },
   // آبخوری
-  nipple:               { name: 'نیپل', icon: '💧' },
-  cup:                  { name: 'کاپ', icon: '🥛' },
-  drinker_auto_hanging: { name: 'آبخوری آویز', icon: '🔔' },
-  fountain_drinker:     { name: 'آبخوری کله‌قندی', icon: '⛲' },
+  nipple:               { name: 'نیپل', icon: 'drinker' },
+  cup:                  { name: 'کاپ', icon: 'drinker_cup' },
+  drinker_auto_hanging: { name: 'آبخوری آویز', icon: 'drinker_hanging' },
+  fountain_drinker:     { name: 'آبخوری کله‌قندی', icon: 'drinker_fountain' },
   trough:               { name: 'آبخوری ناودانی', icon: '🛁' },
   drinker_capsule:      { name: 'آبخوری کپسولی', icon: '🧪' },
   // گرمایش
@@ -81,24 +81,24 @@ export const EQUIP_LABELS: Record<string, { name: string; icon: string }> = {
   lamp_fluorescent: { name: 'لامپ مهتابی', icon: '🔆' },
   dimmer:           { name: 'دیمر', icon: '🎚' },
   // بستر
-  litter_wood_shavings: { name: 'پوشال چوب', icon: '🪵' },
-  litter_sawdust:       { name: 'خاک‌اره', icon: '🪵' },
+  litter_wood_shavings: { name: 'پوشال چوب', icon: 'litter' },
+  litter_sawdust:       { name: 'خاک‌اره', icon: 'litter' },
   litter_roll:          { name: 'رول کاغذی', icon: '📜' },
   litter_rice_hull:     { name: 'سبوس برنج', icon: '🌾' },
-  litter_straw:         { name: 'کاه و کلش', icon: '🌿' },
+  litter_straw:         { name: 'کاه و کلش', icon: 'litter_straw' },
   litter_sand:          { name: 'ماسه', icon: '🏖' },
   litter_peat:          { name: 'پیت ماس', icon: '🟫' },
   // آب‌رسانی
-  water_tank:   { name: 'مخزن آب', icon: '🛢' },
+  water_tank:   { name: 'مخزن آب', icon: 'water_system' },
   water_filter: { name: 'فیلتر آب', icon: '🔵' },
   water_pipe:   { name: 'لوله آب', icon: '🚰' },
   // برق
-  generator:        { name: 'ژنراتور', icon: '⚡' },
+  generator:        { name: 'ژنراتور', icon: 'power' },
   electrical_panel: { name: 'تابلو برق', icon: '🔌' },
   cable:            { name: 'کابل و سیم', icon: '🔗' },
   // توزین
-  bird_scale:     { name: 'ترازوی پرنده', icon: '⚖' },
-  feed_scale:     { name: 'ترازوی دان', icon: '🌾' },
+  bird_scale:     { name: 'ترازوی پرنده', icon: 'scale' },
+  feed_scale:     { name: 'ترازوی دان', icon: 'scale' },
   platform_scale: { name: 'باسکول کفه‌ای', icon: '🏗' },
   // شستشو
   pressure_washer: { name: 'واش‌پرس', icon: '💦' },

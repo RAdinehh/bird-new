@@ -1,3 +1,4 @@
+import { AppIconKey } from '../../shr/icons/AppIcons';
 import { useFormat } from '../../shr/units/useFormat';
 import { useEffect, useState } from 'react';
 import { useForm, Controller, useWatch } from 'react-hook-form';
@@ -33,10 +34,10 @@ export const EMPTY_BREED_FORM: BreedFormData = {
 };
 
 const PURPOSE_OPTIONS = [
-  { key: 'layer',      label: 'تخم‌گذار', icon: undefined },
-  { key: 'breeder',    label: 'مادر',     icon: undefined },
-  { key: 'broiler',    label: 'گوشتی',    icon: undefined },
-  { key: 'ornamental', label: 'تزئینی',   icon: undefined },
+  { key: 'layer',      label: 'تخم‌گذار', icon: '🥚' },
+  { key: 'breeder',    label: 'مادر',     icon: '🐣' },
+  { key: 'broiler',    label: 'گوشتی',    icon: '🥩' },
+  { key: 'ornamental', label: 'تزئینی',   icon: '🎨' },
 ];
 
 const BreedFormSchema = z.object({
@@ -197,7 +198,15 @@ export default function BreedForm({
                   setValue('fcr', ''); setValue('purposes', []);
                 }}
                 error={errors.birdId?.message}
-                options={birds.map(c => ({ value: c.id, label: c.name }))}
+                options={birds.map((c: any) => {
+      const name = (c.name || '').toLowerCase();
+      const kind = (c.kind || c.type || '').toLowerCase();
+      let icon: AppIconKey = 'chicken';
+      if (name.includes('اردک') || name.includes('duck') || kind.includes('duck')) icon = 'duck';
+      else if (name.includes('بوقلمون') || name.includes('turkey') || kind.includes('turkey')) icon = 'turkey';
+      else if (name.includes('تخمگذار') || name.includes('layer')) icon = 'egg';
+      return { value: c.id, label: c.name, icon };
+    })}
                 placeholder="— انتخاب —"
                 modalTitle="انتخاب پرنده"
               />

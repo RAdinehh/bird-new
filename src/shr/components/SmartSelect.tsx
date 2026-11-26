@@ -9,6 +9,7 @@ import { useState, useMemo } from 'react';
 import { Input } from './ui';
 import { getGlobalFormat } from '../units/useFormat';
 import SelectSheetShell, { SheetGroup, SheetItem } from './SelectSheetShell';
+import { OptionIcon } from './OptionIcon';
 
 export interface SmartOption {
   value: string;
@@ -125,7 +126,12 @@ export default function SmartSelect({
           fontWeight: 400,
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
-          {current ? current.label : placeholder}
+          {current ? (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                  <OptionIcon icon={current.icon} size={15} />
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{current.label}</span>
+                </span>
+              ) : placeholder}
           {required && !current ? (
             <span style={{ color: 'var(--danger)', marginRight: 4 }}> *</span>
           ) : null}
@@ -171,9 +177,10 @@ export default function SmartSelect({
             >
               {grouped[gKey].map(o => (
                 <SheetItem
-                  key={o.value}
-                  title={o.label}
-                  subtitle={o.subtitle}
+                      key={o.value}
+                      icon={<OptionIcon icon={o.icon || (o.group ? groupIcons[o.group] : undefined)} size={17} />}
+                      title={o.label}
+                      subtitle={o.subtitle}
                   selected={value === o.value}
                   disabled={o.disabled}
                   onClick={() => !o.disabled && handlePick(o.value)}
@@ -184,9 +191,10 @@ export default function SmartSelect({
         ) : (
           filtered.map(o => (
             <SheetItem
-              key={o.value}
-              title={o.label}
-              subtitle={o.subtitle}
+                      key={o.value}
+                      icon={<OptionIcon icon={o.icon || (o.group ? groupIcons[o.group] : undefined)} size={17} />}
+                      title={o.label}
+                      subtitle={o.subtitle}
               selected={value === o.value}
               disabled={o.disabled}
               onClick={() => !o.disabled && handlePick(o.value)}

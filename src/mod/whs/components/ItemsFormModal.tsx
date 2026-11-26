@@ -82,9 +82,10 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
           </Field>
           <Field label="واحد" error={showError?.('unit')} onTouch={() => markTouched?.('unit')}>
             <Select value={form.unit} onChange={e => setForm({ ...form, unit: e.target.value as ItemUnit })}>
-              {(Object.keys(UNIT_LABEL) as ItemUnit[]).map(u =>
-                <option key={u} value={u}>{UNIT_LABEL[u]}</option>
-              )}
+              {(Object.keys(UNIT_LABEL) as ItemUnit[]).filter(u => u !== 'L').map(u => {
+                      const unitEmoji = ({ kg: '⚖️', g: '⚖️', ton: '⚖️', l: '🧪', ml: '🧪', pcs: '🔢', pack: '📦', bag: '🛍️', vial: '💉', dose: '💧' } as Record<string, string>)[u] || '📏';
+                      return <option key={u} value={u}>{unitEmoji} {UNIT_LABEL[u]}</option>;
+                    })}
             </Select>
           </Field>
         </Grid2>
@@ -343,7 +344,7 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
                   value={form.hallId}
                   placeholder="— بدون سالن —"
                   modalTitle="انتخاب سالن استقرار"
-                  options={halls.map((h) => ({ value: String(h.id), label: String(h.name) }))}
+                  options={halls.map((h) => ({ value: String(h.id), label: String(h.name), icon: '🏭' }))}
                   onChange={(val: string) => setForm({ ...form, hallId: val })}
                 />
               </Field>

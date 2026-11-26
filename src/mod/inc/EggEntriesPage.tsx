@@ -213,7 +213,7 @@ export default function EggEntriesPage({ initialDevice = '', onGoTo, active = tr
     <PageContainer>
       <HelpBanner
         id="inc-entries-guide"
-        icon="🥚"
+        icon="egg"
         title="راهنمای ورود تخم به دستگاه"
         description="تعداد و مشخصات تخم‌های چیده‌شده در دستگاه‌های جوجه‌کشی را ثبت کنید تا زمان کندلینگ و هچ دقیق محاسبه شود."
         tone="info"

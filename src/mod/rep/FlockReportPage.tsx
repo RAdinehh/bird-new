@@ -26,7 +26,7 @@ export default function FlockReportPage() {
       <PageContainer>
       <HelpBanner
         id="rep-flock-guide"
-        icon="🐔"
+        icon="flock"
         title="راهنمای گزارش گله"
         description="شاخص‌های عملکرد، مصرف خوراک، تلفات، درآمد و هزینه‌های هر گله را به‌صورت یکجا بررسی و گزارش تهیه کنید."
         tone="info"
@@ -96,7 +96,7 @@ export default function FlockReportPage() {
     <PageContainer>
       <HelpBanner
         id="rep-flock-guide"
-        icon="🐔"
+        icon="flock"
         title="راهنمای گزارش گله"
         description="شاخص‌های عملکرد، مصرف خوراک، تلفات، درآمد و هزینه‌های هر گله را به‌صورت یکجا بررسی و گزارش تهیه کنید."
         tone="info"

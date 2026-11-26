@@ -63,7 +63,7 @@ export default function AnalyticsCards({
   if (isEmpty) {
     return (
       <MiniEmpty
-        icon="📊"
+        icon="stats"
         title="داده کافی برای تحلیل نیست"
         hint="با ثبت تولید روزانه و داده‌های گله، تحلیل‌ها فعال می‌شوند"
       />
@@ -241,7 +241,7 @@ export default function AnalyticsCards({
                     onClick={() => nav('/rep')}
                   />
                   <KpiCard
-                    icon="📦"
+                    icon="inventory"
                     label="ارزش انبار"
                     value={inventoryValue}
                     unit="تومان"

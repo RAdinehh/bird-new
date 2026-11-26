@@ -195,7 +195,7 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
           value={filterFlock}
           placeholder="همه گله‌ها"
           modalTitle="انتخاب گله"
-          options={activeFlocks.map((f) => ({ value: String(f.id), label: String(f.name) }))}
+          options={activeFlocks.map((f) => ({ value: String(f.id), label: String(f.name), icon: '🐔' }))}
           onChange={(val: string) => setFilterFlock(val)}
         />
       </div>

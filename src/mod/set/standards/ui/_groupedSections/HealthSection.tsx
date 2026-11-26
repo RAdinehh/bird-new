@@ -27,7 +27,7 @@ export default function HealthSection({ std, def, updateBird, overrides, setOver
 
   return (
     <SettingsGroup
-      icon="💀"
+      icon="mortality"
       title="سلامت"
       help={HELP.set.standards.health}
       subtitle={subtitle}

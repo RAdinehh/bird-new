@@ -109,15 +109,16 @@ export default function HallCard(props: HallCardProps) {
         {(() => {
           const st = h.status || (hallFlocks.length > 0 ? 'active' : 'empty');
           type Tone = 'green' | 'gray' | 'blue' | 'warn' | 'red' | 'purple' | 'accent' | 'dim' | 'amber' | 'info' | 'danger';
-          const map: Record<string, { label: string; tone: Tone }> = {
-            active:     { label: 'فعال',      tone: 'green' },
-            empty:      { label: 'خالی',      tone: 'gray' },
-            sanitizing: { label: 'ضدعفونی',   tone: 'blue' },
-            maintenance:{ label: 'تعمیر',     tone: 'warn' },
-            inactive:   { label: 'غیرفعال',   tone: 'red' },
+          const map: Record<string, { icon: string; label: string; tone: Tone }> = {
+            active:     { icon: '🟢', label: 'فعال',      tone: 'green' },
+            empty:      { icon: '⚪', label: 'خالی',      tone: 'gray' },
+            sanitizing: { icon: '🫧', label: 'ضدعفونی',   tone: 'blue' },
+            maintenance:{ icon: '🔧', label: 'تعمیر',     tone: 'warn' },
+            inactive:   { icon: '🔴', label: 'غیرفعال',   tone: 'red' },
           };
-          const it = map[st] || map.empty;
-          return <Tag tone={it.tone}>{it.label}</Tag>;
+          const it = map[st];
+          if (!it) return null;
+          return <Tag tone={it.tone}>{it.icon} {it.label}</Tag>;
         })()}
         {zoneCount > 0 ? <Tag tone="blue">{fmt.int(zoneCount)} بخش</Tag> : null}
         {hallFlocks.length > 0 ? <Tag tone="green">{fmt.int(hallFlocks.length)} گله</Tag> : null}

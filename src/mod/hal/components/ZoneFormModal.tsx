@@ -59,7 +59,7 @@ export default function ZoneFormModal({
         <SmartSelect
           value={form.hallId}
           onChange={v => setForm((f) => ({ ...f, hallId: v }))}
-          options={halls.map(c => ({ value: c.id, label: c.name }))}
+          options={halls.map(c => ({ value: c.id, label: c.name, icon: '🏭' }))}
           placeholder="— انتخاب —"
           modalTitle="انتخاب سالن"
         />

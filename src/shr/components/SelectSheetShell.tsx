@@ -372,10 +372,10 @@ export function SheetGroup({ title, icon, count, children }: GroupProps) {
         display: 'flex', alignItems: 'center', gap: 8,
         padding: '10px 16px',
         minHeight: 38,
-        background: 'color-mix(in srgb, var(--accent) 5%, var(--card-solid))',
+        background: 'var(--card-solid)',
         fontSize: 'var(--fs-sm, 12px)', fontWeight: 700,
-        color: 'var(--accent)',
-        borderBottom: '1px solid color-mix(in srgb, var(--accent) 16%, var(--border))',
+        color: 'var(--muted)',
+        borderBottom: '1px solid color-mix(in srgb, var(--border) 55%, transparent)',
       }}>
         {icon && (
           <span style={{

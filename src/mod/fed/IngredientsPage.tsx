@@ -232,7 +232,7 @@ export default function IngredientsPage({ active = true }: { active?: boolean })
       )}
         <HelpBanner
           id="ingredients-intro"
-          icon="🌾"
+          icon="feed"
           title="مواد اولیه جیره"
           description="ذرت، کنجاله، سبوس و... را اینجا تعریف کنید. درصد پروتئین و انرژی هر ماده برای ساخت جیره لازم است."
           tone="info"

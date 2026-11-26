@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="g_drinker_hanging" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#DC2626"/>
+      <stop offset="100%" stop-color="#7F1D1D"/>
+    </linearGradient>
+  </defs>
+  <rect x="6" y="6" width="116" height="116" rx="28" fill="url(#g_drinker_hanging)"/>
+  <rect x="12" y="10" width="104" height="50" rx="22" fill="#ffffff" fill-opacity="0.16"/>
+  <line x1="64" y1="18" x2="64" y2="34" stroke="#fff" stroke-width="5"/><path d="M64 32c-18 0-28 32-32 54h64c-4-22-14-54-32-54z" fill="#fff"/><ellipse cx="64" cy="88" rx="36" ry="10" fill="#38BDF8"/>
+</svg>

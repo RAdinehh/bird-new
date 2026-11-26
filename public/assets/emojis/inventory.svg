@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="g_inventory" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#B45309"/>
+      <stop offset="100%" stop-color="#78350F"/>
+    </linearGradient>
+  </defs>
+  <rect x="6" y="6" width="116" height="116" rx="28" fill="url(#g_inventory)"/>
+  <rect x="12" y="10" width="104" height="50" rx="22" fill="#ffffff" fill-opacity="0.16"/>
+  <path d="M64 24L28 42v44l36 18 36-18V42L64 24z" fill="#fff"/><path d="M28 42l36 18 36-18M64 60v44" stroke="#92400E" stroke-width="5" fill="none"/>
+</svg>

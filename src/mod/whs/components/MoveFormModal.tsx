@@ -82,6 +82,7 @@ export default function MoveFormModal(props: Props) {
               label: it.name,
               subtitle: `${fmt.num(it.currentStock)} ${UNIT_LABEL[it.unit]}`,
               group: it.category,
+            icon: (CATEGORY_ICON as any)[it.category],
             }))}
             groupLabels={Object.fromEntries(
               Object.entries(CATEGORY_LABEL).map(([k, v]) => [k, v])
@@ -144,7 +145,8 @@ export default function MoveFormModal(props: Props) {
                     subtitle: c.roles.length > 0
                       ? c.roles.map((r) => r === 'customer' ? 'مشتری' : r === 'supplier' ? 'فروشنده' : 'کارگر').join('، ')
                       : undefined,
-                  }))}
+                    icon: '👤',
+                }))}
                   placeholder={partyRequired ? `— انتخاب ${partyLabel} —` : '— بدون مخاطب —'}
                   modalTitle={`انتخاب ${partyLabel}`}
                 />

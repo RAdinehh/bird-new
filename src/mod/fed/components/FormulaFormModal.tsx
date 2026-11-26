@@ -111,7 +111,7 @@ export default function FormulaFormModal(props: Props) {
          value={line.ingredientId}
          placeholder="— انتخاب —"
          modalTitle="انتخاب ماده اولیه"
-         options={available.map((i) => ({ value: String(i.id), label: String(i.name), subtitle: fmt.num(i.protein) + "٪ پروتئین" }))}
+         options={available.map((i) => ({ value: String(i.id), label: String(i.name), subtitle: fmt.num(i.protein) + "٪ پروتئین", icon: '🌾' }))}
          onChange={(val: string) => updateLine(line.id, { ingredientId: val })}
        />
          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>

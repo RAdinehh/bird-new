@@ -22,7 +22,7 @@ export default function NutritionSection({ std, def, updateBird }: SectionProps)
 
   return (
     <SettingsGroup
-      icon="🍽"
+      icon="feed"
       title="تغذیه و رشد"
       help={HELP.set.standards.nutrition}
       subtitle={subtitle}

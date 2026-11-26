@@ -265,7 +265,7 @@ export default function HatchesPage({ initialEntry = '', onGoTo, active = true }
       )}
       <HelpBanner
         id="inc-hatch-intro"
-        icon="🐣"
+        icon="hatch"
         title="راهنمای هچ و نتیجه نهایی"
         description="نتیجهٔ پایانی هر دوره شامل تعداد جوجه‌های هچ‌شده، تلفات جنینی، تفکیک جنسیت و انتقال جوجه به گله یا فروش را ثبت کنید."
         tone="info"

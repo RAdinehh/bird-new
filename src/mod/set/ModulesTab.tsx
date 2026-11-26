@@ -1,5 +1,6 @@
 import { useFormat } from '../../shr/units/useFormat';
 import { useSet, MODULE_LABELS } from './store';
+import { OptionIcon } from '../../shr/components/OptionIcon';
 import { toFa } from '../../shr/utils/fa';
 
 function Toggle({ enabled, disabled, onToggle }: { enabled: boolean; disabled?: boolean; onToggle: () => void }) {
@@ -44,7 +45,7 @@ function FeatureToggle({ icon, title, desc, featureKey, defaultOn = true }: { ic
       background: 'var(--card)', border: '1px solid var(--border)',
       borderRadius: 'var(--r-md)',
     }}>
-      <span style={{ fontSize: '1.2em', lineHeight: 1 }}>{icon}</span>
+      <OptionIcon icon={icon} size={20} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 600 }}>{title}</div>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>{desc}</div>
@@ -110,7 +111,7 @@ export default function ModulesTab() {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <FeatureToggle
-          icon="💉"
+          icon="meds"
           title="واکسن"
           desc="واکسن‌ها: فرم ثبت روزانه، برنامه واکسن گله، هشدار انقضا، تقویم"
           featureKey="vaccine"
@@ -122,7 +123,7 @@ export default function ModulesTab() {
           featureKey="medicine"
         />
         <FeatureToggle
-          icon="🩺"
+          icon="meds"
           title="دوره پرهیز دارو"
           desc="نمایش زمان پرهیز در گله‌ها، هشدار و modal مستقل"
           featureKey="withdrawal"

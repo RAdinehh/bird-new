@@ -1,5 +1,6 @@
 import { useFormat } from '../../shr/units/useFormat';
 import { useSet, MODULE_LABELS } from './store';
+import { OptionIcon } from '../../shr/components/OptionIcon';
 import { Btn, Field, Grid2, Select } from '../../shr/components/ui';
 import { toFa } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
@@ -148,7 +149,7 @@ export default function AppearanceTab() {
                 color: i === 0 ? 'var(--accent)' : 'var(--dim)',
                 fontWeight: i === 0 ? 600 : 400
               }}>
-                <span style={{ fontSize: 'var(--fs-md)' }}>{m ? m.icon : undefined}</span>
+                <OptionIcon icon={m ? m.icon : undefined} size={18} />
                 <span style={{ fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
                   {m ? m.name : '—'}
                 </span>
