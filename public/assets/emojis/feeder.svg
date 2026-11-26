@@ -1,11 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <defs>
-    <linearGradient id="g_feeder" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#F59E0B"/>
-      <stop offset="100%" stop-color="#B45309"/>
-    </linearGradient>
-  </defs>
-  <rect x="6" y="6" width="116" height="116" rx="28" fill="url(#g_feeder)"/>
-  <rect x="12" y="10" width="104" height="50" rx="22" fill="#ffffff" fill-opacity="0.16"/>
-  <path d="M46 24h36l-8 44H54L46 24z" fill="#fff"/><ellipse cx="64" cy="78" rx="38" ry="14" fill="#fff"/><ellipse cx="64" cy="76" rx="30" ry="8" fill="#FDE047"/>
+  <polygon points="40,12 88,12 78,74 50,74" fill="#F59E0B" stroke="#B45309" stroke-width="4"/>
+      <ellipse cx="64" cy="92" rx="50" ry="20" fill="#D97706"/>
+      <ellipse cx="64" cy="88" rx="42" ry="13" fill="#FDE047"/>
 </svg>

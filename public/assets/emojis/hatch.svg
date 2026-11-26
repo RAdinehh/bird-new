@@ -1,11 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <defs>
-    <linearGradient id="g_hatch" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#FACC15"/>
-      <stop offset="100%" stop-color="#CA8A04"/>
-    </linearGradient>
-  </defs>
-  <rect x="6" y="6" width="116" height="116" rx="28" fill="url(#g_hatch)"/>
-  <rect x="12" y="10" width="104" height="50" rx="22" fill="#ffffff" fill-opacity="0.16"/>
-  <circle cx="64" cy="46" r="20" fill="#FEF08A"/><circle cx="57" cy="43" r="3" fill="#1E293B"/><circle cx="71" cy="43" r="3" fill="#1E293B"/><path d="M60 49h8l-4 5-4-5z" fill="#F97316"/><path d="M34 64l14-8 16 10 16-10 14 8c-2 22-14 36-30 36S36 86 34 64z" fill="#fff"/>
+  <circle cx="64" cy="46" r="28" fill="#FACC15" stroke="#CA8A04" stroke-width="4"/>
+      <circle cx="54" cy="42" r="4.5" fill="#0F172A"/>
+      <circle cx="74" cy="42" r="4.5" fill="#0F172A"/>
+      <polygon points="58,50 70,50 64,58" fill="#F97316"/>
+      <polygon points="22,68 42,56 64,70 86,56 106,68 96,114 32,114" fill="#FEF3C7" stroke="#D97706" stroke-width="4" stroke-linejoin="round"/>
 </svg>

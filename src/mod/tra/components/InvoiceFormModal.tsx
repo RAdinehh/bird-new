@@ -99,6 +99,20 @@ const getQuantityMax = (cat: string): number | undefined => {
   }
 };
 
+const CAT_ICON_MAP: Record<string, string> = {
+  egg: 'egg',
+  fertile_egg: 'egg',
+  chick: 'hatch',
+  adult: 'chicken',
+  feed: 'feed',
+  medicine: 'meds',
+  herbal: '🌿',
+  equipment: 'feeder',
+  manure: '💩',
+  broken: '💔',
+  other: '📋',
+};
+
 export default function InvoiceFormModal(props: InvoiceFormModalProps) {
   const { breeds } = useBrd();
   const fmt = useFormat();
@@ -187,6 +201,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             options={(isPurchase ? CATEGORIES.purchase : CATEGORIES.sale).map(([v, l]: [string, string]) => ({
               value: v,
               label: l,
+              icon: CAT_ICON_MAP[v] || '📋',
             }))}
             onChange={newCat => {
               if (newCat === form.category) return;

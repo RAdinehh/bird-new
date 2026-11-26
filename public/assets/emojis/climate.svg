@@ -1,11 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <defs>
-    <linearGradient id="g_climate" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#F43F5E"/>
-      <stop offset="100%" stop-color="#BE123C"/>
-    </linearGradient>
-  </defs>
-  <rect x="6" y="6" width="116" height="116" rx="28" fill="url(#g_climate)"/>
-  <rect x="12" y="10" width="104" height="50" rx="22" fill="#ffffff" fill-opacity="0.16"/>
-  <rect x="54" y="22" width="20" height="62" rx="10" fill="#fff"/><circle cx="64" cy="84" r="18" fill="#fff"/><circle cx="64" cy="84" r="10" fill="#BE123C"/><rect x="60" y="42" width="8" height="40" fill="#BE123C"/>
+  <rect x="50" y="12" width="28" height="76" rx="14" fill="#FFE4E6" stroke="#E11D48" stroke-width="5"/>
+      <circle cx="64" cy="92" r="24" fill="#FFE4E6" stroke="#E11D48" stroke-width="5"/>
+      <circle cx="64" cy="92" r="14" fill="#E11D48"/>
+      <rect x="58" y="38" width="12" height="50" fill="#E11D48"/>
 </svg>

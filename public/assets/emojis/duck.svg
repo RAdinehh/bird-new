@@ -1,11 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <defs>
-    <linearGradient id="g_duck" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#14B8A6"/>
-      <stop offset="100%" stop-color="#0F766E"/>
-    </linearGradient>
-  </defs>
-  <rect x="6" y="6" width="116" height="116" rx="28" fill="url(#g_duck)"/>
-  <rect x="12" y="10" width="104" height="50" rx="22" fill="#ffffff" fill-opacity="0.16"/>
-  <path d="M48 28a14 14 0 0 1 14 14c0 6-3 10-3 14 14 0 33 6 33 22 0 12-12 20-32 20-20 0-30-10-30-24 0-12 8-20 12-26-4-4-6-8-6-12a12 12 0 0 1 12-8z" fill="#fff"/><path d="M22 40h16v7H22z" rx="3" fill="#FBBF24"/><circle cx="48" cy="36" r="3" fill="#1E293B"/>
+  <path d="M46 18 A18 18 0 0 1 64 36 C64 44 60 50 60 54 C82 54 110 62 110 84 C110 102 92 114 64 114 C36 114 22 100 22 80 C22 64 32 54 38 46 C32 40 30 34 30 28 A16 16 0 0 1 46 18 Z" fill="#14B8A6" stroke="#0F766E" stroke-width="4"/>
+      <rect x="10" y="34" width="24" height="10" rx="5" fill="#FACC15" stroke="#CA8A04" stroke-width="2"/>
+      <circle cx="48" cy="30" r="4.5" fill="#0F172A"/>
 </svg>

@@ -1,11 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <defs>
-    <linearGradient id="g_turkey" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#A855F7"/>
-      <stop offset="100%" stop-color="#6B21A8"/>
-    </linearGradient>
-  </defs>
-  <rect x="6" y="6" width="116" height="116" rx="28" fill="url(#g_turkey)"/>
-  <rect x="12" y="10" width="104" height="50" rx="22" fill="#ffffff" fill-opacity="0.16"/>
-  <circle cx="66" cy="64" r="34" fill="#fff" fill-opacity=".45"/><ellipse cx="64" cy="72" rx="26" ry="22" fill="#fff"/><circle cx="48" cy="44" r="11" fill="#fff"/><path d="M36 44l10-3v7l-10-4z" fill="#FBBF24"/>
+  <circle cx="68" cy="64" r="48" fill="#A855F7" stroke="#6B21A8" stroke-width="4"/>
+      <ellipse cx="64" cy="78" rx="34" ry="28" fill="#7E22CE"/>
+      <circle cx="46" cy="44" r="15" fill="#EC4899"/>
+      <polygon points="24,44 38,38 38,50" fill="#FACC15"/>
+      <circle cx="44" cy="41" r="4" fill="#0F172A"/>
 </svg>
