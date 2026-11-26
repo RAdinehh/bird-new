@@ -5,6 +5,7 @@ import { useFormat } from '../../shr/units/useFormat';
 
 import { KpiCard, SectionTitle, MiniEmpty } from './cards';
 import { toFa } from '../../shr/utils/fa';
+import { Select } from '../../shr/components/ui/Select';
 
 interface Props {
   benchmarkData: any;
@@ -74,7 +75,7 @@ export default function TodayCard({
                         🎯 Benchmark گله
                       </div>
                       {activeFlocks.length > 1 && (
-                        <select
+                        <Select
                           value={selectedFlockId}
                           onChange={e => setSelectedFlockId(e.target.value)}
                           style={{
@@ -91,7 +92,7 @@ export default function TodayCard({
                           {activeFlocks.map(f => (
                             <option key={f.id} value={f.id}>{f.name}</option>
                           ))}
-                        </select>
+                        </Select>
                       )}
                     </div>
 

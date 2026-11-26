@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Btn, Field, Input, Modal, ErrorBox } from '../../../../shr/components/ui';
 import { DEFAULT_STANDARDS, type BirdStandard } from '../index';
 import { DEFAULT_SPECIES } from '../../../brd/species';
+import { Select } from '../../../../shr/components/ui/Select';
 
 export function AddBirdModal({
   open, onClose, existingCustom, customSpecies = [], onAdd,
@@ -76,7 +77,7 @@ export function AddBirdModal({
         <Input value={customNameEn} onChange={e => setCustomNameEn(e.target.value)} placeholder="Lari" />
       </Field>
       <Field label="کپی مقادیر از" hint="یک نژاد مشابه">
-        <select
+        <Select
           value={templateKey}
           onChange={e => setTemplateKey(e.target.value)}
           style={{
@@ -94,7 +95,7 @@ export function AddBirdModal({
             const std = existingCustom[k] || DEFAULT_STANDARDS[k];
             return <option key={k} value={k}>{std.nameFa}</option>;
           })}
-        </select>
+        </Select>
       </Field>
       <div style={{
         padding: 'var(--pad-normal)',

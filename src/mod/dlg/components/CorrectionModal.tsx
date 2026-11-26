@@ -294,13 +294,13 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
         >
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '0 6px', minWidth: 0 }}>
             {key === 'weightGender' ? (
-              <select
+              <Select
                 value={values[key] || ''}
                 onChange={e => setVal(key, e.target.value)}
                 style={{ width: '100%', border: 'none', outline: 'none', background: 'transparent', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', color: 'var(--text)', textAlign: 'center', cursor: 'pointer' }}
               >
                 {WEIGHT_GENDER_OPTS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
+              </Select>
             ) : (
               <>
                 <input

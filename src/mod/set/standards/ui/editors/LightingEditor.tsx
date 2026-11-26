@@ -2,6 +2,7 @@
  * LightingEditor — برنامه نوری
  */
 import type { BirdStandard, LightingProgram } from '../../types';
+import { Select } from '../../../../../shr/components/ui/Select';
 
 const F = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -37,7 +38,7 @@ export default function LightingEditor({ std, def, updateBird }: Props) {
   return (
     <>
       <F label="نوع لامپ">
-        <select
+        <Select
           value={lp?.lightType || ''}
           onChange={e => update({ lightType: (e.target.value || undefined) as any })}
           style={inputStyle(lp?.lightType !== dlp?.lightType)}
@@ -47,7 +48,7 @@ export default function LightingEditor({ std, def, updateBird }: Props) {
           <option value="CFL">CFL</option>
           <option value="incandescent">رشته‌ای</option>
           <option value="mixed">ترکیبی</option>
-        </select>
+        </Select>
       </F>
       <F label="یادداشت">
         <input

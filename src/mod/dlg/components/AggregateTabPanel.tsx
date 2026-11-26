@@ -15,6 +15,7 @@ import type { Flock } from '../../flk/store';
 import { Empty } from '../../../shr/components/ui';
 import { toFa } from '../../../shr/utils/fa';
 import { toCSV } from '../../../shr/utils/export';
+import { Select } from '../../../shr/components/ui/Select';
 
 type Period = 'week' | 'month';
 
@@ -463,7 +464,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
           {/* ۲. فیلتر گله */}
           {showFlockSelect && (
             <div style={{ position: 'relative', flexShrink: 0, height: 36 }}>
-              <select
+              <Select
                 value={flockFilter}
                 onChange={(e) => setFlockFilter(e.target.value)}
                 aria-label="فیلتر گله"
@@ -474,8 +475,6 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                   maxWidth: 145,
                   paddingInlineStart: 10,
                   paddingInlineEnd: 24,
-                  appearance: 'none',
-                  WebkitAppearance: 'none',
                   textOverflow: 'ellipsis',
                   overflow: 'hidden',
                 }}
@@ -486,7 +485,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
                     {f.name}
                   </option>
                 ))}
-              </select>
+              </Select>
               <svg
                 aria-hidden="true"
                 width="12"

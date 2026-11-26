@@ -2,6 +2,7 @@
  * VentilationEditor — تهویه دقیق
  */
 import type { BirdStandard, VentilationStandard } from '../../types';
+import { Select } from '../../../../../shr/components/ui/Select';
 
 const F = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -69,7 +70,7 @@ export default function VentilationEditor({ std, def, updateBird }: Props) {
         {numInput('airSpeedMS', 'سرعت هوا (m/s)')}
       </G2>
       <F label="نوع تهویه">
-        <select
+        <Select
           value={v?.ventilationType || ''}
           onChange={e => set('ventilationType', e.target.value || undefined)}
           style={inputStyle(v?.ventilationType !== dv?.ventilationType)}
@@ -79,7 +80,7 @@ export default function VentilationEditor({ std, def, updateBird }: Props) {
           <option value="cross">عرضی</option>
           <option value="natural">طبیعی</option>
           <option value="combined">ترکیبی</option>
-        </select>
+        </Select>
       </F>
     </>
   );

@@ -10,6 +10,7 @@ import {
   type LengthUnit, type AreaUnit,
   type NumberFormat, type ThousandSep, type DateFormat,
 } from '../../../shr/units/types';
+import { Select } from '../../../shr/components/ui/Select';
 
 const SEP_OPTIONS: ThousandSep[] = ['fa', 'en', 'space', 'dot', 'slash', 'none'];
 const DEC_OPTIONS = [0, 1, 2, 3, 4];
@@ -70,7 +71,7 @@ function UnitCard({
         textOverflow: 'ellipsis',
       }}>{preview}</div>
 
-      <select
+      <Select
         value={value}
         onChange={e => onChange(e.target.value)}
         style={{
@@ -92,7 +93,7 @@ function UnitCard({
         {options.map(o => (
           <option key={o.v} value={o.v}>{o.l}</option>
         ))}
-      </select>
+      </Select>
     </div>
   );
 }

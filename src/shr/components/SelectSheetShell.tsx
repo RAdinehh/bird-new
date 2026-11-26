@@ -173,7 +173,7 @@ export default function SelectSheetShell({
       style={{
         position: 'fixed', inset: 0, zIndex: 10000,
         background: 'var(--overlay)',
-        display: 'flex', alignItems: placement === 'center' ? 'center' : 'flex-end', justifyContent: 'center', padding: 0, boxSizing: 'border-box',
+        display: 'flex', alignItems: placement === 'center' ? 'center' : 'flex-end', justifyContent: 'center', padding: placement === 'center' ? '20px 18px' : 0, boxSizing: 'border-box',
         opacity: animating ? 1 : 0,
         transition: 'opacity .2s ease',
       }}
@@ -185,12 +185,14 @@ export default function SelectSheetShell({
         onClick={(e) => e.stopPropagation()}
         style={{
           background: 'var(--card-solid)',
-          borderRadius: placement === 'center' ? 'var(--r-2xl, 20px)' : 'var(--r-2xl, 20px) var(--r-2xl, 20px) 0 0',
-          width: '100%', maxWidth: 540,
-          maxHeight: placement === 'center' ? '80vh' : '70vh',
+          borderRadius: placement === 'center' ? 'var(--r-2xl, 18px)' : 'var(--r-2xl, 20px) var(--r-2xl, 20px) 0 0',
+          width: '100%',
+          maxWidth: placement === 'center' ? 440 : 540,
+          maxHeight: placement === 'center' ? '72vh' : '70vh',
           display: 'flex', flexDirection: 'column',
           overflow: 'hidden',
-          boxShadow: placement === 'center' ? '0 16px 40px rgba(0,0,0,0.22)' : undefined,
+          border: placement === 'center' ? '1px solid var(--border)' : 'none',
+          boxShadow: placement === 'center' ? '0 24px 54px rgba(0, 0, 0, 0.26)' : undefined,
           transform: placement === 'center'
             ? (animating ? 'scale(1)' : 'scale(0.96)')
             : (animating ? `translateY(${dragY}px)` : 'translateY(100%)'),

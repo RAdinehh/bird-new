@@ -5,6 +5,7 @@ import { toFa } from "../../shr/utils/fa";
  * الگوی استاندارد Google/Apple: dropdown کوچیک، آیکون‌دار
  */
 import React, { useMemo } from 'react';
+import { Select } from '../../shr/components/ui/Select';
 
 // ═══════════════════════════════════════════════
 // Sort
@@ -44,7 +45,7 @@ export function SortBar({ value, onChange, options, label = 'مرتب‌سازی
     }}>
       <span aria-hidden="true" style={{ color: 'var(--muted)' }}>⇅</span>
       <span style={{ color: 'var(--muted)', fontWeight: 600 }}>{label}:</span>
-      <select
+      <Select
         value={value}
         onChange={e => onChange(e.target.value)}
         aria-label={label}
@@ -64,7 +65,7 @@ export function SortBar({ value, onChange, options, label = 'مرتب‌سازی
         {options.map(o => (
           <option key={o.value} value={o.value}>{o.label}</option>
         ))}
-      </select>
+      </Select>
     </div>
   );
 }
