@@ -370,310 +370,360 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                 <div style={{ marginTop: 'var(--sp-1)', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
 
                   {/* 🆕 ItemDetailsForm در بالا برای همه دسته‌ها */}
-                  <ItemDetailsForm
-                    category={cat}
-                    item={it}
-                    invoiceDate={form.date}
-                    updateItem={(patch: Record<string, unknown>) => updateItem(it.id, patch as Record<string, unknown>)}
-                    isPurchase={isPurchase}
-                    showError={showError}
-                    markTouched={markTouched}
-                    itemIndex={idx}
-                    quantityField={
-                      cat === 'chick' && (UOM_CATEGORIES[cat] || UOM_CATEGORIES.other).units.length === 1 ? (
-                        <Field label="تعداد" required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
-                          <NumField placeholder="تعداد" unit="پرنده" value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
-                            let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
-                            const max = getQuantityMax(cat);
-                            if (max && val > max) val = max;
-                            if (val < 0) val = 0;
-                            updateItem(it.id, { quantity: val });
-                          }} min={0} max={getQuantityMax(cat)} />
-                        </Field>
-                      ) : undefined
-                    }
-                  />
-                  
+                        <ItemDetailsForm
+                          category={cat}
+                          item={it}
+                          invoiceDate={form.date}
+                          updateItem={(patch: Record<string, unknown>) => updateItem(it.id, patch as Record<string, unknown>)}
+                          isPurchase={isPurchase}
+                          showError={showError}
+                          markTouched={markTouched}
+                          itemIndex={idx}
+                          quantityField={
+                            cat === 'chick' && (UOM_CATEGORIES[cat] || UOM_CATEGORIES.other).units.length === 1 ? (
+                              <Field label="تعداد" required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
+                                <NumField placeholder="تعداد" unit="پرنده" value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
+                                  let val = parseFloat(toEn(e.target.value).replace('٫','.')) || 0;
+                                  const max = getQuantityMax(cat);
+                                  if (max && val > max) val = max;
+                                  if (val < 0) val = 0;
+                                  updateItem(it.id, { quantity: val });
+                                }} min={0} max={getQuantityMax(cat)} />
+                              </Field>
+                            ) : undefined
+                          }
+                        />
 
-                  {(() => {
-                    const baseUom = UOM_CATEGORIES[cat] || UOM_CATEGORIES.other;
-                    const otherCfg = cat === 'other' ? getOtherCostConfig((it as any).costType) : null;
-                    const filteredUnits = otherCfg
-                      ? baseUom.units.filter((u: UOMUnit) => otherCfg.units.includes(u.value))
-                      : baseUom.units;
-                    const uom = { ...baseUom, units: filteredUnits.length > 0 ? filteredUnits : baseUom.units, default: otherCfg ? otherCfg.defaultUnit : baseUom.default };
-                    const isSingleUnit = uom.units.length === 1;
-                    const currentUnit = it.unit || uom.default;
-                    const isFlatOther = !!(otherCfg && otherCfg.isFlat);
-                    const isFlatUnit = !!(otherCfg && currentUnit === 'flat');
-                    const hidePriceUnit = !!(otherCfg && (!otherCfg.showPriceUnit || isFlatUnit));
-                    const unitDef = uom.units.find((u: UOMUnit) => u.value === currentUnit);
-                    const needsWeight = !!(unitDef && unitDef.factor === null);
-                    const weightLabel = currentUnit === 'pack'
-                      ? `وزن/حجم هر بسته (${uom.baseUnit === 'ml' ? 'میلی‌لیتر' : uom.baseUnit === 'dose' ? 'دوز' : 'گرم'})`
-                      : currentUnit === 'vial'
-                      ? `تعداد دوز هر ویال`
-                      : `مقدار هر واحد (${uom.baseUnit})`;
-                                        return (
-                      <>
-                        {!isFlatOther && (
-                            isSingleUnit ? (
-                              (cat === 'chick' || cat === 'adult') && isPurchase ? (
-                                <Field label="تعداد سالم" error={showError(`items.${idx}.healthyCount`)} onTouch={() => markTouched(`items.${idx}.healthyCount`)}>
-                                  <NumField placeholder="تعداد سالم" unit="پرنده" value={it.healthyCount != null && it.healthyCount > 0 ? fmt.code(String(it.healthyCount)) : ''} onChange={e => { const v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || 0; const clamped = v > 0 ? Math.min(v, it.quantity || 0) : null; updateItem(it.id, { healthyCount: clamped }); }} min={0} />
-                                </Field>
-                              ) : null
-                            ) : (
-                              uom.units.length > 1 ? (
-                                <Field label="واحد" error={showError(`items.${idx}.unit`)} onTouch={() => markTouched(`items.${idx}.unit`)}>
-                                  <SmartSelect
-                                    value={currentUnit}
-                                    modalTitle="انتخاب واحد"
-                                    placeholder={undefined}
-                                    options={uom.units.map((u: UOMUnit) => ({ value: u.value, label: u.label }))}
-                                    onChange={val => updateItem(it.id, { unit: val, unitWeight: null, priceUnit: val as any, ...(val === 'flat' ? { quantity: 1 } : {}) })}
-                                  />
-                                </Field>
-                              ) : null
-                            )
-                          )}
-
-                          {(cat === 'chick' || cat === 'adult') && (() => {
-        const sf = !isPurchase && it.flockId ? flocks.find(x => x.id === it.flockId) : undefined;
-        const maxU = sf ? (sf.unknownCount ?? 0) : undefined;
-        return (
-        <div style={{ display: (it.quantity || 0) > 0 ? 'contents' : 'none' }}>
-          <Grid3>
-            <Field label="نر" hint={sf ? `موجود: ${fmt.int(sf.maleCount ?? 0)}` : undefined} error={showError(`items.${idx}.maleCount`)} onTouch={() => markTouched(`items.${idx}.maleCount`)}>
-              <NumField placeholder="۰" value={it.maleCount != null && it.maleCount > 0 ? fmt.code(String(it.maleCount)) : ''} onChange={e => {
-                let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
-                if (v !== null && v < 0) v = 0;
-                if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
-                const patch: Record<string, number | null> = { maleCount: v };
-                if (v !== null && it.femaleCount != null) {
-                  const safeMale = v;
-                  const safeFemale = it.femaleCount;
-                  const rem = Math.max(0, (it.quantity || 0) - safeMale - safeFemale);
-                  patch.unknownCount = sf ? Math.min(rem, maxU ?? 0) : rem;
-                }
-                updateItem(it.id, patch);
-              }} min={0} max={it.quantity || undefined} />
-            </Field>
-            <Field label="ماده" hint={sf ? `موجود: ${fmt.int(sf.femaleCount ?? 0)}` : undefined} error={showError(`items.${idx}.femaleCount`)} onTouch={() => markTouched(`items.${idx}.femaleCount`)}>
-              <NumField placeholder="۰" value={it.femaleCount != null && it.femaleCount > 0 ? fmt.code(String(it.femaleCount)) : ''} onChange={e => {
-                let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
-                if (v !== null && v < 0) v = 0;
-                if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
-                const patch: Record<string, number | null> = { femaleCount: v };
-                if (v !== null && it.maleCount != null) {
-                  const safeMale = it.maleCount;
-                  const safeFemale = v;
-                  const rem = Math.max(0, (it.quantity || 0) - safeMale - safeFemale);
-                  patch.unknownCount = sf ? Math.min(rem, maxU ?? 0) : rem;
-                }
-                updateItem(it.id, patch);
-              }} min={0} max={it.quantity || undefined} />
-            </Field>
-            <Field label="نامشخص" hint={sf ? `موجود: ${fmt.int(maxU)}` : "جنسیت مخلوط"} error={showError(`items.${idx}.unknownCount`)} onTouch={() => markTouched(`items.${idx}.unknownCount`)}>
-              <NumField placeholder="۰" value={it.unknownCount != null && it.unknownCount > 0 ? fmt.code(String(it.unknownCount)) : ''} onChange={e => {
-                let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
-                if (v !== null && v < 0) v = 0;
-                if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
-                updateItem(it.id, { unknownCount: v });
-              }} min={0} max={maxU !== undefined ? Math.min(it.quantity || 0, maxU) : (it.quantity || undefined)} disabled={sf ? (maxU ?? 0) === 0 : false} />
-            </Field>
-          </Grid3>
-          {(() => {
-            const total = (it.maleCount ?? 0) + (it.femaleCount ?? 0) + (it.unknownCount ?? 0);
-            const qty = it.quantity || 0;
-            if (total === 0 && qty === 0) return null;
-            const isMatch = total === qty;
-            return (
-              <div style={{ fontSize: 'var(--fs-xs)', marginTop: 6, textAlign: 'center', fontWeight: 600, color: isMatch ? 'var(--accent)' : 'var(--warn)' }}>
-                {isMatch ? '✅' : '⚠️'} مجموع: {fmt.count(total)} از {fmt.count(qty)}
-              </div>
-            );
-          })()}
-        </div>
-        );
-      })()}
-
-      {needsWeight && (
-                          <Field label={weightLabel} hint="لازم برای تبدیل به واحد پایه انبار و محاسبه قیمت">
-                            <NumField
-                              placeholder="۰"
-                              value={it.unitWeight != null && it.unitWeight > 0 ? fmt.code(String(it.unitWeight)) : ''}
-                              onChange={e => updateItem(it.id, { unitWeight: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })}
-                              min={0}
-                            />
-                          </Field>
-                        )}
                         {(() => {
-      const currentUnitDef = uom.units.find((u: UOMUnit) => u.value === currentUnit);
-      const currentUnitLabel = currentUnitDef?.label || 'واحد';
-      const factor = (currentUnitDef && currentUnitDef.factor !== null) ? currentUnitDef.factor : (it.unitWeight || 1);
-      const rawPriceUnit = String(it.priceUnit || currentUnit || '');
-      const effectivePriceUnit = uom.units.some((u: UOMUnit) => u.value === rawPriceUnit) ? rawPriceUnit : currentUnit;
-      const compatiblePriceUnits = uom.units.filter((u: UOMUnit) => {
-        if (!currentUnitDef) return true;
-        if (currentUnitDef.factor === null) return u.value === currentUnit || u.factor !== null;
-        return u.factor !== null && u.dimension === currentUnitDef.dimension;
-      });
-      const priceUnitOptions = compatiblePriceUnits.length > 0 ? compatiblePriceUnits : uom.units;
-      const activePriceUnitDef = priceUnitOptions.find((u: UOMUnit) => u.value === effectivePriceUnit) || currentUnitDef;
-      const activePriceUnitLabel = activePriceUnitDef?.label || currentUnitLabel;
-      const priceRatio = resolveItemPriceFactor(cat, currentUnit, it.unitWeight, effectivePriceUnit, it.liveWeight, it.quantity);
-      const baseQty = (it.quantity || 0) * factor;
-      const liveTotal = Math.round((it.quantity || 0) * priceRatio * (it.unitPrice || 0));
-      const baseUnitLabel = uom.baseUnit === 'kg' ? 'کیلوگرم' : uom.baseUnit === 'g' ? 'گرم' : uom.baseUnit === 'ml' ? 'میلی‌لیتر' : uom.baseUnit === 'dose' ? 'دوز' : 'واحد';
-      return (
-        <>
-          {(() => {
-              const showPriceUnit = !hidePriceUnit && priceUnitOptions.length > 1;
-              const showShipping = !otherCfg || otherCfg.showShipping;
+                          const baseUom = UOM_CATEGORIES[cat] || UOM_CATEGORIES.other;
+                          const otherCfg = cat === 'other' ? getOtherCostConfig((it as any).costType) : null;
+                          const filteredUnits = otherCfg
+                            ? baseUom.units.filter((u: UOMUnit) => otherCfg.units.includes(u.value))
+                            : baseUom.units;
+                          const uom = { ...baseUom, units: filteredUnits.length > 0 ? filteredUnits : baseUom.units, default: otherCfg ? otherCfg.defaultUnit : baseUom.default };
+                          const currentUnit = it.unit || uom.default;
+                          const isFlatOther = !!(otherCfg && otherCfg.isFlat);
+                          const isFlatUnit = !!(otherCfg && currentUnit === 'flat');
+                          const hidePriceUnit = !!(otherCfg && (!otherCfg.showPriceUnit || isFlatUnit));
+                          const unitDef = uom.units.find((u: UOMUnit) => u.value === currentUnit);
+                          const needsWeight = !!(unitDef && unitDef.factor === null);
+                          const weightLabel = currentUnit === 'pack'
+                            ? `وزن/حجم هر بسته (${uom.baseUnit === 'ml' ? 'میلی‌لیتر' : uom.baseUnit === 'dose' ? 'دوز' : 'گرم'})`
+                            : currentUnit === 'vial'
+                            ? `تعداد دوز هر ویال`
+                            : `مقدار هر واحد (${uom.baseUnit === 'ml' ? 'میلی‌لیتر' : uom.baseUnit === 'dose' ? 'دوز' : uom.baseUnit === 'g' ? 'گرم' : uom.baseUnit === 'kg' ? 'کیلوگرم' : 'واحد'})`;
 
-              const flatPriceField = (
-                <Field label={otherCfg?.priceLabel || "مبلغ کل"} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
-                  <MoneyField placeholder={otherCfg?.priceLabel || "مبلغ کل"} value={it.unitPrice > 0 ? fmt.code(String(it.unitPrice)) : ''} onChange={e => {
-                    let val = parseFloat(toEn(e.target.value).replace('٫', '.')) || 0;
-                    if (maxPrice && val > maxPrice) val = maxPrice;
-                    if (val < 0) val = 0;
-                    updateItem(it.id, { unitPrice: val, quantity: 1 });
-                  }} />
-                </Field>
-              );
+                          const currentUnitDef = uom.units.find((u: UOMUnit) => u.value === currentUnit);
+                          const currentUnitLabel = currentUnitDef?.label || 'واحد';
+                          const factor = (currentUnitDef && currentUnitDef.factor !== null) ? currentUnitDef.factor : (it.unitWeight || 1);
+                          const rawPriceUnit = String(it.priceUnit || currentUnit || '');
+                          const effectivePriceUnit = uom.units.some((u: UOMUnit) => u.value === rawPriceUnit) ? rawPriceUnit : currentUnit;
+                          const compatiblePriceUnits = uom.units.filter((u: UOMUnit) => {
+                            if (!currentUnitDef) return true;
+                            if (currentUnitDef.factor === null) return u.value === currentUnit || u.factor !== null;
+                            return u.factor !== null && u.dimension === currentUnitDef.dimension;
+                          });
+                          const priceUnitOptions = compatiblePriceUnits.length > 0 ? compatiblePriceUnits : uom.units;
+                          const activePriceUnitDef = priceUnitOptions.find((u: UOMUnit) => u.value === effectivePriceUnit) || currentUnitDef;
+                          const activePriceUnitLabel = cat === 'adult'
+                            ? (it.priceUnit === 'perKg' ? 'کیلوگرم' : 'پرنده')
+                            : (cat === 'chick' ? 'پرنده' : (activePriceUnitDef?.label || currentUnitLabel));
+                          const priceRatio = resolveItemPriceFactor(cat, currentUnit, it.unitWeight, effectivePriceUnit, it.liveWeight, it.quantity);
+                          const baseQty = (it.quantity || 0) * factor;
+                          const liveTotal = Math.round((it.quantity || 0) * priceRatio * (it.unitPrice || 0));
+                          const baseUnitLabel = uom.baseUnit === 'kg' ? 'کیلوگرم' : uom.baseUnit === 'g' ? 'گرم' : uom.baseUnit === 'ml' ? 'میلی‌لیتر' : uom.baseUnit === 'dose' ? 'دوز' : 'واحد';
 
-              const qtyField = (
-                <Field label={cat === 'fertile_egg' ? 'تعداد تخم نطفه‌دار' : (otherCfg?.qtyLabel || "تعداد")} required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
-                  <NumField placeholder={cat === 'fertile_egg' ? 'تعداد تخم نطفه‌دار' : (otherCfg?.qtyLabel || "تعداد")} value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
-                    let val = parseFloat(toEn(e.target.value).replace('٫', '.')) || 0;
-                    const max = getQuantityMax(cat);
-                    if (max && val > max) val = max;
-                    if (val < 0) val = 0;
-                    updateItem(it.id, { quantity: val });
-                  }} min={0} max={getQuantityMax(cat)} />
-                </Field>
-              );
+                          const showPriceUnit = !hidePriceUnit && priceUnitOptions.length > 1;
+                          const showShipping = !otherCfg || otherCfg.showShipping;
+                          const hasUnitSelect = !isFlatOther && uom.units.length > 1;
 
-              const unitPriceField = (
-                <Field label={`قیمت هر ${activePriceUnitLabel}`} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
-                  <MoneyField placeholder={`قیمت هر ${activePriceUnitLabel}`} value={it.unitPrice > 0 ? fmt.code(String(it.unitPrice)) : ''} onChange={e => {
-                    let val = parseFloat(toEn(e.target.value).replace('٫', '.')) || 0;
-                    if (maxPrice && val > maxPrice) val = maxPrice;
-                    if (val < 0) val = 0;
-                    updateItem(it.id, { unitPrice: val });
-                  }} />
-                  {it.unitPrice > 0 && <FieldHint fieldPath={`tra.price_${cat}`} value={it.unitPrice} />}
-                </Field>
-              );
+                          const unitField = hasUnitSelect ? (
+                            <Field label="واحد" error={showError(`items.${idx}.unit`)} onTouch={() => markTouched(`items.${idx}.unit`)}>
+                              <SmartSelect
+                                value={currentUnit}
+                                modalTitle="انتخاب واحد"
+                                placeholder={undefined}
+                                options={uom.units.map((u: UOMUnit) => ({ value: u.value, label: u.label }))}
+                                onChange={val => updateItem(it.id, { unit: val, unitWeight: null, priceUnit: val as any, ...(val === 'flat' ? { quantity: 1 } : {}) })}
+                              />
+                            </Field>
+                          ) : null;
 
-              const priceUnitField = (
-                <Field label={FIELD_META.priceUnit.label}>
-                  <SmartSelect
-                    value={effectivePriceUnit}
-                    modalTitle={FIELD_META.priceUnit.modalTitle}
-                    placeholder={undefined}
-                    options={priceUnitOptions.map((u: UOMUnit) => ({ value: u.value, label: u.label }))}
-                    onChange={val => updateItem(it.id, { priceUnit: val as any })}
-                  />
-                </Field>
-              );
+                          const healthyField = (cat === 'chick' || cat === 'adult') && isPurchase ? (
+                            <Field label="تعداد سالم" error={showError(`items.${idx}.healthyCount`)} onTouch={() => markTouched(`items.${idx}.healthyCount`)}>
+                              <NumField placeholder="تعداد سالم" unit="پرنده" value={it.healthyCount != null && it.healthyCount > 0 ? fmt.code(String(it.healthyCount)) : ''} onChange={e => { const v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || 0; const clamped = v > 0 ? Math.min(v, it.quantity || 0) : null; updateItem(it.id, { healthyCount: clamped }); }} min={0} />
+                            </Field>
+                          ) : null;
 
-              const shippingField = (
-                <Field label="هزینه حمل این قلم" error={showError(`items.${idx}.shipping`)} onTouch={() => markTouched(`items.${idx}.shipping`)}>
-                  <MoneyField placeholder="هزینه حمل" value={it.shipping && it.shipping > 0 ? fmt.code(String(it.shipping)) : ''} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫', '.')) || 0 })} min={0} />
-                </Field>
-              );
+                          const flatPriceField = (
+                            <Field label={otherCfg?.priceLabel || "مبلغ کل"} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
+                              <MoneyField placeholder={otherCfg?.priceLabel || "مبلغ کل"} value={it.unitPrice > 0 ? fmt.code(String(it.unitPrice)) : ''} onChange={e => {
+                                let val = parseFloat(toEn(e.target.value).replace('٫', '.')) || 0;
+                                if (maxPrice && val > maxPrice) val = maxPrice;
+                                if (val < 0) val = 0;
+                                updateItem(it.id, { unitPrice: val, quantity: 1 });
+                              }} />
+                            </Field>
+                          );
 
-              if (isFlatOther || isFlatUnit) {
-                return showShipping ? <Grid2>{flatPriceField}{shippingField}</Grid2> : flatPriceField;
-              }
+                          const qtyField = (
+                            <Field label={cat === 'fertile_egg' ? 'تعداد تخم نطفه‌دار' : (otherCfg?.qtyLabel || "تعداد")} required error={showError(`items.${idx}.quantity`)} onTouch={() => markTouched(`items.${idx}.quantity`)}>
+                              <NumField placeholder={cat === 'fertile_egg' ? 'تعداد تخم نطفه‌دار' : (otherCfg?.qtyLabel || "تعداد")} value={it.quantity > 0 ? fmt.code(String(it.quantity)) : ''} onChange={e => {
+                                let val = parseFloat(toEn(e.target.value).replace('٫', '.')) || 0;
+                                const max = getQuantityMax(cat);
+                                if (max && val > max) val = max;
+                                if (val < 0) val = 0;
+                                updateItem(it.id, { quantity: val });
+                              }} min={0} max={getQuantityMax(cat)} />
+                            </Field>
+                          );
 
-              if (cat !== 'chick') {
-                return (
-                  <>
-                    <Grid2>{qtyField}{unitPriceField}</Grid2>
-                    {showPriceUnit && showShipping ? (
-                      <Grid2>{priceUnitField}{shippingField}</Grid2>
-                    ) : (
-                      <>
-                        {showPriceUnit && priceUnitField}
-                        {showShipping && shippingField}
-                      </>
-                    )}
-                  </>
-                );
-              }
+                          const unitPriceField = (
+                            <Field label={`قیمت هر ${activePriceUnitLabel}`} required error={showError(`items.${idx}.unitPrice`)} onTouch={() => markTouched(`items.${idx}.unitPrice`)}>
+                              <MoneyField placeholder={`قیمت هر ${activePriceUnitLabel}`} value={it.unitPrice > 0 ? fmt.code(String(it.unitPrice)) : ''} onChange={e => {
+                                let val = parseFloat(toEn(e.target.value).replace('٫', '.')) || 0;
+                                if (maxPrice && val > maxPrice) val = maxPrice;
+                                if (val < 0) val = 0;
+                                updateItem(it.id, { unitPrice: val });
+                              }} />
+                              {it.unitPrice > 0 && <FieldHint fieldPath={`tra.price_${cat}`} value={it.unitPrice} />}
+                            </Field>
+                          );
 
-              return (
-                <>
-                  {showPriceUnit ? (
-                    <>
-                      <Grid2>{unitPriceField}{priceUnitField}</Grid2>
-                      {showShipping && shippingField}
-                    </>
-                  ) : showShipping ? (
-                    <Grid2>{unitPriceField}{shippingField}</Grid2>
-                  ) : (
-                    unitPriceField
-                  )}
-                </>
-              );
-            })()}
-            {it.quantity > 0 && it.unitPrice > 0 && (
-                <div style={{
-                  marginTop: 'var(--sp-1)',
-                  padding: '10px 12px',
-                  background: 'var(--accent-soft)',
-                  border: '1px dashed var(--accent)',
-                  borderRadius: 'var(--r-md)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '6px'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 600 }}>
-                    <span>
-                      {fmt.num(it.quantity)} {currentUnitLabel}
-                      {factor !== 1 && !currentUnitLabel.includes(baseUnitLabel) ? ` (${fmt.num(baseQty)} ${baseUnitLabel})` : ''}
-                    </span>
-                    <span>× {fmt.money(it.unitPrice, { withUnit: false })} تومان</span>
-                  </div>
-                  <div style={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    borderTop: '1px dashed var(--accent)', paddingTop: '6px', marginTop: '2px'
-                  }}>
-                    <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)' }}>جمع محاسبه‌شده:</span>
-                    <span style={{ fontSize: 'var(--fs-md)', fontWeight: 800, color: 'var(--accent)' }}>
-                      {fmt.money(liveTotal, { withUnit: false })} تومان
-                    </span>
-                  </div>
-                </div>
-              )}
+                          const priceUnitField = (
+                            <Field label={FIELD_META.priceUnit.label}>
+                              <SmartSelect
+                                value={effectivePriceUnit}
+                                modalTitle={FIELD_META.priceUnit.modalTitle}
+                                placeholder={undefined}
+                                options={priceUnitOptions.map((u: UOMUnit) => ({ value: u.value, label: u.label }))}
+                                onChange={val => updateItem(it.id, { priceUnit: val as any })}
+                              />
+                            </Field>
+                          );
+
+                          const shippingField = (
+                            <Field label="هزینه حمل این قلم" error={showError(`items.${idx}.shipping`)} onTouch={() => markTouched(`items.${idx}.shipping`)}>
+                              <MoneyField placeholder="هزینه حمل" value={it.shipping && it.shipping > 0 ? fmt.code(String(it.shipping)) : ''} onChange={e => updateItem(it.id, { shipping: parseFloat(toEn(e.target.value).replace('٫', '.')) || 0 })} min={0} />
+                            </Field>
+                          );
+
+                          const discountField = (
+                            <Field label="تخفیف این قلم" error={showError(`items.${idx}.discountValue`)} onTouch={() => markTouched(`items.${idx}.discountValue`)}>
+                              <MoneyField placeholder="مبلغ تخفیف" value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: Math.max(0, parseFloat(toEn(e.target.value).replace('٫','.')) || 0) })} min={0} />
+                            </Field>
+                          );
+
+                          const totalField = (
+                            <Field label="مبلغ کل این قلم">
+                              <div style={{ height: 38, display: 'flex', alignItems: 'center', fontWeight: 800, color: 'var(--accent)', direction: 'rtl', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', justifyContent: 'flex-end' }}>
+                                {it.total > 0 ? `${fmt.money(it.total, { withUnit: false })} تومان` : ''}
+                              </div>
+                            </Field>
+                          );
+
+                          const sexBreakdown = (cat === 'chick' || cat === 'adult') ? (() => {
+                            const sf = !isPurchase && it.flockId ? flocks.find(x => x.id === it.flockId) : undefined;
+                            const maxU = sf ? (sf.unknownCount ?? 0) : undefined;
+                            return (
+                              <div style={{ display: (it.quantity || 0) > 0 ? 'contents' : 'none' }}>
+                                <Grid3>
+                                  <Field label="نر" hint={sf ? `موجود: ${fmt.int(sf.maleCount ?? 0)}` : undefined} error={showError(`items.${idx}.maleCount`)} onTouch={() => markTouched(`items.${idx}.maleCount`)}>
+                                    <NumField placeholder="۰" value={it.maleCount != null && it.maleCount > 0 ? fmt.code(String(it.maleCount)) : ''} onChange={e => {
+                                      let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
+                                      if (v !== null && v < 0) v = 0;
+                                      if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
+                                      const patch: Record<string, number | null> = { maleCount: v };
+                                      if (v !== null && it.femaleCount != null) {
+                                        const safeMale = v;
+                                        const safeFemale = it.femaleCount;
+                                        const rem = Math.max(0, (it.quantity || 0) - safeMale - safeFemale);
+                                        patch.unknownCount = sf ? Math.min(rem, maxU ?? 0) : rem;
+                                      }
+                                      updateItem(it.id, patch);
+                                    }} min={0} max={it.quantity || undefined} />
+                                  </Field>
+                                  <Field label="ماده" hint={sf ? `موجود: ${fmt.int(sf.femaleCount ?? 0)}` : undefined} error={showError(`items.${idx}.femaleCount`)} onTouch={() => markTouched(`items.${idx}.femaleCount`)}>
+                                    <NumField placeholder="۰" value={it.femaleCount != null && it.femaleCount > 0 ? fmt.code(String(it.femaleCount)) : ''} onChange={e => {
+                                      let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
+                                      if (v !== null && v < 0) v = 0;
+                                      if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
+                                      const patch: Record<string, number | null> = { femaleCount: v };
+                                      if (v !== null && it.maleCount != null) {
+                                        const safeMale = it.maleCount;
+                                        const safeFemale = v;
+                                        const rem = Math.max(0, (it.quantity || 0) - safeMale - safeFemale);
+                                        patch.unknownCount = sf ? Math.min(rem, maxU ?? 0) : rem;
+                                      }
+                                      updateItem(it.id, patch);
+                                    }} min={0} max={it.quantity || undefined} />
+                                  </Field>
+                                  <Field label="نامشخص" hint={sf ? `موجود: ${fmt.int(maxU)}` : "جنسیت مخلوط"} error={showError(`items.${idx}.unknownCount`)} onTouch={() => markTouched(`items.${idx}.unknownCount`)}>
+                                    <NumField placeholder="۰" value={it.unknownCount != null && it.unknownCount > 0 ? fmt.code(String(it.unknownCount)) : ''} onChange={e => {
+                                      let v = Math.round(parseFloat(toEn(e.target.value).replace('٫','.'))) || null;
+                                      if (v !== null && v < 0) v = 0;
+                                      if (v !== null && v > (it.quantity || 0)) v = it.quantity || 0;
+                                      updateItem(it.id, { unknownCount: v });
+                                    }} min={0} max={maxU !== undefined ? Math.min(it.quantity || 0, maxU) : (it.quantity || undefined)} disabled={sf ? (maxU ?? 0) === 0 : false} />
+                                  </Field>
+                                </Grid3>
+                                {(() => {
+                                  const total = (it.maleCount ?? 0) + (it.femaleCount ?? 0) + (it.unknownCount ?? 0);
+                                  const qty = it.quantity || 0;
+                                  if (total === 0 && qty === 0) return null;
+                                  const isMatch = total === qty;
+                                  return (
+                                    <div style={{ fontSize: 'var(--fs-xs)', marginTop: 6, textAlign: 'center', fontWeight: 600, color: isMatch ? 'var(--accent)' : 'var(--warn)' }}>
+                                      {isMatch ? '✅' : '⚠️'} مجموع: {fmt.count(total)} از {fmt.count(qty)}
+                                    </div>
+                                  );
+                                })()}
+                              </div>
+                            );
+                          })() : null;
+
+                          const weightField = needsWeight ? (
+                            <Field label={weightLabel} hint="لازم برای تبدیل به واحد پایه انبار و محاسبه قیمت">
+                              <NumField
+                                placeholder="۰"
+                                value={it.unitWeight != null && it.unitWeight > 0 ? fmt.code(String(it.unitWeight)) : ''}
+                                onChange={e => updateItem(it.id, { unitWeight: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })}
+                                min={0}
+                              />
+                            </Field>
+                          ) : null;
+
+                          const liveSummary = (it.quantity > 0 && it.unitPrice > 0) ? (
+                            <div style={{
+                              marginTop: 'var(--sp-1)',
+                              padding: '10px 12px',
+                              background: 'var(--accent-soft)',
+                              border: '1px dashed var(--accent)',
+                              borderRadius: 'var(--r-md)',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '6px'
+                            }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', color: 'var(--text)', fontWeight: 600 }}>
+                                <span>
+                                  {fmt.num(it.quantity)} {currentUnitLabel}
+                                  {factor !== 1 && !currentUnitLabel.includes(baseUnitLabel) ? ` (${fmt.num(baseQty)} ${baseUnitLabel})` : ''}
+                                </span>
+                                <span>× {fmt.money(it.unitPrice, { withUnit: false })} تومان</span>
+                              </div>
+                              <div style={{
+                                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                borderTop: '1px dashed var(--accent)', paddingTop: '6px', marginTop: '2px'
+                              }}>
+                                <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--accent)' }}>جمع محاسبه‌شده:</span>
+                                <span style={{ fontSize: 'var(--fs-md)', fontWeight: 800, color: 'var(--accent)' }}>
+                                  {fmt.money(liveTotal, { withUnit: false })} تومان
+                                </span>
+                              </div>
+                            </div>
+                          ) : null;
+
+                          // ۱. اقلام مقطوع (قبوض، تعمیرات، یا انتخاب واحد مقطوع)
+                          if (isFlatOther || isFlatUnit) {
+                            return (
+                              <>
+                                {unitField ? <Grid2>{unitField}{flatPriceField}</Grid2> : <Grid2>{flatPriceField}{discountField}</Grid2>}
+                                {unitField && (showShipping ? <Grid2>{shippingField}{discountField}</Grid2> : discountField)}
+                                {totalField}
+                              </>
+                            );
+                          }
+
+                          // ۲. جوجه یک‌روزه (تعداد در فرم بالا کنار وزن اولیه قرار دارد)
+                          if (cat === 'chick') {
+                            return (
+                              <>
+                                {sexBreakdown}
+                                {healthyField ? (
+                                  <>
+                                    <Grid2>{healthyField}{unitPriceField}</Grid2>
+                                    {liveSummary}
+                                    {showShipping ? <Grid2>{shippingField}{discountField}</Grid2> : discountField}
+                                    {totalField}
+                                  </>
+                                ) : (
+                                  <>
+                                    {showShipping ? <Grid2>{unitPriceField}{shippingField}</Grid2> : unitPriceField}
+                                    {liveSummary}
+                                    <Grid2>{discountField}{totalField}</Grid2>
+                                  </>
+                                )}
+                              </>
+                            );
+                          }
+
+                          // ۳. دسته‌های چندواحدی (دان، دارو، واکسن، داروی گیاهی، تجهیزات، مصرفی، کود، سایر)
+                          if (unitField) {
+                            return (
+                              <>
+                                <Grid2>{qtyField}{unitField}</Grid2>
+                                {weightField}
+                                {showPriceUnit ? (
+                                  <>
+                                    <Grid2>{priceUnitField}{unitPriceField}</Grid2>
+                                    {liveSummary}
+                                    {showShipping ? (
+                                      <>
+                                        <Grid2>{shippingField}{discountField}</Grid2>
+                                        {totalField}
+                                      </>
+                                    ) : (
+                                      <Grid2>{discountField}{totalField}</Grid2>
+                                    )}
+                                  </>
+                                ) : showShipping ? (
+                                  <>
+                                    <Grid2>{unitPriceField}{shippingField}</Grid2>
+                                    {liveSummary}
+                                    <Grid2>{discountField}{totalField}</Grid2>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Grid2>{unitPriceField}{discountField}</Grid2>
+                                    {liveSummary}
+                                    {totalField}
+                                  </>
+                                )}
+                              </>
+                            );
+                          }
+
+                          // ۴. دسته‌های تک‌واحدی (تخم، تخم نطفه‌دار، تخم شکسته، پرنده بالغ)
+                          if (healthyField) {
+                            return (
+                              <>
+                                <Grid2>{qtyField}{healthyField}</Grid2>
+                                {sexBreakdown}
+                                {showShipping ? <Grid2>{unitPriceField}{shippingField}</Grid2> : unitPriceField}
+                                {liveSummary}
+                                <Grid2>{discountField}{totalField}</Grid2>
+                              </>
+                            );
+                          }
+
+                          return (
+                            <>
+                              <Grid2>{qtyField}{unitPriceField}</Grid2>
+                              {sexBreakdown}
+                              {liveSummary}
+                              {showShipping ? <Grid2>{shippingField}{discountField}</Grid2> : discountField}
+                              {totalField}
                             </>
                           );
                         })()}
-                      </>
-                    );
-                  })()}
-<Grid2>
-                    <Field label="تخفیف این قلم" error={showError(`items.${idx}.discountValue`)} onTouch={() => markTouched(`items.${idx}.discountValue`)}>
-                      <MoneyField placeholder="مبلغ تخفیف" value={String(it.discountValue || '')} onChange={e => updateItem(it.id, { discountType: 'amount', discountValue: Math.max(0, parseFloat(toEn(e.target.value).replace('٫','.')) || 0) })} min={0} />
-                    </Field>
-                    <Field label="مبلغ کل این قلم">
-                      <div style={{ height: 38, display: 'flex', alignItems: 'center', fontWeight: 800, color: 'var(--accent)', direction: 'rtl', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '0 12px', justifyContent: 'flex-end' }}>
-                        {it.total > 0 ? `${fmt.money(it.total, { withUnit: false })} تومان` : ''}
+
                       </div>
-                    </Field>
-                  </Grid2>
+                    )}
+                  </div>
+                );
+              })}
 
-
-                </div>
-              )}
-            </div>
-          );
-        })}
-
-        <Btn full onClick={addItem}>
+              <Btn full onClick={addItem}>
                 + {form.items.length === 0 ? 'افزودن اولین قلم' : 'افزودن قلم دیگر'}
               </Btn>
       </div>
