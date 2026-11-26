@@ -512,15 +512,15 @@ export const CATEGORY_DEFAULTS: Record<ItemCategory, {
   needsEquipment: boolean;
   title: string;
 }> = {
-  egg:        { unit: getBaseUnit('egg'),  storage: 'room',   needsExpiry: true,  needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '🥚 اطلاعات تخم' },
+  egg:        { unit: getBaseUnit('egg'),  storage: 'room',   needsExpiry: true,  needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: 'اطلاعات تخم' },
   feed:       { unit: getBaseUnit('feed'),   storage: 'room',   needsExpiry: true,  needsWithdrawal: false, needsBatch: true,  needsStorage: false, needsEquipment: false, title: '' },
-  medicine:   { unit: getBaseUnit('medicine'),   storage: 'fridge', needsExpiry: true,  needsWithdrawal: true,  needsBatch: true,  needsStorage: true,  needsEquipment: false, title: '💊 اطلاعات دارویی' },
-  vaccine:    { unit: getBaseUnit('vaccine'), storage: 'fridge', needsExpiry: true,  needsWithdrawal: true,  needsBatch: true,  needsStorage: true,  needsEquipment: false, title: '💉 اطلاعات واکسن' },
-  herbal:     { unit: getBaseUnit('herbal'),    storage: 'room',   needsExpiry: true,  needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '🌿 اطلاعات گیاهی' },
+  medicine:   { unit: getBaseUnit('medicine'),   storage: 'fridge', needsExpiry: true,  needsWithdrawal: true,  needsBatch: true,  needsStorage: true,  needsEquipment: false, title: 'اطلاعات دارویی' },
+  vaccine:    { unit: getBaseUnit('vaccine'), storage: 'fridge', needsExpiry: true,  needsWithdrawal: true,  needsBatch: true,  needsStorage: true,  needsEquipment: false, title: 'اطلاعات واکسن' },
+  herbal:     { unit: getBaseUnit('herbal'),    storage: 'room',   needsExpiry: true,  needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: 'اطلاعات گیاهی' },
   equipment:  { unit: getBaseUnit('equipment'),  storage: 'room',   needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: true,  title: '' },
   consumable: { unit: getBaseUnit('consumable'),  storage: 'room',   needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '' },
-  manure:     { unit: getBaseUnit('manure'),   storage: 'room', needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '🌱 اطلاعات کود' },
-  broken:     { unit: getBaseUnit('broken'),  storage: 'room', needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: '💔 تخم شکسته' },
+  manure:     { unit: getBaseUnit('manure'),   storage: 'room', needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: 'اطلاعات کود' },
+  broken:     { unit: getBaseUnit('broken'),  storage: 'room', needsExpiry: false, needsWithdrawal: false, needsBatch: false, needsStorage: false, needsEquipment: false, title: 'تخم شکسته' },
 };
 
 export const UNIT_LABEL: Record<ItemUnit, string> = {
