@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type { Bird } from './store';
 import BirdNameField, { type BirdPresetPick } from './BirdNameField';
 import { Btn, BtnRow, Field, Modal, ErrorBox } from '../../shr/components/ui';
+import { OptionIcon } from '../../shr/components/OptionIcon';
 import { DEFAULT_STANDARDS } from '../set/standards/data';
 import { resolveStandard } from './_display-values';
 import { DEFAULT_SPECIES } from './species';
@@ -43,7 +44,7 @@ function StatBox({ icon, label, value }: { icon: string; label: string; value: s
       alignItems: 'center',
       gap: 6,
     }}>
-      <span style={{ fontSize: 'var(--fs-md)' }}>{icon}</span>
+      <OptionIcon icon={icon} size={20} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--muted)', fontWeight: 600 }}>
           {label}
@@ -161,7 +162,7 @@ export default function BirdForm({ open, onClose, form, setForm, error, showErro
             <StatBox icon="🌾" label="بومی" value={`${stats.native} نژاد`} />
             <StatBox icon="🏭" label="صنعتی" value={`${stats.industrial} نژاد`} />
             {stats.fancy > 0 && (
-              <StatBox icon="🎨" label="تزئینی" value={`${stats.fancy} نژاد`} />
+              <StatBox icon="🦚" label="تزئینی" value={`${stats.fancy} نژاد`} />
             )}
           </div>
         </div>

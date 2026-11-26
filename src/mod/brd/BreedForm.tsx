@@ -1,10 +1,10 @@
-import { AppIconKey } from '../../shr/icons/AppIcons';
 import { useFormat } from '../../shr/units/useFormat';
 import { useEffect, useState } from 'react';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import type { Bird, Breed } from './store';
+import { getKindInfo } from './_display';
 import { toFa, toEn } from '../../shr/utils/fa';
 import { detectBreedFcrSource, getBreedFcrBaseline } from './_source';
 import { resolveStandard } from './_display-values';
@@ -37,7 +37,7 @@ const PURPOSE_OPTIONS = [
   { key: 'layer',      label: 'تخم‌گذار', icon: '🥚' },
   { key: 'breeder',    label: 'مادر',     icon: '🐣' },
   { key: 'broiler',    label: 'گوشتی',    icon: '🥩' },
-  { key: 'ornamental', label: 'تزئینی',   icon: '🎨' },
+  { key: 'ornamental', label: 'تزئینی',   icon: '🦚' },
 ];
 
 const BreedFormSchema = z.object({
@@ -199,14 +199,9 @@ export default function BreedForm({
                 }}
                 error={errors.birdId?.message}
                 options={birds.map((c: any) => {
-      const name = (c.name || '').toLowerCase();
-      const kind = (c.kind || c.type || '').toLowerCase();
-      let icon: AppIconKey = 'chicken';
-      if (name.includes('اردک') || name.includes('duck') || kind.includes('duck')) icon = 'duck';
-      else if (name.includes('بوقلمون') || name.includes('turkey') || kind.includes('turkey')) icon = 'turkey';
-      else if (name.includes('تخمگذار') || name.includes('layer')) icon = 'egg';
-      return { value: c.id, label: c.name, icon };
-    })}
+                  const info = getKindInfo(c.birdKind || c.kind || c.type);
+                  return { value: c.id, label: c.name, icon: info.emoji };
+                })}
                 placeholder="— انتخاب —"
                 modalTitle="انتخاب پرنده"
               />

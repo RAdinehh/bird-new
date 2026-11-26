@@ -45,7 +45,7 @@ interface Props {
 const CATEGORY_GROUPS: Record<string, { label: string; icon: string; order: number }> = {
   native:     { label: 'بومی',    icon: '🌾', order: 1 },
   industrial: { label: 'صنعتی',   icon: '🏭', order: 2 },
-  fancy:      { label: 'تزئینی',  icon: '🎨', order: 3 },
+  fancy:      { label: 'تزئینی',  icon: '🦚', order: 3 },
 };
 
 const KIND_EMOJI: Record<string, string> = {

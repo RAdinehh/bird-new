@@ -1,7 +1,7 @@
 import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
 import type { Bird, Breed } from './store';
 import { toFa } from '../../shr/utils/fa';
-import { getPurposeInfo, getCategoryInfo } from './_display';
+import { getPurposeInfo, getCategoryInfo, getKindInfo } from './_display';
 import { getBirdDisplayName, getBreedDisplayName } from './_display-name';
 import { getBreedFcr, resolveStandard } from './_display-values';
 import EntityLink from '../../shr/components/EntityLink';

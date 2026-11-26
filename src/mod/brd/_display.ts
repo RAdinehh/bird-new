@@ -37,7 +37,7 @@ export interface PurposeInfo {
 export const PURPOSE_MAP: Record<string, PurposeInfo> = {
   broiler:    { emoji: '🥩', label: 'گوشتی',    tone: 'green' },
   layer:      { emoji: '🥚', label: 'تخم‌گذار', tone: 'green' },
-  breeder:    { emoji: '🧬', label: 'مادر',     tone: 'purple' },
+  breeder:    { emoji: '🐣', label: 'مادر',     tone: 'purple' },
   dual:       { emoji: '🥚🥩', label: 'دو منظوره', tone: 'green' },
   ornamental: { emoji: '🦚', label: 'تزئینی',   tone: 'amber' },
 };
