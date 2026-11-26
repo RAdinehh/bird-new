@@ -292,7 +292,7 @@ export default function SelectSheetShell({
         <div style={{ position: 'relative', flex: 1, display: 'flex', minHeight: 0 }}>
           <ScrollIndicator visible={showIndicator} />
           <div ref={bodyRef} onScroll={checkScroll} style={{
-            padding: flush ? '4px 0 14px' : '10px 10px 16px',
+            padding: flush ? '4px 0 14px' : '8px 0 16px',
             overflowY: 'auto', flex: 1,
             display: 'flex', flexDirection: 'column',
             gap: flush ? 0 : 10,
