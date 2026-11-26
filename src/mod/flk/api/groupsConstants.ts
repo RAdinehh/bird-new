@@ -40,11 +40,11 @@ export const TYPE_ICON_MAP: Record<FlockGroupType, string> = TYPE_OPTIONS.reduce
 }, {} as Record<FlockGroupType, string>);
 
 export const NAME_PLACEHOLDER: Record<FlockGroupType, string> = {
-  season: 'مثلاً: گله پاییز ۱۴۰۵',
-  breed: 'مثلاً: مرندی‌ها',
-  cohort: 'مثلاً: هم‌دوره مرداد',
-  farm: 'مثلاً: مزرعه شمال',
-  owner: 'مثلاً: گله‌های آقای رضایی',
-  custom: 'مثلاً: گله‌های ممتاز',
-  smart: 'مثلاً: همه لایه‌های فعال',
+  season: 'نام دوره یا فصل',
+  breed: 'نام گروه نژادی',
+  cohort: 'نام هم‌دوره',
+  farm: 'نام مزرعه یا واحد',
+  owner: 'نام مالک یا شریک',
+  custom: 'نام گروه دلخواه',
+  smart: 'نام گروه هوشمند',
 };

@@ -64,7 +64,7 @@ export default function FlockCreateModal(props: FlockCreateModalProps) {
       {err && <ErrorBox>{err}</ErrorBox>}
       <Field label="نام گله" required>
         <Input
-          placeholder="مثلاً — گله بهار ۱۴۰۵"
+          placeholder="نام گله"
           value={form.name}
           onChange={e => setForm({ ...form, name: e.target.value })}
         />
@@ -78,7 +78,7 @@ export default function FlockCreateModal(props: FlockCreateModalProps) {
           </Select>
         </Field>
         <Field label="تعداد">
-          <Input placeholder="مثلاً — ۱۰۰" value={String(count || 0)} readOnly dir="ltr" unit="پرنده" />
+          <Input placeholder="۰" value={String(count || 0)} readOnly dir="ltr" unit="پرنده" />
         </Field>
       </Grid2>
       <Grid2>

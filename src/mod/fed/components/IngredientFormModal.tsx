@@ -54,7 +54,7 @@ export default function IngredientFormModal(props: Props) {
             </Select>
           </Field>
           <Field label="قیمت دستی (اختیاری)" hint="اگر پر شود، بر قیمت انبار اولویت دارد">
-            <MoneyField placeholder="مثلاً — ۲٬۵۰۰٬۰۰۰" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} />
+            <MoneyField placeholder="۰" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} />
           </Field>
         </Grid2>
 

@@ -334,7 +334,7 @@ export default function RequirementsPage({ active = true }: { active?: boolean }
         footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
       >
         <Field label="نام نیاز" required>
-          <Input placeholder="مثلاً — مرغ تخم‌گذار — لیر" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+          <Input placeholder="نام جیره یا استاندارد" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
         </Field>
 
         <Grid2>

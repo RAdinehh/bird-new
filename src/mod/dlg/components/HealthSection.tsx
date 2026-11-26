@@ -200,7 +200,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
  )}
  <Grid2>
  <Field label="نام واکسن"required>
- <Input placeholder="مثلاً نیوکاسل"value={v.name} onChange={e =>setForm(f =>({ ...f, vaccines: f.vaccines.map(x =>x.id === v.id ? { ...x, name: e.target.value } : x) }))} />
+ <Input placeholder="نام واکسن"value={v.name} onChange={e =>setForm(f =>({ ...f, vaccines: f.vaccines.map(x =>x.id === v.id ? { ...x, name: e.target.value } : x) }))} />
  </Field>
  <Field label="روش مصرف">
  <SmartSelect
@@ -256,9 +256,9 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
 
  ) : null;
  const doseField = (
- <Field label={<>دوز <HelpIcon text={"**دوز چیست؟**\nدوز، نسخه یا دستور مصرف دامپزشک است (مثلاً ۵ سی‌سی در ۱ لیتر آب).\n\n**تفاوت با مقدار مصرفی:**\n«مقدار مصرفی» کل مقداری است که از انبار کسر می‌شود (مثلاً ۵۰ سی‌سی)."} /></>}>
+ <Field label={<>دوز <HelpIcon text={"**دوز چیست؟**\nدوز، نسخه یا دستور مصرف دامپزشک است (۵ سی‌سی در ۱ لیتر آب).\n\n**تفاوت با مقدار مصرفی:**\n«مقدار مصرفی» کل مقداری است که از انبار کسر می‌شود (۵۰ سی‌سی)."} /></>}>
  <Input
- placeholder="مثلاً ۰.۵"
+ placeholder="۰"
  value={v.dose}
  onChange={e =>setForm(f =>({ ...f, vaccines: f.vaccines.map(x =>x.id === v.id ? { ...x, dose: e.target.value } : x) }))}
  unit={getDoseUnitForMethod(v.method, vaccineItems.find(w =>w.id === v.itemId)?.unit)}
@@ -387,9 +387,9 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
 
  ) : null;
  const doseField = (
- <Field label={<>دوز <HelpIcon text={"**دوز چیست؟**\nدوز، نسخه یا دستور مصرف دامپزشک است (مثلاً ۵ سی‌سی در ۱ لیتر آب).\n\n**تفاوت با مقدار مصرفی:**\n«مقدار مصرفی» کل مقداری است که از انبار کسر می‌شود (مثلاً ۵۰ سی‌سی)."} /></>}>
+ <Field label={<>دوز <HelpIcon text={"**دوز چیست؟**\nدوز، نسخه یا دستور مصرف دامپزشک است (۵ سی‌سی در ۱ لیتر آب).\n\n**تفاوت با مقدار مصرفی:**\n«مقدار مصرفی» کل مقداری است که از انبار کسر می‌شود (۵۰ سی‌سی)."} /></>}>
  <Input
- placeholder="مثلاً ۰.۵"
+ placeholder="۰"
  value={m.dose}
  onChange={e =>setForm(f =>({ ...f, medications: f.medications.map(x =>x.id === m.id ? { ...x, dose: e.target.value } : x) }))}
  unit={getDoseUnitForMethod(m.method, medicineItems.find(w =>w.id === m.itemId)?.unit)}
@@ -399,7 +399,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
  const withdrawalField = !isHerbal ? (
  <Field label={<>دوره پرهیز (روز) <HelpIcon text={"**دوره پرهیز:**\nچند روز بعد از مصرف، گوشت و تخم قابل فروش نیست و باید از فروش خودداری شود.\n\n**مثال:** اگر دوره پرهیز ۷ روز باشد، تخم‌های تولیدی تا ۷ روز قابل فروش نیستند."} /></>}>
  <NumField
- placeholder="مثلاً ۷"
+ placeholder="۰"
  value={m.withdrawalDays !== null && m.withdrawalDays !== undefined ? String(m.withdrawalDays) : ''}
  onChange={e =>setForm(f =>({ ...f, medications: f.medications.map(x =>x.id === m.id ? { ...x, withdrawalDays: e.target.value === ''? null : (parseInt(toEn(e.target.value)) || null) } : x) }))}
  unit="روز"min={0}

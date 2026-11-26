@@ -431,7 +431,7 @@ export default function GroupsPage({ open, onClose }: Props) {
 
 
           <Field label="توضیحات (اختیاری)" hint="چی این گروه رو از بقیه جدا می‌کنه؟">
-            <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="مثلاً: گروه گله‌های ممتاز نژاد مرندی" rows={2} />
+            <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="توضیحات گروه" rows={2} />
           </Field>
 
           {err && <ErrorBox>{err}</ErrorBox>}

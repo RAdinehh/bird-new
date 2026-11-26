@@ -834,10 +834,10 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
 
         <Grid2>
           <Field label="تاریخ شروع" error={showError?.('startDate')} onTouch={() => markTouched?.('startDate')}>
-            <DatePicker value={form.startDate} onChange={v => setForm({...form, startDate: v})} placeholder="از چه تاریخی؟" />
+            <DatePicker value={form.startDate} onChange={v => setForm({...form, startDate: v})} placeholder="از تاریخ" />
           </Field>
           <Field label="تاریخ پایان" error={showError?.('endDate')} onTouch={() => markTouched?.('endDate')}>
-            <DatePicker value={form.endDate} onChange={v => setForm({...form, endDate: v})} placeholder="تا چه تاریخی؟" />
+            <DatePicker value={form.endDate} onChange={v => setForm({...form, endDate: v})} placeholder="تا تاریخ" />
           </Field>
         </Grid2>
 

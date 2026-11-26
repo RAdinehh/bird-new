@@ -82,13 +82,13 @@ export default function ProductionFormModal(props: Props) {
         <Grid2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
             <Field label="🥚 تخم خوراکی">
-              <NumField placeholder="مثلاً — ۴۰" value={form.eatingCount} onChange={(e: any) => setForm({ ...form, eatingCount: e.target.value })} unit="عدد" min={0} integer />
+              <NumField placeholder="۰" value={form.eatingCount} onChange={(e: any) => setForm({ ...form, eatingCount: e.target.value })} unit="عدد" min={0} integer />
             </Field>
             {!vErrors.eatingCount && <FieldHint fieldPath="egg.eatingCount" value={form.eatingCount} context={{ femaleCount: (selectedFlock as any)?.femaleCount ?? flockCount }} />}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
             <Field label="🌱 تخم نطفه‌دار" error={vErrors.fertileCount}>
-              <NumField placeholder="مثلاً — ۱۰" value={form.fertileCount} onChange={(e: any) => setForm({ ...form, fertileCount: e.target.value })} unit="عدد" min={0} integer />
+              <NumField placeholder="۰" value={form.fertileCount} onChange={(e: any) => setForm({ ...form, fertileCount: e.target.value })} unit="عدد" min={0} integer />
             </Field>
             {!vErrors.fertileCount && <FieldHint fieldPath="egg.fertileCount" value={form.fertileCount} context={{ femaleCount: (selectedFlock as any)?.femaleCount ?? flockCount }} />}
           </div>
@@ -115,20 +115,20 @@ export default function ProductionFormModal(props: Props) {
                 <Grid2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
             <Field label="تخم شکسته" error={vErrors.brokenCount}>
-              <NumField placeholder="مثلاً — ۵" value={form.brokenCount} onChange={(e: any) => setForm({ ...form, brokenCount: e.target.value })} unit="عدد" min={0} integer />
+              <NumField placeholder="۰" value={form.brokenCount} onChange={(e: any) => setForm({ ...form, brokenCount: e.target.value })} unit="عدد" min={0} integer />
             </Field>
             {!vErrors.brokenCount && <FieldHint fieldPath="egg.brokenCount" value={form.brokenCount} context={{ femaleCount: (selectedFlock as any)?.femaleCount ?? flockCount }} />}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
             <Field label="تخم نرم" error={vErrors.softCount}>
-              <NumField placeholder="مثلاً — ۲" value={form.softCount} onChange={(e: any) => setForm({ ...form, softCount: e.target.value })} unit="عدد" min={0} integer />
+              <NumField placeholder="۰" value={form.softCount} onChange={(e: any) => setForm({ ...form, softCount: e.target.value })} unit="عدد" min={0} integer />
             </Field>
             {!vErrors.softCount && <FieldHint fieldPath="egg.softCount" value={form.softCount} context={{ femaleCount: (selectedFlock as any)?.femaleCount ?? flockCount }} />}
           </div>
         </Grid2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
           <Field label="تخم کثیف" error={vErrors.dirtyCount}>
-            <NumField placeholder="مثلاً — ۳" value={form.dirtyCount} onChange={(e: any) => setForm({ ...form, dirtyCount: e.target.value })} unit="عدد" min={0} integer />
+            <NumField placeholder="۰" value={form.dirtyCount} onChange={(e: any) => setForm({ ...form, dirtyCount: e.target.value })} unit="عدد" min={0} integer />
           </Field>
           {!vErrors.dirtyCount && <FieldHint fieldPath="egg.dirtyCount" value={form.dirtyCount} context={{ femaleCount: (selectedFlock as any)?.femaleCount ?? flockCount }} />}
         </div>
@@ -182,7 +182,7 @@ export default function ProductionFormModal(props: Props) {
 
         <SectionTitle>⚖ وزن (اختیاری)</SectionTitle>
         <Field label="وزن میانگین تخم" hint="اختیاری" error={vErrors.avgWeight}>
-          <NumField placeholder="مثلاً — ۱.۵" value={form.avgWeight} onChange={(e: any) => setForm({ ...form, avgWeight: e.target.value })} unit="گرم" min={0} />
+          <NumField placeholder="۰" value={form.avgWeight} onChange={(e: any) => setForm({ ...form, avgWeight: e.target.value })} unit="گرم" min={0} />
         </Field>
         {!vErrors.avgWeight && <FieldHint fieldPath="egg.avgWeight" value={form.avgWeight} context={{ species: (selectedFlock as any)?.birdKind }} />}
 

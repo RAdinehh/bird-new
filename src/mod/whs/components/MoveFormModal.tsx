@@ -97,7 +97,7 @@ export default function MoveFormModal(props: Props) {
         <Grid2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
             <Field label="تعداد" required error={showError?.('quantity')} onTouch={() => markTouched?.('quantity')}>
-              <NumField placeholder="مثلاً — ۱۰۰"
+              <NumField placeholder="۰"
                 value={form.quantity}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, quantity: e.target.value })}
                 unit={selectedItem ? UNIT_LABEL[selectedItem.unit] : ''}
@@ -106,7 +106,7 @@ export default function MoveFormModal(props: Props) {
             {!showError?.('quantity') && <FieldHint fieldPath={selectedItem ? `whs.qty_${selectedItem.unit}` : ''} value={form.quantity} context={{ itemId: form.itemId }} />}
           </div>
           <Field label="قیمت واحد">
-            <MoneyField placeholder="مثلاً — ۵۰٬۰۰۰" value={form.unitPrice} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, unitPrice: e.target.value })} />
+            <MoneyField placeholder="۰" value={form.unitPrice} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, unitPrice: e.target.value })} />
           </Field>
         </Grid2>
 

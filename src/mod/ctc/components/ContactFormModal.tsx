@@ -92,7 +92,7 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
               <Field label="سقف اعتبار (تومان)" hint="خالی = بدون سقف">
                 <Input
                   mode="number"
-                  placeholder="مثلاً ۵۰٬۰۰۰٬۰۰۰"
+                  placeholder="۰"
                   value={form.creditLimit != null && form.creditLimit > 0 ? String(form.creditLimit) : ''}
                   onChange={e => {
                     // 🆕 حذف همه کاراکترهای غیرعددی (شامل ٬ U+066C که formatNumWhileTyping اضافه می‌کند)

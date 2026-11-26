@@ -274,7 +274,7 @@ export default function FeedSection({ form, setForm }: Props) {
  ]}
  groupLabels={{ formula: 'جیره‌ها', item: 'دان تکی'}}
  groupIcons={{ formula: '', item: ''}}
- placeholder="انتخاب..."
+ placeholder="— انتخاب —"
  modalTitle="انتخاب منبع"
  />
  </Field>

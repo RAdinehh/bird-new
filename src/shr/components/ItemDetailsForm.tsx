@@ -305,7 +305,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               <DatePicker value={String(item.hatchDate || '')} onChange={v => {
                 const age = computeAgeFromHatch(v);
                 updateItem({ hatchDate: v, ageDays: age });
-              }} placeholder="۱۴۰۵/۰۷/۲۶" />
+              }} placeholder="انتخاب تاریخ" />
             </Field>
           ) : (item.flockId || item.hatchId) && !hatchOverride ? (
             <Field label="تاریخ هچ" locked>
@@ -316,7 +316,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               <DatePicker value={String(item.hatchDate || '')} onChange={v => {
                 const age = computeAgeFromHatch(v);
                 updateItem({ hatchDate: v, ageDays: age });
-              }} placeholder="۱۴۰۵/۰۷/۲۶" />
+              }} placeholder="انتخاب تاریخ" />
             </Field>
           )}
           {!isPurchase && (item.flockId || item.hatchId) && !hatchOverride ? (
@@ -465,7 +465,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               <DatePicker value={String(item.hatchDate || '')} onChange={v => {
                 const age = computeAgeFromHatch(v);
                 updateItem({ hatchDate: v, ageDays: age });
-              }} placeholder="۱۴۰۵/۰۷/۲۶" />
+              }} placeholder="انتخاب تاریخ" />
             </Field>
           )}
           {isLocked ? (
@@ -661,7 +661,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         )}
         <Grid2>
           <Field label="تاریخ انقضا">
-            <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
+            <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="انتخاب تاریخ" />
           </Field>
           <Field label={isPurchase ? "گله مقصد" : "گله مبدأ"} hint={isPurchase ? "هزینه به این گله متصل می‌شود" : "کالا از این گله تخصیص می‌یابد"}>
             <SmartSelect value={String(item.flockId || '')} onChange={v => {
@@ -705,7 +705,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* ردیف ۲: تاریخ انقضا + دوره پرهیز */}
         <Grid2>
           <Field label="تاریخ انقضا">
-            <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
+            <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="انتخاب تاریخ" />
           </Field>
           {isPurchase && (
             <Field label="دوره پرهیز (روز)" hint="بعد از مصرف، چند روز فروش محصول ممنوع">
@@ -1002,7 +1002,7 @@ if (category === 'vaccine' || category === 'herbal') {
 
         {hasExpiry && (
           <Field label="تاریخ انقضا (اختیاری)">
-            <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="1405/12/29" />
+            <DatePicker value={String(item.expiryDate || '')} onChange={v => updateItem({ expiryDate: v })} placeholder="انتخاب تاریخ" />
           </Field>
         )}
         {sellerSlot}
@@ -1057,7 +1057,7 @@ if (category === 'vaccine' || category === 'herbal') {
               }} options={activeFlocks} placeholder={FIELD_META.flock.origin.placeholder} modalTitle="انتخاب گله مبدأ" />
           </Field>
           <Field label="تاریخ تولید تخم">
-            <DatePicker value={String(item.eggDate || '')} onChange={v => updateItem({ eggDate: v })} placeholder="1405/07/20" autoToday />
+            <DatePicker value={String(item.eggDate || '')} onChange={v => updateItem({ eggDate: v })} placeholder="انتخاب تاریخ" autoToday />
           </Field>
         </Grid2>
         {nameFieldJsx}

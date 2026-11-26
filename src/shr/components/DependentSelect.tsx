@@ -38,7 +38,7 @@ export default function DependentSelect({
   parentLabel,
   options,
   emptyListMessage,
-  placeholder = '— انتخاب کنید —',
+  placeholder = '— انتخاب —',
   modalTitle,
   autoThreshold = 4,
   disabled = false,

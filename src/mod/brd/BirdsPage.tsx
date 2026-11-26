@@ -244,7 +244,7 @@ export default function BirdsPage({ active = true }: { active?: boolean } = {}) 
         <Empty
           icon={<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>}
           title="هنوز پرنده‌ای اضافه نکرده‌اید"
-          desc="اولین پرنده‌ی خود را بسازید — مثلاً «مرغ». بعد از آن می‌توانید نژادهایش را اضافه کنید."
+          desc="اولین پرنده‌ی خود را بسازید (مانند مرغ یا بوقلمون). بعد از آن می‌توانید نژادهایش را اضافه کنید."
           action={<Btn variant="primary" onClick={openNew}>+ افزودن پرنده</Btn>}
         />
       ) : (

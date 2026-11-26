@@ -138,7 +138,7 @@ export default function RetireEquipModal({ open, onClose, equipment, onConfirm }
             <Grid2>
               <Field label="مبلغ کل فروش" required>
                 <NumField
-                  placeholder="مثلاً ۵,۰۰۰,۰۰۰"
+                  placeholder="۰"
                   value={salePrice}
                   onChange={e => setSalePrice(e.target.value)}
                   min={0}
@@ -190,12 +190,12 @@ export default function RetireEquipModal({ open, onClose, equipment, onConfirm }
         )}
 
         <Field label="تاریخ خروج">
-          <DatePicker value={soldAt} onChange={setSoldAt} placeholder="انتخاب" autoToday />
+          <DatePicker value={soldAt} onChange={setSoldAt} placeholder="انتخاب تاریخ" autoToday />
         </Field>
 
         <Field label="یادداشت (اختیاری)">
           <Input
-            placeholder={reason === 'scrap' ? 'مثلاً: خراب شد، قابل تعمیر نبود' : 'مثلاً: فروش تجهیز مازاد'}
+            placeholder={reason === 'scrap' ? 'علت اسقاط یا خرابی' : 'توضیحات فروش یا خروج'}
             value={note}
             onChange={e => setNote(e.target.value)}
           />

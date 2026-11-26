@@ -64,7 +64,7 @@ export default function IdentitySection({ std, def, updateBird, overrides, setOv
           value={std.source || ''}
           defaultValue={def.source || ''}
           type="text"
-          placeholder="مثلاً: Aviagen 2024"
+          placeholder="منبع استاندارد"
           onOverride={onOver('source')}
           onClear={onReset('source')}
         />

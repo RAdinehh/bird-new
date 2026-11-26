@@ -198,7 +198,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
       'اصلاح موجودی',
       `موجودی فعلی: ${fmt.num(current)} ${UNIT_LABEL[it.unit]}\n\nموجودی واقعی چقدر است؟`,
       {
-        placeholder: 'مثلاً — ۱۵۰',
+        placeholder: '۰',
         confirmText: 'ثبت اصلاح',
         defaultValue: String(current),
       }

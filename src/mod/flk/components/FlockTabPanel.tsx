@@ -209,7 +209,7 @@ export default function FlockTabPanel({
           const note = await showPromptAsync(
             'واکسن گروهی',
             'نام واکسن برای ' + getGlobalFormat().count(ids.length) + ' گله:',
-            { label: 'واکسن', placeholder: 'مثلاً نیوکاسل', required: true, confirmText: 'ثبت' }
+            { label: 'واکسن', placeholder: 'نام واکسن', required: true, confirmText: 'ثبت' }
           );
           if (!note?.trim()) return;
           const { useFlk } = await import('../store');
@@ -238,7 +238,7 @@ export default function FlockTabPanel({
           const note = await showPromptAsync(
             'دان گروهی',
             'توضیح دان برای ' + getGlobalFormat().count(ids.length) + ' گله:',
-            { label: 'دان', placeholder: 'مثلاً دان رشد', required: true, confirmText: 'ثبت' }
+            { label: 'دان', placeholder: 'نام دان', required: true, confirmText: 'ثبت' }
           );
           if (!note?.trim()) return;
           const { useFlk } = await import('../store');

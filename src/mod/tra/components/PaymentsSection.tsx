@@ -122,7 +122,7 @@ export default function PaymentsSection({
                     💰 تخفیف نقدی (اختیاری)
                   </div>
                   <Grid2>
-                    <Field label="تخفیف نقدی (٪)" hint="پرداخت زودتر" help="اگر مشتری مبلغ فاکتور را زودتر از موعد سرسید پرداخت کند، این درصد از مبلغ کل کسر می‌شود. مثلاً ۲٪ تخفیف برای پرداخت تا ۱۰ روز">
+                    <Field label="تخفیف نقدی (٪)" hint="پرداخت زودتر" help="اگر مشتری مبلغ فاکتور را زودتر از موعد سررسید پرداخت کند، این درصد از مبلغ کل کسر می‌شود (برای نمونه ۲٪ تخفیف برای پرداخت تا ۱۰ روز).">
                       <NumField placeholder="۲" value={form.cashDiscountPct || ''} onChange={e => setForm(f => ({ ...f, cashDiscountPct: e.target.value}))} unit="٪" min={0} max={100} />
                     </Field>
                     <Field label="مهلت (روز)" hint="از تاریخ فاکتور" help="مدت زمانی که مشتری فرصت دارد با استفاده از تخفیف نقدی پرداخت کند. اگر پرداخت بعد از این مهلت انجام شود، تخفیف اعمال نمی‌شود">
@@ -139,7 +139,7 @@ export default function PaymentsSection({
 
               {form.paymentTerms === 'installment' && (
                 <Grid2>
-                  <Field label="تعداد اقساط" required help="تعداد دفعاتی که مبلغ باقی‌مانده پرداخت می‌شود. مثلاً اگر تعداد را ۴ بگذارید، مبلغ به ۴ قسط تقسیم می‌شود">
+                  <Field label="تعداد اقساط" required help="تعداد دفعاتی که مبلغ باقی‌مانده پرداخت می‌شود (برای نمونه با عدد ۴، مبلغ به ۴ قسط تقسیم می‌شود).">
                     <NumField placeholder="۱۲" value={form.installmentCount} onChange={e => {
                     const newVal = e.target.value;
                     const cnt = parseInt(toEn(newVal)) || 0;
@@ -154,7 +154,7 @@ export default function PaymentsSection({
                     setForm(f => ({ ...f, installmentCount: newVal, installments: newInst}));
                   }} unit="قسط" min={0} />
                   </Field>
-                  <Field label="فاصله" required help="فاصله زمانی بین هر قسط به روز. مثلاً ۳۰ روز یعنی ماهانه پرداخت می‌کنید. تاریخ قسط‌ها به صورت خودکار از این فاصله محاسبه می‌شود">
+                  <Field label="فاصله" required help="فاصله زمانی بین هر قسط به روز (برای نمونه ۳۰ روز برای پرداخت ماهانه). تاریخ قسط‌ها به صورت خودکار محاسبه می‌شود.">
                     <NumField placeholder="۳۰" value={form.installmentGapDays} onChange={e => {
                     const newVal = e.target.value;
                     const cnt = parseInt(toEn(form.installmentCount)) || 0;

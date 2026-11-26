@@ -124,7 +124,7 @@ export default function CandlingFormModal(props: CandlingFormModalProps) {
           <DatePicker
             value={modalDate}
             onChange={v => setModalDate(v)}
-            placeholder="انتخاب"
+            placeholder="انتخاب تاریخ"
             autoToday
           />
         </Field>

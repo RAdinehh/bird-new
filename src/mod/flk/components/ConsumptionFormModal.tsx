@@ -39,7 +39,7 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
   const num = parseFloat(toEn(amount).replace('٫', '.')) || 0;
   const unit = type === 'feed' ? 'kg' : 'L';
   const hasSplit = !!flock.genderSplitAt;
-  const amountPlaceholder = type === 'feed' ? 'مثلاً ۲۵' : 'مثلاً ۵۰';
+  const amountPlaceholder = '۰';
   const confidence: 'exact' | 'estimated' = source === 'sensor_level' ? 'estimated' : 'exact';
 
   const handleSave = () => {
@@ -136,7 +136,7 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
         <Textarea
           value={notes}
           onChange={e => setNotes(e.target.value)}
-          placeholder="مثلاً پر کردن سطل ۱ و ۲ — یا هر توضیح دیگر"
+          placeholder="توضیحات اختیاری"
           rows={2}
         />
       </Field>

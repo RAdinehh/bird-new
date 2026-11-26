@@ -44,7 +44,7 @@ export default function DeviceFormModal(props: DeviceFormModalProps) {
             : undefined
         }>
           <Input
-            placeholder="مثلاً — دستگاه ۱"
+            placeholder="نام یا شماره دستگاه"
             value={form.name}
             onChange={e => setForm({...form, name: e.target.value})}
             error={form.name && devices.some(x => x.id !== form.id && x.name.trim() === form.name.trim()) ? ' ' : undefined}

@@ -282,7 +282,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
         <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', paddingTop: 6, borderTop: '1px dashed var(--border)' }}>📅 زمان</div>
         <Grid2>
           <Field label="تاریخ ورود" required>
-            <DatePicker value={currentRow.entryDate} onChange={v => setCurrentRow(f => ({ ...f, entryDate: v }))} placeholder="تاریخ" autoToday />
+            <DatePicker value={currentRow.entryDate} onChange={v => setCurrentRow(f => ({ ...f, entryDate: v }))} placeholder="انتخاب تاریخ" autoToday />
           </Field>
           <Field label="ساعت ورود">
             <TimePicker value={currentRow.entryTime} onChange={v => setCurrentRow(f => ({ ...f, entryTime: v }))} placeholder="انتخاب ساعت" />
@@ -414,10 +414,10 @@ export default function EggEntryModal(props: EggEntryModalProps) {
             <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginBottom: 8 }}>💰 مالی</div>
             <Grid2>
               <Field label="قیمت هر تخم">
-                <MoneyField placeholder="مثلاً — ۲٬۵۰۰٬۰۰۰" value={currentRow.unitPrice} onChange={e => setCurrentRow(f => ({ ...f, unitPrice: e.target.value }))} />
+                <MoneyField placeholder="۰" value={currentRow.unitPrice} onChange={e => setCurrentRow(f => ({ ...f, unitPrice: e.target.value }))} />
               </Field>
               <Field label="هزینه حمل">
-                <MoneyField placeholder="مثلاً — ۵۰۰٬۰۰۰" value={currentRow.shippingCost} onChange={e => setCurrentRow(f => ({ ...f, shippingCost: e.target.value }))} />
+                <MoneyField placeholder="۰" value={currentRow.shippingCost} onChange={e => setCurrentRow(f => ({ ...f, shippingCost: e.target.value }))} />
               </Field>
             </Grid2>
             {(() => {

@@ -55,7 +55,7 @@ export default function LightingEditor({ std, def, updateBird }: Props) {
           type="text"
           value={lp?.notes || ''}
           onChange={e => update({ notes: e.target.value || undefined })}
-          placeholder="مثلاً: ۲۳ ساعت روشنایی در هفته اول"
+          placeholder="شرح برنامه نوری"
           style={inputStyle(lp?.notes !== dlp?.notes)}
         />
       </F>

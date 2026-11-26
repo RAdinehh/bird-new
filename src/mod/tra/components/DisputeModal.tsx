@@ -21,13 +21,13 @@ function getReasonPlaceholder(reason: DisputeReason, isPurchase: boolean): strin
     case 'price':
       return isPurchase
         ? 'مغایرت قیمت توافقی با نرخ درج‌شده در فاکتور'
-        : 'مغایرت قیمت توافقی و مبلغ فاکتور (مثلاً ۵ میلیون تومان اختلاف)';
+        : 'مغایرت قیمت توافقی و مبلغ درج‌شده در فاکتور';
     case 'quantity':
       return isPurchase
         ? 'کسری یا مغایرت تعداد تحویلی نسبت به فاکتور'
         : 'مغایرت تعداد ارسالی با تعداد ثبت‌شده در فاکتور';
     case 'quality':
-      return 'توضیح مشکل کیفی (مثلاً تلفات، شکستگی یا ضعف گله)';
+      return 'شرح مشکل کیفی (تلفات، شکستگی یا ضعف گله)';
     case 'other':
       return 'شرح مختصر دلیل اختلاف روی این فاکتور...';
   }

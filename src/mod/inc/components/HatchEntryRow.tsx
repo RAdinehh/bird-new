@@ -188,24 +188,24 @@ export default function HatchEntryRow(props: HatchEntryRowProps) {
 
           <Grid2>
             <Field label="جوجه هچ‌شده" required>
-              <NumField placeholder="مثلاً — ۴۵۰" value={d.hatched}
+              <NumField placeholder="۰" value={d.hatched}
                 onChange={ev => onUpdate({ hatched: ev.target.value })}
                 max={Math.max(0, base - uh - ds - pp - ot)} min={0} unit="عدد" />
             </Field>
             <Field label="هچ‌نشده">
-              <NumField placeholder="مثلاً — ۲۰" value={d.unhatched}
+              <NumField placeholder="۰" value={d.unhatched}
                 onChange={ev => onUpdate({ unhatched: ev.target.value })}
                 max={Math.max(0, base - h - ds - pp - ot)} min={0} unit="عدد" />
             </Field>
           </Grid2>
           <Grid2>
             <Field label="مرده در پوسته">
-              <NumField placeholder="مثلاً — ۱۰" value={d.deadInShell}
+              <NumField placeholder="۰" value={d.deadInShell}
                 onChange={ev => onUpdate({ deadInShell: ev.target.value })}
                 max={Math.max(0, base - h - uh - pp - ot)} min={0} unit="عدد" />
             </Field>
             <Field label="نوک‌زده">
-              <NumField placeholder="مثلاً — ۵" value={d.pipped}
+              <NumField placeholder="۰" value={d.pipped}
                 onChange={ev => onUpdate({ pipped: ev.target.value })}
                 max={Math.max(0, base - h - uh - ds - ot)} min={0} unit="عدد" />
             </Field>
@@ -217,7 +217,7 @@ export default function HatchEntryRow(props: HatchEntryRowProps) {
                 max={Math.max(0, base - h - uh - ds - pp)} min={0} unit="عدد" />
             </Field>
             <Field label="وزن متوسط" hint="۲۰-۶۰ گرم">
-              <NumField placeholder="مثلاً — ۱.۵" value={d.avgWeight}
+              <NumField placeholder="۰" value={d.avgWeight}
                 onChange={ev => onUpdate({ avgWeight: ev.target.value })}
                 min={0} max={60} unit="گرم" />
             </Field>

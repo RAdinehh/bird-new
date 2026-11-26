@@ -135,7 +135,7 @@ export default function TransferEquipModal({ open, onClose, equipment, halls, zo
             </Field>
           )}
           <Field label="تاریخ جابجایی">
-            <DatePicker value={date} onChange={setDate} placeholder="انتخاب" autoToday />
+            <DatePicker value={date} onChange={setDate} placeholder="انتخاب تاریخ" autoToday />
           </Field>
         </Grid2>
 
@@ -143,7 +143,7 @@ export default function TransferEquipModal({ open, onClose, equipment, halls, zo
           <Input
             value={note}
             onChange={e => setNote(e.target.value)}
-            placeholder="مثلاً: انتقال به بخش جدید یا تعمیر"
+            placeholder="علت انتقال"
           />
         </Field>
       </div>

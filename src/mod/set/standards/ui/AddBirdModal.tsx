@@ -61,7 +61,7 @@ export function AddBirdModal({
         <Input
           value={customBirdName}
           onChange={e => setCustomBirdName(e.target.value)}
-          placeholder="مثلاً — مرغ یا طوطی"
+          placeholder="نام پرنده"
           list="bird-species-list"
         />
         <datalist id="bird-species-list">
@@ -71,7 +71,7 @@ export function AddBirdModal({
         </datalist>
       </Field>
       <Field label="نام نژاد (فارسی)" required>
-        <Input value={customNameFa} onChange={e => setCustomNameFa(e.target.value)} placeholder="مثلاً — لاری" />
+        <Input value={customNameFa} onChange={e => setCustomNameFa(e.target.value)} placeholder="نام فارسی نژاد" />
       </Field>
       <Field label="نام نژاد (انگلیسی)">
         <Input value={customNameEn} onChange={e => setCustomNameEn(e.target.value)} placeholder="Lari" />

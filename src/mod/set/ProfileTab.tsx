@@ -64,7 +64,7 @@ export default function ProfileTab() {
           <Input
             value={farm.name}
             onChange={e => updateSection('farm', { name: e.target.value })}
-            placeholder="مثلاً — مرغداری سبز دشت"
+            placeholder="نام مجموعه یا مزرعه"
           />
         </Field>
         <Grid2>
@@ -82,7 +82,7 @@ export default function ProfileTab() {
           </Field>
           <Field label="شماره پروانه">
             <Input
-              placeholder="مثلاً — ۰۰۱"
+              placeholder="کد واحد"
               value={farm.licenseNo}
               onChange={e => updateSection('farm', { licenseNo: e.target.value })}
               dir="ltr"
@@ -92,7 +92,7 @@ export default function ProfileTab() {
         <Grid2>
           <Field label="استان">
             <Input
-              placeholder="مثلاً — تهران"
+              placeholder="نام شهر"
               value={farm.province}
               onChange={e => updateSection('farm', { province: e.target.value })}
             />
@@ -153,12 +153,12 @@ export default function ProfileTab() {
             <Input
               value={bank.bankName}
               onChange={e => updateSection('bank', { bankName: e.target.value })}
-              placeholder="مثلاً — ملت"
+              placeholder="نام بانک"
             />
           </Field>
           <Field label="صاحب حساب">
             <Input
-              placeholder="مثلاً — علی رضایی"
+              placeholder="نام صاحب حساب"
               value={bank.accountHolder}
               onChange={e => updateSection('bank', { accountHolder: e.target.value })}
             />

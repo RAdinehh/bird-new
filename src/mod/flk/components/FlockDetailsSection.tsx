@@ -38,7 +38,7 @@ export default function FlockDetailsSection({ form, setForm, showError, markTouc
           error={showError('hatchDate')}
           onTouch={() => markTouched('hatchDate')}
         >
-          <DatePicker value={form.hatchDate} onChange={v => !isSourceLinked && setForm({ ...form, hatchDate: v })} placeholder="انتخاب" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.hatchDate, jalaliBounds(18))} disabled={isSourceLinked} />
+          <DatePicker value={form.hatchDate} onChange={v => !isSourceLinked && setForm({ ...form, hatchDate: v })} placeholder="انتخاب تاریخ" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.hatchDate, jalaliBounds(18))} disabled={isSourceLinked} />
         </Field>
         <Field
           label={isSourceLinked ? <span>تاریخ خرید <span style={{ fontSize: 10, color: 'var(--warn)' }}>🔒</span></span> : 'تاریخ خرید'}
@@ -46,7 +46,7 @@ export default function FlockDetailsSection({ form, setForm, showError, markTouc
           error={showError('purchaseDate')}
           onTouch={() => markTouched('purchaseDate')}
         >
-          <DatePicker value={form.purchaseDate} onChange={v => !(isSourceLinked && form.sourceInvoiceId) && setForm({ ...form, purchaseDate: v })} placeholder="انتخاب" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.purchaseDate, jalaliBounds(18))} disabled={isSourceLinked} />
+          <DatePicker value={form.purchaseDate} onChange={v => !(isSourceLinked && form.sourceInvoiceId) && setForm({ ...form, purchaseDate: v })} placeholder="انتخاب تاریخ" autoToday min={jalaliBounds(18).min} max={jalaliBounds(18).max} warn={checkDateBounds(form.purchaseDate, jalaliBounds(18))} disabled={isSourceLinked} />
         </Field>
         
         <Field label="تاریخ شروع نگهداری" hint="اگه دقیق نمی‌دونی" error={showError('startDate')} onTouch={() => markTouched('startDate')}>

@@ -64,7 +64,7 @@ export default function AddEventModal({ open, onClose, prefillDate }: Props) {
     >
       <Field label="عنوان" required>
         <Input
-          placeholder="مثلاً — واکسن نیوکاسل"
+          placeholder="عنوان رویداد"
           value={title}
           onChange={e => setTitle(e.target.value)}
         />
@@ -75,7 +75,7 @@ export default function AddEventModal({ open, onClose, prefillDate }: Props) {
           <DatePicker value={date} onChange={setDate}  autoToday />
         </Field>
         <Field label="ساعت" hint="اختیاری">
-          <TimePicker value={time} onChange={setTime} placeholder="انتخاب" />
+          <TimePicker value={time} onChange={setTime} placeholder="انتخاب ساعت" />
         </Field>
       </Grid2>
 

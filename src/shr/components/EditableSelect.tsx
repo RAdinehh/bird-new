@@ -173,7 +173,7 @@ export default function EditableSelect({
           </>
         ) : (
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {placeholder || '— انتخاب کنید —'}
+            {placeholder || '— انتخاب —'}
           </span>
         )}
       </span>
@@ -310,7 +310,7 @@ export default function EditableSelect({
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       <Field label="نام">
         <Input
-          placeholder="— آبخوری نیپل استیل"
+          placeholder="نام مورد"
           value={formName}
           onChange={e => setFormName(e.target.value)}
         />

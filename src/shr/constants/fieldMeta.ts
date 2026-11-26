@@ -16,6 +16,17 @@ export interface FieldMetaEntry {
 
 export const SELECT_PLACEHOLDER = '— انتخاب —' as const;
 
+export const COMMON_PLACEHOLDERS = {
+  select: SELECT_PLACEHOLDER,
+  number: '۰',
+  money: '۰',
+  date: 'انتخاب تاریخ',
+  dateFrom: 'از تاریخ',
+  dateTo: 'تا تاریخ',
+  time: 'انتخاب ساعت',
+  notes: 'توضیحات اختیاری',
+} as const;
+
 export const FIELD_META = {
   bird: {
     label: 'پرنده',

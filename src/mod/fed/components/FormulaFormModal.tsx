@@ -47,7 +47,7 @@ export default function FormulaFormModal(props: Props) {
     footer={<BtnRow><Btn variant="primary" onClick={save} disabled={Object.keys(vErrors).length > 0}>ذخیره</Btn><Btn onClick={() => setOpen(false)}>لغو</Btn></BtnRow>}
    >
     <Field label="نام جیره" required>
-     <Input placeholder="مثلاً — جیره لیر زمستان" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+     <Input placeholder="نام جیره" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
     </Field>
 
     <Grid2>
@@ -117,7 +117,7 @@ export default function FormulaFormModal(props: Props) {
          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
           <div style={{ flex: 1 }}>
            <Field label="درصد در جیره">
-            <NumField placeholder="مثلاً — ۱۰"
+            <NumField placeholder="۰"
              value={String(line.percent)}
              onChange={e => updateLine(line.id, { percent: parseFloat(toEn(e.target.value).replace('٫','.')) || 0 })}
              unit="٪"

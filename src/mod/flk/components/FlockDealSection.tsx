@@ -193,14 +193,14 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
             </Field>
           </Grid2>
           <Field label="شرح کالا/خدمات معاوضی">
-            <input type="text" value={form.barterDescription || ''} onChange={e => setForm({ ...form, barterDescription: e.target.value })} placeholder="مثلاً: ۵ تن دان" style={{ width: '100%', height: 38, padding: '0 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-base)', fontFamily: 'inherit', textAlign: 'right', boxSizing: 'border-box' }} />
+            <input type="text" value={form.barterDescription || ''} onChange={e => setForm({ ...form, barterDescription: e.target.value })} placeholder="شرح کالای تهاتری" style={{ width: '100%', height: 38, padding: '0 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 'var(--fs-base)', fontFamily: 'inherit', textAlign: 'right', boxSizing: 'border-box' }} />
           </Field>
           <Grid2>
             <Field label="تاریخ شروع تهاتر" error={showError?.('barterStartDate')} onTouch={() => markTouched?.('barterStartDate')}>
-              <DatePicker value={form.barterStartDate || ''} onChange={v => setForm({ ...form, barterStartDate: v })} placeholder="از چه تاریخی؟" autoToday />
+              <DatePicker value={form.barterStartDate || ''} onChange={v => setForm({ ...form, barterStartDate: v })} placeholder="از تاریخ" autoToday />
             </Field>
             <Field label="تاریخ پایان تهاتر" error={showError?.('barterEndDate') || (form.barterStartDate && form.barterEndDate && form.barterStartDate >= form.barterEndDate ? 'باید بعد از شروع باشد' : undefined)} onTouch={() => markTouched?.('barterEndDate')}>
-              <DatePicker value={form.barterEndDate || ''} onChange={v => setForm({ ...form, barterEndDate: v })} placeholder="تا چه تاریخی؟" min={form.barterStartDate} />
+              <DatePicker value={form.barterEndDate || ''} onChange={v => setForm({ ...form, barterEndDate: v })} placeholder="تا تاریخ" min={form.barterStartDate} />
             </Field>
           </Grid2>
         </>
@@ -237,12 +237,12 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
               </Select>
             </Field>
             <Field label="شروع اجاره" error={showError?.('rentStartDate')} onTouch={() => markTouched?.('rentStartDate')} required help={HELP.flk.ownership.rentStartDate}>
-              <DatePicker placeholder="از چه تاریخی؟" value={form.rentStartDate || ''} onChange={v => setForm({ ...form, rentStartDate: v })} autoToday />
+              <DatePicker placeholder="از تاریخ" value={form.rentStartDate || ''} onChange={v => setForm({ ...form, rentStartDate: v })} autoToday />
             </Field>
           </Grid2>
           {form.rentPeriod === 'total' && (
             <Field label="پایان قرارداد" required help={HELP.flk.ownership.rentEndDate} error={showError?.('rentEndDate') || (form.rentStartDate && form.rentEndDate && form.rentStartDate >= form.rentEndDate ? 'باید بعد از شروع باشد' : undefined)} onTouch={() => markTouched?.('rentEndDate')}>
-              <DatePicker placeholder="تا چه تاریخی؟" value={form.rentEndDate || ''} onChange={v => setForm({ ...form, rentEndDate: v })} min={form.rentStartDate} />
+              <DatePicker placeholder="تا تاریخ" value={form.rentEndDate || ''} onChange={v => setForm({ ...form, rentEndDate: v })} min={form.rentStartDate} />
               {rentEndWarn && (
                 <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', paddingRight: 2, marginTop: 4 }}>
                   ⚠️ پایان اجاره بعد از پایان چرخه گله ({cycleEnd}) — مطمئن شو قرارداد رو تمدید می‌کنی

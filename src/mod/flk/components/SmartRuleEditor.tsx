@@ -102,7 +102,7 @@ export function SmartRuleEditor({ rule, onChange, breeds, halls }: SmartRuleEdit
       </div>
 
       <Grid2>
-        <Field label="نوع گله" hint={!rule.type ? 'مثلاً: تخم‌گذار — خالی = همه' : undefined}>
+        <Field label="نوع گله" hint={!rule.type ? 'خالی = همه انواع گله' : undefined}>
           <Select value={rule.type || ''} onChange={e => update({ type: e.target.value as FlockGroupRule['type'] || undefined })}>
             <option value="">همه</option>
             <option value="layer">تخم‌گذار</option>
@@ -177,7 +177,7 @@ export function SmartRuleEditor({ rule, onChange, breeds, halls }: SmartRuleEdit
 
       {currentStage === 'custom' && (
         <Grid2>
-          <Field label="سن از (روز)" hint={!rule.minAge ? 'حداقل سن (حداکثر ۶۰۰) — مثلاً: ۱۴۰' : undefined}>
+          <Field label="سن از (روز)" hint={!rule.minAge ? 'حداقل سن به روز (حداکثر ۶۰۰)' : undefined}>
             <Input
               value={typeof rule.minAge === 'number' ? fmt.raw.digits(String(rule.minAge), fmt.units.numberFormat) : ''}
               onChange={e => update({ minAge: parseAge(e.target.value) })}
@@ -188,7 +188,7 @@ export function SmartRuleEditor({ rule, onChange, breeds, halls }: SmartRuleEdit
               showWords={false}
             />
           </Field>
-          <Field label="سن تا (روز)" hint={!rule.maxAge ? 'حداکثر سن (حداکثر ۶۰۰) — مثلاً: ۲۰۰' : undefined}>
+          <Field label="سن تا (روز)" hint={!rule.maxAge ? 'حداکثر سن به روز (حداکثر ۶۰۰)' : undefined}>
             <Input
               value={typeof rule.maxAge === 'number' ? fmt.raw.digits(String(rule.maxAge), fmt.units.numberFormat) : ''}
               onChange={e => update({ maxAge: parseAge(e.target.value) })}
