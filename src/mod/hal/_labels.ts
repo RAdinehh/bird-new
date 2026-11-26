@@ -66,7 +66,7 @@ export const EQUIP_LABELS: Record<string, { name: string; icon: string }> = {
   cup:                  { name: 'کاپ', icon: 'drinker_cup' },
   drinker_auto_hanging: { name: 'آبخوری آویز', icon: 'drinker_hanging' },
   fountain_drinker:     { name: 'آبخوری کله‌قندی', icon: 'drinker_fountain' },
-  trough:               { name: 'آبخوری ناودانی', icon: '🛁' },
+  trough:               { name: 'آبخوری ناودانی', icon: 'drinker_trough' },
   drinker_capsule:      { name: 'آبخوری کپسولی', icon: '🧪' },
   // گرمایش
   jet_heater:      { name: 'جت هیتر', icon: '♨' },

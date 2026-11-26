@@ -5,7 +5,7 @@ export const ICON_KEYS = [
   'feeder', 'drinker', 'litter',
   'ventilation', 'water_system', 'power', 'scale',
   'feeder_chain', 'feeder_tube', 'feeder_bucket', 'feeder_tray',
-  'drinker_cup', 'drinker_hanging', 'drinker_fountain', 'litter_straw',
+  'drinker_cup', 'drinker_hanging', 'drinker_fountain', 'drinker_trough', 'litter_straw',
   'kg', 'pcs',
   'chicken', 'duck', 'turkey', 'egg',
   'hatch', 'feed', 'invoice', 'meds',
