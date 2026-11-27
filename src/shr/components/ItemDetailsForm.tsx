@@ -627,10 +627,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               });
             }}
             options={[
-              { value: '__new__', label: `تعریف ${catLabel} جدید در انبار` },
+              { value: '__new__', label: `تعریف ${catLabel} جدید در انبار`, icon: 'inventory' },
               ...filteredWhs.map(i => ({
                 value: i.id,
-                label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`,
+                label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`, icon: category === 'feed' ? 'feed' : category === 'herbal' ? 'herbal' : category === 'manure' ? 'manure' : category === 'broken' ? 'broken_egg' : 'meds',
               })),
             ]}
             placeholder={undefined}
