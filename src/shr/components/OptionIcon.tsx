@@ -29,8 +29,6 @@ const ICON_KEY_TO_EMOJI: Record<string, string> = {
   equipment: '🔧',
   cooling: '❄️',
   lighting: '💡',
-  cleaning: '🧹',
-  weighing: '⚖️',
   cage: '🏗️',
 };
 

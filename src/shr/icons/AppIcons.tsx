@@ -12,7 +12,7 @@ export const ICON_KEYS = [
   'mortality', 'water', 'stats', 'flock', 'flocks_group',
   'inventory', 'cash', 'climate', 'unknown'
 ,
-  'fan_tunnel', 'fan_ceiling', 'air_inlet', 'cooling_pad', 'feeder_manual', 'nipple', 'drinker_capsule', 'heating', 'jet_heater', 'duct_heater', 'radiant_brooder', 'lighting', 'lamp_led', 'lamp_fluorescent', 'dimmer', 'litter_sawdust', 'litter_roll', 'litter_rice_hull', 'litter_sand', 'litter_peat', 'cooling', 'fogger', 'misting_system', 'swamp_cooler', 'water_filter', 'water_pipe', 'generator', 'electrical_panel', 'cable', 'weighing', 'platform_scale', 'cleaning', 'pressure_washer', 'sprayer', 'flame_gun', 'safety', 'fire_extinguisher', 'smoke_detector', 'emergency_light', 'first_aid', 'hand_tools', 'wheelbarrow', 'shovel', 'rake', 'feed_scoop', 'broom', 'bucket', 'auxiliary', 'camera', 'sensor'
+  'fan_tunnel', 'fan_ceiling', 'air_inlet', 'cooling_pad', 'feeder_manual', 'nipple', 'drinker_capsule', 'heating', 'jet_heater', 'duct_heater', 'radiant_brooder', 'lighting', 'lamp_led', 'lamp_fluorescent', 'dimmer', 'litter_sawdust', 'litter_roll', 'litter_rice_hull', 'litter_sand', 'litter_peat', 'cooling', 'fogger', 'misting_system', 'swamp_cooler', 'water_filter', 'water_pipe', 'generator', 'electrical_panel', 'cable', 'weighing', 'platform_scale', 'bird_scale', 'feed_scale', 'cleaning', 'pressure_washer', 'sprayer', 'flame_gun', 'safety', 'fire_extinguisher', 'smoke_detector', 'emergency_light', 'first_aid', 'hand_tools', 'wheelbarrow', 'shovel', 'rake', 'feed_scoop', 'broom', 'bucket', 'auxiliary', 'camera', 'sensor'
 ] as const;
 
 export type AppIconKey = typeof ICON_KEYS[number];

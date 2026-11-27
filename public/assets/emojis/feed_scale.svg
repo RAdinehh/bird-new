@@ -1,5 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M20 34 H108 L94 60 H34 Z" fill="#F59E0B" stroke="#B45309" stroke-width="4" stroke-linejoin="round"/><ellipse cx="64" cy="34" rx="40" ry="8" fill="#FDE047" stroke="#1E293B" stroke-width="3.2" stroke-linejoin="round"/><rect x="54" y="60" width="20" height="14" fill="#64748B" stroke="#1E293B" stroke-width="3.2" stroke-linejoin="round"/><rect x="24" y="74" width="80" height="38" rx="10" fill="#334155" stroke="#0F172A" stroke-width="4"/><rect x="40" y="84" width="48" height="18" rx="4" fill="#0F172A" stroke="#1E293B" stroke-width="3.2" stroke-linejoin="round"/><rect x="46" y="89" width="36" height="8" rx="2" fill="#38BDF8" stroke="#1E293B" stroke-width="3.2" stroke-linejoin="round"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <!-- ظرف/کیسه دان روی ترازو -->
+    <path d="M36 28 H92 L84 62 H44 Z" fill="#F59E0B" stroke="#78350F" stroke-width="4"/>
+    <path d="M44 42 H84" stroke="#FEF3C7" stroke-width="3.5"/>
+    <!-- کفه و بدنه ترازو -->
+    <rect x="22" y="62" width="84" height="12" rx="4" fill="#94A3B8" stroke="#1E293B" stroke-width="4"/>
+    <rect x="28" y="74" width="72" height="34" rx="8" fill="#E2E8F0" stroke="#1E293B" stroke-width="4"/>
+    <rect x="42" y="83" width="44" height="16" rx="4" fill="#0F172A"/>
+    <path d="M52 91 H76" stroke="#FBBF24" stroke-width="4"/>
   </g>
 </svg>
