@@ -28,7 +28,6 @@ const ICON_KEY_TO_EMOJI: Record<string, string> = {
   invoice: '🧾',
   equipment: '🔧',
   cooling: '❄️',
-  ventilation: '💨',
   lighting: '💡',
   cleaning: '🧹',
   weighing: '⚖️',
