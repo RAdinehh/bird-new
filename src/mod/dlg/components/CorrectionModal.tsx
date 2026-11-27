@@ -315,7 +315,7 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
                   <input
                     type="text"
                     inputMode="decimal"
-                    value={fmt.code(values[key] || '')}
+                    value={values[key] ? fmt.code(values[key]) : ''}
                     onChange={e => setVal(key, toEn(e.target.value))}
                     placeholder="جدید"
                     style={{
