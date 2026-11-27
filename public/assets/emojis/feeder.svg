@@ -1,18 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <g stroke-linecap="round" stroke-linejoin="round">
-    <!-- آویز و مخزن قیفی دانخوری -->
-    <line x1="64" y1="10" x2="64" y2="24" stroke="#475569" stroke-width="5"/>
-    <path d="M44 24 H84 L92 64 H36 Z" fill="#F59E0B" stroke="#78350F" stroke-width="4"/>
-    <rect x="42" y="22" width="44" height="8" rx="3" fill="#D97706" stroke="#78350F" stroke-width="3.5"/>
-    <!-- لوله مرکزی -->
-    <rect x="57" y="64" width="14" height="24" fill="#94A3B8" stroke="#1E293B" stroke-width="3.5"/>
-    <!-- دانه‌های داخل سینی -->
-    <circle cx="38" cy="84" r="3.5" fill="#FBBF24"/>
-    <circle cx="48" cy="85" r="3" fill="#F59E0B"/>
-    <circle cx="80" cy="85" r="3" fill="#F59E0B"/>
-    <circle cx="90" cy="84" r="3.5" fill="#FBBF24"/>
-    <!-- سینی پهن دانخوری -->
-    <path d="M18 84 H110 L102 102 C100 106 96 108 92 108 H36 C32 108 28 106 26 102 Z" fill="#EA580C" stroke="#7C2D12" stroke-width="4"/>
-    <path d="M24 91 H104" stroke="#FDBA74" stroke-width="3"/>
+    <!-- دسته/قلاب بالا -->
+    <path d="M52 14 C52 8 76 8 76 14" fill="none" stroke="#475569" stroke-width="5"/>
+    <rect x="46" y="14" width="36" height="8" rx="3" fill="#CBD5E1" stroke="#334155" stroke-width="3.5"/>
+    <!-- بدنه اصلی دانخوری سطلی -->
+    <rect x="38" y="22" width="52" height="52" rx="6" fill="#F97316" stroke="#7C2D12" stroke-width="4"/>
+    <!-- پنجره شفاف نمایش دان داخل مخزن -->
+    <rect x="48" y="34" width="32" height="28" rx="4" fill="#FEF3C7" stroke="#7C2D12" stroke-width="3"/>
+    <path d="M49 46 H79" stroke="#F59E0B" stroke-width="4"/>
+    <circle cx="56" cy="54" r="2.5" fill="#D97706"/>
+    <circle cx="65" cy="52" r="2.5" fill="#D97706"/>
+    <circle cx="73" cy="55" r="2.5" fill="#D97706"/>
+    <!-- قیف کوچک پایین دانخوری -->
+    <path d="M32 74 H96 L80 98 H48 Z" fill="#EA580C" stroke="#7C2D12" stroke-width="4"/>
+    <rect x="44" y="98" width="40" height="8" rx="3" fill="#9A3412" stroke="#431407" stroke-width="3.5"/>
   </g>
 </svg>

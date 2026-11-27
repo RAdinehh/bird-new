@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <g stroke-linecap="round" stroke-linejoin="round">
-    <!-- قلاب آویز -->
-    <path d="M64 10 V22" stroke="#475569" stroke-width="5"/>
-    <circle cx="64" cy="24" r="5" fill="#CBD5E1" stroke="#334155" stroke-width="3.5"/>
-    <!-- بدنه مخروطی/کله‌قندی آبخوری -->
-    <path d="M64 29 L38 78 H90 Z" fill="#38BDF8" stroke="#0369A1" stroke-width="4"/>
-    <path d="M64 38 L47 72 H57 L64 48 Z" fill="#BAE6FD" opacity="0.7"/>
-    <!-- کاسه آب پایین -->
-    <path d="M24 78 H104 L97 100 C95 105 91 108 86 108 H42 C37 108 33 105 31 100 Z" fill="#0284C7" stroke="#0C4A6E" stroke-width="4"/>
-    <!-- خط سطح آب -->
-    <path d="M30 84 Q47 80 64 84 T98 84" fill="none" stroke="#E0F2FE" stroke-width="3.5"/>
+    <!-- لوله اصلی آبخوری در بالا -->
+    <rect x="18" y="24" width="92" height="20" rx="8" fill="#0284C7" stroke="#0C4A6E" stroke-width="4"/>
+    <path d="M26 30 H102" stroke="#7DD3FC" stroke-width="3"/>
+    <!-- بدنه نیپل آبخوری -->
+    <rect x="55" y="44" width="18" height="22" rx="3" fill="#94A3B8" stroke="#1E293B" stroke-width="3.5"/>
+    <!-- پین/سوپاپ نیپل -->
+    <line x1="64" y1="66" x2="64" y2="80" stroke="#475569" stroke-width="4.5"/>
+    <!-- قطره آب در حال چکیدن -->
+    <path d="M64 84 C64 84 52 98 52 105 a12 12 0 0 0 24 0 C76 98 64 84 64 84 Z" fill="#38BDF8" stroke="#0369A1" stroke-width="3.5"/>
+    <circle cx="60" cy="105" r="3" fill="#E0F2FE"/>
   </g>
 </svg>
