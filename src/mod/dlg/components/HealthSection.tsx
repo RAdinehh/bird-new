@@ -68,7 +68,19 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
  const medicineItems = useMemo(() => whsItems.filter(x => x.category === 'medicine' || x.category === 'herbal'), [whsItems]);
  const chemicalItems = useMemo(() => medicineItems.filter(x => x.category === 'medicine'), [medicineItems]);
  const herbalItems = useMemo(() => medicineItems.filter(x => x.category === 'herbal'), [medicineItems]);
- const causeOptions = useMemo(() => DEATH_CAUSES.map(([v, l]) => ({ value: v, label: l })), []);
+ const DEATH_CAUSE_ICON: Record<string, string> = {
+   '': 'unknown',
+   disease: 'cause_disease',
+   heat_stress: 'cause_heat_stress',
+   suffocation: 'cause_suffocation',
+   cannibalism: 'cause_cannibalism',
+   injury: 'cause_injury',
+   weakness: 'cause_weakness',
+   egg_disorder: 'broken_egg',
+   culling: 'cause_culling',
+   other: 'other',
+ };
+ const causeOptions = useMemo(() => DEATH_CAUSES.map(([v, l]) => ({ value: v, label: l, icon: DEATH_CAUSE_ICON[v] || 'other' })), []);
  const [expandedId, setExpandedId] = useState<string | null>(null);
   const buildUnitOptions = (itemId: string | undefined, items: any[]): UnitOption[] => {
     const it = items.find(x => x.id === itemId);
@@ -206,7 +218,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
  <SmartSelect
  value={v.method || ''}
  onChange={val =>setForm(f =>({ ...f, vaccines: f.vaccines.map(x =>x.id === v.id ? { ...x, method: val } : x) }))}
- options={getAllowedMethods(vaccineItems.find(w =>w.id === v.itemId)).map(o =>({ value: o.value, label: o.label }))}
+ options={getAllowedMethods(vaccineItems.find(w =>w.id === v.itemId)).map(o =>({ value: o.value, label: o.label, icon: o.icon }))}
  placeholder="انتخاب روش"
  modalTitle="روش مصرف"
  />
@@ -337,7 +349,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
  <SmartSelect
  value={m.method || ''}
  onChange={val =>setForm(f =>({ ...f, medications: f.medications.map(x =>x.id === m.id ? { ...x, method: val } : x) }))}
- options={getAllowedMethods(medicineItems.find(w =>w.id === m.itemId)).map(o =>({ value: o.value, label: o.label }))}
+ options={getAllowedMethods(medicineItems.find(w =>w.id === m.itemId)).map(o =>({ value: o.value, label: o.label, icon: o.icon }))}
  placeholder="انتخاب روش"
  modalTitle="روش مصرف"
  />

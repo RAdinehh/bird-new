@@ -614,14 +614,14 @@ export const SOUND_LABEL: Record<string, string> = {
 /** دلایل رایج تلفات */
 export const DEATH_CAUSES: [string, string][] = [
   ['',             'نامشخص'],
-  ['disease',      'بیماری (تنفسی/گوارشی)'],
-  ['heat_stress',  'تنش دمایی (گرما/سرما)'],
-  ['suffocation',  'خفگی / تهویه'],
+  ['disease',      'بیماری'],
+  ['heat_stress',  'تنش دمایی'],
+  ['suffocation',  'خفگی'],
   ['cannibalism',  'هم‌نوع‌خواری'],
-  ['injury',       'آسیب / تصادف'],
-  ['weakness',     'ضعف / تحلیل بدنی'],
-  ['egg_disorder', 'اختلال تخم‌گذاری'],
-  ['culling',      'حذف فنی (کشتار)'],
+  ['injury',       'آسیب‌دیدگی'],
+  ['weakness',     'ضعف'],
+  ['egg_disorder', 'اختلال تخم'],
+  ['culling',      'حذف فنی'],
   ['other',        'سایر'],
 ];
 
