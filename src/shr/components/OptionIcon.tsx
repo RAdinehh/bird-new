@@ -14,7 +14,6 @@ const ICON_KEY_TO_EMOJI: Record<string, string> = {
   chicken: '🐔',
   duck: '🦆',
   turkey: '🦃',
-  quail: '🐦',
   hatch: '🐣',
   chick: '🐤',
   egg: '🥚',
@@ -43,7 +42,7 @@ export function OptionIcon({ icon, size = 22, color = 'currentColor', style }: O
   if (!icon) return null;
 
   if (typeof icon === 'string') {
-    const trimmed = icon.trim();
+    const trimmed = icon.trim() === '🐦' ? 'quail' : icon.trim();
     const emoji = ICON_KEY_TO_EMOJI[trimmed];
     if (!emoji && isValidIconKey(trimmed)) {
       return <AppIcon name={trimmed} size={size} style={style} />;
