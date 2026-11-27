@@ -99,6 +99,21 @@ const getQuantityMax = (cat: string): number | undefined => {
   }
 };
 
+const CAT_SUB_MAP: Record<string, string> = {
+  feed: 'ذرت، کنجاله سویا، گندم، مکمل و مواد اولیه خوراک',
+  medicine: 'داروهای درمانی، آنتی‌بیوتیک، ویتامین و الکترولیت',
+  vaccine: 'واکسن‌های آشامیدنی، تزریقی و اسپری گله',
+  herbal: 'داروهای گیاهی، عصاره‌ها و تقویت‌کننده‌های طبیعی',
+  chick: 'جوجه یک‌روزه و نیمچه آماده ورود به سالن',
+  adult: 'مرغ مادر، تخم‌گذار، گوشتی و پرندگان بالغ',
+  egg: 'تخم خوراکی، نطفه‌دار و شکسته‌شده',
+  fertile_egg: 'تخم نطفه‌دار قابل جوجه‌کشی',
+  broken: 'تخم شکسته و ترک‌دار قابل فروش',
+  manure: 'کود مرغی و بستر تخلیه‌شده سالن',
+  equipment: 'تجهیزات دانخوری، آبخوری، تهویه، گرمایش و سرمایش',
+  other: 'سوخت، پوشال، دستمزد، قبوض، حمل‌ونقل و تعمیرات',
+};
+
 const CAT_ICON_MAP: Record<string, string> = {
   egg: 'egg',
   fertile_egg: 'fertile_egg',
@@ -201,6 +216,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             options={(isPurchase ? CATEGORIES.purchase : CATEGORIES.sale).map(([v, l]: [string, string]) => ({
               value: v,
               label: l,
+              subtitle: CAT_SUB_MAP[v] || undefined,
               icon: CAT_ICON_MAP[v] || '📋',
             }))}
             onChange={newCat => {
@@ -227,8 +243,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             value={(form.isPreorder && form.category !== 'other') ? 'preorder' : 'stock'}
             modalTitle="انتخاب نوع سفارش"
             options={[
-              { value: 'stock', label: isPurchase ? 'خرید از موجودی' : 'فروش از موجودی', icon: '📦' },
-              ...(form.category !== 'other' ? [{ value: 'preorder', label: isPurchase ? 'پیش‌خرید' : 'پیش‌فروش', icon: '📅' }] : []),
+              { value: 'stock', label: isPurchase ? 'خرید نقدی / فوری' : 'فروش از موجودی', subtitle: isPurchase ? 'ورود مستقیم کالا به انبار یا سالن' : 'تحویل و خروج آنی کالا از انبار یا گله', icon: 'inventory' },
+              ...(form.category !== 'other' ? [{ value: 'preorder', label: isPurchase ? 'پیش‌خرید قراردادی' : 'پیش‌فروش قراردادی', subtitle: 'ثبت تعهد تحویل آینده با پیش‌پرداخت یا چک', icon: 'invoice' }] : []),
             ]}
             onChange={v => setForm(f => ({ ...f, isPreorder: v === 'preorder' }))}
           />

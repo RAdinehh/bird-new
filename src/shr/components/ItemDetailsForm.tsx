@@ -159,10 +159,15 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
   const activeFlocks = flocks.filter(f => f.status === 'active').map(f => {
     const parts: string[] = [];
-    if (typeof f.currentCount === 'number') parts.push('🐔 ' + getGlobalFormat().count(f.currentCount) + ' پرنده');
+    const fBird = birds.find((b: any) => b.id === f.birdId);
+    const fBreed = breeds.find((b: any) => b.id === f.breedId);
+    if (fBird || fBreed) {
+      parts.push([fBird?.name, fBreed?.name ? `(${fBreed.name})` : ''].filter(Boolean).join(' '));
+    }
+    if (typeof f.currentCount === 'number') parts.push(getGlobalFormat().count(f.currentCount) + ' قطعه');
     const age = getAgeDays(f);
-    if (age != null && age > 0) parts.push(getGlobalFormat().day(age) + ' روز');
-    return { value: f.id, label: f.name, subtitle: parts.join(' · ') || undefined, icon: 'flock' };
+    if (age != null && age >= 0) parts.push('سن ' + getGlobalFormat().day(age) + ' روز');
+    return { value: f.id, label: f.name, subtitle: parts.join(' · ') || 'گله فعال', icon: 'flock' };
   });
 
   // 🎯 فیلتر آبشاری گله‌ها: فقط گله‌هایی که با پرنده/نژاد انتخاب‌شده مطابقت دارند
@@ -177,6 +182,40 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       return true;
     });
   };
+  const birdOptions = birds.map((b: any) => {
+    const bBreeds = breeds.filter((br: any) => br.birdId === b.id);
+    const icon = b.icon || ((b.name || '').includes('اردک') ? 'duck' : (b.name || '').includes('بوقلمون') ? 'turkey' : (b.name || '').includes('بلدرچین') ? 'quail' : 'chicken');
+    const sub = bBreeds.length > 0 ? `${toFa(bBreeds.length)} نژاد ثبت‌شده (${bBreeds.slice(0, 2).map((x: any) => x.name).join('، ')})` : 'گونه پرنده پرورشی';
+    return { value: b.id, label: b.name, subtitle: sub, icon };
+  });
+
+  const breedOptions = breedsForBird.map((b: any) => {
+    const purposeMap: Record<string, string> = { layer: 'تخم‌گذار', breeder: 'مادر', broiler: 'گوشتی', ornamental: 'زینتی' };
+    const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
+    const parentBird = birds.find((x: any) => x.id === b.birdId);
+    const subParts = [parentBird?.name, purposeLabels.length > 0 ? `کاربری: ${purposeLabels.join('، ')}` : ''].filter(Boolean);
+    const icon = (b.purposes || []).includes('layer') ? 'egg' : (b.purposes || []).includes('breeder') ? 'fertile_egg' : 'chicken';
+    return { value: b.id, label: b.name, subtitle: subParts.join(' · ') || 'نژاد پرنده', icon };
+  });
+
+  const hallOptions = halls.filter((h: any) => !h.archived).map((h: any) => {
+    const hZones = zones.filter((z: any) => z.hallId === h.id && !z.archived);
+    const hFlocks = flocks.filter((f: any) => f.status === 'active' && f.hallId === h.id);
+    const parts: string[] = [];
+    if (h.capacity) parts.push(`ظرفیت ${getGlobalFormat().count(h.capacity)} قطعه`);
+    if (hZones.length > 0) parts.push(`${toFa(hZones.length)} بخش`);
+    if (hFlocks.length > 0) parts.push(`گله: ${hFlocks.map((f: any) => f.name).join('، ')}`);
+    return { value: h.id, label: h.name, subtitle: parts.join(' · ') || 'سالن پرورش', icon: 'hall' };
+  });
+
+  const zoneOptions = zones.filter((z: any) => z.hallId === item.hallId && !z.archived).map((z: any) => {
+    const parentHall = halls.find((h: any) => h.id === z.hallId);
+    const parts: string[] = [];
+    if (parentHall) parts.push(parentHall.name);
+    if (z.capacity) parts.push(`ظرفیت ${getGlobalFormat().count(z.capacity)} قطعه`);
+    return { value: z.id, label: z.name, subtitle: parts.join(' · ') || 'بخش داخل سالن', icon: 'zone' };
+  });
+
   const birdObj = birds.find(b => b.id === item.birdId);
   const breedObj = breeds.find(b => b.id === item.breedId);
     const isEggCategory = isPurchase ? category === 'egg' : category === 'fertile_egg';
@@ -230,8 +269,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 value={String(item.source || 'flock')}
                 modalTitle="انتخاب منبع جوجه"
                 options={[
-                  { value: 'flock', label: 'از گله موجود' },
-                  { value: 'hatch', label: 'از هچری' },
+                  { value: 'flock', label: 'از گله موجود', subtitle: 'انتخاب از گله‌های فعال فارم', icon: 'flock' },
+                  { value: 'hatch', label: 'از هچری', subtitle: 'جوجه‌های هچ‌شده از دستگاه جوجه کشی', icon: 'hatch' },
                 ]}
                 onChange={v => {
                   const ns = v as 'flock' | 'hatch';
@@ -281,14 +320,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* --- بخش ۱: هویت پرنده --- */}
         <Grid2>
           <Field label={FIELD_META.bird.label} required error={err('birdId')} onTouch={touch('birdId')}>
-            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map((b: any) => ({ value: b.id, label: b.name, icon: b.icon || ((b.name || '').includes('اردک') ? '🦆' : (b.name || '').includes('بوقلمون') ? '🦃' : (b.name || '').includes('بلدرچین') ? '🐦' : (b.name || '').includes('غاز') ? '🦢' : '🐔') }))} placeholder="— انتخاب —" modalTitle={FIELD_META.bird.modalTitle} disabled={!!item.existingFlockId || (!isPurchase && !!item.flockId)} />
+            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birdOptions} placeholder="— انتخاب —" modalTitle={FIELD_META.bird.modalTitle} disabled={!!item.existingFlockId || (!isPurchase && !!item.flockId)} />
           </Field>
           <Field label={FIELD_META.breed.label} required error={err('breedId')} onTouch={touch('breedId')}>
-            <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
-              const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
-              const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
-              return { value: b.id, label: b.name, subtitle: purposeLabels.length > 0 ? purposeLabels.join('، ') : undefined };
-            })} placeholder="— انتخاب —" modalTitle={FIELD_META.breed.modalTitle} disabled={!!item.existingFlockId || (!isPurchase && !!item.flockId)} />
+            <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedOptions} placeholder="— انتخاب —" modalTitle={FIELD_META.breed.modalTitle} disabled={!!item.existingFlockId || (!isPurchase && !!item.flockId)} />
             {item.birdId && breedsForBird.length === 0 && (
               <div style={{ color: 'var(--warn)', fontSize: 11, marginTop: 4, fontWeight: 600 }}>
                 ⚠️ برای این پرنده هنوز نژادی ثبت نشده است. ابتدا از بخش «پرنده و نژاد» نژاد تعریف کنید.
@@ -382,10 +417,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {isPurchase && (
           <Grid2>
             <Field label="سالن مقصد">
-              <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.filter(h => !h.archived).map(h => ({ value: h.id, label: h.name, icon: 'hall' }))} placeholder="— انتخاب —" modalTitle="انتخاب سالن مقصد" />
+              <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={hallOptions} placeholder="— انتخاب —" modalTitle="انتخاب سالن مقصد" />
             </Field>
             <Field label="بخش مقصد">
-              <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId && !z.archived).map(z => ({ value: z.id, label: z.name, icon: 'zone' }))} placeholder="— انتخاب —" disabled={!item.hallId} modalTitle="انتخاب بخش مقصد" />
+              <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zoneOptions} placeholder="— انتخاب —" disabled={!item.hallId} modalTitle="انتخاب بخش مقصد" />
             </Field>
           </Grid2>
         )}
@@ -442,14 +477,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* --- بخش ۱: هویت مشتق‌شده از گله --- */}
         <Grid2>
           <Field label={FIELD_META.bird.label} required error={err('birdId')} onTouch={touch('birdId')} lockedFrom={isSaleLocked ? "گله" : undefined}>
-            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map((b: any) => ({ value: b.id, label: b.name, icon: b.icon || ((b.name || '').includes('اردک') ? '🦆' : (b.name || '').includes('بوقلمون') ? '🦃' : (b.name || '').includes('بلدرچین') ? '🐦' : (b.name || '').includes('غاز') ? '🦢' : '🐔') }))} placeholder="— انتخاب —" modalTitle={FIELD_META.bird.modalTitle} disabled={isLocked} />
+            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birdOptions} placeholder="— انتخاب —" modalTitle={FIELD_META.bird.modalTitle} disabled={isLocked} />
           </Field>
           <Field label={FIELD_META.breed.label} required error={err('breedId')} onTouch={touch('breedId')} lockedFrom={isSaleLocked ? "گله" : undefined}>
-            <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
-              const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
-              const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
-              return { value: b.id, label: b.name, subtitle: purposeLabels.length > 0 ? purposeLabels.join('، ') : undefined };
-            })} placeholder="— انتخاب —" modalTitle={FIELD_META.breed.modalTitle} disabled={isLocked || !item.birdId} />
+            <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedOptions} placeholder="— انتخاب —" modalTitle={FIELD_META.breed.modalTitle} disabled={isLocked || !item.birdId} />
           </Field>
         </Grid2>
         {hasIncompatibleBreedsOnly && (
@@ -531,10 +562,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
 
             <Grid2>
               <Field label="سالن مقصد">
-                <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={halls.filter(h => !h.archived).map(h => ({ value: h.id, label: h.name, icon: 'hall' }))} placeholder="— انتخاب —" modalTitle="انتخاب سالن مقصد" />
+                <SmartSelect value={String(item.hallId || '')} onChange={v => updateItem({ hallId: v, zoneId: '' })} options={hallOptions} placeholder="— انتخاب —" modalTitle="انتخاب سالن مقصد" />
               </Field>
               <Field label="بخش مقصد">
-                <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zones.filter(z => z.hallId === item.hallId && !z.archived).map(z => ({ value: z.id, label: z.name, icon: 'zone' }))} placeholder="— انتخاب —" disabled={!item.hallId} modalTitle="انتخاب بخش مقصد" />
+                <SmartSelect value={String(item.zoneId || '')} onChange={v => updateItem({ zoneId: v })} options={zoneOptions} placeholder="— انتخاب —" disabled={!item.hallId} modalTitle="انتخاب بخش مقصد" />
               </Field>
             </Grid2>
           </>
@@ -567,10 +598,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 modalTitle="انتخاب دلیل فروش"
                 placeholder="— انتخاب —"
                 options={[
-                  { value: 'culling', label: 'حذف از گله (کالینگ)' },
-                  { value: 'sick', label: 'بیماری' },
-                  { value: 'old_age', label: 'سن بالا' },
-                  { value: 'surplus', label: 'مازاد' },
+                  { value: 'culling', label: 'حذف از گله (کالینگ)', subtitle: 'پرندگان ضعیف یا خارج‌شده از چرخه تولید', icon: 'flock' },
+                  { value: 'sick', label: 'بیماری', subtitle: 'فروش اضطراری به دلیل عوارض یا بیماری', icon: 'meds' },
+                  { value: 'old_age', label: 'سن بالا / پایان دوره', subtitle: 'حذف گله مادر یا تخم‌گذار در پایان دوره', icon: 'chicken' },
+                  { value: 'surplus', label: 'مازاد گله', subtitle: 'فروش پرندگان سالم مازاد بر ظرفیت سالن', icon: 'stats' },
                   { value: 'breeding_stock', label: 'فروش مولد' },
                   { value: 'other', label: 'سایر' },
                 ]}
@@ -785,17 +816,17 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   // ========== تجهیزات ==========
   if (category === 'equipment') {
     const EQUIP_CATEGORIES = [
-      { value: 'heating', label: 'گرمایش و مادر مصنوعی', icon: 'heating' },
-      { value: 'cooling', label: 'سرمایش و مه‌پاش', icon: 'cooling' },
-      { value: 'ventilation', label: 'تهویه و هواکش', icon: 'ventilation' },
-      { value: 'feeding', label: 'دانخوری', icon: 'equipment' },
-      { value: 'drinking', label: 'آبخوری', icon: 'drinker' },
-      { value: 'lighting', label: 'روشنایی و دیمر', icon: 'lighting' },
-      { value: 'cleaning', label: 'دستگاه و لوازم شست‌وشو', icon: 'cleaning' },
-      { value: 'weighing', label: 'ترازو و باسکول', icon: 'weighing' },
-      { value: 'power', label: 'برق و ژنراتور', icon: 'generator' },
-      { value: 'cage', label: 'قفس و تجهیزات نگهداری', icon: 'cage' },
-      { value: 'other', label: 'سایر تجهیزات', icon: 'hand_tools' },
+      { value: 'heating', label: 'گرمایش و مادر مصنوعی', subtitle: 'هیتر، جت‌هیتر، کوره هوای گرم و مادر مصنوعی', icon: 'heating' },
+      { value: 'cooling', label: 'سرمایش و مه‌پاش', subtitle: 'پد سلولزی، کولر، فوگر و سیستم مه‌پاش', icon: 'cooling' },
+      { value: 'ventilation', label: 'تهویه و هواکش', subtitle: 'هواکش ۱۴۰، اینلت، فن سقفی و سیرکوله', icon: 'ventilation' },
+      { value: 'feeding', label: 'دانخوری', subtitle: 'دانخوری زنجیری، بشقابی، سطلی و سینی جوجه', icon: 'equipment' },
+      { value: 'drinking', label: 'آبخوری', subtitle: 'نیپل، آبخوری آویز، کله‌قندی و ناودانی', icon: 'drinker' },
+      { value: 'lighting', label: 'روشنایی و دیمر', subtitle: 'لامپ LED، مهتابی، دیمر و چراغ اضطراری', icon: 'lighting' },
+      { value: 'cleaning', label: 'دستگاه و لوازم شست‌وشو', subtitle: 'کارواش صنعتی، سمپاش، شعله‌افکن و فرچه', icon: 'cleaning' },
+      { value: 'weighing', label: 'ترازو و باسکول', subtitle: 'باسکول دیجیتال، ترازوی پرنده و توزین دان', icon: 'weighing' },
+      { value: 'power', label: 'برق و ژنراتور', subtitle: 'موتور برق، تابلو برق، کابل و استابلایزر', icon: 'generator' },
+      { value: 'cage', label: 'قفس و تجهیزات نگهداری', subtitle: 'قفس تخم‌گذار، قفس حمل طیور و پارتیشن', icon: 'cage' },
+      { value: 'other', label: 'سایر تجهیزات', subtitle: 'فرقون، بیل، دوربین، سنسور و ابزار دستی', icon: 'hand_tools' },
     ];
     const EQUIP_KINDS = [
       { value: 'asset', label: 'تجهیز دائمی (سرمایه‌ای)' },
@@ -835,14 +866,10 @@ if (category === 'egg' || category === 'fertile_egg') {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>      <SecTitle icon="egg" title="اطلاعات تخم" />
       <Grid2>
         <Field label={FIELD_META.bird.label} required error={err('birdId')} onTouch={touch('birdId')}>
-          <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map((b: any) => ({ value: b.id, label: b.name, icon: b.icon || ((b.name || '').includes('اردک') ? '🦆' : (b.name || '').includes('بوقلمون') ? '🦃' : (b.name || '').includes('بلدرچین') ? '🐦' : (b.name || '').includes('غاز') ? '🦢' : '🐔') }))} placeholder="— انتخاب —" modalTitle={FIELD_META.bird.modalTitle} />
+          <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birdOptions} placeholder="— انتخاب —" modalTitle={FIELD_META.bird.modalTitle} />
         </Field>
         <Field label={FIELD_META.breed.label} required error={err('breedId')} onTouch={touch('breedId')}>
-          <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
-            const purposeMap: Record<string, string> = { layer: '🥚 تخم‌گذار', breeder: '🐣 مادر', broiler: '🍗 گوشتی', ornamental: '🌸 زینتی' };
-            const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
-            return { value: b.id, label: b.name, subtitle: purposeLabels.length > 0 ? purposeLabels.join('، ') : undefined };
-          })} placeholder="— انتخاب —"
+          <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedOptions} placeholder="— انتخاب —"
             disabled={!item.birdId} modalTitle={FIELD_META.breed.modalTitle} />
         </Field>
       </Grid2>
@@ -984,7 +1011,7 @@ if (category === 'vaccine' || category === 'herbal') {
             <SmartSelect
               value={String(item.hallId || '')}
               onChange={v => updateItem({ hallId: v })}
-              options={halls.map(h => ({ value: h.id, label: h.name }))}
+              options={hallOptions}
               placeholder={FIELD_META.hall.relatedOptional.placeholder}
               modalTitle="انتخاب سالن"
             />
