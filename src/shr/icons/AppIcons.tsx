@@ -7,7 +7,7 @@ export const ICON_KEYS = [
   'feeder_chain', 'feeder_tube', 'feeder_bucket', 'feeder_tray',
   'drinker_cup', 'drinker_hanging', 'drinker_fountain', 'drinker_trough', 'litter_straw',
   'kg', 'pcs',
-  'chicken', 'duck', 'turkey', 'egg', 'fertile_egg', 'broken_egg', 'manure', 'herbal', 'other', 'equipment', 'bag', 'vial', 'liquid', 'dose', 'pack', 'cage',
+  'chicken', 'duck', 'turkey', 'egg', 'fertile_egg', 'broken_egg', 'manure', 'herbal', 'other', 'equipment', 'bag', 'vial', 'liquid', 'dose', 'pack', 'cage', 'corn', 'wheat', 'barley', 'bran', 'soybean_meal', 'sesame_meal', 'sunflower_meal', 'canola_meal', 'fish_meal', 'alfalfa', 'calcium_powder', 'oyster_shell', 'salt', 'oil', 'amino_acid', 'premix',
   'hatch', 'feed', 'invoice', 'meds',
   'mortality', 'water', 'stats', 'flock', 'flocks_group',
   'inventory', 'cash', 'climate', 'unknown'
@@ -77,4 +77,26 @@ export function getSmartIconByText(text?: string): AppIconKey {
 
 export function isValidIconKey(key: string): key is AppIconKey {
   return (ICON_KEYS as readonly string[]).includes(key);
+}
+
+export function getSmartFeedIcon(name?: string, fallback: AppIconKey = 'feed'): AppIconKey {
+  if (!name) return fallback;
+  const n = name.trim().toLowerCase();
+  if (n.includes('سبوس')) return 'bran';
+  if (n.includes('ذرت')) return 'corn';
+  if (n.includes('گندم')) return 'wheat';
+  if (n.includes('جو')) return 'barley';
+  if (n.includes('روغن')) return 'oil';
+  if (n.includes('سویا')) return 'soybean_meal';
+  if (n.includes('کنجد')) return 'sesame_meal';
+  if (n.includes('آفتابگردان')) return 'sunflower_meal';
+  if (n.includes('کانولا') || n.includes('کلزا')) return 'canola_meal';
+  if (n.includes('ماهی')) return 'fish_meal';
+  if (n.includes('یونجه')) return 'alfalfa';
+  if (n.includes('صدف')) return 'oyster_shell';
+  if (n.includes('کلسیم') || n.includes('آهک') || n.includes('فسفات')) return 'calcium_powder';
+  if (n.includes('نمک')) return 'salt';
+  if (n.includes('متیونین') || n.includes('لیزین')) return 'amino_acid';
+  if (n.includes('پرمیکس') || n.includes('ویتامین') || n.includes('مکمل')) return 'premix';
+  return fallback;
 }

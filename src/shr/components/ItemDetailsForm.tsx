@@ -1,3 +1,4 @@
+import { getSmartFeedIcon } from '../icons/AppIcons';
 import { OptionIcon } from './OptionIcon';
 import { AppIconKey } from '../icons/AppIcons';
 import { FIELD_META } from '../constants/fieldMeta';
@@ -630,7 +631,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               { value: '__new__', label: `تعریف ${catLabel} جدید در انبار`, icon: 'inventory' },
               ...filteredWhs.map(i => ({
                 value: i.id,
-                label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`, icon: category === 'feed' ? 'feed' : category === 'herbal' ? 'herbal' : category === 'manure' ? 'manure' : category === 'broken' ? 'broken_egg' : 'meds',
+                label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`, icon: category === 'feed' ? getSmartFeedIcon(i.name, 'feed') : category === 'herbal' ? 'herbal' : category === 'manure' ? 'manure' : category === 'broken' ? 'broken_egg' : 'meds',
               })),
             ]}
             placeholder={undefined}
@@ -661,7 +662,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 unitPrice: wItem?.lastPrice || item.unitPrice,
                 description: wItem?.name || item.description,
               });
-            }} options={feedItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`, icon: 'feed' }))} placeholder="— انتخاب —" modalTitle="انتخاب کالای انبار" />
+            }} options={feedItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`, icon: getSmartFeedIcon(i.name, 'feed') }))} placeholder="— انتخاب —" modalTitle="انتخاب کالای انبار" />
           </Field>
         )}
         <Grid2>
