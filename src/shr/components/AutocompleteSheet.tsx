@@ -12,6 +12,7 @@ import { getGlobalFormat } from '../units/useFormat';
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import SelectSheetShell, { SheetGroup, SheetItem } from './SelectSheetShell';
+import { OptionIcon } from './OptionIcon';
 
 export interface AutoOption {
   value: string;
@@ -121,6 +122,11 @@ export default function AutocompleteSheet({
   };
 
   const handleShowMore = () => setVisibleCount(c => c + STEP);
+  const selectedOpt = useMemo(() => {
+    const v = value.trim().toLowerCase();
+    if (!v) return null;
+    return options.find(o => o.label.trim().toLowerCase() === v) || (pickedOpt && pickedOpt.label.trim().toLowerCase() === v ? pickedOpt : null);
+  }, [options, value, pickedOpt]);
 
   return (
     <>
@@ -133,6 +139,11 @@ export default function AutocompleteSheet({
         borderRadius: 'var(--r-md, 8px)',
         transition: 'border-color .15s ease',
       }}>
+        {(selectedOpt?.icon || (value.trim() && defaultIcon)) && (
+          <span style={{ display: 'inline-flex', alignItems: 'center', paddingRight: 10, flexShrink: 0 }}>
+            <OptionIcon icon={selectedOpt?.icon || defaultIcon} size={19} />
+          </span>
+        )}
         <input
           ref={inputRef}
           type="text"
@@ -169,7 +180,7 @@ export default function AutocompleteSheet({
           placeholder={placeholder || 'تایپ کن یا ▼ بزن'}
           autoComplete="off"
           style={{
-            flex: '1 1 0%', minWidth: 0, height: 36, padding: matched ? '0 12px 0 28px' : '0 12px',
+            flex: '1 1 0%', minWidth: 0, height: 36, padding: (selectedOpt?.icon || (value.trim() && defaultIcon)) ? (matched ? '0 6px 0 28px' : '0 6px 0 12px') : (matched ? '0 12px 0 28px' : '0 12px'),
             background: 'transparent',
             border: 'none',
             color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-base)',
