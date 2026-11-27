@@ -46,6 +46,27 @@ function getFeedUnitOpts(src: FeedSource, feedItems: any[]): UnitOption[] {
   return opts;
 }
 
+const getFeedItemIcon = (name: string): string => {
+  const n = name || '';
+  if (/ذرت/i.test(n)) return 'corn';
+  if (/سویا|کنجاله سویا/i.test(n)) return 'soybean_meal';
+  if (/گندم/i.test(n)) return 'wheat';
+  if (/جو/i.test(n)) return 'barley';
+  if (/سبوس/i.test(n)) return 'bran';
+  if (/یونجه/i.test(n)) return 'alfalfa';
+  if (/کلزا|کانولا/i.test(n)) return 'canola_meal';
+  if (/آفتابگردان/i.test(n)) return 'sunflower_meal';
+  if (/کنجد/i.test(n)) return 'sesame_meal';
+  if (/ماهی|پودر ماهی/i.test(n)) return 'fish_meal';
+  if (/روغن/i.test(n)) return 'oil';
+  if (/صدف/i.test(n)) return 'oyster_shell';
+  if (/کلسیم|دی‌کلسیم|کربنات/i.test(n)) return 'calcium_powder';
+  if (/نمک/i.test(n)) return 'salt';
+  if (/مکمل|پرمیکس|ویتامین/i.test(n)) return 'premix';
+  if (/متیونین|لیزین|آمینو/i.test(n)) return 'amino_acid';
+  return 'feed';
+};
+
 export default function FeedSection({ form, setForm }: Props) {
   const fmt = useFormat();
  const { formulas, ingredients } = useFed();
@@ -265,8 +286,8 @@ export default function FeedSection({ form, setForm }: Props) {
  else updateSource(idx, { type: 'item', refId: '', displayUnit: undefined, displayValue: undefined });
  }}
  options={[
- ...formulas.map(f =>({ value: 'f:'+ f.id, label: f.name, subtitle: `${fmt.count(f.lines.length)} ماده`, group: 'formula'})),
- ...feedItems.map(it =>({ value: 'i:'+ it.id, label: it.name, subtitle: `موجودی ${fmt.num(it.currentStock)} ${UNIT_LABEL[it.unit]}`, group: 'item'})),
+ ...formulas.map(f =>({ value: 'f:'+ f.id, label: f.name, subtitle: `${fmt.count(f.lines.length)} ماده`, group: 'formula', icon: 'feed'})),
+ ...feedItems.map(it =>({ value: 'i:'+ it.id, label: it.name, subtitle: `موجودی ${fmt.num(it.currentStock)} ${UNIT_LABEL[it.unit]}`, group: 'item', icon: getFeedItemIcon(it.name)})),
  ]}
  groupLabels={{ formula: 'جیره‌ها', item: 'دان تکی'}}
  groupIcons={{ formula: '', item: ''}}

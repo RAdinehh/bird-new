@@ -208,7 +208,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
  return { ...x, itemId: id, quantity: id ? (x.quantity ?? 0) : null, unit: newItem?.unit || x.unit, name: newItem ? newItem.name : x.name, dose: autoDose ? String(autoDose) : x.dose };
  })
  }))}
- options={vaccineItems.map(w =>({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}`}))}
+ options={vaccineItems.map(w =>({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}`, icon: 'vial'}))}
  placeholder="— متصل نکن —"
  modalTitle="انتخاب از انبار"
  />
@@ -337,7 +337,7 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
  };
  })
  }))}
- options={medicineItems.map(w =>({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}`, group: w.category === 'herbal'? 'herbal': 'chemical'}))}
+ options={medicineItems.map(w =>({ value: w.id, label: w.name, subtitle: `موجودی ${formatQty(w.currentStock, w.unit)}`, group: w.category === 'herbal'? 'herbal': 'chemical', icon: w.category === 'herbal' ? 'herbal' : 'meds'}))}
  groupLabels={{ chemical: 'شیمیایی', herbal: 'گیاهی'}}
  groupIcons={{ chemical: '', herbal: ''}}
  placeholder="— متصل نکن —"

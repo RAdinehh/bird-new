@@ -76,7 +76,7 @@ export default function FormModal(props: FormModalProps) {
           value={form.flockId}
           onChange={onFlockChange}
           options={activeFlocks.map(f => ({
-            value: f.id, label: f.name,
+            value: f.id, label: f.name, icon: 'flock',
             subtitle: f.currentCount ? `${fmt.count(f.currentCount)} پرنده` : undefined,
           }))}
           placeholder="— انتخاب —"
