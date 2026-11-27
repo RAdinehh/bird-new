@@ -128,8 +128,8 @@ export default function SmartSelect({
           overflow: 'visible',
         }}>
           {current ? (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-                  <OptionIcon icon={current.icon} size={19} />
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: current.icon ? 6 : 0, minWidth: 0 }}>
+                    {current.icon && <OptionIcon icon={current.icon} size={19} />}
                   <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.2 }}>{current.label}</span>
                 </span>
               ) : placeholder}
