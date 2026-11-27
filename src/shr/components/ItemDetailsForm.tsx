@@ -827,8 +827,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       { value: 'other', label: 'سایر', icon: 'hand_tools' },
     ];
     const EQUIP_KINDS = [
-      { value: 'asset', label: 'تجهیز دائمی (سرمایه‌ای)' },
-      { value: 'consumable', label: 'تجهیز مصرفی (ورود به انبار)' },
+      { value: 'asset', label: 'تجهیز دائمی' , icon: '⚙️' },
+      { value: 'consumable', label: 'تجهیز مصرفی' , icon: '📦' },
     ];
 
     return (
