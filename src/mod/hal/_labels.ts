@@ -50,7 +50,7 @@ export const UNIT_LABELS_EQ: Record<EquipmentUnit, string> = {
 
 export const EQUIP_LABELS: Record<string, { name: string; icon: string }> = {
   // تهویه
-  fan_tunnel:   { name: 'فن تونلی', icon: 'ventilation' },
+  fan_tunnel:   { name: 'فن تونلی', icon: 'fan_tunnel' },
   fan_ceiling:  { name: 'فن سقفی', icon: 'fan_ceiling' },
   air_inlet:    { name: 'دریچه اینلت', icon: 'air_inlet' },
   cooling_pad:  { name: 'پد سلولزی', icon: 'cooling_pad' },

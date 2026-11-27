@@ -250,7 +250,7 @@ export function sourceIcon(type: string): string {
   const map: Record<string, string> = {
     nipple: '💧', cup: '🥛', trough: '🛁', fountain_drinker: '⛲',
     feeder_manual: '🪣', feeder_pan: '🥣', feeder_chain: '⛓', feeder_tube: '🥤', feeder_bucket: '🪣',
-    fan_tunnel: '🌀', fan_ceiling: '💨', air_inlet: '🪟', cooling_pad: '❄',
+    fan_tunnel: 'fan_tunnel', fan_ceiling: '💨', air_inlet: '🪟', cooling_pad: '❄',
   };
   return map[type] || '🔧';
 }

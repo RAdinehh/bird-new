@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <!-- بدنه کانال/تونل مکش در عقب -->
+    <path d="M24 26 L44 18 V110 L24 102 Z" fill="#94A3B8" stroke="#1E293B" stroke-width="4"/>
+    <!-- قاب جلویی فن تونلی بزرگ -->
+    <rect x="44" y="16" width="64" height="96" rx="12" fill="#CBD5E1" stroke="#1E293B" stroke-width="4.5"/>
+    <circle cx="76" cy="64" r="27" fill="#0F172A" stroke="#334155" stroke-width="3.5"/>
+    <!-- پره‌های پهن فن تونلی -->
+    <path d="M76 52 C62 30 92 26 94 46 C95 54 85 57 76 52 Z" fill="#38BDF8" stroke="#0284C7" stroke-width="3"/>
+    <path d="M88 64 C110 50 114 80 94 82 C86 83 83 73 88 64 Z" fill="#0EA5E9" stroke="#0369A1" stroke-width="3"/>
+    <path d="M76 76 C90 98 60 102 58 82 C57 74 67 71 76 76 Z" fill="#38BDF8" stroke="#0284C7" stroke-width="3"/>
+    <path d="M64 64 C42 78 38 48 58 46 C66 45 69 55 64 64 Z" fill="#0EA5E9" stroke="#0369A1" stroke-width="3"/>
+    <circle cx="76" cy="64" r="9" fill="#F8FAFC" stroke="#1E293B" stroke-width="3"/>
+    <!-- خطوط جریان هوای طولی -->
+    <path d="M112 44 H122 M112 64 H124 M112 84 H122" stroke="#0284C7" stroke-width="4.5"/>
+  </g>
+</svg>
