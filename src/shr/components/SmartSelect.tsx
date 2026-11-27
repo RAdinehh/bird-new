@@ -179,7 +179,7 @@ export default function SmartSelect({
               {grouped[gKey].map(o => (
                 <SheetItem
                       key={o.value}
-                      icon={<OptionIcon icon={o.icon || (o.group ? groupIcons[o.group] : undefined)} size={22} />}
+                      icon={o.icon || (o.group ? groupIcons[o.group] : undefined)}
                       title={o.label}
                       subtitle={o.subtitle}
                   selected={value === o.value}
@@ -193,7 +193,7 @@ export default function SmartSelect({
           filtered.map(o => (
             <SheetItem
                       key={o.value}
-                      icon={<OptionIcon icon={o.icon || (o.group ? groupIcons[o.group] : undefined)} size={22} />}
+                      icon={o.icon || (o.group ? groupIcons[o.group] : undefined)}
                       title={o.label}
                       subtitle={o.subtitle}
               selected={value === o.value}
