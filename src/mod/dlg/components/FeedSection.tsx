@@ -9,6 +9,7 @@ import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { Field, Grid2, NumField, Btn, Select, AlertBox, Tag, SummaryCard, QuantityUnitInput, type UnitOption, SummaryRow } from '../../../shr/components/ui';
 import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
 import SmartSelect from '../../../shr/components/SmartSelect';
+import OverrideHint from '../../../shr/components/OverrideHint';
 import { UNIT_LABEL } from '../../whs/store';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { WATER_SYSTEM_LABEL } from '../../../shr/utils/systemType';
@@ -179,41 +180,39 @@ export default function FeedSection({ form, setForm }: Props) {
 
  return (
   <>
-   <div style={{ marginBottom: 10 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-          <Field label="دانخوری">
-            <SmartSelect
-              value={form.feedMethod || ''}
-              onChange={v => setForm(f => ({ ...f, feedMethod: v as 'scoop' | 'bag' | 'semi_auto' | 'auto_sensor' | 'auto_chain' | '', feedMethodSource: 'manual' }))}
-              options={FEED_METHOD_OPTIONS}
-              placeholder="— انتخاب —"
-              modalTitle="انتخاب دانخوری"
-              compact
-            />
-          </Field>
-          <Field label="آبخوری">
-            <SmartSelect
-              value={form.waterMethod || ''}
-              onChange={v => setForm(f => ({ ...f, waterMethod: v as 'manual' | 'nipple' | 'trough' | 'tank' | '', waterMethodSource: 'manual' }))}
-              options={WATER_METHOD_OPTIONS}
-              placeholder="— انتخاب —"
-              modalTitle="انتخاب آبخوری"
-              compact
-            />
-          </Field>
-        </div>
-        {(form.feedMethodSource === 'manual' || form.waterMethodSource === 'manual') && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 6, padding: '4px 8px', background: 'var(--warn-soft)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-2xs)' }}>
-            <span style={{ color: 'var(--warn)', fontWeight: 700 }}>تغییر موقت نسبت به سالن</span>
-            <button
-              type="button"
-              onClick={() => setForm(f => ({ ...f, feedMethod: (f.feedMethodFromHall || '') as any, waterMethod: (f.waterMethodFromHall || '') as any, feedMethodSource: 'hall', waterMethodSource: 'hall' }))}
-              style={{ background: 'none', border: 'none', color: 'var(--warn)', fontFamily: 'inherit', fontSize: 'var(--fs-2xs)', fontWeight: 700, cursor: 'pointer', padding: '2px 4px' }}
-            >
-              ↺ بازگشت به سالن
-            </button>
-          </div>
-        )}
+   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 10 }}>
+        <Field label="دانخوری">
+          <SmartSelect
+            value={form.feedMethod || ''}
+            onChange={v => setForm(f => ({ ...f, feedMethod: v as 'scoop' | 'bag' | 'semi_auto' | 'auto_sensor' | 'auto_chain' | '', feedMethodSource: v === (f.feedMethodFromHall || '') ? 'hall' : 'manual' }))}
+            options={FEED_METHOD_OPTIONS}
+            placeholder="— انتخاب —"
+            modalTitle="انتخاب دانخوری"
+            compact
+          />
+          <OverrideHint
+            overridden={form.feedMethodSource === 'manual' && form.feedMethod !== (form.feedMethodFromHall || '')}
+            stdValue={FEED_METHOD_OPTIONS.find(o => o.value === form.feedMethodFromHall)?.label || null}
+            label="سالن"
+            onReset={() => setForm(f => ({ ...f, feedMethod: (f.feedMethodFromHall || '') as any, feedMethodSource: 'hall' }))}
+          />
+        </Field>
+        <Field label="آبخوری">
+          <SmartSelect
+            value={form.waterMethod || ''}
+            onChange={v => setForm(f => ({ ...f, waterMethod: v as 'manual' | 'nipple' | 'trough' | 'tank' | '', waterMethodSource: v === (f.waterMethodFromHall || '') ? 'hall' : 'manual' }))}
+            options={WATER_METHOD_OPTIONS}
+            placeholder="— انتخاب —"
+            modalTitle="انتخاب آبخوری"
+            compact
+          />
+          <OverrideHint
+            overridden={form.waterMethodSource === 'manual' && form.waterMethod !== (form.waterMethodFromHall || '')}
+            stdValue={WATER_METHOD_OPTIONS.find(o => o.value === form.waterMethodFromHall)?.label || null}
+            label="سالن"
+            onReset={() => setForm(f => ({ ...f, waterMethod: (f.waterMethodFromHall || '') as any, waterMethodSource: 'hall' }))}
+          />
+        </Field>
       </div>
 
    <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginBottom: 6 }}>

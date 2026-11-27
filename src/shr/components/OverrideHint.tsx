@@ -24,10 +24,12 @@ interface Props {
   decimals?: number;
   /** کلیک → بازگشت به استاندارد */
   onReset: () => void;
+  /** برچسب پیشوند (پیش‌فرض: استاندارد) */
+  label?: string;
 }
 
 export default function OverrideHint({
-  overridden, stdValue, unit, decimals = 0, onReset,
+  overridden, stdValue, unit, decimals = 0, onReset, label = 'استاندارد',
 }: Props) {
   if (!overridden || stdValue == null || stdValue === '') return null;
 
@@ -42,8 +44,8 @@ export default function OverrideHint({
       tabIndex={0}
       onClick={onReset}
       onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onReset(); } }}
-      aria-label={`بازگشت به استاندارد ${text}`}
-      title={`لمس کن تا برگرده به استاندارد: ${text}`}
+      aria-label={`بازگشت به ${label} ${text}`}
+      title={`لمس کن تا برگرده به ${label}: ${text}`}
       style={{
         display: 'inline-flex',
         alignItems: 'center',
@@ -59,7 +61,7 @@ export default function OverrideHint({
         width: 'fit-content',
       }}
     >
-      <span>استاندارد: {text}</span>
+      <span>{label}: {text}</span>
       <span aria-hidden="true" style={{ fontSize: 12, lineHeight: 1 }}>↺</span>
     </span>
   );
