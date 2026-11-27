@@ -10,13 +10,47 @@ interface OptionIconProps {
 
 const EMOJI_FONT = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
 
+const EMOJI_TO_ICON_KEY: Record<string, string> = {
+  '🐔': 'chicken',
+  '🐓': 'chicken',
+  '🦆': 'duck',
+  '🦢': 'duck',
+  '🦃': 'turkey',
+  '🐦': 'quail',
+  '🐣': 'hatch',
+  '🐤': 'chick',
+  '🐥': 'chick',
+  '🥚': 'egg',
+  '🏠': 'hall',
+  '🏚️': 'hall',
+  '🏢': 'hall',
+  '🔧': 'equipment',
+  '⚙️': 'equipment',
+  '🛠️': 'hand_tools',
+  '🔥': 'heating',
+  '❄️': 'cooling',
+  '💨': 'ventilation',
+  '💧': 'drinker',
+  '💡': 'lighting',
+  '🧹': 'cleaning',
+  '⚖️': 'weighing',
+  '⚡': 'generator',
+  '💊': 'meds',
+  '💉': 'vaccine',
+  '🌿': 'herbal',
+  '🌾': 'feed',
+  '📦': 'inventory',
+  '🧾': 'invoice',
+};
+
 export function OptionIcon({ icon, size = 22, color = 'currentColor', style }: OptionIconProps) {
   if (!icon) return null;
 
   if (typeof icon === 'string') {
     const trimmed = icon.trim();
-    if (isValidIconKey(trimmed)) {
-      return <AppIcon name={trimmed} size={size} style={style} />;
+    const mapped = EMOJI_TO_ICON_KEY[trimmed] || trimmed;
+    if (isValidIconKey(mapped)) {
+      return <AppIcon name={mapped} size={size} style={style} />;
     }
     return (
       <span
