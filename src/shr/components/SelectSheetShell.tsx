@@ -444,7 +444,7 @@ export function SheetItem({ icon, equipType, category, title, subtitle, selected
         border: 'none',
         borderBottom: 'none',
         fontFamily: 'inherit',
-        width: '100%', textAlign: 'right',
+        width: '100%', direction: 'rtl', textAlign: 'right',
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.45 : 1,
         position: 'relative',
