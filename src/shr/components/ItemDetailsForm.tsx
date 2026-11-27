@@ -801,7 +801,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     ];
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="⚙️" title="مشخصات تجهیزات" />        {nameFieldJsx}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="equipment" title="مشخصات تجهیزات" />        {nameFieldJsx}
         <Grid2>
           <Field label="دسته تجهیزات" required error={err('equipmentCategory')} onTouch={touch('equipmentCategory')}>
             <SmartSelect

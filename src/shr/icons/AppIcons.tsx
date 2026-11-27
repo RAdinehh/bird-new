@@ -7,7 +7,7 @@ export const ICON_KEYS = [
   'feeder_chain', 'feeder_tube', 'feeder_bucket', 'feeder_tray',
   'drinker_cup', 'drinker_hanging', 'drinker_fountain', 'drinker_trough', 'litter_straw',
   'kg', 'pcs',
-  'chicken', 'duck', 'turkey', 'egg', 'fertile_egg', 'broken_egg', 'manure', 'herbal', 'other',
+  'chicken', 'duck', 'turkey', 'egg', 'fertile_egg', 'broken_egg', 'manure', 'herbal', 'other', 'equipment',
   'hatch', 'feed', 'invoice', 'meds',
   'mortality', 'water', 'stats', 'flock', 'flocks_group',
   'inventory', 'cash', 'climate', 'unknown'

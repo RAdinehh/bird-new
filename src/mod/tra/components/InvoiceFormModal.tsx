@@ -107,7 +107,7 @@ const CAT_ICON_MAP: Record<string, string> = {
   feed: 'feed',
   medicine: 'meds',
   herbal: 'herbal',
-  equipment: 'feeder',
+  equipment: 'equipment',
   manure: 'manure',
   broken: 'broken_egg',
   other: 'other',
