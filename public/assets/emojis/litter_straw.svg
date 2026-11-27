@@ -1,6 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M22 104 L52 20 M44 108 L72 16 M66 108 L92 20 M88 104 L110 28" stroke="#EAB308" stroke-width="11" stroke-linecap="round"/>
-      <rect x="18" y="64" width="92" height="14" rx="7" fill="#A16207" stroke="#1E293B" stroke-width="3.2" stroke-linejoin="round"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 96 L96 28" stroke="#D97706" stroke-width="7"/>
+    <path d="M22 96 L96 28" stroke="#FCD34D" stroke-width="3"/>
+    <path d="M32 104 L108 42" stroke="#B45309" stroke-width="7"/>
+    <path d="M32 104 L108 42" stroke="#FDE68A" stroke-width="3"/>
+    <path d="M18 82 L84 22" stroke="#F59E0B" stroke-width="6.5"/>
+    <path d="M44 108 L112 58" stroke="#D97706" stroke-width="6.5"/>
+    <ellipse cx="64" cy="66" rx="14" ry="7" transform="rotate(-38 64 66)" fill="#92400E" stroke="#451A03" stroke-width="3"/>
   </g>
 </svg>

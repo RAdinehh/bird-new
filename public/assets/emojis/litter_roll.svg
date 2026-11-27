@@ -1,5 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <ellipse cx="64" cy="40" rx="36" ry="16" fill="#F8FAFC" stroke="#64748B" stroke-width="4"/><ellipse cx="64" cy="40" rx="12" ry="5" fill="#475569" stroke="#1E293B" stroke-width="3.2" stroke-linejoin="round"/><path d="M28 40 V88 C28 98 44 106 64 106 C84 106 100 98 100 88 V40" fill="#E2E8F0" stroke="#64748B" stroke-width="4"/><path d="M100 66 H116 V98 H88" fill="#F1F5F9" stroke="#64748B" stroke-width="4" stroke-linejoin="round"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <!-- بدنه رول کاغذی قهوه‌ای -->
+    <path d="M36 24 H88 C100 24 106 41 106 64 C106 87 100 104 88 104 H36 Z" fill="#C2884F" stroke="#5C3A1E" stroke-width="4"/>
+    <!-- برگه بازشده رول در پایین -->
+    <path d="M52 104 C52 114 62 118 76 116 L96 112" fill="none" stroke="#8C5828" stroke-width="4.5"/>
+    <!-- وجه جلویی استوانه و هسته مرکزی رول -->
+    <ellipse cx="36" cy="64" rx="14" ry="40" fill="#D99B5E" stroke="#5C3A1E" stroke-width="4"/>
+    <ellipse cx="36" cy="64" rx="5.5" ry="15" fill="#5C3A1E"/>
+    <!-- خطوط لایه‌های رول -->
+    <path d="M48 34 H96" stroke="#E5B482" stroke-width="2.5"/>
+    <path d="M50 88 H98" stroke="#8C5828" stroke-width="3"/>
   </g>
 </svg>

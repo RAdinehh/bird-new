@@ -1,5 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M14 98 Q40 48 68 54 Q94 60 114 98 Z" fill="#FCD34D" stroke="#D97706" stroke-width="4"/><circle cx="52" cy="76" r="2.5" fill="#B45309" stroke="#1E293B" stroke-width="3.2" stroke-linejoin="round"/><circle cx="68" cy="72" r="2.5" fill="#B45309" stroke="#1E293B" stroke-width="3.2" stroke-linejoin="round"/><circle cx="80" cy="84" r="2.5" fill="#B45309" stroke="#1E293B" stroke-width="3.2" stroke-linejoin="round"/><circle cx="44" cy="86" r="2.5" fill="#B45309" stroke="#1E293B" stroke-width="3.2" stroke-linejoin="round"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16 98 C26 68 52 54 66 54 C82 54 104 70 112 98 Z" fill="#E6C280" stroke="#78552B" stroke-width="4"/>
+    <path d="M24 94 C44 82 82 82 104 94" fill="none" stroke="#C49A52" stroke-width="3.5"/>
+    <circle cx="44" cy="78" r="2" fill="#78552B"/>
+    <circle cx="64" cy="68" r="2" fill="#78552B"/>
+    <circle cx="84" cy="78" r="2" fill="#78552B"/>
+    <circle cx="54" cy="88" r="2" fill="#78552B"/>
+    <circle cx="74" cy="88" r="2" fill="#78552B"/>
   </g>
 </svg>

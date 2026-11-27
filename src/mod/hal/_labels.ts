@@ -81,7 +81,7 @@ export const EQUIP_LABELS: Record<string, { name: string; icon: string }> = {
   lamp_fluorescent: { name: 'لامپ مهتابی', icon: 'lamp_fluorescent' },
   dimmer:           { name: 'دیمر', icon: 'dimmer' },
   // بستر
-  litter_wood_shavings: { name: 'پوشال چوب', icon: 'litter' },
+  litter_wood_shavings: { name: 'پوشال چوب', icon: 'litter_sawdust' },
   litter_sawdust:       { name: 'خاک‌اره', icon: 'litter_sawdust' },
   litter_roll:          { name: 'رول کاغذی', icon: 'litter_roll' },
   litter_rice_hull:     { name: 'سبوس برنج', icon: 'litter_rice_hull' },

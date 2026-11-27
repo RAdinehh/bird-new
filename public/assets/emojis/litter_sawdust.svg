@@ -1,5 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M16 98 Q36 44 64 44 Q92 44 112 98 Z" fill="#D97706" stroke="#78350F" stroke-width="4"/><path d="M44 74 Q50 66 56 74 M68 68 Q74 60 80 68 M56 84 Q62 76 68 84" fill="none" stroke="#FEF3C7" stroke-width="4" stroke-linecap="round"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 98 C22 76 38 66 56 64 C70 52 92 56 102 74 C108 82 110 90 108 98 Z" fill="#C68B59" stroke="#6B3E1E" stroke-width="4"/>
+    <!-- ذرات پودری و براده چوب -->
+    <circle cx="34" cy="84" r="2.5" fill="#FDE68A"/>
+    <circle cx="48" cy="76" r="2" fill="#78350F"/>
+    <circle cx="64" cy="86" r="2.5" fill="#FDE68A"/>
+    <circle cx="78" cy="74" r="2.2" fill="#78350F"/>
+    <circle cx="92" cy="84" r="2.5" fill="#FDE68A"/>
+    <circle cx="42" cy="92" r="2" fill="#78350F"/>
+    <circle cx="84" cy="92" r="2" fill="#78350F"/>
+    <path d="M54 68 L60 72 M72 64 L68 70" stroke="#FEF3C7" stroke-width="2.5"/>
   </g>
 </svg>
