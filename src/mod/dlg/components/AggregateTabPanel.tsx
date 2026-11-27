@@ -1,3 +1,4 @@
+import SmartSelect from '../../../shr/components/SmartSelect';
 /**
  * AggregateTabPanel.tsx — تب «جمع‌بندی» در /dlg
  *
@@ -464,28 +465,18 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
           {/* ۲. فیلتر گله */}
           {showFlockSelect && (
             <div style={{ position: 'relative', flexShrink: 0, height: 36 }}>
-              <Select
+              <SmartSelect
                 value={flockFilter}
-                onChange={(e) => setFlockFilter(e.target.value)}
-                aria-label="فیلتر گله"
-                style={{
-                  ...CTRL_BASE,
-                  width: 'auto',
-                  minWidth: 96,
-                  maxWidth: 145,
-                  paddingInlineStart: 10,
-                  paddingInlineEnd: 24,
-                  textOverflow: 'ellipsis',
-                  overflow: 'hidden',
-                }}
-              >
-                <option value="">همه گله‌ها</option>
-                {activeFlocks.map((f) => (
-                  <option key={f.id} value={f.id}>
-                    {f.name}
-                  </option>
-                ))}
-              </Select>
+                onChange={v => setFlockFilter(v)}
+                options={[
+                  { value: '', label: 'همه گله‌ها' },
+                  ...activeFlocks.map(f => ({ value: f.id, label: f.name })),
+                ]}
+                placeholder="همه گله‌ها"
+                modalTitle="فیلتر گله"
+                compact
+                height={36}
+              />
               <svg
                 aria-hidden="true"
                 width="12"

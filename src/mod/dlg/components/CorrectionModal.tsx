@@ -1,3 +1,4 @@
+import SmartSelect from '../../../shr/components/SmartSelect';
 /**
  * CorrectionModal.tsx — modal ثبت اصلاح چند-فیلدی
  * استاندارد: ALCOA+ / 21 CFR Part 11 §11.10(e)
@@ -11,7 +12,7 @@
 import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Modal, Btn, BtnRow, Field, Select, Input, Grid2 } from '../../../shr/components/ui';
+import { Modal, Btn, BtnRow, Field, Input, Grid2 } from '../../../shr/components/ui';
 import type { DailyLog } from '../store';
 import { toEn, toFa } from '../../../shr/utils/fa';
 import { v4 as uuid } from 'uuid';
@@ -67,10 +68,10 @@ const REASONS = [
 ];
 
 const WEIGHT_GENDER_OPTS = [
-  { value: '', label: '— نامشخص —' },
-  { value: 'male', label: 'نر' },
-  { value: 'female', label: 'ماده' },
-  { value: 'mixed', label: 'مخلوط' },
+  { value: '', label: 'نامشخص', icon: 'unknown' },
+  { value: 'male', label: 'نر', icon: 'sex_male' },
+  { value: 'female', label: 'ماده', icon: 'sex_female' },
+  { value: 'mixed', label: 'مخلوط', icon: 'sex_mixed' },
 ];
 
 interface Props {
@@ -294,13 +295,15 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
         >
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '0 6px', minWidth: 0 }}>
             {key === 'weightGender' ? (
-              <Select
+              <SmartSelect
                 value={values[key] || ''}
-                onChange={e => setVal(key, e.target.value)}
-                style={{ width: '100%', border: 'none', outline: 'none', background: 'transparent', fontFamily: 'inherit', fontSize: 'var(--fs-sm)', color: 'var(--text)', textAlign: 'center', cursor: 'pointer' }}
-              >
-                {WEIGHT_GENDER_OPTS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </Select>
+                onChange={v => setVal(key, v)}
+                options={WEIGHT_GENDER_OPTS}
+                placeholder="نامشخص"
+                modalTitle="جنسیت وزن‌کشی"
+                compact
+                height={32}
+              />
             ) : (
               <>
                 <input
@@ -490,9 +493,12 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
         )}
 
         <Field label="دلیل اصلاح">
-          <Select value={reason} onChange={e => setReason(e.target.value)}>
-            {REASONS.map(r => <option key={r} value={r}>{r}</option>)}
-          </Select>
+          <SmartSelect
+            value={reason}
+            onChange={v => setReason(v)}
+            options={REASONS.map(r => ({ value: r, label: r }))}
+            modalTitle="دلیل اصلاح"
+          />
         </Field>
 
         <Field label="توضیحات">

@@ -109,7 +109,7 @@ export default function SmartSelect({
         style={{
           width: '100%', height, boxSizing: 'border-box',
           textAlign: 'right',
-          padding: compact ? '0 10px' : '0 12px',
+          padding: compact ? '0 8px' : (current?.icon ? '0 10px' : '0 8px'),
           background: 'var(--input-bg)',
           border: `1px solid ${borderColor}`,
           borderRadius: 'var(--r-md)',
