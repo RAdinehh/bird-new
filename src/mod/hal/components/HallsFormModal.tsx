@@ -230,7 +230,6 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                   else if (t.includes('غاز') || t.includes('goose')) emoji = '🦢';
                   return { value: b.id, label: b.name, icon: emoji };
                 })}
-                autoThreshold={0}
                 placeholder="— انتخاب —"
                 modalTitle="انتخاب پرنده"
               />
