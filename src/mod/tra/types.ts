@@ -526,14 +526,14 @@ export const CATEGORIES: Record<InvoiceType, [string, string][]> = {
     ['other', 'سایر']
   ],
   sale: [
-    ['chick', 'جوجه'],
     ['egg', 'تخم خوراکی'],
     ['fertile_egg', 'تخم نطفه‌دار'],
-    ['adult', 'پرنده بالغ'],
-    ['manure', 'کود'],
-    ['feed', 'دان'],
-    ['equipment', 'وسایل و تجهیزات'],
     ['broken', 'تخم شکسته'],
+    ['chick', 'جوجه یک‌روزه'],
+    ['adult', 'پرنده بالغ'],
+    ['feed', 'دان و مواد اولیه'],
+    ['equipment', 'تجهیزات'],
+    ['manure', 'کود'],
     ['other', 'سایر']
   ]
 };

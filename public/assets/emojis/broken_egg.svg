@@ -1,12 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M64 12 C40 12 24 46 24 76 C24 102 42 118 64 118 C86 118 104 102 104 76 C104 46 88 12 64 12 Z" fill="#FDE68A" stroke="#D97706" stroke-width="5"/>
-    <ellipse cx="46" cy="42" rx="6" ry="14" transform="rotate(-18 46 42)" fill="#FFFFFF" fill-opacity="0.7"/>
-    <!-- رگه‌های ترک مویی روی پوسته تخم‌مرغ -->
-    <path d="M58 34 L63 46 L55 56 L66 68 L58 80 L67 94" fill="none" stroke="#92400E" stroke-width="3.2"/>
-    <path d="M63 46 L76 52 L84 48" fill="none" stroke="#92400E" stroke-width="2.6"/>
-    <path d="M55 56 L42 62 L35 58" fill="none" stroke="#92400E" stroke-width="2.6"/>
-    <path d="M66 68 L79 74 L86 82" fill="none" stroke="#92400E" stroke-width="2.6"/>
-    <path d="M58 80 L45 86 L40 93" fill="none" stroke="#92400E" stroke-width="2.4"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <!-- سفیده و زرده بیرون‌ریخته -->
+    <path d="M22 98 C22 86 42 80 64 80 C86 80 108 86 108 98 C108 110 88 116 64 116 C40 116 22 110 22 98 Z" fill="#FEF9C3" stroke="#CA8A04" stroke-width="3.5"/>
+    <ellipse cx="64" cy="97" rx="18" ry="11" fill="#F59E0B" stroke="#B45309" stroke-width="3.5"/>
+    <ellipse cx="59" cy="93" rx="5" ry="2.5" fill="#FDE68A"/>
+    <!-- نیمه چپ پوسته شکسته -->
+    <path d="M18 54 C14 34 26 18 46 18 L54 34 L42 46 L56 60 L44 74 C28 74 20 66 18 54 Z" fill="#FDE68A" stroke="#78350F" stroke-width="4.5"/>
+    <!-- نیمه راست پوسته شکسته -->
+    <path d="M110 54 C114 34 102 18 82 18 L74 34 L86 46 L72 60 L84 74 C100 74 108 66 110 54 Z" fill="#FDE68A" stroke="#78350F" stroke-width="4.5"/>
+    <!-- قطره در حال ریختن -->
+    <path d="M64 62 C60 68 60 74 64 76 C68 74 68 68 64 62 Z" fill="#F59E0B" stroke="#B45309" stroke-width="2.5"/>
   </g>
 </svg>

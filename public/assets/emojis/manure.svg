@@ -1,15 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <!-- توده کود حیوانی بیرون‌زده از دهانه کیسه -->
-    <path d="M36 46 C38 30 50 22 64 22 C78 22 90 30 92 46 Z" fill="#5C2D0C" stroke="#3B1A04" stroke-width="4"/>
-    <circle cx="54" cy="34" r="3" fill="#3B1A04"/>
-    <circle cx="72" cy="36" r="3.5" fill="#3B1A04"/>
-    <circle cx="63" cy="28" r="2.5" fill="#78350F"/>
-    <!-- بدنه کیسه کشاورزی -->
-    <path d="M28 46 L100 46 L106 106 C106 112 101 116 95 116 L33 116 C27 116 22 112 22 106 Z" fill="#D6B88D" stroke="#78350F" stroke-width="4.5"/>
-    <!-- لبه تاخورده دهانه کیسه -->
-    <path d="M25 44 C42 52 86 52 103 44 L100 56 C84 63 44 63 28 56 Z" fill="#B89463" stroke="#78350F" stroke-width="3.5"/>
-    <!-- خط دوخت و بافت روی کیسه -->
-    <path d="M40 78 Q64 84 88 78" fill="none" stroke="#92400E" stroke-width="3" stroke-dasharray="5 5"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <!-- تپه کود مرغی -->
+    <path d="M16 104 C18 76 34 54 64 52 C94 54 110 76 112 104 C112 110 106 114 98 114 H30 C22 114 16 110 16 104 Z" fill="#6D4C41" stroke="#3E2723" stroke-width="4.5"/>
+    <!-- بافت و دانه‌های کود -->
+    <circle cx="44" cy="86" r="4" fill="#4E342E"/>
+    <circle cx="66" cy="96" r="4.5" fill="#4E342E"/>
+    <circle cx="84" cy="84" r="3.8" fill="#4E342E"/>
+    <circle cx="56" cy="72" r="3.2" fill="#8D6E63"/>
+    <circle cx="76" cy="70" r="3" fill="#8D6E63"/>
+    <!-- جوانه سبز نشانه کود کشاورزی -->
+    <path d="M64 52 V30" stroke="#15803D" stroke-width="5"/>
+    <path d="M64 36 C50 34 42 24 44 16 C54 16 62 24 64 36 Z" fill="#22C55E" stroke="#14532D" stroke-width="3.5"/>
+    <path d="M64 32 C78 30 86 20 84 12 C74 12 66 20 64 32 Z" fill="#4ADE80" stroke="#14532D" stroke-width="3.5"/>
   </g>
 </svg>
