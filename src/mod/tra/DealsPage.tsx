@@ -7,6 +7,8 @@ import { scrollToFocusId } from '../../shr/utils/scrollToFocusId';
 import { useState, useMemo , useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
 import { useTra, DEAL_LABEL, type Deal, type DealType, type SettlementType, type DealGood, type DealDelivery, type DealSale, type DealPayment, type Settlement } from './store';
+
+const DEAL_ICON: Record<DealType, string> = { consignment: '📦', partnership: '🤝', barter: '🔄', conditional: '📝' };
 import { generateDealNumber, calcDealCommission, getTodayJalali, dealAgingLevel } from './calc';
 import { Row, SectionTitle, chip } from './helpers';
 import { useNavigate } from 'react-router-dom';
@@ -562,7 +564,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                 ms={ms}
                 accent={accent}
                 index={fmt.count(i + 1)}
-                iconEmoji="🤝"
+                iconEmoji={DEAL_ICON[d.type] || '🤝'}
                 title={`${DEAL_LABEL[d.type]} — ${d.description}`}
                 subtitle={`${party?.name || '—'} • ${fmt.date(d.date)}`}
                 isOpen={isOpen}
@@ -805,7 +807,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                 }
                 setForm(f => ({ ...f, ...updates }));
               }}>
-              {(Object.keys(DEAL_LABEL) as DealType[]).map(t => <option key={t} value={t}>{DEAL_LABEL[t]}</option>)}
+              {(Object.keys(DEAL_LABEL) as DealType[]).map(t => <option key={t} value={t}>{`${DEAL_ICON[t]} ${DEAL_LABEL[t]}`}</option>)}
             </Select>
           </Field>
         </Grid2>
@@ -860,7 +862,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
           <Field label="نوع تسویه" help={HELP.tra.deal.settlementType} error={showError?.('settlementType')} onTouch={() => markTouched?.('settlementType')}>
             <Select value={form.settlementType || 'percent'} onChange={e => setForm({...form, settlementType: e.target.value as SettlementType})}>
               <option value="percent">💰 درصدی</option>
-              <option value="per_unit">💵 به ازای هر واحد</option>
+              <option value="per_unit">💵 هر واحد</option>
               <option value="fixed">🏷️ مبلغ ثابت</option>
               <option value="rental">📅 ماهانه</option>
               <option value="barter">🔄 تهاتر</option>
@@ -913,9 +915,9 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
 
         <Field label="وضعیت" help={HELP.tra.deal.status} error={showError?.('status')} onTouch={() => markTouched?.('status')}>
           <Select value={form.status} onChange={e => setForm({...form, status: e.target.value as 'open' | 'settled' | 'cancelled'})}>
-            <option value="open">باز</option>
-            <option value="settled">تسویه‌شده</option>
-            <option value="cancelled">لغوشده</option>
+            <option value="open">🟢 باز</option>
+            <option value="settled">✅ تسویه‌شده</option>
+            <option value="cancelled">❌ لغوشده</option>
           </Select>
         </Field>
 
@@ -966,17 +968,17 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                 sales: f.sales.filter(sl => sl.goodId !== g.id),
               }));
             }}>
-              <optgroup label="🐔 دام و طیور — پیگیری چند مرحله‌ای">
+              <optgroup label="🐔 طیور و تخم">
+                <option value="egg">🥚 تخم خوراکی</option>
+                <option value="fertile_egg">🥚 تخم نطفه‌دار</option>
                 <option value="chick">🐥 جوجه یک‌روزه</option>
                 <option value="adult">🐔 پرنده بالغ</option>
-                <option value="egg">🥚 تخم خوراکی</option>
-                <option value="fertile_egg">🐣 تخم نطفه‌دار</option>
               </optgroup>
-              <optgroup label="📦 کالاهای فروش و مصرف انبار">
-                <option value="feed">🌾 دان و خوراک</option>
-                <option value="medicine">💊 دارو / واکسن</option>
+              <optgroup label="📦 انبار و تجهیزات">
+                <option value="feed">🌾 دان و مواد اولیه</option>
+                <option value="medicine">💊 دارو و واکسن</option>
                 <option value="equipment">🔧 تجهیزات</option>
-                <option value="other">📎 سایر</option>
+                <option value="other">📋 سایر</option>
               </optgroup>
             </Select>
           </Field>
@@ -1259,10 +1261,10 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
               <Grid2>
                 <Field label="نوع" required error={showError?.(`deliveries.${di}.type`)} onTouch={() => markTouched?.(`deliveries.${di}.type`)}>
                   <Select value={dv.type} onChange={e => setForm(f => ({ ...f, deliveries: f.deliveries.map(x => x.id === dv.id ? { ...x, type: e.target.value as any } : x) }))}>
-                    <option value="out">تحویل به طرف</option>
-                    <option value="return">برگشت از طرف</option>
-                    <option value="loss">تلفات</option>
-                    <option value="in">📥 دریافت از طرف (تهاتر)</option>
+                    <option value="out">📤 تحویل</option>
+                    <option value="return">↩️ برگشت</option>
+                    <option value="loss">💀 تلفات</option>
+                    <option value="in">📥 دریافت (تهاتر)</option>
                   </Select>
                 </Field>
                 <Field label="کالا" required error={showError?.(`deliveries.${di}.goodId`)} onTouch={() => markTouched?.(`deliveries.${di}.goodId`)}>
@@ -1469,8 +1471,8 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
           <Grid2>
             <Field label="جهت" error={showError?.(`payments.${pi}.direction`)} onTouch={() => markTouched?.(`payments.${pi}.direction`)}>
               <Select value={p.direction} onChange={e => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, direction: e.target.value as any } : x) }))}>
-                <option value="in">📥 دریافت از طرف</option>
-                <option value="out">📤 پرداخت به طرف</option>
+                <option value="in">📥 دریافت</option>
+                <option value="out">📤 پرداخت</option>
               </Select>
             </Field>
             <Field label="روش" error={showError?.(`payments.${pi}.method`)} onTouch={() => markTouched?.(`payments.${pi}.method`)}>
