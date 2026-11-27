@@ -1,8 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M64 12 C40 12 24 46 24 76 C24 102 42 118 64 118 C86 118 104 102 104 76 C104 46 88 12 64 12 Z" fill="#FEF3C7" stroke="#D97706" stroke-width="5"/>
-    <circle cx="64" cy="74" r="22" fill="#FDBA74" fill-opacity="0.45" stroke="#F97316" stroke-width="2.5" stroke-dasharray="5 4"/>
-    <path d="M64 87 C64 87 48 76 48 66 C48 60 53 56 58 56 C61 56 63 58 64 60 C65 58 67 56 70 56 C75 56 80 60 80 66 C80 76 64 87 64 87 Z" fill="#EF4444" stroke="#B91C1C" stroke-width="2.5"/>
-    <ellipse cx="46" cy="42" rx="6" ry="14" transform="rotate(-18 46 42)" fill="#FFFFFF" fill-opacity="0.75"/>
+    <!-- پوسته تخم با نوردهی کندلینگ -->
+    <path d="M64 12 C39 12 23 46 23 76 C23 102 41 118 64 118 C87 118 105 102 105 76 C105 46 89 12 64 12 Z" fill="#FDE68A" stroke="#B45309" stroke-width="5"/>
+    <!-- هاله نورانی داخل تخم -->
+    <ellipse cx="64" cy="70" rx="28" ry="34" fill="#FB923C" fill-opacity="0.45"/>
+    <circle cx="64" cy="68" r="16" fill="#F97316" fill-opacity="0.55"/>
+    <!-- هسته نطفه و رگه‌های ظریف خونی -->
+    <circle cx="64" cy="68" r="6.5" fill="#DC2626" stroke="#991B1B" stroke-width="2"/>
+    <path d="M64 62 Q58 50 48 46 M64 62 Q72 52 80 48 M58 70 Q46 72 42 80 M70 70 Q80 74 84 82 M64 75 Q60 86 64 94" fill="none" stroke="#DC2626" stroke-width="2.6"/>
+    <ellipse cx="45" cy="40" rx="5.5" ry="13" transform="rotate(-18 45 40)" fill="#FFFFFF" fill-opacity="0.75"/>
   </g>
 </svg>

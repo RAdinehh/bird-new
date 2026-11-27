@@ -1,8 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M46 14 C50 6 62 8 62 16 C68 10 78 16 74 24" stroke="#EF4444" stroke-width="9" stroke-linecap="round" fill="none"/>
-      <path d="M42 24 C56 20 68 32 66 46 C86 50 108 68 106 92 C104 110 84 116 62 116 C38 116 24 100 24 78 C24 64 30 54 36 46 L16 40 L34 32 C34 26 38 24 42 24 Z" fill="#F97316" stroke="#C2410C" stroke-width="4"/>
-      <polygon points="14,40 34,34 34,46" fill="#FACC15" stroke="#1E293B" stroke-width="3.2" stroke-linejoin="round"/>
-      <circle cx="46" cy="36" r="4.5" fill="#0F172A" stroke="#1E293B" stroke-width="3.2" stroke-linejoin="round"/>
+    <!-- تاج قرمز مرغ/خروس -->
+    <path d="M36 30 C32 16 42 12 46 22 C50 12 60 13 58 24 C64 16 72 20 66 30 Z" fill="#EF4444" stroke="#991B1B" stroke-width="3.5"/>
+    <!-- غبغب قرمز زیر نوک -->
+    <path d="M32 50 C26 56 28 66 36 64 C40 62 40 54 36 50 Z" fill="#EF4444" stroke="#991B1B" stroke-width="3"/>
+    <!-- نوک زرد -->
+    <polygon points="30,38 14,44 30,50" fill="#F59E0B" stroke="#B45309" stroke-width="3"/>
+    <!-- بدن، سر و دم پرپشت -->
+    <path d="M32 38 C32 26 54 24 62 36 C68 46 78 50 92 44 C102 38 112 28 114 38 C116 48 108 58 114 64 C106 72 98 70 96 82 C92 98 76 104 58 104 C38 104 28 90 30 70 C31 58 32 48 32 38 Z" fill="#F59E0B" stroke="#92400E" stroke-width="4.5"/>
+    <!-- بال روی بدن -->
+    <path d="M52 64 C66 60 80 68 78 82 C76 92 60 92 50 82 Z" fill="#D97706" stroke="#92400E" stroke-width="3.5"/>
+    <!-- چشم -->
+    <circle cx="43" cy="38" r="4" fill="#0F172A"/>
+    <circle cx="41.8" cy="36.8" r="1.2" fill="#FFFFFF"/>
+    <!-- پاها -->
+    <path d="M54 104 L54 116 M46 116 L62 116 M72 103 L72 116 M64 116 L80 116" fill="none" stroke="#B45309" stroke-width="4"/>
   </g>
 </svg>

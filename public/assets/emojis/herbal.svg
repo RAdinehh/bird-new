@@ -1,8 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M64 112 C64 78 64 46 64 20" fill="none" stroke="#15803D" stroke-width="5"/>
-    <path d="M64 86 C36 86 22 68 24 52 C42 52 56 66 64 86 Z" fill="#22C55E" stroke="#15803D" stroke-width="4"/>
-    <path d="M64 70 C92 70 106 52 104 36 C86 36 72 50 64 70 Z" fill="#4ADE80" stroke="#15803D" stroke-width="4"/>
-    <path d="M64 46 C44 46 34 32 36 20 C50 20 60 32 64 46 Z" fill="#86EFAC" stroke="#15803D" stroke-width="3.8"/>
+    <!-- دسته هاون -->
+    <path d="M76 62 L98 22 C101 17 108 20 105 26 L86 64" fill="#D6D3D1" stroke="#57534E" stroke-width="4.5"/>
+    <!-- برگ‌های سبز دارویی داخل هاون -->
+    <path d="M58 62 C36 58 26 42 32 30 C46 30 56 44 58 62 Z" fill="#22C55E" stroke="#15803D" stroke-width="4"/>
+    <path d="M64 60 C62 38 74 24 86 28 C86 42 76 54 64 60 Z" fill="#4ADE80" stroke="#15803D" stroke-width="4"/>
+    <!-- کاسه هاون داروسازی -->
+    <path d="M24 62 L104 62 C102 92 86 106 64 106 C42 106 26 92 24 62 Z" fill="#A8A29E" stroke="#44403C" stroke-width="4.5"/>
+    <rect x="44" y="106" width="40" height="8" rx="4" fill="#78716C" stroke="#44403C" stroke-width="3.5"/>
   </g>
 </svg>

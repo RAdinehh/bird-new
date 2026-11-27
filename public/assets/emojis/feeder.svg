@@ -1,5 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="8" y="14" width="112" height="12" rx="6" fill="#94A3B8" stroke="#1E293B" stroke-width="3.2"/><polygon points="52,26 76,26 72,56 56,56" fill="#EF4444" stroke="#1E293B" stroke-width="3.2"/><polygon points="36,56 92,56 104,88 24,88" fill="#FACC15" stroke="#1E293B" stroke-width="3.2"/><line x1="48" y1="56" x2="42" y2="88" stroke="#1E293B" stroke-width="3"/><line x1="64" y1="56" x2="64" y2="88" stroke="#1E293B" stroke-width="3"/><line x1="80" y1="56" x2="86" y2="88" stroke="#1E293B" stroke-width="3"/><ellipse cx="64" cy="94" rx="48" ry="14" fill="#DC2626" stroke="#1E293B" stroke-width="3.5"/><ellipse cx="64" cy="91" rx="40" ry="9" fill="#FDE047" stroke="#1E293B" stroke-width="2.5"/>
+    <!-- چرخ‌دنده صنعتی -->
+    <circle cx="80" cy="48" r="24" fill="#CBD5E1" stroke="#334155" stroke-width="4.5"/>
+    <circle cx="80" cy="48" r="9" fill="#FFFFFF" stroke="#334155" stroke-width="4"/>
+    <path d="M80 18 L80 24 M80 72 L80 78 M50 48 L56 48 M104 48 L110 48 M59 27 L63 31 M97 65 L101 69 M101 27 L97 31 M63 65 L59 69" stroke="#334155" stroke-width="6"/>
+    <!-- آچار تخت -->
+    <path d="M24 96 L64 56 C62 46 68 36 78 34 L70 44 L76 50 L86 42 C84 52 74 58 64 56 L32 104 C27 109 19 101 24 96 Z" fill="#94A3B8" stroke="#1E293B" stroke-width="4.5"/>
   </g>
 </svg>
