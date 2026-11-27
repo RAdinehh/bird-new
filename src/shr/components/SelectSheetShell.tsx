@@ -383,7 +383,7 @@ export function SheetGroup({ title, icon, count, children }: GroupProps) {
             width: 16, height: 16, flexShrink: 0,
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 13, lineHeight: 1,
-          }}><OptionIcon icon={icon} size={24} /></span>
+          }}><OptionIcon icon={icon} size={22} /></span>
         )}
         <span style={{ flex: 1 }}>{title}</span>
         {count != null && (
@@ -426,7 +426,7 @@ export function SheetItem({ icon, equipType, category, title, subtitle, selected
       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
       fontSize: 18, lineHeight: 1,
     }}>
-      <OptionIcon icon={icon} size={24} />
+      <OptionIcon icon={icon} size={22} />
     </span>
   ) : null;
 

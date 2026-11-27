@@ -1,3 +1,4 @@
+import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import EquipmentPage from '../mod/hal/EquipmentPage';
@@ -28,7 +29,7 @@ beforeEach(() => {
 
 describe('EquipmentPage', () => {
   it('رندر بدون خطا', () => {
-    const { container } = render(<EquipmentPage />);
+    const { container } = render(<MemoryRouter><EquipmentPage /></MemoryRouter>);
     expect(container).toBeTruthy();
   });
 });

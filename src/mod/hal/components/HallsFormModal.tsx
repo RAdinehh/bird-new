@@ -226,10 +226,11 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                   let emoji = '🐔';
                   if (t.includes('اردک') || t.includes('duck')) emoji = '🦆';
                   else if (t.includes('بوقلمون') || t.includes('turkey')) emoji = '🦃';
-                  else if (t.includes('بلدرچین') || t.includes('quail')) emoji = '🐦';
+                  else if (t.includes('بلدرچین') || t.includes('quail')) emoji = 'quail';
                   else if (t.includes('غاز') || t.includes('goose')) emoji = '🦢';
                   return { value: b.id, label: b.name, icon: emoji };
                 })}
+                autoThreshold={0}
                 placeholder="— انتخاب —"
                 modalTitle="انتخاب پرنده"
               />
@@ -252,7 +253,16 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                     value: b.id,
                     label: b.name,
                     subtitle: purposeLabels.length > 0 ? purposeLabels.join('، ') : undefined,
-                    icon: '🧬',
+                    icon: (() => {
+                    const parentBird = birds.find((pb: Bird) => pb.id === form.birdId);
+                    const t = `${parentBird?.name || ''} ${(parentBird as any)?.birdKind || ''}`.toLowerCase();
+                    if (t.includes('اردک') || t.includes('duck')) return '🦆';
+                    if (t.includes('بوقلمون') || t.includes('turkey')) return '🦃';
+                    if (t.includes('بلدرچین') || t.includes('quail')) return 'quail';
+                    if (t.includes('غاز') || t.includes('goose')) return '🦢';
+                    if (parentBird) return '🐔';
+                    return '🧬';
+                  })(),
                   };
                 })}
                 emptyMode="select"

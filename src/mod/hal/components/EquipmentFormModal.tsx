@@ -68,6 +68,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               value={form.hallId}
               onChange={v => setForm((f) => ({ ...f, hallId: v, zoneId: '' }))}
               options={halls.map(c => ({ value: c.id, label: c.name, icon: 'hall' }))}
+              autoThreshold={0}
               placeholder="— انتخاب —"
               modalTitle="انتخاب سالن"
             />
@@ -115,6 +116,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
                 label: v.name,
                 icon: v.icon,
               }))}
+              autoThreshold={0}
               placeholder="— انتخاب —"
               modalTitle="انتخاب دسته"
             />
@@ -167,6 +169,7 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               value={form.supplierId || ''}
               onChange={v => setForm({...form, supplierId: v})}
               options={suppliers.map((s: Person) => ({ value: s.id, label: s.name, subtitle: s.phone, icon: '🏪' }))}
+              autoThreshold={0}
               placeholder="— انتخاب —"
               modalTitle="انتخاب تأمین‌کننده"
             />

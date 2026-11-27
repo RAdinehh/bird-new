@@ -5,6 +5,7 @@ interface Opt {
   value: string;
   label: string;
   subtitle?: string;
+  icon?: string;
   group?: string;
 }
 
@@ -107,7 +108,8 @@ export default function DependentSelect({
   }
 
   // حالت ۳: لیست کوتاه → Select
-  if (options.length <= autoThreshold) {
+  const hasIcons = options.some(o => Boolean(o.icon));
+  if (options.length <= autoThreshold && !hasIcons) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
         <Select
@@ -154,7 +156,7 @@ export default function DependentSelect({
       options={options}
       placeholder={placeholder}
       modalTitle={modalTitle || `انتخاب ${parentLabel}`}
-      autoThreshold={autoThreshold}
+      autoThreshold={hasIcons ? 0 : autoThreshold}
       disabled={disabled}
       required={required}
       error={error}
