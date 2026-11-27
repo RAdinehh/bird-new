@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <g stroke-linecap="round" stroke-linejoin="round">
-    <!-- سفیده و زرده بیرون‌ریخته -->
-    <path d="M22 98 C22 86 42 80 64 80 C86 80 108 86 108 98 C108 110 88 116 64 116 C40 116 22 110 22 98 Z" fill="#FEF9C3" stroke="#CA8A04" stroke-width="3.5"/>
-    <ellipse cx="64" cy="97" rx="18" ry="11" fill="#F59E0B" stroke="#B45309" stroke-width="3.5"/>
-    <ellipse cx="59" cy="93" rx="5" ry="2.5" fill="#FDE68A"/>
-    <!-- نیمه چپ پوسته شکسته -->
-    <path d="M18 54 C14 34 26 18 46 18 L54 34 L42 46 L56 60 L44 74 C28 74 20 66 18 54 Z" fill="#FDE68A" stroke="#78350F" stroke-width="4.5"/>
-    <!-- نیمه راست پوسته شکسته -->
-    <path d="M110 54 C114 34 102 18 82 18 L74 34 L86 46 L72 60 L84 74 C100 74 108 66 110 54 Z" fill="#FDE68A" stroke="#78350F" stroke-width="4.5"/>
-    <!-- قطره در حال ریختن -->
-    <path d="M64 62 C60 68 60 74 64 76 C68 74 68 68 64 62 Z" fill="#F59E0B" stroke="#B45309" stroke-width="2.5"/>
+    <!-- نیمه پایینی تخم -->
+    <path d="M26 68 C26 98 42 116 64 116 C86 116 102 98 102 68 L84 74 L70 62 L54 76 L40 62 Z" fill="#FDE68A" stroke="#78350F" stroke-width="4.5"/>
+    <!-- درخشش زرد داخل ترک -->
+    <path d="M34 64 L48 56 L62 68 L76 56 L94 64 L84 74 L70 62 L54 76 L40 62 Z" fill="#F59E0B"/>
+    <!-- نیمه بالایی تخم (کمی کج و جداشده از وسط) -->
+    <path d="M64 14 C42 14 28 40 27 62 L41 56 L55 70 L71 56 L85 68 L101 60 C100 38 86 14 64 14 Z" fill="#FEF3C7" stroke="#78350F" stroke-width="4.5"/>
+    <!-- برق روی پوسته -->
+    <ellipse cx="48" cy="36" rx="5" ry="10" transform="rotate(22 48 36)" fill="#FFFFFF" opacity="0.8"/>
+    <!-- خطوط ریز ترک اطراف -->
+    <path d="M55 70 L50 82 M71 56 L77 45" stroke="#78350F" stroke-width="3"/>
   </g>
 </svg>

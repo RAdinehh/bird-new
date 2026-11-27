@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <g stroke-linecap="round" stroke-linejoin="round">
-    <!-- تپه کود مرغی -->
-    <path d="M16 104 C18 76 34 54 64 52 C94 54 110 76 112 104 C112 110 106 114 98 114 H30 C22 114 16 110 16 104 Z" fill="#6D4C41" stroke="#3E2723" stroke-width="4.5"/>
+    <!-- تپه کود با رنگ قهوه‌ای کم‌رنگ‌تر -->
+    <path d="M16 104 C18 76 34 54 64 52 C94 54 110 76 112 104 C112 110 106 114 98 114 H30 C22 114 16 110 16 104 Z" fill="#A1887F" stroke="#5D4037" stroke-width="4.5"/>
     <!-- بافت و دانه‌های کود -->
-    <circle cx="44" cy="86" r="4" fill="#4E342E"/>
-    <circle cx="66" cy="96" r="4.5" fill="#4E342E"/>
-    <circle cx="84" cy="84" r="3.8" fill="#4E342E"/>
-    <circle cx="56" cy="72" r="3.2" fill="#8D6E63"/>
-    <circle cx="76" cy="70" r="3" fill="#8D6E63"/>
+    <circle cx="44" cy="86" r="4" fill="#795548"/>
+    <circle cx="66" cy="96" r="4.5" fill="#795548"/>
+    <circle cx="84" cy="84" r="3.8" fill="#795548"/>
+    <circle cx="56" cy="72" r="3.2" fill="#BCAAA4"/>
+    <circle cx="76" cy="70" r="3" fill="#BCAAA4"/>
     <!-- جوانه سبز نشانه کود کشاورزی -->
     <path d="M64 52 V30" stroke="#15803D" stroke-width="5"/>
     <path d="M64 36 C50 34 42 24 44 16 C54 16 62 24 64 36 Z" fill="#22C55E" stroke="#14532D" stroke-width="3.5"/>
