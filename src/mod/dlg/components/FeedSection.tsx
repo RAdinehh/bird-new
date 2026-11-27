@@ -6,7 +6,7 @@ import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
 
 import { useMemo, useState } from 'react';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
-import { Field, Grid2, NumField, Btn, Select, Sheet, AlertBox, Tag, SummaryCard, QuantityUnitInput, type UnitOption, SummaryRow } from '../../../shr/components/ui';
+import { Field, Grid2, NumField, Btn, Select, AlertBox, Tag, SummaryCard, QuantityUnitInput, type UnitOption, SummaryRow } from '../../../shr/components/ui';
 import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { UNIT_LABEL } from '../../whs/store';
@@ -50,20 +50,19 @@ export default function FeedSection({ form, setForm }: Props) {
  const { formulas, ingredients } = useFed();
  const isFeedAuto = ['semi_auto', 'auto_sensor', 'auto_chain'].includes(form.feedMethod || '');
  const isWaterAuto = ['nipple', 'trough', 'tank'].includes(form.waterMethod || '');
- const [hallSheetOpen, setHallSheetOpen] = useState(false);
  const [expandedSourceId, setExpandedSourceId] = useState<string | null>(null);
  const FEED_METHOD_OPTIONS = [
-  { value: 'scoop', label: 'دانخوری سطلی', icon: 'feeder_bucket' },
-  { value: 'bag', label: 'دانخوری دستی (کیسه‌ای)', icon: 'bag' },
-  { value: 'semi_auto', label: 'دانخوری نیمه‌اتومات', icon: 'feeder_tube' },
-  { value: 'auto_sensor', label: 'دانخوری اتومات سنسوردار', icon: 'sensor' },
-  { value: 'auto_chain', label: 'دانخوری زنجیری', icon: 'feeder_chain' },
+  { value: 'scoop', label: 'سطلی', icon: 'feeder_bucket' },
+  { value: 'bag', label: 'دستی', icon: 'bag' },
+  { value: 'semi_auto', label: 'نیمه‌اتومات', icon: 'feeder_tube' },
+  { value: 'auto_sensor', label: 'اتومات سنسوردار', icon: 'sensor' },
+  { value: 'auto_chain', label: 'زنجیری', icon: 'feeder_chain' },
  ];
  const WATER_METHOD_OPTIONS = [
-  { value: 'manual', label: 'آبخوری دستی', icon: 'drinker_fountain' },
+  { value: 'manual', label: 'دستی', icon: 'drinker_fountain' },
   { value: 'nipple', label: 'نیپل', icon: 'nipple' },
-  { value: 'trough', label: 'آبخوری ناودانی', icon: 'drinker_trough' },
-  { value: 'tank', label: 'آبخوری مخزنی', icon: 'water_system' },
+  { value: 'trough', label: 'ناودانی', icon: 'drinker_trough' },
+  { value: 'tank', label: 'مخزنی', icon: 'water_system' },
  ];
  const [editFeedMethod, setEditFeedMethod] = useState(false);
  const [editWaterMethod, setEditWaterMethod] = useState(false);
@@ -180,48 +179,42 @@ export default function FeedSection({ form, setForm }: Props) {
 
  return (
   <>
-   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', marginBottom: 8, fontSize: 'var(--fs-sm)', gap: 8 }}>
-    <span style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-     <span>🍽️ {FEED_METHOD_OPTIONS.find(o => o.value === form.feedMethod)?.label || '—'}</span>
-     <span style={{ color: 'var(--muted)' }}>•</span>
-     <span>💧 {WATER_METHOD_OPTIONS.find(o => o.value === form.waterMethod)?.label || '—'}</span>
-     {(form.feedMethodSource === 'manual' || form.waterMethodSource === 'manual') && (
-      <span style={{ padding: '1px 6px', background: 'var(--warn-soft)', color: 'var(--warn)', borderRadius: 4, fontSize: 'var(--fs-2xs)', fontWeight: 700 }}>تغییر موقت</span>
-     )}
-    </span>
-    <button type="button" onClick={() => setHallSheetOpen(true)} style={{ padding: '4px 10px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-sm)', color: 'var(--muted)', fontFamily: 'inherit', fontSize: 'var(--fs-xs)', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
-     تغییر
-    </button>
-   </div>
-
-   <Sheet open={hallSheetOpen} onClose={() => setHallSheetOpen(false)} title="تنظیم سیستم سالن">
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-     <Field label="دانخوری">
+   <div style={{ marginBottom: 10 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          <Field label="دانخوری">
             <SmartSelect
               value={form.feedMethod || ''}
               onChange={v => setForm(f => ({ ...f, feedMethod: v as 'scoop' | 'bag' | 'semi_auto' | 'auto_sensor' | 'auto_chain' | '', feedMethodSource: 'manual' }))}
               options={FEED_METHOD_OPTIONS}
               placeholder="— انتخاب —"
               modalTitle="انتخاب دانخوری"
+              compact
             />
           </Field>
-     <Field label="آبخوری">
+          <Field label="آبخوری">
             <SmartSelect
               value={form.waterMethod || ''}
               onChange={v => setForm(f => ({ ...f, waterMethod: v as 'manual' | 'nipple' | 'trough' | 'tank' | '', waterMethodSource: 'manual' }))}
               options={WATER_METHOD_OPTIONS}
               placeholder="— انتخاب —"
               modalTitle="انتخاب آبخوری"
+              compact
             />
           </Field>
-     {(form.feedMethodSource === 'manual' || form.waterMethodSource === 'manual') && (
-      <Btn onClick={() => setForm(f => ({ ...f, feedMethod: (f.feedMethodFromHall || '') as any, waterMethod: (f.waterMethodFromHall || '') as any, feedMethodSource: 'hall', waterMethodSource: 'hall' }))}>
-       ↺ بازگشت به سالن
-      </Btn>
-     )}
-     <Btn variant="primary" onClick={() => setHallSheetOpen(false)}>تایید</Btn>
-    </div>
-   </Sheet>
+        </div>
+        {(form.feedMethodSource === 'manual' || form.waterMethodSource === 'manual') && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 6, padding: '4px 8px', background: 'var(--warn-soft)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-2xs)' }}>
+            <span style={{ color: 'var(--warn)', fontWeight: 700 }}>تغییر موقت نسبت به سالن</span>
+            <button
+              type="button"
+              onClick={() => setForm(f => ({ ...f, feedMethod: (f.feedMethodFromHall || '') as any, waterMethod: (f.waterMethodFromHall || '') as any, feedMethodSource: 'hall', waterMethodSource: 'hall' }))}
+              style={{ background: 'none', border: 'none', color: 'var(--warn)', fontFamily: 'inherit', fontSize: 'var(--fs-2xs)', fontWeight: 700, cursor: 'pointer', padding: '2px 4px' }}
+            >
+              ↺ بازگشت به سالن
+            </button>
+          </div>
+        )}
+      </div>
 
    <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginBottom: 6 }}>
     🌾 منابع دان مصرفی
