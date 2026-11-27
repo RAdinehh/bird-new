@@ -279,7 +279,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* --- بخش ۱: هویت پرنده --- */}
         <Grid2>
           <Field label={FIELD_META.bird.label} required error={err('birdId')} onTouch={touch('birdId')}>
-            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map((b: any) => ({ value: b.id, label: b.name, icon: ((b.name || '').includes('اردک') ? 'duck' : (b.name || '').includes('بوقلمون') ? 'turkey' : 'chicken') as AppIconKey }))} placeholder="— انتخاب —" modalTitle={FIELD_META.bird.modalTitle} disabled={!!item.existingFlockId || (!isPurchase && !!item.flockId)} />
+            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map((b: any) => ({ value: b.id, label: b.name, icon: b.icon || ((b.name || '').includes('اردک') ? '🦆' : (b.name || '').includes('بوقلمون') ? '🦃' : (b.name || '').includes('بلدرچین') ? '🐦' : (b.name || '').includes('غاز') ? '🦢' : '🐔') }))} placeholder="— انتخاب —" modalTitle={FIELD_META.bird.modalTitle} disabled={!!item.existingFlockId || (!isPurchase && !!item.flockId)} />
           </Field>
           <Field label={FIELD_META.breed.label} required error={err('breedId')} onTouch={touch('breedId')}>
             <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
@@ -440,7 +440,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
         {/* --- بخش ۱: هویت مشتق‌شده از گله --- */}
         <Grid2>
           <Field label={FIELD_META.bird.label} required error={err('birdId')} onTouch={touch('birdId')} lockedFrom={isSaleLocked ? "گله" : undefined}>
-            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map((b: any) => ({ value: b.id, label: b.name, icon: ((b.name || '').includes('اردک') ? 'duck' : (b.name || '').includes('بوقلمون') ? 'turkey' : 'chicken') as AppIconKey }))} placeholder="— انتخاب —" modalTitle={FIELD_META.bird.modalTitle} disabled={isLocked} />
+            <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map((b: any) => ({ value: b.id, label: b.name, icon: b.icon || ((b.name || '').includes('اردک') ? '🦆' : (b.name || '').includes('بوقلمون') ? '🦃' : (b.name || '').includes('بلدرچین') ? '🐦' : (b.name || '').includes('غاز') ? '🦢' : '🐔') }))} placeholder="— انتخاب —" modalTitle={FIELD_META.bird.modalTitle} disabled={isLocked} />
           </Field>
           <Field label={FIELD_META.breed.label} required error={err('breedId')} onTouch={touch('breedId')} lockedFrom={isSaleLocked ? "گله" : undefined}>
             <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {
@@ -833,7 +833,7 @@ if (category === 'egg' || category === 'fertile_egg') {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>      <SecTitle icon="egg" title="اطلاعات تخم" />
       <Grid2>
         <Field label={FIELD_META.bird.label} required error={err('birdId')} onTouch={touch('birdId')}>
-          <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map((b: any) => ({ value: b.id, label: b.name, icon: ((b.name || '').includes('اردک') ? 'duck' : (b.name || '').includes('بوقلمون') ? 'turkey' : 'chicken') as AppIconKey }))} placeholder="— انتخاب —" modalTitle={FIELD_META.bird.modalTitle} />
+          <SmartSelect value={String(item.birdId || '')} error={err('birdId')} onChange={v => updateItem({ birdId: v, breedId: '' })} options={birds.map((b: any) => ({ value: b.id, label: b.name, icon: b.icon || ((b.name || '').includes('اردک') ? '🦆' : (b.name || '').includes('بوقلمون') ? '🦃' : (b.name || '').includes('بلدرچین') ? '🐦' : (b.name || '').includes('غاز') ? '🦢' : '🐔') }))} placeholder="— انتخاب —" modalTitle={FIELD_META.bird.modalTitle} />
         </Field>
         <Field label={FIELD_META.breed.label} required error={err('breedId')} onTouch={touch('breedId')}>
           <SmartSelect value={String(item.breedId || '')} error={err('breedId')} onChange={v => updateItem({ breedId: v })} options={breedsForBird.map((b) => {

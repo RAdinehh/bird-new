@@ -1,9 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M18 108 C18 88 32 76 44 74 C44 60 54 52 64 52 C74 52 84 60 84 74 C96 76 110 88 110 108 Z" fill="#92400E" stroke="#451A03" stroke-width="4.5"/>
-    <path d="M32 104 C36 92 48 86 64 86 C80 86 92 92 96 104" fill="none" stroke="#B45309" stroke-width="3.5"/>
-    <path d="M64 52 L64 26" fill="none" stroke="#15803D" stroke-width="4.5"/>
-    <path d="M64 38 C50 38 42 28 44 20 C54 20 62 28 64 38 Z" fill="#22C55E" stroke="#15803D" stroke-width="3.5"/>
-    <path d="M64 32 C78 32 86 22 84 14 C74 14 66 22 64 32 Z" fill="#4ADE80" stroke="#15803D" stroke-width="3.5"/>
+    <!-- توده کود حیوانی بیرون‌زده از دهانه کیسه -->
+    <path d="M36 46 C38 30 50 22 64 22 C78 22 90 30 92 46 Z" fill="#5C2D0C" stroke="#3B1A04" stroke-width="4"/>
+    <circle cx="54" cy="34" r="3" fill="#3B1A04"/>
+    <circle cx="72" cy="36" r="3.5" fill="#3B1A04"/>
+    <circle cx="63" cy="28" r="2.5" fill="#78350F"/>
+    <!-- بدنه کیسه کشاورزی -->
+    <path d="M28 46 L100 46 L106 106 C106 112 101 116 95 116 L33 116 C27 116 22 112 22 106 Z" fill="#D6B88D" stroke="#78350F" stroke-width="4.5"/>
+    <!-- لبه تاخورده دهانه کیسه -->
+    <path d="M25 44 C42 52 86 52 103 44 L100 56 C84 63 44 63 28 56 Z" fill="#B89463" stroke="#78350F" stroke-width="3.5"/>
+    <!-- خط دوخت و بافت روی کیسه -->
+    <path d="M40 78 Q64 84 88 78" fill="none" stroke="#92400E" stroke-width="3" stroke-dasharray="5 5"/>
   </g>
 </svg>
