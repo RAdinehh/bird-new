@@ -458,7 +458,8 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--sp-1)' }}>
               {group.keys.map(k => {
                 const key = k as CorrectableKey;
-                const f = CORRECTABLE_FIELDS.find(x => x.key === key);
+                if (!canShowEggFields && EGG_KEYS.includes(key)) return null;
+                    const f = availableFields.find(x => x.key === key);
                 if (!f) return null;
                 const isSel = selected.has(key);
                 const isCh = isChanged(key);
