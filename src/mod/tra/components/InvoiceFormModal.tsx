@@ -101,15 +101,15 @@ const getQuantityMax = (cat: string): number | undefined => {
 
 const CAT_ICON_MAP: Record<string, string> = {
   egg: 'egg',
-  fertile_egg: 'egg',
+  fertile_egg: 'fertile_egg',
   chick: 'hatch',
   adult: 'chicken',
   feed: 'feed',
   medicine: 'meds',
   herbal: '🌿',
   equipment: 'feeder',
-  manure: '💩',
-  broken: '💔',
+  manure: 'manure',
+  broken: 'broken_egg',
   other: '📋',
 };
 
@@ -185,7 +185,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
     >
       {/* ====== اطلاعات پایه ====== */}
 
-      <SectionTitle first><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> اطلاعات پایه</SectionTitle>
+      <SectionTitle first><span style={{ fontSize: 'var(--fs-sm)', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🧾</span> اطلاعات پایه</SectionTitle>
 
       
       <Grid2>

@@ -156,7 +156,7 @@ export default function InvoiceCard({ inv, partyName, isOpen, ms, onToggle, onTr
       ms={ms}
       accent={rem2 === 0 ? 'accent' : 'warn'}
       index={fmt.count(index + 1)}
-      iconEmoji="🛒"
+      iconEmoji="🧾"
       title={partyName || '—'}
       subtitle={`${fmt.date(inv.date)}${inv.number ? ` • ${formatInvoiceNumber(inv.number)}` : ''}`}
       isOpen={isOpen}

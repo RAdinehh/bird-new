@@ -742,7 +742,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   if (category === 'manure' && !isPurchase) {
     const manureItems = (whsItems || []).filter(w => w.category === 'manure');
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="💩" title="اطلاعات کود" />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="manure" title="اطلاعات کود" />
       {nameFieldJsx}        <Field label={isPurchase ? "افزودن به انبار" : "کاهش از انبار"} error={err('stockItemId')} onTouch={touch('stockItemId')} required={!isPurchase} hint={isPurchase ? "به موجودی اضافه" : "از موجودی کاهش"}>
           <SmartSelect
             value={String(item.stockItemId || '')}
@@ -896,17 +896,17 @@ if (category === 'vaccine' || category === 'herbal') {
   // ========== سایر ==========
   if (category === 'other') {
     const COST_TYPES = [
-      { value: 'fuel', label: 'سوخت و گرمایش' },
-      { value: 'bedding', label: 'بستر و پوشال' },
-      { value: 'biosecurity', label: 'مواد ضدعفونی و بهداشتی' },
-      { value: 'vet_lab', label: 'دامپزشکی و آزمایشگاه' },
-      { value: 'labor', label: 'دستمزد و کارگر' },
-      { value: 'utilities', label: 'قبوض آب، برق، گاز' },
-      { value: 'transport', label: 'حمل و نقل' },
-      { value: 'maintenance', label: 'تعمیرات و نگهداری' },
-      { value: 'packaging', label: 'بسته‌بندی' },
-      { value: 'rent', label: 'اجاره سالن و انبار' },
-      { value: 'other', label: 'سایر هزینه‌ها' },
+      { value: 'fuel', label: 'سوخت و گرمایش', icon: '⛽' },
+      { value: 'bedding', label: 'بستر و پوشال', icon: '🌾' },
+      { value: 'biosecurity', label: 'مواد ضدعفونی و بهداشتی', icon: '🧴' },
+      { value: 'vet_lab', label: 'دامپزشکی و آزمایشگاه', icon: '🩺' },
+      { value: 'labor', label: 'دستمزد و کارگر', icon: '👷' },
+      { value: 'utilities', label: 'قبوض آب، برق، گاز', icon: '⚡' },
+      { value: 'transport', label: 'حمل و نقل', icon: '🚚' },
+      { value: 'maintenance', label: 'تعمیرات و نگهداری', icon: '🔧' },
+      { value: 'packaging', label: 'بسته‌بندی', icon: '📦' },
+      { value: 'rent', label: 'اجاره سالن و انبار', icon: '🏠' },
+      { value: 'other', label: 'سایر هزینه‌ها', icon: '📋' },
     ];
     const ct = String(item.costType || '');
     const otherCfg = getOtherCostConfig(ct);
@@ -1019,7 +1019,7 @@ if (category === 'vaccine' || category === 'herbal') {
       (w.category === 'egg' && (w.name === 'تخم مصرفی' || w.name === 'تخم شکسته'))
     );
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="💔" title="اطلاعات تخم شکسته" />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="broken_egg" title="اطلاعات تخم شکسته" />
         {/* انتخاب از تولیدات تخم — شکسته */}
         <Field label="تولیدات تخم شکسته" hint="برای پر شدن خودکار مشخصات">
           <SmartSelect
