@@ -1,3 +1,4 @@
+import { OptionIcon } from './OptionIcon';
 import { AppIconKey } from '../icons/AppIcons';
 import { FIELD_META } from '../constants/fieldMeta';
 import { getGlobalFormat } from '../units/useFormat';
@@ -94,7 +95,7 @@ itemIndex?: number;
 
 const SecTitle = ({ icon, title }: { icon: string; title: string }) => (
   <div style={{ paddingTop: 12, fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px', borderTop: '1px dashed var(--border)', marginBottom: 8 }}>
-    {icon} {title}
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><OptionIcon icon={icon} size={18} /><span>{title}</span></span>
   </div>
 );
 
@@ -548,8 +549,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               value={String(item.priceUnit || 'perBird')}
               modalTitle="انتخاب مبنای قیمت"
               options={[
-                { value: 'perBird', label: 'به ازای هر پرنده' },
-                { value: 'perKg', label: 'به ازای هر کیلوگرم' },
+                { value: 'perBird', label: 'به ازای هر پرنده', icon: 'chicken' },
+                { value: 'perKg', label: 'به ازای هر کیلوگرم', icon: 'scale' },
               ]}
               onChange={v => updateItem({ priceUnit: v })}
             />
