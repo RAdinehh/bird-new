@@ -53,17 +53,17 @@ export default function FeedSection({ form, setForm }: Props) {
  const [hallSheetOpen, setHallSheetOpen] = useState(false);
  const [expandedSourceId, setExpandedSourceId] = useState<string | null>(null);
  const FEED_METHOD_OPTIONS = [
-  { value: 'scoop', label: 'قیفی (سطل)' },
-  { value: 'bag', label: 'کیسه‌ای' },
-  { value: 'semi_auto', label: 'نیمه‌اتومات' },
-  { value: 'auto_sensor', label: 'اتومات با سنسور' },
-  { value: 'auto_chain', label: 'اتومات زنجیری' },
+  { value: 'scoop', label: 'دانخوری سطلی', icon: 'feeder_bucket' },
+  { value: 'bag', label: 'دانخوری دستی (کیسه‌ای)', icon: 'bag' },
+  { value: 'semi_auto', label: 'دانخوری نیمه‌اتومات', icon: 'feeder_tube' },
+  { value: 'auto_sensor', label: 'دانخوری اتومات سنسوردار', icon: 'sensor' },
+  { value: 'auto_chain', label: 'دانخوری زنجیری', icon: 'feeder_chain' },
  ];
  const WATER_METHOD_OPTIONS = [
-  { value: 'manual', label: 'دستی (سطل/مخزن)' },
-  { value: 'nipple', label: 'نیپل اتومات' },
-  { value: 'trough', label: 'کانالی' },
-  { value: 'tank', label: 'مخزن اتومات' },
+  { value: 'manual', label: 'آبخوری دستی', icon: 'drinker_fountain' },
+  { value: 'nipple', label: 'نیپل', icon: 'nipple' },
+  { value: 'trough', label: 'آبخوری ناودانی', icon: 'drinker_trough' },
+  { value: 'tank', label: 'آبخوری مخزنی', icon: 'water_system' },
  ];
  const [editFeedMethod, setEditFeedMethod] = useState(false);
  const [editWaterMethod, setEditWaterMethod] = useState(false);
@@ -197,17 +197,23 @@ export default function FeedSection({ form, setForm }: Props) {
    <Sheet open={hallSheetOpen} onClose={() => setHallSheetOpen(false)} title="تنظیم سیستم سالن">
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
      <Field label="دانخوری">
-      <Select value={form.feedMethod || ''} onChange={e => setForm(f => ({ ...f, feedMethod: e.target.value as 'scoop' | 'bag' | 'semi_auto' | 'auto_sensor' | 'auto_chain' | '', feedMethodSource: 'manual' }))}>
-       <option value="">—</option>
-       {FEED_METHOD_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-      </Select>
-     </Field>
+            <SmartSelect
+              value={form.feedMethod || ''}
+              onChange={v => setForm(f => ({ ...f, feedMethod: v as 'scoop' | 'bag' | 'semi_auto' | 'auto_sensor' | 'auto_chain' | '', feedMethodSource: 'manual' }))}
+              options={FEED_METHOD_OPTIONS}
+              placeholder="— انتخاب —"
+              modalTitle="انتخاب دانخوری"
+            />
+          </Field>
      <Field label="آبخوری">
-      <Select value={form.waterMethod || ''} onChange={e => setForm(f => ({ ...f, waterMethod: e.target.value as 'manual' | 'nipple' | 'trough' | 'tank' | '', waterMethodSource: 'manual' }))}>
-       <option value="">—</option>
-       {WATER_METHOD_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-      </Select>
-     </Field>
+            <SmartSelect
+              value={form.waterMethod || ''}
+              onChange={v => setForm(f => ({ ...f, waterMethod: v as 'manual' | 'nipple' | 'trough' | 'tank' | '', waterMethodSource: 'manual' }))}
+              options={WATER_METHOD_OPTIONS}
+              placeholder="— انتخاب —"
+              modalTitle="انتخاب آبخوری"
+            />
+          </Field>
      {(form.feedMethodSource === 'manual' || form.waterMethodSource === 'manual') && (
       <Btn onClick={() => setForm(f => ({ ...f, feedMethod: (f.feedMethodFromHall || '') as any, waterMethod: (f.waterMethodFromHall || '') as any, feedMethodSource: 'hall', waterMethodSource: 'hall' }))}>
        ↺ بازگشت به سالن

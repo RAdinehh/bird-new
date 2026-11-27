@@ -42,7 +42,7 @@ export function waterSystemFromHall(drinkerType: string): WaterSystem {
 
 export const WATER_SYSTEM_LABEL: Record<WaterSystem, string> = {
   manual: 'آبخوری دستی',
-  nipple: 'نوپل/کاپ',
+  nipple: 'نیپل/کاپ',
   trough: 'ناودانی',
   tank: 'تانکر'
 };
