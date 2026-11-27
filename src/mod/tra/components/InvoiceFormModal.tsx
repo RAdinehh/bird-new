@@ -106,11 +106,11 @@ const CAT_ICON_MAP: Record<string, string> = {
   adult: 'chicken',
   feed: 'feed',
   medicine: 'meds',
-  herbal: '🌿',
+  herbal: 'herbal',
   equipment: 'feeder',
   manure: 'manure',
   broken: 'broken_egg',
-  other: '📋',
+  other: 'other',
 };
 
 export default function InvoiceFormModal(props: InvoiceFormModalProps) {

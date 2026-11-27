@@ -160,7 +160,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     if (typeof f.currentCount === 'number') parts.push('🐔 ' + getGlobalFormat().count(f.currentCount) + ' پرنده');
     const age = getAgeDays(f);
     if (age != null && age > 0) parts.push(getGlobalFormat().day(age) + ' روز');
-    return { value: f.id, label: f.name, subtitle: parts.join(' · ') || undefined };
+    return { value: f.id, label: f.name, subtitle: parts.join(' · ') || undefined, icon: 'flock' };
   });
 
   // 🎯 فیلتر آبشاری گله‌ها: فقط گله‌هایی که با پرنده/نژاد انتخاب‌شده مطابقت دارند
@@ -370,6 +370,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                   value: f.id,
                   label: `${isLinked ? '🟢 ' : ''}${f.name}`,
                   subtitle: meta || undefined,
+                  icon: 'flock',
                 };
               })} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله" />
           </Field>
@@ -521,6 +522,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                   value: f.id,
                   label: `${isLinked ? '🟢 ' : ''}${f.name}`,
                   subtitle: meta || undefined,
+                  icon: 'flock',
                 };
               })} placeholder="— ایجاد گله جدید —" modalTitle="انتخاب گله مبدأ" />
             </Field>

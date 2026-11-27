@@ -260,9 +260,9 @@ export default function PaymentsSection({
                             </Field>
                             <Field label="روش پرداخت" help={HELP.tra.payment.method}>
                               <Select value={p.method} onChange={e => updatePayment(p.id, { method: e.target.value as 'cash' | 'card' | 'check' })}>
-                                <option value="cash">نقدی</option>
-                                <option value="card">کارت</option>
-                                <option value="check">چک</option>
+                                <option value="cash">💵 نقدی</option>
+                                <option value="card">💳 کارت</option>
+                                <option value="check">📄 چک</option>
                               </Select>
                             </Field>
                           </Grid2>
