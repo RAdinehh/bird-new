@@ -130,16 +130,24 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
       <div style={DIVIDER}>💼 مدل بهره‌برداری</div>
 
       <Field label="نوع مالکیت" help={HELP.flk.ownership.type}>
-        <Select value={form.dealType || 'own'} onChange={e => {
-              const newType = e.target.value;
-              const patch: any = { dealType: newType };
-              if (newType === 'rent' && !form.rentStartDate && form.startDate) {
-                patch.rentStartDate = form.startDate;
-              }
-              setForm({ ...form, ...patch });
-            }}>
-          {Object.entries(DEAL_TYPE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-        </Select>
+        <SmartSelect
+          value={form.dealType || 'own'}
+          modalTitle="انتخاب نوع مالکیت"
+          options={[
+            { value: 'own', label: 'مالکیت کامل (خودم)', icon: '🏠' },
+            { value: 'partnership', label: 'شراکتی', icon: '🤝' },
+            { value: 'consignment', label: 'امانی', icon: '📦' },
+            { value: 'barter', label: 'تهاتری', icon: '🔄' },
+            { value: 'rent', label: 'اجاره‌ای', icon: '📋' },
+          ]}
+          onChange={(newType: string) => {
+            const patch: any = { dealType: newType };
+            if (newType === 'rent' && !form.rentStartDate && form.startDate) {
+              patch.rentStartDate = form.startDate;
+            }
+            setForm({ ...form, ...patch });
+          }}
+        />
       </Field>
 
       {form.dealType === 'partnership' && (
@@ -230,11 +238,16 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
           )}
           <Grid2>
             <Field label="دوره" error={showError?.('rentPeriod')} onTouch={() => markTouched?.('rentPeriod')} help={HELP.flk.ownership.rentPeriod}>
-              <Select value={form.rentPeriod || 'monthly'} onChange={e => setForm({ ...form, rentPeriod: e.target.value })}>
-                <option value="monthly">ماهانه</option>
-                <option value="season">فصلی</option>
-                <option value="total">کل دوره</option>
-              </Select>
+              <SmartSelect
+                value={form.rentPeriod || 'monthly'}
+                modalTitle="انتخاب دوره اجاره"
+                options={[
+                  { value: 'monthly', label: 'ماهانه', icon: '📅' },
+                  { value: 'season', label: 'فصلی', icon: '🗓️' },
+                  { value: 'total', label: 'کل دوره', icon: '⏳' },
+                ]}
+                onChange={(v: string) => setForm({ ...form, rentPeriod: v })}
+              />
             </Field>
             <Field label="شروع اجاره" error={showError?.('rentStartDate')} onTouch={() => markTouched?.('rentStartDate')} required help={HELP.flk.ownership.rentStartDate}>
               <DatePicker placeholder="از تاریخ" value={form.rentStartDate || ''} onChange={v => setForm({ ...form, rentStartDate: v })} autoToday />

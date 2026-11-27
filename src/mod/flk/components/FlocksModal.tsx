@@ -155,8 +155,16 @@ export default function FlocksModal(props: FlocksModalProps) {
     />
   </Field>
         <Field label="نوع گله" required error={showError('type')} onTouch={() => markTouched('type')}>
-          <Select value={form.type} onChange={async e => {
-            const newType = e.target.value as 'layer' | 'broiler' | 'breeder';
+          <SmartSelect
+            value={form.type}
+            modalTitle="انتخاب نوع گله"
+            options={[
+              { value: 'layer', label: 'تخم‌گذار', icon: '🥚' },
+              { value: 'broiler', label: 'گوشتی', icon: '🥩' },
+              { value: 'breeder', label: 'مادر (تخم نطفه‌دار)', icon: '🐣' },
+            ]}
+            onChange={async (val: string) => {
+            const newType = val as 'layer' | 'broiler' | 'breeder';
             if (form.id) {
               const original = allFlocks.find(f => f.id === form.id);
               const hasEvents = (original?.events?.length || 0) > 0;
@@ -170,18 +178,21 @@ export default function FlocksModal(props: FlocksModalProps) {
               }
             }
             setForm({ ...form, type: newType });
-          }}>
-            <option value="layer">تخم‌گذار</option>
-            <option value="broiler">گوشتی</option>
-            <option value="breeder">مادر (تخم نطفه‌دار)</option>
-          </Select>
+          }}
+          />
         </Field>
       </Grid2>
 
       <Grid2>
         <Field label="منبع">
-          <Select value={form.source} onChange={e => {
-            const newSource = e.target.value;
+          <SmartSelect
+            value={form.source}
+            modalTitle="انتخاب منبع گله"
+            options={[
+              { value: 'purchase', label: 'خریداری', icon: '🛒' },
+              { value: 'hatch', label: 'جوجه‌کشی خودم', icon: '🐥' },
+            ]}
+            onChange={(newSource: string) => {
             const today = todayJ();
             setForm(f => {
               if (newSource === 'hatch') {
@@ -192,9 +203,8 @@ export default function FlocksModal(props: FlocksModalProps) {
               }
               return { ...f, source: newSource };
             });
-          }}>
-            {Object.entries(SOURCE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-          </Select>
+          }}
+          />
         </Field>
   <FlockSourcePickers
     form={form}
@@ -212,7 +222,15 @@ export default function FlocksModal(props: FlocksModalProps) {
           <SmartSelect
             value={form.birdId}
             onChange={v => !isSourceLinked && setForm(f => ({ ...f, birdId: v, breedId: '' }))}
-            options={birds.map(c => ({ value: c.id, label: c.name }))}
+            options={birds.map(c => {
+              const t = `${c.name || ''} ${(c as any).birdKind || ''}`.toLowerCase();
+              let icon = '🐔';
+              if (t.includes('اردک') || t.includes('duck')) icon = '🦆';
+              else if (t.includes('بوقلمون') || t.includes('turkey')) icon = '🦃';
+              else if (t.includes('بلدرچین') || t.includes('quail')) icon = 'quail';
+              else if (t.includes('غاز') || t.includes('goose')) icon = '🦢';
+              return { value: c.id, label: c.name, icon };
+            })}
             placeholder="— انتخاب —"
             modalTitle="انتخاب پرنده"
             disabled={isSourceLinked}
@@ -252,7 +270,14 @@ export default function FlocksModal(props: FlocksModalProps) {
                   const purposeStr = b.purposes && b.purposes.length > 0 ? b.purposes.map((p: string) => labels[p] || p).join('، ') : '';
                   if (purposeStr) suffix = ` (${purposeStr})`;
                 }
-                return { value: b.id, label: `${b.name}${suffix}` };
+                const parentBird = birds.find(pb => pb.id === form.birdId);
+              const t = `${parentBird?.name || ''} ${(parentBird as any)?.birdKind || ''}`.toLowerCase();
+              let icon = parentBird ? '🐔' : '🧬';
+              if (t.includes('اردک') || t.includes('duck')) icon = '🦆';
+              else if (t.includes('بوقلمون') || t.includes('turkey')) icon = '🦃';
+              else if (t.includes('بلدرچین') || t.includes('quail')) icon = 'quail';
+              else if (t.includes('غاز') || t.includes('goose')) icon = '🦢';
+              return { value: b.id, label: `${b.name}${suffix}`, icon };
               })}
               emptyListMessage="این پرنده هنوز نژادی ندارد — از بخش «پرنده و نژاد» اضافه کنید"
               placeholder="— انتخاب —"
@@ -281,7 +306,7 @@ export default function FlocksModal(props: FlocksModalProps) {
           <SmartSelect
             value={form.hallId}
             onChange={v => setForm(f => ({ ...f, hallId: v, zoneId: '' }))}
-            options={halls.map(c => ({ value: c.id, label: c.name, icon: '🏭' }))}
+            options={halls.map(c => ({ value: c.id, label: c.name, icon: 'hall' }))}
             placeholder="— انتخاب —"
             modalTitle="انتخاب سالن"
           />
@@ -293,7 +318,7 @@ export default function FlocksModal(props: FlocksModalProps) {
             onChange={v => setForm(f => ({ ...f, zoneId: v }))}
             parentValue={form.hallId}
             parentLabel="سالن"
-            options={zonesForHall.map(z => ({ value: z.id, label: z.name }))}
+            options={zonesForHall.map(z => ({ value: z.id, label: z.name, icon: 'zone' }))}
             emptyListMessage="این سالن هنوز بخشی ندارد — از تب «بخش‌ها» اضافه کنید"
             emptyMode="select"
             placeholder="— بدون بخش —"

@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../../shr/components/OptionIcon';
 /**
  * FlocksKpiCards — ۳ کارت KPI بالای لیست گله‌ها
  * الگو: FOUNDATION-PATTERNS ب۲۲
@@ -41,7 +42,7 @@ function KpiCard({ icon, label, value, tone }: KpiCardProps) {
           background: soft, color,
           fontSize: 'var(--fs-sm)',
           flexShrink: 0,
-        }}>{icon}</span>
+        }}><OptionIcon icon={icon} size={15} /></span>
         <span style={{
           fontSize: 'var(--fs-2xs)',
           color: 'var(--muted)',
@@ -81,13 +82,13 @@ export default function FlocksKpiCards({ totalFlocks, totalBirds, totalValue }: 
       gap: 'var(--sp-2)',
     }}>
       <KpiCard
-        icon="🐔"
+        icon="flocks_group"
         label="کل گله‌ها"
         value={`${fmt.count(totalFlocks)} گله`}
         tone="accent"
       />
       <KpiCard
-        icon="🥚"
+        icon="flock"
         label="کل پرنده‌ها"
         value={`${fmt.count(totalBirds)} پرنده`}
         tone="purple"

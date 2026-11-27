@@ -25,6 +25,7 @@ vi.mock('../cor/storage/historyArchive', () => ({
   },
   getArchived: mockGetArchived,
   purgeArchiveIds: mockPurgeArchiveIds,
+  putArchiveRecord: vi.fn(async () => {}),
 }));
 
 vi.mock('../cor/storage/idbStorage', () => ({

@@ -400,11 +400,16 @@ export default function GroupsPage({ open, onClose }: Props) {
 
           <Grid2>
 <Field label="نوع گروه" hint={TYPE_DESC[form.type]}>
-            <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as FlockGroupType })}>
-              {(Object.keys(TYPE_LABEL) as FlockGroupType[]).map(t => (
-                <option key={t} value={t}>{TYPE_LABEL[t]}</option>
-              ))}
-            </Select>
+            <SmartSelect
+              value={form.type}
+              modalTitle="انتخاب نوع گروه"
+              options={(Object.keys(TYPE_LABEL) as FlockGroupType[]).map(t => ({
+                value: t,
+                label: TYPE_LABEL[t],
+                icon: t === 'smart' ? '⚡' : '📁',
+              }))}
+              onChange={v => setForm({ ...form, type: v as FlockGroupType })}
+            />
           </Field>
 
 <Field label="گروه والد" hint="برای ساختار تودرتو">
@@ -414,7 +419,7 @@ export default function GroupsPage({ open, onClose }: Props) {
               modalTitle="انتخاب گروه والد"
               options={groups
                 .filter((g) => g.id !== editingId && !g.archived)
-                .map((g) => ({ value: String(g.id), label: String(g.name) }))}
+                .map((g) => ({ value: String(g.id), label: String(g.name), icon: '🗂️' }))}
               onChange={(val: string) => setForm({ ...form, parentGroupId: val })}
             />
           </Field>

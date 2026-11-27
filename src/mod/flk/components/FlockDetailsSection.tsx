@@ -124,6 +124,7 @@ export default function FlockDetailsSection({ form, setForm, showError, markTouc
             options={schedulesByType(form.type as 'layer' | 'broiler' | 'breeder').map((sch) => ({
               value: String(sch.id),
               label: String(sch.label),
+              icon: '💉',
             }))}
             onChange={(val: string) => setForm({ ...form, vaccineScheduleId: val })}
           />

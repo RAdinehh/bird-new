@@ -1,3 +1,4 @@
+import SmartSelect from '../../../shr/components/SmartSelect';
 /**
  * ConsumptionFormModal.tsx — فرم ثبت دان/آب
  * فاز ۸b — داده اصلی دو ستونه، جزئیات تک ستونه
@@ -79,10 +80,15 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
           <DatePicker value={date} onChange={setDate} />
         </Field>
         <Field label="نوع" required>
-          <Select value={type} onChange={e => setType(e.target.value as 'feed' | 'water')}>
-            <option value="feed">🍽️ دان</option>
-            <option value="water">💧 آب</option>
-          </Select>
+          <SmartSelect
+            value={type}
+            modalTitle="انتخاب نوع مصرف"
+            options={[
+              { value: 'feed', label: 'دان', icon: 'feed' },
+              { value: 'water', label: 'آب', icon: '💧' },
+            ]}
+            onChange={v => setType(v as 'feed' | 'water')}
+          />
         </Field>
       </Grid2>
 
@@ -95,12 +101,17 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
           </Field>
         ) : hasSplit ? (
           <Field label="جنسیت">
-            <Select value={sex} onChange={e => setSex(e.target.value as '' | 'male' | 'female' | 'mixed')}>
-              <option value="">کل گله</option>
-              <option value="male">♂ نر</option>
-              <option value="female">♀ ماده</option>
-              <option value="mixed">مخلوط</option>
-            </Select>
+            <SmartSelect
+              value={sex}
+              modalTitle="انتخاب جنسیت"
+              options={[
+                { value: '', label: 'کل گله', icon: '🐥' },
+                { value: 'male', label: 'نر', icon: '🐓' },
+                { value: 'female', label: 'ماده', icon: '🐔' },
+                { value: 'mixed', label: 'مخلوط', icon: '🔀' },
+              ]}
+              onChange={v => setSex(v as '' | 'male' | 'female' | 'mixed')}
+            />
           </Field>
         ) : (
           <Field label="جنسیت" hint={`گله «${flock.name}» تفکیک نشده`}>

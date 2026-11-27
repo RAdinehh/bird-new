@@ -1,9 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="44" cy="76" r="32" fill="#F97316" stroke="#C2410C" stroke-width="4"/>
-      <circle cx="38" cy="40" r="18" fill="#F97316" stroke="#C2410C" stroke-width="4"/>
-      <polygon points="12,42 26,36 26,48" fill="#FACC15" stroke="#1E293B" stroke-width="3.2" stroke-linejoin="round"/>
-      <circle cx="90" cy="86" r="22" fill="#FACC15" stroke="#CA8A04" stroke-width="4"/>
-      <circle cx="86" cy="62" r="14" fill="#FACC15" stroke="#CA8A04" stroke-width="4"/>
+  <g data-normalized="1" transform="translate(4, 4) scale(0.93)" stroke-linecap="round" stroke-linejoin="round">
+    <!-- پرنده اول (مرغ بالغ در جلو) -->
+    <!-- تاج قرمز -->
+    <path d="M36,24 C36,15 44,14 47,20 C50,13 59,15 58,23 C63,18 69,23 64,29 Z" fill="#EF4444" stroke="#991B1B" stroke-width="3.5"/>
+    <!-- بدن و سر مرغ -->
+    <path d="M26,74 C24,52 36,30 52,30 C64,30 68,42 66,54 C76,56 84,66 80,82 C76,96 58,104 42,102 C30,100 26,88 26,74 Z" fill="#FFF7ED" stroke="#C2410C" stroke-width="4.5"/>
+    <!-- بال -->
+    <path d="M44,64 C54,60 66,66 64,78 C62,88 48,88 42,80" fill="#FED7AA" stroke="#C2410C" stroke-width="3.8"/>
+    <!-- نوک و چشم مرغ -->
+    <polygon points="14,45 29,39 29,51" fill="#F59E0B" stroke="#B45309" stroke-width="3.5"/>
+    <circle cx="40" cy="42" r="4" fill="#1E293B"/>
+    <!-- غبغب قرمز -->
+    <path d="M26,51 C22,57 25,63 30,60" fill="#EF4444" stroke="#991B1B" stroke-width="3"/>
+
+    <!-- پرنده دوم (جوجه در کنار مرغ) -->
+    <circle cx="96" cy="84" r="22" fill="#FACC15" stroke="#A16207" stroke-width="4.2"/>
+    <circle cx="92" cy="60" r="14" fill="#FACC15" stroke="#A16207" stroke-width="4.2"/>
+    <polygon points="72,61 82,57 82,65" fill="#F97316" stroke="#9A3412" stroke-width="3"/>
+    <circle cx="88" cy="58" r="3" fill="#1E293B"/>
   </g>
 </svg>
