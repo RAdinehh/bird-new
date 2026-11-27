@@ -228,7 +228,7 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
               }}
             options={contacts
               .filter(c => kind === 'sale' ? c.roles?.includes('customer') : c.roles?.includes('supplier'))
-              .map(c => ({ value: c.id, label: c.name }))}
+              .map(c => ({ value: c.id, label: c.name, subtitle: c.phone || undefined, icon: '👤' }))}
             placeholder="— انتخاب —"
             modalTitle="انتخاب طرف حساب"
           />
@@ -248,9 +248,9 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
         </Field>
         <Field label="روش">
           <Select value={method} onChange={e => setMethod(e.target.value as any)}>
-            <option value="cash">نقدی</option>
-            <option value="card">کارت</option>
-            <option value="check">چک</option>
+            <option value="cash">💵 نقدی</option>
+            <option value="card">💳 کارت</option>
+            <option value="check">📝 چک</option>
           </Select>
         </Field>
       </Grid2>

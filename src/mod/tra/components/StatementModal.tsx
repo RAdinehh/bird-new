@@ -42,7 +42,7 @@ const KIND_INFO: Record<LineKind, { icon: string; label: string; color: string }
   invoice_sale: { icon: '🧾', label: 'فاکتور فروش', color: 'var(--info)' },
   invoice_purchase: { icon: '🛒', label: 'فاکتور خرید', color: 'var(--info)' },
   deal: { icon: '🤝', label: 'معامله خاص', color: 'var(--purple)' },
-  payment_cash: { icon: '💰', label: 'دریافت نقدی', color: 'var(--accent)' },
+  payment_cash: { icon: '💵', label: 'دریافت نقدی', color: 'var(--accent)' },
   payment_card: { icon: '💳', label: 'دریافت کارت', color: 'var(--accent)' },
   payment_check: { icon: '📝', label: 'دریافت چک', color: 'var(--accent)' },
   advance: { icon: '🪙', label: 'پیش‌پرداخت', color: 'var(--accent)' },
@@ -445,6 +445,7 @@ export default function StatementModal({ open, onClose, kind }: Props) {
                 value: c.id,
                 label: c.name,
                 subtitle: rolesStr || undefined,
+                icon: '👤',
               };
             })}
             onChange={val => setPartyId(val)}
