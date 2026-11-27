@@ -250,13 +250,13 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
             display: 'flex',
             alignItems: 'center',
             gap: 'var(--sp-2)',
-            padding: '8px 0',
-            minHeight: 54,
+            padding: '5px 0',
+            minHeight: 46,
             width: '100%',
             minWidth: 0,
           }}
         >
-          <div style={{ width: 96, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+          <div style={{ width: 78, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
             <span
               style={{
                 fontSize: 'var(--fs-sm)',
@@ -291,7 +291,7 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
             style={{
               flex: 1,
               minWidth: 0,
-              minHeight: 42,
+              height: 36,
               display: 'flex',
               alignItems: 'stretch',
               border: `1px solid ${isCh ? 'var(--accent)' : 'var(--border)'}`,
@@ -300,7 +300,7 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
               overflow: 'hidden',
             }}
           >
-            <div style={{ flex: 1.25, minWidth: 0, display: 'flex', alignItems: 'center', padding: '0 6px' }}>
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', padding: '0 6px' }}>
               {key === 'weightGender' ? (
                 <SmartSelect
                   value={values[key] || ''}
@@ -308,7 +308,7 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
                   options={WEIGHT_GENDER_OPTS}
                   placeholder="نامشخص"
                   modalTitle="جنسیت وزن‌کشی"
-                  height={38}
+                  height={32}
                 />
               ) : (
                 <>
@@ -351,12 +351,12 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
 
             <div
               style={{
-                flex: 0.9,
-                minWidth: 54,
+                flex: 1,
+                minWidth: 0,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                borderRight: `1px solid ${isCh ? 'var(--accent)' : 'var(--border)'}`,
+                borderRight: `1px dashed ${isCh ? 'var(--accent)' : 'var(--border)'}`,
                 color: (oldVal != null && oldVal !== '') ? 'var(--danger)' : 'var(--muted)',
                 fontFamily: 'monospace',
                 fontSize: 'var(--fs-sm)',
