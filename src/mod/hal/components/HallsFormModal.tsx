@@ -223,9 +223,9 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                 onChange={v => setForm({...form, birdId: v, breedId: ''})}
                 options={birds.map((b: Bird) => {
                   const t = `${b.name || ''} ${(b as any).birdKind || ''}`.toLowerCase();
-                  let emoji = '🐔';
-                  if (t.includes('اردک') || t.includes('duck')) emoji = '🦆';
-                  else if (t.includes('بوقلمون') || t.includes('turkey')) emoji = '🦃';
+                  let emoji = 'chicken';
+                  if (t.includes('اردک') || t.includes('duck')) emoji = 'duck';
+                  else if (t.includes('بوقلمون') || t.includes('turkey')) emoji = 'turkey';
                   else if (t.includes('بلدرچین') || t.includes('quail')) emoji = 'quail';
                   else if (t.includes('غاز') || t.includes('goose')) emoji = '🦢';
                   return { value: b.id, label: b.name, icon: emoji };
@@ -255,11 +255,11 @@ export default function HallsFormModal(props: HallsFormModalProps) {
                     icon: (() => {
                     const parentBird = birds.find((pb: Bird) => pb.id === form.birdId);
                     const t = `${parentBird?.name || ''} ${(parentBird as any)?.birdKind || ''}`.toLowerCase();
-                    if (t.includes('اردک') || t.includes('duck')) return '🦆';
-                    if (t.includes('بوقلمون') || t.includes('turkey')) return '🦃';
+                    if (t.includes('اردک') || t.includes('duck')) return 'duck';
+                    if (t.includes('بوقلمون') || t.includes('turkey')) return 'turkey';
                     if (t.includes('بلدرچین') || t.includes('quail')) return 'quail';
                     if (t.includes('غاز') || t.includes('goose')) return '🦢';
-                    if (parentBird) return '🐔';
+                    if (parentBird) return 'chicken';
                     return '🧬';
                   })(),
                   };

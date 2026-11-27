@@ -224,9 +224,9 @@ export default function FlocksModal(props: FlocksModalProps) {
             onChange={v => !isSourceLinked && setForm(f => ({ ...f, birdId: v, breedId: '' }))}
             options={birds.map(c => {
               const t = `${c.name || ''} ${(c as any).birdKind || ''}`.toLowerCase();
-              let icon = '🐔';
-              if (t.includes('اردک') || t.includes('duck')) icon = '🦆';
-              else if (t.includes('بوقلمون') || t.includes('turkey')) icon = '🦃';
+              let icon = 'chicken';
+              if (t.includes('اردک') || t.includes('duck')) icon = 'duck';
+              else if (t.includes('بوقلمون') || t.includes('turkey')) icon = 'turkey';
               else if (t.includes('بلدرچین') || t.includes('quail')) icon = 'quail';
               else if (t.includes('غاز') || t.includes('goose')) icon = '🦢';
               return { value: c.id, label: c.name, icon };
@@ -272,9 +272,9 @@ export default function FlocksModal(props: FlocksModalProps) {
                 }
                 const parentBird = birds.find(pb => pb.id === form.birdId);
               const t = `${parentBird?.name || ''} ${(parentBird as any)?.birdKind || ''}`.toLowerCase();
-              let icon = parentBird ? '🐔' : '🧬';
-              if (t.includes('اردک') || t.includes('duck')) icon = '🦆';
-              else if (t.includes('بوقلمون') || t.includes('turkey')) icon = '🦃';
+              let icon = 'chicken';
+              if (t.includes('اردک') || t.includes('duck')) icon = 'duck';
+              else if (t.includes('بوقلمون') || t.includes('turkey')) icon = 'turkey';
               else if (t.includes('بلدرچین') || t.includes('quail')) icon = 'quail';
               else if (t.includes('غاز') || t.includes('goose')) icon = '🦢';
               return { value: b.id, label: `${b.name}${suffix}`, icon };
