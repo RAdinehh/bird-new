@@ -10,7 +10,8 @@ import EditableSelect from '../../../shr/components/EditableSelect';
 import { toFa } from '../../../shr/utils/fa';
 import { CATEGORY_LABELS, EQUIP_LABELS } from '../store';
 import { getEquipUnit } from '../equipUnits';
-import { EquipmentIcon, CATEGORY_COLORS } from '../../../shr/icons/equipment';
+import { CATEGORY_COLORS } from '../../../shr/icons/equipment';
+import { OptionIcon } from '../../../shr/components/OptionIcon';
 
 export interface HallEquipModalsProps {
   detailCat: string | null;
@@ -81,7 +82,7 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
               flexShrink: 0,
             }}>
-              <EquipmentIcon type={detailList[0]?.type || 'default'} size={18} weight="duotone" color={detailColor} />
+              <OptionIcon icon={(detailList[0]?.type && EQUIP_LABELS[detailList[0].type]?.icon) || (detailCat && CATEGORY_LABELS[detailCat as keyof typeof CATEGORY_LABELS]?.icon) || 'auxiliary'} size={18} />
             </span>
             <span>{detailCatLabel}</span>
             {detailTone !== 'none' && (
@@ -144,7 +145,7 @@ export default function HallEquipModals(props: HallEquipModalsProps) {
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0,
                   }}>
-                    <EquipmentIcon type={e.type} size={20} weight="duotone" color={detailColor} />
+                    <OptionIcon icon={EQUIP_LABELS[e.type]?.icon || CATEGORY_LABELS[e.category]?.icon || 'auxiliary'} size={20} />
                   </span>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.name}</div>

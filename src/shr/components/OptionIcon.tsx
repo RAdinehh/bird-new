@@ -8,14 +8,15 @@ interface OptionIconProps {
   style?: React.CSSProperties;
 }
 
+const EMOJI_FONT = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+
 export function OptionIcon({ icon, size = 22, color = 'currentColor', style }: OptionIconProps) {
   if (!icon) return null;
 
   if (typeof icon === 'string') {
     const trimmed = icon.trim();
-    if (typeof trimmed === 'string' && isValidIconKey(trimmed)) {
-      const scaledSize = Math.round(size * 1.12);
-      return <AppIcon name={trimmed} size={scaledSize} style={style} />;
+    if (isValidIconKey(trimmed)) {
+      return <AppIcon name={trimmed} size={size} style={style} />;
     }
     return (
       <span
@@ -24,11 +25,15 @@ export function OptionIcon({ icon, size = 22, color = 'currentColor', style }: O
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
-          width: size,
-          height: size,
-          fontSize: Math.round(size * 0.9),
-          lineHeight: 1,
+          minWidth: size,
+          height: size + 4,
+          fontSize: Math.round(size * 0.85),
+          fontFamily: EMOJI_FONT,
+          lineHeight: 1.25,
+          overflow: 'visible',
+          verticalAlign: 'middle',
           flexShrink: 0,
+          userSelect: 'none',
           ...style,
         }}
       >

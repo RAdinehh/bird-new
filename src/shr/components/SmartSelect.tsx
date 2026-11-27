@@ -124,12 +124,13 @@ export default function SmartSelect({
       >
         <span style={{
           fontWeight: 400,
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          display: 'inline-flex', alignItems: 'center', minWidth: 0, flex: 1,
+          overflow: 'visible',
         }}>
           {current ? (
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-                  <OptionIcon icon={current.icon} size={15} />
-                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{current.label}</span>
+                  <OptionIcon icon={current.icon} size={19} />
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.2 }}>{current.label}</span>
                 </span>
               ) : placeholder}
           {required && !current ? (
@@ -178,7 +179,7 @@ export default function SmartSelect({
               {grouped[gKey].map(o => (
                 <SheetItem
                       key={o.value}
-                      icon={<OptionIcon icon={o.icon || (o.group ? groupIcons[o.group] : undefined)} size={17} />}
+                      icon={<OptionIcon icon={o.icon || (o.group ? groupIcons[o.group] : undefined)} size={22} />}
                       title={o.label}
                       subtitle={o.subtitle}
                   selected={value === o.value}
@@ -192,7 +193,7 @@ export default function SmartSelect({
           filtered.map(o => (
             <SheetItem
                       key={o.value}
-                      icon={<OptionIcon icon={o.icon || (o.group ? groupIcons[o.group] : undefined)} size={17} />}
+                      icon={<OptionIcon icon={o.icon || (o.group ? groupIcons[o.group] : undefined)} size={22} />}
                       title={o.label}
                       subtitle={o.subtitle}
               selected={value === o.value}

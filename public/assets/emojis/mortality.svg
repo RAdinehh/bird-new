@@ -1,3 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <path d="M26 26 L102 102 M102 26 L26 102" stroke="#EF4444" stroke-width="18" stroke-linecap="round"/>
+  <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M26 26 L102 102 M102 26 L26 102" stroke="#EF4444" stroke-width="18" stroke-linecap="round"/>
+  </g>
 </svg>

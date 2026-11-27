@@ -170,7 +170,7 @@ export default function EditableSelect({
         ) : current ? (
           <>
             {current.icon ? <OptionIcon icon={current.icon as any} size={20} /> : null}
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{current.label}</span>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.2 }}>{current.label}</span>
           </>
         ) : (
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

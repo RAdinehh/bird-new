@@ -97,8 +97,8 @@ export const EQUIP_LABELS: Record<string, { name: string; icon: string }> = {
   electrical_panel: { name: 'تابلو برق', icon: 'electrical_panel' },
   cable:            { name: 'کابل و سیم', icon: 'cable' },
   // توزین
-  bird_scale:     { name: 'ترازوی پرنده', icon: 'scale' },
-  feed_scale:     { name: 'ترازوی دان', icon: 'scale' },
+  bird_scale:     { name: 'ترازوی پرنده', icon: 'bird_scale' },
+  feed_scale:     { name: 'ترازوی دان', icon: 'feed_scale' },
   platform_scale: { name: 'باسکول کفه‌ای', icon: 'platform_scale' },
   // شستشو
   pressure_washer: { name: 'واش‌پرس', icon: 'pressure_washer' },
@@ -119,15 +119,15 @@ export const EQUIP_LABELS: Record<string, { name: string; icon: string }> = {
   // جانبی
   camera: { name: 'دوربین', icon: 'camera' },
   sensor: { name: 'سنسور', icon: 'sensor' },
-  scale:  { name: 'ترازو', icon: '⚖' },
+  scale:  { name: 'ترازو', icon: 'scale' },
   // سازگاری با داده‌های قدیمی
-  lamp:    { name: 'لامپ', icon: '💡' },
-  fan:     { name: 'فن', icon: '🌀' },
-  heater:  { name: 'هیتر', icon: '🔥' },
-  cooler:  { name: 'کولر', icon: '❄' },
-  drinker: { name: 'آبخوری', icon: '💧' },
-  feeder:  { name: 'دانخوری', icon: '🥣' },
-  other:   { name: 'سایر', icon: '🔧' },
+  lamp:    { name: 'لامپ', icon: 'lighting' },
+  fan:     { name: 'فن', icon: 'ventilation' },
+  heater:  { name: 'هیتر', icon: 'heating' },
+  cooler:  { name: 'کولر', icon: 'cooling' },
+  drinker: { name: 'آبخوری', icon: 'drinker' },
+  feeder:  { name: 'دانخوری', icon: 'feeder' },
+  other:   { name: 'سایر', icon: 'auxiliary' },
 };
 
 /** واحد ظرفیت هر نوع تجهیز */

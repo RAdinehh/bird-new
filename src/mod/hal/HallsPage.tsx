@@ -292,7 +292,7 @@ export default function HallsPage({ active = true }: { active?: boolean } = {}) 
     <PageContainer>
       <HelpBanner
         id="hal-halls-intro"
-        icon="🏭"
+        icon="hall"
         title="راهنمای سالن‌ها"
         description="سالن‌های مرغداری را تعریف و مدیریت کنید؛ برای هر سالن ظرفیت، ابعاد، شرایط محیطی، بخش‌ها و تجهیزات مربوط را ثبت کنید."
         tone="info"

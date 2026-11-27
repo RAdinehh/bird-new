@@ -448,13 +448,13 @@ export {
 
 export function sourceIcon(type: string): string {
   const map: Record<string, string> = {
-    nipple: '💧', cup: '🥛', trough: '🛁', fountain_drinker: '⛲',
-    feeder_manual: '🪣', feeder_pan: '🥣', feeder_chain: '⛓', feeder_tube: '🥤', feeder_bucket: '🪣',
-    fan_tunnel: '🌀', fan_ceiling: '💨', air_inlet: '🪟', cooling_pad: '❄',
-    litter_wood_shavings: '🪵', litter_roll: '📜', litter_sand: '🏖',
-    tunnel: '🌀', longitudinal: '💨', transverse: '🌬', natural: '🍃',
-    chain: '⛓', pan: '🥣', tube: '🥤', manual: '🪣',
-    wood_shavings: '🪵', straw: '🌾', sand: '🏖', net: '🕸',
+    nipple: 'nipple', cup: 'drinker_cup', trough: 'drinker_trough', fountain_drinker: 'drinker_fountain',
+    feeder_manual: 'feeder_manual', feeder_pan: 'feeder', feeder_chain: 'feeder_chain', feeder_tube: 'feeder_tube', feeder_bucket: 'feeder_bucket',
+    fan_tunnel: 'ventilation', fan_ceiling: 'fan_ceiling', air_inlet: 'air_inlet', cooling_pad: 'cooling_pad',
+    litter_wood_shavings: 'litter', litter_roll: 'litter_roll', litter_sand: 'litter_sand',
+    tunnel: 'ventilation', longitudinal: 'fan_ceiling', transverse: 'air_inlet', natural: 'cooling_pad',
+    chain: 'feeder_chain', pan: 'feeder', tube: 'feeder_tube', manual: 'feeder_manual',
+    wood_shavings: 'litter', straw: 'litter_straw', sand: 'litter_sand', net: 'litter_roll',
   };
-  return map[type] || '•';
+  return map[type] || 'auxiliary';
 }

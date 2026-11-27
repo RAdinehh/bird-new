@@ -140,12 +140,11 @@ export default function EquipmentFormModal(props: EquipmentFormModalProps) {
               setForm({ ...form, ...patch });
             }}
             options={typesForCategory(form.category || 'auxiliary').map(k => {
-              const v = getEquipLabel(k) || { name: k };
+              const v = getEquipLabel(k);
               return {
                 value: k,
-                label: v.name,
-                equipType: k,
-                category: form.category || 'auxiliary',
+                label: v?.name || k,
+                icon: v?.icon,
               };
             })}
             customKey={'hal.equip.type.' + (form.category || 'auxiliary')}

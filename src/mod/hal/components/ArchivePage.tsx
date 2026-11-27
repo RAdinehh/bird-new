@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../../shr/components/OptionIcon';
 import { useFormat } from "../../../shr/units/useFormat";
 /**
  * ArchivePage — تب آرشیو hal (سالن + بخش + تجهیز)
@@ -102,7 +103,7 @@ export default function ArchivePage({ active = true }: Props = {}) {
       />
       {total === 0 ? (
         <Empty
-          icon={<span style={{ fontSize: 32 }}>📦</span>}
+          icon={<OptionIcon icon="inventory" size={32} />}
           title="آرشیو خالی است"
           desc="سالن، بخش یا تجهیز آرشیو شده‌ای وجود ندارد."
         />

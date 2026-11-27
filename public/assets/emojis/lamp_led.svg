@@ -1,1 +1,5 @@
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 13h10l-1.5-6h-7L7 13z"/><path d="M12 3v4"/><path d="M9 16v3M12 16v4M15 16v3"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M40 30 H88 L98 62 H30 Z" fill="#334155" stroke="#0F172A" stroke-width="4"/><ellipse cx="64" cy="64" rx="34" ry="12" fill="#FEF08A" stroke="#EAB308" stroke-width="3"/><rect x="56" y="14" width="16" height="16" rx="4" fill="#64748B" stroke="#1E293B" stroke-width="3.2" stroke-linejoin="round"/><line x1="42" y1="84" x2="34" y2="102" stroke="#FACC15" stroke-width="5" stroke-linecap="round"/><line x1="64" y1="86" x2="64" y2="106" stroke="#FACC15" stroke-width="5" stroke-linecap="round"/><line x1="86" y1="84" x2="94" y2="102" stroke="#FACC15" stroke-width="5" stroke-linecap="round"/>
+  </g>
+</svg>

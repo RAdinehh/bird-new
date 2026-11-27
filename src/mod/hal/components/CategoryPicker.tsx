@@ -4,7 +4,8 @@ import { useFormat } from "../../../shr/units/useFormat";
  */
 import { createPortal } from 'react-dom';
 import { getCategoryLabel, getCategorySoft, getCategoryColor } from '../_typedLabels';
-import { CategoryIcon, CATEGORY_COLORS } from '../../../shr/icons/equipment';
+import { CATEGORY_COLORS } from '../../../shr/icons/equipment';
+import { OptionIcon } from '../../../shr/components/OptionIcon';
 import { CATEGORY_LABELS } from '../store';
 import { ALL_CATS } from '../_equipHelpers';
 import { toFa } from '../../../shr/utils/fa';
@@ -95,7 +96,7 @@ export default function CategoryPicker({ open, onClose, onPick, grouped }: Props
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   background: soft, color,
                 }}>
-                  <CategoryIcon category={cat} size={18} weight="duotone" color={color} />
+                  <OptionIcon icon={getCategoryLabel(cat)?.icon || cat} size={18} />
                 </span>
                 <span style={{ flex: 1, fontSize: 'var(--fs-base)', fontWeight: 600, color: 'var(--text)' }}>{label}</span>
                 {count > 0 && <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>{fmt.count(count)} مورد</span>}

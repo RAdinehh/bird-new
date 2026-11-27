@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../shr/components/OptionIcon';
 import { useFormat } from '../../shr/units/useFormat';
 import { useEffect, useState } from 'react';
 import { useForm, Controller, useWatch } from 'react-hook-form';
@@ -263,7 +264,7 @@ export default function BreedForm({
                   borderRadius: 'var(--r-md)', color: active ? 'var(--accent)' : 'var(--muted)',
                   fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
                   fontWeight: active ? 700 : 500, cursor: 'pointer' }}>
-                <span>{opt.icon}</span> <span>{opt.label}</span>
+                <OptionIcon icon={opt.icon} size={18} /> <span>{opt.label}</span>
               </button>
             );
           })}

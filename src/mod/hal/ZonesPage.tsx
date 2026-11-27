@@ -301,7 +301,7 @@ export default function ZonesPage({ active = true }: { active?: boolean } = {}) 
     <PageContainer>
       <HelpBanner
         id="hal-zones-intro"
-        icon="🗂"
+        icon="zone"
         title="راهنمای بخش‌های سالن"
         description="هر بخش یا سالنک را در زیرمجموعهٔ سالن مربوط تعریف کنید تا ظرفیت، تجهیزات و عملیات هر قسمت به‌صورت مستقل قابل پیگیری باشد."
         tone="info"

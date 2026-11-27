@@ -4,7 +4,8 @@
  */
 import { useFormat } from '../../../shr/units/useFormat';
 
-import { CategoryIcon, CATEGORY_COLORS } from '../../../shr/icons/equipment';
+import { CATEGORY_COLORS } from '../../../shr/icons/equipment';
+import { OptionIcon } from '../../../shr/components/OptionIcon';
 import { getCategoryLabel, getCategorySoft } from '../_typedLabels';
 import { toFa } from '../../../shr/utils/fa';
 
@@ -61,7 +62,7 @@ export default function HallEquipCatCard({ cat, count, tone, pct, onClick }: Pro
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           background: soft, color, flexShrink: 0,
         }}>
-          <CategoryIcon category={cat} size={15} weight="duotone" color={color} />
+          <OptionIcon icon={getCategoryLabel(cat)?.icon || cat} size={16} />
         </span>
         <span style={{
           flex: 1,
