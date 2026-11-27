@@ -188,7 +188,6 @@ export default function FeedSection({ form, setForm }: Props) {
             options={FEED_METHOD_OPTIONS}
             placeholder="— انتخاب —"
             modalTitle="انتخاب دانخوری"
-            compact
           />
           <OverrideHint
             overridden={form.feedMethodSource === 'manual' && form.feedMethod !== (form.feedMethodFromHall || '')}
@@ -204,7 +203,6 @@ export default function FeedSection({ form, setForm }: Props) {
             options={WATER_METHOD_OPTIONS}
             placeholder="— انتخاب —"
             modalTitle="انتخاب آبخوری"
-            compact
           />
           <OverrideHint
             overridden={form.waterMethodSource === 'manual' && form.waterMethod !== (form.waterMethodFromHall || '')}
