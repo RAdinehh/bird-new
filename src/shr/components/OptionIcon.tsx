@@ -32,7 +32,6 @@ const ICON_KEY_TO_EMOJI: Record<string, string> = {
   lighting: '💡',
   cleaning: '🧹',
   weighing: '⚖️',
-  generator: '⚡',
   cage: '🏗️',
 };
 

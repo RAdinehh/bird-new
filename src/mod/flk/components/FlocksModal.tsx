@@ -161,7 +161,7 @@ export default function FlocksModal(props: FlocksModalProps) {
             options={[
               { value: 'layer', label: 'تخم‌گذار', icon: '🥚' },
               { value: 'broiler', label: 'گوشتی', icon: '🥩' },
-              { value: 'breeder', label: 'مادر (تخم نطفه‌دار)', icon: '🐣' },
+              { value: 'breeder', label: 'مادر', icon: '🐣' },
             ]}
             onChange={async (val: string) => {
             const newType = val as 'layer' | 'broiler' | 'breeder';
@@ -190,7 +190,7 @@ export default function FlocksModal(props: FlocksModalProps) {
             modalTitle="انتخاب منبع گله"
             options={[
               { value: 'purchase', label: 'خریداری', icon: '🛒' },
-              { value: 'hatch', label: 'جوجه‌کشی خودم', icon: '🐥' },
+              { value: 'hatch', label: 'جوجه‌کشی', icon: '🐥' },
             ]}
             onChange={(newSource: string) => {
             const today = todayJ();

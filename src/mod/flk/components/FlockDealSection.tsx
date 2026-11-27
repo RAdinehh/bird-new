@@ -23,7 +23,7 @@ interface Props {
 }
 
 const DEAL_TYPE_LABEL: Record<string, string> = {
-  own: '🏠 مالکیت کامل (خودم)',
+  own: '🏠 مالکیت',
   partnership: '🤝 شراکتی',
   consignment: '📦 امانی',
   rent: '📋 اجاره‌ای',
@@ -134,7 +134,7 @@ export default function FlockDealSection({ form, setForm, showError, markTouched
           value={form.dealType || 'own'}
           modalTitle="انتخاب نوع مالکیت"
           options={[
-            { value: 'own', label: 'مالکیت کامل (خودم)', icon: '🏠' },
+            { value: 'own', label: 'مالکیت', icon: '🏠' },
             { value: 'partnership', label: 'شراکتی', icon: '🤝' },
             { value: 'consignment', label: 'امانی', icon: '📦' },
             { value: 'barter', label: 'تهاتری', icon: '🔄' },

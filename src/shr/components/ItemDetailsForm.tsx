@@ -579,8 +579,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
               value={String(item.priceUnit || 'perBird')}
               modalTitle="انتخاب مبنای قیمت"
               options={[
-                { value: 'perBird', label: 'به ازای هر پرنده', icon: 'chicken' },
-                { value: 'perKg', label: 'به ازای هر کیلوگرم', icon: 'scale' },
+                { value: 'perBird', label: 'پرنده', icon: 'chicken' },
+                { value: 'perKg', label: 'کیلوگرم', icon: 'scale' },
               ]}
               onChange={v => updateItem({ priceUnit: v })}
             />
@@ -596,9 +596,9 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 modalTitle="انتخاب دلیل فروش"
                 placeholder="— انتخاب —"
                 options={[
-                  { value: 'culling', label: 'حذف از گله (کالینگ)', icon: 'flock' },
+                  { value: 'culling', label: 'کالینگ', icon: 'flock' },
                   { value: 'sick', label: 'بیماری', icon: 'meds' },
-                  { value: 'old_age', label: 'سن بالا / پایان دوره', icon: 'chicken' },
+                  { value: 'old_age', label: 'پایان‌دوره', icon: 'chicken' },
                   { value: 'surplus', label: 'مازاد گله', icon: 'stats' },
                   { value: 'breeding_stock', label: 'فروش مولد' },
                   { value: 'other', label: 'سایر' },
@@ -814,17 +814,17 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   // ========== تجهیزات ==========
   if (category === 'equipment') {
     const EQUIP_CATEGORIES = [
-      { value: 'heating', label: 'گرمایش و مادر مصنوعی', icon: 'heating' },
-      { value: 'cooling', label: 'سرمایش و مه‌پاش', icon: 'cooling' },
-      { value: 'ventilation', label: 'تهویه و هواکش', icon: 'ventilation' },
+      { value: 'heating', label: 'گرمایش', icon: 'heating' },
+      { value: 'cooling', label: 'سرمایش', icon: 'cooling' },
+      { value: 'ventilation', label: 'تهویه', icon: 'ventilation' },
       { value: 'feeding', label: 'دانخوری', icon: 'feeder' },
       { value: 'drinking', label: 'آبخوری', icon: 'drinker' },
-      { value: 'lighting', label: 'روشنایی و دیمر', icon: 'lighting' },
-      { value: 'cleaning', label: 'دستگاه و لوازم شست‌وشو', icon: 'cleaning' },
-      { value: 'weighing', label: 'ترازو و باسکول', icon: 'weighing' },
-      { value: 'power', label: 'برق و ژنراتور', icon: 'generator' },
-      { value: 'cage', label: 'قفس و تجهیزات نگهداری', icon: 'cage' },
-      { value: 'other', label: 'سایر تجهیزات', icon: 'hand_tools' },
+      { value: 'lighting', label: 'روشنایی', icon: 'lighting' },
+      { value: 'cleaning', label: 'شست‌وشو', icon: 'cleaning' },
+      { value: 'weighing', label: 'ترازو', icon: 'weighing' },
+      { value: 'power', label: 'برق', icon: 'generator' },
+      { value: 'cage', label: 'قفس', icon: 'cage' },
+      { value: 'other', label: 'سایر', icon: 'hand_tools' },
     ];
     const EQUIP_KINDS = [
       { value: 'asset', label: 'تجهیز دائمی (سرمایه‌ای)' },
@@ -925,17 +925,17 @@ if (category === 'vaccine' || category === 'herbal') {
   // ========== سایر ==========
   if (category === 'other') {
     const COST_TYPES = [
-      { value: 'fuel', label: 'سوخت و گرمایش', icon: '⛽' },
-      { value: 'bedding', label: 'بستر و پوشال', icon: 'litter' },
-      { value: 'biosecurity', label: 'مواد ضدعفونی و بهداشتی', icon: '🧴' },
-      { value: 'vet_lab', label: 'دامپزشکی و آزمایشگاه', icon: '🩺' },
-      { value: 'labor', label: 'دستمزد و کارگر', icon: '👷' },
-      { value: 'utilities', label: 'قبوض آب، برق، گاز', icon: '⚡' },
-      { value: 'transport', label: 'حمل و نقل', icon: '🚚' },
-      { value: 'maintenance', label: 'تعمیرات و نگهداری', icon: '🔧' },
+      { value: 'fuel', label: 'سوخت', icon: '⛽' },
+      { value: 'bedding', label: 'بستر', icon: 'litter' },
+      { value: 'biosecurity', label: 'ضدعفونی', icon: '🧴' },
+      { value: 'vet_lab', label: 'دامپزشکی', icon: '🩺' },
+      { value: 'labor', label: 'دستمزد', icon: '👷' },
+      { value: 'utilities', label: 'قبوض', icon: '⚡' },
+      { value: 'transport', label: 'حمل', icon: '🚚' },
+      { value: 'maintenance', label: 'تعمیرات', icon: '🔧' },
       { value: 'packaging', label: 'بسته‌بندی', icon: '📦' },
-      { value: 'rent', label: 'اجاره سالن و انبار', icon: '🏠' },
-      { value: 'other', label: 'سایر هزینه‌ها', icon: '📋' },
+      { value: 'rent', label: 'اجاره', icon: '🏠' },
+      { value: 'other', label: 'سایر', icon: '📋' },
     ];
     const ct = String(item.costType || '');
     const otherCfg = getOtherCostConfig(ct);
@@ -952,7 +952,7 @@ if (category === 'vaccine' || category === 'herbal') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>        <SecTitle icon="📋" title={ct ? otherCfg.sectionTitle : 'مشخصات قلم'} />        <Grid2>
           {isPurchase && (
-            <Field label="زیرمجموعه" help={"**سوخت و گرمایش** گازوئیل، گاز و کپسول (هزینه جاری)\n**بستر و پوشال** پوشال، کلش و خاک‌اره (ورود به انبار)\n**ضدعفونی و شست‌وشو** مواد ضدعفونی (ورود به انبار) یا شست‌وشوی مقطوع سالن\n**دامپزشکی و آزمایشگاه** ویزیت دامپزشک، کالبدگشایی و آزمایش‌ها\n**دستمزد و کارگر** کارگر روزمزد، ماهانه یا کنتراتی\n**قبوض آب، برق، گاز** قبوض دوره‌ای با ثبت مبلغ کل\n**حمل و نقل** کرایه بار (دربستی، تنی یا کیلومتری)\n**تعمیرات و نگهداری** تعمیر تجهیزات و تأسیسات سالن\n**بسته‌بندی** شانه، کارتن، کیسه و رول (ورود به انبار)\n**اجاره سالن و انبار** اجاره ماهانه یا روزانه\n**سایر هزینه‌ها** سایر اقلام و هزینه‌های متفرقه فارم"} required error={err('costType')} onTouch={touch('costType')}>
+            <Field label="زیرمجموعه" help={"**سوخت** گازوئیل، گاز و کپسول (هزینه جاری)\n**بستر** پوشال، کلش و خاک‌اره (ورود به انبار)\n**ضدعفونی و شست‌وشو** مواد ضدعفونی (ورود به انبار) یا شست‌وشوی مقطوع سالن\n**دامپزشکی** ویزیت دامپزشک، کالبدگشایی و آزمایش‌ها\n**دستمزد** کارگر روزمزد، ماهانه یا کنتراتی\n**قبوض** قبوض دوره‌ای با ثبت مبلغ کل\n**حمل** کرایه بار (دربستی، تنی یا کیلومتری)\n**تعمیرات** تعمیر تجهیزات و تأسیسات سالن\n**بسته‌بندی** شانه، کارتن، کیسه و رول (ورود به انبار)\n**اجاره** اجاره ماهانه یا روزانه\n**سایر** سایر اقلام و هزینه‌های متفرقه فارم"} required error={err('costType')} onTouch={touch('costType')}>
               <SmartSelect
                 value={ct}
                 modalTitle="انتخاب زیرمجموعه"
