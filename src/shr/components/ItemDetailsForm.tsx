@@ -190,11 +190,9 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   });
 
   const breedOptions = breedsForBird.map((b: any) => {
-    const purposeMap: Record<string, string> = { layer: 'تخم‌گذار', breeder: 'مادر', broiler: 'گوشتی', ornamental: 'زینتی' };
-    const purposeLabels = (b.purposes || []).map((p: string) => purposeMap[p] || p);
     const parentBird = birds.find((x: any) => x.id === b.birdId);
-    const subParts = [parentBird?.name, purposeLabels.length > 0 ? `کاربری: ${purposeLabels.join('، ')}` : ''].filter(Boolean);
-    const icon = (b.purposes || []).includes('layer') ? 'egg' : (b.purposes || []).includes('breeder') ? 'fertile_egg' : 'chicken';
+    const pName = parentBird?.name || '';
+    const icon = (parentBird as any)?.icon || (pName.includes('اردک') ? 'duck' : pName.includes('بوقلمون') ? 'turkey' : pName.includes('بلدرچین') ? 'quail' : 'chicken');
     return { value: b.id, label: b.name, icon };
   });
 
