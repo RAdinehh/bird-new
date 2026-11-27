@@ -1,7 +1,8 @@
+import SmartSelect from '../../../shr/components/SmartSelect';
 /**
  * EnvironmentSection — محیط و پرنده
  */
-import { Field, Grid2, Grid3, NumField, PercentField, Select, Textarea } from '../../../shr/components/ui';
+import { Field, Grid2, Grid3, NumField, PercentField, Textarea } from '../../../shr/components/ui';
 import type { F } from '../types';
 import { useFlk } from '../../flk/store';
 import { useHal } from '../../hal/store';
@@ -73,41 +74,66 @@ export default function EnvironmentSection({ form, setForm, vErrors, showError, 
 
       <Grid2>
         <Field label="تهویه">
-          <Select value={form.ventilation} onChange={e => setForm({ ...form, ventilation: e.target.value })}>
-            <option value="ok">مناسب</option>
-            <option value="low">ضعیف</option>
-            <option value="high">شدید</option>
-          </Select>
+          <SmartSelect
+            value={form.ventilation}
+            onChange={v => setForm({ ...form, ventilation: v })}
+            options={[
+              { value: 'ok', label: 'مناسب', icon: 'env_vent_ok' },
+              { value: 'low', label: 'ضعیف', icon: 'env_vent_low' },
+              { value: 'high', label: 'شدید', icon: 'env_vent_high' },
+            ]}
+            modalTitle="وضعیت تهویه"
+          />
         </Field>
         <Field label="بستر">
-          <Select value={form.litter} onChange={e => setForm({ ...form, litter: e.target.value })}>
-            <option value="dry">خشک</option>
-            <option value="wet">مرطوب</option>
-            <option value="clumped">کلوخه</option>
-          </Select>
+          <SmartSelect
+            value={form.litter}
+            onChange={v => setForm({ ...form, litter: v })}
+            options={[
+              { value: 'dry', label: 'خشک', icon: 'litter_straw' },
+              { value: 'wet', label: 'مرطوب', icon: 'env_litter_wet' },
+              { value: 'clumped', label: 'کلوخه', icon: 'env_litter_clumped' },
+            ]}
+            modalTitle="وضعیت بستر"
+          />
         </Field>
       </Grid2>
 
       <Grid3>
         <Field label="رفتار">
-          <Select value={form.behavior} onChange={e => setForm({ ...form, behavior: e.target.value })}>
-            <option value="active">فعال</option>
-            <option value="lethargic">بی‌حال</option>
-            <option value="excited">پرهیجان</option>
-          </Select>
+          <SmartSelect
+            value={form.behavior}
+            onChange={v => setForm({ ...form, behavior: v })}
+            options={[
+              { value: 'active', label: 'فعال', icon: 'env_behav_active' },
+              { value: 'lethargic', label: 'بی‌حال', icon: 'env_behav_lethargic' },
+              { value: 'excited', label: 'پرهیجان', icon: 'env_behav_excited' },
+            ]}
+            modalTitle="رفتار گله"
+          />
         </Field>
         <Field label="توزیع">
-          <Select value={form.distribution} onChange={e => setForm({ ...form, distribution: e.target.value })}>
-            <option value="uniform">یکنواخت</option>
-            <option value="cornered">گوشه‌گیر</option>
-          </Select>
+          <SmartSelect
+            value={form.distribution}
+            onChange={v => setForm({ ...form, distribution: v })}
+            options={[
+              { value: 'uniform', label: 'یکنواخت', icon: 'env_dist_uniform' },
+              { value: 'cornered', label: 'گوشه‌گیر', icon: 'env_dist_cornered' },
+            ]}
+            modalTitle="توزیع در سالن"
+          />
         </Field>
         <Field label="صدا">
-          <Select value={form.sound} onChange={e => setForm({ ...form, sound: e.target.value })}>
-            <option value="normal">طبیعی</option>
-            <option value="cough">سرفه</option>
-            <option value="sneeze">عطسه</option>
-          </Select>
+          <SmartSelect
+            value={form.sound}
+            onChange={v => setForm({ ...form, sound: v })}
+            options={[
+              { value: 'normal', label: 'طبیعی', icon: 'env_sound_normal' },
+              { value: 'cough', label: 'سرفه', icon: 'env_sound_cough' },
+              { value: 'sneeze', label: 'عطسه', icon: 'env_sound_sneeze' },
+            ]}
+            modalTitle="صدای گله"
+          />
         </Field>
       </Grid3>
 

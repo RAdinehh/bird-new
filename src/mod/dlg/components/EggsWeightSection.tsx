@@ -1,10 +1,11 @@
 import { useFormat } from '../../../shr/units/useFormat';
+import SmartSelect from '../../../shr/components/SmartSelect';
 import { useState } from 'react';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 /**
  * EggsWeightSection — تخم و وزن‌کشی
  */
-import { Btn, Field, Grid2, NumField, Select } from '../../../shr/components/ui';
+import { Btn, Field, Grid2, NumField } from '../../../shr/components/ui';
 import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { cvText } from '../../../shr/utils/weightHelpers';
@@ -136,12 +137,18 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
  <NumField placeholder="۰"value={w.weight} onBlur={() =>markTouched(`weightSamples.${i}.weight`)} onChange={e =>setForm(f =>({ ...f, weightSamples: f.weightSamples.map(x =>x.id === w.id ? { ...x, weight: e.target.value } : x) }))} unit="گرم"min={0} />
  </Field>
  <Field label="جنسیت">
- <Select value={form.weightGender} onChange={e =>setForm({ ...form, weightGender: e.target.value as any })}>
- <option value="">— نامشخص —</option>
- <option value="male">نر</option>
- <option value="female">ماده</option>
- <option value="mixed">مخلوط</option>
- </Select>
+ <SmartSelect
+            value={form.weightGender}
+            onChange={v => setForm({ ...form, weightGender: v as any })}
+            options={[
+              { value: '', label: 'نامشخص', icon: 'unknown' },
+              { value: 'male', label: 'نر', icon: 'sex_male' },
+              { value: 'female', label: 'ماده', icon: 'sex_female' },
+              { value: 'mixed', label: 'مخلوط', icon: 'sex_mixed' },
+            ]}
+            placeholder="نامشخص"
+            modalTitle="جنسیت وزن‌کشی"
+          />
  </Field>
  </Grid2>
  <div style={{ padding: 'var(--pad-normal)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)'}}>

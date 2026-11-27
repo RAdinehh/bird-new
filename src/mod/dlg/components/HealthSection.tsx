@@ -4,7 +4,7 @@
 import { useFormat } from '../../../shr/units/useFormat';
 
 import { useMemo, useState } from 'react';
-import { Btn, Field, Grid2, Input, NumField, Select, Textarea, AlertBox, Tag, SummaryCard, SummarySection, SummaryRow, Chip } from '../../../shr/components/ui';
+import { Btn, Field, Grid2, Input, NumField, Textarea, AlertBox, Tag, SummaryCard, SummarySection, SummaryRow, Chip } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
 import { HelpIcon } from '../../../shr/components/ui/HelpIcon';
 import SmartSelect from '../../../shr/components/SmartSelect';
@@ -159,11 +159,16 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
  </Grid2>
  {isSexed && (
  <Field label="جنسیت تلفات">
- <Select value={d.sex || 'unknown'} onChange={e =>setForm(f =>({ ...f, deaths: f.deaths.map(x =>x.id === d.id ? { ...x, sex: e.target.value as 'male'| 'female'| 'unknown'} : x) }))}>
- <option value="male">نر</option>
- <option value="female">ماده</option>
- <option value="unknown">نامشخص</option>
- </Select>
+ <SmartSelect
+              value={d.sex || 'unknown'}
+              onChange={v => setForm(f => ({ ...f, deaths: f.deaths.map(x => x.id === d.id ? { ...x, sex: v as 'male' | 'female' | 'unknown' } : x) }))}
+              options={[
+                { value: 'male', label: 'نر', icon: 'sex_male' },
+                { value: 'female', label: 'ماده', icon: 'sex_female' },
+                { value: 'unknown', label: 'نامشخص', icon: 'unknown' },
+              ]}
+              modalTitle="جنسیت تلفات"
+            />
  </Field>
  )}
  <Field label="توضیحات">
