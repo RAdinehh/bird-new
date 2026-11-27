@@ -1,13 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <!-- پوسته تخم با نوردهی کندلینگ -->
-    <path d="M64 12 C39 12 23 46 23 76 C23 102 41 118 64 118 C87 118 105 102 105 76 C105 46 89 12 64 12 Z" fill="#FDE68A" stroke="#B45309" stroke-width="5"/>
-    <!-- هاله نورانی داخل تخم -->
-    <ellipse cx="64" cy="70" rx="28" ry="34" fill="#FB923C" fill-opacity="0.45"/>
-    <circle cx="64" cy="68" r="16" fill="#F97316" fill-opacity="0.55"/>
-    <!-- هسته نطفه و رگه‌های ظریف خونی -->
-    <circle cx="64" cy="68" r="6.5" fill="#DC2626" stroke="#991B1B" stroke-width="2"/>
-    <path d="M64 62 Q58 50 48 46 M64 62 Q72 52 80 48 M58 70 Q46 72 42 80 M70 70 Q80 74 84 82 M64 75 Q60 86 64 94" fill="none" stroke="#DC2626" stroke-width="2.6"/>
-    <ellipse cx="45" cy="40" rx="5.5" ry="13" transform="rotate(-18 45 40)" fill="#FFFFFF" fill-opacity="0.75"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <!-- هاله نور کندلینگ پشت تخم -->
+    <circle cx="64" cy="68" r="46" fill="#FEF08A" opacity="0.55"/>
+    <!-- پوسته تخم مرغ -->
+    <path d="M64 16 C42 16 26 52 26 76 C26 99 42 114 64 114 C86 114 102 99 102 76 C102 52 86 16 64 16 Z" fill="#FDE68A" stroke="#92400E" stroke-width="4.5"/>
+    <!-- درخشش نطفه و رگه‌های کندلینگ داخل تخم -->
+    <circle cx="64" cy="74" r="18" fill="#F59E0B" opacity="0.85"/>
+    <circle cx="64" cy="74" r="8" fill="#DC2626"/>
+    <!-- رگه‌های ظریف نطفه -->
+    <path d="M64 66 L58 54 M64 66 L72 56 M72 74 L84 70 M56 74 L44 72 M64 82 L58 94 M64 82 L72 92" stroke="#B91C1C" stroke-width="2.5"/>
+    <!-- برق روی پوسته -->
+    <ellipse cx="47" cy="46" rx="5" ry="11" transform="rotate(20 47 46)" fill="#FFFFFF" opacity="0.75"/>
   </g>
 </svg>

@@ -1,12 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <!-- دسته هاون -->
-    <path d="M76 62 L98 22 C101 17 108 20 105 26 L86 64" fill="#D6D3D1" stroke="#57534E" stroke-width="4.5"/>
-    <!-- برگ‌های سبز دارویی داخل هاون -->
-    <path d="M58 62 C36 58 26 42 32 30 C46 30 56 44 58 62 Z" fill="#22C55E" stroke="#15803D" stroke-width="4"/>
-    <path d="M64 60 C62 38 74 24 86 28 C86 42 76 54 64 60 Z" fill="#4ADE80" stroke="#15803D" stroke-width="4"/>
-    <!-- کاسه هاون داروسازی -->
-    <path d="M24 62 L104 62 C102 92 86 106 64 106 C42 106 26 92 24 62 Z" fill="#A8A29E" stroke="#44403C" stroke-width="4.5"/>
-    <rect x="44" y="106" width="40" height="8" rx="4" fill="#78716C" stroke="#44403C" stroke-width="3.5"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <!-- درپوش شیشه دارو -->
+    <rect x="46" y="14" width="36" height="14" rx="4" fill="#15803D" stroke="#052E16" stroke-width="4"/>
+    <rect x="52" y="28" width="24" height="10" fill="#BBF7D0" stroke="#14532D" stroke-width="3.5"/>
+    <!-- بدنه شیشه دارو -->
+    <rect x="30" y="38" width="68" height="74" rx="14" fill="#D97706" stroke="#78350F" stroke-width="4"/>
+    <!-- برچسب سفید -->
+    <rect x="38" y="54" width="52" height="42" rx="6" fill="#FFFFFF" stroke="#92400E" stroke-width="3"/>
+    <!-- برگ گیاهی روی برچسب -->
+    <path d="M52 84 C52 66 64 60 78 62 C76 76 68 84 52 84 Z" fill="#22C55E" stroke="#14532D" stroke-width="3"/>
+    <path d="M50 86 L68 68" stroke="#14532D" stroke-width="3"/>
   </g>
 </svg>

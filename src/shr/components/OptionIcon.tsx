@@ -21,8 +21,6 @@ const ICON_KEY_TO_EMOJI: Record<string, string> = {
   flock: '🐔',
   meds: '💊',
   vaccine: '💉',
-  herbal: '🌿',
-  feed: '🌾',
   inventory: '📦',
   invoice: '🧾',
   equipment: '🔧',
