@@ -69,7 +69,6 @@ export default function HealthSection({ form, setForm, vErrors, flockAliveCount,
  const chemicalItems = useMemo(() => medicineItems.filter(x => x.category === 'medicine'), [medicineItems]);
  const herbalItems = useMemo(() => medicineItems.filter(x => x.category === 'herbal'), [medicineItems]);
  const DEATH_CAUSE_ICON: Record<string, string> = {
-   '': 'unknown',
    disease: 'cause_disease',
    heat_stress: 'cause_heat_stress',
    suffocation: 'cause_suffocation',

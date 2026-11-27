@@ -613,7 +613,6 @@ export const SOUND_LABEL: Record<string, string> = {
 
 /** دلایل رایج تلفات */
 export const DEATH_CAUSES: [string, string][] = [
-  ['',             'نامشخص'],
   ['disease',      'بیماری'],
   ['heat_stress',  'تنش دمایی'],
   ['suffocation',  'خفگی'],
