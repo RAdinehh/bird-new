@@ -1,9 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M26 70 C36 42 92 42 102 70 Z" fill="#D97706" stroke="#78350F" stroke-width="4"/>
-    <circle cx="52" cy="58" r="3" fill="#FEF3C7"/>
-    <circle cx="66" cy="54" r="3.5" fill="#78350F"/>
-    <circle cx="78" cy="60" r="3" fill="#FEF3C7"/>
-    <path d="M20 70 L108 70 L98 104 C96 110 90 112 84 112 L44 112 C38 112 32 110 30 104 Z" fill="#92400E" stroke="#451A03" stroke-width="4.5"/>
+    <!-- تپه پولک‌های سبوس قهوه‌ای روشن در بالا -->
+    <path d="M28 48 C38 22 90 22 100 48 Z" fill="#FDE68A" stroke="#92400E" stroke-width="4"/>
+    <!-- پولک‌ها و پوسته‌های ریز سبوس -->
+    <ellipse cx="50" cy="36" rx="5" ry="2.5" transform="rotate(-20 50 36)" fill="#B45309"/>
+    <ellipse cx="66" cy="32" rx="5" ry="2.5" transform="rotate(15 66 32)" fill="#92400E"/>
+    <ellipse cx="78" cy="38" rx="5" ry="2.5" transform="rotate(-10 78 38)" fill="#B45309"/>
+    <ellipse cx="58" cy="42" rx="4.5" ry="2" fill="#78350F"/>
+    <!-- کیسه گونی بازشده سبوس -->
+    <path d="M24 46 L104 46 L98 106 C97 112 92 115 86 115 L42 115 C36 115 31 112 30 106 Z" fill="#D97706" stroke="#78350F" stroke-width="4.5"/>
+    <!-- نوار سبز روی کیسه سبوس -->
+    <rect x="27" y="72" width="74" height="16" fill="#65A30D" stroke="#3F6212" stroke-width="3"/>
   </g>
 </svg>
