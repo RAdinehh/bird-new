@@ -249,12 +249,14 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
         style={{
           display: 'flex',
           alignItems: 'center',
+          flexWrap: 'wrap',
           gap: 'var(--sp-2)',
-          padding: 'var(--sp-1) 0',
+          padding: '6px 0',
           minHeight: 48,
+          minWidth: 0,
         }}
       >
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <div style={{ flex: '1 1 110px', minWidth: 100, display: 'flex', flexDirection: 'column', gap: 2 }}>
           <span style={{
             fontSize: 'var(--fs-sm)',
             fontWeight: 700,
@@ -285,12 +287,12 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
           style={{
             display: 'flex',
             alignItems: 'stretch',
-            height: 36,
-            width: 180,
-            flexShrink: 0,
+            minHeight: 36,
+            flex: '1 1 190px',
+            maxWidth: 230,
+            minWidth: 170,
             border: `1px solid ${isCh ? 'var(--accent)' : 'var(--border)'}`,
             borderRadius: 'var(--r-sm)',
-            overflow: 'hidden',
             background: 'var(--card)',
           }}
         >
