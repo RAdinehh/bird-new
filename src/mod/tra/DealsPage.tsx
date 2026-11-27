@@ -820,7 +820,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
             <SmartSelect
               value={form.partyId}
               onChange={v => setForm({...form, partyId: v})}
-              options={contacts.filter(c => c.roles?.includes('customer') || c.roles?.includes('supplier')).map(c => ({ value: c.id, label: c.name, subtitle: c.phone || undefined }))}
+              options={contacts.filter(c => c.roles?.includes('customer') || c.roles?.includes('supplier')).map(c => ({ value: c.id, label: c.name, subtitle: c.phone || undefined, icon: '👤' }))}
               placeholder="— انتخاب —"
               modalTitle="انتخاب طرف معامله"
             />
@@ -1024,6 +1024,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                           value: f.id,
                           label: f.name,
                           subtitle: `${getGlobalFormat().count(f.currentCount || 0)} قطعه${!hasStock ? ' (بدون موجودی)' : ''}`,
+                          icon: 'chicken',
                           disabled: !hasStock,
                         };
                       })}
@@ -1049,6 +1050,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                           value: h.id,
                           label: (h as any).batchCode || (h as any).code || (h as any).title || h.id.slice(0, 6),
                           subtitle: `${getGlobalFormat().count(h.hatched || 0)} جوجه${!hasStock ? ' (بدون موجودی)' : ''}`,
+                          icon: 'hatch',
                           disabled: !hasStock,
                         };
                       })}
@@ -1082,6 +1084,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                           value: f.id,
                           label: f.name,
                           subtitle: `${getGlobalFormat().count(f.currentCount || 0)} قطعه${!hasStock ? ' (بدون موجودی)' : ''}`,
+                          icon: 'chicken',
                           disabled: !hasStock,
                         };
                       })}
