@@ -25,7 +25,7 @@ import { UNIT_LABEL } from '../../whs/store';
 import type { F } from '../types-invoice';
 import { useCtc } from '../../ctc/store';
 import { UOM_CATEGORIES, resolveItemPriceFactor, type UOMUnit } from '../hooks/useInvoiceForm';
-import { getOtherCostConfig } from '../../../shr/units/uom';
+import { getOtherCostConfig, UNIT_ICON_MAP } from '../../../shr/units/uom';
 import { getTodayJalali } from '../calc';
 
 export interface InvoiceFormModalProps {
@@ -459,7 +459,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                                 value={currentUnit}
                                 modalTitle="انتخاب واحد"
                                 placeholder={undefined}
-                                options={uom.units.map((u: UOMUnit) => ({ value: u.value, label: u.label }))}
+                                options={uom.units.map((u: UOMUnit) => ({ value: u.value, label: u.label, icon: UNIT_ICON_MAP[u.value] || 'pcs' }))}
                                 onChange={val => updateItem(it.id, { unit: val, unitWeight: null, priceUnit: val as any, ...(val === 'flat' ? { quantity: 1 } : {}) })}
                               />
                             </Field>
@@ -512,7 +512,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
                                 value={effectivePriceUnit}
                                 modalTitle={FIELD_META.priceUnit.modalTitle}
                                 placeholder={undefined}
-                                options={priceUnitOptions.map((u: UOMUnit) => ({ value: u.value, label: u.label }))}
+                                options={priceUnitOptions.map((u: UOMUnit) => ({ value: u.value, label: u.label, icon: UNIT_ICON_MAP[u.value] || 'pcs' }))}
                                 onChange={val => updateItem(it.id, { priceUnit: val as any })}
                               />
                             </Field>

@@ -661,7 +661,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 unitPrice: wItem?.lastPrice || item.unitPrice,
                 description: wItem?.name || item.description,
               });
-            }} options={feedItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`, icon: '📦' }))} placeholder="— انتخاب —" modalTitle="انتخاب کالای انبار" />
+            }} options={feedItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`, icon: 'feed' }))} placeholder="— انتخاب —" modalTitle="انتخاب کالای انبار" />
           </Field>
         )}
         <Grid2>
@@ -703,7 +703,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 unitPrice: wItem?.lastPrice || item.unitPrice,
                 description: wItem?.name || item.description,
               });
-            }} options={medItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`, icon: '📦' }))} placeholder="— انتخاب —" modalTitle="انتخاب دارو یا واکسن" />
+            }} options={medItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`, icon: 'meds' }))} placeholder="— انتخاب —" modalTitle="انتخاب دارو یا واکسن" />
           </Field>
         )}
 
@@ -759,7 +759,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 description: wItem?.name || item.description,
               });
             }}
-            options={manureItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`, icon: '📦' }))}
+            options={manureItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`, icon: 'manure' }))}
             placeholder="— انتخاب —"
             modalTitle="انتخاب کالای کود"
           />
@@ -784,17 +784,17 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   // ========== تجهیزات ==========
   if (category === 'equipment') {
     const EQUIP_CATEGORIES = [
-      { value: 'heating', label: 'گرمایش و مادر مصنوعی' },
-      { value: 'cooling', label: 'سرمایش و مه‌پاش' },
-      { value: 'ventilation', label: 'تهویه و هواکش' },
-      { value: 'feeding', label: 'دانخوری' },
-      { value: 'drinking', label: 'آبخوری' },
-      { value: 'lighting', label: 'روشنایی و دیمر' },
-      { value: 'cleaning', label: 'دستگاه و لوازم شست‌وشو' },
-      { value: 'weighing', label: 'ترازو و باسکول' },
-      { value: 'power', label: 'برق و ژنراتور' },
-      { value: 'cage', label: 'قفس و تجهیزات نگهداری' },
-      { value: 'other', label: 'سایر تجهیزات' },
+      { value: 'heating', label: 'گرمایش و مادر مصنوعی', icon: 'heating' },
+      { value: 'cooling', label: 'سرمایش و مه‌پاش', icon: 'cooling' },
+      { value: 'ventilation', label: 'تهویه و هواکش', icon: 'ventilation' },
+      { value: 'feeding', label: 'دانخوری', icon: 'equipment' },
+      { value: 'drinking', label: 'آبخوری', icon: 'drinker' },
+      { value: 'lighting', label: 'روشنایی و دیمر', icon: 'lighting' },
+      { value: 'cleaning', label: 'دستگاه و لوازم شست‌وشو', icon: 'cleaning' },
+      { value: 'weighing', label: 'ترازو و باسکول', icon: 'weighing' },
+      { value: 'power', label: 'برق و ژنراتور', icon: 'generator' },
+      { value: 'cage', label: 'قفس و تجهیزات نگهداری', icon: 'cage' },
+      { value: 'other', label: 'سایر تجهیزات', icon: 'hand_tools' },
     ];
     const EQUIP_KINDS = [
       { value: 'asset', label: 'تجهیز دائمی (سرمایه‌ای)' },
@@ -885,7 +885,7 @@ if (category === 'vaccine' || category === 'herbal') {
                   description: wItem?.name || item.description,
                 });
               }}
-              options={subItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`, icon: '📦' }))}
+              options={subItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`, icon: category === 'herbal' ? 'herbal' : 'meds' }))}
               placeholder="— انتخاب —"
               modalTitle={category === 'vaccine' ? 'انتخاب واکسن' : 'انتخاب داروی گیاهی'}
             />
@@ -1089,7 +1089,7 @@ if (category === 'vaccine' || category === 'herbal') {
                 description: wItem?.name || item.description,
               });
             }}
-            options={brokenItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`, icon: '📦' }))}
+            options={brokenItems.map(i => ({ value: i.id, label: i.name, subtitle: `موجودی ${formatQty(i.currentStock, i.unit)}`, icon: 'broken_egg' }))}
             placeholder="— انتخاب —"
             modalTitle="انتخاب کالای تخم شکسته"
           />

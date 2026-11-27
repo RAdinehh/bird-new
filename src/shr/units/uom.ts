@@ -191,3 +191,25 @@ const OTHER_COST_MAP: Record<string, OtherCostConfig> = {
 export function getOtherCostConfig(costType?: string): OtherCostConfig {
   return OTHER_COST_MAP[String(costType || 'other')] || OTHER_COST_MAP.other;
 }
+
+export const UNIT_ICON_MAP: Record<string, string> = {
+  kg: "kg",
+  g: "scale",
+  ton: "scale",
+  pcs: "pcs",
+  bag: "bag",
+  vial: "vial",
+  ml: "liquid",
+  l: "liquid",
+  dose: "dose",
+  pack: "pack",
+  roll: "litter_roll",
+  bill: "invoice",
+  day: "📅",
+  month: "📅",
+  trip: "🚚",
+  km: "🛣️",
+  visit: "🩺",
+  sample: "🧪",
+  flat: "💼",
+};
