@@ -250,8 +250,8 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
             display: 'flex',
             alignItems: 'center',
             gap: 'var(--sp-2)',
-            padding: '6px 0',
-            minHeight: 48,
+            padding: '8px 0',
+            minHeight: 54,
             width: '100%',
             minWidth: 0,
           }}
@@ -291,7 +291,7 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
             style={{
               flex: 1,
               minWidth: 0,
-              minHeight: 38,
+              minHeight: 42,
               display: 'flex',
               alignItems: 'stretch',
               border: `1px solid ${isCh ? 'var(--accent)' : 'var(--border)'}`,
@@ -308,7 +308,7 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
                   options={WEIGHT_GENDER_OPTS}
                   placeholder="نامشخص"
                   modalTitle="جنسیت وزن‌کشی"
-                  height={34}
+                  height={38}
                 />
               ) : (
                 <>
@@ -366,7 +366,7 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
               }}
               title="مقدار قبلی"
             >
-              {formatOldValue(key, oldVal) || '—'}
+              {formatOldValue(key, oldVal)}
             </div>
           </div>
 
