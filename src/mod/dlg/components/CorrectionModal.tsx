@@ -14,7 +14,7 @@ import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
 import { useEffect, useMemo, useState } from 'react';
 import { Modal, Btn, BtnRow, Field, Input, Grid2 } from '../../../shr/components/ui';
 import type { DailyLog } from '../store';
-import { useFlk, isLayingReady } from '../../flk/store';
+import { useFlk, getBirdAgeAt, getLayingStartDay } from '../../flk/store';
 import { toEn, toFa } from '../../../shr/utils/fa';
 import { v4 as uuid } from 'uuid';
 import { applyCorrections } from '../api/applyCorrections';
@@ -112,7 +112,9 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
     const flock = flocks.find(f => f.id === log.flockId);
     if (!flock) return false;
     const isLayerType = flock.type === 'layer' || flock.type === 'breeder';
-    return isLayerType && isLayingReady(flock);
+    if (!isLayerType) return false;
+    const ageAtLog = log.date ? getBirdAgeAt(flock, log.date) : getBirdAgeAt(flock, flock.startDate);
+    return ageAtLog >= getLayingStartDay(flock);
   }, [flocks, log]);
 
   const availableFields = useMemo(
