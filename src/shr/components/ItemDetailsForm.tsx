@@ -817,7 +817,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
       { value: 'heating', label: 'گرمایش و مادر مصنوعی', icon: 'heating' },
       { value: 'cooling', label: 'سرمایش و مه‌پاش', icon: 'cooling' },
       { value: 'ventilation', label: 'تهویه و هواکش', icon: 'ventilation' },
-      { value: 'feeding', label: 'دانخوری', icon: 'equipment' },
+      { value: 'feeding', label: 'دانخوری', icon: 'feeder' },
       { value: 'drinking', label: 'آبخوری', icon: 'drinker' },
       { value: 'lighting', label: 'روشنایی و دیمر', icon: 'lighting' },
       { value: 'cleaning', label: 'دستگاه و لوازم شست‌وشو', icon: 'cleaning' },
@@ -926,7 +926,7 @@ if (category === 'vaccine' || category === 'herbal') {
   if (category === 'other') {
     const COST_TYPES = [
       { value: 'fuel', label: 'سوخت و گرمایش', icon: '⛽' },
-      { value: 'bedding', label: 'بستر و پوشال', icon: '🌾' },
+      { value: 'bedding', label: 'بستر و پوشال', icon: 'litter' },
       { value: 'biosecurity', label: 'مواد ضدعفونی و بهداشتی', icon: '🧴' },
       { value: 'vet_lab', label: 'دامپزشکی و آزمایشگاه', icon: '🩺' },
       { value: 'labor', label: 'دستمزد و کارگر', icon: '👷' },

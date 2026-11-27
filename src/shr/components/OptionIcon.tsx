@@ -26,6 +26,14 @@ const ICON_KEY_TO_EMOJI: Record<string, string> = {
   feed: '🌾',
   inventory: '📦',
   invoice: '🧾',
+  equipment: '🔧',
+  cooling: '❄️',
+  ventilation: '💨',
+  lighting: '💡',
+  cleaning: '🧹',
+  weighing: '⚖️',
+  generator: '⚡',
+  cage: '🏗️',
 };
 
 export function OptionIcon({ icon, size = 22, color = 'currentColor', style }: OptionIconProps) {
