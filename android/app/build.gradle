@@ -20,7 +20,7 @@ android {
         release {
             def storeFilePath = System.getenv("ANDROID_KEYSTORE_PATH")
             if (storeFilePath) {
-                storeFile file(storeFilePath)
+                storeFile file("release-keystore.jks")
                 storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
                 keyAlias System.getenv("ANDROID_KEY_ALIAS")
                 keyPassword System.getenv("ANDROID_KEY_PASSWORD")
