@@ -156,7 +156,7 @@ export default function DependentSelect({
       options={options}
       placeholder={placeholder}
       modalTitle={modalTitle || `انتخاب ${parentLabel}`}
-      autoThreshold={hasIcons ? 0 : autoThreshold}
+      autoThreshold={autoThreshold}
       disabled={disabled}
       required={required}
       error={error}
