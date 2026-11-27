@@ -1,18 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <!-- گیاه کنجد در نیمه بالا (جدا از کاسه) -->
-    <path d="M64 62 L64 14" stroke="#166534" stroke-width="4.5"/>
-    <path d="M58 30 C44 22 34 28 32 36 C44 40 52 36 58 30 Z" fill="#FCE7F3" stroke="#BE185D" stroke-width="3.5"/>
-    <path d="M70 24 C84 16 94 22 96 30 C84 34 76 30 70 24 Z" fill="#FFF1F2" stroke="#BE185D" stroke-width="3.5"/>
-    <rect x="42" y="40" width="11" height="18" rx="5.5" transform="rotate(-18 47 49)" fill="#4ADE80" stroke="#15803D" stroke-width="3"/>
-    <rect x="75" y="38" width="11" height="18" rx="5.5" transform="rotate(18 80 47)" fill="#4ADE80" stroke="#15803D" stroke-width="3"/>
-    <!-- بذرهای کنجد داخل کاسه -->
-    <path d="M30 82 C42 64 86 64 98 82 Z" fill="#FEF3C7" stroke="#92400E" stroke-width="3.5"/>
-    <path d="M46 75 C49 71 52 75 50 79 C48 81 44 78 46 75 Z" fill="#FFFFFF" stroke="#B45309" stroke-width="1.8"/>
-    <path d="M62 71 C65 67 68 71 66 75 C64 77 60 74 62 71 Z" fill="#F59E0B" stroke="#78350F" stroke-width="1.8"/>
-    <path d="M78 75 C81 71 84 75 82 79 C80 81 76 78 78 75 Z" fill="#FFFFFF" stroke="#B45309" stroke-width="1.8"/>
-    <!-- کاسه سفالی جداگانه در پایین -->
-    <path d="M24 82 L104 82 C100 104 86 114 64 114 C42 114 28 104 24 82 Z" fill="#B45309" stroke="#451A03" stroke-width="4.5"/>
-    <line x1="22" y1="82" x2="106" y2="82" stroke="#78350F" stroke-width="5"/>
+    <!-- سمت چپ: گیاه کنجد (کاملاً جدا از پیاله) -->
+    <path d="M36 108 L36 20" stroke="#166534" stroke-width="4.5"/>
+    <path d="M32 36 C20 28 12 34 12 42 C22 46 28 42 32 36 Z" fill="#FCE7F3" stroke="#BE185D" stroke-width="3.5"/>
+    <path d="M40 28 C52 20 58 26 58 34 C48 38 42 34 40 28 Z" fill="#FFF1F2" stroke="#BE185D" stroke-width="3.5"/>
+    <rect x="18" y="54" width="10" height="18" rx="5" transform="rotate(-18 23 63)" fill="#4ADE80" stroke="#15803D" stroke-width="3"/>
+    <rect x="42" y="50" width="10" height="18" rx="5" transform="rotate(18 47 59)" fill="#4ADE80" stroke="#15803D" stroke-width="3"/>
+    <!-- سمت راست: پیاله جداگانه بذرهای کنجد -->
+    <path d="M64 80 C72 64 108 64 116 80 Z" fill="#FEF3C7" stroke="#92400E" stroke-width="3.5"/>
+    <path d="M77 74 C79 70 82 74 80 78 C78 80 75 77 77 74 Z" fill="#FFFFFF" stroke="#B45309" stroke-width="1.8"/>
+    <path d="M89 70 C91 66 94 70 92 74 C90 76 87 73 89 70 Z" fill="#F59E0B" stroke="#78350F" stroke-width="1.8"/>
+    <path d="M101 74 C103 70 106 74 104 78 C102 80 99 77 101 74 Z" fill="#FFFFFF" stroke="#B45309" stroke-width="1.8"/>
+    <path d="M60 80 L120 80 C116 100 106 108 90 108 C74 108 64 100 60 80 Z" fill="#B45309" stroke="#451A03" stroke-width="4.5"/>
+    <line x1="58" y1="80" x2="122" y2="80" stroke="#78350F" stroke-width="4.5"/>
   </g>
 </svg>
