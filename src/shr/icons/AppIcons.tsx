@@ -63,6 +63,7 @@ export function getSmartIconByText(text?: string): AppIconKey {
   if (t.includes('مرغ') || t.includes('خروس') || t.includes('chicken') || t.includes('hen')) return 'chicken';
   if (t.includes('اردک') || t.includes('duck')) return 'duck';
   if (t.includes('بوقلمون') || t.includes('turkey')) return 'turkey';
+  if (t.includes('نطفه') || t.includes('fertile')) return 'fertile_egg';
   if (t.includes('تخم') || t.includes('egg')) return 'egg';
   if (t.includes('دارو') || t.includes('واکسن') || t.includes('درمان') || t.includes('سرنگ') || t.includes('meds') || t.includes('vaccine')) return 'meds';
   if (t.includes('تلفات') || t.includes('مرگ') || t.includes('mortality') || t.includes('dead')) return 'mortality';
