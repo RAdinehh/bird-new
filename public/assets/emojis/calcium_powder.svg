@@ -1,9 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M20 98 C34 48 94 48 108 98 Z" fill="#F8FAFC" stroke="#475569" stroke-width="4.5"/>
-    <polygon points="44,54 58,34 76,42 70,60" fill="#E2E8F0" stroke="#334155" stroke-width="4"/>
-    <circle cx="52" cy="82" r="3" fill="#94A3B8"/>
-    <circle cx="72" cy="78" r="3" fill="#94A3B8"/>
-    <circle cx="62" cy="88" r="3" fill="#94A3B8"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <!-- توده پودر سفید کلسیم -->
+    <path d="M24 66 C34 44 54 36 66 36 C82 36 96 46 104 66 Z" fill="#FFFFFF" stroke="#64748B" stroke-width="3.5"/>
+    <path d="M44 54 C54 44 68 44 78 52" fill="none" stroke="#CBD5E1" stroke-width="3"/>
+    <!-- کاسه پایین -->
+    <path d="M20 66 H108 L98 98 C96 103 92 106 86 106 H42 C36 106 32 103 30 98 Z" fill="#94A3B8" stroke="#334155" stroke-width="4"/>
+    <path d="M32 76 H96" stroke="#E2E8F0" stroke-width="3"/>
   </g>
 </svg>

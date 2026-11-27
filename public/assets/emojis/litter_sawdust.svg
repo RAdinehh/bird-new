@@ -1,14 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <g stroke-linecap="round" stroke-linejoin="round">
-    <path d="M18 98 C22 76 38 66 56 64 C70 52 92 56 102 74 C108 82 110 90 108 98 Z" fill="#C68B59" stroke="#6B3E1E" stroke-width="4"/>
-    <!-- ذرات پودری و براده چوب -->
-    <circle cx="34" cy="84" r="2.5" fill="#FDE68A"/>
-    <circle cx="48" cy="76" r="2" fill="#78350F"/>
-    <circle cx="64" cy="86" r="2.5" fill="#FDE68A"/>
-    <circle cx="78" cy="74" r="2.2" fill="#78350F"/>
-    <circle cx="92" cy="84" r="2.5" fill="#FDE68A"/>
-    <circle cx="42" cy="92" r="2" fill="#78350F"/>
-    <circle cx="84" cy="92" r="2" fill="#78350F"/>
-    <path d="M54 68 L60 72 M72 64 L68 70" stroke="#FEF3C7" stroke-width="2.5"/>
+    <!-- پشته اصلی خاک‌اره -->
+    <path d="M16 98 L34 66 L62 56 L92 64 L112 98 Z" fill="#D99B52" stroke="#6B3E1E" stroke-width="4"/>
+    <!-- براده‌ها و مکعب‌های ریز چوب -->
+    <polygon points="32,84 42,78 48,86 38,92" fill="#FDE68A" stroke="#78350F" stroke-width="2.5"/>
+    <polygon points="56,74 68,68 72,78 60,84" fill="#FEF3C7" stroke="#78350F" stroke-width="2.5"/>
+    <polygon points="78,84 90,78 96,88 84,94" fill="#FDE68A" stroke="#78350F" stroke-width="2.5"/>
+    <polygon points="46,94 56,88 60,96 50,100" fill="#B45309" stroke="#451A03" stroke-width="2"/>
+    <polygon points="68,94 78,88 82,96 72,100" fill="#B45309" stroke="#451A03" stroke-width="2"/>
   </g>
 </svg>

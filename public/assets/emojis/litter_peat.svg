@@ -1,10 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <g stroke-linecap="round" stroke-linejoin="round">
-    <path d="M18 98 C22 72 42 58 64 58 C86 58 106 72 110 98 Z" fill="#5C3A21" stroke="#2E1A0D" stroke-width="4"/>
-    <path d="M32 82 C44 74 56 76 66 84" fill="none" stroke="#9A6B43" stroke-width="3"/>
-    <path d="M68 74 C80 68 92 72 98 82" fill="none" stroke="#9A6B43" stroke-width="3"/>
-    <circle cx="46" cy="90" r="2.5" fill="#3B2314"/>
-    <circle cx="66" cy="92" r="2.5" fill="#9A6B43"/>
-    <circle cx="86" cy="88" r="2.5" fill="#3B2314"/>
+    <path d="M16 98 C20 70 42 54 64 54 C86 54 108 70 112 98 Z" fill="#3E2723" stroke="#1B0E0A" stroke-width="4"/>
+    <!-- رگه‌های الیاف گیاهی تیره -->
+    <path d="M28 84 C42 72 58 74 70 84" fill="none" stroke="#6D4C41" stroke-width="3.5"/>
+    <path d="M58 68 C74 58 90 64 100 78" fill="none" stroke="#8D6E63" stroke-width="3"/>
+    <path d="M36 94 C56 84 80 86 98 94" fill="none" stroke="#261612" stroke-width="3.5"/>
   </g>
 </svg>
