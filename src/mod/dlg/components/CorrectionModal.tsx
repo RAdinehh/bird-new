@@ -489,7 +489,7 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
               if (group.length > 1) {
                 return <Grid2 key={idx}>{fields}</Grid2>;
               }
-              return <div key={idx}>{fields}</div>;
+              return <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>{fields}</div>;
             })}
             </div>
           </div>
