@@ -200,8 +200,10 @@ export default function BreedForm({
                 }}
                 error={errors.birdId?.message}
                 options={birds.map((c: any) => {
-                  const info = getKindInfo(c.birdKind || c.kind || c.type);
-                  return { value: c.id, label: c.name, icon: info.emoji };
+                  const k = c.birdKind || c.kind || c.type || '';
+                        const n = c.name || '';
+                        const icon = (k === 'duck' || n.includes('اردک')) ? 'duck' : (k === 'turkey' || n.includes('بوقلمون')) ? 'turkey' : (k === 'quail' || n.includes('بلدرچین')) ? 'quail' : 'chicken';
+                        return { value: c.id, label: c.name, icon };
                 })}
                 placeholder="— انتخاب —"
                 modalTitle="انتخاب پرنده"
