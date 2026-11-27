@@ -308,7 +308,7 @@ export default function MultiPayModal({ open, onClose, kind, prefillPartyId, pre
 
       {partyId && (
         <>
-          <SectionTitle><span style={{ fontSize: 'var(--fs-sm)' }}>📄</span> فاکتورهای بدهکار ({fmt.count(unpaid.length)})</SectionTitle>
+          <SectionTitle><span style={{ fontSize: 'var(--fs-sm)' }}>🧾</span> فاکتورهای بدهکار ({fmt.count(unpaid.length)})</SectionTitle>
           {unpaid.length === 0 ? (
             <div style={{ padding: 'var(--pad-normal)', textAlign: 'center', color: 'var(--muted)', fontSize: 'var(--fs-sm)', background: 'var(--input-bg)', borderRadius: 'var(--r-md)' }}>
               این طرف حساب فاکتور بدهکاری ندارد ✅

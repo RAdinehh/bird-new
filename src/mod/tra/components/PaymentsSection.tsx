@@ -229,7 +229,7 @@ export default function PaymentsSection({
                 </div>
                 {form.payments.map((p, idx) => {
                   const isExpanded = expandedPaymentId === p.id;
-                  const methodLabel = p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📄 چک';
+                  const methodLabel = p.method === 'cash' ? '💵 نقدی' : p.method === 'card' ? '💳 کارت' : '📝 چک';
                   return (
                     <div key={p.id}
                     data-focus-id={`tra-payment-${p.id}`} style={{ padding: 'var(--pad-normal)', background: 'var(--card-solid)', border: `1px solid ${isExpanded ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 'var(--r-md)', marginBottom: 8 }}>
@@ -262,7 +262,7 @@ export default function PaymentsSection({
                               <Select value={p.method} onChange={e => updatePayment(p.id, { method: e.target.value as 'cash' | 'card' | 'check' })}>
                                 <option value="cash">💵 نقدی</option>
                                 <option value="card">💳 کارت</option>
-                                <option value="check">📄 چک</option>
+                                <option value="check">📝 چک</option>
                               </Select>
                             </Field>
                           </Grid2>
@@ -288,7 +288,7 @@ export default function PaymentsSection({
                                 <Field label="سرسید" error={showError?.('payments.' + idx + '.dueDate')} onTouch={() => markTouched?.('payments.' + idx + '.dueDate')}><DatePicker value={p.dueDate} onChange={v => updatePayment(p.id, { dueDate: v })}  autoToday /></Field>
                                 <Field label="وضعیت چک" help={HELP.tra.payment.checkStatus}>
                                   <Select value={p.status || 'pending'} onChange={e => { const newStatus = e.target.value as CheckStatus; const patch: Partial<Payment> = { status: newStatus }; if (newStatus === 'bounced') { patch.bouncedDate = getTodayJalali(); patch.clearedDate = ''; } else if (newStatus === 'cleared') { patch.clearedDate = getTodayJalali(); patch.bouncedDate = ''; } else { patch.bouncedDate = ''; patch.clearedDate = ''; } updatePayment(p.id, patch); }}>
-                                    <option value="pending">🟡 در جریان</option>
+                                    <option value="pending">🔄 در جریان</option>
                                     <option value="cleared">✅ نقد شد</option>
                                     <option value="bounced">❌ برگشتی</option>
                                   </Select>

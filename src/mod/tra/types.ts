@@ -54,10 +54,10 @@ export const WORKFLOW_LABEL: Record<WorkflowStatus, string> = {
 };
 
 export const CHECK_STATUS_LABEL: Record<CheckStatus, string> = {
-  pending: '🕒 در دست',
-  in_transit: '🏦 در جریان وصول',
+  pending: '⏳ در دست',
+  in_transit: '🔄 در جریان وصول',
   cleared: '✅ نقد شد',
-  bounced: '↩️ برگشتی',
+  bounced: '❌ برگشتی',
 };
 
 

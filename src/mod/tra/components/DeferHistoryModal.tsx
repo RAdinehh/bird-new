@@ -46,7 +46,7 @@ export default function DeferHistoryModal({ open, onClose, deferrals, invoiceNum
     <HistoryModalShell
       open={open}
       onClose={onClose}
-      title="📋 تاریخچه تعویق‌ها"
+      title="🗓️ تاریخچه تعویق‌ها"
       size="md"
     >
       <div style={{

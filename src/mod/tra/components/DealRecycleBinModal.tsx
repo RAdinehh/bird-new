@@ -157,7 +157,7 @@ export default function DealRecycleBinModal({ open, onClose }: Props) {
                       🗑️ حذف
                     </Btn>
                     <Btn size="sm" variant="primary" onClick={() => handleRestore(deal.id)} style={{ minHeight: 28, height: 28, padding: '0 8px', fontSize: 11 }}>
-                      ↩️ بازیابی
+                      ♻️ بازیابی
                     </Btn>
                   </div>
                 </div>

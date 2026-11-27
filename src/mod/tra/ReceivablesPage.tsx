@@ -344,7 +344,7 @@ renderSummary={(d) => {
                         if (_c <= 0.5) return null;
                         return (
                           <span style={{ fontSize: 'var(--fs-2xs)', fontWeight: 700, padding: '2px 6px', borderRadius: 4, color: 'var(--accent)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                            ⚡ {fmt.count(_c)}
+                            🪙 {fmt.count(_c)}
                           </span>
                         );
                       })()}
@@ -442,7 +442,7 @@ renderSummary={(inv) => {
                       if (_c <= 0.5) return null;
                       return (
                         <span style={{ fontSize: 'var(--fs-2xs)', fontWeight: 700, padding: '2px 6px', borderRadius: 4, color: 'var(--accent)', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                          ⚡ {fmt.count(_c)}
+                          🪙 {fmt.count(_c)}
                         </span>
                       );
                     })()}
@@ -524,7 +524,7 @@ renderDetails={(inv) => {
                     </Btn>
                   )}
                   {!isLockedFromSettlement && rem > 0 && inv.partyId && computeUnappliedAdvances(inv.partyId) > 0.5 && (
-                    <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setApplyAdvanceTarget(inv); }}>⚡ پیش‌پرداخت</Btn>
+                    <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setApplyAdvanceTarget(inv); }}>🪙 پیش‌پرداخت</Btn>
                   )}
                   <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setReminderInvoiceId(inv.id); }}>📨 یادآوری</Btn>
                   <Btn size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); openDefer(inv); }}>⏰ تعویق</Btn>

@@ -122,7 +122,7 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
   if (!effectiveDeal) return null;
 
   const isIn = direction === 'in';
-  const title = isIn ? '💳 ثبت دریافت' : '💳 ثبت پرداخت';
+  const title = isIn ? '📥 ثبت دریافت' : '📤 ثبت پرداخت';
 
   return (
     <Modal open={open} onClose={onClose} title={title} size="md">

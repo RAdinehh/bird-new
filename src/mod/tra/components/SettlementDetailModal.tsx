@@ -165,7 +165,7 @@ export default function SettlementDetailModal({
         <>
           <BtnRow>
             <Btn variant="outline" onClick={onPrint}>🖨️ چاپ</Btn>
-            <Btn variant="outline" onClick={onViewInvoice}>📄 مشاهده فاکتور</Btn>
+            <Btn variant="outline" onClick={onViewInvoice}>🧾 مشاهده فاکتور</Btn>
           </BtnRow>
           <BtnRow>
             <Btn variant="danger" onClick={onUndo}>↩️ لغو تبدیل</Btn>

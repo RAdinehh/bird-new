@@ -90,7 +90,7 @@ export default function ApplyAdvanceModal({ open, onClose, invoice }: Props) {
     <Modal
       open={open}
       onClose={onClose}
-      title="⚡ مصرف پیش‌پرداخت"
+      title="🪙 مصرف پیش‌پرداخت"
       size="md"
       footer={
         <BtnRow>
@@ -107,7 +107,7 @@ export default function ApplyAdvanceModal({ open, onClose, invoice }: Props) {
           فاکتور {invoice.number} — باقی‌مانده: {fmt.money(rem)}
         </div>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', marginTop: 4, fontWeight: 600 }}>
-          ⚡ پیش‌پرداخت موجود: {fmt.money(unapplied)}
+          🪙 پیش‌پرداخت موجود: {fmt.money(unapplied)}
         </div>
       </div>
 

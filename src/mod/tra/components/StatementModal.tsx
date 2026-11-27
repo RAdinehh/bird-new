@@ -39,13 +39,13 @@ interface StatementLine {
 }
 
 const KIND_INFO: Record<LineKind, { icon: string; label: string; color: string }> = {
-  invoice_sale: { icon: '📄', label: 'فاکتور فروش', color: 'var(--info)' },
+  invoice_sale: { icon: '🧾', label: 'فاکتور فروش', color: 'var(--info)' },
   invoice_purchase: { icon: '🛒', label: 'فاکتور خرید', color: 'var(--info)' },
   deal: { icon: '🤝', label: 'معامله خاص', color: 'var(--purple)' },
   payment_cash: { icon: '💰', label: 'دریافت نقدی', color: 'var(--accent)' },
   payment_card: { icon: '💳', label: 'دریافت کارت', color: 'var(--accent)' },
   payment_check: { icon: '📝', label: 'دریافت چک', color: 'var(--accent)' },
-  advance: { icon: '⚡', label: 'پیش‌پرداخت', color: 'var(--accent)' },
+  advance: { icon: '🪙', label: 'پیش‌پرداخت', color: 'var(--accent)' },
   refund: { icon: '↩️', label: 'عودت وجه', color: 'var(--danger)' },
 };
 
@@ -424,7 +424,7 @@ export default function StatementModal({ open, onClose, kind }: Props) {
     <Modal
       open={open}
       onClose={onClose}
-      title="📄 صورت‌حساب طرف حساب"
+      title="🧾 صورت‌حساب طرف حساب"
       size="lg"
       footer={
         <ModalFooter actions={[

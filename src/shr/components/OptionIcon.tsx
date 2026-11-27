@@ -17,7 +17,6 @@ const ICON_KEY_TO_EMOJI: Record<string, string> = {
   hatch: '🐣',
   chick: '🐤',
   egg: '🥚',
-  fertile_egg: '🥚',
   hall: '🏠',
   flock: '🐔',
   meds: '💊',

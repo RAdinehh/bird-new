@@ -798,7 +798,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
               flexWrap: 'wrap',
             }}>
               <div style={{ fontSize: 'var(--fs-sm)' }}>
-                ⚡ <b>پیش‌پرداخت موجود:</b> {fmt.money(_unapplied)}
+                🪙 <b>پیش‌پرداخت موجود:</b> {fmt.money(_unapplied)}
               </div>
               <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 'var(--fs-sm)', fontWeight: 600 }}>
                 <input

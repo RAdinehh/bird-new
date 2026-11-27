@@ -861,7 +861,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
             <Select value={form.settlementType || 'percent'} onChange={e => setForm({...form, settlementType: e.target.value as SettlementType})}>
               <option value="percent">💰 درصدی</option>
               <option value="per_unit">💵 به ازای هر واحد</option>
-              <option value="fixed">📋 مبلغ ثابت</option>
+              <option value="fixed">🏷️ مبلغ ثابت</option>
               <option value="rental">📅 ماهانه</option>
               <option value="barter">🔄 تهاتر</option>
             </Select>
@@ -966,17 +966,17 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                 sales: f.sales.filter(sl => sl.goodId !== g.id),
               }));
             }}>
-              <optgroup label="🌱 دام و طیور — پیگیری چند مرحله‌ای">
-                <option value="chick">🐣 جوجه یک‌روزه</option>
+              <optgroup label="🐔 دام و طیور — پیگیری چند مرحله‌ای">
+                <option value="chick">🐥 جوجه یک‌روزه</option>
                 <option value="adult">🐔 پرنده بالغ</option>
                 <option value="egg">🥚 تخم خوراکی</option>
-                <option value="fertile_egg">🥚 تخم نطفه‌دار</option>
+                <option value="fertile_egg">🐣 تخم نطفه‌دار</option>
               </optgroup>
               <optgroup label="📦 کالاهای فروش و مصرف انبار">
                 <option value="feed">🌾 دان و خوراک</option>
                 <option value="medicine">💊 دارو / واکسن</option>
                 <option value="equipment">🔧 تجهیزات</option>
-                <option value="other">📋 سایر</option>
+                <option value="other">📎 سایر</option>
               </optgroup>
             </Select>
           </Field>
@@ -1469,15 +1469,15 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
           <Grid2>
             <Field label="جهت" error={showError?.(`payments.${pi}.direction`)} onTouch={() => markTouched?.(`payments.${pi}.direction`)}>
               <Select value={p.direction} onChange={e => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, direction: e.target.value as any } : x) }))}>
-                <option value="in">↑ دریافت از طرف</option>
-                <option value="out">↓ پرداخت به طرف</option>
+                <option value="in">📥 دریافت از طرف</option>
+                <option value="out">📤 پرداخت به طرف</option>
               </Select>
             </Field>
             <Field label="روش" error={showError?.(`payments.${pi}.method`)} onTouch={() => markTouched?.(`payments.${pi}.method`)}>
               <Select value={p.method} onChange={e => setForm(f => ({ ...f, payments: f.payments.map(x => x.id === p.id ? { ...x, method: e.target.value as any } : x) }))}>
                 <option value="cash">💵 نقدی</option>
                 <option value="card">💳 کارت</option>
-                <option value="check">📄 چک</option>
+                <option value="check">📝 چک</option>
               </Select>
             </Field>
           </Grid2>
