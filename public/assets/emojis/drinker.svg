@@ -1,7 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="54" y="8" width="20" height="22" rx="4" fill="#64748B" stroke="#1E293B" stroke-width="3.2" stroke-linejoin="round"/>
-      <path d="M64 32 C64 32 30 70 30 90 a34 34 0 0 0 68 0 C98 70 64 32 64 32 Z" fill="#0EA5E9" stroke="#0369A1" stroke-width="4"/>
-      <ellipse cx="52" cy="86" rx="7" ry="13" transform="rotate(-20 52 86)" fill="#BAE6FD" stroke="#1E293B" stroke-width="3.2" stroke-linejoin="round"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <!-- قلاب آویز -->
+    <path d="M64 10 V22" stroke="#475569" stroke-width="5"/>
+    <circle cx="64" cy="24" r="5" fill="#CBD5E1" stroke="#334155" stroke-width="3.5"/>
+    <!-- بدنه مخروطی/کله‌قندی آبخوری -->
+    <path d="M64 29 L38 78 H90 Z" fill="#38BDF8" stroke="#0369A1" stroke-width="4"/>
+    <path d="M64 38 L47 72 H57 L64 48 Z" fill="#BAE6FD" opacity="0.7"/>
+    <!-- کاسه آب پایین -->
+    <path d="M24 78 H104 L97 100 C95 105 91 108 86 108 H42 C37 108 33 105 31 100 Z" fill="#0284C7" stroke="#0C4A6E" stroke-width="4"/>
+    <!-- خط سطح آب -->
+    <path d="M30 84 Q47 80 64 84 T98 84" fill="none" stroke="#E0F2FE" stroke-width="3.5"/>
   </g>
 </svg>
