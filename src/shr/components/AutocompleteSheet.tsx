@@ -40,6 +40,7 @@ interface Props {
   hideCustom?: boolean;
   /** 🆕 مخفی کردن متن خطای داخلی — وقتی داخل <Field> است */
   hideInternalError?: boolean;
+  defaultIcon?: string;
 }
 
 const INITIAL_COUNT = 5;
@@ -50,7 +51,7 @@ export default function AutocompleteSheet({
   value, onChange, onSelect, onSubmit,
   options, placeholder, customLabel = 'افزودن مورد دلخواه',
   error, title = 'انتخاب کنید', emptyMessage, emptyHint, actionValues = [], hideCustom = false,
-  hideInternalError = false,
+  hideInternalError = false, defaultIcon,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState('');

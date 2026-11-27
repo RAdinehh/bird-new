@@ -262,6 +262,7 @@ export default function BreedNameField({
       hideInternalError={hideInternalError}
       emptyMessage={emptyMessage}
       emptyHint={emptyHint}
+      defaultIcon={parentKind ? (KIND_EMOJI[parentKind] || '🧬') : '🧬'}
     />
     </>
   );
