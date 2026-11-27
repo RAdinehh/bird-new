@@ -1,22 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <!-- ساقه و غلاف‌های گیاه سویا در بالا -->
-    <path d="M64 78 L64 16" stroke="#15803D" stroke-width="4.5"/>
-    <path d="M64 32 C46 20 30 26 28 38 C42 44 56 40 64 32 Z" fill="#22C55E" stroke="#15803D" stroke-width="3.5"/>
-    <path d="M62 52 C42 48 26 56 24 68 C38 76 54 70 62 58 Z" fill="#4ADE80" stroke="#15803D" stroke-width="3.5"/>
-    <circle cx="36" cy="64" r="4.5" fill="#FEF08A" stroke="#15803D" stroke-width="2"/>
-    <circle cx="48" cy="60" r="4.5" fill="#FEF08A" stroke="#15803D" stroke-width="2"/>
-    <path d="M66 44 C86 40 102 48 104 60 C90 68 74 62 66 50 Z" fill="#22C55E" stroke="#15803D" stroke-width="3.5"/>
-    <circle cx="78" cy="52" r="4.5" fill="#FEF08A" stroke="#15803D" stroke-width="2"/>
-    <circle cx="90" cy="56" r="4.5" fill="#FEF08A" stroke="#15803D" stroke-width="2"/>
-    <!-- تپه دانه‌ها و بذرهای گرد و خردشده سویا در پایین -->
-    <path d="M22 104 C36 74 92 74 106 104 C92 114 36 114 22 104 Z" fill="#FBBF24" stroke="#92400E" stroke-width="4"/>
-    <circle cx="46" cy="92" r="5" fill="#FEF08A" stroke="#92400E" stroke-width="2.2"/>
-    <circle cx="62" cy="87" r="5" fill="#FDE047" stroke="#92400E" stroke-width="2.2"/>
-    <circle cx="78" cy="91" r="5" fill="#FEF08A" stroke="#92400E" stroke-width="2.2"/>
-    <circle cx="38" cy="102" r="4.5" fill="#FDE047" stroke="#92400E" stroke-width="2"/>
-    <circle cx="54" cy="100" r="5" fill="#FEF9C3" stroke="#92400E" stroke-width="2.2"/>
-    <circle cx="70" cy="101" r="5" fill="#FDE047" stroke="#92400E" stroke-width="2.2"/>
-    <circle cx="86" cy="101" r="4.5" fill="#FEF08A" stroke="#92400E" stroke-width="2"/>
+    <!-- گیاه و غلاف سویا در نیمه بالا (جدا از کاسه) -->
+    <path d="M64 62 L64 14" stroke="#15803D" stroke-width="4.5"/>
+    <path d="M64 26 C46 16 32 22 30 32 C44 38 56 34 64 26 Z" fill="#22C55E" stroke="#15803D" stroke-width="3.5"/>
+    <path d="M62 44 C42 40 28 46 26 56 C40 62 54 58 62 48 Z" fill="#4ADE80" stroke="#15803D" stroke-width="3.5"/>
+    <circle cx="38" cy="52" r="4" fill="#FEF08A" stroke="#15803D" stroke-width="1.8"/>
+    <circle cx="48" cy="49" r="4" fill="#FEF08A" stroke="#15803D" stroke-width="1.8"/>
+    <path d="M66 36 C86 32 100 38 102 48 C88 54 74 50 66 40 Z" fill="#22C55E" stroke="#15803D" stroke-width="3.5"/>
+    <circle cx="78" cy="42" r="4" fill="#FEF08A" stroke="#15803D" stroke-width="1.8"/>
+    <circle cx="88" cy="45" r="4" fill="#FEF08A" stroke="#15803D" stroke-width="1.8"/>
+    <!-- دانه‌های سویا داخل کاسه -->
+    <path d="M30 82 C42 64 86 64 98 82 Z" fill="#FDE047" stroke="#92400E" stroke-width="3.5"/>
+    <circle cx="48" cy="76" r="4.5" fill="#FEF9C3" stroke="#92400E" stroke-width="2"/>
+    <circle cx="64" cy="72" r="4.5" fill="#FACC15" stroke="#92400E" stroke-width="2"/>
+    <circle cx="80" cy="76" r="4.5" fill="#FEF9C3" stroke="#92400E" stroke-width="2"/>
+    <!-- کاسه سفالی جداگانه در پایین -->
+    <path d="M24 82 L104 82 C100 104 86 114 64 114 C42 114 28 104 24 82 Z" fill="#B45309" stroke="#451A03" stroke-width="4.5"/>
+    <line x1="22" y1="82" x2="106" y2="82" stroke="#78350F" stroke-width="5"/>
   </g>
 </svg>
