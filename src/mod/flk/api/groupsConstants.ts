@@ -25,7 +25,7 @@ export const TYPE_DESC: Record<FlockGroupType, string> = {
 };
 
 export const TYPE_OPTIONS = [
-  { value: 'season', label: 'فصلی', icon: '🗓', subtitle: 'گله‌های یه فصل' },
+  { value: 'season', label: 'فصلی', icon: '🗓️', subtitle: 'گله‌های یه فصل' },
   { value: 'breed', label: 'نژادی', icon: '🧬', subtitle: 'گله‌های هم‌نژاد (سن آزاد)' },
   { value: 'cohort', label: 'هم‌دوره', icon: '👥', subtitle: 'گله‌های هم‌دوره (سن نزدیک)' },
   { value: 'farm', label: 'مزرعه', icon: '🏭', subtitle: 'گله‌های یه مزرعه' },

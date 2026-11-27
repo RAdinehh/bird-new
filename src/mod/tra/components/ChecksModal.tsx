@@ -23,8 +23,8 @@ const CAT_LABEL: Record<string, string> = {
 const STATUS_INFO: Record<CheckStatus, { label: string; bg: string; color: string; icon: string }> = {
   pending:    { label: 'در دست',   bg: 'var(--warn-soft)',   color: 'var(--warn)',   icon: '⏳' },
   in_transit: { label: 'در جریان', bg: 'var(--info-soft, rgba(2,132,199,.12))', color: 'var(--info, #0284c7)', icon: '↑' },
-  cleared:    { label: 'وصول شده', bg: 'var(--accent-soft)', color: 'var(--accent)', icon: '✓' },
-  bounced:    { label: 'برگشتی',   bg: 'var(--danger-soft)', color: 'var(--danger)', icon: '✗' },
+  cleared:    { label: 'وصول شده', bg: 'var(--accent-soft)', color: 'var(--accent)', icon: '✅' },
+  bounced:    { label: 'برگشتی',   bg: 'var(--danger-soft)', color: 'var(--danger)', icon: '↩️' },
 };
 
 type FilterKey = 'all' | 'pending' | 'in_transit' | 'cleared' | 'bounced' | 'soon';
