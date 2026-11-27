@@ -23,10 +23,8 @@ const ICON_KEY_TO_EMOJI: Record<string, string> = {
   vaccine: '💉',
   inventory: '📦',
   invoice: '🧾',
-  equipment: '🔧',
   cooling: '❄️',
   lighting: '💡',
-  cage: '🏗️',
 };
 
 export function OptionIcon({ icon, size = 22, color = 'currentColor', style }: OptionIconProps) {

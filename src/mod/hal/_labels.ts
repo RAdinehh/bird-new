@@ -127,7 +127,7 @@ export const EQUIP_LABELS: Record<string, { name: string; icon: string }> = {
   cooler:  { name: 'کولر', icon: 'cooling' },
   drinker: { name: 'آبخوری', icon: 'drinker' },
   feeder:  { name: 'دانخوری', icon: 'feeder' },
-  other:   { name: 'سایر', icon: 'auxiliary' },
+  other:   { name: 'سایر', icon: 'other' },
 };
 
 /** واحد ظرفیت هر نوع تجهیز */

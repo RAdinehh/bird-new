@@ -1,16 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <!-- قلاب و میله آویز بالا -->
-    <path d="M64 10 C70 10 72 18 64 22 L64 32" fill="none" stroke="#475569" stroke-width="5"/>
-    <!-- درپوش مخزن -->
-    <path d="M40 34 C40 28 88 28 88 34 Z" fill="#FACC15" stroke="#B45309" stroke-width="4"/>
-    <!-- بدنه مخزن استوانه‌ای قرمز دانخوری -->
-    <path d="M42 34 L86 34 L83 84 L45 84 Z" fill="#EF4444" stroke="#991B1B" stroke-width="4.5"/>
-    <!-- پره‌های تقسیم‌کننده روی سینی -->
-    <line x1="52" y1="76" x2="48" y2="94" stroke="#B45309" stroke-width="4"/>
-    <line x1="64" y1="76" x2="64" y2="94" stroke="#B45309" stroke-width="4"/>
-    <line x1="76" y1="76" x2="80" y2="94" stroke="#B45309" stroke-width="4"/>
-    <!-- سینی زرد زیرین دانخوری -->
-    <path d="M22 88 L106 88 L100 108 C99 112 95 114 90 114 L38 114 C33 114 29 112 28 108 Z" fill="#FACC15" stroke="#B45309" stroke-width="4.5"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <!-- دسته جعبه تجهیزات -->
+    <path d="M46 34 V24 C46 20 50 18 54 18 H74 C78 18 82 20 82 24 V34" fill="none" stroke="#334155" stroke-width="5.5"/>
+    <!-- بدنه جعبه تجهیزات -->
+    <rect x="16" y="34" width="96" height="74" rx="12" fill="#475569" stroke="#0F172A" stroke-width="4.5"/>
+    <!-- نوار قفل بالایی -->
+    <path d="M16 58 H112" stroke="#1E293B" stroke-width="4"/>
+    <rect x="54" y="50" width="20" height="16" rx="4" fill="#F59E0B" stroke="#78350F" stroke-width="3.5"/>
+    <!-- آچار و چرخ‌دنده روی جعبه -->
+    <circle cx="42" cy="84" r="10" fill="#CBD5E1" stroke="#0F172A" stroke-width="3.5"/>
+    <circle cx="42" cy="84" r="3.5" fill="#475569"/>
+    <path d="M74 76 L92 92 M88 76 L78 86" stroke="#E2E8F0" stroke-width="4.5"/>
   </g>
 </svg>

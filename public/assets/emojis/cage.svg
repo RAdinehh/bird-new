@@ -1,12 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M64 14 L64 24" stroke="#475569" stroke-width="5"/>
-    <path d="M24 54 C24 32 42 24 64 24 C86 24 104 32 104 54 L104 102 L24 102 Z" fill="#E2E8F0" fill-opacity="0.45" stroke="#334155" stroke-width="4.5"/>
-    <rect x="18" y="102" width="92" height="12" rx="4" fill="#64748B" stroke="#1E293B" stroke-width="4"/>
-    <line x1="44" y1="28" x2="44" y2="102" stroke="#475569" stroke-width="3.5"/>
-    <line x1="64" y1="24" x2="64" y2="102" stroke="#475569" stroke-width="3.5"/>
-    <line x1="84" y1="28" x2="84" y2="102" stroke="#475569" stroke-width="3.5"/>
-    <line x1="24" y1="56" x2="104" y2="56" stroke="#475569" stroke-width="3.5"/>
-    <line x1="24" y1="80" x2="104" y2="80" stroke="#475569" stroke-width="3.5"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <!-- قاب اصلی قفس فلزی -->
+    <rect x="18" y="22" width="92" height="80" rx="8" fill="#E2E8F0" stroke="#334155" stroke-width="4.5"/>
+    <!-- پایه‌های قفس -->
+    <line x1="26" y1="102" x2="26" y2="114" stroke="#334155" stroke-width="5"/>
+    <line x1="102" y1="102" x2="102" y2="114" stroke="#334155" stroke-width="5"/>
+    <!-- طبقات افقی قفس -->
+    <line x1="18" y1="62" x2="110" y2="62" stroke="#334155" stroke-width="4.5"/>
+    <!-- میله‌های عمودی توری قفس -->
+    <line x1="36" y1="22" x2="36" y2="102" stroke="#64748B" stroke-width="3"/>
+    <line x1="54" y1="22" x2="54" y2="102" stroke="#64748B" stroke-width="3"/>
+    <line x1="74" y1="22" x2="74" y2="102" stroke="#64748B" stroke-width="3"/>
+    <line x1="92" y1="22" x2="92" y2="102" stroke="#64748B" stroke-width="3"/>
+    <!-- ناودانی جلوی قفس -->
+    <rect x="14" y="57" width="100" height="8" rx="3" fill="#F59E0B" stroke="#78350F" stroke-width="2.5"/>
+    <rect x="14" y="96" width="100" height="8" rx="3" fill="#F59E0B" stroke="#78350F" stroke-width="2.5"/>
   </g>
 </svg>
