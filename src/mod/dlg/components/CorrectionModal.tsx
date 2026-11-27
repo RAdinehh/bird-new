@@ -447,7 +447,7 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
         <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', lineHeight: 1.6 }}>
-          فیلدهای مورد نظر را انتخاب کنید، سپس مقدار جدید را وارد کنید. می‌توانید چند فیلد را هم‌زمان اصلاح کنید.
+          یک یا چند فیلد را انتخاب و مقدار جدید را وارد کنید.
         </div>
 
         {FIELD_GROUPS.map(group => (
