@@ -1,8 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <g stroke-linecap="round" stroke-linejoin="round">
-    <rect x="22" y="28" width="84" height="72" rx="16" fill="#F59E0B" stroke="#78350F" stroke-width="4.5"/>
-    <ellipse cx="48" cy="52" rx="12" ry="7" transform="rotate(-15 48 52)" fill="#FEF3C7" stroke="#92400E" stroke-width="3"/>
-    <ellipse cx="78" cy="50" rx="12" ry="7" transform="rotate(15 78 50)" fill="#FDE68A" stroke="#92400E" stroke-width="3"/>
-    <ellipse cx="64" cy="76" rx="14" ry="8" fill="#FEF3C7" stroke="#92400E" stroke-width="3"/>
+    <!-- توده ریز سبوس و گندم آسیاب‌شده در دهانه کیسه -->
+    <path d="M28 46 C36 26 92 26 100 46 Z" fill="#FDE68A" stroke="#92400E" stroke-width="3.8"/>
+    <circle cx="42" cy="39" r="3" fill="#B45309"/>
+    <circle cx="52" cy="35" r="2.5" fill="#78350F"/>
+    <circle cx="62" cy="38" r="3.2" fill="#D97706"/>
+    <circle cx="73" cy="35" r="2.6" fill="#78350F"/>
+    <circle cx="84" cy="40" r="3" fill="#B45309"/>
+    <circle cx="58" cy="43" r="2.4" fill="#92400E"/>
+    <circle cx="76" cy="42" r="2.5" fill="#B45309"/>
+    <!-- کیسه سبوس -->
+    <path d="M24 46 H104 L98 106 C97 111 93 114 87 114 H41 C35 114 31 111 30 106 Z" fill="#D97706" stroke="#78350F" stroke-width="4.5"/>
+    <circle cx="46" cy="76" r="3" fill="#FEF3C7"/>
+    <circle cx="64" cy="72" r="3.5" fill="#FEF3C7"/>
+    <circle cx="82" cy="76" r="3" fill="#FEF3C7"/>
+    <circle cx="55" cy="88" r="3" fill="#FDE68A"/>
+    <circle cx="73" cy="88" r="3" fill="#FDE68A"/>
   </g>
 </svg>

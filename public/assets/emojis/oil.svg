@@ -1,6 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <g stroke-linecap="round" stroke-linejoin="round">
-    <path d="M64 16 C64 16 30 58 30 84 C30 102 45 114 64 114 C83 114 98 102 98 84 C98 58 64 16 64 16 Z" fill="#FACC15" stroke="#B45309" stroke-width="4.5"/>
-    <path d="M48 70 C45 78 46 89 53 96" fill="none" stroke="#FEF9C3" stroke-width="4.5"/>
+    <!-- بطری شیشه‌ای روغن -->
+    <rect x="34" y="18" width="20" height="14" rx="4" fill="#CBD5E1" stroke="#334155" stroke-width="3.8"/>
+    <path d="M36 32 H52 L62 46 V104 C62 109 58 112 53 112 H35 C30 112 26 109 26 104 V46 Z" fill="#FEF9C3" fill-opacity="0.75" stroke="#475569" stroke-width="4.2"/>
+    <path d="M29 60 H59 V103 C59 107 56 109 52 109 H36 C32 109 29 107 29 103 Z" fill="#FACC15" stroke="#B45309" stroke-width="2.5"/>
+    <!-- قطره روغن در کنار بطری -->
+    <path d="M88 46 C88 46 68 70 68 86 C68 98 77 108 88 108 C99 108 108 98 108 86 C108 70 88 46 88 46 Z" fill="#FBBF24" stroke="#92400E" stroke-width="4.2"/>
+    <path d="M78 78 C76 84 77 92 82 97" fill="none" stroke="#FEF9C3" stroke-width="3.5"/>
   </g>
 </svg>
