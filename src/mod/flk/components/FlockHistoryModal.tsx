@@ -3,6 +3,7 @@
  * ۳ تب با سلسله‌مراتب منطقی + موجودی تفکیک‌شده
  */
 import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
+import SmartSelect from '../../../shr/components/SmartSelect';
 
 
 
@@ -30,10 +31,10 @@ import { calculateMortality } from '../../../shr/calc/formulas/mortality';
 import { calculateStockingDensity } from '../../../shr/calc/formulas/stocking';
 import { useHal } from '../../hal/store';
 
-const REASON_OPTIONS: { value: FlockEventReasonCode; label: string }[] = [
-  { value: 'data_entry_error', label: 'خطای ثبت' },
-  { value: 'found_stock', label: 'موجودی پیدا شده' },
-  { value: 'unknown', label: 'نامشخص' },
+const REASON_OPTIONS: { value: FlockEventReasonCode; label: string; icon: string }[] = [
+  { value: 'data_entry_error', label: 'خطای ثبت', icon: 'invoice' },
+  { value: 'found_stock', label: 'موجودی پیدا شده', icon: 'inventory' },
+  { value: 'unknown', label: 'نامشخص', icon: 'unknown' },
 ];
 
 const TYPE_INFO: Record<FlockEventType, { icon: string; label: string; tone: string }> = {
@@ -529,23 +530,13 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>دلیل</span>
-              <Select
-                value={reasonCode}
-                onChange={e => setReasonCode(e.target.value as FlockEventReasonCode)}
-                style={{
-                  background: '#ffffff',
-                  border: '1px solid var(--warn)',
-                  borderRadius: 'var(--r-md)',
-                  height: 40,
-                  padding: '0 var(--sp-3)',
-                  fontFamily: 'inherit',
-                  fontSize: 'var(--fs-sm)',
-                  color: 'var(--text)',
-                  width: '100%',
-                }}
-              >
-                {REASON_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </Select>
+              <SmartSelect
+                      value={reasonCode}
+                      onChange={v => setReasonCode(v as FlockEventReasonCode)}
+                      options={REASON_OPTIONS}
+                      modalTitle="دلیل اصلاح"
+                      height={40}
+                    />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}>توضیح (اختیاری)</span>

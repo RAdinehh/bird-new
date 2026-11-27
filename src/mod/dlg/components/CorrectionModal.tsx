@@ -59,13 +59,14 @@ function hasMultiDeaths(log: DailyLog | null): boolean {
   return (log?.deaths?.length || 0) > 1;
 }
 
-const REASONS = [
-  'اشتباه شمارش',
-  'اشتباه خواندن سنسور',
-  'تایپ اشتباه',
-  'فراموشی ثبت',
-  'سایر',
+const REASON_OPTIONS = [
+  { value: 'اشتباه شمارش', label: 'اشتباه شمارش', icon: 'stats' },
+  { value: 'اشتباه خواندن سنسور', label: 'اشتباه خواندن سنسور', icon: 'sensor' },
+  { value: 'تایپ اشتباه', label: 'تایپ اشتباه', icon: 'invoice' },
+  { value: 'فراموشی ثبت', label: 'فراموشی ثبت', icon: 'other' },
+  { value: 'سایر', label: 'سایر', icon: 'other' },
 ];
+const REASONS = REASON_OPTIONS.map(r => r.value);
 
 const WEIGHT_GENDER_OPTS = [
   { value: '', label: 'نامشخص', icon: 'unknown' },
@@ -496,7 +497,7 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
           <SmartSelect
             value={reason}
             onChange={v => setReason(v)}
-            options={REASONS.map(r => ({ value: r, label: r }))}
+            options={REASON_OPTIONS}
             modalTitle="دلیل اصلاح"
           />
         </Field>
