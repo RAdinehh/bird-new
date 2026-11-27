@@ -1,11 +1,9 @@
-import { OptionIcon } from '../../../shr/components/OptionIcon';
 /**
  * FlocksKpiCards — ۳ کارت KPI بالای لیست گله‌ها
- * الگو: FOUNDATION-PATTERNS ب۲۲
+ * متصل به کامپوننت مشترک KpiCard
  */
+import { KpiCard } from '../../../shr/components/ui/KpiCard';
 import { useFormat } from '../../../shr/units/useFormat';
-
-import { toFa } from '../../../shr/utils/fa';
 
 interface Props {
   totalFlocks: number;
@@ -13,67 +11,9 @@ interface Props {
   totalValue: number;
 }
 
-interface KpiCardProps {
-  icon: string;
-  label: string;
-  value: string;
-  tone: 'accent' | 'purple' | 'info';
-}
-
-function KpiCard({ icon, label, value, tone }: KpiCardProps) {
-  const color = `var(--${tone})`;
-  const soft = tone === 'accent' ? 'var(--accent-soft)' : tone === 'purple' ? 'var(--purple-soft)' : 'var(--info-soft)';
-  return (
-    <div style={{
-      padding: 'var(--pad-tight)',
-      background: 'var(--card-solid)',
-      border: '1px solid var(--border)',
-      borderRadius: 'var(--r-md)',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 4,
-      minWidth: 0,
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <span style={{
-          width: 22, height: 22,
-          borderRadius: 'var(--r-sm)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: soft, color,
-          fontSize: 'var(--fs-sm)',
-          flexShrink: 0,
-        }}><OptionIcon icon={icon} size={15} /></span>
-        <span style={{
-          fontSize: 'var(--fs-2xs)',
-          color: 'var(--muted)',
-          fontWeight: 600,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}>{label}</span>
-      </div>
-      <div style={{
-        fontSize: 'var(--fs-sm)',
-        fontWeight: 700,
-        color,
-        fontVariantNumeric: 'tabular-nums',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-      }}>{value}</div>
-    </div>
-  );
-}
-
 export default function FlocksKpiCards({ totalFlocks, totalBirds, totalValue }: Props) {
   const fmt = useFormat();
   if (totalFlocks === 0) return null;
-
-  const valueText = totalValue >= 1_000_000_000
-    ? `${fmt.money(totalValue)}`
-    : totalValue >= 1_000_000
-      ? `${fmt.money(totalValue)}`
-      : `${fmt.money(totalValue)}`;
 
   return (
     <div style={{
@@ -84,19 +24,22 @@ export default function FlocksKpiCards({ totalFlocks, totalBirds, totalValue }: 
       <KpiCard
         icon="flocks_group"
         label="کل گله‌ها"
-        value={`${fmt.count(totalFlocks)} گله`}
+        value={fmt.count(totalFlocks)}
+        unit="گله"
         tone="accent"
       />
       <KpiCard
         icon="flock"
         label="کل پرنده‌ها"
-        value={`${fmt.count(totalBirds)} پرنده`}
+        value={fmt.count(totalBirds)}
+        unit="پرنده"
         tone="purple"
       />
       <KpiCard
         icon="💰"
         label="ارزش کل"
-        value={`${valueText} ت`}
+        value={fmt.money(totalValue)}
+        unit="ت"
         tone="info"
       />
     </div>
