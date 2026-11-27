@@ -57,6 +57,7 @@ export default function AutocompleteSheet({
   const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
   const [typedError, setTypedError] = useState<string | null>(null);
   const [matched, setMatched] = useState(false);
+  const [pickedOpt, setPickedOpt] = useState<AutoOption | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const matchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -105,6 +106,7 @@ export default function AutocompleteSheet({
       setOpen(false);
       return;
     }
+    setPickedOpt(opt);
     onChange(opt.label);
     onSelect(opt);
     setOpen(false);
