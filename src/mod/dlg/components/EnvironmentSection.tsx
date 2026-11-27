@@ -78,9 +78,9 @@ export default function EnvironmentSection({ form, setForm, vErrors, showError, 
             value={form.ventilation}
             onChange={v => setForm({ ...form, ventilation: v })}
             options={[
-              { value: 'ok', label: 'مناسب', icon: 'env_vent_ok' },
-              { value: 'low', label: 'ضعیف', icon: 'env_vent_low' },
-              { value: 'high', label: 'شدید', icon: 'env_vent_high' },
+              { value: 'ok', label: 'مناسب' },
+              { value: 'low', label: 'ضعیف' },
+              { value: 'high', label: 'شدید' },
             ]}
             modalTitle="وضعیت تهویه"
           />
@@ -90,9 +90,9 @@ export default function EnvironmentSection({ form, setForm, vErrors, showError, 
             value={form.litter}
             onChange={v => setForm({ ...form, litter: v })}
             options={[
-              { value: 'dry', label: 'خشک', icon: 'litter_straw' },
-              { value: 'wet', label: 'مرطوب', icon: 'env_litter_wet' },
-              { value: 'clumped', label: 'کلوخه', icon: 'env_litter_clumped' },
+              { value: 'dry', label: 'خشک' },
+              { value: 'wet', label: 'مرطوب' },
+              { value: 'clumped', label: 'کلوخه' },
             ]}
             modalTitle="وضعیت بستر"
           />
@@ -105,9 +105,9 @@ export default function EnvironmentSection({ form, setForm, vErrors, showError, 
             value={form.behavior}
             onChange={v => setForm({ ...form, behavior: v })}
             options={[
-              { value: 'active', label: 'فعال', icon: 'env_behav_active' },
-              { value: 'lethargic', label: 'بی‌حال', icon: 'env_behav_lethargic' },
-              { value: 'excited', label: 'پرهیجان', icon: 'env_behav_excited' },
+              { value: 'active', label: 'فعال' },
+              { value: 'lethargic', label: 'بی‌حال' },
+              { value: 'excited', label: 'پرهیجان' },
             ]}
             modalTitle="رفتار گله"
           />
@@ -117,8 +117,8 @@ export default function EnvironmentSection({ form, setForm, vErrors, showError, 
             value={form.distribution}
             onChange={v => setForm({ ...form, distribution: v })}
             options={[
-              { value: 'uniform', label: 'یکنواخت', icon: 'env_dist_uniform' },
-              { value: 'cornered', label: 'گوشه‌گیر', icon: 'env_dist_cornered' },
+              { value: 'uniform', label: 'یکنواخت' },
+              { value: 'cornered', label: 'گوشه‌گیر' },
             ]}
             modalTitle="توزیع در سالن"
           />
@@ -128,9 +128,9 @@ export default function EnvironmentSection({ form, setForm, vErrors, showError, 
             value={form.sound}
             onChange={v => setForm({ ...form, sound: v })}
             options={[
-              { value: 'normal', label: 'طبیعی', icon: 'env_sound_normal' },
-              { value: 'cough', label: 'سرفه', icon: 'env_sound_cough' },
-              { value: 'sneeze', label: 'عطسه', icon: 'env_sound_sneeze' },
+              { value: 'normal', label: 'طبیعی' },
+              { value: 'cough', label: 'سرفه' },
+              { value: 'sneeze', label: 'عطسه' },
             ]}
             modalTitle="صدای گله"
           />
