@@ -49,7 +49,7 @@ const CATEGORY_GROUPS: Record<string, { label: string; icon: string; order: numb
 };
 
 const KIND_EMOJI: Record<string, string> = {
-  chicken: '🐔', duck: '🦆', turkey: '🦃', quail: '🐦', goose: '🦢',
+  chicken: 'chicken', duck: 'duck', turkey: 'turkey', quail: 'quail', goose: 'duck',
 };
 
 export default function BreedNameField({

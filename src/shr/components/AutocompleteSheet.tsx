@@ -282,7 +282,7 @@ export default function AutocompleteSheet({
                 {g.items.map(opt => (
                   <SheetItem
                     key={opt.value}
-                    icon={opt.icon}
+                    icon={opt.icon ? <OptionIcon icon={opt.icon} size={22} /> : undefined}
                     title={opt.label}
                     selected={opt.label.trim().toLowerCase() === value.trim().toLowerCase()}
                     onClick={() => handlePick(opt)}
@@ -294,7 +294,7 @@ export default function AutocompleteSheet({
             toShow.map(opt => (
               <SheetItem
                 key={opt.value}
-                icon={opt.icon}
+                icon={opt.icon ? <OptionIcon icon={opt.icon} size={22} /> : undefined}
                 title={opt.label}
                 selected={opt.label.trim().toLowerCase() === value.trim().toLowerCase()}
                 onClick={() => handlePick(opt)}

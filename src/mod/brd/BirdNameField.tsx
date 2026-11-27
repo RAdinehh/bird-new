@@ -53,7 +53,7 @@ export default function BirdNameField({ value, onChange, onPick, error, openMana
       opts.push({
         value: 'species:' + sp.kind,
         label: sp.nameFa,
-        icon: sp.icon,
+        icon: ['chicken', 'duck', 'turkey', 'quail'].includes(sp.kind) ? sp.kind : (sp.icon || 'chicken'),
         group: sp.builtIn ? 'builtin' : 'custom',
         groupLabel: sp.builtIn ? 'پرنده‌های اصلی' : 'پرنده‌های سفارشی',
         groupIcon: sp.builtIn ? '🐔' : '⭐',
