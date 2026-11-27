@@ -14,6 +14,7 @@ import { useFormat, getGlobalFormat } from '../../../shr/units/useFormat';
 import { useEffect, useMemo, useState } from 'react';
 import { Modal, Btn, BtnRow, Field, Input, Grid2 } from '../../../shr/components/ui';
 import type { DailyLog } from '../store';
+import { useFlk, isLayingReady } from '../../flk/store';
 import { toEn, toFa } from '../../../shr/utils/fa';
 import { v4 as uuid } from 'uuid';
 import { applyCorrections } from '../api/applyCorrections';
@@ -44,6 +45,7 @@ const FIELD_GROUPS = [
 ] as const;
 
 type CorrectableKey = typeof CORRECTABLE_FIELDS[number]['key'];
+const EGG_KEYS: CorrectableKey[] = ['eatingEggs', 'fertileEggs', 'brokenEggs', 'otherEggs'];
 
 // هم‌خانواده‌ها (مثل ثبت روزانه)
 const PAIRS: [CorrectableKey, CorrectableKey][] = [
@@ -99,6 +101,37 @@ function formatOldValue(key: CorrectableKey, val: any): string {
 
 export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
   const fmt = useFormat();
+  const { flocks } = useFlk();
+  const canShowEggFields = useMemo(() => {
+    if (!log) return false;
+    const hasExistingEggData = EGG_KEYS.some(k => {
+      const v = (log as any)[k];
+      return v != null && v !== '' && Number(v) > 0;
+    });
+    if (hasExistingEggData) return true;
+    const flock = flocks.find(f => f.id === log.flockId);
+    if (!flock) return false;
+    const isLayerType = flock.type === 'layer' || flock.type === 'breeder';
+    return isLayerType && isLayingReady(flock);
+  }, [flocks, log]);
+
+  const availableFields = useMemo(
+    () => CORRECTABLE_FIELDS.filter(f => canShowEggFields || !EGG_KEYS.includes(f.key)),
+    [canShowEggFields]
+  );
+
+  useEffect(() => {
+    if (!canShowEggFields) {
+      setSelected(prev => {
+        const next = new Set(prev);
+        let changed = false;
+        for (const ek of EGG_KEYS) {
+          if (next.delete(ek)) changed = true;
+        }
+        return changed ? next : prev;
+      });
+    }
+  }, [canShowEggFields]);
   const [selected, setSelected] = useState<Set<CorrectableKey>>(new Set());
   const [values, setValues] = useState<Partial<Record<CorrectableKey, string>>>({});
   const [reason, setReason] = useState<string>(REASONS[0]);
@@ -238,7 +271,7 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
   }
 
     const renderField = (key: CorrectableKey) => {
-      const field = CORRECTABLE_FIELDS.find(f => f.key === key);
+      const field = availableFields.find(f => f.key === key);
       if (!field) return null;
       const oldVal = (effectiveLog as any)[key];
       const isCh = isChanged(key);
