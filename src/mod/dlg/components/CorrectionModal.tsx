@@ -237,137 +237,164 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
     }
   }
 
-  const renderField = (key: CorrectableKey) => {
-    const field = CORRECTABLE_FIELDS.find(f => f.key === key);
-    if (!field) return null;
-    const oldVal = (effectiveLog as any)[key];
-    const isCh = isChanged(key);
+    const renderField = (key: CorrectableKey) => {
+      const field = CORRECTABLE_FIELDS.find(f => f.key === key);
+      if (!field) return null;
+      const oldVal = (effectiveLog as any)[key];
+      const isCh = isChanged(key);
 
-    return (
-      <div
-        key={key}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: 'var(--sp-2)',
-          padding: '6px 0',
-          minHeight: 48,
-          minWidth: 0,
-        }}
-      >
-        <div style={{ flex: '1 1 110px', minWidth: 100, display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <span style={{
-            fontSize: 'var(--fs-sm)',
-            fontWeight: 700,
-            color: 'var(--text)',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}>
-            {stripEmoji(field.label)}
-          </span>
-          {isCh && (
-            <span style={{
-              fontSize: 'var(--fs-2xs, 10px)',
-              color: 'var(--accent)',
-              background: 'var(--accent-soft, rgba(59,130,246,0.15))',
-              padding: '1px 6px',
-              borderRadius: '999px',
-              fontWeight: 700,
-              alignSelf: 'flex-start',
-              lineHeight: 1.4,
-            }}>
-              تغییر کرد
-            </span>
-          )}
-        </div>
-
+      return (
         <div
+          key={key}
           style={{
             display: 'flex',
-            alignItems: 'stretch',
-            minHeight: 36,
-            flex: '1 1 190px',
-            maxWidth: 230,
-            minWidth: 170,
-            border: `1px solid ${isCh ? 'var(--accent)' : 'var(--border)'}`,
-            borderRadius: 'var(--r-sm)',
-            background: 'var(--card)',
+            alignItems: 'center',
+            gap: 'var(--sp-2)',
+            padding: '6px 0',
+            minHeight: 48,
+            width: '100%',
+            minWidth: 0,
           }}
         >
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '0 6px', minWidth: 0 }}>
-            {key === 'weightGender' ? (
-              <SmartSelect
-                value={values[key] || ''}
-                onChange={v => setVal(key, v)}
-                options={WEIGHT_GENDER_OPTS}
-                placeholder="نامشخص"
-                modalTitle="جنسیت وزن‌کشی"
-                compact
-                height={32}
-              />
-            ) : (
-              <>
-                <input
-                  type="text"
-                  inputMode="decimal"
-                  value={fmt.code(values[key] || '')}
-                  onChange={e => setVal(key, toEn(e.target.value))}
-                  placeholder=""
-                  style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontFamily: 'monospace', fontSize: 'var(--fs-sm)', color: 'var(--text)', textAlign: 'center', minWidth: 0, fontWeight: 700 }}
-                />
-                {field.unit && (
-                  <span style={{ fontSize: 'var(--fs-2xs, 10px)', color: 'var(--muted)', fontWeight: 600, marginRight: 4, whiteSpace: 'nowrap' }}>
-                    {field.unit}
-                  </span>
-                )}
-              </>
+          <div style={{ width: 96, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+            <span
+              style={{
+                fontSize: 'var(--fs-sm)',
+                fontWeight: 700,
+                color: 'var(--text)',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {stripEmoji(field.label)}
+            </span>
+            {isCh && (
+              <span
+                style={{
+                  fontSize: 'var(--fs-2xs, 10px)',
+                  color: 'var(--accent)',
+                  background: 'var(--accent-soft, rgba(59,130,246,0.15))',
+                  padding: '1px 6px',
+                  borderRadius: '999px',
+                  fontWeight: 700,
+                  alignSelf: 'flex-start',
+                  lineHeight: 1.4,
+                }}
+              >
+                تغییر کرد
+              </span>
             )}
           </div>
+
           <div
             style={{
               flex: 1,
+              minWidth: 0,
+              minHeight: 38,
               display: 'flex',
+              alignItems: 'stretch',
+              border: `1px solid ${isCh ? 'var(--accent)' : 'var(--border)'}`,
+              borderRadius: 'var(--r-sm)',
+              background: 'var(--card)',
+              overflow: 'hidden',
+            }}
+          >
+            <div style={{ flex: 1.25, minWidth: 0, display: 'flex', alignItems: 'center', padding: '0 6px' }}>
+              {key === 'weightGender' ? (
+                <SmartSelect
+                  value={values[key] || ''}
+                  onChange={v => setVal(key, v)}
+                  options={WEIGHT_GENDER_OPTS}
+                  placeholder="نامشخص"
+                  modalTitle="جنسیت وزن‌کشی"
+                  height={34}
+                />
+              ) : (
+                <>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={fmt.code(values[key] || '')}
+                    onChange={e => setVal(key, toEn(e.target.value))}
+                    placeholder="جدید"
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      border: 'none',
+                      outline: 'none',
+                      background: 'transparent',
+                      fontFamily: 'monospace',
+                      fontSize: 'var(--fs-sm)',
+                      color: 'var(--text)',
+                      textAlign: 'center',
+                      fontWeight: 700,
+                    }}
+                  />
+                  {field.unit && (
+                    <span
+                      style={{
+                        fontSize: 'var(--fs-2xs, 10px)',
+                        color: 'var(--muted)',
+                        fontWeight: 600,
+                        marginRight: 4,
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {field.unit}
+                    </span>
+                  )}
+                </>
+              )}
+            </div>
+
+            <div
+              style={{
+                flex: 0.9,
+                minWidth: 54,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRight: `1px solid ${isCh ? 'var(--accent)' : 'var(--border)'}`,
+                color: (oldVal != null && oldVal !== '') ? 'var(--danger)' : 'var(--muted)',
+                fontFamily: 'monospace',
+                fontSize: 'var(--fs-sm)',
+                fontWeight: 700,
+                padding: '0 4px',
+                whiteSpace: 'nowrap',
+              }}
+              title="مقدار قبلی"
+            >
+              {formatOldValue(key, oldVal) || '—'}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => toggle(key)}
+            title="حذف از انتخاب"
+            style={{
+              width: 28,
+              height: 28,
+              flexShrink: 0,
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--r-sm)',
+              background: 'var(--card)',
+              color: 'var(--muted)',
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              fontSize: 'var(--fs-xs)',
+              display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              borderRight: `1px solid ${isCh ? 'var(--accent)' : 'var(--border)'}`,
-              background: 'transparent',
-              color: (oldVal != null && oldVal !== '') ? 'var(--danger)' : 'transparent',
-              fontFamily: 'monospace',
-              fontSize: 'var(--fs-sm)',
-              fontWeight: 700,
-              minWidth: 0,
-              padding: '0 4px',
             }}
-            title="مقدار قبلی"
           >
-            {formatOldValue(key, oldVal)}
-          </div>
+            ✕
+          </button>
         </div>
-
-        <button
-          type="button"
-          onClick={() => toggle(key)}
-          title="حذف از انتخاب"
-          style={{
-            width: 24,
-            height: 24,
-            flexShrink: 0,
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--r-sm)',
-            background: 'var(--card)',
-            color: 'var(--muted)',
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-            fontSize: 'var(--fs-2xs, 10px)',
-          }}
-        >
-          ✕
-        </button>
-      </div>
-    );
-  };
+      );
+    };
 
   return (
     <Modal
@@ -484,13 +511,7 @@ export default function CorrectionModal({ open, onClose, log, onSave }: Props) {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)' }}>
-              {groups.map((group, idx) => {
-              const fields = group.map(key => renderField(key));
-              if (group.length > 1) {
-                return <Grid2 key={idx}>{fields}</Grid2>;
-              }
-              return <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>{fields}</div>;
-            })}
+              {Array.from(selected).map(key => renderField(key))}
             </div>
           </div>
         )}
