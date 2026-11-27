@@ -1,15 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <!-- دو ساقه متقاطع گندم -->
-    <path d="M36 114 L82 26" stroke="#B45309" stroke-width="5"/>
-    <path d="M92 114 L46 26" stroke="#D97706" stroke-width="5"/>
-    <!-- خوشه اصلی پرپشت گندم طلایی -->
-    <ellipse cx="52" cy="74" rx="9" ry="15" transform="rotate(-35 52 74)" fill="#FBBF24" stroke="#92400E" stroke-width="3.5"/>
-    <ellipse cx="76" cy="74" rx="9" ry="15" transform="rotate(35 76 74)" fill="#FBBF24" stroke="#92400E" stroke-width="3.5"/>
-    <ellipse cx="52" cy="52" rx="9" ry="15" transform="rotate(-35 52 52)" fill="#FACC15" stroke="#92400E" stroke-width="3.5"/>
-    <ellipse cx="76" cy="52" rx="9" ry="15" transform="rotate(35 76 52)" fill="#FACC15" stroke="#92400E" stroke-width="3.5"/>
-    <ellipse cx="54" cy="32" rx="8" ry="14" transform="rotate(-25 54 32)" fill="#FDE047" stroke="#92400E" stroke-width="3.5"/>
-    <ellipse cx="74" cy="32" rx="8" ry="14" transform="rotate(25 74 32)" fill="#FDE047" stroke="#92400E" stroke-width="3.5"/>
-    <ellipse cx="64" cy="20" rx="7" ry="13" fill="#FEF08A" stroke="#92400E" stroke-width="3.5"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M34 114 L84 22" stroke="#B45309" stroke-width="5"/>
+    <path d="M94 114 L44 22" stroke="#D97706" stroke-width="5"/>
+    <path d="M64 116 L64 16" stroke="#92400E" stroke-width="4.5"/>
+    <ellipse cx="48" cy="84" rx="9" ry="15" transform="rotate(-38 48 84)" fill="#F59E0B" stroke="#92400E" stroke-width="3.5"/>
+    <ellipse cx="80" cy="84" rx="9" ry="15" transform="rotate(38 80 84)" fill="#F59E0B" stroke="#92400E" stroke-width="3.5"/>
+    <ellipse cx="49" cy="63" rx="9" ry="15" transform="rotate(-35 49 63)" fill="#FBBF24" stroke="#92400E" stroke-width="3.5"/>
+    <ellipse cx="79" cy="63" rx="9" ry="15" transform="rotate(35 79 63)" fill="#FBBF24" stroke="#92400E" stroke-width="3.5"/>
+    <ellipse cx="51" cy="43" rx="8.5" ry="14" transform="rotate(-30 51 43)" fill="#FACC15" stroke="#92400E" stroke-width="3.5"/>
+    <ellipse cx="77" cy="43" rx="8.5" ry="14" transform="rotate(30 77 43)" fill="#FACC15" stroke="#92400E" stroke-width="3.5"/>
+    <ellipse cx="54" cy="26" rx="7.5" ry="13" transform="rotate(-22 54 26)" fill="#FDE047" stroke="#92400E" stroke-width="3.2"/>
+    <ellipse cx="74" cy="26" rx="7.5" ry="13" transform="rotate(22 74 26)" fill="#FDE047" stroke="#92400E" stroke-width="3.2"/>
+    <ellipse cx="64" cy="18" rx="7" ry="12" fill="#FEF08A" stroke="#92400E" stroke-width="3.2"/>
   </g>
 </svg>

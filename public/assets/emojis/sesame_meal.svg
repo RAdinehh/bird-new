@@ -1,17 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <!-- سمت چپ: گیاه کنجد (کاملاً جدا از پیاله) -->
-    <path d="M36 108 L36 20" stroke="#166534" stroke-width="4.5"/>
-    <path d="M32 36 C20 28 12 34 12 42 C22 46 28 42 32 36 Z" fill="#FCE7F3" stroke="#BE185D" stroke-width="3.5"/>
-    <path d="M40 28 C52 20 58 26 58 34 C48 38 42 34 40 28 Z" fill="#FFF1F2" stroke="#BE185D" stroke-width="3.5"/>
-    <rect x="18" y="54" width="10" height="18" rx="5" transform="rotate(-18 23 63)" fill="#4ADE80" stroke="#15803D" stroke-width="3"/>
-    <rect x="42" y="50" width="10" height="18" rx="5" transform="rotate(18 47 59)" fill="#4ADE80" stroke="#15803D" stroke-width="3"/>
-    <!-- سمت راست: پیاله جداگانه بذرهای کنجد -->
-    <path d="M64 80 C72 64 108 64 116 80 Z" fill="#FEF3C7" stroke="#92400E" stroke-width="3.5"/>
-    <path d="M77 74 C79 70 82 74 80 78 C78 80 75 77 77 74 Z" fill="#FFFFFF" stroke="#B45309" stroke-width="1.8"/>
-    <path d="M89 70 C91 66 94 70 92 74 C90 76 87 73 89 70 Z" fill="#F59E0B" stroke="#78350F" stroke-width="1.8"/>
-    <path d="M101 74 C103 70 106 74 104 78 C102 80 99 77 101 74 Z" fill="#FFFFFF" stroke="#B45309" stroke-width="1.8"/>
-    <path d="M60 80 L120 80 C116 100 106 108 90 108 C74 108 64 100 60 80 Z" fill="#B45309" stroke="#451A03" stroke-width="4.5"/>
-    <line x1="58" y1="80" x2="122" y2="80" stroke="#78350F" stroke-width="4.5"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="44" cy="54" rx="12" ry="20" transform="rotate(-24 44 54)" fill="#FFFBEB" stroke="#92400E" stroke-width="4"/>
+    <ellipse cx="82" cy="54" rx="12" ry="20" transform="rotate(24 82 54)" fill="#FDE68A" stroke="#92400E" stroke-width="4"/>
+    <ellipse cx="64" cy="78" rx="13" ry="22" fill="#FEF3C7" stroke="#92400E" stroke-width="4.2"/>
   </g>
 </svg>

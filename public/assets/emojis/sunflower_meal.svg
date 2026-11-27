@@ -1,16 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <!-- سمت چپ: گل آفتابگردان (کاملاً جدا از پیاله) -->
-    <path d="M36 108 L36 52" stroke="#15803D" stroke-width="4.5"/>
-    <path d="M36 82 C24 76 16 80 14 88 C24 90 32 88 36 82 Z" fill="#22C55E" stroke="#15803D" stroke-width="3"/>
-    <circle cx="36" cy="44" r="22" fill="#FACC15" stroke="#CA8A04" stroke-width="4"/>
-    <circle cx="36" cy="44" r="11" fill="#451A03" stroke="#78350F" stroke-width="3"/>
-    <!-- سمت راست: پیاله جداگانه تخمه‌های آفتابگردان -->
-    <path d="M64 80 C72 64 108 64 116 80 Z" fill="#D97706" stroke="#78350F" stroke-width="3.5"/>
-    <ellipse cx="78" cy="75" rx="3.5" ry="6.5" transform="rotate(-25 78 75)" fill="#0F172A" stroke="#F8FAFC" stroke-width="1.6"/>
-    <ellipse cx="90" cy="71" rx="3.5" ry="6.5" transform="rotate(10 90 71)" fill="#1E293B" stroke="#F8FAFC" stroke-width="1.6"/>
-    <ellipse cx="102" cy="75" rx="3.5" ry="6.5" transform="rotate(25 102 75)" fill="#0F172A" stroke="#F8FAFC" stroke-width="1.6"/>
-    <path d="M60 80 L120 80 C116 100 106 108 90 108 C74 108 64 100 60 80 Z" fill="#B45309" stroke="#451A03" stroke-width="4.5"/>
-    <line x1="58" y1="80" x2="122" y2="80" stroke="#78350F" stroke-width="4.5"/>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="44" cy="66" rx="18" ry="30" transform="rotate(-22 44 66)" fill="#1E293B" stroke="#0F172A" stroke-width="4.5"/>
+    <ellipse cx="44" cy="66" rx="8" ry="18" transform="rotate(-22 44 66)" fill="#F8FAFC"/>
+    <ellipse cx="82" cy="64" rx="18" ry="30" transform="rotate(22 82 64)" fill="#334155" stroke="#0F172A" stroke-width="4.5"/>
+    <ellipse cx="82" cy="64" rx="8" ry="18" transform="rotate(22 82 64)" fill="#F8FAFC"/>
+    <ellipse cx="64" cy="48" rx="15" ry="25" fill="#FBBF24" stroke="#92400E" stroke-width="4"/>
   </g>
 </svg>
