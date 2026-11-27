@@ -167,7 +167,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     if (typeof f.currentCount === 'number') parts.push(getGlobalFormat().count(f.currentCount) + ' قطعه');
     const age = getAgeDays(f);
     if (age != null && age >= 0) parts.push('سن ' + getGlobalFormat().day(age) + ' روز');
-    return { value: f.id, label: f.name, subtitle: parts.join(' · ') || 'گله فعال', icon: 'flock' };
+    return { value: f.id, label: f.name, icon: 'flock' };
   });
 
   // 🎯 فیلتر آبشاری گله‌ها: فقط گله‌هایی که با پرنده/نژاد انتخاب‌شده مطابقت دارند
@@ -186,7 +186,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     const bBreeds = breeds.filter((br: any) => br.birdId === b.id);
     const icon = b.icon || ((b.name || '').includes('اردک') ? 'duck' : (b.name || '').includes('بوقلمون') ? 'turkey' : (b.name || '').includes('بلدرچین') ? 'quail' : 'chicken');
     const sub = bBreeds.length > 0 ? `${toFa(bBreeds.length)} نژاد ثبت‌شده (${bBreeds.slice(0, 2).map((x: any) => x.name).join('، ')})` : 'گونه پرنده پرورشی';
-    return { value: b.id, label: b.name, subtitle: sub, icon };
+    return { value: b.id, label: b.name, icon };
   });
 
   const breedOptions = breedsForBird.map((b: any) => {
@@ -195,7 +195,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     const parentBird = birds.find((x: any) => x.id === b.birdId);
     const subParts = [parentBird?.name, purposeLabels.length > 0 ? `کاربری: ${purposeLabels.join('، ')}` : ''].filter(Boolean);
     const icon = (b.purposes || []).includes('layer') ? 'egg' : (b.purposes || []).includes('breeder') ? 'fertile_egg' : 'chicken';
-    return { value: b.id, label: b.name, subtitle: subParts.join(' · ') || 'نژاد پرنده', icon };
+    return { value: b.id, label: b.name, icon };
   });
 
   const hallOptions = halls.filter((h: any) => !h.archived).map((h: any) => {
@@ -205,7 +205,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     if (h.capacity) parts.push(`ظرفیت ${getGlobalFormat().count(h.capacity)} قطعه`);
     if (hZones.length > 0) parts.push(`${toFa(hZones.length)} بخش`);
     if (hFlocks.length > 0) parts.push(`گله: ${hFlocks.map((f: any) => f.name).join('، ')}`);
-    return { value: h.id, label: h.name, subtitle: parts.join(' · ') || 'سالن پرورش', icon: 'hall' };
+    return { value: h.id, label: h.name, icon: 'hall' };
   });
 
   const zoneOptions = zones.filter((z: any) => z.hallId === item.hallId && !z.archived).map((z: any) => {
@@ -213,7 +213,7 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
     const parts: string[] = [];
     if (parentHall) parts.push(parentHall.name);
     if (z.capacity) parts.push(`ظرفیت ${getGlobalFormat().count(z.capacity)} قطعه`);
-    return { value: z.id, label: z.name, subtitle: parts.join(' · ') || 'بخش داخل سالن', icon: 'zone' };
+    return { value: z.id, label: z.name, icon: 'zone' };
   });
 
   const birdObj = birds.find(b => b.id === item.birdId);
@@ -269,8 +269,8 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 value={String(item.source || 'flock')}
                 modalTitle="انتخاب منبع جوجه"
                 options={[
-                  { value: 'flock', label: 'از گله موجود', subtitle: 'انتخاب از گله‌های فعال فارم', icon: 'flock' },
-                  { value: 'hatch', label: 'از هچری', subtitle: 'جوجه‌های هچ‌شده از دستگاه جوجه کشی', icon: 'hatch' },
+                  { value: 'flock', label: 'از گله موجود', icon: 'flock' },
+                  { value: 'hatch', label: 'از هچری', icon: 'hatch' },
                 ]}
                 onChange={v => {
                   const ns = v as 'flock' | 'hatch';
@@ -598,10 +598,10 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
                 modalTitle="انتخاب دلیل فروش"
                 placeholder="— انتخاب —"
                 options={[
-                  { value: 'culling', label: 'حذف از گله (کالینگ)', subtitle: 'پرندگان ضعیف یا خارج‌شده از چرخه تولید', icon: 'flock' },
-                  { value: 'sick', label: 'بیماری', subtitle: 'فروش اضطراری به دلیل عوارض یا بیماری', icon: 'meds' },
-                  { value: 'old_age', label: 'سن بالا / پایان دوره', subtitle: 'حذف گله مادر یا تخم‌گذار در پایان دوره', icon: 'chicken' },
-                  { value: 'surplus', label: 'مازاد گله', subtitle: 'فروش پرندگان سالم مازاد بر ظرفیت سالن', icon: 'stats' },
+                  { value: 'culling', label: 'حذف از گله (کالینگ)', icon: 'flock' },
+                  { value: 'sick', label: 'بیماری', icon: 'meds' },
+                  { value: 'old_age', label: 'سن بالا / پایان دوره', icon: 'chicken' },
+                  { value: 'surplus', label: 'مازاد گله', icon: 'stats' },
                   { value: 'breeding_stock', label: 'فروش مولد' },
                   { value: 'other', label: 'سایر' },
                 ]}
@@ -816,17 +816,17 @@ export default function ItemDetailsForm({ category, item, updateItem, isPurchase
   // ========== تجهیزات ==========
   if (category === 'equipment') {
     const EQUIP_CATEGORIES = [
-      { value: 'heating', label: 'گرمایش و مادر مصنوعی', subtitle: 'هیتر، جت‌هیتر، کوره هوای گرم و مادر مصنوعی', icon: 'heating' },
-      { value: 'cooling', label: 'سرمایش و مه‌پاش', subtitle: 'پد سلولزی، کولر، فوگر و سیستم مه‌پاش', icon: 'cooling' },
-      { value: 'ventilation', label: 'تهویه و هواکش', subtitle: 'هواکش ۱۴۰، اینلت، فن سقفی و سیرکوله', icon: 'ventilation' },
-      { value: 'feeding', label: 'دانخوری', subtitle: 'دانخوری زنجیری، بشقابی، سطلی و سینی جوجه', icon: 'equipment' },
-      { value: 'drinking', label: 'آبخوری', subtitle: 'نیپل، آبخوری آویز، کله‌قندی و ناودانی', icon: 'drinker' },
-      { value: 'lighting', label: 'روشنایی و دیمر', subtitle: 'لامپ LED، مهتابی، دیمر و چراغ اضطراری', icon: 'lighting' },
-      { value: 'cleaning', label: 'دستگاه و لوازم شست‌وشو', subtitle: 'کارواش صنعتی، سمپاش، شعله‌افکن و فرچه', icon: 'cleaning' },
-      { value: 'weighing', label: 'ترازو و باسکول', subtitle: 'باسکول دیجیتال، ترازوی پرنده و توزین دان', icon: 'weighing' },
-      { value: 'power', label: 'برق و ژنراتور', subtitle: 'موتور برق، تابلو برق، کابل و استابلایزر', icon: 'generator' },
-      { value: 'cage', label: 'قفس و تجهیزات نگهداری', subtitle: 'قفس تخم‌گذار، قفس حمل طیور و پارتیشن', icon: 'cage' },
-      { value: 'other', label: 'سایر تجهیزات', subtitle: 'فرقون، بیل، دوربین، سنسور و ابزار دستی', icon: 'hand_tools' },
+      { value: 'heating', label: 'گرمایش و مادر مصنوعی', icon: 'heating' },
+      { value: 'cooling', label: 'سرمایش و مه‌پاش', icon: 'cooling' },
+      { value: 'ventilation', label: 'تهویه و هواکش', icon: 'ventilation' },
+      { value: 'feeding', label: 'دانخوری', icon: 'equipment' },
+      { value: 'drinking', label: 'آبخوری', icon: 'drinker' },
+      { value: 'lighting', label: 'روشنایی و دیمر', icon: 'lighting' },
+      { value: 'cleaning', label: 'دستگاه و لوازم شست‌وشو', icon: 'cleaning' },
+      { value: 'weighing', label: 'ترازو و باسکول', icon: 'weighing' },
+      { value: 'power', label: 'برق و ژنراتور', icon: 'generator' },
+      { value: 'cage', label: 'قفس و تجهیزات نگهداری', icon: 'cage' },
+      { value: 'other', label: 'سایر تجهیزات', icon: 'hand_tools' },
     ];
     const EQUIP_KINDS = [
       { value: 'asset', label: 'تجهیز دائمی (سرمایه‌ای)' },

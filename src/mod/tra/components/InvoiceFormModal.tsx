@@ -216,7 +216,6 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             options={(isPurchase ? CATEGORIES.purchase : CATEGORIES.sale).map(([v, l]: [string, string]) => ({
               value: v,
               label: l,
-              subtitle: CAT_SUB_MAP[v] || undefined,
               icon: CAT_ICON_MAP[v] || '📋',
             }))}
             onChange={newCat => {
@@ -243,8 +242,8 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             value={(form.isPreorder && form.category !== 'other') ? 'preorder' : 'stock'}
             modalTitle="انتخاب نوع سفارش"
             options={[
-              { value: 'stock', label: isPurchase ? 'خرید نقدی / فوری' : 'فروش از موجودی', subtitle: isPurchase ? 'ورود مستقیم کالا به انبار یا سالن' : 'تحویل و خروج آنی کالا از انبار یا گله', icon: 'inventory' },
-              ...(form.category !== 'other' ? [{ value: 'preorder', label: isPurchase ? 'پیش‌خرید قراردادی' : 'پیش‌فروش قراردادی', subtitle: 'ثبت تعهد تحویل آینده با پیش‌پرداخت یا چک', icon: 'invoice' }] : []),
+              { value: 'stock', label: isPurchase ? 'خرید نقدی / فوری' : 'فروش از موجودی', icon: 'inventory' },
+              ...(form.category !== 'other' ? [{ value: 'preorder', label: isPurchase ? 'پیش‌خرید قراردادی' : 'پیش‌فروش قراردادی', icon: 'invoice' }] : []),
             ]}
             onChange={v => setForm(f => ({ ...f, isPreorder: v === 'preorder' }))}
           />
