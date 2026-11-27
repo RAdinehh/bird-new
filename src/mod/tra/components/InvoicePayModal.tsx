@@ -146,9 +146,9 @@ export default function InvoicePayModal({ open, onClose, invoice }: Props) {
 
       <Field label="روش">
         <Select value={method} onChange={e => setMethod(e.target.value as 'cash' | 'card' | 'check')}>
-          <option value="cash">نقدی</option>
-          <option value="card">کارت</option>
-          <option value="check">چک</option>
+          <option value="cash">💵 نقدی</option>
+          <option value="card">💳 کارت</option>
+          <option value="check">📝 چک</option>
         </Select>
       </Field>
 

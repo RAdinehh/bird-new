@@ -200,9 +200,9 @@ export default function DealPayModal({ open, onClose, deal }: Props) {
         </Field>
         <Field label="روش">
           <Select value={method} onChange={e => setMethod(e.target.value as 'cash' | 'card' | 'check')}>
-            <option value="cash">نقدی</option>
-            <option value="card">کارت</option>
-            <option value="check">چک</option>
+            <option value="cash">💵 نقدی</option>
+            <option value="card">💳 کارت</option>
+            <option value="check">📝 چک</option>
           </Select>
         </Field>
       </Grid2>
