@@ -41,11 +41,11 @@ export default function BenchmarkCard() {
   const cmpMort = archAvgMort > 0 ? ((activeAvgMort - archAvgMort) / archAvgMort) * 100 : 0;
   const cmpFeed = archAvgFeed > 0 ? ((activeAvgFeed - archAvgFeed) / archAvgFeed) * 100 : 0;
 
-  const Row = ({ label, active, arch, cmp, lowerBetter }: any) => {
+  const Row = ({ icon, label, active, arch, cmp, lowerBetter }: any) => {
     const good = lowerBetter ? cmp < 0 : cmp > 0;
     return (
       <div style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--pad-inner)', background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', fontSize: 'var(--fs-sm)' }}>
-        <span style={{ flex: 1 }}>{label}</span>
+        <span style={{ flex: 1, display: "inline-flex", alignItems: "center", gap: 6 }}>{icon && <OptionIcon icon={icon} size={14} />}<span>{label}</span></span>
         <span style={{ direction: 'ltr', width: 70, textAlign: 'center', fontWeight: 600 }}>{getGlobalFormat().code(active.toFixed(1))}</span>
         <span style={{ direction: 'ltr', width: 70, textAlign: 'center', color: 'var(--muted)' }}>{getGlobalFormat().code(arch.toFixed(1))}</span>
         <span style={{ direction: 'ltr', width: 70, textAlign: 'center', fontWeight: 700, color: good ? 'var(--accent)' : 'var(--danger)' }}>
@@ -67,8 +67,8 @@ export default function BenchmarkCard() {
         <span style={{ width: 70, textAlign: 'center' }}>آرشیو</span>
         <span style={{ width: 70, textAlign: 'center' }}>تغییر</span>
       </div>
-      <Row label="تلفات ٪" active={activeAvgMort} arch={archAvgMort} cmp={cmpMort} lowerBetter />
-      <Row label="دان/پرنده (kg)" active={activeAvgFeed} arch={archAvgFeed} cmp={cmpFeed} lowerBetter />
+      <Row icon="mortality" label="تلفات ٪" active={activeAvgMort} arch={archAvgMort} cmp={cmpMort} lowerBetter />
+      <Row icon="feed" label="دان/پرنده (kg)" active={activeAvgFeed} arch={archAvgFeed} cmp={cmpFeed} lowerBetter />
     </div>
   );
 }
