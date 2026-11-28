@@ -18,7 +18,7 @@ export const ICON_KEYS = [
 
 export type AppIconKey = typeof ICON_KEYS[number];
 
-export const ICON_ASSET_VERSION = 29;
+export const ICON_ASSET_VERSION = 30;
 
 /** نگاشت کلیدهای قدیمی یا مترادف به کلیدهای استاندارد برای حفظ سازگاری با داده‌های ذخیره‌شده */
 export const ICON_KEY_ALIASES: Record<string, AppIconKey> = {
@@ -39,7 +39,7 @@ export const ICON_KEY_ALIASES: Record<string, AppIconKey> = {
 const INLINE_FALLBACK_SVG =
   'data:image/svg+xml;utf8,' +
   encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#E2E8F0" stroke="#94A3B8" stroke-width="3"/><text x="32" y="40" text-anchor="middle" font-size="26" font-family="sans-serif" fill="#475569">?</text></svg>'
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="48">🏷️</text></svg>'
   );
 
 export function normalizeIconKey(name?: string): AppIconKey {
