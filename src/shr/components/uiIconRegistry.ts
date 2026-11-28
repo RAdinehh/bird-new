@@ -180,6 +180,26 @@ const SUBTYPE_ICON_MAP: Record<UiIconCategory, Record<string, AppIconKey>> = {
  * ۱) تطبیق category + subType
  * ۲) بازگشت به پیش‌فرض category در صورت نبود یا ناشناس بودن subType
  */
+
+/** 🆕 منبع حقیقت واحد ایموجی‌ها (در کنار UI_ICON_MAP) */
+export const EMOJI_BY_ICON_KEY: Record<string, string> = {
+  chicken: '🐔',
+  duck: '🦆',
+  turkey: '🦃',
+  hatch: '🐣',
+  chick: '🐤',
+  egg: '🥚',
+  hall: '🏠',
+  flock: '🐔',
+  meds: '💊',
+  vaccine: '💉',
+  inventory: '📦',
+  invoice: '🧾',
+  equipment: '🔧',
+  cooling: '❄️',
+  lighting: '💡',
+};
+
 export function resolveCategoryIconKey(category: UiIconCategory, subType?: string): AppIconKey {
   const defaultKey = CATEGORY_DEFAULT_ICON[category];
   if (!subType) return defaultKey;

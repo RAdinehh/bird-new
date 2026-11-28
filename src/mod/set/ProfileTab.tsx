@@ -44,7 +44,7 @@ export default function ProfileTab() {
               onChange={e => updateSection('user', { role: e.target.value })}
             >
               <option value="owner">👤 مالک</option>
-              <option value="manager">💼 مدیر</option>
+              <option value="manager"><OptionIcon icon="manager" size={16} /> مدیر</option>
               <option value="worker">👷 کارگر</option>
             </Select>
           </Field>
@@ -57,7 +57,7 @@ export default function ProfileTab() {
               placeholder="۰۹..."
             />
           </Field>
-          <Field label={<Lbl icon="📧" text="ایمیل" />}>
+          <Field label="ایمیل">
             <Input
               placeholder="example@domain.com"
               value={user.email}
@@ -69,7 +69,7 @@ export default function ProfileTab() {
       </SettingsGroup>
 
       {/* ═══ اطلاعات مرغداری ═══ */}
-      <SettingsGroup icon="🏡" title="اطلاعات مرغداری" subtitle={farmSummary} tone="info">
+      <SettingsGroup icon="hall" title="اطلاعات مرغداری" subtitle={farmSummary} tone="info">
         <Field label="نام مرغداری">
           <Input
             value={farm.name}
@@ -90,7 +90,7 @@ export default function ProfileTab() {
               <option value="mixed">🔀 مخلوط</option>
             </Select>
           </Field>
-          <Field label={<Lbl icon="🪪" text="شماره پروانه" />}>
+          <Field label="شماره پروانه">
             <Input
               placeholder="کد"
               value={farm.licenseNo}
@@ -115,7 +115,7 @@ export default function ProfileTab() {
           </Field>
         </Grid2>
         <Grid2>
-          <Field label={<Lbl icon="📮" text="کد پستی" />}>
+          <Field label="کد پستی">
             <DigitField
               placeholder="کد ملی"
               maxLength={10}
@@ -174,7 +174,7 @@ export default function ProfileTab() {
             />
           </Field>
         </Grid2>
-        <Field label={<Lbl icon="💳" text="شماره کارت" />}>
+        <Field label="شماره کارت">
           <DigitField
             maxLength={16}
             value={bank.cardNo}
@@ -182,7 +182,7 @@ export default function ProfileTab() {
             placeholder="شماره"
           />
         </Field>
-        <Field label={<Lbl icon="🏦" text="شماره شبا" />}>
+        <Field label="شماره شبا">
           <Input
             value={bank.sheba}
             onChange={e => updateSection('bank', { sheba: e.target.value })}
@@ -220,7 +220,7 @@ export default function ProfileTab() {
                 min={0}
               />
             </Field>
-            <Field label={<Lbl icon="⏱️" text="قفل خودکار پس از" />}>
+            <Field label="قفل خودکار پس از">
               <Select
                 value={String(security.autoLockMin)}
                 onChange={e => updateSection('security', { autoLockMin: Math.round(parseFaNum(e.target.value)) })}

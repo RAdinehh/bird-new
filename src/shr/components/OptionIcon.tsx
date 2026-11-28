@@ -10,23 +10,7 @@ interface OptionIconProps {
 
 const EMOJI_FONT = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
 
-const ICON_KEY_TO_EMOJI: Record<string, string> = {
-  chicken: '🐔',
-  duck: '🦆',
-  turkey: '🦃',
-  hatch: '🐣',
-  chick: '🐤',
-  egg: '🥚',
-  hall: '🏠',
-  flock: '🐔',
-  meds: '💊',
-  vaccine: '💉',
-  inventory: '📦',
-  invoice: '🧾',
-  equipment: '🔧',
-  cooling: '❄️',
-  lighting: '💡',
-};
+import { EMOJI_BY_ICON_KEY as ICON_KEY_TO_EMOJI } from './uiIconRegistry';
 
 export function OptionIcon({ icon, size = 22, color = 'currentColor', style }: OptionIconProps) {
   if (!icon) return null;
