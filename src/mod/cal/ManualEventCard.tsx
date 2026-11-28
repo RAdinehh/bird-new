@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../shr/components/OptionIcon';
 import { IconTag, IconClock, IconNote, IconSyringe, IconLeaf, IconEgg, IconDollar, IconBell } from '../../shr/icons';
 import { useFormat } from '../../shr/units/useFormat';
 import { useState } from 'react';
@@ -14,12 +15,12 @@ interface Props {
 }
 
 const EVENT_TYPE_ICONS: Record<string, React.ReactNode> = {
-  daily: <IconNote size={16} />,
-  vaccine: <IconSyringe size={16} />,
-  herbal: <IconLeaf size={16} />,
-  hatch: <IconEgg size={16} />,
-  payment: <IconDollar size={16} />,
-  finance: <IconBell size={16} />,
+  daily: <OptionIcon icon="📋" size={18} />,
+  vaccine: <OptionIcon icon="vaccine" size={18} />,
+  herbal: <OptionIcon icon="herbal" size={18} />,
+  hatch: <OptionIcon icon="hatch" size={18} />,
+  payment: <OptionIcon icon="cash" size={18} />,
+  finance: <OptionIcon icon="🔔" size={18} />,
 };
 
 export default function ManualEventCard({ event, onChanged }: Props) {
