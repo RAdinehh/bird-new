@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../../shr/components/OptionIcon';
 /**
  * FormModal — فرم افزودن/ویرایش ثبت روزانه
  */
@@ -89,7 +90,7 @@ export default function FormModal(props: FormModalProps) {
       <SectionTitle>🌡 محیط و پرنده</SectionTitle>
       <EnvironmentSection form={form} setForm={setForm} vErrors={vErrors} showError={showError} markTouched={markTouched} />
 
-      <SectionTitle>🍽 تغذیه و آب</SectionTitle>
+      <SectionTitle><span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="feed" size={16} /><span>تغذیه و آب</span></span></SectionTitle>
       <FeedSection form={form} setForm={setForm} vErrors={vErrors} showError={showError} markTouched={markTouched} />
 
       {isLayerType && !isFlockMature && selectedFlock && (

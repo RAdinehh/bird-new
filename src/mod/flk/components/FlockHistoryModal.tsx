@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../../shr/components/OptionIcon';
 /**
  * FlockHistoryModal.tsx — تاریخچه رویدادهای گله
  * ۳ تب با سلسله‌مراتب منطقی + موجودی تفکیک‌شده
@@ -574,8 +575,8 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
               <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>📊 خلاصه ۳۰ روز اخیر</div>
               <div style={{ padding: '8px 10px', background: 'var(--accent-soft)', border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)', fontSize: 11 }}>
                 <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                  <span>🍽️ دان: <b>{fmt.num(consumptionSummary.totalFeedKg)} kg</b></span>
-                  <span>💧 آب: <b>{fmt.num(consumptionSummary.totalWaterL)} L</b></span>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><OptionIcon icon="feed" size={14} /><span>دان:</span> <b>{fmt.num(consumptionSummary.totalFeedKg)} kg</b></span>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><OptionIcon icon="water" size={14} /><span>آب:</span> <b>{fmt.num(consumptionSummary.totalWaterL)} L</b></span>
                   <span style={{ color: 'var(--muted)', fontSize: 10 }}>({fmt.count(consumptionSummary.eventCount)} رویداد)</span>
                 </div>
                 {(consumptionSummary.bySex.male > 0 || consumptionSummary.bySex.female > 0) && (

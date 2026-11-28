@@ -85,7 +85,7 @@ export default function ConsumptionFormModal({ open, onClose, flock }: Props) {
             modalTitle="انتخاب نوع مصرف"
             options={[
               { value: 'feed', label: 'دان', icon: 'feed' },
-              { value: 'water', label: 'آب', icon: '💧' },
+              { value: 'water', label: 'آب', icon: 'water' },
             ]}
             onChange={v => setType(v as 'feed' | 'water')}
           />

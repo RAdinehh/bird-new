@@ -1,3 +1,4 @@
+import EmojiPicker from './EmojiPicker';
 /**
  * EditableSelect.tsx — انتخاب‌گر با قابلیت افزودن/ویرایش/حذف
  *
@@ -14,14 +15,12 @@ import { getGlobalFormat } from '../units/useFormat';
 
 
 import { useState, useMemo } from 'react';
-import { Btn, Field, Input } from './ui';
+import { Btn, Field, Input, Modal } from './ui';
 import { useCustomOptions, type CustomOption } from '../store/customOptions';
 import { showConfirmAsync } from '../../cor/store/dialog';
 import UndoBar from '../../cor/ui/UndoBar';
 import SelectSheetShell, { SheetGroup, SheetItem } from './SelectSheetShell';
 import { Package, Sparkles, Trash2, Pencil } from 'lucide-react';
-import { EMOJI_GROUPS } from '../data/emojis';
-
 export interface EditableOption {
   value: string;
   label: string;
@@ -318,24 +317,13 @@ export default function EditableSelect({
       </Field>
       <Field label="آیکن">
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <div style={{
-            width: 54, height: 54, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 28, background: 'var(--input-bg)',
-            borderRadius: 14, border: '1px solid var(--border)',
-          }}>{formIcon}</div>
+          <div style={{ width: 54, height: 54, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--input-bg)', borderRadius: 14, border: '1px solid var(--border)' }}><OptionIcon icon={formIcon as any} size={28} /></div>
           <Btn onClick={() => setEmojiOpen(o => !o)} style={{ flex: 1 }}>
             {emojiOpen ? 'بستن ایموجی‌ها' : 'انتخاب از ایموجی‌ها'}
           </Btn>
         </div>
       </Field>
-      {emojiOpen && (
-        <div style={{
-          padding: 10, background: 'var(--input-bg)',
-          border: '1px solid var(--border)', borderRadius: 'var(--r-md)',
-        }}>
-          <EmojiPickerInline value={formIcon} onPick={setFormIcon} />
-        </div>
-      )}
+      <EmojiPicker open={emojiOpen} onClose={() => setEmojiOpen(false)} onPick={setFormIcon} title="انتخاب آیکون" />
     </div>
   );
 
@@ -388,41 +376,3 @@ export default function EditableSelect({
 // ═══ helper ═══
 
 // ═══ Emoji Picker Inline ═══
-function EmojiPickerInline({ onPick, value }: { onPick: (e: string) => void; value?: string }) {
-  const [tab, setTab] = useState(EMOJI_GROUPS[0].id);
-  const g = EMOJI_GROUPS.find(x => x.id === tab) || EMOJI_GROUPS[0];
-  return (
-    <>
-      <div style={{ display: 'flex', gap: 4, overflowX: 'auto', paddingBottom: 8 }}>
-        {EMOJI_GROUPS.map(x => (
-          <button key={x.id} type="button" onClick={() => setTab(x.id)} title={x.name}
-            style={{
-              padding: '6px 10px', fontSize: 18,
-              borderRadius: 'var(--r-sm)',
-              border: '1px solid ' + (tab === x.id ? 'var(--accent-border)' : 'var(--border)'),
-              background: tab === x.id ? 'var(--accent-soft)' : 'transparent',
-              cursor: 'pointer', flexShrink: 0,
-            }}>
-            {x.icon}
-          </button>
-        ))}
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(42px, 1fr))', gap: 4 }}>
-        {g.emojis.map(em => {
-          const sel = value === em;
-          return (
-            <button key={em} type="button" onClick={() => onPick(em)}
-              style={{
-                padding: 8, fontSize: 22, lineHeight: 1,
-                background: sel ? 'var(--accent-soft)' : 'var(--card-solid)',
-                border: '1px solid ' + (sel ? 'var(--accent-border)' : 'var(--border)'),
-                borderRadius: 'var(--r-sm)', cursor: 'pointer',
-              }}>
-              {em}
-            </button>
-          );
-        })}
-      </div>
-    </>
-  );
-}

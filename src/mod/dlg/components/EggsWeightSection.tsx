@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../../shr/components/OptionIcon';
 import { useFormat } from '../../../shr/units/useFormat';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { useState } from 'react';
@@ -87,7 +88,7 @@ export default function EggsWeightSection({ form, setForm, vErrors, flockAliveCo
      </Grid2>
      <Grid2>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
-       <Field label="💔 شکسته" error={showError('brokenEggs')}>
+       <Field label={<span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><OptionIcon icon="broken_egg" size={14} /><span>شکسته</span></span>} error={showError('brokenEggs')}>
         <NumField placeholder="۰" value={form.brokenEggs} onChange={e => setForm({...form, brokenEggs: e.target.value})} unit="عدد" min={0} />
        </Field>
       </div>

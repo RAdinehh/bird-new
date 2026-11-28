@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../shr/components/OptionIcon';
 /**
  * CandlingsPage — کندلینگ با Multi-select و تجمیع
  */
@@ -251,7 +252,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
             <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--accent)' }}>{fmt.code(summary.fertilePercent.toFixed(1))}٪</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>📉 تلفات کل</span>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><OptionIcon icon="mortality" size={13} /><span>تلفات</span> کل</span>
             <span style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: summary.lossPercent > 50 ? 'var(--danger)' : summary.lossPercent > 20 ? 'var(--warn)' : 'var(--muted)' }}>{fmt.code(summary.lossPercent.toFixed(1))}٪</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', gridColumn: '1 / -1', paddingTop: 8, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>

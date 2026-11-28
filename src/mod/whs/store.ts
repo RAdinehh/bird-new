@@ -523,7 +523,7 @@ export const UNIT_LABEL: Record<ItemUnit, string> = {
 
 export const MOVEMENT_REASON: Record<MovementReason, string> = {
   purchase: '🛒 خرید نقدی',
-  consumption: '🍽 مصرف',
+  consumption: 'مصرف',
   sale: '💰 فروش',
   gift: '🎁 هدیه',
   loss: '⚠️ ضایعات',

@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../../shr/components/OptionIcon';
 /**
  * ProductionFormModal — فرم افزودن/ویرایش تولید تخم
  */
@@ -141,7 +142,7 @@ export default function ProductionFormModal(props: Props) {
             </div>
             {int(form.brokenCount) > 0 ? (
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)' }}>
-                <span style={{ color: 'var(--muted)' }}>💔 شکسته:</span>
+                <span style={{ color: 'var(--muted)' }}><span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><OptionIcon icon="broken_egg" size={14} /><span>شکسته</span></span>:</span>
                 <span style={{ fontWeight: 700, color: 'var(--danger)' }}>{fmt.count(int(form.brokenCount))}</span>
               </div>
             ) : null}
