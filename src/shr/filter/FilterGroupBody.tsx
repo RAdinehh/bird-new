@@ -7,14 +7,16 @@ import { parseFaNum } from '../utils/fa';
 
 function chipIn(active: boolean): CSSProperties {
   return {
-    display: 'inline-flex', alignItems: 'center', gap: 5,
-    height: 28, padding: '0 8px',
+    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+    height: 40, minHeight: 40, padding: '0 12px',
+    boxSizing: 'border-box',
     background: active ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
     border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
     borderRadius: 'var(--r-md)',
+    boxShadow: 'none', opacity: 1,
     color: active ? 'var(--accent)' : 'var(--text)',
     fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
-    fontWeight: active ? 700 : 600, cursor: 'pointer',
+    fontWeight: 600, cursor: 'pointer',
     whiteSpace: 'nowrap',
     transition: 'all var(--dur-fast) var(--ease-out)',
   };
@@ -39,18 +41,18 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter, filterS
         const arr = isMulti ? (Array.isArray(v) ? (v as string[]) : []) : [];
         const noneActive = isMulti ? arr.length === 0 : !v;
         return (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
             <button type="button"
               onClick={() => { isMulti ? setFilter(def.key, []) : clearFilter(def.key); }}
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                minHeight: 38, padding: '6px 8px',
+                height: 40, minHeight: 40, padding: '0 8px', boxSizing: 'border-box', boxShadow: 'none', opacity: 1,
                 background: noneActive ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                 border: '1px solid ' + (noneActive ? 'var(--accent-border)' : 'var(--border)'),
-                borderRadius: 9,
+                borderRadius: 'var(--r-md)',
                 color: noneActive ? 'var(--accent)' : 'var(--text)',
-                fontFamily: 'inherit', fontSize: 'var(--fs-xs)',
-                fontWeight: noneActive ? 700 : 600, cursor: 'pointer',
+                fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
+                fontWeight: 600, cursor: 'pointer',
                 textAlign: 'center',
                 transition: 'all var(--dur-fast) var(--ease-out)',
               }}>
@@ -70,13 +72,13 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter, filterS
                   }}
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-                    minHeight: 38, padding: '6px 8px',
+                    height: 40, minHeight: 40, padding: '0 8px', boxSizing: 'border-box', boxShadow: 'none', opacity: 1,
                     background: active ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                     border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
-                    borderRadius: 9,
+                    borderRadius: 'var(--r-md)',
                     color: active ? 'var(--accent)' : 'var(--text)',
-                    fontFamily: 'inherit', fontSize: 'var(--fs-xs)',
-                    fontWeight: active ? 700 : 600, cursor: 'pointer',
+                    fontFamily: 'inherit', fontSize: 'var(--fs-sm)',
+                    fontWeight: 600, cursor: 'pointer',
                     textAlign: 'center',
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
@@ -103,7 +105,7 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter, filterS
         const arr = isMulti ? (Array.isArray(v) ? (v as string[]) : []) : [];
         const noneActive = isMulti ? arr.length === 0 : !v;
         return (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             <RowItem
               active={noneActive}
               multi={isMulti}
@@ -137,7 +139,7 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter, filterS
       const arr = isMulti ? (Array.isArray(v) ? (v as string[]) : []) : [];
       const noneActive = isMulti ? arr.length === 0 : !v;
       return (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
           <button type="button"
             onClick={() => { isMulti ? setFilter(def.key, []) : clearFilter(def.key); }}
             style={chipIn(noneActive)}>همه</button>
@@ -168,7 +170,7 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter, filterS
 
     if (def.kind === 'boolean') {
       return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <RowItem active={v === undefined || v === null} multi={false}
             label="همه" onClick={() => clearFilter(def.key)} />
           <RowItem active={v === true} multi={false}

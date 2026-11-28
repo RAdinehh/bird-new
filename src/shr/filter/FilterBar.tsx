@@ -348,7 +348,7 @@ export function FilterBar<T>({
                     }}>{def.icon}</span>
                   )}
                   <span style={{
-                    flex: 1, fontSize: 'var(--fs-base)', fontWeight: 700,
+                    flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 600, opacity: 1,
                     color: cnt > 0 ? 'var(--accent)' : 'var(--text)',
                   }}>{def.label}</span>
                   {cnt > 0 && (
@@ -387,12 +387,12 @@ export function FilterBar<T>({
           </Btn>
           <button type="button" onClick={resetAll} style={{
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            gap: 6, width: '100%', height: 36, padding: '0 12px',
+            gap: 6, width: '100%', height: 40, padding: '0 12px', boxSizing: 'border-box', boxShadow: 'none', opacity: 1,
             background: 'var(--danger-soft)',
             border: '1px solid var(--danger)',
             borderRadius: 'var(--r-md)',
             color: 'var(--danger)', fontFamily: 'inherit',
-            fontSize: 'var(--fs-sm)', fontWeight: 700, cursor: 'pointer',
+            fontSize: 'var(--fs-sm)', fontWeight: 600, cursor: 'pointer',
           }}>پاک‌سازی</button>
         </div>
       </Sheet>
@@ -446,11 +446,13 @@ export function FilterBar<T>({
               <div key={def.key} style={{ position: 'relative' }}>
                 <button type="button" onClick={() => toggleSort(def.key)}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: 'var(--sp-2)',
-                    width: '100%', padding: '6px 8px', minHeight: 36,
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    width: '100%', height: 52, minHeight: 52,
+                    padding: '0 10px', paddingLeft: isPrimary && appendSort ? 40 : 10,
+                    boxSizing: 'border-box', boxShadow: 'none', opacity: 1,
                     background: isActive ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                     border: '1px solid ' + (isActive ? 'var(--accent-border)' : 'var(--border)'),
-                    borderRadius: 'var(--r-lg)',
+                    borderRadius: 'var(--r-md)',
                     color: 'var(--text)',
                     fontFamily: 'inherit', cursor: 'pointer',
                     textAlign: 'right',
@@ -458,7 +460,7 @@ export function FilterBar<T>({
                   }}>
                   {def.icon && typeof def.icon !== 'string' && (
                     <span style={{
-                      width: 30, height: 30, borderRadius: 'var(--r-md)',
+                      width: 26, height: 26, borderRadius: 'var(--r-sm)',
                       background: isActive ? 'var(--accent)' : 'var(--input-bg)',
                       color: isActive ? 'var(--avatar-text)' : 'var(--muted)',
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -467,9 +469,10 @@ export function FilterBar<T>({
                   )}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{
-                      fontSize: 'var(--fs-base)', fontWeight: 700,
+                      fontSize: 'var(--fs-sm)', fontWeight: 600, opacity: 1,
                       color: isActive ? 'var(--accent)' : 'var(--text)',
-                      lineHeight: 1.2, display: 'flex', alignItems: 'center', gap: 6
+                      lineHeight: 1.25, display: 'flex', alignItems: 'center', gap: 6,
+                      whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                     }}>
                       {def.label}
                       {levelLabel && (
@@ -482,8 +485,9 @@ export function FilterBar<T>({
                       )}
                     </div>
                     <div style={{
-                      fontSize: 10.5, color: 'var(--muted)',
+                      fontSize: 'var(--fs-xs)', color: 'var(--muted)', opacity: 1,
                       marginTop: 2, fontWeight: 500,
+                      whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                     }}>
                       {isActive
                         ? (dir === 'asc' ? 'صعودی — از کوچک به بزرگ' : 'نزولی — از بزرگ به کوچک')
