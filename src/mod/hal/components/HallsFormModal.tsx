@@ -200,7 +200,7 @@ export default function HallsFormModal(props: HallsFormModalProps) {
               <option value="active">🟢 فعال</option>
               <option value="empty">⚪ خالی</option>
               <option value="sanitizing">🟡 در حال ضدعفونی</option>
-              <option value="maintenance">🔴 تعمیر</option>
+              <option value="maintenance">تعمیر</option>
               <option value="inactive">⚫ غیرفعال</option>
             </Select>
           </Field>

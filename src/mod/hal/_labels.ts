@@ -35,8 +35,8 @@ export const STATUS_LABELS: Record<EquipmentStatus, { name: string; icon: string
   active:      { name: 'سالم',         icon: '🟢', tone: 'accent' },
   broken:      { name: 'خراب',          icon: '🔴', tone: 'danger' },
   maintenance: { name: 'نیاز به سرویس', icon: '🟡', tone: 'warn' },
-  repairing:   { name: 'در حال تعمیر',  icon: '🟠', tone: 'warn' },
-  retired:     { name: 'اسقاط شده',      icon: '🔚', tone: 'gray' },
+  repairing:   { name: 'در حال تعمیر',  icon: 'hand_tools', tone: 'warn' },
+  retired:     { name: 'اسقاط شده',      icon: 'archive_box', tone: 'gray' },
   archived:    { name: 'آرشیو',         icon: '📦', tone: 'gray' },
 };
 

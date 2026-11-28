@@ -110,11 +110,11 @@ export default function HallCard(props: HallCardProps) {
           const st = h.status || (hallFlocks.length > 0 ? 'active' : 'empty');
           type Tone = 'green' | 'gray' | 'blue' | 'warn' | 'red' | 'purple' | 'accent' | 'dim' | 'amber' | 'info' | 'danger';
           const map: Record<string, { icon: string; label: string; tone: Tone }> = {
-            active:     { icon: '🟢', label: 'فعال',      tone: 'green' },
+            active:     { icon: 'stock',      label: 'فعال',      tone: 'green' },
             empty:      { icon: '⚪', label: 'خالی',      tone: 'gray' },
             sanitizing: { icon: '🫧', label: 'ضدعفونی',   tone: 'blue' },
-            maintenance:{ icon: '🔧', label: 'تعمیر',     tone: 'warn' },
-            inactive:   { icon: '🔴', label: 'غیرفعال',   tone: 'red' },
+            maintenance:{ icon: 'hand_tools', label: 'تعمیر',     tone: 'warn' },
+            inactive:   { icon: 'archive_box',label: 'غیرفعال',   tone: 'red' },
           };
           const it = map[st];
           if (!it) return null;

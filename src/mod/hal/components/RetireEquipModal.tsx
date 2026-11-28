@@ -106,7 +106,7 @@ export default function RetireEquipModal({ open, onClose, equipment, onConfirm }
             style={{ flex: 1 }}
             disabled={!canSave}
           >
-            {reason === 'scrap' ? '🔚 تایید اسقاط' : '💰 ثبت فروش'}
+            {reason === 'scrap' ? 'تایید اسقاط' : '💰 ثبت فروش'}
           </Btn>
           <Btn onClick={handleClose} style={{ flex: 1 }}>لغو</Btn>
         </div>
@@ -117,7 +117,7 @@ export default function RetireEquipModal({ open, onClose, equipment, onConfirm }
           <Field label="نوع خروج" required>
             <Select value={reason} onChange={e => setReason(e.target.value as 'sale' | 'scrap')}>
               <option value="sale">💰 فروش (با مبلغ)</option>
-              <option value="scrap">🔚 اسقاط (بدون مبلغ)</option>
+              <option value="scrap">اسقاط (بدون مبلغ)</option>
             </Select>
           </Field>
 

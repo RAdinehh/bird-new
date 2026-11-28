@@ -21,6 +21,9 @@ function inferRowIcon(l: ReactNode): AppIconKey | null {
   if (/تخم\s*(خوراکی|سالم|کل)/.test(raw)) return 'egg';
   if (/ضرر|زیان/.test(raw)) return 'profit_trend';
   if (/خرید/.test(raw)) return 'invoice';
+  if (/تعمیر/.test(raw)) return 'hand_tools';
+  if (/اسقاط/.test(raw)) return 'archive_box';
+  if (/^فعال$/.test(raw)) return 'equipment';
   if (/رطوبت|آب/.test(raw)) return 'water';
   if (/دما/.test(raw)) return 'climate';
   if (/دان|خوراک/.test(raw)) return 'feed';

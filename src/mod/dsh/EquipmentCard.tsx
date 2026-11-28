@@ -96,9 +96,9 @@ export default function EquipmentCard({ nav }: Props) {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginTop: 8 }}>
-        <MiniStat label="✅ فعال" value={stats.active} suffix="" color="accent" />
-        <MiniStat label="🔧 تعمیر" value={stats.repair} suffix="" color="warn" />
-        <MiniStat label="❌ اسقاط" value={stats.scrapped} suffix="" color="danger" />
+        <MiniStat label="فعال" value={stats.active} suffix="" color="accent" />
+        <MiniStat label="تعمیر" value={stats.repair} suffix="" color="warn" />
+        <MiniStat label="اسقاط" value={stats.scrapped} suffix="" color="danger" />
       </div>
 
       {stats.broken > 0 && (
