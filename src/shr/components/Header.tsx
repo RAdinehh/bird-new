@@ -70,7 +70,6 @@ export default function Header({ title }: { title: string }) {
           background: badgeColor || 'var(--danger)', color: '#fff',
           fontSize: 9, fontWeight: 700,
           minWidth: 20, height: 20, borderRadius: 999, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap', lineHeight: 1, padding: '0 6px',
-          border: '2px solid var(--bg)'
         }}>{badge}</span>
       ) : null}
     </button>

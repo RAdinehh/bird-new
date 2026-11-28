@@ -1,5 +1,6 @@
 /** filter/configs/ctc.tsx */
 import { IconTag, IconClock, IconUser } from '../../icons';
+import { OptionIcon } from '../../components/OptionIcon';
 import { type Person, type Role, ROLE_LABEL } from '../../../mod/ctc/store';
 import type { FilterConfig } from './_types';
 
@@ -12,6 +13,7 @@ export function getCtcContactsConfig(): FilterConfig<Person> {
         options: (Object.keys(ROLE_LABEL) as Role[]).map(r => ({
           value: r,
           label: ROLE_LABEL[r],
+          icon: <OptionIcon icon={r === 'customer' ? 'cash' : r === 'supplier' ? 'inventory' : 'hand_tools'} size={16} />,
         })),
         getValue: (p: Person) => p.roles[0] || '',
         multi: true,

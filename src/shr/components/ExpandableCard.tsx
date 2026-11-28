@@ -231,7 +231,6 @@ export default function ExpandableCard({
                 background: color, color: 'var(--avatar-text)',
                 fontSize: 'var(--fs-xs)', fontWeight: 800,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                border: '2px solid var(--card-solid)',
               }}>{index}</span>
             )}
           </div>
