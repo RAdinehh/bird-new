@@ -12,7 +12,7 @@ import { toFa } from '../../../shr/utils/fa';
 import { VET_METHOD_LABEL } from '../../../shr/constants/vetMethods';
 import { Btn, Tag } from '../../../shr/components/ui';
 import ExpandableCard from '../../../shr/components/ExpandableCard';
-import { Row, SectionTitle } from '../helpers';
+import { Row, SectionTitle , getWhsItemIcon } from '../helpers';
 import EntityLink from '../../../shr/components/EntityLink';
 import { CATEGORY_ICON, CATEGORY_LABEL, UNIT_LABEL, STORAGE_LABEL, stockWarning, expiryWarning, daysToExpiry, getAvgPrice } from '../store';
 import { showConfirmAsync } from '../../../cor/store/dialog';
@@ -80,7 +80,7 @@ export default function ItemCard(props: ItemCardProps) {
 
   return (
     <ExpandableCard key={it.id} id={it.id} ms={ms} accent={accent} index={fmt.count(i + 1)}
-      iconEmoji={(CATEGORY_ICON as any)[it.category]} title={it.name}
+      iconEmoji={getWhsItemIcon(it.name, it.category, (CATEGORY_ICON as any)[it.category])} title={it.name}
       subtitle={`${(CATEGORY_LABEL as any)[it.category]} • ${formatQty(it.currentStock, it.unit)}`}
       isOpen={isOpen} onToggle={onToggle}
       badge={

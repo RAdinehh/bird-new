@@ -6,6 +6,7 @@ import { useFormat } from '../../../shr/units/useFormat';
 import { Btn, BtnRow, Field, Grid2, Modal, MoneyField, NumField, Select, Textarea, ErrorBox } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
+import { getWhsItemIcon } from '../helpers';
 import { toFa } from '../../../shr/utils/fa';
 import { FieldHint } from '../../../shr/intelligence';
 import { MOVEMENT_REASON, UNIT_LABEL, CATEGORY_ICON, CATEGORY_LABEL, type MovementType, type MovementReason, type Item } from '../store';
@@ -95,7 +96,7 @@ export default function MoveFormModal(props: Props) {
               label: it.name,
               subtitle: `${fmt.num(it.currentStock)} ${UNIT_LABEL[it.unit]}`,
               group: it.category,
-            icon: (CATEGORY_ICON as any)[it.category],
+            icon: getWhsItemIcon(it.name, it.category, (CATEGORY_ICON as any)[it.category]),
             }))}
             groupLabels={Object.fromEntries(
               Object.entries(CATEGORY_LABEL).map(([k, v]) => [k, v])

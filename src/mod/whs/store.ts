@@ -469,27 +469,27 @@ export const useWhs = create<State>()(
 );
 
 export const CATEGORY_LABEL: Record<ItemCategory, string> = {
-  egg: '🥚 تخم مرغ',
+  egg: 'تخم مرغ',
   feed: 'دان و خوراک',
   medicine: 'دارو',
   vaccine: 'واکسن',
   herbal: 'گیاه دارویی',
   equipment: 'تجهیزات',
   consumable: 'مصرفی',
-  manure: '🌱 کود',
-  broken: '💔 تخم شکسته'
+  manure: 'کود',
+  broken: 'تخم شکسته'
 };
 
 export const CATEGORY_ICON: Record<ItemCategory, string> = {
-  egg: '🥚',
-  feed: '🌾',
-  medicine: '💊',
-  vaccine: '💉',
-  herbal: '🌿',
-  equipment: '🔧',
-  consumable: '📦',
-  manure: '🌱',
-  broken: '💔'
+  egg: 'egg',
+  feed: 'feed',
+  medicine: 'meds',
+  vaccine: 'vet_injection',
+  herbal: 'herbal',
+  equipment: 'equipment',
+  consumable: 'inventory',
+  manure: 'manure',
+  broken: 'broken_egg',
 };
 
 
