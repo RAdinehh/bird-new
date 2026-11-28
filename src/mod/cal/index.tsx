@@ -87,18 +87,21 @@ export default function Cal() {
               type="button"
               onClick={() => setFilter(f.id)}
               style={{
-                padding: '7px 12px',
-                fontSize: 'var(--fs-sm)',
+                height: 34,
+                padding: '0 12px',
+                fontSize: 'var(--fs-xs)',
                 background: active ? 'var(--accent-soft)' : 'var(--btn-bg)',
                 border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
-                borderRadius: 8,
+                borderRadius: 'var(--r-md)',
                 color: active ? 'var(--accent)' : 'var(--muted)',
-                fontWeight: active ? 700 : 500,
+                fontWeight: active ? 700 : 600,
+                opacity: 1,
+                boxShadow: 'none',
                 cursor: 'pointer',
                 fontFamily: 'inherit',
-                display: 'flex',
+                display: 'inline-flex',
                 alignItems: 'center',
-                gap: 5,
+                gap: 6,
                 whiteSpace: 'nowrap'
               }}
             >

@@ -89,13 +89,19 @@ export default function MonthView({ events, onDayClick, filter }: Props) {
         onClick={goToday}
         style={{
           alignSelf: 'center',
-          padding: '6px 16px',
+          height: 34,
+          padding: '0 14px',
           background: 'var(--accent-soft)',
           border: '1px solid var(--accent-border)',
-          borderRadius: 8,
+          borderRadius: 'var(--r-md)',
           color: 'var(--accent)',
-          fontSize: 'var(--fs-sm)',
+          fontSize: 'var(--fs-xs)',
           fontWeight: 700,
+          opacity: 1,
+          boxShadow: 'none',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
           cursor: 'pointer',
           fontFamily: 'inherit'
         }}
