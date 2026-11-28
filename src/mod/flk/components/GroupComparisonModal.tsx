@@ -1,3 +1,4 @@
+import { resolveCategoryIconKey } from '../../../shr/components/uiIconRegistry';
 import { OptionIcon } from '../../../shr/components/OptionIcon';
 /**
  * GroupComparisonModal.tsx — مقایسه ۲-۳ گروه

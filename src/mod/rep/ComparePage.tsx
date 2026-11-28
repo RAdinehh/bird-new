@@ -1,3 +1,4 @@
+import { resolveCategoryIconKey } from '../../shr/components/uiIconRegistry';
 import { OptionIcon } from '../../shr/components/OptionIcon';
 import { useFormat } from '../../shr/units/useFormat';
 import { useState, useMemo } from 'react';

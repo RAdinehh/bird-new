@@ -1,3 +1,4 @@
+import { resolveCategoryIconKey } from '../../shr/components/uiIconRegistry';
 import { OptionIcon } from '../../shr/components/OptionIcon';
 import { getGlobalFormat } from '../../shr/units/useFormat';
 import { Btn } from '../../shr/components/ui';
