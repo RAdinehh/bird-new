@@ -141,10 +141,10 @@ const SUBTYPE_ICON_MAP: Record<UiIconCategory, Record<string, AppIconKey>> = {
     default: UI_ICON_MAP.inventory,
   },
   analytics: {
-    pareto: UI_ICON_MAP.stats,
+    pareto: 'mortality' as AppIconKey,
     share: UI_ICON_MAP.target,
-    egg_feed: UI_ICON_MAP.stats,
-    hen_day: UI_ICON_MAP.stats,
+    egg_feed: 'feed' as AppIconKey,
+    hen_day: 'egg' as AppIconKey,
     best_month: UI_ICON_MAP.trophy,
   },
   finance: {

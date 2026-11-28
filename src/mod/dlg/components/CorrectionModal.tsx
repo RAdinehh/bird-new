@@ -62,7 +62,7 @@ function hasMultiDeaths(log: DailyLog | null): boolean {
 }
 
 const REASON_OPTIONS = [
-  { value: 'اشتباه شمارش', label: 'اشتباه شمارش', icon: 'stats' },
+  { value: 'اشتباه شمارش', label: 'اشتباه شمارش', icon: 'pcs' },
   { value: 'اشتباه خواندن سنسور', label: 'اشتباه خواندن سنسور', icon: 'sensor' },
   { value: 'تایپ اشتباه', label: 'تایپ اشتباه', icon: 'invoice' },
   { value: 'فراموشی ثبت', label: 'فراموشی ثبت', icon: 'other' },

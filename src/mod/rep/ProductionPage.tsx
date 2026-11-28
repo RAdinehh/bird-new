@@ -95,7 +95,7 @@ export default function ProductionPage() {
     <PageContainer>
       <HelpBanner
         id="rep-production-guide"
-        icon="stats"
+        icon="profit_trend"
         title="راهنمای گزارش تولید"
         description="آمار ماهانهٔ تولید تخم، مصرف خوراک و تلفات را کنار هم ببینید و جدول یا گزارش تحلیلی دریافت کنید."
         tone="info"
