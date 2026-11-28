@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../shr/components/OptionIcon';
 import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
 import { useMemo } from 'react';
 import { useFlk, getAgeDays } from '../flk/store';
@@ -55,7 +56,7 @@ export default function BenchmarkCard() {
 
   return (
     <div style={{ padding: 'var(--pad-card)', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📈</span> Benchmark — مقایسه گله‌ها</div>
+      <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}><span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="compare_scale" size={18} /><span>Benchmark — مقایسه گله‌ها</span></span></div>
       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
         فعال ({getGlobalFormat().count(active.length)}) vs آرشیو ({getGlobalFormat().count(archived.length)})
       </div>

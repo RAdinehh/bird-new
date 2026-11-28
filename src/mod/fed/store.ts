@@ -273,12 +273,12 @@ export const CATEGORY_LABEL: Record<IngredientCategory, string> = {
 };
 
 export const CATEGORY_ICON: Record<IngredientCategory, string> = {
-  energy: '🌽',
-  protein: '🫘',
-  mineral: '🦴',
-  vitamin: '💊',
-  amino: '🧪',
-  additive: '✨'
+  energy: 'corn',
+  protein: 'soybean_meal',
+  mineral: 'calcium_powder',
+  vitamin: 'premix',
+  amino: 'amino_acid',
+  additive: 'auxiliary'
 };
 
 export const STAGE_LABEL: Record<string, string> = {

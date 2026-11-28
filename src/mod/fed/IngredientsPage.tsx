@@ -1,3 +1,4 @@
+import { getSmartFeedIcon, type AppIconKey } from '../../shr/icons/AppIcons';
 import { useFormat } from '../../shr/units/useFormat';
 import { useState, useMemo, useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
@@ -307,7 +308,7 @@ export default function IngredientsPage({ active = true }: { active?: boolean })
                 ms={ms}
                 accent={it.isHidden ? 'dim' : (it.isCore ? 'blue' : 'accent')}
                 index={fmt.count(i + 1)}
-                iconEmoji={CATEGORY_ICON[it.category]}
+                iconEmoji={getSmartFeedIcon(it.name, (CATEGORY_ICON[it.category] || 'feed') as AppIconKey)}
                 title={it.name}
                 subtitle={`${CATEGORY_LABEL[it.category]} • پروتئین ${fmt.num(it.protein)}٪`}
                 isOpen={isOpen}

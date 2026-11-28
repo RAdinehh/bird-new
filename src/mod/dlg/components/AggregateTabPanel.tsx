@@ -553,7 +553,7 @@ export default function AggregateTabPanel({ active, logs, flocks }: Props) {
             {showAllCols ? 'ستون‌های کمتر' : 'همه ستون‌ها'}
           </button>
 
-          {/* ۵. <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="export_report" size={16} /><span>خروجی CSV</span></span> */}
+          {/* ۵. <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="export_report" size={16} /><span><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="export_report" size={16} /><span>خروجی CSV</span></span></span></span> */}
           <button
             type="button"
             disabled={visibleBuckets.length === 0}

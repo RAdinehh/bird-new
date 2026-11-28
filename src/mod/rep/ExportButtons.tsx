@@ -209,7 +209,7 @@ export default function ExportButtons() {
           <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="export_report" size={18} /><span>خروجی PDF</span></span>
         </div>
         <Btn variant="primary" full onClick={exportSummaryPDF}>
-          📄 گزارش کلی PDF
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="export_report" size={17} /><span>گزارش کلی PDF</span></span>
         </Btn>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
           در پنجره‌ی چاپ، «ذخیره به PDF» را انتخاب کنید
