@@ -1,3 +1,5 @@
+import { CATEGORY_ICON } from '../store';
+import { getSmartFeedIcon, type AppIconKey } from '../../../shr/icons/AppIcons';
 import { useFormat } from '../../../shr/units/useFormat';
 import { useState } from 'react';
 /**
@@ -111,7 +113,7 @@ export default function FormulaFormModal(props: Props) {
          value={line.ingredientId}
          placeholder="— انتخاب —"
          modalTitle="انتخاب ماده اولیه"
-         options={available.map((i) => ({ value: String(i.id), label: String(i.name), subtitle: fmt.num(i.protein) + "٪ پروتئین", icon: '🌾' }))}
+         options={available.map((i) => ({ value: String(i.id), label: String(i.name), subtitle: fmt.num(i.protein) + "٪ پروتئین", icon: getSmartFeedIcon(i.name, ((CATEGORY_ICON as Record<string, string>)[String(i.category)] || 'feed') as AppIconKey) }))}
          onChange={(val: string) => updateLine(line.id, { ingredientId: val })}
        />
          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>

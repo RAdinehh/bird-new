@@ -1,3 +1,4 @@
+import SmartSelect from '../../shr/components/SmartSelect';
 import { useFormat } from '../../shr/units/useFormat';
 import { useState, useMemo , useEffect } from 'react';
 import { useFab } from '../../shr/hooks/useFab';
@@ -342,11 +343,16 @@ export default function RequirementsPage({ active = true }: { active?: boolean }
             <Input placeholder="پرنده" value={form.birdType} onChange={e => setForm({ ...form, birdType: e.target.value })} />
           </Field>
           <Field label="مرحله">
-            <Select value={form.stage} onChange={e => setForm({ ...form, stage: e.target.value })}>
-              {(Object.keys(STAGE_LABEL)).map(s =>
-                <option key={s} value={s}>{STAGE_LABEL_LONG[s]}</option>
-              )}
-            </Select>
+            <SmartSelect
+              value={form.stage}
+              onChange={v => v && setForm({ ...form, stage: String(v) })}
+              options={(Object.keys(STAGE_LABEL)).map(st => ({
+                value: st,
+                label: STAGE_LABEL_LONG[st],
+                icon: ({ starter: 'chick', grower: 'chick', developer: 'chicken', prelayer: 'egg', layer: 'egg', finisher: 'chicken', breeder: 'hatch' } as Record<string, string>)[st] || 'chicken',
+              }))}
+              modalTitle="انتخاب مرحله"
+            />
           </Field>
         </Grid2>
 

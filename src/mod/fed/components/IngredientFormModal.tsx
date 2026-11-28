@@ -1,3 +1,5 @@
+import { getWhsItemIcon } from '../../whs/helpers';
+import { getSmartFeedIcon, type AppIconKey } from '../../../shr/icons/AppIcons';
 /**
  * IngredientFormModal — فرم افزودن/ویرایش ماده اولیه
  */
@@ -32,12 +34,17 @@ export default function IngredientFormModal(props: Props) {
       >
         {!form.id && (
           <Field label="انتخاب از کتابخانه" hint="یکی از مواد پیش‌فرض را انتخاب کنید">
-            <Select value={form.standardKey} onChange={e => pickFromLibrary(e.target.value)}>
-              <option value="">— انتخاب از کتابخانه (اختیاری) —</option>
-              {INGREDIENT_STANDARDS.map(s => (
-                <option key={s.key} value={s.key}>{CATEGORY_ICON[s.category]} {s.name}</option>
-              ))}
-            </Select>
+            <SmartSelect
+              value={form.standardKey}
+              onChange={v => pickFromLibrary(String(v || ""))}
+              options={INGREDIENT_STANDARDS.map(st => ({
+                value: st.key,
+                label: st.name,
+                icon: getSmartFeedIcon(st.name, (CATEGORY_ICON[st.category] || 'feed') as AppIconKey),
+              }))}
+              placeholder="— انتخاب از کتابخانه (اختیاری) —"
+              modalTitle="انتخاب از کتابخانه"
+            />
           </Field>
         )}
 
@@ -47,11 +54,16 @@ export default function IngredientFormModal(props: Props) {
 
         <Grid2>
           <Field label="دسته" required>
-            <Select value={form.category} onChange={e => setForm({ ...form, category: e.target.value as IngredientCategory })}>
-              {(Object.keys(CATEGORY_LABEL) as IngredientCategory[]).map(c =>
-                <option key={c} value={c}>{CATEGORY_ICON[c]} {CATEGORY_LABEL[c]}</option>
-              )}
-            </Select>
+            <SmartSelect
+              value={form.category}
+              onChange={v => v && setForm({ ...form, category: v as IngredientCategory })}
+              options={(Object.keys(CATEGORY_LABEL) as IngredientCategory[]).map(c => ({
+                value: c,
+                label: CATEGORY_LABEL[c],
+                icon: CATEGORY_ICON[c],
+              }))}
+              modalTitle="انتخاب دسته"
+            />
           </Field>
           <Field label="قیمت دستی" hint="اگر پر شود، بر قیمت انبار اولویت دارد">
             <MoneyField placeholder="۰" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} />
@@ -91,6 +103,7 @@ export default function IngredientFormModal(props: Props) {
                 value: c.id,
                 label: c.name,
                 subtitle: (i => i.name)(c),
+                icon: c.icon || getWhsItemIcon(c.name, c.category),
               }))}
               placeholder="— انتخاب —"
               modalTitle="انتخاب کالا"
