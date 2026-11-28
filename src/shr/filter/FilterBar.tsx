@@ -348,7 +348,7 @@ export function FilterBar<T>({
                     }}>{def.icon}</span>
                   )}
                   <span style={{
-                    flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 600, opacity: 1,
+                    flex: 1, fontSize: 'var(--fs-sm)', fontWeight: 700, opacity: 1,
                     color: cnt > 0 ? 'var(--accent)' : 'var(--text)',
                   }}>{def.label}</span>
                   {cnt > 0 && (

@@ -34,7 +34,7 @@ export function RowItem({
       )}
       <span style={{
         flex: 1, minWidth: 0,
-        fontSize: 'var(--fs-sm)', fontWeight: 600,
+        fontSize: 'var(--fs-xs)', fontWeight: 600,
         color: active ? 'var(--accent)' : 'var(--text)',
         opacity: 1,
         whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
