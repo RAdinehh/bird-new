@@ -68,7 +68,7 @@ export default function ComparePage() {
     <PageContainer>
       <HelpBanner
         id="rep-compare-guide"
-        icon="compare"
+        icon="compare_scale"
         title="راهنمای مقایسه"
         description="عملکرد چند گله یا دورهٔ زمانی را از نظر تولید، مصرف، تلفات و شاخص‌های کلیدی با هم مقایسه کنید."
         tone="info"
@@ -79,7 +79,7 @@ export default function ComparePage() {
           <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="cal_30" size={15} /><span>ماهانه</span></span>
         </button>
         <button onClick={() => setMode('quarter')} style={chip(mode === 'quarter')}>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="stats" size={15} /><span>سه‌ماهه</span></span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="cal_3m" size={17} /><span>سه‌ماهه</span></span>
         </button>
       </div>
 

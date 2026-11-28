@@ -34,7 +34,7 @@ export const CATEGORY_ICON: Record<DocCategory, string> = {
   pdf: '📄',
   audio: '🎵',
   video: '🎬',
-  excel: '📊',
+  excel: 'excel_export',
   other: '📎'
 };
 

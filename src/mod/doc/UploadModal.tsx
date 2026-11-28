@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../shr/components/OptionIcon';
 import { useState, useRef } from 'react';
 import { addFile, fileCategory, CATEGORY_LABEL, LINKED_TYPE_LABEL, formatSize, type DocCategory } from './store';
 import { Btn, BtnRow, Field, Input, Modal, Select, ErrorBox , Textarea } from '../../shr/components/ui';
@@ -121,7 +122,7 @@ export default function UploadModal({ open, onClose, onUploaded, prefillType, pr
         ) : (
           <>
             <div style={{ fontSize: 'var(--fs-hero)' }}>
-              {category === 'image' ? '🖼' : category === 'pdf' ? '📄' : category === 'audio' ? '🎵' : category === 'video' ? '🎬' : category === 'excel' ? '📊' : '📎'}
+              {category === 'image' ? '🖼' : category === 'pdf' ? '📄' : category === 'audio' ? '🎵' : category === 'video' ? '🎬' : category === 'excel' ? <OptionIcon icon="excel_export" size={18} /> : '📎'}
             </div>
             <div style={{
               fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)',
