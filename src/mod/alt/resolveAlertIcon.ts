@@ -23,8 +23,8 @@ export function resolveAlertIcon(alert: {
   if (/یادآور/.test(t)) return "reminder";
   if (/قول پرداخت|تعویق|چک/.test(t)) return "payment_promise";
   if (/طلب|بدهی/.test(t)) return "cash";
-  if (/منقضی/.test(t)) return "expired";
   if (/نزدیک انقضا/.test(t)) return "expiring_soon";
+  if (/انقضا|منقضی/.test(t)) return "expired";
   if (/تجهیز|سرویس|گارانتی/.test(t)) return "equipment";
   if (/پرهیز|واکسن/.test(t)) return "meds";
   if (/هچ|جوجه‌کشی|Lock-down|چرخش/.test(t)) return "hatch";

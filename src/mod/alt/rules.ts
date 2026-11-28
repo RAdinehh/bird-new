@@ -69,7 +69,7 @@ export function detectAllAlerts(): RuleAlert[] {
       alerts.push({
         level: 'critical',
         category: alertCat,
-        title: 'منقضی‌شده: ' + item.name,
+        title: 'انقضا: ' + item.name,
         message: 'تاریخ انقضا گذشته است. از مصرف خودداری کنید.',
         source: 'whs',
         sourceId: item.id + ':expired',
@@ -160,7 +160,7 @@ export function detectAllAlerts(): RuleAlert[] {
       alerts.push({
         level: 'important',
         category: 'payment',
-        title: 'یادآوری پیگیری',
+        title: 'یادآور پیگیری',
         message: 'فاکتور ' + (inv.number || '—') + ' — امروز موعد یادآوری است',
         source: 'tra',
         sourceId: inv.id + ':reminder-today',
@@ -278,7 +278,7 @@ export function detectAllAlerts(): RuleAlert[] {
         alerts.push({
           level: 'critical',
           category: 'other',
-          title: 'پایان چرخه گله: ' + flock.name,
+          title: 'پایان چرخه: ' + flock.name,
           message: 'سن: ' + getGlobalFormat().num(age) + ' از ' + getGlobalFormat().num(cycleDays) + ' روز (' + getGlobalFormat().count(Math.round(progress)) + '٪) — آماده‌ی جایگزینی فوری',
           source: 'flk',
           sourceId: flock.id + ':end-cycle-95',
@@ -302,7 +302,7 @@ export function detectAllAlerts(): RuleAlert[] {
         alerts.push({
           level: 'info',
           category: 'other',
-          title: 'چرخه تمام شده: ' + flock.name,
+          title: 'پایان چرخه: ' + flock.name,
           message: 'سن: ' + getGlobalFormat().num(age) + ' روز (از ' + getGlobalFormat().num(cycleDays) + ' روز گذشته)',
           source: 'flk',
           sourceId: flock.id + ':cycle-over',

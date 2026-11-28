@@ -35,7 +35,7 @@ export function detectWithdrawalAlerts(alerts: RuleAlert[]): void {
     alerts.push({
       level: isCritical ? 'critical' : 'important',
       category: 'other',
-      title: (isCritical ? '⚠️ پرهیز فوری: ' : 'دوره پرهیز: ') + f.name,
+      title: (isCritical ? '⚠️ پرهیز فوری: ' : 'پرهیز: ') + f.name,
       message,
       source: 'flk',
       sourceId: f.id + ':withdrawal',
