@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../shr/components/OptionIcon';
 /**
  * helpers.tsx — ماژول whs
  */
@@ -34,7 +35,7 @@ export function WarningGroup({ title, icon, color, items, renderLine }: {
         borderBottom: '1px solid var(--border)',
         display: 'flex', alignItems: 'center', gap: 10
       }}>
-        <span style={{ fontSize: 'var(--fs-lg)' }}>{icon}</span>
+        <OptionIcon icon={icon} size={20} />
         <div style={{ flex: 1, fontSize: 'var(--fs-base)', fontWeight: 700 }}>{title}</div>
         <Tag tone={tone}>{getGlobalFormat().count(items.length)}</Tag>
       </div>
@@ -48,7 +49,7 @@ export function WarningGroup({ title, icon, color, items, renderLine }: {
             borderBottom: '1px solid var(--border)'
           }}
         >
-          <span style={{ fontSize: 'var(--fs-md)', flexShrink: 0 }}>{CATEGORY_ICON[it.category]}</span>
+          <OptionIcon icon={it.icon || getWhsItemIcon(it.name, it.category, CATEGORY_ICON[it.category])} size={22} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{
               fontSize: 'var(--fs-sm)', fontWeight: 600,
