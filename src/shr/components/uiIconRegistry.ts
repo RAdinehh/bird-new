@@ -41,6 +41,8 @@ export const UI_ICON_MAP = {
   inventory: 'inventory' as AppIconKey,
   hall: 'hall' as AppIconKey,
   handTools: 'hand_tools' as AppIconKey,
+  other: 'other' as AppIconKey,
+  manure: 'manure' as AppIconKey,
   note: 'invoice' as AppIconKey,
 } as const;
 
@@ -130,6 +132,9 @@ const SUBTYPE_ICON_MAP: Record<UiIconCategory, Record<string, AppIconKey>> = {
     medicine: UI_ICON_MAP.meds,
     herbal: UI_ICON_MAP.herbal,
     equipment: UI_ICON_MAP.equipment,
+    manure: UI_ICON_MAP.manure,
+    broken: 'broken_egg' as AppIconKey,
+    other: UI_ICON_MAP.other,
   },
   event: {
     vaccine: UI_ICON_MAP.vaccine,
