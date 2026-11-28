@@ -1,3 +1,4 @@
+import { resolveCategoryIconKey } from '../../shr/components/uiIconRegistry';
 import { OptionIcon } from '../../shr/components/OptionIcon';
 import { IconCalendar, IconNote, IconSyringe, IconLeaf, IconEgg, IconDollar, IconBell } from '../../shr/icons';
 import { useState } from 'react';
@@ -15,10 +16,10 @@ interface Props {
 
 const EVENT_TYPE_ICONS: Record<string, React.ReactNode> = {
   daily: <OptionIcon icon="📋" size={18} />,
-  vaccine: <OptionIcon icon="vaccine" size={18} />,
-  herbal: <OptionIcon icon="herbal" size={18} />,
-  hatch: <OptionIcon icon="hatch" size={18} />,
-  payment: <OptionIcon icon="cash" size={18} />,
+  vaccine: <OptionIcon icon={resolveCategoryIconKey('event', 'vaccine')} size={18} />,
+  herbal: <OptionIcon icon={resolveCategoryIconKey('event', 'herbal')} size={18} />,
+  hatch: <OptionIcon icon={resolveCategoryIconKey('event', 'hatch')} size={18} />,
+  payment: <OptionIcon icon={resolveCategoryIconKey('event', 'payment')} size={18} />,
   finance: <OptionIcon icon="🔔" size={18} />,
 };
 

@@ -1,3 +1,4 @@
+import { resolveCategoryIconKey } from '../../../shr/components/uiIconRegistry';
 import { FIELD_META } from '../../../shr/constants/fieldMeta';
 import { scrollToFocusId } from '../../../shr/utils/scrollToFocusId';
 /**
@@ -216,7 +217,7 @@ export default function InvoiceFormModal(props: InvoiceFormModalProps) {
             options={(isPurchase ? CATEGORIES.purchase : CATEGORIES.sale).map(([v, l]: [string, string]) => ({
               value: v,
               label: l,
-              icon: (isPurchase && v === 'egg') ? 'fertile_egg' : (CAT_ICON_MAP[v] || '📋'),
+              icon: (isPurchase && v === 'egg') ? resolveCategoryIconKey('invoice', 'fertile_egg') : (CAT_ICON_MAP[v] ? resolveCategoryIconKey('invoice', v) : '📋'),
             }))}
             onChange={newCat => {
               if (newCat === form.category) return;
