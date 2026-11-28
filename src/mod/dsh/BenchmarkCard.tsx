@@ -57,7 +57,7 @@ export default function BenchmarkCard() {
 
   return (
     <div style={{ padding: 'var(--pad-card)', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}><span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="compare_scale" size={18} /><span>Benchmark — مقایسه گله‌ها</span></span></div>
+      <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}><span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('compare', 'flocks')} size={18} /><span>Benchmark — مقایسه گله‌ها</span></span></div>
       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
         فعال ({getGlobalFormat().count(active.length)}) vs آرشیو ({getGlobalFormat().count(archived.length)})
       </div>

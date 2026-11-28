@@ -88,7 +88,7 @@ export default function GroupComparisonModal({ open, onClose }: Props) {
   };
 
   return (
-    <Modal open={open} onClose={onClose} title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="compare_scale" size={18} /><span>مقایسه گروه‌ها</span></span>}>
+    <Modal open={open} onClose={onClose} title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('compare', 'groups')} size={18} /><span>مقایسه گروه‌ها</span></span>}>
       {/* انتخاب گروه‌ها */}
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
         {ids.map(id => {

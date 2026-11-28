@@ -80,7 +80,7 @@ export default function ComparePage() {
           <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="cal_30" size={15} /><span>ماهانه</span></span>
         </button>
         <button onClick={() => setMode('quarter')} style={chip(mode === 'quarter')}>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="cal_3m" size={17} /><span>سه‌ماهه</span></span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon={resolveCategoryIconKey('period', '3m')} size={17} /><span>سه‌ماهه</span></span>
         </button>
       </div>
 
@@ -148,7 +148,7 @@ export default function ComparePage() {
       </Section>
 
       {/* نمودار سود */}
-      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="profit_trend" size={18} /><span>سود در طول زمان</span></span>}>
+      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('profit', 'timeline')} size={18} /><span>سود در طول زمان</span></span>}>
         <BarChart
           data={currentData.map(d => ({ label: d.label, value: d.sales - d.purchases }))}
           color="var(--accent)"

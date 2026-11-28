@@ -1,3 +1,5 @@
+import { resolveCategoryIconKey } from '../../../shr/components/uiIconRegistry';
+import { OptionIcon } from '../../../shr/components/OptionIcon';
 /**
  * GroupsPage.tsx — مدیریت گروه‌های گله
  */
@@ -462,8 +464,8 @@ export default function GroupsPage({ open, onClose }: Props) {
         <Btn variant="primary" onClick={handleNew} style={{ flex: 1, height: 40 }}>+ گروه جدید</Btn>
         <div style={{ flex: 1, display: 'flex', gap: 4 }}>
           <button type="button" onClick={() => fileInputRef.current?.click()} title="Import JSON" aria-label="Import" style={{ flex: 1, height: 40, borderRadius: 'var(--r-md)', border: '1px solid var(--border)', background: 'var(--btn-bg)', color: 'var(--muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>📥</button>
-          <button type="button" onClick={handleExport} disabled={groups.length === 0} title="Export JSON" aria-label="Export" style={{ flex: 1, height: 40, borderRadius: 'var(--r-md)', border: '1px solid var(--border)', background: 'var(--btn-bg)', color: 'var(--muted)', cursor: groups.length === 0 ? 'not-allowed' : 'pointer', opacity: groups.length === 0 ? 0.4 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>📤</button>
-          <button type="button" onClick={() => setComparisonOpen(true)} disabled={groups.length < 2} title="مقایسه" aria-label="مقایسه" style={{ flex: 1, height: 40, borderRadius: 'var(--r-md)', border: '1px solid var(--border)', background: 'var(--btn-bg)', color: 'var(--muted)', cursor: groups.length < 2 ? 'not-allowed' : 'pointer', opacity: groups.length < 2 ? 0.4 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>📊</button>
+          <button type="button" onClick={handleExport} disabled={groups.length === 0} title="Export JSON" aria-label="Export" style={{ flex: 1, height: 40, borderRadius: 'var(--r-md)', border: '1px solid var(--border)', background: 'var(--btn-bg)', color: 'var(--muted)', cursor: groups.length === 0 ? 'not-allowed' : 'pointer', opacity: groups.length === 0 ? 0.4 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}><OptionIcon icon={resolveCategoryIconKey('export', 'report')} size={16} /></button>
+          <button type="button" onClick={() => setComparisonOpen(true)} disabled={groups.length < 2} title="مقایسه" aria-label="مقایسه" style={{ flex: 1, height: 40, borderRadius: 'var(--r-md)', border: '1px solid var(--border)', background: 'var(--btn-bg)', color: 'var(--muted)', cursor: groups.length < 2 ? 'not-allowed' : 'pointer', opacity: groups.length < 2 ? 0.4 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}><OptionIcon icon={resolveCategoryIconKey('compare', 'groups')} size={16} /></button>
         </div>
       </div>
       )}

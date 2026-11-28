@@ -159,12 +159,12 @@ export default function FinancialPage() {
       ) : null}
 
       {/* نمودار فروش */}
-      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="cal_6m" size={18} /><span>فروش ۶ ماه اخیر</span></span>}>
+      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('period', '6m')} size={18} /><span>فروش ۶ ماه اخیر</span></span>}>
         <BarChart data={salesData} color="var(--accent)" />
       </Section>
 
       {/* نمودار خرید */}
-      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="cal_6m" size={18} /><span>خرید ۶ ماه اخیر</span></span>}>
+      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('period', '6m')} size={18} /><span>خرید ۶ ماه اخیر</span></span>}>
         <BarChart data={purchaseData} color="var(--warn)" />
       </Section>
 
@@ -174,7 +174,7 @@ export default function FinancialPage() {
       </Section>
 
       {/* روند سود */}
-      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="profit_trend" size={18} /><span>روند سود</span></span>}>
+      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('profit', 'trend')} size={18} /><span>روند سود</span></span>}>
         <LineChart
           data={months.map(m => ({
             label: monthLabel(m),
@@ -193,7 +193,7 @@ export default function FinancialPage() {
 
       {/* خروجی‌ها */}
       <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', padding: '4px 4px 8px' }}>
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="export_report" size={18} /><span>خروجی گرفتن</span></span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('export', 'report')} size={18} /><span>خروجی گرفتن</span></span>
       </div>
       <ExportButtons />
     </PageContainer>

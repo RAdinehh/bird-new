@@ -191,7 +191,7 @@ export default function FlockReportPage() {
           </Section>
         </>
       ) : null}
-          <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="export_report" size={18} /><span>خروجی CSV</span></span>}>
+          <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('export', 'csv')} size={18} /><span>خروجی CSV</span></span>}>
         <Btn full variant="primary" onClick={() => {
           const headers = ['گله', 'نوع', 'تعداد', 'تخم کل', 'مرگ‌ومیر٪', 'Hen-Day٪', 'دان (kg)', 'شکسته٪', 'رکوردها'];
           const rows = flockData.map(d => [
