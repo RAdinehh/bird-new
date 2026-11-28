@@ -35,7 +35,7 @@ export function OptionIcon({ icon, size = 22, color = 'currentColor', style }: O
     const trimmed = icon.trim() === '🐦' ? 'quail' : icon.trim();
     const emoji = ICON_KEY_TO_EMOJI[trimmed];
     if (!emoji && isValidIconKey(trimmed)) {
-      return <AppIcon name={trimmed} size={size} style={style} />;
+      return <AppIcon name={trimmed} size={Math.round(size * 0.85)} style={{ verticalAlign: "middle", flexShrink: 0, ...style }} />;
     }
     return (
       <span
