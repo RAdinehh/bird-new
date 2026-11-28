@@ -28,7 +28,7 @@ export default function NotificationsTab() {
 
       {/* ═══ ۱. سطوح هشدار ═══ */}
       <SettingsGroup
-        icon="📡"
+        icon="alert_bell"
         title="سطوح هشدار"
         subtitle={`${fmt.count(activeAlerts)} از ۳ سطح فعال`}
         tone="accent"
@@ -55,7 +55,7 @@ export default function NotificationsTab() {
 
       {/* ═══ ۲. ساعات سکوت ═══ */}
       <SettingsGroup
-        icon="🌙"
+        icon="reminder"
         title="ساعات سکوت"
         subtitle={qh.enabled ? `${qh.from} تا ${qh.to}` : 'غیرفعال'}
         tone="purple"
@@ -96,7 +96,7 @@ export default function NotificationsTab() {
 
       {/* ═══ ۳. یادآور سرسید ═══ */}
       <SettingsGroup
-        icon="⏰"
+        icon="cal_today"
         title="یادآور سرسید"
         subtitle={`${fmt.count(activeReminders)} یادآور فعال`}
         tone="warn"

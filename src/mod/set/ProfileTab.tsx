@@ -19,7 +19,7 @@ export default function ProfileTab() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
 
       {/* ═══ پروفایل کاربر ═══ */}
-      <SettingsGroup icon="👤" title="پروفایل کاربر" subtitle={userSummary} tone="accent">
+      <SettingsGroup icon="contact_user" title="پروفایل کاربر" subtitle={userSummary} tone="accent">
         <Grid2>
           <Field label="نام و نام خانوادگی">
             <Input
@@ -59,7 +59,7 @@ export default function ProfileTab() {
       </SettingsGroup>
 
       {/* ═══ اطلاعات مرغداری ═══ */}
-      <SettingsGroup icon="🏠" title="اطلاعات مرغداری" subtitle={farmSummary} tone="info">
+      <SettingsGroup icon="home" title="اطلاعات مرغداری" subtitle={farmSummary} tone="info">
         <Field label="نام مرغداری">
           <Input
             value={farm.name}
@@ -137,7 +137,7 @@ export default function ProfileTab() {
       </SettingsGroup>
 
       {/* ═══ اطلاعات بانکی ═══ */}
-      <SettingsGroup icon="🏦" title="اطلاعات بانکی" subtitle={bankSummary} tone="purple">
+      <SettingsGroup icon="bank_check" title="اطلاعات بانکی" subtitle={bankSummary} tone="purple">
         <div style={{
           fontSize: 'var(--fs-xs)',
           color: 'var(--muted)',
@@ -184,7 +184,7 @@ export default function ProfileTab() {
 
       {/* ═══ امنیت ═══ */}
       <SettingsGroup
-        icon="🔒"
+        icon="lock"
         title="امنیت"
         subtitle={security.pinEnabled ? 'قفل با PIN فعال' : 'قفل غیرفعال'}
         tone="danger"

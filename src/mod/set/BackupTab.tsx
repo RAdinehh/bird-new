@@ -194,7 +194,7 @@ export default function BackupTab() {
 
       {/* ═══ ۱. پشتیبان‌گیری ═══ */}
       <SettingsGroup
-        icon="📤"
+        icon="export"
         title="پشتیبان‌گیری"
         subtitle={`حجم کل: ${formatSize(stats.totalSize)}`}
         tone="accent"
@@ -231,7 +231,7 @@ export default function BackupTab() {
 
       {/* ═══ ۲. پشتیبان خودکار ═══ */}
       <SettingsGroup
-        icon="⏱"
+        icon="reminder"
         title="پشتیبان خودکار"
         subtitle={s.autoBackup.enabled ? `هر ${fmt.int(s.autoBackup.intervalHours)} ساعت` : 'غیرفعال'}
         tone="purple"
@@ -272,7 +272,7 @@ export default function BackupTab() {
       
       {/* ═══ ۲.۵ پشتیبان ابری Google Drive ═══ */}
       <SettingsGroup
-        icon="☁️"
+        icon="sync"
         title="پشتیبان ابری (Google Drive)"
         subtitle={
           driveCfg.lastSyncedAt

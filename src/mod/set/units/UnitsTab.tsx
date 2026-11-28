@@ -109,14 +109,14 @@ export default function UnitsTab() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
 
       {/* ═══ کارت ۱: واحدهای اندازه‌گیری ═══ */}
-      <SettingsGroup icon="📐" title="واحدهای اندازه‌گیری" subtitle="با پیش‌نمایش زنده" tone="accent">
+      <SettingsGroup icon="weighing" title="واحدهای اندازه‌گیری" subtitle="با پیش‌نمایش زنده" tone="accent">
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
           gap: 8,
         }}>
           <UnitCard
-            icon="💰" label="ارز"
+            icon="cash" label="ارز"
             value={units.currency}
             onChange={v => update({ currency: v as CurrencyUnit })}
             options={[
@@ -127,7 +127,7 @@ export default function UnitsTab() {
             preview={fmt.money(SAMPLE.money)}
           />
           <UnitCard
-            icon="🌡" label="دما"
+            icon="climate" label="دما"
             value={units.temperature}
             onChange={v => update({ temperature: v as TempUnit })}
             options={[
@@ -137,7 +137,7 @@ export default function UnitsTab() {
             preview={fmt.temp(SAMPLE.temp)}
           />
           <UnitCard
-            icon="⚖️" label="وزن"
+            icon="weighing" label="وزن"
             value={units.weight}
             onChange={v => update({ weight: v as WeightUnit })}
             options={[
@@ -149,7 +149,7 @@ export default function UnitsTab() {
             preview={fmt.weight(SAMPLE.weight)}
           />
           <UnitCard
-            icon="💧" label="حجم"
+            icon="water" label="حجم"
             value={units.volume}
             onChange={v => update({ volume: v as VolumeUnit })}
             options={[
@@ -160,7 +160,7 @@ export default function UnitsTab() {
             preview={fmt.volume(SAMPLE.volume)}
           />
           <UnitCard
-            icon="📏" label="طول"
+            icon="target" label="طول"
             value={units.length}
             onChange={v => update({ length: v as LengthUnit })}
             options={[
@@ -172,7 +172,7 @@ export default function UnitsTab() {
             preview={fmt.length(SAMPLE.length)}
           />
           <UnitCard
-            icon="📐" label="مساحت"
+            icon="hall" label="مساحت"
             value={units.area}
             onChange={v => update({ area: v as AreaUnit })}
             options={[
@@ -230,14 +230,14 @@ export default function UnitsTab() {
       </SettingsGroup>
 
       {/* ═══ کارت ۲: نمایش اعداد و تاریخ ═══ */}
-      <SettingsGroup icon="🔢" title="نمایش اعداد و تاریخ" subtitle="فرمت سراسری کل نرم‌افزار" tone="purple">
+      <SettingsGroup icon="pcs" title="نمایش اعداد و تاریخ" subtitle="فرمت سراسری کل نرم‌افزار" tone="purple">
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
           gap: 8,
         }}>
           <UnitCard
-            icon="🔤" label="فرمت اعداد"
+            icon="note" label="فرمت اعداد"
             value={units.numberFormat}
             onChange={v => update({ numberFormat: v as NumberFormat })}
             options={[
@@ -247,21 +247,21 @@ export default function UnitsTab() {
             preview={fmt.int(SAMPLE.number)}
           />
           <UnitCard
-            icon="🔢" label="تعداد اعشار"
+            icon="pcs" label="تعداد اعشار"
             value={String(units.decimals)}
             onChange={v => update({ decimals: Number(v) })}
             options={DEC_OPTIONS.map(n => ({ v: String(n), l: `${n} رقم` }))}
             preview={fmt.num(1234.5678)}
           />
           <UnitCard
-            icon="⌨️" label="جداکننده هزار"
+            icon="tag" label="جداکننده هزار"
             value={units.thousandSep}
             onChange={v => update({ thousandSep: v as ThousandSep })}
             options={SEP_OPTIONS.map(k => ({ v: k, l: UNIT_LABELS.thousandSep[k] }))}
             preview={fmt.int(SAMPLE.number)}
           />
           <UnitCard
-            icon="📅" label="تقویم"
+            icon="cal_30" label="تقویم"
             value={units.dateFormat}
             onChange={v => update({ dateFormat: v as DateFormat })}
             options={[

@@ -421,25 +421,25 @@ const [, _setTick] = useState(0);
       const w = expiryWarning(i);
       return w === 'soon' || w === 'expired';
     }).length;
-    if (expiring > 0) list.push({ icon: '💊', label: 'قلم نزدیک انقضا', count: expiring, tone: 'danger', route: '/whs' });
+    if (expiring > 0) list.push({ icon: 'meds', label: 'قلم نزدیک انقضا', count: expiring, tone: 'danger', route: '/whs' });
 
     // ۲. انبار: زیر حد
     const lowStock = whsItems.filter(i => {
       const w = stockWarning(i);
       return w === 'low' || w === 'critical';
     }).length;
-    if (lowStock > 0) list.push({ icon: '🌾', label: 'قلم زیر حد موجودی', count: lowStock, tone: 'warn', route: '/whs' });
+    if (lowStock > 0) list.push({ icon: 'feed', label: 'قلم زیر حد موجودی', count: lowStock, tone: 'warn', route: '/whs' });
 
     // ۳. جوجه‌کشی: هچ نزدیک
     const nearHatch = eggEntries.filter(e => {
       const d = daysToHatch(e as any);
       return d !== null && d !== undefined && d >= 0 && d <= 3 && e.status !== 'done' && e.status !== 'hatched';
     }).length;
-    if (nearHatch > 0) list.push({ icon: '🐣', label: 'هچ در ۳ روز آینده', count: nearHatch, tone: 'info', route: '/inc' });
+    if (nearHatch > 0) list.push({ icon: 'hatch', label: 'هچ در ۳ روز آینده', count: nearHatch, tone: 'info', route: '/inc' });
 
     // ۴. هشدارهای بحرانی
     const critical = activeAlerts(alerts).filter(a => a.level === 'critical').length;
-    if (critical > 0) list.push({ icon: '🚨', label: 'هشدار بحرانی', count: critical, tone: 'danger', route: '/alt' });
+    if (critical > 0) list.push({ icon: 'alert_critical', label: 'هشدار بحرانی', count: critical, tone: 'danger', route: '/alt' });
 
     // ۵. چرخه تخم‌گذاری (SAP 4-stage lifecycle)
     const layerBreeds = activeFlocks.filter(f =>
@@ -461,13 +461,13 @@ const [, _setTick] = useState(0);
       }
     }
     if (stopped > 0) {
-      list.push({ icon: '⏹', label: 'تخم‌گذاری متوقف', count: stopped, tone: 'muted', route: '/flk' });
+      list.push({ icon: 'egg', label: 'تخم‌گذاری متوقف', count: stopped, tone: 'muted', route: '/flk' });
     }
     if (endingSoon > 0) {
-      list.push({ icon: '🔚', label: 'پایان چرخه نزدیک', count: endingSoon, tone: 'danger', route: '/flk' });
+      list.push({ icon: 'alert_warning', label: 'پایان چرخه نزدیک', count: endingSoon, tone: 'danger', route: '/flk' });
     }
     if (startingSoon > 0) {
-      list.push({ icon: '⏰', label: 'شروع تخم‌گذاری نزدیک', count: startingSoon, tone: 'warn', route: '/flk' });
+      list.push({ icon: 'reminder', label: 'شروع تخم‌گذاری نزدیک', count: startingSoon, tone: 'warn', route: '/flk' });
     }
 
     return list;

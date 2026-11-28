@@ -255,20 +255,20 @@ export const useSet = create<State>()(
 );
 
 export const MODULE_LABELS: Record<string, { name: string; desc: string; icon: string }> = {
-  dsh: { name: 'داشبورد', desc: 'نمای کلی و شاخص‌ها', icon: '🏠' },
-  brd: { name: 'پرنده و نژاد', desc: 'مدیریت پرنده‌ها و نژادها', icon: '🐔' },
+  dsh: { name: 'داشبورد', desc: 'نمای کلی و شاخص‌ها', icon: 'home' },
+  brd: { name: 'پرنده و نژاد', desc: 'مدیریت پرنده‌ها و نژادها', icon: 'chicken' },
   hal: { name: 'سالن‌ها', desc: 'مدیریت سالن و تجهیزات', icon: 'hall' },
-  ctc: { name: 'مخاطبین', desc: 'مشتری، فروشنده، کارگر', icon: '👥' },
+  ctc: { name: 'مخاطبین', desc: 'مشتری، فروشنده، کارگر', icon: 'contact_user' },
   flk: { name: 'گله‌ها', desc: 'گله‌های تخم‌گذار، گوشتی، مادر', icon: 'flock' },
   inc: { name: 'جوجه‌کشی', desc: 'دستگاه، ورودی تخم، کندلینگ، هچ', icon: 'hatch' },
   egg: { name: 'تخم‌ها', desc: 'تخم‌گذاری و انبار تخم', icon: 'egg' },
-  dlg: { name: 'ثبت روزانه', desc: 'چک‌لیست روزانه سالن', icon: '📋' },
+  dlg: { name: 'ثبت روزانه', desc: 'چک‌لیست روزانه سالن', icon: 'daily_log' },
   whs: { name: 'انبار', desc: 'مواد، دارو، واکسن، گیاهان', icon: 'inventory' },
   fed: { name: 'جیره‌نویسی', desc: 'فرمول و نیاز غذایی', icon: 'feed' },
   tra: { name: 'معاملات', desc: 'خرید، فروش، معاملات خاص', icon: 'cash' },
   rep: { name: 'گزارش‌ها', desc: 'تحلیل مالی و تولید', icon: 'stats' },
-  alt: { name: 'هشدارها', desc: 'هشدارهای بحرانی و مهم', icon: '🔔' },
-  cal: { name: 'تقویم', desc: 'تقویم تخصصی مرغداری', icon: '📅' },
-  doc: { name: 'اسناد', desc: 'فایل‌ها و تصاویر', icon: '📎' },
-  set: { name: 'تنظیمات', desc: 'همیشه فعال', icon: '⚙' }
+  alt: { name: 'هشدارها', desc: 'هشدارهای بحرانی و مهم', icon: 'alert_bell' },
+  cal: { name: 'تقویم', desc: 'تقویم تخصصی مرغداری', icon: 'cal_30' },
+  doc: { name: 'اسناد', desc: 'فایل‌ها و تصاویر', icon: 'attachment' },
+  set: { name: 'تنظیمات', desc: 'همیشه فعال', icon: 'equipment' }
 };

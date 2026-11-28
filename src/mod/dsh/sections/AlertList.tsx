@@ -26,7 +26,7 @@ export default function AlertList({ active, counts, nav }: Props) {
               <>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 4px 8px' }}>
                   <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>
-                    🔔 هشدارهای فعال ({fmt.count(counts.total)})
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="alert_bell" size={16} /><span>هشدارهای فعال</span></span> ({fmt.count(counts.total)})
                   </span>
                   <span onClick={() => nav('/alt')} style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', cursor: 'pointer' }}>
                     مشاهده همه ←

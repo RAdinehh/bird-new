@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../../shr/components/OptionIcon';
 /**
  * StockAlertCard — کارت هشدار انبار
  */
@@ -29,7 +30,7 @@ export default function StockAlertCard({ stockAlerts, nav }: Props) {
                 }}
               >
                 <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--warn)', fontWeight: 700 }}>
-                  📦 هشدار انبار
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="inventory" size={16} /><span>هشدار انبار</span></span>
                 </span>
                 <span style={{ fontSize: 'var(--fs-md)', color: 'var(--warn)', fontWeight: 700 }}>
                   {fmt.count(stockAlerts)} قلم

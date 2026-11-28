@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../shr/components/OptionIcon';
 /**
  * TodayCard — بخش «امروز در یک نگاه»: Benchmark گله + 9 KpiCard
  */
@@ -45,7 +46,7 @@ export default function TodayCard({
   if (activeFlocks.length === 0) {
     return (
       <>
-        <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> امروز در یک نگاه</SectionTitle>
+        <SectionTitle icon="cal_today">امروز در یک نگاه</SectionTitle>
         <MiniEmpty
           icon="flock"
           title="هنوز گله‌ای ثبت نشده"
@@ -72,7 +73,7 @@ export default function TodayCard({
                       gap: 8,
                     }}>
                       <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
-                        🎯 Benchmark گله
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="target" size={16} /><span>شاخص عملکرد گله</span></span>
                       </div>
                       {activeFlocks.length > 1 && (
                         <Select
@@ -193,7 +194,7 @@ export default function TodayCard({
                   </div>
                 )}
 
-                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> امروز در یک نگاه</SectionTitle>
+                <SectionTitle icon="cal_today">امروز در یک نگاه</SectionTitle>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4 }}>
                   <KpiCard
                     icon="egg"

@@ -1,8 +1,9 @@
+import { OptionIcon } from '../../shr/components/OptionIcon';
 import { useEffect, useState, type ReactNode } from 'react';
 import { HelpIcon } from '../../shr/components/ui/HelpIcon';
 
 interface Props {
-  icon: string;
+  icon: ReactNode;
   title: string;
   subtitle?: string;
   help?: string;
@@ -93,7 +94,7 @@ export default function SettingsGroup({
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 'var(--fs-md)',
           flexShrink: 0
-        }}>{icon}</div>
+        }}>{typeof icon === 'string' && /^[a-z0-9_]+$/.test(icon) ? <OptionIcon icon={icon} size={18} /> : icon}</div>
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{

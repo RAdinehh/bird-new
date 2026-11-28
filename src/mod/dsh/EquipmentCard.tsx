@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../shr/components/OptionIcon';
 /**
  * EquipmentCard — کارت خلاصه تجهیزات در Dashboard
  * نمایش ارزش کل، تعداد فعال/تعمیر/اسقاط و تفکیک سالن
@@ -61,8 +62,8 @@ export default function EquipmentCard({ nav }: Props) {
   if (equipment.length === 0) {
     return (
       <div style={{ marginTop: 14 }}>
-        <SectionTitle>🔧 تجهیزات</SectionTitle>
-        <MiniEmpty icon="🔧" title="تجهیزی ثبت نشده" hint="از بخش انبار → اقلام، تجهیزات رو ثبت کن" />
+        <SectionTitle icon="equipment">تجهیزات</SectionTitle>
+        <MiniEmpty icon="equipment" title="تجهیزی ثبت نشده" hint="از بخش انبار → اقلام، تجهیزات رو ثبت کن" />
       </div>
     );
   }
@@ -73,7 +74,7 @@ export default function EquipmentCard({ nav }: Props) {
 
   return (
     <div style={{ marginTop: 14 }}>
-      <SectionTitle>🔧 تجهیزات</SectionTitle>
+      <SectionTitle icon="equipment">تجهیزات</SectionTitle>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 8 }}>
         <KpiCard
@@ -123,7 +124,7 @@ export default function EquipmentCard({ nav }: Props) {
       {hallRows.length > 0 && (
         <div style={{ marginTop: 10, background: 'var(--input-bg)', borderRadius: 'var(--r-sm)', padding: '8px 10px' }}>
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 700, marginBottom: 6 }}>
-            📍 تفکیک بر اساس سالن
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="hall" size={15} /><span>تفکیک بر اساس سالن</span></span>
           </div>
           {hallRows.map(row => {
             const hall = row.id === '__none__' ? null : halls.find(h => h.id === row.id);

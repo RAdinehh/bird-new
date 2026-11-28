@@ -19,7 +19,7 @@ export default function AppearanceTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
 
-      <SettingsGroup icon="🎨" title="تم و رنگ" subtitle={s.theme === 'light' ? 'روشن • سبز' : 'تیره • سبز'} tone="accent">
+      <SettingsGroup icon="palette" title="تم و رنگ" subtitle={s.theme === 'light' ? 'روشن • سبز' : 'تیره • سبز'} tone="accent">
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           {themes.map(([v, ic, l]) => (
             <button key={v} type="button" onClick={() => s.update({ theme: v as any })} style={{
@@ -46,7 +46,7 @@ export default function AppearanceTab() {
         </Field>
       </SettingsGroup>
 
-      <SettingsGroup icon="🔤" title="فونت و چیدمان" subtitle={`اندازه ${fmt.int(s.fontSizePercent || 100)}٪`} tone="info">
+      <SettingsGroup icon="note" title="فونت و چیدمان" subtitle={`اندازه ${fmt.int(s.fontSizePercent || 100)}٪`} tone="info">
         {/* اسلایدر اندازه فونت — تمام عرض */}
         <div style={{
           padding: '12px 14px',
@@ -132,7 +132,7 @@ export default function AppearanceTab() {
         />
       </SettingsGroup>
 
-      <SettingsGroup icon="📱" title="منوی پایین" subtitle={`${fmt.count(activeNavCount)} از ۵ جای خالی`} tone="purple">
+      <SettingsGroup icon="home" title="منوی پایین" subtitle={`${fmt.count(activeNavCount)} از ۵ جای خالی`} tone="purple">
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
           نوار پایین را دلخواه تنظیم کنید
         </div>
@@ -196,7 +196,7 @@ export default function AppearanceTab() {
         </Btn>
       </SettingsGroup>
 
-      <SettingsGroup icon="🖨" title="چاپ" subtitle={`کاغذ ${s.printPaper}`} tone="warn">
+      <SettingsGroup icon="invoice" title="چاپ" subtitle={`کاغذ ${s.printPaper}`} tone="warn">
         <Field label="اندازه‌ی کاغذ پیش‌فرض">
           <Select value={s.printPaper} onChange={e => s.update({ printPaper: e.target.value as any })}>
             {papers.map(([v, l]) => <option key={v} value={v}>{l}</option>)}

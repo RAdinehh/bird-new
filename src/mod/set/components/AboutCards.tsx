@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../../shr/components/OptionIcon';
 /**
  * AboutCards — StatCard و LinkRow
  */
@@ -5,7 +6,7 @@ import { getGlobalFormat } from '../../../shr/units/useFormat';
 
 import { toFa } from '../../../shr/utils/fa';
 
-export function StatCard({ icon, value, label, tone }: { icon: string; value: number; label: string; tone: 'accent' | 'info' | 'purple' | 'warn' }) {
+export function StatCard({ icon, value, label, tone }: { icon: React.ReactNode; value: number; label: string; tone: 'accent' | 'info' | 'purple' | 'warn' }) {
   return (
     <div style={{
       background: 'var(--' + tone + '-soft)',
@@ -17,7 +18,7 @@ export function StatCard({ icon, value, label, tone }: { icon: string; value: nu
       gap: 10,
       minWidth: 0,
     }}>
-      <span style={{ fontSize: 22, lineHeight: 1, flexShrink: 0 }} aria-hidden="true">{icon}</span>
+      <span style={{ fontSize: 22, lineHeight: 1, flexShrink: 0, display: 'inline-flex', alignItems: 'center' }} aria-hidden="true">{typeof icon === 'string' && /^[a-z0-9_]+$/.test(icon) ? <OptionIcon icon={icon} size={22} /> : icon}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{
           fontSize: 'var(--fs-lg)',
@@ -40,7 +41,7 @@ export function StatCard({ icon, value, label, tone }: { icon: string; value: nu
 }
 
 // ═══ ردیف لینک ═══
-export function LinkRow({ icon, label, onClick }: { icon: string; label: string; onClick: () => void }) {
+export function LinkRow({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
   return (
     <button
       type="button"
@@ -62,7 +63,7 @@ export function LinkRow({ icon, label, onClick }: { icon: string; label: string;
         fontWeight: 600,
       }}
     >
-      <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0 }} aria-hidden="true">{icon}</span>
+      <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0, display: 'inline-flex', alignItems: 'center' }} aria-hidden="true">{typeof icon === 'string' && /^[a-z0-9_]+$/.test(icon) ? <OptionIcon icon={icon} size={18} /> : icon}</span>
       <span style={{ flex: 1 }}>{label}</span>
       <span style={{ color: 'var(--muted)', fontSize: 14 }}>‹</span>
     </button>

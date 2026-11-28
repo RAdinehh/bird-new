@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../shr/components/OptionIcon';
 /**
  * AnalyticsCards — بخش‌های 2+3+4: سلامت گله، عملکرد تولیدی، مالی این ماه
  */
@@ -72,7 +73,7 @@ export default function AnalyticsCards({
 
   return (
     <>
-                <SectionTitle>❤️ سلامت گله</SectionTitle>
+                <SectionTitle icon="meds">سلامت گله</SectionTitle>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4 }}>
                   <MiniStat
                     label="نرخ زنده‌مانی"
@@ -95,7 +96,7 @@ export default function AnalyticsCards({
                 </div>
 
                 {/* ============ ۳. عملکرد تولیدی ============ */}
-                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> عملکرد تولیدی</SectionTitle>
+                <SectionTitle icon="stats">عملکرد تولیدی</SectionTitle>
                 <div style={{
                   background: 'var(--card)',
                   border: '1px solid var(--border)',
@@ -110,7 +111,7 @@ export default function AnalyticsCards({
                     gap: 8,
                   }}>
                     <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700 }}>
-                      🥚 روند تخم‌گذاری
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="egg" size={16} /><span>روند تخم‌گذاری</span></span>
                     </div>
                     <div style={{ display: 'flex', gap: 3 }}>
                       {([7, 30, 90] as const).map(d => (
@@ -214,10 +215,10 @@ export default function AnalyticsCards({
                 )}
 
                 {/* ============ ۴. مالی ============ */}
-                <SectionTitle><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>💰</span> مالی این ماه</SectionTitle>
+                <SectionTitle icon="cash">مالی این ماه</SectionTitle>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
                   <KpiCard
-                    icon="📥"
+                    icon="invoice"
                     label={`فروش ماه ${momComparison.salesChange !== 0 ? (momComparison.salesChange > 0 ? '📈' : '📉') : ''}`}
                     value={salesThisMonth}
                     unit={`تومان${momComparison.salesChange !== 0 ? ` • ${momComparison.salesChange > 0 ? '+' : ''}${fmt.num(momComparison.salesChange)}٪` : ''}`}
@@ -225,7 +226,7 @@ export default function AnalyticsCards({
                     onClick={() => nav('/tra')}
                   />
                   <KpiCard
-                    icon="📤"
+                    icon="payment_promise"
                     label={`خرید ماه ${momComparison.purchaseChange !== 0 ? (momComparison.purchaseChange > 0 ? '📈' : '📉') : ''}`}
                     value={purchasesThisMonth}
                     unit={`تومان${momComparison.purchaseChange !== 0 ? ` • ${momComparison.purchaseChange > 0 ? '+' : ''}${fmt.num(momComparison.purchaseChange)}٪` : ''}`}
@@ -233,7 +234,7 @@ export default function AnalyticsCards({
                     onClick={() => nav('/tra')}
                   />
                   <KpiCard
-                    icon={profit >= 0 ? '📈' : '📉'}
+                    icon={profit >= 0 ? 'profit_trend' : 'alert_warning'}
                     label={profit >= 0 ? 'سود ماه' : 'زیان ماه'}
                     value={Math.abs(profit)}
                     unit="تومان"
@@ -263,7 +264,7 @@ export default function AnalyticsCards({
                     }}
                   >
                     <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--accent)', fontWeight: 700 }}>
-                      📥 طلب از مشتریان
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="cash" size={15} /><span>طلب از مشتریان</span></span>
                     </span>
                     <span style={{ fontSize: 'var(--fs-md)', color: 'var(--accent)', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
                       {fmt.money(receivables)}

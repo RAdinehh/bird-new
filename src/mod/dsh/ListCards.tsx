@@ -29,7 +29,7 @@ export default function ListCards({
   if (isEmpty) {
     return (
       <MiniEmpty
-        icon="✅"
+        icon="flock"
         title="همه‌چیز مرتبه"
         hint="هیچ هشدار، گله فعال، یا جوجه‌کشی در جریان نیست"
       />

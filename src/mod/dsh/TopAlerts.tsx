@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../shr/components/OptionIcon';
 /**
  * TopAlerts — 3 کارت بالای داشبورد: هشدارهای تجمیعی + سرسیدهای نزدیک + چک‌های در جریان
  */
@@ -47,7 +48,7 @@ export default function TopAlerts({
                   fontWeight: 700,
                   color: 'var(--danger)',
                 }}>
-                  🚨 هشدارهای فوری ({fmt.count(aggregatedAlerts.length)})
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="alert_critical" size={16} /><span>هشدارهای فوری</span></span> ({fmt.count(aggregatedAlerts.length)})
                 </div>
                 <div style={{ padding: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
                   {aggregatedAlerts.map((a, i) => (
@@ -77,7 +78,7 @@ export default function TopAlerts({
               </div>
             )}
 
-            {/* ⏰ سرسیدهای نزدیک */}
+            {/* <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="reminder" size={16} /><span>سررسیدهای نزدیک</span></span> */}
             {upcomingDues.length > 0 && (
               <div>
                 <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', paddingBottom: 4 }}>
@@ -119,7 +120,7 @@ export default function TopAlerts({
               </div>
             )}
 
-            {/* 🏦 چک‌های در جریان */}
+            {/* <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="bank_check" size={16} /><span>چک‌های در جریان</span></span> */}
             {pendingChecks.length > 0 && (
               <div>
                 <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)', paddingBottom: 4 }}>
@@ -165,7 +166,7 @@ export default function TopAlerts({
                 border: '1px solid var(--border)',
                 borderRadius: 'var(--r-lg)'
               }}>
-                <div style={{ fontSize: 'var(--fs-hero)', marginBottom: 12 }}>🐔</div>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}><OptionIcon icon="chicken" size={44} /></div>
                 <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, marginBottom: 8 }}>خوش آمدید</div>
                 <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--muted)', lineHeight: 1.8, maxWidth: 300, margin: '0 auto' }}>
                   برای شروع، ابتدا پرنده و نژاد را تعریف کنید، سپس سالن و گله را بسازید و از انبار و ثبت روزانه استفاده کنید.

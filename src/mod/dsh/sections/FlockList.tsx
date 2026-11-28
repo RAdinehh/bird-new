@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../../shr/components/OptionIcon';
 /**
  * FlockList — لیست گله‌های فعال Dashboard
  */
@@ -32,7 +33,7 @@ export default function FlockList({ activeFlocks, birds, productions, nav }: Pro
               <>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 4px 8px' }}>
                   <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>
-                    🐔 گله‌های فعال
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="flock" size={16} /><span>گله‌های فعال</span></span>
                   </span>
                   <span onClick={() => nav('/flk')} style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', cursor: 'pointer' }}>
                     مشاهده همه ←
@@ -70,7 +71,7 @@ export default function FlockList({ activeFlocks, birds, productions, nav }: Pro
                             background: 'var(--accent-soft)',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             fontSize: 'var(--fs-md)', flexShrink: 0
-                          }}>🐔</div>
+                          }}><OptionIcon icon="chicken" size={22} /></div>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{
                               fontSize: 'var(--fs-base)', fontWeight: 700,
@@ -87,7 +88,7 @@ export default function FlockList({ activeFlocks, birds, productions, nav }: Pro
                               <span style={{ color: 'var(--border)' }}>|</span>
                               <span>{fmt.day(age)} روز</span>
                               <span style={{ color: 'var(--border)' }}>|</span>
-                              <span>🐔 {fmt.count(flockCount)}</span>
+                              <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><OptionIcon icon="chicken" size={14} /><span>{fmt.count(flockCount)}</span></span>
                               {flockHenDay > 0 && (<>
                                 <span style={{ color: 'var(--border)' }}>|</span>
                                 <span>{fmt.code(flockHenDay.toFixed(0))}٪</span>

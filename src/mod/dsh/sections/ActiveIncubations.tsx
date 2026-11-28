@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../../shr/components/OptionIcon';
 /**
  * ActiveIncubations — لیست جوجه‌کشی‌های فعال
  */
@@ -23,7 +24,7 @@ export default function ActiveIncubations({ activeEntries, birds, nav }: Props) 
               <>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 4px 8px' }}>
                   <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>
-                    🥚 جوجه‌کشی فعال ({fmt.count(activeEntries.length)})
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="incubator" size={16} /><span>جوجه‌کشی فعال</span></span> ({fmt.count(activeEntries.length)})
                   </span>
                   <span onClick={() => nav('/inc')} style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', cursor: 'pointer' }}>
                     مشاهده ←
@@ -57,7 +58,7 @@ export default function ActiveIncubations({ activeEntries, birds, nav }: Props) 
                           background: window ? 'var(--purple-soft)' : locked ? 'var(--warn-soft)' : 'var(--accent-soft)',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           fontSize: 'var(--fs-md)', flexShrink: 0
-                        }}>🥚</div>
+                        }}><OptionIcon icon="fertile_egg" size={22} /></div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{
                             fontSize: 'var(--fs-sm)', fontWeight: 600,

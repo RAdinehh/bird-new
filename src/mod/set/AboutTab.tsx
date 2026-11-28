@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../shr/components/OptionIcon';
 import { useFormat } from '../../shr/units/useFormat';
 import { useSet } from './store';
 import { safeStorage } from '../../shr/utils/storage';
@@ -52,7 +53,7 @@ export default function AboutTab() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 28, color: '#fff', fontWeight: 700,
             flexShrink: 0,
-          }} aria-hidden="true">🐔</div>
+          }} aria-hidden="true"><OptionIcon icon="chicken" size={40} /></div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}>
               مدیریت مرغداری
@@ -72,18 +73,18 @@ export default function AboutTab() {
           gridTemplateColumns: '1fr 1fr',
           gap: 8,
         }}>
-          <StatCard icon="🐔" value={counts.birds} label="پرنده" tone="accent" />
-          <StatCard icon="🏷️" value={counts.breeds} label="نژاد" tone="info" />
-          <StatCard icon="👥" value={counts.suppliers} label="فروشنده" tone="purple" />
-          <StatCard icon="🛒" value={counts.purchases} label="خرید" tone="warn" />
+          <StatCard icon="chicken" value={counts.birds} label="پرنده" tone="accent" />
+          <StatCard icon="tag" value={counts.breeds} label="نژاد" tone="info" />
+          <StatCard icon="contact_user" value={counts.suppliers} label="فروشنده" tone="purple" />
+          <StatCard icon="invoice" value={counts.purchases} label="خرید" tone="warn" />
         </div>
       </Section>
 
       {/* ═══ ۳. راهنما و آموزش ═══ */}
       <Section title="🎓 راهنما و آموزش">
-        <LinkRow icon="❓" label={`سؤالات متداول (${fmt.count(FAQS.length)})`} onClick={() => setOpenFaq(true)} />
-        <LinkRow icon="📖" label="راهنمای کاربری" onClick={() => setOpenGuide(true)} />
-        <LinkRow icon="💡" label="نمایش مجدد راهنماهای صفحه‌ها" onClick={resetHelpBanners} />
+        <LinkRow icon="alert_info" label={`سؤالات متداول (${fmt.count(FAQS.length)})`} onClick={() => setOpenFaq(true)} />
+        <LinkRow icon="note" label="راهنمای کاربری" onClick={() => setOpenGuide(true)} />
+        <LinkRow icon="reminder" label="نمایش مجدد راهنماهای صفحه‌ها" onClick={resetHelpBanners} />
         <LinkRow
           icon="🔄"
           label="بازنشانی آموزش اولیه"
@@ -97,10 +98,10 @@ export default function AboutTab() {
 
       {/* ═══ ۴. ارتباط و اطلاعات ═══ */}
       <Section title="📞 ارتباط و اطلاعات">
-        <LinkRow icon="✉️" label="ارسال بازخورد" onClick={() => showToast('ارسال بازخورد — در گام بعدی', 'info')} />
-        <LinkRow icon="🔍" label="بررسی بروزرسانی" onClick={() => showToast('بررسی بروزرسانی — در گام بعدی', 'info')} />
-        <LinkRow icon="📜" label="شرایط استفاده" onClick={() => showToast('شرایط استفاده — در گام بعدی', 'info')} />
-        <LinkRow icon="🔒" label="سیاست حریم خصوصی" onClick={() => showToast('حریم خصوصی — در گام بعدی', 'info')} />
+        <LinkRow icon="mail" label="ارسال بازخورد" onClick={() => showToast('ارسال بازخورد — در گام بعدی', 'info')} />
+        <LinkRow icon="search" label="بررسی بروزرسانی" onClick={() => showToast('بررسی بروزرسانی — در گام بعدی', 'info')} />
+        <LinkRow icon="doc_file" label="شرایط استفاده" onClick={() => showToast('شرایط استفاده — در گام بعدی', 'info')} />
+        <LinkRow icon="lock" label="سیاست حریم خصوصی" onClick={() => showToast('حریم خصوصی — در گام بعدی', 'info')} />
       </Section>
 
       {/* ═══ ۵. عملیات حساس ═══ */}

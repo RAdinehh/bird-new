@@ -1,7 +1,7 @@
 // QuickActions.tsx - بخش 9: دسترسی سریع
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SectionTitle } from '../../shr/components/ui';
+import { SectionTitle } from './cards';
 import { OptionIcon } from '../../shr/components/OptionIcon';
 
 function QuickAction({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
@@ -31,13 +31,13 @@ export default function QuickActions() {
   const nav = useNavigate();
   return (
     <>
-      <SectionTitle>⚡ دسترسی سریع</SectionTitle>
+      <SectionTitle icon="stats">دسترسی سریع</SectionTitle>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4 }}>
-        <QuickAction icon="🐦" label="پرنده و نژاد" onClick={() => nav('/brd')} />
+        <QuickAction icon="chicken" label="پرنده و نژاد" onClick={() => nav('/brd')} />
         <QuickAction icon="hall" label="سالن‌ها" onClick={() => nav('/hal')} />
         <QuickAction icon="flock" label="گله‌ها" onClick={() => nav('/flk')} />
         <QuickAction icon="inventory" label="انبار" onClick={() => nav('/whs')} />
-        <QuickAction icon="📋" label="ثبت روزانه" onClick={() => nav('/dlg')} />
+        <QuickAction icon="daily_log" label="ثبت روزانه" onClick={() => nav('/dlg')} />
         <QuickAction icon="cash" label="معاملات" onClick={() => nav('/tra')} />
       </div>
     </>

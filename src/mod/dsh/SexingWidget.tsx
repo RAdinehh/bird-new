@@ -40,7 +40,7 @@ export default function SexingWidget({ nav, activeFlocks }: Props) {
 
   return (
     <div style={{ marginBottom: 12 }}>
-      <SectionTitle>🕐 زمان تفکیک جنسیت</SectionTitle>
+      <SectionTitle icon="reminder">زمان تفکیک جنسیت</SectionTitle>
       <div
         role="button"
         tabIndex={0}
