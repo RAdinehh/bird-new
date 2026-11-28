@@ -86,20 +86,20 @@ export default function WarningsPage() {
           ⚠ {fmt.count(totalWarnings)} هشدار
         </div>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
-          <StatBox icon="rotten_egg" label="منقضی" value={fmt.count(expired.length)} tone={expired.length > 0 ? 'danger' : 'default'} />
+          <StatBox icon="expired" label="منقضی" value={fmt.count(expired.length)} tone={expired.length > 0 ? 'danger' : 'default'} />
           <Dot />
-          <StatBox icon="inventory" label="تمام‌شده" value={fmt.count(criticalStock.length)} tone={criticalStock.length > 0 ? 'danger' : 'default'} />
+          <StatBox icon="stock_empty" label="تمام‌شده" value={fmt.count(criticalStock.length)} tone={criticalStock.length > 0 ? 'danger' : 'default'} />
           <Dot />
-          <StatBox icon="cal_7" label="نزدیک انقضا" value={fmt.count(expiringSoon.length)} tone={expiringSoon.length > 0 ? 'warn' : 'default'} />
+          <StatBox icon="expiring_soon" label="نزدیک انقضا" value={fmt.count(expiringSoon.length)} tone={expiringSoon.length > 0 ? 'warn' : 'default'} />
           <Dot />
-          <StatBox icon="stats" label="کم" value={fmt.count(lowStock.length)} tone={lowStock.length > 0 ? 'warn' : 'default'} />
+          <StatBox icon="stock_low" label="کم" value={fmt.count(lowStock.length)} tone={lowStock.length > 0 ? 'warn' : 'default'} />
         </div>
       </div>
 
       {expired.length > 0 ? (
         <WarningGroup
           title="منقضی‌شده"
-          icon="rotten_egg"
+          icon="expired"
           color="red"
           items={expired}
           renderLine={(it) => `تاریخ انقضا گذشته — ${fmt.day(Math.abs(daysToExpiry(it.expireDate) || 0))} روز پیش`}
@@ -109,7 +109,7 @@ export default function WarningsPage() {
       {criticalStock.length > 0 ? (
         <WarningGroup
           title="موجودی تمام‌شده"
-          icon="inventory"
+          icon="stock_empty"
           color="red"
           items={criticalStock}
           renderLine={(it) => `موجودی صفر — حداقل ${fmt.num(it.minStock)} ${UNIT_LABEL[it.unit]}`}
@@ -119,7 +119,7 @@ export default function WarningsPage() {
       {expiringSoon.length > 0 ? (
         <WarningGroup
           title="نزدیک انقضا"
-          icon="cal_7"
+          icon="expiring_soon"
           color="amber"
           items={expiringSoon}
           renderLine={(it) => `${fmt.day(daysToExpiry(it.expireDate) || 0)} روز تا انقضا`}
@@ -129,7 +129,7 @@ export default function WarningsPage() {
       {lowStock.length > 0 ? (
         <WarningGroup
           title="موجودی کم"
-          icon="stats"
+          icon="stock_low"
           color="amber"
           items={lowStock}
           renderLine={(it) => `${fmt.num(it.currentStock)} ${UNIT_LABEL[it.unit]} — حداقل ${fmt.num(it.minStock)}`}
