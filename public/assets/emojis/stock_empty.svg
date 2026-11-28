@@ -1,18 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <defs>
-    <linearGradient id="mbBody" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#60A5FA"/>
-      <stop offset="100%" stop-color="#2563EB"/>
+    <linearGradient id="boxSide" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E2B07E"/>
+      <stop offset="100%" stop-color="#B87D4B"/>
     </linearGradient>
-    <linearGradient id="mbFront" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#1E3A8A"/>
-      <stop offset="100%" stop-color="#0F172A"/>
+    <linearGradient id="boxInside" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6B4423"/>
+      <stop offset="100%" stop-color="#4A2E16"/>
     </linearGradient>
+    <radialGradient id="zeroBadge" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#FF5E57"/>
+      <stop offset="100%" stop-color="#DC2626"/>
+    </radialGradient>
   </defs>
-  <rect x="29" y="42" width="6" height="16" rx="2" fill="#92400E"/>
-  <path d="M22 16h22a10 10 0 0 1 10 10v16H14V26a10 10 0 0 1 8-10z" fill="url(#mbBody)"/>
-  <path d="M12 26a10 10 0 0 1 20 0v16H12V26z" fill="url(#mbFront)"/>
-  <path d="M12 42l-5 11h17l4-11H12z" fill="#93C5FD" stroke="#3B82F6" stroke-width="1.2" stroke-linejoin="round"/>
-  <path d="M40 28h12v4H43v5h-3v-9z" fill="#EF4444"/>
-  <circle cx="41.5" cy="29.5" r="2.2" fill="#DC2626"/>
+  <!-- بدنه کارتن باز -->
+  <path d="M12 24L32 15L52 24V46L32 56L12 46V24Z" fill="url(#boxSide)" stroke="#9A6336" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- داخل خالی و تاریک کارتن -->
+  <path d="M15 24L32 17L49 24L32 32L15 24Z" fill="url(#boxInside)"/>
+  <!-- درهای باز شده کارتن -->
+  <path d="M12 24L5 19L23 11L32 15L12 24Z" fill="#F3C99B" stroke="#9A6336" stroke-width="1.3" stroke-linejoin="round"/>
+  <path d="M52 24L59 19L41 11L32 15L52 24Z" fill="#F3C99B" stroke="#9A6336" stroke-width="1.3" stroke-linejoin="round"/>
+  <!-- خط تا وسط کارتن -->
+  <path d="M32 32V56" stroke="#8C582E" stroke-width="1.5"/>
+  <!-- بج قرمز دایره‌ای با علامت صفر در گوشه -->
+  <circle cx="48" cy="48" r="12" fill="url(#zeroBadge)" stroke="#FFFFFF" stroke-width="2"/>
+  <ellipse cx="48" cy="48" rx="4.2" ry="6" fill="none" stroke="#FFFFFF" stroke-width="2.6"/>
 </svg>
