@@ -201,7 +201,7 @@ export default function BackupTab() {
       >
         <Grid2>
           <Btn variant="primary" full onClick={handleExport}>
-            📥 دانلود JSON
+            📤 دانلود JSON
           </Btn>
           <Btn full onClick={handleShareExport}>
             ☁️ ارسال به Drive / OneDrive
