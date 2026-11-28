@@ -1,4 +1,4 @@
-import { IconCalendar, IconNote } from '../../shr/icons';
+import { IconCalendar, IconNote, IconSyringe, IconLeaf, IconEgg, IconDollar, IconBell } from '../../shr/icons';
 import { useState } from 'react';
 import { useManual, TYPE_OPTIONS } from './manual';
 import { todayJalali, type EventType } from './store';
@@ -11,6 +11,15 @@ interface Props {
   onClose: () => void;
   prefillDate?: string;
 }
+
+const EVENT_TYPE_ICONS: Record<string, React.ReactNode> = {
+  daily: <IconNote size={16} />,
+  vaccine: <IconSyringe size={16} />,
+  herbal: <IconLeaf size={16} />,
+  hatch: <IconEgg size={16} />,
+  payment: <IconDollar size={16} />,
+  finance: <IconBell size={16} />,
+};
 
 export default function AddEventModal({ open, onClose, prefillDate }: Props) {
   const { add } = useManual();
@@ -83,7 +92,7 @@ export default function AddEventModal({ open, onClose, prefillDate }: Props) {
       <Field label="نوع رویداد">
         <Select value={type} onChange={e => setType(e.target.value as EventType)}>
           {TYPE_OPTIONS.map(o => (
-            <option key={o.id} value={o.id}>{o.label}</option>
+            <option key={o.id} value={o.id} data-icon={EVENT_TYPE_ICONS[o.id]}>{o.label}</option>
           ))}
         </Select>
       </Field>

@@ -13,6 +13,7 @@ import { getGlobalFormat } from "../../units/useFormat";
 interface ParsedOption {
   value: string;
   label: string;
+  icon?: React.ReactNode;
   disabled?: boolean;
   group?: string;
 }
@@ -38,7 +39,8 @@ function parseOptions(children: React.ReactNode, group?: string, out: ParsedOpti
     } else if (child.type === "option") {
       const label = extractText(props?.children).trim();
       const val = props?.value !== undefined ? String(props.value) : label;
-      out.push({ value: val, label: label || val, disabled: !!props?.disabled, group });
+      const icon = (props as any)["data-icon"] ?? (props as any)?.icon;
+      out.push({ value: val, label: label || val, icon, disabled: !!props?.disabled, group });
     }
   });
   return out;
@@ -222,6 +224,7 @@ export function Select({
           filtered.map((o, idx) => (
             <SheetItem
               key={`${o.value}-${idx}`}
+              icon={o.icon}
               title={o.label}
               selected={currentVal === o.value}
               disabled={o.disabled}

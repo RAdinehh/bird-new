@@ -1,4 +1,4 @@
-import { IconTag, IconClock } from '../../shr/icons';
+import { IconTag, IconClock, IconNote, IconSyringe, IconLeaf, IconEgg, IconDollar, IconBell } from '../../shr/icons';
 import { useFormat } from '../../shr/units/useFormat';
 import { useState } from 'react';
 import { useManual, TYPE_OPTIONS, type ManualEvent } from './manual';
@@ -12,6 +12,15 @@ interface Props {
   event: ManualEvent;
   onChanged: () => void;
 }
+
+const EVENT_TYPE_ICONS: Record<string, React.ReactNode> = {
+  daily: <IconNote size={16} />,
+  vaccine: <IconSyringe size={16} />,
+  herbal: <IconLeaf size={16} />,
+  hatch: <IconEgg size={16} />,
+  payment: <IconDollar size={16} />,
+  finance: <IconBell size={16} />,
+};
 
 export default function ManualEventCard({ event, onChanged }: Props) {
   const fmt = useFormat();
@@ -139,7 +148,7 @@ export default function ManualEventCard({ event, onChanged }: Props) {
         </Grid2>
         <Field label="نوع">
           <Select value={type} onChange={e => setType(e.target.value as any)}>
-            {TYPE_OPTIONS.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
+            {TYPE_OPTIONS.map(o => <option key={o.id} value={o.id} data-icon={EVENT_TYPE_ICONS[o.id]}>{o.label}</option>)}
           </Select>
         </Field>
         <Field label="یادداشت">
