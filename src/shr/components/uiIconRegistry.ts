@@ -4,12 +4,16 @@ import type { AppIconKey } from '../icons/AppIcons';
 export const UI_ICON_MAP = {
   compare: 'compare_scale' as AppIconKey,
   profitTrend: 'profit_trend' as AppIconKey,
+  period30d: 'cal_30' as AppIconKey,
   period3m: 'cal_3m' as AppIconKey,
   period6m: 'cal_6m' as AppIconKey,
   exportReport: 'export_report' as AppIconKey,
   exportExcel: 'excel_export' as AppIconKey,
   stats: 'stats' as AppIconKey,
+  target: 'target' as AppIconKey,
+  trophy: 'trophy' as AppIconKey,
   cash: 'cash' as AppIconKey,
+  invoice: 'invoice' as AppIconKey,
   egg: 'egg' as AppIconKey,
   fertileEgg: 'fertile_egg' as AppIconKey,
   hatch: 'hatch' as AppIconKey,
@@ -24,7 +28,17 @@ export const UI_ICON_MAP = {
   inventory: 'inventory' as AppIconKey,
 } as const;
 
-export type UiIconCategory = 'compare' | 'profit' | 'period' | 'export' | 'invoice' | 'event' | 'inventory';
+export type UiIconCategory =
+  | 'compare'
+  | 'profit'
+  | 'period'
+  | 'export'
+  | 'invoice'
+  | 'event'
+  | 'inventory'
+  | 'analytics'
+  | 'finance'
+  | 'production';
 
 /** آیکون پیش‌فرض هر دسته برای حالتی که زیردسته وجود ندارد یا مشخص نشده است */
 const CATEGORY_DEFAULT_ICON: Record<UiIconCategory, AppIconKey> = {
@@ -35,6 +49,9 @@ const CATEGORY_DEFAULT_ICON: Record<UiIconCategory, AppIconKey> = {
   invoice: UI_ICON_MAP.cash,
   event: UI_ICON_MAP.stats,
   inventory: UI_ICON_MAP.inventory,
+  analytics: UI_ICON_MAP.stats,
+  finance: UI_ICON_MAP.cash,
+  production: UI_ICON_MAP.egg,
 };
 
 /** نگاشت زیردسته‌ها به کلیدهای آیکون در هر دسته */
@@ -54,6 +71,7 @@ const SUBTYPE_ICON_MAP: Record<UiIconCategory, Record<string, AppIconKey>> = {
     timeline: UI_ICON_MAP.profitTrend,
   },
   period: {
+    '30d': UI_ICON_MAP.period30d,
     '3m': UI_ICON_MAP.period3m,
     '6m': UI_ICON_MAP.period6m,
   },
@@ -82,6 +100,26 @@ const SUBTYPE_ICON_MAP: Record<UiIconCategory, Record<string, AppIconKey>> = {
   },
   inventory: {
     default: UI_ICON_MAP.inventory,
+  },
+  analytics: {
+    pareto: UI_ICON_MAP.stats,
+    share: UI_ICON_MAP.target,
+    egg_feed: UI_ICON_MAP.stats,
+    hen_day: UI_ICON_MAP.stats,
+    best_month: UI_ICON_MAP.trophy,
+  },
+  finance: {
+    receivable: UI_ICON_MAP.cash,
+    payable: UI_ICON_MAP.invoice,
+    cashflow: UI_ICON_MAP.cash,
+    sales_vs_purchase: UI_ICON_MAP.cash,
+    sales: UI_ICON_MAP.cash,
+    purchases: UI_ICON_MAP.invoice,
+  },
+  production: {
+    egg: UI_ICON_MAP.egg,
+    mortality: UI_ICON_MAP.mortality,
+    flock: UI_ICON_MAP.flock,
   },
 };
 
