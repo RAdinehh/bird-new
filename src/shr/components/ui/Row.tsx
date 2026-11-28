@@ -9,7 +9,9 @@ function inferRowIcon(l: ReactNode): AppIconKey | null {
   if (/نطفه/.test(t)) return 'fertile_egg';
   if (/تخم\s*(خوراکی|سالم|کل)/.test(t)) return 'egg';
   if (/تلفات/.test(t)) return 'mortality';
-  if (/آب/.test(t)) return 'water';
+  if (/ضرر|زیان/.test(t)) return 'profit_trend';
+  if (/خرید/.test(t)) return 'invoice';
+  if (/رطوبت|آب/.test(t)) return 'water';
   if (/دما/.test(t)) return 'climate';
   if (/دان|خوراک/.test(t)) return 'feed';
   return null;

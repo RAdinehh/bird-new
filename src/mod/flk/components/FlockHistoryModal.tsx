@@ -624,7 +624,7 @@ export default function FlockHistoryModal({ open, onClose, flock }: Props) {
       )}
       {mortalityResult && mortalityResult.cumulativePct > 0 && (
         <div>
-          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)' }}>💀 نرخ تلفات</div>
+          <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--muted)', paddingBottom: 6, marginBottom: 6, borderBottom: '1px dashed var(--border)', display: 'flex', alignItems: 'center', gap: 6 }}><OptionIcon icon="mortality" size={14} /><span>نرخ تلفات</span></div>
           <div style={{ padding: '8px 10px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: 11 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, marginBottom: 4 }}>
               <span style={{ fontSize: 14, fontWeight: 700 }}>{fmt.num(mortalityResult.cumulativePct)}٪</span>

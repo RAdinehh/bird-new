@@ -227,7 +227,7 @@ export default function AnalyticsCards({
                   />
                   <KpiCard
                     icon="payment_promise"
-                    label={`خرید ماه ${momComparison.purchaseChange !== 0 ? (momComparison.purchaseChange > 0 ? '📈' : '📉') : ''}`}
+                    label="خرید ماه"
                     value={purchasesThisMonth}
                     unit={`تومان${momComparison.purchaseChange !== 0 ? ` • ${momComparison.purchaseChange > 0 ? '+' : ''}${fmt.num(momComparison.purchaseChange)}٪` : ''}`}
                     color="warn"
@@ -235,7 +235,7 @@ export default function AnalyticsCards({
                   />
                   <KpiCard
                     icon={profit >= 0 ? 'profit_trend' : 'alert_warning'}
-                    label={profit >= 0 ? 'سود ماه' : 'زیان ماه'}
+                  label={profit >= 0 ? 'سود ماه' : 'زیان ماه'}
                     value={Math.abs(profit)}
                     unit="تومان"
                     color={profit >= 0 ? 'accent' : 'danger'}

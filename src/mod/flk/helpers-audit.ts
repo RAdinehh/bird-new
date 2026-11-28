@@ -8,7 +8,7 @@ export type SexAuditType = FlockSexBalanceEvent['type'];
 
 export const SEX_AUDIT_META: Record<SexAuditType, { icon: string; label: string; tone: string }> = {
   sexing:                 { icon: '🧬', label: 'تفکیک جنسیت',        tone: 'var(--accent)' },
-  death:                  { icon: '💀', label: 'تلفات',               tone: 'var(--danger)' },
+  death:                  { icon: 'mortality', label: 'تلفات',               tone: 'var(--danger)' },
   sale:                   { icon: '💰', label: 'فروش',                tone: 'var(--purple)' },
   return:                 { icon: '↩️', label: 'برگشت',              tone: 'var(--info)' },
   correction:             { icon: '✏️', label: 'اصلاح',              tone: 'var(--warn)' },
