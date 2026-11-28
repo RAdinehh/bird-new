@@ -248,8 +248,7 @@ export default function TodayCard({
                     onClick={() => nav('/dlg')}
                   />
                             <KpiCard
-              icon="egg"
-              label="تخم شکسته"
+              icon="broken_egg" label="تخم شکسته"
               value={brokenToday}
               unit="عدد"
               color={brokenToday > 0 ? 'warn' : 'info'}
@@ -264,8 +263,7 @@ export default function TodayCard({
               onClick={() => nav('/dlg')}
             />
             <KpiCard
-              icon="water"
-              label="رطوبت سالن"
+              icon="water" label="رطوبت سالن"
               value={humidToday}
               unit={humidToday > 0 ? '٪' : 'ثبت نشده'}
               color={humidToday > 70 ? 'warn' : 'info'}
