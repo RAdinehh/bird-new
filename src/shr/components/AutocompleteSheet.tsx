@@ -180,7 +180,7 @@ export default function AutocompleteSheet({
           placeholder={placeholder || 'تایپ کن یا ▼ بزن'}
           autoComplete="off"
           style={{
-            flex: '1 1 0%', minWidth: 0, height: 36, padding: (selectedOpt?.icon || (value.trim() && defaultIcon)) ? (matched ? '0 6px 0 28px' : '0 6px 0 12px') : (matched ? '0 12px 0 28px' : '0 12px'),
+            flex: '1 1 0%', minWidth: 0, height: 38, padding: (selectedOpt?.icon || (value.trim() && defaultIcon)) ? (matched ? '0 6px 0 28px' : '0 6px 0 12px') : (matched ? '0 12px 0 28px' : '0 12px'),
             background: 'transparent',
             border: 'none',
             color: 'var(--text)', fontFamily: 'inherit', fontSize: 'var(--fs-base)',
@@ -212,7 +212,7 @@ export default function AutocompleteSheet({
           onClick={handleOpen}
           aria-label="باز کردن لیست"
           style={{
-            height: 36, minWidth: 38, padding: '0 12px',
+            height: 38, minWidth: 38, padding: '0 12px',
             background: 'transparent',
             border: 'none',
             color: 'var(--muted)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12,

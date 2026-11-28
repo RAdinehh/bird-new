@@ -8,7 +8,7 @@ import { parseFaNum } from '../utils/fa';
 function chipIn(active: boolean): CSSProperties {
   return {
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-    height: 40, minHeight: 40, padding: '0 12px',
+    height: 38, minHeight: 38, padding: '0 12px',
     boxSizing: 'border-box',
     background: active ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
     border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
@@ -46,7 +46,7 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter, filterS
               onClick={() => { isMulti ? setFilter(def.key, []) : clearFilter(def.key); }}
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                height: 40, minHeight: 40, padding: '0 8px', boxSizing: 'border-box', boxShadow: 'none', opacity: 1,
+                height: 38, minHeight: 38, padding: '0 8px', boxSizing: 'border-box', boxShadow: 'none', opacity: 1,
                 background: noneActive ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                 border: '1px solid ' + (noneActive ? 'var(--accent-border)' : 'var(--border)'),
                 borderRadius: 'var(--r-md)',
@@ -72,7 +72,7 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter, filterS
                   }}
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-                    height: 40, minHeight: 40, padding: '0 8px', boxSizing: 'border-box', boxShadow: 'none', opacity: 1,
+                    height: 38, minHeight: 38, padding: '0 8px', boxSizing: 'border-box', boxShadow: 'none', opacity: 1,
                     background: active ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
                     border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
                     borderRadius: 'var(--r-md)',

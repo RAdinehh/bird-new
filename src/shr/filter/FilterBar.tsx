@@ -387,7 +387,7 @@ export function FilterBar<T>({
           </Btn>
           <button type="button" onClick={resetAll} style={{
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            gap: 6, width: '100%', height: 40, padding: '0 12px', boxSizing: 'border-box', boxShadow: 'none', opacity: 1,
+            gap: 6, width: '100%', height: 38, padding: '0 12px', boxSizing: 'border-box', boxShadow: 'none', opacity: 1,
             background: 'var(--danger-soft)',
             border: '1px solid var(--danger)',
             borderRadius: 'var(--r-md)',

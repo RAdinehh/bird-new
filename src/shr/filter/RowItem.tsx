@@ -12,7 +12,7 @@ export function RowItem({
   return (
     <button type="button" onClick={onClick} style={{
       display: 'flex', alignItems: 'center', gap: 8,
-      height: 40, minHeight: 40, padding: '0 10px', width: '100%',
+      height: 38, minHeight: 38, padding: '0 10px', width: '100%',
       boxSizing: 'border-box',
       background: active ? 'var(--accent-soft)' : 'var(--card-solid, #fff)',
       border: '1px solid ' + (active ? 'var(--accent-border)' : 'var(--border)'),
