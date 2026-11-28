@@ -173,7 +173,7 @@ export default function FinancialPage() {
       </Section>
 
       {/* روند سود */}
-      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="stats" size={16} /><span>روند سود</span></span>}>
+      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="profit_trend" size={18} /><span>روند سود</span></span>}>
         <LineChart
           data={months.map(m => ({
             label: monthLabel(m),
@@ -192,7 +192,7 @@ export default function FinancialPage() {
 
       {/* خروجی‌ها */}
       <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', padding: '4px 4px 8px' }}>
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="export_doc" size={16} /><span>خروجی گرفتن</span></span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="export_report" size={18} /><span>خروجی گرفتن</span></span>
       </div>
       <ExportButtons />
     </PageContainer>

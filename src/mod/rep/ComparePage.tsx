@@ -147,7 +147,7 @@ export default function ComparePage() {
       </Section>
 
       {/* نمودار سود */}
-      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="stats" size={16} /><span>سود در طول زمان</span></span>}>
+      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="profit_trend" size={18} /><span>سود در طول زمان</span></span>}>
         <BarChart
           data={currentData.map(d => ({ label: d.label, value: d.sales - d.purchases }))}
           color="var(--accent)"

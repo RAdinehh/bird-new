@@ -206,7 +206,7 @@ export default function ExportButtons() {
         display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)'
       }}>
         <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="export_doc" size={16} /><span>خروجی PDF</span></span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="export_report" size={18} /><span>خروجی PDF</span></span>
         </div>
         <Btn variant="primary" full onClick={exportSummaryPDF}>
           📄 گزارش کلی PDF

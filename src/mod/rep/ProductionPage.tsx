@@ -162,7 +162,7 @@ export default function ProductionPage() {
           <BarChart data={deathData} color="var(--danger)" />
         </Section>
       ) : null}
-          <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="export_doc" size={16} /><span>خروجی CSV</span></span>}>
+          <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="export_report" size={18} /><span>خروجی CSV</span></span>}>
         <Btn full variant="primary" onClick={() => {
           const headers = ['ماه', 'تخم سالم', 'دان (kg)', 'تلفات'];
           const rows = months.map(m => {

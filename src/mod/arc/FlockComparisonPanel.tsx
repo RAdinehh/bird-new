@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../shr/components/OptionIcon';
 import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
 import { useState, useMemo, useEffect } from 'react';
 import {
@@ -761,16 +762,16 @@ export default function FlockComparisonPanel({
           </CardSection>
 
           <CardSection
-            title="خروجی گزارش"
+            title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="export_report" size={18} /><span>خروجی گزارش</span></span>}
             meta={`${fmt.count(orderedCandidates.length)} از ${fmt.count(MAX_FLOCKS)} گله`}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 <Btn size="sm" variant="primary" disabled={!canCompare} onClick={handleExportCSV}>
-                  خروجی CSV
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="export_report" size={15} /><span>خروجی CSV</span></span>
                 </Btn>
                 <Btn size="sm" variant="primary" disabled={!canCompare} onClick={handleExportPDF}>
-                  خروجی PDF
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="export_report" size={15} /><span>خروجی PDF</span></span>
                 </Btn>
               </div>
             </div>
