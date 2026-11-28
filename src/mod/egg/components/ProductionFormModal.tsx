@@ -62,7 +62,7 @@ export default function ProductionFormModal(props: Props) {
               value={form.flockId}
               placeholder="— انتخاب —"
               modalTitle="انتخاب گله"
-              options={activeFlocks.map((f) => ({ value: String(f.id), label: String(f.name), icon: '🐔' }))}
+              options={activeFlocks.map((f) => ({ value: String(f.id), label: String(f.name), icon: 'flock' }))}
               onChange={(val: string) => setForm({ ...form, flockId: val })}
             />
           </Field>

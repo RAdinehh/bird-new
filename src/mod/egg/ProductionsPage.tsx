@@ -283,7 +283,7 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
       )}
       <HelpBanner
         id="egg-prod-intro"
-        icon="🥚"
+        icon="egg"
         title="ثبت تخم‌گذاری روزانه"
         description="هر روز تعداد تخم‌ها را بین خوراکی، نطفه‌دار و مصرفی تقسیم کنید."
         tone="info"
@@ -352,7 +352,7 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
                 ms={ms}
                 accent={accent}
                 index={fmt.count(i + 1)}
-                iconEmoji="🥚"
+                iconEmoji="egg"
                 title={fmt.count(healthy2) + ' تخم سالم — ' + (flock?.name || '—')}
                 subtitle={fmt.date(p.date) + (bird ? ' • ' + bird.name : '') + (ageDays > 0 ? ' • ' + fmt.day(ageDays) + ' روز' : '')}
                 isOpen={isOpen}

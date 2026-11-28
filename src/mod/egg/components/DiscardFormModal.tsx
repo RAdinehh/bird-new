@@ -6,6 +6,7 @@
  */
 import { Btn, BtnRow, Field, Grid2, Modal, NumField, Select, Textarea, ErrorBox } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
+import SmartSelect from '../../../shr/components/SmartSelect';
 import type { EggDiscard, EggDiscardType, EggDiscardReason } from '../store';
 
 interface Props {
@@ -63,14 +64,16 @@ export default function DiscardFormModal(props: Props) {
           />
         </Field>
         <Field label="نوع" required>
-          <Select
+          <SmartSelect
             value={form.type}
-            onChange={e => setForm({ ...form, type: e.target.value as EggDiscardType })}
-          >
-            {(['broken', 'soft', 'dirty'] as const).map(t => (
-              <option key={t} value={t}>{TYPE_LABELS[t]}</option>
-            ))}
-          </Select>
+            modalTitle="نوع تخم"
+            options={[
+              { value: 'broken', label: TYPE_LABELS.broken, icon: 'broken_egg' },
+              { value: 'soft', label: TYPE_LABELS.soft, icon: 'soft_egg' },
+              { value: 'dirty', label: TYPE_LABELS.dirty, icon: 'dirty_egg' },
+            ]}
+            onChange={v => setForm({ ...form, type: v as EggDiscardType })}
+          />
         </Field>
       </Grid2>
 
@@ -85,14 +88,18 @@ export default function DiscardFormModal(props: Props) {
           />
         </Field>
         <Field label="دلیل" required>
-          <Select
+          <SmartSelect
             value={form.reason}
-            onChange={e => setForm({ ...form, reason: e.target.value as EggDiscardReason })}
-          >
-            {(['rotten', 'broken_handling', 'expired', 'contaminated', 'other'] as const).map(r => (
-              <option key={r} value={r}>{REASON_LABELS[r]}</option>
-            ))}
-          </Select>
+            modalTitle="دلیل دور ریخت"
+            options={[
+              { value: 'rotten', label: REASON_LABELS.rotten, icon: 'rotten_egg' },
+              { value: 'broken_handling', label: REASON_LABELS.broken_handling, icon: 'broken_egg' },
+              { value: 'expired', label: REASON_LABELS.expired, icon: '⏳' },
+              { value: 'contaminated', label: REASON_LABELS.contaminated, icon: 'cause_disease' },
+              { value: 'other', label: REASON_LABELS.other, icon: 'other' },
+            ]}
+            onChange={v => setForm({ ...form, reason: v as EggDiscardReason })}
+          />
         </Field>
       </Grid2>
 

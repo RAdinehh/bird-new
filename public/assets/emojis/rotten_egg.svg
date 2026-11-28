@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="re_grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#BEF264"/>
+      <stop offset="60%" stop-color="#65A30D"/>
+      <stop offset="100%" stop-color="#3F6212"/>
+    </linearGradient>
+  </defs>
+  <!-- خطوط بوی تعفن بالای تخم -->
+  <path d="M24 14 C22 10 26 8 24 4 M32 12 C30 8 34 6 32 2 M40 14 C38 10 42 8 40 4" stroke="#65A30D" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+  <!-- بدنه تخم سبز/فاسد -->
+  <path d="M32 16 C22 16 16 28 16 40 C16 51 23 59 32 59 C41 59 48 51 48 40 C48 28 42 16 32 16 Z" fill="url(#re_grad)" stroke="#365314" stroke-width="2"/>
+  <!-- لکه‌های فساد -->
+  <circle cx="27" cy="36" r="4" fill="#365314" opacity="0.45"/>
+  <circle cx="38" cy="45" r="3" fill="#365314" opacity="0.45"/>
+  <circle cx="36" cy="30" r="2" fill="#ECFCCB" opacity="0.5"/>
+</svg>

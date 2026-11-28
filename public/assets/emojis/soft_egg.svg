@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="se_grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FEF3C7"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+  </defs>
+  <!-- تخم با دیواره فرورفته و پوسته نرم/منعطف -->
+  <path d="M32 8 C22 8 15 20 15 34 C15 47 22 56 32 56 C43 56 49 48 48 37 C47 33 41 32 41 26 C41 21 45 18 42 13 C39 9 36 8 32 8 Z" fill="url(#se_grad)" stroke="#B45309" stroke-width="2" stroke-linejoin="round"/>
+  <!-- خطوط چین‌خوردگی و نرمی پوسته -->
+  <path d="M38 22 C35 25 35 29 38 32" stroke="#B45309" stroke-width="1.8" stroke-linecap="round" fill="none" stroke-dasharray="2.5 2"/>
+  <path d="M22 25 C20 31 20 38 23 44" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity="0.65" fill="none"/>
+  <!-- فلش کوچک نشان‌دهنده فرورفتگی پوسته -->
+  <path d="M53 23 L45 26 M48 22 L45 26 L49 28" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -178,24 +178,29 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
     <PageContainer>
       <HelpBanner
         id="egg-stats-guide"
-        icon="📊"
+        icon="stats"
         title="راهنمای آمار تولید تخم"
         description="روند تولید روزانه و تفکیک تخم‌های خوراکی، نطفه‌دار و مصرفی را در بازه‌های زمانی مختلف بررسی و مقایسه کنید."
         tone="info"
       />
       {/* فیلترها */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        <Select value={range} onChange={e => setRange(e.target.value as Range)}>
-          <option value="7">۷ روز اخیر</option>
-          <option value="30">۳۰ روز اخیر</option>
-          <option value="90">۹۰ روز اخیر</option>
-          <option value="all">همه</option>
-        </Select>
+        <SmartSelect
+          value={range}
+          modalTitle="بازه زمانی"
+          options={[
+            { value: '7', label: '۷ روز اخیر', icon: '📅' },
+            { value: '30', label: '۳۰ روز اخیر', icon: '🗓️' },
+            { value: '90', label: '۹۰ روز اخیر', icon: '📆' },
+            { value: 'all', label: 'همه', icon: 'stats' },
+          ]}
+          onChange={v => setRange(v as Range)}
+        />
         <SmartSelect
           value={filterFlock}
           placeholder="همه گله‌ها"
           modalTitle="انتخاب گله"
-          options={activeFlocks.map((f) => ({ value: String(f.id), label: String(f.name), icon: '🐔' }))}
+          options={activeFlocks.map((f) => ({ value: String(f.id), label: String(f.name), icon: 'flock' }))}
           onChange={(val: string) => setFilterFlock(val)}
         />
       </div>

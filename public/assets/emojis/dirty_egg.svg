@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="de_grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FEF9C3"/>
+      <stop offset="100%" stop-color="#E5D5B5"/>
+    </linearGradient>
+  </defs>
+  <!-- بدنه تخم -->
+  <path d="M32 7 C21 7 14 21 14 35 C14 48 22 57 32 57 C42 57 50 48 50 35 C50 21 43 7 32 7 Z" fill="url(#de_grad)" stroke="#78716C" stroke-width="2"/>
+  <!-- لکه‌های کود و آلودگی روی پوسته -->
+  <path d="M22 36 C25 32 32 33 34 38 C35 42 30 47 25 45 C21 44 20 39 22 36 Z" fill="#78350F" opacity="0.85"/>
+  <circle cx="39" cy="27" r="4.2" fill="#92400E" opacity="0.8"/>
+  <circle cx="42" cy="43" r="3" fill="#713F12" opacity="0.85"/>
+  <circle cx="25" cy="24" r="2.2" fill="#78350F" opacity="0.75"/>
+  <circle cx="35" cy="49" r="2" fill="#78350F" opacity="0.75"/>
+</svg>
