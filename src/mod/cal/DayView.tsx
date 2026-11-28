@@ -1,3 +1,4 @@
+import { IconPin, IconBell } from '../../shr/icons';
 import { useFormat } from '../../shr/units/useFormat';
 import { eventsOfDay, type CalEvent } from './store';
 import { useManual } from './manual';
@@ -63,7 +64,7 @@ export default function DayView({ date, events, onBack, onChanged }: Props) {
             fontSize: 'var(--fs-xs)', fontWeight: 700, color: 'var(--muted)',
             padding: '4px 4px 8px', display: 'flex', alignItems: 'center', gap: 6
           }}>
-            <span>📌 رویدادهای شما</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><IconPin size={13} /> رویدادهای شما</span>
             <span style={{ color: 'var(--dim)' }}>({fmt.count(manualDay.length)})</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -81,7 +82,7 @@ export default function DayView({ date, events, onBack, onChanged }: Props) {
             fontSize: 'var(--fs-xs)', fontWeight: 700, color: 'var(--muted)',
             padding: '4px 4px 8px', display: 'flex', alignItems: 'center', gap: 6
           }}>
-            <span>🔔 رویدادهای سیستم</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><IconBell size={13} /> رویدادهای سیستم</span>
             <span style={{ color: 'var(--dim)' }}>({fmt.count(autoEvents.length)})</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
