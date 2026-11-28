@@ -1,3 +1,4 @@
+import { IconCalendar } from '../../shr/icons';
 import { useFormat } from '../../shr/units/useFormat';
 import { useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths } from 'date-fns-jalali';
@@ -99,7 +100,7 @@ export default function MonthView({ events, onDayClick, filter }: Props) {
           fontFamily: 'inherit'
         }}
       >
-        📅 امروز ({fmt.code(format(new Date(), 'd MMMM'))})
+        <IconCalendar size={14} /> امروز ({fmt.code(format(new Date(), 'd MMMM'))})
       </button>
 
       {/* گرید */}
