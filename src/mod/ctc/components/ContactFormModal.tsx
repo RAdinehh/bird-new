@@ -1,3 +1,4 @@
+import { resolveCategoryIconKey } from '../../../shr/components/uiIconRegistry';
 /**
  * ContactFormModal — فرم افزودن/ویرایش مخاطب
  */
@@ -304,7 +305,7 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
             />
           </Field>
 
-          <Field label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><OptionIcon icon="invoice" size={15} />یادداشت</span> as any}>
+          <Field label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><OptionIcon icon={resolveCategoryIconKey('contact', 'note')} size={15} />یادداشت</span> as any}>
             <Textarea placeholder="توضیحات" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
           </Field>
           <ErrorBox>{err}</ErrorBox>

@@ -1,3 +1,4 @@
+import { resolveCategoryIconKey } from '../../../shr/components/uiIconRegistry';
 /**
  * ContactTabPanel — محتوای یک تب از مخاطبین (carousel)
  */
@@ -238,7 +239,7 @@ export default function ContactTabPanel({ tab, active, onEdit, onAdd }: Props) {
                 </>}
               >
  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
- <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', display: 'inline-flex', alignItems: 'center', gap: 6 }}><OptionIcon icon="flock" size={16} />اطلاعات تماس</div>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', display: 'inline-flex', alignItems: 'center', gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('contact', 'info')} size={16} />اطلاعات تماس</div>
  <div style={{ display: 'flex', gap: 4 }}>
  <CopyBtn text={formatContactSection(p)} />
  <ShareBtn title={`تماس ${p.name}`} text={formatContactSection(p)} />
@@ -254,7 +255,7 @@ export default function ContactTabPanel({ tab, active, onEdit, onAdd }: Props) {
  {(p.city || p.address) && (
  <>
  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
- <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', display: 'inline-flex', alignItems: 'center', gap: 6 }}><OptionIcon icon="hall" size={16} />آدرس</div>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', display: 'inline-flex', alignItems: 'center', gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('contact', 'address')} size={16} />آدرس</div>
  <div style={{ display: 'flex', gap: 4 }}>
  <CopyBtn text={formatAddressSection(p)} />
  <ShareBtn title={`آدرس ${p.name}`} text={formatAddressSection(p)} />
@@ -285,7 +286,7 @@ export default function ContactTabPanel({ tab, active, onEdit, onAdd }: Props) {
 
  {p.roles.includes('customer') && (
  <>
- <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', display: 'inline-flex', alignItems: 'center', gap: 6 }}><OptionIcon icon="cash" size={16} />اطلاعات مشتری</div>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', display: 'inline-flex', alignItems: 'center', gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('contact', 'customer')} size={16} />اطلاعات مشتری</div>
  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
  <Row l="نوع"v={CUSTOMER_TYPES.find(x =>x[0] === p.customerType)?.[1] || '—'} />
  {p.trustScore && <Row l="اعتبار"v={`${fmt.num(p.trustScore)} از ۱۰`} />}
@@ -296,7 +297,7 @@ export default function ContactTabPanel({ tab, active, onEdit, onAdd }: Props) {
 
  {p.roles.includes('supplier') && p.supplierTypes.length >0 && (
  <>
- <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', display: 'inline-flex', alignItems: 'center', gap: 6 }}><OptionIcon icon="inventory" size={16} />کالاهای فروشنده</div>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', display: 'inline-flex', alignItems: 'center', gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('contact', 'vendor')} size={16} />کالاهای فروشنده</div>
  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
  {p.supplierTypes.map(t =>(
  <span key={t} style={{
@@ -313,7 +314,7 @@ export default function ContactTabPanel({ tab, active, onEdit, onAdd }: Props) {
 
  {p.roles.includes('worker') && (
  <>
- <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', display: 'inline-flex', alignItems: 'center', gap: 6 }}><OptionIcon icon="hand_tools" size={16} />اطلاعات کارگر</div>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', display: 'inline-flex', alignItems: 'center', gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('contact', 'worker')} size={16} />اطلاعات کارگر</div>
  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
  {p.position && <Row l="سمت"v={p.position} />}
  {p.startDate && <Row l="تاریخ شروع"v={fmt.date(p.startDate)} />}
@@ -325,7 +326,7 @@ export default function ContactTabPanel({ tab, active, onEdit, onAdd }: Props) {
 
  {p.notes && (
  <>
- <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', display: 'inline-flex', alignItems: 'center', gap: 6 }}><OptionIcon icon="invoice" size={16} />یادداشت</div>
+ <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', display: 'inline-flex', alignItems: 'center', gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('contact', 'note')} size={16} />یادداشت</div>
  <div style={{ fontSize: 'var(--fs-sm)', lineHeight: 1.7,
  padding: 'var(--pad-normal)', background: 'var(--input-bg)',
  borderRadius: 'var(--r-sm)'}}>{p.notes}</div>

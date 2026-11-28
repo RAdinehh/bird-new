@@ -1,3 +1,4 @@
+import { resolveCategoryIconKey } from '../../shr/components/uiIconRegistry';
 import { OptionIcon } from '../../shr/components/OptionIcon';
 import { useState, useRef } from 'react';
 import { addFile, fileCategory, CATEGORY_LABEL, LINKED_TYPE_LABEL, formatSize, type DocCategory } from './store';
@@ -122,7 +123,7 @@ export default function UploadModal({ open, onClose, onUploaded, prefillType, pr
         ) : (
           <>
             <div style={{ fontSize: 'var(--fs-hero)' }}>
-              {category === 'image' ? '🖼' : category === 'pdf' ? '📄' : category === 'audio' ? '🎵' : category === 'video' ? '🎬' : category === 'excel' ? <OptionIcon icon="excel_export" size={18} /> : '📎'}
+              {category === 'image' ? '🖼' : category === 'pdf' ? '📄' : category === 'audio' ? '🎵' : category === 'video' ? '🎬' : category === 'excel' ? <OptionIcon icon={resolveCategoryIconKey('export', 'excel')} size={18} /> : '📎'}
             </div>
             <div style={{
               fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)',
