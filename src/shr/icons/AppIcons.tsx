@@ -20,7 +20,7 @@ export type AppIconKey = typeof ICON_KEYS[number];
 
 // تابع پیدا کردن مسیر آیکون‌های تایید شده‌ی اپلی در پروژه
 export function getAppIconPath(key: AppIconKey): string {
-  return `/assets/emojis/${key}.svg?v=21`;
+  return `/assets/emojis/${key}.svg?v=22`;
 }
 
 // کامپوننت هوشمند برای نمایش ایموجی‌های جدید با سایز استاندارد
