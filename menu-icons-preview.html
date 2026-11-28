@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>بازبینی ۶ آیکون خطی نامرتبط</title>
+  <style>
+    body { font-family: Vazirmatn, sans-serif; background: #f4f6f8; margin: 0; padding: 16px; color: #1e293b; }
+    h1 { font-size: 18px; margin: 0 0 14px; }
+    .row { background: #fff; border-radius: 12px; padding: 12px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+    .title { font-weight: 700; margin-bottom: 8px; font-size: 14px; }
+    .opts { display: flex; flex-wrap: wrap; gap: 10px; }
+    .card { border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; background: #f8fafc; }
+    svg { width: 30px; height: 30px; stroke: #0f172a; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .tag { font-size: 12px; color: #334155; }
+  </style>
+</head>
+<body>
+  <h1>بازبینی ۶ آیکون خطی: پرنده‌ها، گله، جوجه‌کشی، تخم، هشدارها، جیره‌نویسی</h1>
+  <div id="app"></div>
+  <script>
+    const items = [
+      { label: "پرنده‌ها و نژادها", opts: [
+        { name: "۱) پرنده خطی", d: ["M19 7c-2-2-5-2-7 0l-4 4-5 1 3 3 2 5 4-4 5-1c2-2 2-5 0-7z", "M16 7h.01"] },
+        { name: "۲) بال با پر", d: ["M4 17c2-6 7-10 15-11-1 6-5 11-11 13l-4-2z", "M8 14l5-3", "M10 17l5-3"] }
+      ]},
+      { label: "گله‌ها", opts: [
+        { name: "۱) دسته ۳تایی منظم", d: ["M12 7a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z", "M6 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z", "M18 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z", "M8 20a4 4 0 0 1 8 0", "M2.5 20a3.5 3.5 0 0 1 5-3.2", "M16.5 16.8a3.5 3.5 0 0 1 5 3.2"] },
+        { name: "۲) محدوده/آغل + گله", d: ["M3 11l9-7 9 7", "M6 12v8", "M18 12v8", "M9 20a3 3 0 0 1 6 0", "M12 13a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"] }
+      ]},
+      { label: "جوجه‌کشی", opts: [
+        { name: "۱) تخم + دمای/گرمای بالا", d: ["M12 7c-3.5 4.2-5 7-5 9.8a5 5 0 0 0 10 0c0-2.8-1.5-5.6-5-9.8z", "M9 3.5c1-1.2 2-1.2 3 0s2 1.2 3 0"] },
+        { name: "۲) تخم ترک‌خورده", d: ["M12 3c-3.8 4.8-5.5 8-5.5 11.2a5.5 5.5 0 0 0 11 0C17.5 11 15.8 7.8 12 3z", "M7 12.5l3 2 2.5-2.5 4 2.5"] }
+      ]},
+      { label: "تخم‌ها", opts: [
+        { name: "۱) دو تخم کنار هم", d: ["M9.5 4.5C6.8 8 5.2 11 5.2 14a4.3 4.3 0 0 0 8.6 0c0-3-1.6-6-4.3-9.5z", "M16.8 8.5c-2 2.6-3.2 4.9-3.2 7.2a3.2 3.2 0 0 0 6.4 0c0-2.3-1.2-4.6-3.2-7.2z"] },
+        { name: "۲) تخم با خط حجم", d: ["M12 3c-3.8 4.8-5.5 8-5.5 11.2a5.5 5.5 0 0 0 11 0C17.5 11 15.8 7.8 12 3z", "M9.5 13.5c0 2 1.1 3.5 2.5 4"] }
+      ]},
+      { label: "هشدارها", opts: [
+        { name: "۱) مثلث هشدار (!)", d: ["M12 3L2.5 20h19L12 3z", "M12 9v5", "M12 17.5h.01"] },
+        { name: "۲) دایره هشدار (!)", d: ["M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z", "M12 8v5", "M12 16.5h.01"] }
+      ]},
+      { label: "جیره‌نویسی", opts: [
+        { name: "۱) ترازو/وزن جیره", d: ["M12 3v18", "M5 7h14", "M5 7l-2.5 6h5L5 7z", "M19 7l-2.5 6h5L19 7z", "M8 21h8"] },
+        { name: "۲) کیسه خوراک + نشان", d: ["M8 4h8l-1.5 3.5h-5L8 4z", "M9.5 7.5C6.5 9.5 5.5 13 5.5 16.5A3.5 3.5 0 0 0 9 20h6a3.5 3.5 0 0 0 3.5-3.5c0-3.5-1-7-4-9z", "M9.5 14h5"] }
+      ]}
+    ];
+    const root = document.getElementById("app");
+    items.forEach(it => {
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML = `<div class="title">${it.label}</div><div class="opts">${it.opts.map(o => `
+        <div class="card">
+          <svg viewBox="0 0 24 24">${o.d.map(p => `<path d="${p}"/>`).join("")}</svg>
+          <span class="tag">${o.name}</span>
+        </div>`).join("")}</div>`;
+      root.appendChild(row);
+    });
+  </script>
+</body>
+</html>
