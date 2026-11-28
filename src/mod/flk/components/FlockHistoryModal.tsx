@@ -41,7 +41,7 @@ const REASON_OPTIONS: { value: FlockEventReasonCode; label: string; icon: string
 const TYPE_INFO: Record<FlockEventType, { icon: string; label: string; tone: string }> = {
   add:        { icon: '➕', label: 'افزودن',  tone: 'var(--accent)' },
   sell:       { icon: '💰', label: 'فروش',    tone: 'var(--purple)' },
-  death:      { icon: '💀', label: 'تلفات',   tone: 'var(--danger)' },
+  death:      { icon: 'mortality', label: 'تلفات',   tone: 'var(--danger)' },
   transfer:   { icon: '🔄', label: 'انتقال',  tone: 'var(--info)' },
   correction: { icon: '✏️', label: 'اصلاح',   tone: 'var(--warn)' },
   cull:       { icon: '🗑',  label: 'حذف',    tone: 'var(--warn)' },
