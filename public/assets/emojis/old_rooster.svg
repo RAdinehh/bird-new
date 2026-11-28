@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="or_head" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F1F5F9"/>
+      <stop offset="100%" stop-color="#94A3B8"/>
+    </linearGradient>
+  </defs>
+  <!-- تاج قرمز خروس -->
+  <path d="M22 18C20 11 26 8 29 13C31 7 38 8 38 14C42 10 47 14 43 20Z" fill="#DC2626" stroke="#991B1B" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- سر و گردن خروس با پرهای سفید/خاکستری -->
+  <path d="M18 46C17 34 21 19 33 19C44 19 48 29 47 41C47 49 43 56 32 56C22 56 18 52 18 46Z" fill="url(#or_head)" stroke="#475569" stroke-width="2"/>
+  <!-- ریش/پرهای سفید پیری روی گلو -->
+  <path d="M23 44C26 48 31 49 35 48C39 47 42 45 44 43C42 51 37 55 32 55C27 55 24 50 23 44Z" fill="#FFFFFF" opacity="0.85"/>
+  <!-- غبغب قرمز -->
+  <path d="M44 37C48 39 48 45 43 46C40 46 39 42 41 38Z" fill="#DC2626" stroke="#991B1B" stroke-width="1.2"/>
+  <!-- نوک -->
+  <path d="M44 29L55 33L44 36Z" fill="#F59E0B" stroke="#B45309" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- ابروی سفید خمیده -->
+  <path d="M31 24C34 22 38 22 41 24" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+  <!-- عینک گرد پیری -->
+  <circle cx="36" cy="29" r="5" fill="#E0F2FE" fill-opacity="0.55" stroke="#334155" stroke-width="1.8"/>
+  <line x1="31" y1="29" x2="23" y2="27" stroke="#334155" stroke-width="1.6" stroke-linecap="round"/>
+  <!-- چشم -->
+  <circle cx="36.5" cy="29" r="1.8" fill="#0F172A"/>
+  <circle cx="37.2" cy="28.3" r="0.6" fill="#FFFFFF"/>
+</svg>

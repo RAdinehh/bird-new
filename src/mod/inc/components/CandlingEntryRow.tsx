@@ -173,7 +173,7 @@ export default function CandlingEntryRow(props: CandlingEntryRowProps) {
                 modalTitle="دلیل بی‌نطفه"
                 options={INFERTILE_REASONS.map(([v, l]) => {
                   const t = String(v + " " + l);
-                  const icon = !v ? '' : /فصل|season/i.test(t) ? '🗓️' : /خروس|نر|male/i.test(t) ? 'sex_male' : /تغذیه|nutr/i.test(t) ? 'feed' : /ژنتیک|gene/i.test(t) ? '🧬' : /نگهداری|انبار|stor/i.test(t) ? 'egg_tray' : 'candling';
+                  const icon = !v ? '' : /فصل|season/i.test(t) ? '🗓️' : /خروس|نر|male/i.test(t) ? 'old_rooster' : /تغذیه|nutr/i.test(t) ? 'feed' : /ژنتیک|gene/i.test(t) ? '🧬' : /نگهداری|انبار|stor/i.test(t) ? 'egg_tray' : 'candling';
                   return { value: v, label: l, icon: icon || undefined };
                 })}
                 onChange={v => onUpdate({ infertileReason: v })}

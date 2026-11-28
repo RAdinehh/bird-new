@@ -7,7 +7,7 @@ export const ICON_KEYS = [
   'feeder_chain', 'feeder_tube', 'feeder_bucket', 'feeder_tray',
   'drinker_cup', 'drinker_hanging', 'drinker_fountain', 'drinker_trough', 'litter_straw',
   'kg', 'pcs',
-  'chicken', 'duck', 'turkey', 'egg', 'fertile_egg', 'incubator', 'candling', 'egg_tray', 'broken_egg', 'manure', 'herbal', 'other', 'equipment', 'bag', 'vial', 'liquid', 'dose', 'pack', 'cage', 'corn', 'wheat', 'barley', 'bran', 'soybean_meal', 'sesame_meal', 'sunflower_meal', 'canola_meal', 'fish_meal', 'alfalfa', 'calcium_powder', 'oyster_shell', 'salt', 'oil', 'amino_acid', 'premix',
+  'chicken', 'duck', 'turkey', 'egg', 'fertile_egg', 'incubator', 'candling', 'egg_tray', 'old_rooster', 'broken_egg', 'manure', 'herbal', 'other', 'equipment', 'bag', 'vial', 'liquid', 'dose', 'pack', 'cage', 'corn', 'wheat', 'barley', 'bran', 'soybean_meal', 'sesame_meal', 'sunflower_meal', 'canola_meal', 'fish_meal', 'alfalfa', 'calcium_powder', 'oyster_shell', 'salt', 'oil', 'amino_acid', 'premix',
   'hatch', 'feed', 'invoice', 'meds',
   'mortality', 'water', 'stats', 'flock', 'flocks_group',
   'inventory', 'cash', 'climate', 'unknown'
@@ -20,7 +20,7 @@ export type AppIconKey = typeof ICON_KEYS[number];
 
 // تابع پیدا کردن مسیر آیکون‌های تایید شده‌ی اپلی در پروژه
 export function getAppIconPath(key: AppIconKey): string {
-  return `/assets/emojis/${key}.svg?v=9`;
+  return `/assets/emojis/${key}.svg?v=10`;
 }
 
 // کامپوننت هوشمند برای نمایش ایموجی‌های جدید با سایز استاندارد
