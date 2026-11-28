@@ -38,13 +38,25 @@ export const ARCHIVE_REASON_LABELS: Record<string, string> = {
   manual: 'آرشیو دستی',
 };
 
-const ARCHIVE_REASON_OPTIONS = Object.entries(ARCHIVE_REASON_LABELS).map(([value, label]) => ({ value, label }));
+const ARCHIVE_REASON_ICONS: Record<string, string> = {
+  age: 'cal_90',
+  'flock-closed': 'flock',
+  'count-threshold': 'stats',
+  ancient: 'cal_all',
+  manual: 'archive_box',
+};
+
+const ARCHIVE_REASON_OPTIONS = Object.entries(ARCHIVE_REASON_LABELS).map(([value, label]) => ({
+  value,
+  label,
+  icon: ARCHIVE_REASON_ICONS[value] || 'archive_box',
+}));
 
 const STORE_OPTIONS = [
-  { value: 'flk', label: 'گله‌ها' },
-  { value: 'tra', label: 'معاملات' },
-  { value: 'whs', label: 'انبار' },
-  { value: 'inc', label: 'جوجه‌کشی' },
+  { value: 'flk', label: 'گله‌ها', icon: 'flock' },
+  { value: 'tra', label: 'معاملات', icon: 'invoice' },
+  { value: 'whs', label: 'انبار', icon: 'inventory' },
+  { value: 'inc', label: 'جوجه‌کشی', icon: 'incubator' },
 ];
 
 export function getArcArchiveConfig(ctx: {
@@ -62,8 +74,8 @@ export function getArcArchiveConfig(ctx: {
         key: 'status', label: 'وضعیت', kind: 'enum',
         icon: <IconActivity size={18} />,
         options: [
-          { value: 'archived', label: 'آرشیو' },
-          { value: 'sold', label: 'فروخته شده' },
+          { value: 'archived', label: 'آرشیو', icon: 'archive_box' },
+          { value: 'sold', label: 'فروخته شده', icon: 'cash' },
         ],
         getValue: (f: Flock) => f.status || 'archived',
         multi: true,
@@ -72,9 +84,9 @@ export function getArcArchiveConfig(ctx: {
         key: 'type', label: 'نوع گله', kind: 'enum',
         icon: <IconTag size={18} />,
         options: [
-          { value: 'layer', label: 'تخم‌گذار' },
-          { value: 'broiler', label: 'گوشتی' },
-          { value: 'breeder', label: 'مادر' },
+          { value: 'layer', label: 'تخم‌گذار', icon: 'egg' },
+          { value: 'broiler', label: 'گوشتی', icon: 'chicken' },
+          { value: 'breeder', label: 'مادر', icon: 'fertile_egg' },
         ],
         getValue: (f: Flock) => f.type || '',
         multi: true,

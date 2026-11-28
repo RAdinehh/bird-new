@@ -1,7 +1,7 @@
 import { resolveCategoryIconKey } from '../../shr/components/uiIconRegistry';
 import { OptionIcon } from '../../shr/components/OptionIcon';
 import { useState, useRef } from 'react';
-import { addFile, fileCategory, CATEGORY_LABEL, LINKED_TYPE_LABEL, formatSize, type DocCategory } from './store';
+import { addFile, fileCategory, CATEGORY_LABEL, CATEGORY_ICON, LINKED_TYPE_LABEL, formatSize, type DocCategory } from './store';
 import { Btn, BtnRow, Field, Input, Modal, Select, ErrorBox , Textarea } from '../../shr/components/ui';
 
 interface Props {
@@ -11,6 +11,16 @@ interface Props {
   prefillType?: string;
   prefillId?: string;
 }
+
+const LINKED_TYPE_ICON: Record<string, string> = {
+  flk: 'flock',
+  hal: 'hall',
+  ctc: 'flocks_group',
+  inc: 'incubator',
+  whs: 'inventory',
+  tra: 'invoice',
+  none: 'unknown',
+};
 
 const ACCEPT = 'image/*,application/pdf,audio/*,video/*,.xlsx,.xls,.csv';
 
@@ -122,9 +132,7 @@ export default function UploadModal({ open, onClose, onUploaded, prefillType, pr
           </>
         ) : (
           <>
-            <div style={{ fontSize: 'var(--fs-hero)' }}>
-              {category === 'image' ? '🖼' : category === 'pdf' ? '📄' : category === 'audio' ? '🎵' : category === 'video' ? '🎬' : category === 'excel' ? <OptionIcon icon={resolveCategoryIconKey('export', 'excel')} size={18} /> : '📎'}
-            </div>
+            <div style={{ display: 'flex', justifyContent: 'center' }}><OptionIcon icon={CATEGORY_ICON[category]} size={34} /></div>
             <div style={{
               fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)',
               maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
@@ -145,7 +153,7 @@ export default function UploadModal({ open, onClose, onUploaded, prefillType, pr
       <Field label="دسته‌ی فایل">
         <Select value={category} onChange={e => setCategory(e.target.value as DocCategory)}>
           {(Object.keys(CATEGORY_LABEL) as DocCategory[]).map(c => (
-            <option key={c} value={c}>{CATEGORY_LABEL[c]}</option>
+            <option key={c} value={c} data-icon={<OptionIcon icon={CATEGORY_ICON[c]} size={18} />}>{CATEGORY_LABEL[c]}</option>
           ))}
         </Select>
       </Field>
@@ -154,7 +162,7 @@ export default function UploadModal({ open, onClose, onUploaded, prefillType, pr
       <Field label="اتصال به" hint="اختیاری — فایل را به یک رکورد وصل کن">
         <Select value={linkedType} onChange={e => setLinkedType(e.target.value)}>
           {Object.entries(LINKED_TYPE_LABEL).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
+            <option key={k} value={k} data-icon={<OptionIcon icon={LINKED_TYPE_ICON[k] || 'unknown'} size={18} />}>{v}</option>
           ))}
         </Select>
       </Field>

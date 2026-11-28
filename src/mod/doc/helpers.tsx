@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../shr/components/OptionIcon';
 /**
  * helpers.tsx — ماژول doc
  */
@@ -38,7 +39,7 @@ export function GridCard({ file, onPreview, onDelete }: { file: DocFile; onPrevi
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : (
-          CATEGORY_ICON[file.category]
+          <OptionIcon icon={CATEGORY_ICON[file.category]} size={36} />
         )}
       </button>
       <div style={{ padding: 'var(--pad-normal)', flex: 1 }}>
@@ -97,7 +98,7 @@ export function ListCard({ file, onPreview, onDelete }: { file: DocFile; onPrevi
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : (
-          CATEGORY_ICON[file.category]
+          <OptionIcon icon={CATEGORY_ICON[file.category]} size={24} />
         )}
       </button>
       <div style={{ flex: 1, minWidth: 0 }}>
