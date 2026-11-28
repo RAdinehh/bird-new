@@ -3,6 +3,13 @@ import type { AppIconKey } from '../icons/AppIcons';
 /** کلیدهای خام مرجع — هرگونه تغییر نام کلید در آینده فقط اینجا اصلاح می‌شود */
 export const UI_ICON_MAP = {
   compare: 'compare_scale' as AppIconKey,
+  climate: 'climate' as AppIconKey,
+  alertBell: 'alert_bell' as AppIconKey,
+  alertCritical: 'alert_critical' as AppIconKey,
+  alertImportant: 'alert_important' as AppIconKey,
+  alertInfo: 'alert_info' as AppIconKey,
+  humidity: 'humidity' as AppIconKey,
+  behavior: 'behavior' as AppIconKey,
   profitTrend: 'profit_trend' as AppIconKey,
   period30d: 'cal_30' as AppIconKey,
   period3m: 'cal_3m' as AppIconKey,
@@ -33,6 +40,7 @@ export const UI_ICON_MAP = {
 
 export type UiIconCategory =
   | 'compare'
+  | 'alert'
   | 'profit'
   | 'period'
   | 'export'
@@ -47,6 +55,7 @@ export type UiIconCategory =
 /** آیکون پیش‌فرض هر دسته برای حالتی که زیردسته وجود ندارد یا مشخص نشده است */
 const CATEGORY_DEFAULT_ICON: Record<UiIconCategory, AppIconKey> = {
   compare: UI_ICON_MAP.compare,
+  alert: UI_ICON_MAP.alertBell,
   profit: UI_ICON_MAP.profitTrend,
   period: UI_ICON_MAP.period6m,
   export: UI_ICON_MAP.exportReport,
@@ -61,6 +70,25 @@ const CATEGORY_DEFAULT_ICON: Record<UiIconCategory, AppIconKey> = {
 
 /** نگاشت زیردسته‌ها به کلیدهای آیکون در هر دسته */
 const SUBTYPE_ICON_MAP: Record<UiIconCategory, Record<string, AppIconKey>> = {
+  alert: {
+    bell: UI_ICON_MAP.alertBell,
+    critical: UI_ICON_MAP.alertCritical,
+    important: UI_ICON_MAP.alertImportant,
+    info: UI_ICON_MAP.alertInfo,
+    stock: UI_ICON_MAP.inventory,
+    vaccine: UI_ICON_MAP.meds,
+    payment: UI_ICON_MAP.cash,
+    temp: UI_ICON_MAP.climate,
+    humidity: UI_ICON_MAP.humidity,
+    ventilation: 'ventilation' as AppIconKey,
+    litter: 'litter' as AppIconKey,
+    behavior: UI_ICON_MAP.behavior,
+    water: 'water' as AppIconKey,
+    feed: 'feed' as AppIconKey,
+    mortality: UI_ICON_MAP.mortality,
+    reproduction: 'egg' as AppIconKey,
+    other: UI_ICON_MAP.alertInfo,
+  },
   compare: {
     guide: UI_ICON_MAP.compare,
     flocks: UI_ICON_MAP.compare,

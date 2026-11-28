@@ -1,3 +1,5 @@
+import { OptionIcon } from '../../../shr/components/OptionIcon';
+import { resolveCategoryIconKey } from '../../../shr/components/uiIconRegistry';
 /**
  * AlertTabPanel — محتوای یک تب از هشدارها (carousel)
  */
@@ -86,7 +88,7 @@ export default function AlertTabPanel({ tab, active: isActive }: Props) {
     <PageContainer>
       <HelpBanner
         id="alt-tab-guide"
-        icon="🔔"
+        icon={resolveCategoryIconKey('alert', 'bell')}
         title="راهنمای هشدارها"
         description="هشدارهای این دسته را بر اساس اولویت بررسی کنید، موارد انجام‌شده را ببندید یا یادآور ثبت کنید."
         tone="info"
@@ -97,9 +99,9 @@ export default function AlertTabPanel({ tab, active: isActive }: Props) {
 
       {tab === 'active' && counts.total > 0 && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
-          <CountBox label="بحرانی" count={counts.critical} color="danger" icon="🔴" />
-          <CountBox label="مهم" count={counts.important} color="warn" icon="🟡" />
-          <CountBox label="اطلاعی" count={counts.info} color="info" icon="🔵" />
+          <CountBox label="بحرانی" count={counts.critical} color="danger" icon={<OptionIcon icon={resolveCategoryIconKey('alert', 'critical')} size={18} />} />
+          <CountBox label="مهم" count={counts.important} color="warn" icon={<OptionIcon icon={resolveCategoryIconKey('alert', 'important')} size={18} />} />
+          <CountBox label="اطلاعی" count={counts.info} color="info" icon={<OptionIcon icon={resolveCategoryIconKey('alert', 'info')} size={18} />} />
         </div>
       )}
 
@@ -155,7 +157,7 @@ export default function AlertTabPanel({ tab, active: isActive }: Props) {
                 key={a.id}
                 accent={accent}
                 index={fmt.count(i + 1)}
-                iconEmoji={LEVEL_ICON[a.level]}
+                iconEmoji={resolveCategoryIconKey('alert', a.category || a.level)}
                 title={a.title}
                 subtitle={CATEGORY_LABEL[a.category] + ' • ' + fmt.date(a.date)}
                 isOpen={isOpen}
@@ -235,7 +237,7 @@ function CountBox({
   label: string;
   count: number;
   color: 'danger' | 'warn' | 'info';
-  icon: string;
+  icon: React.ReactNode;
 }) {
   const fmt = useFormat();
   return (
