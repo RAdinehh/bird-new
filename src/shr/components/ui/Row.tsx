@@ -16,7 +16,7 @@ export function Row({ l, v, accent, warn, autoFrom }: { l: ReactNode; v: ReactNo
         <span style={{ fontWeight: 600, color: textColor, minWidth: 0, wordBreak: 'break-word', textAlign: 'left' }}>{v}</span>
       </div>
       {autoFrom && (
-        <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--accent)', fontWeight: 600, opacity: 0.85, textAlign: 'left' }}>
+        <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--accent)', fontWeight: 600, opacity: 1, textAlign: 'left' }}>
           {'✨ از ' + autoFrom}
         </div>
       )}

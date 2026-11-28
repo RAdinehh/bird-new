@@ -167,7 +167,7 @@ export default function MenuDrawer() {
               <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700 }}>
                 مدیریت مرغداری
               </div>
-              <div style={{ fontSize: 'var(--fs-xs)', opacity: 0.85, marginTop: 2 }}>
+              <div style={{ fontSize: 'var(--fs-xs)', opacity: 1, marginTop: 2 }}>
                 نسخه ۰.۴.۰ • ۱۵ ماژول
               </div>
             </div>

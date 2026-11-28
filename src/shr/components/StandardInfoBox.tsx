@@ -78,7 +78,7 @@ export default function StandardInfoBox({
                 fontSize: "var(--fs-2xs)",
                 fontWeight: 600,
                 color: "var(--muted)",
-                opacity: 0.9,
+                opacity: 1,
                 marginBottom: children ? 4 : 0,
                 overflow: "hidden",
                 textOverflow: "ellipsis",

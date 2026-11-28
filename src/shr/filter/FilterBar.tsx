@@ -269,9 +269,9 @@ export function FilterBar<T>({
               whiteSpace: 'nowrap', flexShrink: 0,
             }}>
               <span style={{
-                opacity: 0.65, fontWeight: 600, fontSize: 10.5,
+                opacity: 1, fontWeight: 600, fontSize: 10.5,
               }}>{c.label}</span>
-              <span style={{ opacity: 0.3 }}>·</span>
+              <span style={{ opacity: 1, color: 'var(--muted)' }}>·</span>
               <span>{c.text}</span>
               <button type="button" onClick={() => clearFilter(c.key)}
                 aria-label="حذف فیلتر"
