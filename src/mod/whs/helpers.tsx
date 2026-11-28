@@ -80,7 +80,7 @@ export function getWhsItemIcon(name: string, category: string, fallback?: string
   if (/ذرت|corn/.test(n)) return 'corn';
   if (/سبوس|bran/i.test(n)) return 'bran';
   if (/گندم|wheat/i.test(n)) return 'wheat';
-  if (n.trim() === 'جو' || /(?:^|\s|\u200c)جو(?:$|\s|\u200c)|دانه جو|barley/i.test(n)) return 'barley';
+  if (n.trim() === 'جو' || /(?:^|\s|\u200c)جو(?:$|\s|\u200c)|barley/i.test(n)) return 'barley';
   if (/سویا|soy/.test(n)) return 'soybean_meal';
   if (/کلزا|کانولا|canola/.test(n)) return 'canola_meal';
   if (/آفتابگردان|sunflower/.test(n)) return 'sunflower_meal';
