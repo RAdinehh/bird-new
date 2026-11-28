@@ -87,7 +87,7 @@ export default function MenuDrawer() {
       tone: 'purple',
       items: [
         { to: '/rep', label: 'گزارش‌ها', icon: 'M3 3v18h18 M19 9l-5 5-4-4-3 3' },
-        { to: '/alt', label: 'هشدارها', icon: 'M12 3L2.5 20h19L12 3z M12 9v5 M12 17.5h.01', badge: alertCount > 0 ? 'alerts' : null },
+        { to: '/alt', label: 'هشدارها', icon: 'M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9 M10.3 21a1.94 1.94 0 0 0 3.4 0', badge: alertCount > 0 ? 'alerts' : null },
         { to: '/doc', label: 'اسناد و فایل‌ها', icon: 'M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z' },
         { to: '/arc', label: 'آرشیو', icon: 'M21 8 21 21 3 21 3 8 M1 3h22v5H1z M10 12h4' },
       ]
