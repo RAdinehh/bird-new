@@ -2,6 +2,12 @@ import { getSmartFeedIcon, type AppIconKey } from '../icons/AppIcons';
 
 /** کلیدهای خام مرجع — هرگونه تغییر نام کلید در آینده فقط اینجا اصلاح می‌شود */
 export const UI_ICON_MAP = {
+  folder: 'folder' as AppIconKey,
+  folderOpen: 'folder_open' as AppIconKey,
+  storageDisk: 'storage_disk' as AppIconKey,
+  attachment: 'attachment' as AppIconKey,
+  archiveBox: 'archive_box' as AppIconKey,
+  dailyLog: 'daily_log' as AppIconKey,
   compare: 'compare_scale' as AppIconKey,
   climate: 'climate' as AppIconKey,
   alertBell: 'alert_bell' as AppIconKey,

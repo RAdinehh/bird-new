@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../shr/components/OptionIcon';
 import { useFormat } from '../../shr/units/useFormat';
 import { useState, useEffect, useMemo } from 'react';
 import {
@@ -72,7 +73,7 @@ export default function FilesPage() {
     <PageContainer>
       <HelpBanner
         id="doc-files-guide"
-        icon="📁"
+        icon="folder"
         title="راهنمای اسناد و فایل‌ها"
         description="رسیدها، برگه‌های آزمایش، مجوزها و فایل‌های مرتبط با گله‌ها، معاملات و انبار را دسته‌بندی، پیش‌نمایش و مدیریت کنید."
         tone="info"
@@ -91,7 +92,7 @@ export default function FilesPage() {
           marginBottom: 10
         }}>
           <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>
-            📁 اسناد
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><OptionIcon icon="folder" size={18} /><span>اسناد</span></span>
           </div>
           <button
             type="button"
@@ -123,11 +124,11 @@ export default function FilesPage() {
           </button>
         </div>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
-          <StatBox icon="📁" label="فایل‌ها" value={fmt.count(files.length)} tone="accent" />
+          <StatBox icon="folder" label="فایل‌ها" value={fmt.count(files.length)} tone="accent" />
           <Dot />
-          <StatBox icon="💾" label="حجم" value={formatSize(totalBytes)} />
+          <StatBox icon="storage_disk" label="حجم" value={formatSize(totalBytes)} />
           <Dot />
-          <StatBox icon="📂" label="دسته‌ها" value={fmt.count(Object.keys(counts).length - 1)} />
+          <StatBox icon="folder_open" label="دسته‌ها" value={fmt.count(Object.keys(counts).length - 1)} />
         </div>
       </div>
 

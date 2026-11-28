@@ -839,7 +839,7 @@ export default function FlockComparisonPanel({
         )}
 
         {groupedByYear.length === 0 ? (
-          <Empty icon="🐔" title="گله‌ای یافت نشد" desc="فیلتر یا جستجو را تغییر دهید." />
+          <Empty icon="chicken" title="گله‌ای یافت نشد" desc="فیلتر یا جستجو را تغییر دهید." />
         ) : (
           groupedByYear.map(([yearLabel, yearItems]) => (
             <SheetGroup

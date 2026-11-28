@@ -30,12 +30,12 @@ export const CATEGORY_LABEL: Record<DocCategory, string> = {
 };
 
 export const CATEGORY_ICON: Record<DocCategory, string> = {
-  image: '🖼',
-  pdf: '📄',
-  audio: '🎵',
-  video: '🎬',
+  image: 'image_file',
+  pdf: 'export_report',
+  audio: 'audio_file',
+  video: 'video_file',
   excel: 'excel_export',
-  other: '📎'
+  other: 'attachment'
 };
 
 export const LINKED_TYPE_LABEL: Record<string, string> = {

@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../shr/components/OptionIcon';
 import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useFlk, getAgeDays, calcCosts, formatAge, SOURCE_LABEL, type Flock } from '../flk/store';
@@ -574,13 +575,13 @@ export default function ArchivePage() {
         border: '1px solid var(--border)',
       }}>
         <TabButton active={kind === 'flocks'} onClick={() => { setKind('flocks'); setExpandedId(null); }}>
-          🗄 گله‌ها
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><OptionIcon icon="archive_box" size={16} /><span>گله‌ها</span></span>
         </TabButton>
         <TabButton active={kind === 'logs'} onClick={() => { setKind('logs'); setExpandedId(null); }}>
-          📒 دفتر روزانه
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><OptionIcon icon="daily_log" size={16} /><span>دفتر روزانه</span></span>
         </TabButton>
         <TabButton active={kind === 'stores'} onClick={() => { setKind('stores'); setExpandedId(null); }}>
-          📦 سایر مخازن
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><OptionIcon icon="inventory" size={16} /><span>سایر مخازن</span></span>
         </TabButton>
       </div>
 
@@ -588,7 +589,7 @@ export default function ArchivePage() {
       {kind === 'flocks' && (
         <HelpBanner
           id="arc-flocks-guide"
-          icon="🗄"
+          icon="archive_box"
           title="راهنمای آرشیو گله‌ها"
           description="گله‌های بسته‌شده یا فروخته‌شده و خلاصه‌های مقایسه‌ای این‌جا قرار می‌گیرند. می‌توانید دوره‌ها را بررسی، مقایسه یا در صورت امکان بازیابی کنید."
           tone="info"
@@ -597,7 +598,7 @@ export default function ArchivePage() {
       {kind === 'logs' && (
         <HelpBanner
           id="arc-logs-guide"
-          icon="📒"
+          icon="daily_log"
           title="راهنمای آرشیو دفتر روزانه"
           description="ثبت‌های روزانهٔ آرشیوشده یا مربوط به گله‌های بسته‌شده این‌جا نگهداری می‌شوند. با بازیابی، موارد به مخزن فعال دفتر روزانه بازمی‌گردند."
           tone="info"
@@ -606,7 +607,7 @@ export default function ArchivePage() {
       {kind === 'stores' && (
         <HelpBanner
           id="arc-stores-guide"
-          icon="📦"
+          icon="inventory"
           title="راهنمای سایر مخازن آرشیو"
           description="نمای تجمیعیِ رکوردهای آرشیوشده در معاملات، انبار، جوجه‌کشی و گله‌های بسته است؛ با فیلتر مخزن می‌توانید موارد موجود را تفکیک کنید."
           tone="info"
@@ -623,7 +624,7 @@ export default function ArchivePage() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
           <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>
-            {kind === 'flocks' ? '🗄' : kind === 'logs' ? '📒' : '📦'}
+            <OptionIcon icon={kind === 'flocks' ? 'archive_box' : kind === 'logs' ? 'daily_log' : 'inventory'} size={18} />
           </span>
           <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
             {statLabel}
@@ -896,7 +897,7 @@ export default function ArchivePage() {
                 key={f.id}
                 accent="dim"
                 index={fmt.count(i + 1)}
-                iconEmoji="🗄"
+                iconEmoji="archive_box"
                 title={f.name}
                 subtitle={(bird?.name || '—') + (breed ? ' • ' + breed.name : '') + (hall ? ' • ' + hall.name : '')}
                 isOpen={isOpen}

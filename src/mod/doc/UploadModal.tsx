@@ -75,7 +75,7 @@ export default function UploadModal({ open, onClose, onUploaded, prefillType, pr
     <Modal
       open={open}
       onClose={handleCancel}
-      title="📎 افزودن فایل"
+      title={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><OptionIcon icon="attachment" size={18} /><span>افزودن فایل</span></span>}
       footer={
         <BtnRow>
           <Btn variant="primary" onClick={handleUpload} disabled={uploading || file === null}>
@@ -112,7 +112,7 @@ export default function UploadModal({ open, onClose, onUploaded, prefillType, pr
       >
         {file === null ? (
           <>
-            <div style={{ fontSize: 'var(--fs-hero)' }}>📎</div>
+            <div style={{ display: 'flex', justifyContent: 'center' }}><OptionIcon icon="attachment" size={34} /></div>
             <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--accent)' }}>
               برای انتخاب فایل بزنید
             </div>

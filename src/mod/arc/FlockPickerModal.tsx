@@ -150,7 +150,7 @@ export default function FlockPickerModal({
         )}
 
         {filteredCandidates.length === 0 ? (
-          <Empty icon="🐔" title="گله‌ای یافت نشد" desc="فیلتر یا جستجو را تغییر دهید." />
+          <Empty icon="chicken" title="گله‌ای یافت نشد" desc="فیلتر یا جستجو را تغییر دهید." />
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {groupedCandidates.map(([year, items]) => (
