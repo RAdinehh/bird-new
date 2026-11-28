@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { OptionIcon } from '../../shr/components/OptionIcon';
 import { useSet } from './store';
 import { Field, Grid2, Input, NumField, PhoneField, DigitField, Select } from '../../shr/components/ui';
 import DatePicker from '../../shr/components/DatePicker';
@@ -6,6 +7,15 @@ import { parseFaNum } from '../../shr/utils/fa';
 import SettingsGroup from './SettingsGroup';
 import { ToggleRow } from './helpers';
 import PinSetupModal from '../../shr/components/PinSetupModal';
+
+function Lbl({ icon, text }: { icon: string; text: string }) {
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+      <OptionIcon icon={icon} size={15} />
+      <span>{text}</span>
+    </span>
+  );
+}
 
 export default function ProfileTab() {
   const { user, farm, bank, security, updateSection } = useSet();
@@ -33,9 +43,9 @@ export default function ProfileTab() {
               value={user.role}
               onChange={e => updateSection('user', { role: e.target.value })}
             >
-              <option value="owner">مالک</option>
-              <option value="manager">مدیر</option>
-              <option value="worker">کارگر</option>
+              <option value="owner">👤 مالک</option>
+              <option value="manager">🧑‍💼 مدیر</option>
+              <option value="worker">hand_tools کارگر</option>
             </Select>
           </Field>
         </Grid2>
@@ -47,7 +57,7 @@ export default function ProfileTab() {
               placeholder="۰۹..."
             />
           </Field>
-          <Field label="ایمیل">
+          <Field label={<Lbl icon="📧" text="ایمیل" />}>
             <Input
               placeholder="example@domain.com"
               value={user.email}
@@ -59,7 +69,7 @@ export default function ProfileTab() {
       </SettingsGroup>
 
       {/* ═══ اطلاعات مرغداری ═══ */}
-      <SettingsGroup icon="home" title="اطلاعات مرغداری" subtitle={farmSummary} tone="info">
+      <SettingsGroup icon="hall" title="اطلاعات مرغداری" subtitle={farmSummary} tone="info">
         <Field label="نام مرغداری">
           <Input
             value={farm.name}
@@ -73,14 +83,14 @@ export default function ProfileTab() {
               value={farm.type}
               onChange={e => updateSection('farm', { type: e.target.value })}
             >
-              <option value="layer">تخم‌گذار</option>
-              <option value="broiler">گوشتی</option>
-              <option value="breeder">مادر</option>
-              <option value="hatchery">جوجه‌کشی</option>
-              <option value="mixed">مخلوط</option>
+              <option value="layer">🥚 تخم‌گذار</option>
+              <option value="broiler">🍗 گوشتی</option>
+              <option value="breeder">🐣 مادر</option>
+              <option value="hatchery">hatch جوجه‌کشی</option>
+              <option value="mixed">🔀 مخلوط</option>
             </Select>
           </Field>
-          <Field label="شماره پروانه">
+          <Field label={<Lbl icon="🪪" text="شماره پروانه" />}>
             <Input
               placeholder="کد"
               value={farm.licenseNo}
@@ -105,7 +115,7 @@ export default function ProfileTab() {
           </Field>
         </Grid2>
         <Grid2>
-          <Field label="کد پستی">
+          <Field label={<Lbl icon="📮" text="کد پستی" />}>
             <DigitField
               placeholder="کد ملی"
               maxLength={10}
@@ -137,7 +147,7 @@ export default function ProfileTab() {
       </SettingsGroup>
 
       {/* ═══ اطلاعات بانکی ═══ */}
-      <SettingsGroup icon="bank_check" title="اطلاعات بانکی" subtitle={bankSummary} tone="purple">
+      <SettingsGroup icon="💳" title="اطلاعات بانکی" subtitle={bankSummary} tone="purple">
         <div style={{
           fontSize: 'var(--fs-xs)',
           color: 'var(--muted)',
@@ -164,7 +174,7 @@ export default function ProfileTab() {
             />
           </Field>
         </Grid2>
-        <Field label="شماره کارت">
+        <Field label={<Lbl icon="💳" text="شماره کارت" />}>
           <DigitField
             maxLength={16}
             value={bank.cardNo}
@@ -172,7 +182,7 @@ export default function ProfileTab() {
             placeholder="شماره"
           />
         </Field>
-        <Field label="شماره شبا">
+        <Field label={<Lbl icon="🏦" text="شماره شبا" />}>
           <Input
             value={bank.sheba}
             onChange={e => updateSection('bank', { sheba: e.target.value })}
@@ -183,9 +193,7 @@ export default function ProfileTab() {
       </SettingsGroup>
 
       {/* ═══ امنیت ═══ */}
-      <SettingsGroup
-        icon="lock"
-        title="امنیت"
+      <SettingsGroup icon="lock" title="امنیت"
         subtitle={security.pinEnabled ? 'قفل با PIN فعال' : 'قفل غیرفعال'}
         tone="danger"
       >
@@ -212,7 +220,7 @@ export default function ProfileTab() {
                 min={0}
               />
             </Field>
-            <Field label="قفل خودکار پس از">
+            <Field label={<Lbl icon="⏱️" text="قفل خودکار پس از" />}>
               <Select
                 value={String(security.autoLockMin)}
                 onChange={e => updateSection('security', { autoLockMin: Math.round(parseFaNum(e.target.value)) })}
