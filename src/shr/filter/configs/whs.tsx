@@ -154,10 +154,10 @@ export function getWhsWarningsConfig(): FilterConfig<Item> {
         key: 'warnKind', label: 'نوع هشدار', kind: 'enum',
         icon: <IconActivity size={18} />,
         options: [
-          { value: 'expired', label: 'منقضی', icon: '❌' },
-          { value: 'critical', label: 'تمام‌شده', icon: '🚫' },
-          { value: 'soon', label: 'نزدیک انقضا', icon: '⏰' },
-          { value: 'low', label: 'موجودی کم', icon: '⚠️' },
+          { value: 'expired', label: 'منقضی', icon: 'expired' },
+          { value: 'critical', label: 'تمام‌شده', icon: 'stock_empty' },
+          { value: 'soon', label: 'نزدیک انقضا', icon: 'expiring_soon' },
+          { value: 'low', label: 'موجودی کم', icon: 'stock_low' },
         ],
         getValue: (it: Item) => {
           const exp = it.expireDate ? expiryWarning(it) : 'ok';

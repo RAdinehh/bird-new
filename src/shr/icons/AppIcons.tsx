@@ -7,10 +7,10 @@ export const ICON_KEYS = [
   'feeder_chain', 'feeder_tube', 'feeder_bucket', 'feeder_tray',
   'drinker_cup', 'drinker_hanging', 'drinker_fountain', 'drinker_trough', 'litter_straw',
   'kg', 'pcs',
-  'chicken', 'duck', 'turkey', 'egg', 'fertile_egg', 'incubator', 'candling', 'egg_tray', 'old_rooster', 'soft_egg', 'dirty_egg', 'rotten_egg', 'cal_7', 'cal_30', 'cal_90', 'cal_all', 'broken_egg', 'manure', 'herbal', 'other', 'equipment', 'bag', 'vial', 'liquid', 'dose', 'pack', 'cage', 'corn', 'wheat', 'barley', 'bran', 'wheat_bran', 'soybean_meal', 'sesame_meal', 'sunflower_meal', 'canola_meal', 'fish_meal', 'alfalfa', 'calcium_powder', 'oyster_shell', 'rock_salt', 'salt', 'oil', 'amino_acid', 'premix',
+  'chicken', 'duck', 'turkey', 'egg', 'fertile_egg', 'incubator', 'candling', 'egg_tray', 'old_rooster', 'soft_egg', 'dirty_egg', 'rotten_egg', 'cal_7', 'cal_30', 'cal_90', 'cal_all', 'broken_egg', 'manure', 'herbal', 'other', 'equipment', 'bag', 'vial', 'liquid', 'dose', 'pack', 'cage', 'corn', 'wheat', 'barley', 'bran', 'soybean_meal', 'sesame_meal', 'sunflower_meal', 'canola_meal', 'fish_meal', 'alfalfa', 'calcium_powder', 'oyster_shell', 'rock_salt', 'salt', 'oil', 'amino_acid', 'premix',
   'hatch', 'feed', 'invoice', 'meds',
   'mortality', 'water', 'stats', 'flock', 'flocks_group',
-  'inventory', 'cash', 'climate', 'unknown'
+  'inventory', 'expired', 'stock_empty', 'expiring_soon', 'stock_low', 'cash', 'climate', 'unknown'
 ,
   'fan_tunnel', 'fan_ceiling', 'air_inlet', 'cooling_pad', 'feeder_manual', 'nipple', 'drinker_capsule', 'heating', 'jet_heater', 'duct_heater', 'radiant_brooder', 'lighting', 'lamp_led', 'lamp_fluorescent', 'dimmer', 'litter_sawdust', 'litter_roll', 'litter_rice_hull', 'litter_sand', 'litter_peat', 'cooling', 'fogger', 'misting_system', 'swamp_cooler', 'water_filter', 'water_pipe', 'generator', 'electrical_panel', 'cable', 'weighing', 'platform_scale', 'bird_scale', 'feed_scale', 'cleaning', 'pressure_washer', 'sprayer', 'flame_gun', 'safety', 'fire_extinguisher', 'smoke_detector', 'emergency_light', 'first_aid', 'hand_tools', 'wheelbarrow', 'shovel', 'rake', 'feed_scoop', 'broom', 'bucket', 'auxiliary', 'camera', 'sensor', 'vet_eye_drop', 'vet_wing_web', 'vet_injection', 'vet_topical', 'cause_disease', 'cause_heat_stress', 'cause_suffocation', 'cause_cannibalism', 'cause_injury', 'cause_weakness', 'cause_culling', 'sex_male', 'sex_female', 'sex_mixed',
   'bank_melli', 'bank_mellat', 'bank_saderat', 'bank_tejarat', 'bank_sepah', 'bank_keshavarzi', 'bank_maskan', 'bank_refah', 'bank_postbank', 'bank_tosee', 'bank_sanatmadan', 'bank_tosee_coop', 'bank_markazi', 'bank_pasargad', 'bank_saman', 'bank_parsian', 'bank_en', 'bank_ayande', 'bank_sina', 'bank_day', 'bank_shahr', 'bank_sarmaye', 'bank_gardeshgari', 'bank_iranzamin', 'bank_karafarin', 'bank_khavarmiane', 'bank_mehreiran', 'bank_resalat', 'bank_mellal', 'bank_noor', 'bank_caspian', 'bank_ansar', 'bank_hekmat', 'bank_ghavamin', 'bank_kosar', 'bank_mehreghtesad', 'bank_other'
@@ -20,7 +20,7 @@ export type AppIconKey = typeof ICON_KEYS[number];
 
 // تابع پیدا کردن مسیر آیکون‌های تایید شده‌ی اپلی در پروژه
 export function getAppIconPath(key: AppIconKey): string {
-  return `/assets/emojis/${key}.svg?v=19`;
+  return `/assets/emojis/${key}.svg?v=20`;
 }
 
 // کامپوننت هوشمند برای نمایش ایموجی‌های جدید با سایز استاندارد
@@ -84,7 +84,7 @@ export function isValidIconKey(key: string): key is AppIconKey {
 export function getSmartFeedIcon(name?: string, fallback: AppIconKey = 'feed'): AppIconKey {
   if (!name) return fallback;
   const n = name.trim().toLowerCase();
-  if (n.includes('سبوس') || n.includes('bran')) return 'wheat_bran';
+  if (n.includes('سبوس') || n.includes('bran')) return 'bran';
   if (n.includes('ذرت')) return 'corn';
   if (n.includes('گندم')) return 'wheat';
   if (/(?:^|\s|\u200c)جو(?:$|\s|\u200c)|barley/.test(n)) return 'barley';

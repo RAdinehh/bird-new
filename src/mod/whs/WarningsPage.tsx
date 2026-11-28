@@ -37,7 +37,7 @@ export default function WarningsPage() {
       <PageContainer>
       <HelpBanner
         id="whs-warnings-guide"
-        icon="⚠️"
+        icon="stock_low"
         title="راهنمای هشدارهای انبار"
         description="اقلامی که موجودی‌شان به حد هشدار رسیده یا تاریخ انقضایشان نزدیک است اینجا نمایش داده می‌شوند تا پیش از کمبود یا فاسد شدن اقدام کنید."
         tone="info"
