@@ -18,24 +18,74 @@ export const ICON_KEYS = [
 
 export type AppIconKey = typeof ICON_KEYS[number];
 
-// تابع پیدا کردن مسیر آیکون‌های تایید شده‌ی اپلی در پروژه
-export function getAppIconPath(key: AppIconKey): string {
-  return `/assets/emojis/${key}.svg?v=28`;
+export const ICON_ASSET_VERSION = 29;
+
+/** نگاشت کلیدهای قدیمی یا مترادف به کلیدهای استاندارد برای حفظ سازگاری با داده‌های ذخیره‌شده */
+export const ICON_KEY_ALIASES: Record<string, AppIconKey> = {
+  bell: 'alert_bell',
+  critical: 'alert_critical',
+  important: 'alert_important',
+  warn: 'alert_important',
+  warning: 'alert_important',
+  info: 'alert_info',
+  remind: 'reminder',
+  promise: 'payment_promise',
+  pay_promise: 'payment_promise',
+  stock: 'inventory',
+  temp: 'climate',
+  temperature: 'climate',
+};
+
+const INLINE_FALLBACK_SVG =
+  'data:image/svg+xml;utf8,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#E2E8F0" stroke="#94A3B8" stroke-width="3"/><text x="32" y="40" text-anchor="middle" font-size="26" font-family="sans-serif" fill="#475569">?</text></svg>'
+  );
+
+export function normalizeIconKey(name?: string): AppIconKey {
+  if (!name) return 'unknown';
+  const trimmed = name.trim();
+  if (ICON_KEYS.includes(trimmed as AppIconKey)) {
+    return trimmed as AppIconKey;
+  }
+  if (trimmed in ICON_KEY_ALIASES) {
+    return ICON_KEY_ALIASES[trimmed];
+  }
+  return 'unknown';
 }
 
-// کامپوننت هوشمند برای نمایش ایموجی‌های جدید با سایز استاندارد
+// تابع پیدا کردن مسیر آیکون‌های تایید شده‌ی اپلی در پروژه
+export function getAppIconPath(key: AppIconKey): string {
+  return '/assets/emojis/' + key + '.svg?v=' + ICON_ASSET_VERSION;
+}
+
+// کامپوننت هوشمند برای نمایش ایموجی‌های جدید با سایز استاندارد و مقاوم در برابر خطای لود
 interface AppIconProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   name?: string;
   size?: number | string;
 }
 
-export const AppIcon: React.FC<AppIconProps> = ({ name, size = '1.2em', style, ...props }) => {
-  const key = (name && ICON_KEYS.includes(name as AppIconKey) ? name : 'unknown') as AppIconKey;
-  
+export const AppIcon: React.FC<AppIconProps> = ({ name, size = '1.2em', style, onError, ...props }) => {
+  const key = normalizeIconKey(name);
+
+  const handleError: React.ReactEventHandler<HTMLImageElement> = (e) => {
+    const img = e.currentTarget;
+    const step = img.dataset.fallbackStep || '0';
+    if (step === '0' && key !== 'unknown') {
+      img.dataset.fallbackStep = '1';
+      img.src = getAppIconPath('unknown');
+    } else if (step !== '2') {
+      img.dataset.fallbackStep = '2';
+      img.src = INLINE_FALLBACK_SVG;
+    }
+    onError?.(e);
+  };
+
   return (
     <img
       src={getAppIconPath(key)}
       alt={key}
+      onError={handleError}
       style={{
         display: 'inline-flex',
         alignItems: 'center',
@@ -77,8 +127,10 @@ export function getSmartIconByText(text?: string): AppIconKey {
   return 'unknown';
 }
 
-export function isValidIconKey(key: string): key is AppIconKey {
-  return (ICON_KEYS as readonly string[]).includes(key);
+export function isValidIconKey(key?: string): key is AppIconKey {
+  if (!key) return false;
+  const t = key.trim();
+  return ICON_KEYS.includes(t as AppIconKey) || t in ICON_KEY_ALIASES;
 }
 
 export function getSmartFeedIcon(name?: string, fallback: AppIconKey = 'feed'): AppIconKey {

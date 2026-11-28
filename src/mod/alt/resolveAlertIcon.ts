@@ -1,5 +1,18 @@
-import { useWhs } from "../whs/store";
-import { resolveAlertIconKey } from "../../shr/components/uiIconRegistry";
+import { useWhs, type ItemCategory } from "../whs/store";
+import { getSmartFeedIcon } from "../../shr/icons/AppIcons";
+import { resolveAlertIconKey, resolveCategoryIconKey } from "../../shr/components/uiIconRegistry";
+
+const WHS_CATEGORY_ICON: Record<ItemCategory, string> = {
+  feed: "feed",
+  medicine: "meds",
+  vaccine: "meds",
+  herbal: "herbal",
+  equipment: "equipment",
+  consumable: "pack",
+  egg: "egg",
+  manure: "manure",
+  broken: "broken",
+};
 
 export function resolveAlertIcon(alert: {
   source?: string;
@@ -9,16 +22,23 @@ export function resolveAlertIcon(alert: {
   category?: string;
   level?: string;
 }): string {
-  // 1. اولویت اول: آیکون واقعی خود قلم در انبار (ماژول مبدأ)
+  // 1. اولویت اول: خود قلم در ماژول مبدأ (آیکون ثبت‌شده ← تشخیص از نام ← زیردسته‌ی قلم در انبار)
   if (alert.source === "whs" && alert.sourceId) {
     const recordId = alert.sourceId.split(":")[0];
     const item = useWhs.getState().items.find((i) => i.id === recordId);
     if (item?.icon && item.icon.trim()) {
       return item.icon.trim();
     }
+    if (item?.name) {
+      const fromItemName = getSmartFeedIcon(item.name, "unknown");
+      if (fromItemName !== "unknown") return fromItemName;
+    }
+    if (item?.category && WHS_CATEGORY_ICON[item.category]) {
+      return WHS_CATEGORY_ICON[item.category];
+    }
   }
 
-  // 2. اولویت دوم: تشخیص کلمات کلیدی مشترک و پرتکرار در عنوان هشدار
+  // 2. اولویت دوم: کلیدواژه‌های مشترک بین ماژول‌ها
   const t = (alert.title || "").trim();
   if (/یادآور/.test(t)) return "reminder";
   if (/قول پرداخت|تعویق|چک/.test(t)) return "payment_promise";
@@ -37,6 +57,10 @@ export function resolveAlertIcon(alert: {
   if (/بی‌حال|سرفه|عطسه|گوشه‌گیر/.test(t)) return "behavior";
   if (/چرخه|گله مادر/.test(t)) return "flock";
 
-  // 3. اولویت سوم: تشخیص هوشمند نام خوراک (گندم، جو، ذرت، کنجد...) و در نهایت زیرگروه
-  return resolveAlertIconKey(alert);
+  // 3 و 4. اولویت سوم و چهارم: نام خوراک در متن ← دسته‌بندی/ماژول هشدار
+  const resolved = resolveAlertIconKey(alert);
+  if (resolved && resolved !== "unknown") return resolved;
+
+  // 5. اولویت پنجم: سطح هشدار ← و در نهایت unknown
+  return resolveCategoryIconKey("alert", alert.level);
 }

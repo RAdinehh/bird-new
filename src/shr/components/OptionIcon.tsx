@@ -34,7 +34,8 @@ export function OptionIcon({ icon, size = 22, color = 'currentColor', style }: O
   if (typeof icon === 'string') {
     const trimmed = icon.trim() === '🐦' ? 'quail' : icon.trim();
     const emoji = ICON_KEY_TO_EMOJI[trimmed];
-    if (!emoji && isValidIconKey(trimmed)) {
+    const isRawKeyLike = /^[a-z0-9_-]+$/i.test(trimmed);
+    if (!emoji && (isValidIconKey(trimmed) || isRawKeyLike)) {
       return (
         <span
           aria-hidden="true"
