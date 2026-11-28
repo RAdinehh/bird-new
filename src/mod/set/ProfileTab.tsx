@@ -44,8 +44,8 @@ export default function ProfileTab() {
               onChange={e => updateSection('user', { role: e.target.value })}
             >
               <option value="owner">👤 مالک</option>
-              <option value="manager">🧑‍💼 مدیر</option>
-              <option value="worker">hand_tools کارگر</option>
+              <option value="manager">💼 مدیر</option>
+              <option value="worker">👷 کارگر</option>
             </Select>
           </Field>
         </Grid2>
@@ -69,7 +69,7 @@ export default function ProfileTab() {
       </SettingsGroup>
 
       {/* ═══ اطلاعات مرغداری ═══ */}
-      <SettingsGroup icon="hall" title="اطلاعات مرغداری" subtitle={farmSummary} tone="info">
+      <SettingsGroup icon="🏡" title="اطلاعات مرغداری" subtitle={farmSummary} tone="info">
         <Field label="نام مرغداری">
           <Input
             value={farm.name}
@@ -86,7 +86,7 @@ export default function ProfileTab() {
               <option value="layer">🥚 تخم‌گذار</option>
               <option value="broiler">🍗 گوشتی</option>
               <option value="breeder">🐣 مادر</option>
-              <option value="hatchery">hatch جوجه‌کشی</option>
+              <option value="hatchery">🐣 جوجه‌کشی</option>
               <option value="mixed">🔀 مخلوط</option>
             </Select>
           </Field>
@@ -193,7 +193,7 @@ export default function ProfileTab() {
       </SettingsGroup>
 
       {/* ═══ امنیت ═══ */}
-      <SettingsGroup icon="lock" title="امنیت"
+      <SettingsGroup icon="🔐" title="امنیت"
         subtitle={security.pinEnabled ? 'قفل با PIN فعال' : 'قفل غیرفعال'}
         tone="danger"
       >
