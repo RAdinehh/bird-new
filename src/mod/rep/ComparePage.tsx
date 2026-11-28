@@ -69,7 +69,7 @@ export default function ComparePage() {
     <PageContainer>
       <HelpBanner
         id="rep-compare-guide"
-        icon="compare_scale"
+        icon={resolveCategoryIconKey('compare', 'guide')}
         title="راهنمای مقایسه"
         description="عملکرد چند گله یا دورهٔ زمانی را از نظر تولید، مصرف، تلفات و شاخص‌های کلیدی با هم مقایسه کنید."
         tone="info"

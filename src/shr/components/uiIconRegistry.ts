@@ -67,7 +67,7 @@ const SUBTYPE_ICON_MAP: Record<UiIconCategory, Record<string, AppIconKey>> = {
     groups: UI_ICON_MAP.compare,
     egg_feed: UI_ICON_MAP.compare,
     egg_rate: UI_ICON_MAP.compare,
-    mortality: UI_ICON_MAP.compare,
+    mortality: UI_ICON_MAP.mortality,
     hen_day: UI_ICON_MAP.compare,
     fcr: UI_ICON_MAP.compare,
   },

@@ -1,3 +1,5 @@
+import { resolveCategoryIconKey } from '../../../shr/components/uiIconRegistry';
+import { OptionIcon } from '../../../shr/components/OptionIcon';
 /**
  * GroupKpiRow.tsx — کارت KPI گروه گله
  * جدا شده از GroupsPage.tsx
@@ -45,7 +47,7 @@ export function GroupKpiRow({ group, onOpen }: GroupKpiRowProps) {
         <span title="نر / ماده">♂ {fmt.count(kpi.totalMale)} / ♀ {fmt.count(kpi.totalFemale)}</span>
       )}
       {kpi.totalDeaths > 0 && (
-        <span>💀 <b style={{ color: mortalityTone }}>{fmt.count(kpi.totalDeaths)}</b> ({fmt.num(kpi.mortalityRate)}٪)</span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><OptionIcon icon={resolveCategoryIconKey('production', 'mortality')} size={15} /><b style={{ color: mortalityTone }}>{fmt.count(kpi.totalDeaths)}</b> ({fmt.num(kpi.mortalityRate)}٪)</span>
       )}
       {kpi.totalCost > 0 && <span>💰 <b style={{ color: 'var(--text)' }}>{fmt.num(kpi.totalCost / 1_000_000)}M</b></span>}
       {kpi.totalRevenue > 0 && <span>📈 <b style={{ color: profitTone }}>{fmt.num(kpi.totalProfit / 1_000_000)}M</b></span>}
