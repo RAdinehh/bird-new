@@ -57,10 +57,10 @@ export default function MenuDrawer() {
       tone: 'accent',
       items: [
         { to: '/brd', label: 'پرنده‌ها و نژادها', icon: 'M17 9c0-2.5-2-4-4.5-4-1.5 0-2.8.7-3.5 1.8L7 6l1 2.5C6.5 10 6 12 6 14c0 2.8 2.2 5 5 5h4c2.8 0 4-1.8 4-4l2-2-4-4z' },
-        { to: '/hal', label: 'سالن‌ها', icon: 'M3 3h18v18H3z M3 9h18 M9 21V9' },
+        { to: '/hal', label: 'سالن‌ها', icon: 'M3 21h18 M5 21V7l8-4v18 M19 21V11l-6-4 M9 9v.01 M9 12v.01 M9 15v.01 M9 18v.01' },
         { to: '/flk', label: 'گله‌ها', icon: 'M5 9l3-2 3 2 M13 7l4-2.5 4 2.5 M9 16l4-2.5 4 2.5' },
-        { to: '/inc', label: 'جوجه‌کشی', icon: 'M12 3C8 8 6 11.5 6 15a6 6 0 0 0 12 0c0-3.5-2-7-6-12z M12 12v6 M9 15h6' },
-        { to: '/egg', label: 'تخم‌ها', icon: 'M12 5a7 7 0 0 0-7 7 7 7 0 0 0 14 0 7 7 0 0 0-7-7z' },
+        { to: '/inc', label: 'جوجه‌کشی', icon: 'M12 22c6.23-.05 7.87-5.57 7.5-10-.36-4.34-3.95-9.96-7.5-10-3.55.04-7.14 5.66-7.5 10-.37 4.43 1.27 9.95 7.5 10z' },
+        { to: '/egg', label: 'تخم‌ها', icon: 'M12 3c-4.5 0-8 5.5-8 10a8 8 0 0 0 16 0c0-4.5-3.5-10-8-10z' },
       ]
     },
     {
@@ -69,7 +69,7 @@ export default function MenuDrawer() {
       tone: 'info',
       items: [
         { to: '/whs', label: 'انبار', icon: 'M3 7l9-4 9 4v11l-9 4-9-4V7z M3 7l9 4 9-4 M12 11v11', badge: stockCount > 0 ? 'stock' : null },
-        { to: '/fed', label: 'جیره‌نویسی', icon: 'M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2 M9 9h6 M9 13h6 M9 17h4' },
+        { to: '/fed', label: 'جیره‌نویسی', icon: 'M6 4h12v16H6z M6 8h12 M9 12h6 M9 16h6' },
       ]
     },
     {
@@ -78,7 +78,7 @@ export default function MenuDrawer() {
       tone: 'warn',
       items: [
         { to: '/tra', label: 'معاملات', icon: 'M7 8h11 M15 5l3 3-3 3 M17 16H6 M9 13l-3 3 3 3' },
-        { to: '/ctc', label: 'مخاطبین', icon: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z' },
+        { to: '/ctc', label: 'مخاطبین', icon: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75' },
       ]
     },
     {
@@ -87,9 +87,9 @@ export default function MenuDrawer() {
       tone: 'purple',
       items: [
         { to: '/rep', label: 'گزارش‌ها', icon: 'M3 3v18h18 M19 9l-5 5-4-4-3 3' },
-        { to: '/alt', label: 'هشدارها', icon: 'M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9', badge: alertCount > 0 ? 'alerts' : null },
-        { to: '/doc', label: 'اسناد و فایل‌ها', icon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6' },
-        { to: '/arc', label: 'آرشیو', icon: 'M4 4h16v4H4z M5 8v12h14V8 M9 13h6' },
+        { to: '/alt', label: 'هشدارها', icon: 'M12 3L2.5 20h19L12 3z M12 9v5 M12 17.5h.01', badge: alertCount > 0 ? 'alerts' : null },
+        { to: '/doc', label: 'اسناد و فایل‌ها', icon: 'M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z' },
+        { to: '/arc', label: 'آرشیو', icon: 'M21 8 21 21 3 21 3 8 M1 3h22v5H1z M10 12h4' },
       ]
     },
     {
