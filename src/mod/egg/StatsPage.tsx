@@ -178,7 +178,7 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
     <PageContainer>
       <HelpBanner
         id="egg-stats-guide"
-        icon="stats"
+        icon="📊"
         title="راهنمای آمار تولید تخم"
         description="روند تولید روزانه و تفکیک تخم‌های خوراکی، نطفه‌دار و مصرفی را در بازه‌های زمانی مختلف بررسی و مقایسه کنید."
         tone="info"
@@ -189,10 +189,10 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
           value={range}
           modalTitle="بازه زمانی"
           options={[
-            { value: '7', label: '۷ روز اخیر', icon: '📅' },
-            { value: '30', label: '۳۰ روز اخیر', icon: '🗓️' },
-            { value: '90', label: '۹۰ روز اخیر', icon: '📆' },
-            { value: 'all', label: 'همه', icon: 'stats' },
+            { value: '7', label: '۷ روز اخیر', icon: 'cal_7' },
+            { value: '30', label: '۳۰ روز اخیر', icon: 'cal_30' },
+            { value: '90', label: '۹۰ روز اخیر', icon: 'cal_90' },
+            { value: 'all', label: 'همه', icon: 'cal_all' },
           ]}
           onChange={v => setRange(v as Range)}
         />

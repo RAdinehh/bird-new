@@ -283,7 +283,7 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
       )}
       <HelpBanner
         id="egg-prod-intro"
-        icon="egg"
+        icon="🥚"
         title="ثبت تخم‌گذاری روزانه"
         description="هر روز تعداد تخم‌ها را بین خوراکی، نطفه‌دار و مصرفی تقسیم کنید."
         tone="info"
