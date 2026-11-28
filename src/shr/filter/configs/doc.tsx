@@ -23,7 +23,7 @@ export function getDocFilesConfig(): FilterConfig<DocFile> {
         options: [
           { value: 'flk', label: 'گله', icon: 'flock' },
           { value: 'hal', label: 'سالن', icon: 'hall' },
-          { value: 'ctc', label: 'مخاطب', icon: 'flocks_group' },
+          { value: 'ctc', label: 'مخاطب', icon: 'contact_user' },
           { value: 'inc', label: 'جوجه‌کشی', icon: 'incubator' },
           { value: 'whs', label: 'انبار', icon: 'inventory' },
           { value: 'tra', label: 'معاملات', icon: 'invoice' },

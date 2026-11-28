@@ -15,7 +15,7 @@ interface Props {
 const LINKED_TYPE_ICON: Record<string, string> = {
   flk: 'flock',
   hal: 'hall',
-  ctc: 'flocks_group',
+  ctc: 'contact_user',
   inc: 'incubator',
   whs: 'inventory',
   tra: 'invoice',

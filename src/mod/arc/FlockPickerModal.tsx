@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../shr/components/OptionIcon';
 /**
  * FlockPickerModal.tsx — مودال انتخاب گله برای مقایسه و مرجع
  * (استخراج‌شده از FlockComparisonPanel.tsx — فاز رفکتور)
@@ -184,14 +185,17 @@ export default function FlockPickerModal({
                       fontFamily: 'inherit',
                     }}
                   >
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: 'var(--text)' }}>
-                        {getTitle(c)}
-                      </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <OptionIcon icon="flock" size={24} />
+                            <div>
+                              <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: 'var(--text)' }}>
+                                {getTitle(c)}
+                              </div>
                       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                        {isActiveFlock ? 'فعال' : 'آرشیو'} • {fmt.day(getDays(c))} روز
-                      </div>
-                    </div>
+                                {isActiveFlock ? 'فعال' : 'آرشیو'} • {fmt.day(getDays(c))} روز
+                              </div>
+                            </div>
+                          </div>
                     <Tag tone={isRef ? 'info' : isActiveFlock ? 'green' : 'gray'}>
                       {isRef ? 'مرجع' : isActiveFlock ? 'فعال' : 'آرشیو'}
                     </Tag>
@@ -219,14 +223,17 @@ export default function FlockPickerModal({
                     fontFamily: 'inherit',
                   }}
                 >
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: 'var(--text)' }}>
-                      {getTitle(c)}
-                    </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <OptionIcon icon="flock" size={24} />
+                            <div>
+                              <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: 'var(--text)' }}>
+                                {getTitle(c)}
+                              </div>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 2 }}>
-                      {isActiveFlock ? 'فعال' : 'آرشیو'} • {fmt.day(getDays(c))} روز
-                    </div>
-                  </div>
+                                {isActiveFlock ? 'فعال' : 'آرشیو'} • {fmt.day(getDays(c))} روز
+                              </div>
+                            </div>
+                          </div>
                   <Tag tone={isRef ? 'info' : isSelected ? 'green' : 'gray'}>
                     {isRef ? 'مرجع' : isSelected ? 'انتخاب‌شده' : 'انتخاب'}
                   </Tag>
