@@ -178,15 +178,15 @@ export default function FlockReportPage() {
 
       {flockData.length > 1 ? (
         <>
-          <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="egg" size={16} /><span>مقایسه تخم‌گذاری گله‌ها</span></span>}>
+          <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('production', 'egg')} size={16} /><span>مقایسه تخم‌گذاری گله‌ها</span></span>}>
             <BarChart data={eggsChart} color="var(--accent)" />
           </Section>
 
-          <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="mortality" size={16} /><span>مقایسه مرگ‌ومیر</span></span>}>
+          <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('production', 'mortality')} size={16} /><span>مقایسه مرگ‌ومیر</span></span>}>
             <BarChart data={mortalityChart} color="var(--danger)" />
           </Section>
 
-          <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="stats" size={16} /><span>مقایسه Hen-Day</span></span>}>
+          <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('analytics', 'hen_day')} size={16} /><span>مقایسه Hen-Day</span></span>}>
             <BarChart data={henDayChart} color="var(--accent)" />
           </Section>
         </>

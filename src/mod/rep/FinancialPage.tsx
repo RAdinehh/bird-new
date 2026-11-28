@@ -32,7 +32,7 @@ function ParetoCard({ invoices }: { invoices: any[] }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 'var(--pad-comfy)', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)' }}>
-      <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}><span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="stats" size={16} /><span>تحلیل Pareto — اقلام پرهزینه</span></span></div>
+      <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}><span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('analytics', 'pareto')} size={16} /><span>تحلیل Pareto — اقلام پرهزینه</span></span></div>
       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
         {getGlobalFormat().count(top80.length)} قلم اول = حدود ۸۰٪ کل خرید
       </div>
@@ -102,7 +102,7 @@ export default function FinancialPage() {
       <PageContainer>
       <HelpBanner
         id="rep-financial-guide"
-        icon="cash"
+        icon={resolveCategoryIconKey('finance', 'cashflow')}
         title="راهنمای گزارش مالی"
         description="جمع فروش و خرید، جریان نقدی، مطالبات و بدهی‌ها و سهم اقلام پرهزینه را در بازه‌های زمانی مختلف مشاهده و خروجی بگیرید."
         tone="info"
@@ -121,7 +121,7 @@ export default function FinancialPage() {
     <PageContainer>
       <HelpBanner
         id="rep-financial-guide"
-        icon="cash"
+        icon={resolveCategoryIconKey('finance', 'cashflow')}
         title="راهنمای گزارش مالی"
         description="جمع فروش و خرید، جریان نقدی، مطالبات و بدهی‌ها و سهم اقلام پرهزینه را در بازه‌های زمانی مختلف مشاهده و خروجی بگیرید."
         tone="info"
@@ -139,7 +139,7 @@ export default function FinancialPage() {
           {receivables > 0 ? (
             <div style={{ padding: 'var(--pad-comfy)', background: 'var(--accent-soft)',
                border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)' }}>
-              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="cash" size={15} /><span>طلب از مشتریان</span></span></div>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon={resolveCategoryIconKey('finance', 'receivable')} size={15} /><span>طلب از مشتریان</span></span></div>
               <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--accent)', marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
                 {fmt.money(receivables, { withUnit: false })}
               </div>
@@ -148,7 +148,7 @@ export default function FinancialPage() {
           ) : null}
           {payables > 0 ? (
             <div style={{ padding: 'var(--pad-comfy)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-md)' }}>
-              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="invoice" size={15} /><span>بدهی به فروشندگان</span></span></div>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon={resolveCategoryIconKey('finance', 'payable')} size={15} /><span>بدهی به فروشندگان</span></span></div>
               <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--warn)', marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
                 {fmt.money(payables, { withUnit: false })}
               </div>
@@ -169,7 +169,7 @@ export default function FinancialPage() {
       </Section>
 
       {/* جریان نقدی */}
-      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="cash" size={16} /><span>جریان نقدی</span></span>}>
+      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('finance', 'cashflow')} size={16} /><span>جریان نقدی</span></span>}>
         <DualBarChart data={cashData} colorA="var(--accent)" colorB="var(--danger)" labelA="دریافت" labelB="پرداخت" />
       </Section>
 
@@ -186,7 +186,7 @@ export default function FinancialPage() {
 
       {/* سهم دسته‌ها */}
       {catSales.length > 0 ? (
-        <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="target" size={16} /><span>سهم دسته‌ها در فروش</span></span>}>
+        <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('analytics', 'share')} size={16} /><span>سهم دسته‌ها در فروش</span></span>}>
           <PieChart data={catSales} />
         </Section>
       ) : null}

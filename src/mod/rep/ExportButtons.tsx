@@ -184,13 +184,13 @@ export default function ExportButtons() {
         display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)'
       }}>
         <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="stats" size={16} /><span>خروجی Excel (CSV)</span></span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('export', 'excel')} size={16} /><span>خروجی Excel (CSV)</span></span>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-          <Btn size="sm" onClick={exportSales}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="cash" size={15} /><span>فروش</span></span></Btn>
-          <Btn size="sm" onClick={exportPurchases}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="invoice" size={15} /><span>خرید</span></span></Btn>
-          <Btn size="sm" onClick={exportEggs}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="egg" size={15} /><span>تخم‌گذاری</span></span></Btn>
-          <Btn size="sm" onClick={exportFlocks}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="flock" size={15} /><span>گله‌ها</span></span></Btn>
+          <Btn size="sm" onClick={exportSales}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon={resolveCategoryIconKey('finance', 'sales')} size={15} /><span>فروش</span></span></Btn>
+          <Btn size="sm" onClick={exportPurchases}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon={resolveCategoryIconKey('finance', 'purchases')} size={15} /><span>خرید</span></span></Btn>
+          <Btn size="sm" onClick={exportEggs}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon={resolveCategoryIconKey('production', 'egg')} size={15} /><span>تخم‌گذاری</span></span></Btn>
+          <Btn size="sm" onClick={exportFlocks}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon={resolveCategoryIconKey('production', 'flock')} size={15} /><span>گله‌ها</span></span></Btn>
           <Btn size="sm" onClick={exportContacts}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="👥" size={15} /><span>مخاطبین</span></span></Btn>
           <Btn size="sm" onClick={exportDailyLogs}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="📋" size={15} /><span>ثبت روزانه</span></span></Btn>
         </div>

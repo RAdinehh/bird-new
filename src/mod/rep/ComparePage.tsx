@@ -77,7 +77,7 @@ export default function ComparePage() {
       {/* انتخاب حالت */}
       <div style={{ display: 'flex', gap: 6 }}>
         <button onClick={() => setMode('month')} style={chip(mode === 'month')}>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="cal_30" size={15} /><span>ماهانه</span></span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon={resolveCategoryIconKey('period', '30d')} size={15} /><span>ماهانه</span></span>
         </button>
         <button onClick={() => setMode('quarter')} style={chip(mode === 'quarter')}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon={resolveCategoryIconKey('period', '3m')} size={17} /><span>سه‌ماهه</span></span>
@@ -95,7 +95,7 @@ export default function ComparePage() {
             display: 'flex', flexDirection: 'column', gap: 4
           }}>
             <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="trophy" size={15} /><span>بهترین ماه فروش</span></span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon={resolveCategoryIconKey('analytics', 'best_month')} size={15} /><span>بهترین ماه فروش</span></span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
               <span style={{ fontSize: 'var(--fs-base)', fontWeight: 700 }}>{best.label}</span>
@@ -137,7 +137,7 @@ export default function ComparePage() {
       ) : null}
 
       {/* نمودار فروش vs خرید */}
-      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="cash" size={16} /><span>فروش در مقابل خرید</span></span>}>
+      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('finance', 'sales_vs_purchase')} size={16} /><span>فروش در مقابل خرید</span></span>}>
         <DualBarChart
           data={currentData.map(d => ({ label: d.label, a: d.sales, b: d.purchases }))}
           colorA="var(--accent)"
@@ -157,7 +157,7 @@ export default function ComparePage() {
 
       {/* نمودار تخم */}
       {currentData.some(d => d.eggs > 0) ? (
-        <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="egg" size={16} /><span>تولید تخم در طول زمان</span></span>}>
+        <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('production', 'egg')} size={16} /><span>تولید تخم در طول زمان</span></span>}>
           <BarChart
             data={currentData.map(d => ({ label: d.label, value: d.eggs }))}
             color="var(--accent)"

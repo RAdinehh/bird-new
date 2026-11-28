@@ -136,20 +136,20 @@ export default function ProductionPage() {
       </Section>
 
       {/* مقایسه تخم و دان */}
-      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="stats" size={16} /><span>مقایسه تخم و دان</span></span>}>
+      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('analytics', 'egg_feed')} size={16} /><span>مقایسه تخم و دان</span></span>}>
         <DualBarChart data={productionVsFeed} colorA="var(--accent)" colorB="var(--warn)" labelA="تخم" labelB="دان (kg)" />
       </Section>
 
       {/* Hen-Day */}
       {henDayData.some(d => d.value > 0) ? (
-        <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="stats" size={16} /><span>نرخ تخم‌گذاری (Hen-Day)</span></span>}>
+        <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('analytics', 'hen_day')} size={16} /><span>نرخ تخم‌گذاری (Hen-Day)</span></span>}>
           <LineChart data={henDayData} color="var(--accent)" />
         </Section>
       ) : null}
 
       {/* FCR */}
       {fcrData.some(d => d.value > 0) ? (
-        <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="compare" size={16} /><span>FCR (ضریب تبدیل)</span></span>}>
+        <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('compare', 'fcr')} size={16} /><span>FCR (ضریب تبدیل)</span></span>}>
           <LineChart data={fcrData} color="var(--accent)" />
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', textAlign: 'center', marginTop: 4 }}>
             محاسبه: دان مصرفی / وزن تخم‌های تولیدی
