@@ -125,12 +125,12 @@ export default function ProductionPage() {
       ) : null}
 
       {/* نمودار تخم */}
-      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="egg" size={16} /><span>تولید تخم ۶ ماه</span></span>}>
+      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="cal_6m" size={18} /><span>تولید تخم ۶ ماه</span></span>}>
         <BarChart data={eggData} color="var(--accent)" />
       </Section>
 
       {/* نمودار دان */}
-      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="feed" size={16} /><span>مصرف دان ۶ ماه</span></span>}>
+      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="cal_6m" size={18} /><span>مصرف دان ۶ ماه</span></span>}>
         <BarChart data={feedData} color="var(--warn)" />
       </Section>
 
@@ -158,7 +158,7 @@ export default function ProductionPage() {
 
       {/* نمودار تلفات */}
       {totalDeaths > 0 ? (
-        <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="mortality" size={16} /><span>تلفات ۶ ماه</span></span>}>
+        <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="cal_6m" size={18} /><span>تلفات ۶ ماه</span></span>}>
           <BarChart data={deathData} color="var(--danger)" />
         </Section>
       ) : null}

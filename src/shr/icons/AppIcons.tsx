@@ -7,7 +7,7 @@ export const ICON_KEYS = [
   'feeder_chain', 'feeder_tube', 'feeder_bucket', 'feeder_tray',
   'drinker_cup', 'drinker_hanging', 'drinker_fountain', 'drinker_trough', 'litter_straw',
   'kg', 'pcs',
-  'chicken', 'duck', 'turkey', 'egg', 'fertile_egg', 'incubator', 'candling', 'egg_tray', 'old_rooster', 'soft_egg', 'dirty_egg', 'rotten_egg', 'cal_7', 'cal_30', 'cal_90', 'cal_all', 'broken_egg', 'manure', 'herbal', 'other', 'equipment', 'bag', 'vial', 'liquid', 'dose', 'pack', 'cage', 'corn', 'wheat', 'barley', 'bran', 'soybean_meal', 'sesame_meal', 'sunflower_meal', 'canola_meal', 'fish_meal', 'alfalfa', 'calcium_powder', 'oyster_shell', 'rock_salt', 'salt', 'oil', 'amino_acid', 'premix',
+  'chicken', 'duck', 'turkey', 'egg', 'fertile_egg', 'incubator', 'candling', 'egg_tray', 'old_rooster', 'soft_egg', 'dirty_egg', 'rotten_egg', 'cal_7', 'cal_30', 'cal_6m', 'cal_90', 'cal_all', 'broken_egg', 'manure', 'herbal', 'other', 'equipment', 'bag', 'vial', 'liquid', 'dose', 'pack', 'cage', 'corn', 'wheat', 'barley', 'bran', 'soybean_meal', 'sesame_meal', 'sunflower_meal', 'canola_meal', 'fish_meal', 'alfalfa', 'calcium_powder', 'oyster_shell', 'rock_salt', 'salt', 'oil', 'amino_acid', 'premix',
   'hatch', 'feed', 'invoice', 'meds',
   'mortality', 'water', 'stats', 'flock', 'flocks_group',
   'inventory', 'expired', 'stock_empty', 'expiring_soon', 'stock_low', 'cash', 'climate', 'compare', 'trophy', 'broken', 'target', 'export_doc', 'unknown'

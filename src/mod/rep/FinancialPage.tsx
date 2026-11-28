@@ -158,12 +158,12 @@ export default function FinancialPage() {
       ) : null}
 
       {/* نمودار فروش */}
-      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="stats" size={16} /><span>فروش ۶ ماه اخیر</span></span>}>
+      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="cal_6m" size={18} /><span>فروش ۶ ماه اخیر</span></span>}>
         <BarChart data={salesData} color="var(--accent)" />
       </Section>
 
       {/* نمودار خرید */}
-      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="invoice" size={16} /><span>خرید ۶ ماه اخیر</span></span>}>
+      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="cal_6m" size={18} /><span>خرید ۶ ماه اخیر</span></span>}>
         <BarChart data={purchaseData} color="var(--warn)" />
       </Section>
 

@@ -190,7 +190,7 @@ export default function ExportButtons() {
           <Btn size="sm" onClick={exportPurchases}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="invoice" size={15} /><span>خرید</span></span></Btn>
           <Btn size="sm" onClick={exportEggs}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="egg" size={15} /><span>تخم‌گذاری</span></span></Btn>
           <Btn size="sm" onClick={exportFlocks}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="flock" size={15} /><span>گله‌ها</span></span></Btn>
-          <Btn size="sm" onClick={exportContacts}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="flock" size={15} /><span>مخاطبین</span></span></Btn>
+          <Btn size="sm" onClick={exportContacts}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="👥" size={15} /><span>مخاطبین</span></span></Btn>
           <Btn size="sm" onClick={exportDailyLogs}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="📋" size={15} /><span>ثبت روزانه</span></span></Btn>
         </div>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
