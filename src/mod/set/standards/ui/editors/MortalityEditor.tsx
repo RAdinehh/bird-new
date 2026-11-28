@@ -21,7 +21,7 @@ export function MortalityEditor({
         >
           <CompactField
             decimals={1}
-            label="💀 حداکثر تلفات"
+            label="حداکثر تلفات"
             value={r.maxPct}
             onChange={v => update(i, { maxPct: v ?? 0 })}
             unit="٪"

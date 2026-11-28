@@ -2,18 +2,28 @@ import type { ReactNode } from 'react';
 import { OptionIcon } from '../OptionIcon';
 import type { AppIconKey } from '../../icons/AppIcons';
 
+function extractText(node: ReactNode): string {
+  if (node == null || typeof node === 'boolean') return '';
+  if (typeof node === 'string' || typeof node === 'number') return String(node);
+  if (Array.isArray(node)) return node.map(extractText).join(' ');
+  if (typeof node === 'object' && 'props' in node && (node as any).props) {
+    return extractText((node as any).props.children);
+  }
+  return '';
+}
+
 function inferRowIcon(l: ReactNode): AppIconKey | null {
-  if (typeof l !== 'string') return null;
-  const t = l.trim();
-  if (/تخم\s*شکسته|شکسته/.test(t)) return 'broken_egg';
-  if (/نطفه/.test(t)) return 'fertile_egg';
-  if (/تخم\s*(خوراکی|سالم|کل)/.test(t)) return 'egg';
-  if (/تلفات/.test(t)) return 'mortality';
-  if (/ضرر|زیان/.test(t)) return 'profit_trend';
-  if (/خرید/.test(t)) return 'invoice';
-  if (/رطوبت|آب/.test(t)) return 'water';
-  if (/دما/.test(t)) return 'climate';
-  if (/دان|خوراک/.test(t)) return 'feed';
+  const raw = extractText(l).trim();
+  if (!raw) return null;
+  if (/تلفات\s*رود|تلفات/.test(raw)) return 'mortality';
+  if (/تخم\s*شکسته|شکسته/.test(raw)) return 'broken_egg';
+  if (/نطفه/.test(raw)) return 'fertile_egg';
+  if (/تخم\s*(خوراکی|سالم|کل)/.test(raw)) return 'egg';
+  if (/ضرر|زیان/.test(raw)) return 'profit_trend';
+  if (/خرید/.test(raw)) return 'invoice';
+  if (/رطوبت|آب/.test(raw)) return 'water';
+  if (/دما/.test(raw)) return 'climate';
+  if (/دان|خوراک/.test(raw)) return 'feed';
   return null;
 }
 

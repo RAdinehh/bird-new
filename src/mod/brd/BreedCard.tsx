@@ -79,7 +79,7 @@ function getRelevantFields(stdData: any, purposes: string[]): Array<{ icon: stri
       if (last?.adgG) fields.push({ icon: '', label: 'ADG', value: `${getGlobalFormat().num(last.adgG)} گرم` });
     }
     if (stdData.mortalityTotalPct) {
-      fields.push({ icon: '', label: 'تلفات', value: `${getGlobalFormat().num(stdData.mortalityTotalPct)}٪` });
+      fields.push({ icon: 'mortality', label: 'تلفات', value: `${getGlobalFormat().num(stdData.mortalityTotalPct)}٪` });
     }
   }
 
