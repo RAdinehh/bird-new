@@ -1,5 +1,5 @@
 import { OptionIcon } from '../../../shr/components/OptionIcon';
-import { resolveCategoryIconKey } from '../../../shr/components/uiIconRegistry';
+import { resolveAlertIconKey } from '../../../shr/components/uiIconRegistry';
 /**
  * AlertList — لیست هشدارهای فعال Dashboard
  */
@@ -49,7 +49,7 @@ export default function AlertList({ active, counts, nav }: Props) {
                         cursor: 'pointer'
                       }}
                     >
-                      <OptionIcon icon={resolveCategoryIconKey('alert', a.category || a.level)} size={18} />
+                      <OptionIcon icon={resolveAlertIconKey(a)} size={18} />
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{
                           fontSize: 'var(--fs-sm)', fontWeight: 600,

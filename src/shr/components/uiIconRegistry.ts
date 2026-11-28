@@ -1,4 +1,4 @@
-import type { AppIconKey } from '../icons/AppIcons';
+import { getSmartFeedIcon, type AppIconKey } from '../icons/AppIcons';
 
 /** کلیدهای خام مرجع — هرگونه تغییر نام کلید در آینده فقط اینجا اصلاح می‌شود */
 export const UI_ICON_MAP = {
@@ -175,4 +175,18 @@ export function resolveCategoryIconKey(category: UiIconCategory, subType?: strin
 
   const categorySubtypes = SUBTYPE_ICON_MAP[category];
   return categorySubtypes[subType] ?? defaultKey;
+}
+
+/** تشخیص هوشمند آیکون هشدار: اولویت با قلم/خوراک موجود در عنوان یا متن، در غیر این صورت دسته‌بندی هشدار */
+export function resolveAlertIconKey(alert: {
+  title?: string;
+  message?: string;
+  category?: string;
+  level?: string;
+}): AppIconKey {
+  const fromTitle = getSmartFeedIcon(alert.title, 'unknown');
+  if (fromTitle !== 'unknown') return fromTitle;
+  const fromMsg = getSmartFeedIcon(alert.message, 'unknown');
+  if (fromMsg !== 'unknown') return fromMsg;
+  return resolveCategoryIconKey('alert', alert.category || alert.level);
 }
