@@ -936,7 +936,7 @@ if (category === 'vaccine' || category === 'herbal') {
       { value: 'maintenance', label: 'تعمیرات', icon: '🔧' },
       { value: 'packaging', label: 'بسته‌بندی', icon: '📦' },
       { value: 'rent', label: 'اجاره', icon: '🏠' },
-      { value: 'other', label: 'سایر', icon: '📋' },
+      { value: 'other', label: 'سایر', icon: 'other' },
     ];
     const ct = String(item.costType || '');
     const otherCfg = getOtherCostConfig(ct);

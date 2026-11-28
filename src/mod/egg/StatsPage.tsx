@@ -243,7 +243,7 @@ export default function StatsPage({ active = true }: { active?: boolean } = {}) 
             <QualityBar icon="🥚" label="خوراکی" pct={stats.eatingPct} count={stats.eating} total={stats.total} color="var(--accent)" />
             <QualityBar icon="💔" label="شکسته" pct={stats.brokenPct} count={stats.broken} total={stats.total} color="var(--warn)" />
             {stats.other > 0 && (
-              <QualityBar icon="📦" label="سایر" pct={stats.otherPct} count={stats.other} total={stats.total} color="var(--muted)" />
+              <QualityBar icon="other" label="سایر" pct={stats.otherPct} count={stats.other} total={stats.total} color="var(--muted)" />
             )}
           </div>
 

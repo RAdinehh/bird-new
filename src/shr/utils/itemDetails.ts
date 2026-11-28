@@ -29,7 +29,7 @@ export const EGG_TYPE_LABEL: Record<EggType, string> = {
   small: '🥚 کوچک',
   broken: '💔 شکسته',
   dirty: '🟤 کثیف/لکه‌دار',
-  other: '❓ سایر',
+  other: 'سایر',
 };
 
 export const SALE_REASON_LABEL: Record<SaleReason, string> = {

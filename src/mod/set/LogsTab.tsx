@@ -17,7 +17,7 @@ const ACTION_LABEL: Record<string, string> = {
   export: '📤 خروجی',
   import: '📥 ورودی',
   restore: '↩️ بازگردانی',
-  other: '📝 سایر',
+  other: 'سایر',
 };
 
 const ACTION_TONE: Record<string, string> = {

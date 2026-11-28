@@ -978,7 +978,7 @@ const handleConvertSettlement = async (settlement: Settlement, deal: Deal) => {
                 <option value="feed">🌾 دان و مواد اولیه</option>
                 <option value="medicine">💊 دارو و واکسن</option>
                 <option value="equipment">🔧 تجهیزات</option>
-                <option value="other">📋 سایر</option>
+                <option value="other">سایر</option>
               </optgroup>
             </Select>
           </Field>

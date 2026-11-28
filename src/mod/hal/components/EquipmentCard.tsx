@@ -53,7 +53,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
 
   const _cm = allCustomOpts.find(o => o.key.startsWith('hal.equip.type.') && o.name === e.type);
   const _isDeleted = _cm ? _cm.hidden === true : false;
-  const meta = EQUIP_LABELS[e.type] || (_cm ? { name: _cm.name, icon: _cm.icon } : { name: 'سایر', icon: undefined });
+  const meta = EQUIP_LABELS[e.type] || (_cm ? { name: _cm.name, icon: _cm.icon } : { name: 'سایر', icon: 'other' });
   const value = calcEquipValue(e);
 
   return (
