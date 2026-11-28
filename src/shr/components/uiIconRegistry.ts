@@ -11,11 +11,19 @@ export const UI_ICON_MAP = {
   stats: 'stats' as AppIconKey,
   cash: 'cash' as AppIconKey,
   egg: 'egg' as AppIconKey,
+  fertileEgg: 'fertile_egg' as AppIconKey,
+  hatch: 'hatch' as AppIconKey,
+  chicken: 'chicken' as AppIconKey,
+  feed: 'feed' as AppIconKey,
+  meds: 'meds' as AppIconKey,
+  herbal: 'herbal' as AppIconKey,
+  equipment: 'equipment' as AppIconKey,
   flock: 'flock' as AppIconKey,
   mortality: 'mortality' as AppIconKey,
+  vaccine: 'vaccine' as AppIconKey,
 } as const;
 
-export type UiIconCategory = 'compare' | 'profit' | 'period' | 'export';
+export type UiIconCategory = 'compare' | 'profit' | 'period' | 'export' | 'invoice' | 'event';
 
 /** آیکون پیش‌فرض هر دسته برای حالتی که زیردسته وجود ندارد یا مشخص نشده است */
 const CATEGORY_DEFAULT_ICON: Record<UiIconCategory, AppIconKey> = {
@@ -23,6 +31,8 @@ const CATEGORY_DEFAULT_ICON: Record<UiIconCategory, AppIconKey> = {
   profit: UI_ICON_MAP.profitTrend,
   period: UI_ICON_MAP.period6m,
   export: UI_ICON_MAP.exportReport,
+  invoice: UI_ICON_MAP.cash,
+  event: UI_ICON_MAP.stats,
 };
 
 /** نگاشت زیردسته‌ها به کلیدهای آیکون در هر دسته */
@@ -35,6 +45,7 @@ const SUBTYPE_ICON_MAP: Record<UiIconCategory, Record<string, AppIconKey>> = {
     egg_rate: UI_ICON_MAP.compare,
     mortality: UI_ICON_MAP.compare,
     hen_day: UI_ICON_MAP.compare,
+    fcr: UI_ICON_MAP.compare,
   },
   profit: {
     trend: UI_ICON_MAP.profitTrend,
@@ -50,6 +61,22 @@ const SUBTYPE_ICON_MAP: Record<UiIconCategory, Record<string, AppIconKey>> = {
     csv: UI_ICON_MAP.exportReport,
     pdf: UI_ICON_MAP.exportReport,
     report: UI_ICON_MAP.exportReport,
+  },
+  invoice: {
+    egg: UI_ICON_MAP.egg,
+    fertile_egg: UI_ICON_MAP.fertileEgg,
+    chick: UI_ICON_MAP.hatch,
+    adult: UI_ICON_MAP.chicken,
+    feed: UI_ICON_MAP.feed,
+    medicine: UI_ICON_MAP.meds,
+    herbal: UI_ICON_MAP.herbal,
+    equipment: UI_ICON_MAP.equipment,
+  },
+  event: {
+    vaccine: UI_ICON_MAP.vaccine,
+    herbal: UI_ICON_MAP.herbal,
+    hatch: UI_ICON_MAP.hatch,
+    payment: UI_ICON_MAP.cash,
   },
 };
 
