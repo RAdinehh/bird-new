@@ -377,7 +377,7 @@ export default function ProductionsPage({ active = true }: { active?: boolean } 
 
  {rate >0 ? (
  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--fs-sm)', padding: 'var(--pad-normal)', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 'var(--r-sm)', fontWeight: 700 }}>
- <span>نرخ تخم‌گذاری (Hen-Day):</span>
+ <span>نرخ تخم‌گذاری:</span>
  <span>{fmt.code(rate.toFixed(1))}٪</span>
  </div>
  ) : null}

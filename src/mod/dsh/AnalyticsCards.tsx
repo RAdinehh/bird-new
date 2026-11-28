@@ -81,7 +81,7 @@ export default function AnalyticsCards({
                     color={survivalTone}
                   />
                   <MiniStat
-                    label="Hen-Day ۷ روز"
+                    label="تخم‌گذاری ۷ روز"
                     value={henDay7}
                     suffix="٪"
                     color={henDayTone}

@@ -168,7 +168,7 @@ export default function FlockReportPage() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
             <StatCard icon="egg" label="تخم کل" value={fmt.count(d.totalEggs)} color="accent" />
             <StatCard icon="mortality" label="تلفات" value={fmt.code(d.mortality.toFixed(1)) + '٪'} color="danger" />
-            <StatCard icon="egg" label="Hen-Day" value={fmt.code(d.avgHenDay.toFixed(1)) + '٪'} color="info" />
+            <StatCard icon="egg" label="نرخ تخم‌گذاری" value={fmt.code(d.avgHenDay.toFixed(1)) + '٪'} color="info" />
             <StatCard icon="feed" label="دان مصرفی" value={fmt.num(d.totalFeed) + ' kg'} color="warn" />
             {d.avgBroken > 0 ? <StatCard icon="broken" label="شکسته" value={fmt.code(d.avgBroken.toFixed(1)) + '٪'} color="warn" /> : null}
             <StatCard icon="📋" label="رکوردها" value={fmt.count(d.productionsCount + d.logsCount)} color="accent" />
@@ -186,14 +186,14 @@ export default function FlockReportPage() {
             <BarChart data={mortalityChart} color="var(--danger)" />
           </Section>
 
-          <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('analytics', 'hen_day')} size={16} /><span>مقایسه Hen-Day</span></span>}>
+          <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('analytics', 'hen_day')} size={16} /><span>مقایسه نرخ تخم‌گذاری</span></span>}>
             <BarChart data={henDayChart} color="var(--accent)" />
           </Section>
         </>
       ) : null}
           <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('export', 'csv')} size={18} /><span>خروجی CSV</span></span>}>
         <Btn full variant="primary" onClick={() => {
-          const headers = ['گله', 'نوع', 'تعداد', 'تخم کل', 'تلفات٪', 'Hen-Day٪', 'دان (kg)', 'شکسته٪', 'رکوردها'];
+          const headers = ['گله', 'نوع', 'تعداد', 'تخم کل', 'تلفات٪', 'تخم‌گذاری٪', 'دان (kg)', 'شکسته٪', 'رکوردها'];
           const rows = flockData.map(d => [
             d.flock.name,
             d.flock.type,

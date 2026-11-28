@@ -57,7 +57,7 @@ export default function Dashboard() {
                   const rows = [
                     ['گله‌های فعال', activeFlocks.length],
                     ['نرخ بقا٪', survivalRate.toFixed(2)],
-                    ['Hen-Day ۷ روز٪', henDay7.toFixed(2)],
+                    ['نرخ تخم‌گذاری ۷ روز٪', henDay7.toFixed(2)],
                     ['شکسته ۷ روز٪', brokenRate7.toFixed(2)],
                     ['FCR', fcr.toFixed(2)],
                     ['آب/دان', waterFeedRatio.toFixed(2)],

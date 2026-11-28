@@ -165,7 +165,7 @@ export default function TodayCard({
                             justifyContent: 'space-between',
                             fontSize: 'var(--fs-xs)',
                           }}>
-                            <span style={{ color: 'var(--muted)' }}>Hen-Day این گله</span>
+                            <span style={{ color: 'var(--muted)' }}>نرخ تخم‌گذاری این گله</span>
                             <span style={{
                               fontWeight: 700,
                               color: benchmarkData.henDay >= 80 ? 'var(--accent)' : benchmarkData.henDay >= 60 ? 'var(--warn)' : 'var(--danger)',

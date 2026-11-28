@@ -142,7 +142,7 @@ export default function ProductionPage() {
 
       {/* Hen-Day */}
       {henDayData.some(d => d.value > 0) ? (
-        <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('analytics', 'hen_day')} size={16} /><span>نرخ تخم‌گذاری (Hen-Day)</span></span>}>
+        <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('analytics', 'hen_day')} size={16} /><span>نرخ تخم‌گذاری</span></span>}>
           <LineChart data={henDayData} color="var(--accent)" />
         </Section>
       ) : null}
