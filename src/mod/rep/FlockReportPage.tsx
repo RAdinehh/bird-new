@@ -82,7 +82,7 @@ export default function FlockReportPage() {
     value: d.totalEggs
   }));
 
-  // نمودار مرگ‌ومیر
+  // نمودار تلفات
   const mortalityChart = flockData.map(d => ({
     label: d.flock.name.slice(0, 8),
     value: Math.round(d.mortality * 10) / 10
@@ -167,7 +167,7 @@ export default function FlockReportPage() {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
             <StatCard icon="egg" label="تخم کل" value={fmt.count(d.totalEggs)} color="accent" />
-            <StatCard icon="mortality" label="مرگ‌ومیر" value={fmt.code(d.mortality.toFixed(1)) + '٪'} color="danger" />
+            <StatCard icon="mortality" label="تلفات" value={fmt.code(d.mortality.toFixed(1)) + '٪'} color="danger" />
             <StatCard icon="egg" label="Hen-Day" value={fmt.code(d.avgHenDay.toFixed(1)) + '٪'} color="info" />
             <StatCard icon="feed" label="دان مصرفی" value={fmt.num(d.totalFeed) + ' kg'} color="warn" />
             {d.avgBroken > 0 ? <StatCard icon="broken" label="شکسته" value={fmt.code(d.avgBroken.toFixed(1)) + '٪'} color="warn" /> : null}
@@ -193,7 +193,7 @@ export default function FlockReportPage() {
       ) : null}
           <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('export', 'csv')} size={18} /><span>خروجی CSV</span></span>}>
         <Btn full variant="primary" onClick={() => {
-          const headers = ['گله', 'نوع', 'تعداد', 'تخم کل', 'مرگ‌ومیر٪', 'Hen-Day٪', 'دان (kg)', 'شکسته٪', 'رکوردها'];
+          const headers = ['گله', 'نوع', 'تعداد', 'تخم کل', 'تلفات٪', 'Hen-Day٪', 'دان (kg)', 'شکسته٪', 'رکوردها'];
           const rows = flockData.map(d => [
             d.flock.name,
             d.flock.type,
