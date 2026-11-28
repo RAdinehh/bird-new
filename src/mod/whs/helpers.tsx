@@ -86,7 +86,7 @@ export function getWhsItemIcon(name: string, category: string, fallback?: string
   if (/کنجد|sesame/.test(n)) return 'sesame_meal';
   if (/پودر ماهی|fish/.test(n)) return 'fish_meal';
   if (/یونجه|alfalfa/.test(n)) return 'alfalfa';
-  if (/سبوس|bran/.test(n)) return 'wheat_bran';
+  if (/سبوس|bran/i.test(n)) return 'bran';
   if (/صدف|oyster/.test(n)) return 'oyster_shell';
   if (/بی‌کربنات|جوش شیرین|bicarbonate/.test(n)) return 'calcium_bicarbonate';
   if (/کلسیم|آهک|دی‌کلسیم|calcium/.test(n)) return 'calcium_powder';
