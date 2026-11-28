@@ -1,3 +1,4 @@
+import { IconCalendar, IconNote } from '../../shr/icons';
 import { useState } from 'react';
 import { useManual, TYPE_OPTIONS } from './manual';
 import { todayJalali, type EventType } from './store';
@@ -54,7 +55,7 @@ export default function AddEventModal({ open, onClose, prefillDate }: Props) {
     <Modal
       open={open}
       onClose={handleCancel}
-      title="📅 افزودن رویداد"
+      title={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><IconCalendar size={16} /> افزودن رویداد</span>}
       footer={
         <BtnRow>
           <Btn variant="primary" onClick={handleSave}>ذخیره</Btn>
@@ -107,7 +108,7 @@ export default function AddEventModal({ open, onClose, prefillDate }: Props) {
         textAlign: 'center',
         lineHeight: 1.7
       }}>
-        💡 این رویداد فقط برای یادآوری است — روی داده‌های دیگر تأثیر ندارد.
+        <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}><IconNote size={14} /> این رویداد فقط برای یادآوری است — روی داده‌های دیگر تأثیر ندارد.</span>
       </div>
     </Modal>
   );
