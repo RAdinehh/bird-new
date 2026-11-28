@@ -21,9 +21,10 @@ export const UI_ICON_MAP = {
   flock: 'flock' as AppIconKey,
   mortality: 'mortality' as AppIconKey,
   vaccine: 'vaccine' as AppIconKey,
+  inventory: 'inventory' as AppIconKey,
 } as const;
 
-export type UiIconCategory = 'compare' | 'profit' | 'period' | 'export' | 'invoice' | 'event';
+export type UiIconCategory = 'compare' | 'profit' | 'period' | 'export' | 'invoice' | 'event' | 'inventory';
 
 /** آیکون پیش‌فرض هر دسته برای حالتی که زیردسته وجود ندارد یا مشخص نشده است */
 const CATEGORY_DEFAULT_ICON: Record<UiIconCategory, AppIconKey> = {
@@ -33,6 +34,7 @@ const CATEGORY_DEFAULT_ICON: Record<UiIconCategory, AppIconKey> = {
   export: UI_ICON_MAP.exportReport,
   invoice: UI_ICON_MAP.cash,
   event: UI_ICON_MAP.stats,
+  inventory: UI_ICON_MAP.inventory,
 };
 
 /** نگاشت زیردسته‌ها به کلیدهای آیکون در هر دسته */
@@ -77,6 +79,9 @@ const SUBTYPE_ICON_MAP: Record<UiIconCategory, Record<string, AppIconKey>> = {
     herbal: UI_ICON_MAP.herbal,
     hatch: UI_ICON_MAP.hatch,
     payment: UI_ICON_MAP.cash,
+  },
+  inventory: {
+    default: UI_ICON_MAP.inventory,
   },
 };
 

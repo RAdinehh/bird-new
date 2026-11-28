@@ -1,3 +1,4 @@
+import { resolveCategoryIconKey } from '../../../shr/components/uiIconRegistry';
 import { OptionIcon } from '../../../shr/components/OptionIcon';
 import { useFormat } from "../../../shr/units/useFormat";
 /**
@@ -103,7 +104,7 @@ export default function ArchivePage({ active = true }: Props = {}) {
       />
       {total === 0 ? (
         <Empty
-          icon={<OptionIcon icon="inventory" size={32} />}
+          icon={<OptionIcon icon={resolveCategoryIconKey('inventory')} size={32} />}
           title="آرشیو خالی است"
           desc="سالن، بخش یا تجهیز آرشیو شده‌ای وجود ندارد."
         />
