@@ -82,7 +82,7 @@ export default function AddEventModal({ open, onClose, prefillDate }: Props) {
       <Field label="نوع رویداد">
         <Select value={type} onChange={e => setType(e.target.value as EventType)}>
           {TYPE_OPTIONS.map(o => (
-            <option key={o.id} value={o.id}>{o.icon} {o.label}</option>
+            <option key={o.id} value={o.id}>{o.label}</option>
           ))}
         </Select>
       </Field>

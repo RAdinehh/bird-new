@@ -95,7 +95,7 @@ export function collectEvents(): CalEvent[] {
           title: 'هچ ' + birdName,
           subtitle: (entry.count || 0) + ' تخم — ' + days + ' روز مانده',
           status: days === 0 ? 'today' : (days < 0 ? 'past' : 'future'),
-          icon: '🐣',
+          icon: 'egg',
           refId: entry.id
         });
       }
@@ -112,7 +112,7 @@ export function collectEvents(): CalEvent[] {
           title: '🐣 پنجره‌ی هچ',
           subtitle: (entry.count || 0) + ' تخم',
           status: 'today',
-          icon: '🐣',
+          icon: 'egg',
           refId: entry.id
         });
       }
@@ -127,7 +127,7 @@ export function collectEvents(): CalEvent[] {
           title: '🔒 Lock-down',
           subtitle: (entry.count || 0) + ' تخم — چرخش قطع',
           status: 'today',
-          icon: '🔒',
+          icon: 'lock',
           refId: entry.id
         });
       }
@@ -149,7 +149,7 @@ export function collectEvents(): CalEvent[] {
             title: '💉 ' + v.name,
             subtitle: (v.dose || '') + ' — ' + (v.method || ''),
             status: statusOf(log.date),
-            icon: '💉',
+            icon: 'syringe',
             refId: log.id
           });
         }
@@ -169,7 +169,7 @@ export function collectEvents(): CalEvent[] {
             title: '⏰ انقضای ' + item.name,
             subtitle: days + ' روز مانده',
             status: days <= 30 ? 'today' : 'future',
-            icon: '⏰',
+            icon: 'clock',
             refId: item.id
           });
         }
@@ -201,7 +201,7 @@ export function collectEvents(): CalEvent[] {
           title: '💉 ' + item.name,
           subtitle: f.name + ' — ' + item.method + (daysLeft >= 0 ? ' • ' + daysLeft + ' روز مانده' : ' • گذشته'),
           status: daysLeft === 0 ? 'today' : (daysLeft < 0 ? 'past' : 'future'),
-          icon: '💉',
+          icon: 'syringe',
           refId: f.id,
         });
       });
@@ -220,10 +220,10 @@ export function collectEvents(): CalEvent[] {
             id: 'due-' + inv.id,
             date: inv.dueDate,
             type: 'payment',
-            title: inv.type === 'sale' ? '📥 دریافت از مشتری' : '📤 پرداخت به فروشنده',
+            title: inv.type === 'sale' ? 'دریافت از مشتری' : 'پرداخت به فروشنده',
             subtitle: getGlobalFormat().money(rem) + ' — فاکتور ' + (inv.number || '—'),
             status: daysFromToday(inv.dueDate) < 0 ? 'overdue' : statusOf(inv.dueDate),
-            icon: '💰',
+            icon: 'dollar',
             refId: inv.id
           });
         }
@@ -239,7 +239,7 @@ export function collectEvents(): CalEvent[] {
               title: '🏦 سرسید چک',
               subtitle: getGlobalFormat().money(p.amount) + (p.bank ? ' — ' + p.bank : ''),
               status: daysFromToday(p.dueDate) < 0 ? 'overdue' : statusOf(p.dueDate),
-              icon: '🏦',
+              icon: 'bank',
               refId: inv.id
             });
           }
@@ -261,7 +261,7 @@ export function collectEvents(): CalEvent[] {
         title: '📋 ثبت روزانه امروز',
         subtitle: 'ثبت نشده — یادآور',
         status: 'today',
-        icon: '📋',
+        icon: 'note',
         refId: today
       });
     }
@@ -283,7 +283,7 @@ export function collectEvents(): CalEvent[] {
           title: m.title,
           subtitle: (m.time ? '⏰ ' + m.time + ' — ' : '') + (m.notes || 'رویداد دستی'),
           status: statusOf(m.date),
-          icon: '📌',
+          icon: 'pin',
           refId: m.id
         });
       });
@@ -321,7 +321,7 @@ export function collectEvents(): CalEvent[] {
           title: '💉 ' + item.name,
           subtitle: flock.name + ' — روز ' + item.day + ' • ' + item.method,
           status: diff < 0 ? 'past' : diff === 0 ? 'today' : 'future',
-          icon: '💉',
+          icon: 'syringe',
           refId: flock.id,
         });
       });
@@ -351,7 +351,7 @@ export function collectEvents(): CalEvent[] {
             title: '🌿 ' + m.name,
             subtitle: (m.dose || '') + (m.method ? ' — ' + m.method : ''),
             status: statusOf(log.date),
-            icon: '🌿',
+            icon: 'leaf',
             refId: log.id,
           });
         });

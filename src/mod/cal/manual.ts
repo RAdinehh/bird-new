@@ -49,9 +49,10 @@ export const useManual = create<State>()(
 );
 
 export const TYPE_OPTIONS: { id: EventType; label: string; icon: string }[] = [
-  { id: 'daily', label: 'کار روزانه', icon: '📋' },
-  { id: 'vaccine', label: 'واکسن / دارو', icon: '💉' },
-  { id: 'hatch', label: 'جوجه‌کشی', icon: '🐣' },
-  { id: 'payment', label: 'مالی', icon: '💰' },
-  { id: 'finance', label: 'یادآور', icon: '🔔' }
+  { id: 'daily', label: 'کار روزانه', icon: 'note' },
+  { id: 'vaccine', label: 'واکسن / دارو', icon: 'syringe' },
+  { id: 'herbal', label: 'گیاهی', icon: 'leaf' },
+  { id: 'hatch', label: 'جوجه‌کشی', icon: 'egg' },
+  { id: 'payment', label: 'مالی', icon: 'dollar' },
+  { id: 'finance', label: 'یادآور', icon: 'bell' }
 ];

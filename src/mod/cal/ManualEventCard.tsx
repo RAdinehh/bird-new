@@ -1,3 +1,4 @@
+import { IconTag } from '../../shr/icons';
 import { useFormat } from '../../shr/units/useFormat';
 import { useState } from 'react';
 import { useManual, TYPE_OPTIONS, type ManualEvent } from './manual';
@@ -102,7 +103,7 @@ export default function ManualEventCard({ event, onChanged }: Props) {
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 4, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <span><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📅</span> {fmt.date(event.date)}</span>
             {event.time ? <span>⏰ {fmt.code(event.time)}</span> : null}
-            <span style={{ color: colors.text }}>🏷 {typeLabel}</span>
+            <span style={{ color: colors.text, display: 'inline-flex', alignItems: 'center', gap: 4 }}><IconTag size={12} /> {typeLabel}</span>
           </div>
 
           {event.notes ? (
@@ -138,7 +139,7 @@ export default function ManualEventCard({ event, onChanged }: Props) {
         </Grid2>
         <Field label="نوع">
           <Select value={type} onChange={e => setType(e.target.value as any)}>
-            {TYPE_OPTIONS.map(o => <option key={o.id} value={o.id}>{o.icon} {o.label}</option>)}
+            {TYPE_OPTIONS.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
           </Select>
         </Field>
         <Field label="یادداشت">

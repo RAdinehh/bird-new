@@ -7,13 +7,13 @@ import AddEventModal from './AddEventModal';
 import { toFa } from '../../shr/utils/fa';
 import { useFab } from '../../shr/hooks/useFab';
 
-const FILTERS: { id: EventType | 'all'; label: string; icon: string }[] = [
-  { id: 'all', label: 'همه', icon: '📋' },
-  { id: 'hatch', label: 'جوجه‌کشی', icon: '🐣' },
-  { id: 'vaccine', label: 'واکسن', icon: '💉' },
-  { id: 'herbal', label: 'گیاهی', icon: '🌿' },
-  { id: 'payment', label: 'مالی', icon: '💰' },
-  { id: 'daily', label: 'روزانه', icon: '📋' }
+const FILTERS: { id: EventType | 'all'; label: string }[] = [
+  { id: 'all', label: 'همه' },
+  { id: 'hatch', label: 'جوجه‌کشی' },
+  { id: 'vaccine', label: 'واکسن' },
+  { id: 'herbal', label: 'گیاهی' },
+  { id: 'payment', label: 'مالی' },
+  { id: 'daily', label: 'روزانه' }
 ];
 
 export default function Cal() {
@@ -102,7 +102,6 @@ export default function Cal() {
                 whiteSpace: 'nowrap'
               }}
             >
-              <span>{f.icon}</span>
               <span>{f.label}</span>
               {count > 0 ? (
                 <span style={{

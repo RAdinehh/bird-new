@@ -209,7 +209,7 @@ export default function MonthView({ events, onDayClick, filter }: Props) {
               {type === 'hatch' ? 'جوجه‌کشی' :
                type === 'vaccine' ? 'واکسن' :
                type === 'payment' ? 'مالی' :
-               type === 'daily' ? 'روزانه' : 'سایر'}
+               type === 'herbal' ? 'گیاهی' : type === 'daily' ? 'روزانه' : 'سایر'}
             </span>
           </div>
         ))}
