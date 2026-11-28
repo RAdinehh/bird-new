@@ -5,14 +5,15 @@ import { useFormat } from '../../../shr/units/useFormat';
 
 import { Btn, BtnRow, DigitField, Field, Grid2, Input, Modal, PhoneField, Select, Textarea, ErrorBox } from '../../../shr/components/ui';
 import SmartSelect from '../../../shr/components/SmartSelect';
+import { OptionIcon } from '../../../shr/components/OptionIcon';
 import { ROLE_LABEL, CUSTOMER_TYPES, BANKS_BY_GROUP, BANKS, isBankCode, findBankByShabaCode, findBankByCardBin, type Role, type Gender, type BankAccount , useCtc} from '../store';
 import { toEn , toFa} from '../../../shr/utils/fa';
 import { cardValidation, shabaValidation, accountValidation } from '../validators';
 
-const GENDER_OPTIONS: { value: Gender; label: string; icon: string }[] = [
-  { value: 'unspecified', label: 'بی‌طرف', icon: '—' },
-  { value: 'male', label: 'مرد', icon: '♂️' },
-  { value: 'female', label: 'زن', icon: '♀️' },
+const GENDER_OPTIONS: { value: Gender; label: string }[] = [
+  { value: 'unspecified', label: 'بی‌طرف' },
+  { value: 'male', label: 'مرد' },
+  { value: 'female', label: 'زن' },
 ];
 
 interface F {
@@ -79,8 +80,7 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
                       fontWeight: form.customerTypes.includes(v) ? 600 : 500,
                       cursor: 'pointer', fontFamily: 'inherit'
                     }}>
-                    {l}
-                  </button>
+                    {l}</button>
                 ))}
               </div>
             </Field>
@@ -149,14 +149,14 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
                       cursor: 'pointer', fontFamily: 'inherit',
                     }}
                   >
-                    {opt.icon} {opt.label}
+                    {opt.label}
                   </button>
                 );
               })}
             </div>
           </Field>
 
-          <div style={{ paddingTop: 8, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}>🏦 اطلاعات بانکی (اختیاری)</div>
+          <div style={{ paddingTop: 8, marginTop: 4, borderTop: '1px dashed var(--border)', fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', letterSpacing: '.3px' }}><span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><OptionIcon icon={form.bankAccount?.bank ? `bank_${form.bankAccount.bank}` : 'cash'} size={18} />اطلاعات بانکی (اختیاری)</span></div>
 
           <Grid2>
             <Field label="بانک" hint={(() => {
@@ -194,21 +194,24 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
                     label: b.label,
                     subtitle: `کد شبا: ${b.code}`,
                     group: 'gov',
+                    icon: b.icon,
                   })),
                   ...BANKS_BY_GROUP.private.map(b => ({
                     value: b.key,
                     label: b.label,
                     subtitle: `کد شبا: ${b.code}`,
                     group: 'private',
+                    icon: b.icon,
                   })),
                   ...BANKS_BY_GROUP.other.map(b => ({
                     value: b.key,
                     label: b.label,
                     group: 'other',
+                    icon: b.icon,
                   })),
                 ]}
                 groupLabels={{ gov: 'دولتی', private: 'خصوصی', other: 'سایر' }}
-                groupIcons={{ gov: '🏛', private: '🏦', other: '📋' }}
+                groupIcons={{ gov: 'hall', private: 'cash', other: 'other' }}
                 placeholder="— انتخاب —"
                 modalTitle="انتخاب بانک"
               />
@@ -301,7 +304,7 @@ export default function ContactFormModal({ open, setOpen, form, setForm, err, on
             />
           </Field>
 
-          <Field label="یادداشت">
+          <Field label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><OptionIcon icon="invoice" size={15} />یادداشت</span> as any}>
             <Textarea placeholder="توضیحات" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
           </Field>
           <ErrorBox>{err}</ErrorBox>

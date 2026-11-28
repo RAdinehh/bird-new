@@ -14,10 +14,42 @@ export type Gender = 'male' | 'female' | 'unspecified';
 export type BankGroup = 'gov' | 'private' | 'other';
 
 export type BankCode =
-  | 'melli' | 'mellat' | 'saderat' | 'tejarat' | 'sepah' | 'keshavarzi' | 'maskan' | 'refah' | 'postbank' | 'tosee'
-  | 'sanatmadan' | 'mehreiran' | 'resalat' | 'tosee_coop' | 'markazi'
-  | 'pasargad' | 'saman' | 'parsian' | 'en' | 'ayande' | 'sina' | 'day' | 'shahr' | 'sarmaye'
-  | 'gardeshgari' | 'iranzamin' | 'karafarin' | 'khavarmiane' | 'mellal'
+  | 'melli'
+  | 'mellat'
+  | 'saderat'
+  | 'tejarat'
+  | 'sepah'
+  | 'keshavarzi'
+  | 'maskan'
+  | 'refah'
+  | 'postbank'
+  | 'tosee'
+  | 'sanatmadan'
+  | 'tosee_coop'
+  | 'markazi'
+  | 'pasargad'
+  | 'saman'
+  | 'parsian'
+  | 'en'
+  | 'ayande'
+  | 'sina'
+  | 'day'
+  | 'shahr'
+  | 'sarmaye'
+  | 'gardeshgari'
+  | 'iranzamin'
+  | 'karafarin'
+  | 'khavarmiane'
+  | 'mehreiran'
+  | 'resalat'
+  | 'mellal'
+  | 'noor'
+  | 'caspian'
+  | 'ansar'
+  | 'hekmat'
+  | 'ghavamin'
+  | 'kosar'
+  | 'mehreghtesad'
   | 'other';
 
 export interface BankInfo {
@@ -26,39 +58,47 @@ export interface BankInfo {
   shortLabel: string;
   code: string;
   group: BankGroup;
+  icon: string;
 }
 
 export const BANKS: BankInfo[] = [
-  { key: 'melli', label: 'بانک ملی', shortLabel: 'ملی', code: '017', group: 'gov' },
-  { key: 'mellat', label: 'بانک ملت', shortLabel: 'ملت', code: '012', group: 'gov' },
-  { key: 'saderat', label: 'بانک صادرات', shortLabel: 'صادرات', code: '019', group: 'gov' },
-  { key: 'tejarat', label: 'بانک تجارت', shortLabel: 'تجارت', code: '018', group: 'gov' },
-  { key: 'sepah', label: 'بانک سپه', shortLabel: 'سپه', code: '015', group: 'gov' },
-  { key: 'keshavarzi', label: 'بانک کشاورزی', shortLabel: 'کشاورزی', code: '016', group: 'gov' },
-  { key: 'maskan', label: 'بانک مسکن', shortLabel: 'مسکن', code: '014', group: 'gov' },
-  { key: 'refah', label: 'بانک رفاه', shortLabel: 'رفاه', code: '013', group: 'gov' },
-  { key: 'postbank', label: 'پست بانک', shortLabel: 'پست بانک', code: '021', group: 'gov' },
-  { key: 'tosee', label: 'بانک توسعه صادرات', shortLabel: 'توسعه صادرات', code: '020', group: 'gov' },
-  { key: 'sanatmadan', label: 'بانک صنعت و معدن', shortLabel: 'صنعت و معدن', code: '011', group: 'gov' },
-  { key: 'tosee_coop', label: 'بانک توسعه تعاون', shortLabel: 'توسعه تعاون', code: '022', group: 'gov' },
-  { key: 'markazi', label: 'بانک مرکزی', shortLabel: 'مرکزی', code: '010', group: 'gov' },
-  { key: 'pasargad', label: 'بانک پاسارگاد', shortLabel: 'پاسارگاد', code: '057', group: 'private' },
-  { key: 'saman', label: 'بانک سامان', shortLabel: 'سامان', code: '056', group: 'private' },
-  { key: 'parsian', label: 'بانک پارسیان', shortLabel: 'پارسیان', code: '054', group: 'private' },
-  { key: 'en', label: 'بانک اقتصاد نوین', shortLabel: 'اقتصاد نوین', code: '055', group: 'private' },
-  { key: 'ayande', label: 'بانک آینده', shortLabel: 'آینده', code: '062', group: 'private' },
-  { key: 'sina', label: 'بانک سینا', shortLabel: 'سینا', code: '059', group: 'private' },
-  { key: 'day', label: 'بانک دی', shortLabel: 'دی', code: '066', group: 'private' },
-  { key: 'shahr', label: 'بانک شهر', shortLabel: 'شهر', code: '061', group: 'private' },
-  { key: 'sarmaye', label: 'بانک سرمایه', shortLabel: 'سرمایه', code: '058', group: 'private' },
-  { key: 'gardeshgari', label: 'بانک گردشگری', shortLabel: 'گردشگری', code: '064', group: 'private' },
-  { key: 'iranzamin', label: 'بانک ایران زمین', shortLabel: 'ایران زمین', code: '069', group: 'private' },
-  { key: 'karafarin', label: 'بانک کارآفرین', shortLabel: 'کارآفرین', code: '053', group: 'private' },
-  { key: 'khavarmiane', label: 'بانک خاورمیانه', shortLabel: 'خاورمیانه', code: '078', group: 'private' },
-  { key: 'mellal', label: 'بانک ملل', shortLabel: 'ملل', code: '075', group: 'private' },
-  { key: 'mehreiran', label: 'قرض‌الحسنه مهر ایران', shortLabel: 'مهر ایران', code: '060', group: 'private' },
-  { key: 'resalat', label: 'قرض‌الحسنه رسالت', shortLabel: 'رسالت', code: '070', group: 'private' },
-  { key: 'other', label: 'سایر', shortLabel: 'سایر', code: '', group: 'other' },
+  { key: 'melli', label: 'بانک ملی ایران', shortLabel: 'ملی', code: '017', group: 'gov', icon: 'bank_melli' },
+  { key: 'mellat', label: 'بانک ملت', shortLabel: 'ملت', code: '012', group: 'gov', icon: 'bank_mellat' },
+  { key: 'saderat', label: 'بانک صادرات ایران', shortLabel: 'صادرات', code: '019', group: 'gov', icon: 'bank_saderat' },
+  { key: 'tejarat', label: 'بانک تجارت', shortLabel: 'تجارت', code: '018', group: 'gov', icon: 'bank_tejarat' },
+  { key: 'sepah', label: 'بانک سپه', shortLabel: 'سپه', code: '015', group: 'gov', icon: 'bank_sepah' },
+  { key: 'keshavarzi', label: 'بانک کشاورزی', shortLabel: 'کشاورزی', code: '016', group: 'gov', icon: 'bank_keshavarzi' },
+  { key: 'maskan', label: 'بانک مسکن', shortLabel: 'مسکن', code: '014', group: 'gov', icon: 'bank_maskan' },
+  { key: 'refah', label: 'بانک رفاه کارگران', shortLabel: 'رفاه', code: '013', group: 'gov', icon: 'bank_refah' },
+  { key: 'postbank', label: 'پست بانک ایران', shortLabel: 'پست بانک', code: '021', group: 'gov', icon: 'bank_postbank' },
+  { key: 'tosee', label: 'بانک توسعه صادرات', shortLabel: 'توسعه صادرات', code: '020', group: 'gov', icon: 'bank_tosee' },
+  { key: 'sanatmadan', label: 'بانک صنعت و معدن', shortLabel: 'صنعت و معدن', code: '011', group: 'gov', icon: 'bank_sanatmadan' },
+  { key: 'tosee_coop', label: 'بانک توسعه تعاون', shortLabel: 'توسعه تعاون', code: '022', group: 'gov', icon: 'bank_tosee_coop' },
+  { key: 'markazi', label: 'بانک مرکزی جمهوری اسلامی', shortLabel: 'مرکزی', code: '010', group: 'gov', icon: 'bank_markazi' },
+  { key: 'pasargad', label: 'بانک پاسارگاد', shortLabel: 'پاسارگاد', code: '057', group: 'private', icon: 'bank_pasargad' },
+  { key: 'saman', label: 'بانک سامان', shortLabel: 'سامان', code: '056', group: 'private', icon: 'bank_saman' },
+  { key: 'parsian', label: 'بانک پارسیان', shortLabel: 'پارسیان', code: '054', group: 'private', icon: 'bank_parsian' },
+  { key: 'en', label: 'بانک اقتصاد نوین', shortLabel: 'اقتصاد نوین', code: '055', group: 'private', icon: 'bank_en' },
+  { key: 'ayande', label: 'بانک آینده', shortLabel: 'آینده', code: '062', group: 'private', icon: 'bank_ayande' },
+  { key: 'sina', label: 'بانک سینا', shortLabel: 'سینا', code: '059', group: 'private', icon: 'bank_sina' },
+  { key: 'day', label: 'بانک دی', shortLabel: 'دی', code: '066', group: 'private', icon: 'bank_day' },
+  { key: 'shahr', label: 'بانک شهر', shortLabel: 'شهر', code: '061', group: 'private', icon: 'bank_shahr' },
+  { key: 'sarmaye', label: 'بانک سرمایه', shortLabel: 'سرمایه', code: '058', group: 'private', icon: 'bank_sarmaye' },
+  { key: 'gardeshgari', label: 'بانک گردشگری', shortLabel: 'گردشگری', code: '064', group: 'private', icon: 'bank_gardeshgari' },
+  { key: 'iranzamin', label: 'بانک ایران زمین', shortLabel: 'ایران زمین', code: '069', group: 'private', icon: 'bank_iranzamin' },
+  { key: 'karafarin', label: 'بانک کارآفرین', shortLabel: 'کارآفرین', code: '053', group: 'private', icon: 'bank_karafarin' },
+  { key: 'khavarmiane', label: 'بانک خاورمیانه', shortLabel: 'خاورمیانه', code: '078', group: 'private', icon: 'bank_khavarmiane' },
+  { key: 'mehreiran', label: 'بانک قرض‌الحسنه مهر ایران', shortLabel: 'مهر ایران', code: '060', group: 'private', icon: 'bank_mehreiran' },
+  { key: 'resalat', label: 'بانک قرض‌الحسنه رسالت', shortLabel: 'رسالت', code: '070', group: 'private', icon: 'bank_resalat' },
+  { key: 'mellal', label: 'مؤسسه اعتباری ملل', shortLabel: 'ملل', code: '075', group: 'private', icon: 'bank_mellal' },
+  { key: 'noor', label: 'مؤسسه اعتباری نور', shortLabel: 'نور', code: '080', group: 'private', icon: 'bank_noor' },
+  { key: 'caspian', label: 'مؤسسه اعتباری کاسپین', shortLabel: 'کاسپین', code: '095', group: 'private', icon: 'bank_caspian' },
+  { key: 'ansar', label: 'بانک انصار (ادغام سپه)', shortLabel: 'انصار', code: '063', group: 'private', icon: 'bank_ansar' },
+  { key: 'hekmat', label: 'بانک حکمت ایرانیان (ادغام سپه)', shortLabel: 'حکمت', code: '065', group: 'private', icon: 'bank_hekmat' },
+  { key: 'ghavamin', label: 'بانک قوامین (ادغام سپه)', shortLabel: 'قوامین', code: '052', group: 'private', icon: 'bank_ghavamin' },
+  { key: 'kosar', label: 'مؤسسه اعتباری کوثر (ادغام سپه)', shortLabel: 'کوثر', code: '073', group: 'private', icon: 'bank_kosar' },
+  { key: 'mehreghtesad', label: 'بانک مهر اقتصاد (ادغام سپه)', shortLabel: 'مهر اقتصاد', code: '079', group: 'private', icon: 'bank_mehreghtesad' },
+  { key: 'other', label: 'سایر بانک‌ها', shortLabel: 'سایر', code: '', group: 'other', icon: 'bank_other' },
 ];
 
 export const BANKS_BY_GROUP = {
@@ -97,6 +137,13 @@ export const CARD_BINS: Partial<Record<BankCode, string[]>> = {
   karafarin: ['627488', '502910'],
   khavarmiane: ['585947'],
   mellal: ['606256'],
+  noor: ['507677'],
+  caspian: ['505801'],
+  ansar: ['627381'],
+  hekmat: ['636949'],
+  ghavamin: ['639599'],
+  kosar: ['505809'],
+  mehreghtesad: ['639370'],
   markazi: ['636795', '636797'],
 };
 
