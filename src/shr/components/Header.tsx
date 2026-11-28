@@ -68,8 +68,8 @@ export default function Header({ title }: { title: string }) {
         <span style={{
           position: 'absolute', top: -3, left: -3,
           background: badgeColor || 'var(--danger)', color: '#fff',
-          fontSize: 9, fontWeight: 700,
-          minWidth: 20, height: 20, borderRadius: 999, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap', lineHeight: 1, padding: '0 6px',
+          fontSize: 8.5, fontWeight: 800,
+          minWidth: 18, height: 18, borderRadius: 999, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap', lineHeight: 1, padding: '0 5px',
         }}>{badge}</span>
       ) : null}
     </button>
