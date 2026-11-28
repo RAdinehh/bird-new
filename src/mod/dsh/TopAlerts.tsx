@@ -66,9 +66,7 @@ export default function TopAlerts({
                         fontSize: 'var(--fs-sm)',
                       }}
                     >
-                      <span style={{ color: `var(--${a.tone})`, fontWeight: 600 }}>
-                        {a.icon} {a.label}
-                      </span>
+                      <span style={{ color: `var(--${a.tone})`, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={a.icon} size={15} /><span>{a.label}</span></span>
                       <span style={{ fontWeight: 700, color: `var(--${a.tone})` }}>
                         {fmt.count(a.count)}
                       </span>
