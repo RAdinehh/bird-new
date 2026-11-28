@@ -253,7 +253,7 @@ export default function MenuDrawer() {
                       <span style={{
                         background: 'var(--danger)', color: '#fff',
                         fontSize: 10, fontWeight: 700,
-                        minWidth: 20, height: 20, borderRadius: 10,
+                        minWidth: 20, height: 20, borderRadius: 999, whiteSpace: 'nowrap', lineHeight: 1,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         padding: '0 6px'
                       }}>{getGlobalFormat().count(alertCount)}</span>
@@ -263,7 +263,7 @@ export default function MenuDrawer() {
                       <span style={{
                         background: 'var(--warn)', color: '#fff',
                         fontSize: 10, fontWeight: 700,
-                        minWidth: 20, height: 20, borderRadius: 10,
+                        minWidth: 20, height: 20, borderRadius: 999, whiteSpace: 'nowrap', lineHeight: 1,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         padding: '0 6px'
                       }}>{getGlobalFormat().count(stockCount)}</span>

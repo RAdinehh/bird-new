@@ -86,9 +86,7 @@ export function Tabs<T extends string = string>({
                   fontSize: 12,
                   background: activeTab === t.id ? 'var(--accent-soft)' : 'var(--input-bg)',
                   color: activeTab === t.id ? 'var(--accent)' : 'var(--muted)',
-                  padding: '1px 5px',
-                  borderRadius: 8,
-                  fontWeight: 700,
+                  minWidth: 20, height: 20, padding: '0 6px', borderRadius: 999, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap', lineHeight: 1, fontWeight: 700,
                 }}>{getGlobalFormat().count(t.count)}</span>
               )}
               {newTabBadge === t.id && (

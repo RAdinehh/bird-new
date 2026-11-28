@@ -69,9 +69,7 @@ export default function Header({ title }: { title: string }) {
           position: 'absolute', top: -3, left: -3,
           background: badgeColor || 'var(--danger)', color: '#fff',
           fontSize: 9, fontWeight: 700,
-          minWidth: 15, height: 15, borderRadius: 8,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: '0 3px',
+          minWidth: 20, height: 20, borderRadius: 999, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap', lineHeight: 1, padding: '0 6px',
           border: '2px solid var(--bg)'
         }}>{badge}</span>
       ) : null}

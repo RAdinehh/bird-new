@@ -66,9 +66,7 @@ export default function Whs() {
                 fontSize: 12,
                 background: 'var(--danger)',
                 color: '#fff',
-                padding: '1px 6px',
-                borderRadius: 8,
-                fontWeight: 700,
+                minWidth: 20, height: 20, padding: '0 6px', borderRadius: 999, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap', lineHeight: 1, fontWeight: 700,
               }}>{getGlobalFormat().count(warnCount)}</span>
             ) : null}
             {tab === t.id ? (

@@ -7,7 +7,7 @@ export const ICON_KEYS = [
   'feeder_chain', 'feeder_tube', 'feeder_bucket', 'feeder_tray',
   'drinker_cup', 'drinker_hanging', 'drinker_fountain', 'drinker_trough', 'litter_straw',
   'kg', 'pcs',
-  'chicken', 'duck', 'turkey', 'egg', 'fertile_egg', 'incubator', 'candling', 'egg_tray', 'old_rooster', 'soft_egg', 'dirty_egg', 'rotten_egg', 'cal_7', 'cal_30', 'cal_90', 'cal_all', 'broken_egg', 'manure', 'herbal', 'other', 'equipment', 'bag', 'vial', 'liquid', 'dose', 'pack', 'cage', 'corn', 'wheat', 'barley', 'bran', 'soybean_meal', 'sesame_meal', 'sunflower_meal', 'canola_meal', 'fish_meal', 'alfalfa', 'calcium_powder', 'oyster_shell', 'salt', 'oil', 'amino_acid', 'premix',
+  'chicken', 'duck', 'turkey', 'egg', 'fertile_egg', 'incubator', 'candling', 'egg_tray', 'old_rooster', 'soft_egg', 'dirty_egg', 'rotten_egg', 'cal_7', 'cal_30', 'cal_90', 'cal_all', 'wheat_bran', 'broken_egg', 'manure', 'herbal', 'other', 'equipment', 'bag', 'vial', 'liquid', 'dose', 'pack', 'cage', 'corn', 'wheat', 'barley', 'bran', 'soybean_meal', 'sesame_meal', 'sunflower_meal', 'canola_meal', 'fish_meal', 'alfalfa', 'calcium_powder', 'oyster_shell', 'rock_salt', 'salt', 'oil', 'amino_acid', 'premix',
   'hatch', 'feed', 'invoice', 'meds',
   'mortality', 'water', 'stats', 'flock', 'flocks_group',
   'inventory', 'cash', 'climate', 'unknown'
@@ -20,7 +20,7 @@ export type AppIconKey = typeof ICON_KEYS[number];
 
 // تابع پیدا کردن مسیر آیکون‌های تایید شده‌ی اپلی در پروژه
 export function getAppIconPath(key: AppIconKey): string {
-  return `/assets/emojis/${key}.svg?v=14`;
+  return `/assets/emojis/${key}.svg?v=17`;
 }
 
 // کامپوننت هوشمند برای نمایش ایموجی‌های جدید با سایز استاندارد
@@ -84,10 +84,10 @@ export function isValidIconKey(key: string): key is AppIconKey {
 export function getSmartFeedIcon(name?: string, fallback: AppIconKey = 'feed'): AppIconKey {
   if (!name) return fallback;
   const n = name.trim().toLowerCase();
-  if (n.includes('سبوس')) return 'bran';
+  if (n.includes('سبوس') || n.includes('bran')) return 'wheat_bran';
   if (n.includes('ذرت')) return 'corn';
   if (n.includes('گندم')) return 'wheat';
-  if (n.includes('جو')) return 'barley';
+  if (/(?:^|\s|\u200c)جو(?:$|\s|\u200c)|barley/.test(n)) return 'barley';
   if (n.includes('روغن')) return 'oil';
   if (n.includes('سویا')) return 'soybean_meal';
   if (n.includes('کنجد')) return 'sesame_meal';
