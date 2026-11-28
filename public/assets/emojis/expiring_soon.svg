@@ -1,5 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <path d="M18 10h28M18 54h28" stroke="#D97706" stroke-width="4" stroke-linecap="round"/>
-  <path d="M21 10c0 12 11 16 11 22s-11 10-11 22h22c0-12-11-16-11-22s11-10 11-22H21z" fill="#FEF3C7" stroke="#D97706" stroke-width="3.5" stroke-linejoin="round"/>
-  <path d="M24 49h16l-8-9-8 9z" fill="#F59E0B"/>
+  <defs>
+    <linearGradient id="hgCap" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#D97706"/>
+      <stop offset="50%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#B45309"/>
+    </linearGradient>
+    <linearGradient id="hgGlass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#E0F2FE" stop-opacity="0.85"/>
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#BAE6FD" stop-opacity="0.85"/>
+    </linearGradient>
+    <linearGradient id="hgSand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+  </defs>
+  <path d="M19 11h26c0 12-10 16-10 21s10 9 10 21H19c0-12 10-16 10-21s-10-9-10-21z" fill="url(#hgGlass)" stroke="#93C5FD" stroke-width="1.5"/>
+  <path d="M24 22h16c-2 4-6 6-8 9-2-3-6-5-8-9z" fill="url(#hgSand)"/>
+  <line x1="32" y1="31" x2="32" y2="47" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+  <path d="M21 52c2-6 7-8 11-8s9 2 11 8H21z" fill="url(#hgSand)"/>
+  <rect x="14" y="6" width="36" height="6" rx="3" fill="url(#hgCap)"/>
+  <rect x="14" y="52" width="36" height="6" rx="3" fill="url(#hgCap)"/>
 </svg>

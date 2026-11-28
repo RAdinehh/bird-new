@@ -1,6 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <path d="M12 22l20-10 20 10v24L32 56 12 46V22z" fill="#FEE2E2" stroke="#DC2626" stroke-width="3.5" stroke-linejoin="round"/>
-  <path d="M12 22l20 10 20-10M32 32v24" stroke="#DC2626" stroke-width="3" stroke-linejoin="round"/>
-  <circle cx="48" cy="48" r="11" fill="#DC2626"/>
-  <path d="M43 48h10" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+  <defs>
+    <linearGradient id="mbBody" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#60A5FA"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+    <linearGradient id="mbFront" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+  </defs>
+  <rect x="29" y="42" width="6" height="16" rx="2" fill="#92400E"/>
+  <path d="M22 16h22a10 10 0 0 1 10 10v16H14V26a10 10 0 0 1 8-10z" fill="url(#mbBody)"/>
+  <path d="M12 26a10 10 0 0 1 20 0v16H12V26z" fill="url(#mbFront)"/>
+  <path d="M12 42l-5 11h17l4-11H12z" fill="#93C5FD" stroke="#3B82F6" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M40 28h12v4H43v5h-3v-9z" fill="#EF4444"/>
+  <circle cx="41.5" cy="29.5" r="2.2" fill="#DC2626"/>
 </svg>
