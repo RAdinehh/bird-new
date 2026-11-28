@@ -54,22 +54,35 @@ export default function MoveFormModal(props: Props) {
       >
         <Grid2>
           <Field label="نوع گردش" required error={showError?.('type')} onTouch={() => markTouched?.('type')}>
-            <Select value={form.type} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-              const newType = e.target.value as MovementType;
-              const validReasons = REASONS_BY_TYPE[newType];
-              const newReason = validReasons.includes(form.reason) ? form.reason : validReasons[0];
-              setForm({ ...form, type: newType, reason: newReason });
-            }}>
-              <option value="in">📥 ورود به انبار</option>
-              <option value="out">📤 خروج از انبار</option>
-            </Select>
+            <SmartSelect
+              value={form.type}
+              modalTitle="نوع عملیات"
+              options={[
+                { value: 'in', label: 'ورود به انبار', icon: '📥' },
+                { value: 'out', label: 'خروج از انبار', icon: '📤' },
+              ]}
+              onChange={v => {
+                const newType = v as MovementType;
+                const validReasons = REASONS_BY_TYPE[newType];
+                const newReason = validReasons.includes(form.reason) ? form.reason : validReasons[0];
+                setForm({ ...form, type: newType, reason: newReason });
+              }}
+            />
           </Field>
           <Field label="دلیل" required error={showError?.('reason')} onTouch={() => markTouched?.('reason')}>
-            <Select value={form.reason} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setForm({ ...form, reason: e.target.value as MovementReason })}>
-              {REASONS_BY_TYPE[form.type].map((r) =>
-                <option key={r} value={r}>{MOVEMENT_REASON[r]}</option>
-              )}
-            </Select>
+            <SmartSelect
+              value={form.reason}
+              modalTitle="دلیل"
+              options={REASONS_BY_TYPE[form.type].map((r) => {
+                const reasonIcons: Record<string, string> = {
+                  purchase: '🛒', consumption: 'feed', sale: '💰',
+                  gift: '🎁', loss: '⚠️', adjustment: '🔄', return: '↩️'
+                };
+                const cleanLabel = String(MOVEMENT_REASON[r]).replace(/^[^؀-ۿa-zA-Z0-9]+s*/, '');
+                return { value: r, label: cleanLabel, icon: reasonIcons[r] || 'inventory' };
+              })}
+              onChange={v => setForm({ ...form, reason: v as MovementReason })}
+            />
           </Field>
         </Grid2>
 

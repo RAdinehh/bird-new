@@ -63,30 +63,44 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
 
         <Grid2>
           <Field label="دسته" required error={showError?.('category')} onTouch={() => markTouched?.('category')}>
-            <Select value={form.category} onChange={e => {
-              const newCat = e.target.value as ItemCategory;
-              const def = CATEGORY_DEFAULTS[newCat];
-              setForm((f: any) => ({
-                ...f,
-                category: newCat,
-                unit: def.unit,
-                storage: def.storage,
-                expireDate: def.needsExpiry ? f.expireDate : '',
-                withdrawalDays: def.needsWithdrawal ? f.withdrawalDays : '',
-              }));
-            }}>
-              {(Object.keys(CATEGORY_LABEL) as ItemCategory[]).map(c =>
-                <option key={c} value={c}>{CATEGORY_ICON[c]} {CATEGORY_LABEL[c]}</option>
-              )}
-            </Select>
+            <SmartSelect
+              value={form.category}
+              modalTitle="دسته‌بندی کالا"
+              options={(Object.keys(CATEGORY_LABEL) as ItemCategory[]).map(c => {
+                const catIcons: Record<string, string> = {
+                  egg: 'egg', feed: 'feed', medicine: 'meds', vaccine: 'vet_injection',
+                  herbal: 'herbal', equipment: 'equipment', consumable: 'inventory',
+                  manure: 'manure', broken: 'broken_egg'
+                };
+                return { value: c, label: CATEGORY_LABEL[c], icon: catIcons[c] || (CATEGORY_ICON as any)[c] || 'inventory' };
+              })}
+              onChange={v => {
+                const newCat = v as ItemCategory;
+                const def = CATEGORY_DEFAULTS[newCat];
+                setForm((f: any) => ({
+                  ...f,
+                  category: newCat,
+                  unit: def.unit,
+                  storage: def.storage,
+                  expireDate: def.needsExpiry ? f.expireDate : '',
+                  withdrawalDays: def.needsWithdrawal ? f.withdrawalDays : '',
+                }));
+              }}
+            />
           </Field>
           <Field label="واحد" error={showError?.('unit')} onTouch={() => markTouched?.('unit')}>
-            <Select value={form.unit} onChange={e => setForm({ ...form, unit: e.target.value as ItemUnit })}>
-              {(Object.keys(UNIT_LABEL) as ItemUnit[]).filter(u => u !== 'L').map(u => {
-                      const unitEmoji = ({ kg: '⚖️', g: '⚖️', ton: '⚖️', l: '🧪', ml: '🧪', pcs: '🔢', pack: '📦', bag: '🛍️', vial: '💉', dose: '💧' } as Record<string, string>)[u] || '📏';
-                      return <option key={u} value={u}>{unitEmoji} {UNIT_LABEL[u]}</option>;
-                    })}
-            </Select>
+            <SmartSelect
+              value={form.unit}
+              modalTitle="واحد اندازه‌گیری"
+              options={(Object.keys(UNIT_LABEL) as ItemUnit[]).filter(u => u !== 'L').map(u => {
+                const unitIcons: Record<string, string> = {
+                  kg: 'kg', g: 'scale', ton: 'platform_scale', l: 'liquid', ml: 'liquid',
+                  pcs: 'pcs', pack: 'pack', bag: 'bag', vial: 'vial', dose: 'dose'
+                };
+                return { value: u, label: UNIT_LABEL[u], icon: unitIcons[u] || 'scale' };
+              })}
+              onChange={v => setForm({ ...form, unit: v as ItemUnit })}
+            />
           </Field>
         </Grid2>
 
@@ -182,11 +196,16 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
                 )}
                 {extras.needsStorage && (
                   <Field label="نگهداری" error={showError?.('storage')} onTouch={() => markTouched?.('storage')}>
-                    <Select value={form.storage} onChange={e => setForm({ ...form, storage: e.target.value })}>
-                      <option value="room">دمای اتاق</option>
-                      <option value="fridge">یخچال (۲-۸°)</option>
-                      <option value="freezer">فریزر</option>
-                    </Select>
+                    <SmartSelect
+                      value={form.storage}
+                      modalTitle="شرایط نگهداری"
+                      options={[
+                        { value: 'room', label: 'دمای اتاق', icon: 'climate' },
+                        { value: 'fridge', label: 'یخچال (۲-۸°)', icon: '🧊' },
+                        { value: 'freezer', label: 'فریزر', icon: '❄️' },
+                      ]}
+                      onChange={v => setForm({ ...form, storage: v })}
+                    />
                   </Field>
                 )}
               </Grid2>
@@ -257,12 +276,17 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
             <SectionTitle>🧪 ترکیبات تغذیه‌ای</SectionTitle>
             <Grid2>
               <Field label="نوع دان">
-                <Select value={form.feedType || ''} onChange={e => setForm({ ...form, feedType: e.target.value })}>
-                  <option value="">— انتخاب —</option>
-                  <option value="starter">آغازین (Starter)</option>
-                  <option value="grower">میانی (Grower)</option>
-                  <option value="finisher">پایانی (Finisher)</option>
-                </Select>
+                <SmartSelect
+                  value={form.feedType || ''}
+                  placeholder="— انتخاب —"
+                  modalTitle="نوع دان"
+                  options={[
+                    { value: 'starter', label: 'آغازین (Starter)', icon: '🐣' },
+                    { value: 'grower', label: 'میانی (Grower)', icon: '🐥' },
+                    { value: 'finisher', label: 'پایانی (Finisher)', icon: 'chicken' },
+                  ]}
+                  onChange={v => setForm({ ...form, feedType: v })}
+                />
               </Field>
               <Field label="برند">
                 <Input value={form.brand || ''} onChange={e => setForm({ ...form, brand: e.target.value })} placeholder="برند" />
@@ -344,16 +368,21 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
                   value={form.hallId}
                   placeholder="— بدون سالن —"
                   modalTitle="انتخاب سالن استقرار"
-                  options={halls.map((h) => ({ value: String(h.id), label: String(h.name), icon: '🏭' }))}
+                  options={halls.map((h) => ({ value: String(h.id), label: String(h.name), icon: 'hall' }))}
                   onChange={(val: string) => setForm({ ...form, hallId: val })}
                 />
               </Field>
               <Field label="وضعیت">
-                <Select value={form.equipmentStatus} onChange={e => setForm({ ...form, equipmentStatus: e.target.value })}>
-                  <option value="active">✅ فعال</option>
-                  <option value="repair">🔧 در تعمیر</option>
-                  <option value="scrapped">❌ اسقاط</option>
-                </Select>
+                <SmartSelect
+                  value={form.equipmentStatus}
+                  modalTitle="وضعیت تجهیز"
+                  options={[
+                    { value: 'active', label: 'فعال', icon: '✅' },
+                    { value: 'repair', label: 'در تعمیر', icon: 'hand_tools' },
+                    { value: 'scrapped', label: 'اسقاط', icon: '❌' },
+                  ]}
+                  onChange={v => setForm({ ...form, equipmentStatus: v })}
+                />
               </Field>
             </Grid2>
             <Field label="قیمت خرید (کل)">
