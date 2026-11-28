@@ -101,7 +101,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px' }}>
           <span>📦</span><span>انتخاب دستگاه</span>
         </div>
-        <SmartSelect value={multiDeviceId} onChange={v => setMultiDeviceId(v)} options={devices.map(c => ({ value: c.id, label: c.name }))} placeholder="— انتخاب —" modalTitle="انتخاب دستگاه" />
+        <SmartSelect value={multiDeviceId} onChange={v => setMultiDeviceId(v)} options={devices.map(c => ({ value: c.id, label: c.name, icon: 'incubator' }))} placeholder="— انتخاب —" modalTitle="انتخاب دستگاه" />
         {liveUsage && liveUsage.total > 0 && (
           <div style={{
             padding: 'var(--pad-normal)',
@@ -245,7 +245,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
                   value={currentRow.dealData.sellerId || ''}
                   placeholder="— انتخاب —"
                   modalTitle="انتخاب فروشنده"
-                  options={suppliers.map((p) => ({ value: String(p.id), label: String(p.name) }))}
+                  options={suppliers.map((p) => ({ value: String(p.id), label: String(p.name), icon: '💰' }))}
                   onChange={(val: string) => setD("sellerId", val)}
                 />
             )}
@@ -254,10 +254,13 @@ export default function EggEntryModal(props: EggEntryModalProps) {
 
         {currentRow.dealType === 'partnership' && (
           <Field label="شریک" required>
-            <Select value={currentRow.dealData.partnerId || ''} onChange={e => setD('partnerId', e.target.value)}>
-              <option value="">— انتخاب —</option>
-              {allPersons.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-            </Select>
+            <SmartSelect
+              value={currentRow.dealData.partnerId || ''}
+              placeholder="— انتخاب شریک —"
+              modalTitle="انتخاب شریک"
+              options={allPersons.map((p) => ({ value: String(p.id), label: String(p.name), icon: '🤝' }))}
+              onChange={(val: string) => setD('partnerId', val)}
+            />
           </Field>
         )}
 
@@ -337,7 +340,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
           <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px', marginBottom: 8 }}>🥚 مشخصات تخم</div>
           <Grid2>
             <Field label="پرنده" required>
-              <SmartSelect value={currentRow.birdId} onChange={v => setCurrentRow(f => ({ ...f, birdId: v, breedId: '' }))} options={birds.map(c => ({ value: c.id, label: c.name }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" />
+              <SmartSelect value={currentRow.birdId} onChange={v => setCurrentRow(f => ({ ...f, birdId: v, breedId: '' }))} options={birds.map(c => ({ value: c.id, label: c.name, icon: c.id === 'duck' ? 'duck' : c.id === 'turkey' ? 'turkey' : c.id === 'quail' ? 'quail' : 'chicken' }))} placeholder="— انتخاب —" modalTitle="انتخاب پرنده" />
             </Field>
             <Field label="نژاد">
               <Select value={currentRow.breedId}

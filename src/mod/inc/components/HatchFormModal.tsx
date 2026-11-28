@@ -9,6 +9,7 @@ import {
   SectionTitle, Select, Textarea,
 } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
+import SmartSelect from '../../../shr/components/SmartSelect';
 import HatchEntryRow, { type HatchRowData } from './HatchEntryRow';
 import type { EggEntry } from '../store';
 import type { Candling } from '../store';

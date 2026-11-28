@@ -213,7 +213,7 @@ export default function CandlingsPage({ initialEntry = '', onGoTo, active = true
     <PageContainer>
       <HelpBanner
         id="inc-candlings-guide"
-        icon="🔦"
+        icon="candling"
         title="راهنمای کندلینگ"
         description="تعداد تخم‌های بارور، بی‌نطفه و حذف‌شده یا تلفات جنینی را در هر مرحلهٔ کندلینگ ثبت کنید تا درصد باروری و هچ به‌روز بماند."
         tone="info"

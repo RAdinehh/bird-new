@@ -5,6 +5,7 @@ import { useFormat } from '../../../shr/units/useFormat';
 
 import { Btn, BtnRow, Field, Grid2, Input, Modal, Select, ErrorBox } from '../../../shr/components/ui';
 import { toFa } from '../../../shr/utils/fa';
+import SmartSelect from '../../../shr/components/SmartSelect';
 
 export interface FlockForm {
   name: string;

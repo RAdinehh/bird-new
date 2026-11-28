@@ -5,6 +5,7 @@ import { useFormat } from '../../../shr/units/useFormat';
 
 import { toFa, toEn } from '../../../shr/utils/fa';
 import { Field, Grid2, NumField, Select } from '../../../shr/components/ui';
+import SmartSelect from '../../../shr/components/SmartSelect';
 
 export interface EntryData {
   alive: string;

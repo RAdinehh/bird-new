@@ -42,7 +42,7 @@ export default function HatchCard(props: HatchCardProps) {
   const { hatch: h, index: i, bird, dev, entry, isOpen, ms, hr, realRate, aliveAfter, total, isComplete, tone, onToggle, onEdit, onDelete, onOpenFlock, onOpenSell } = props;
 
             return (
-              <ExpandableCard key={h.id} id={h.id} ms={ms} accent="accent" index={fmt.count(i + 1)} iconEmoji="🐣"
+              <ExpandableCard key={h.id} id={h.id} ms={ms} accent="accent" index={fmt.count(i + 1)} iconEmoji="hatch"
                 title={fmt.count(h.hatched || 0) + ' جوجه • ' + (bird?.name || '—')}
                 subtitle={(dev?.name || '—') + ' • ' + fmt.date(h.date)}
                 isOpen={isOpen} onToggle={() => onToggle()}

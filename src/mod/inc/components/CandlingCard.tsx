@@ -54,7 +54,7 @@ export default function CandlingCard(props: CandlingCardProps) {
   return (
     <ExpandableCard
       accent="accent"
-      iconEmoji="🔍"
+      iconEmoji="candling"
       title={birdName || '—'}
       subtitle={`${deviceName || '—'} • ${fmt.count(entryTotal)} تخم • ${fmt.code(entryDate || '—')}`}
       isOpen={isOpen}

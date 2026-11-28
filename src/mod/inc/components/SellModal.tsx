@@ -8,6 +8,7 @@ import {
   Btn, BtnRow, ErrorBox, Field, Grid2, Modal, MoneyField, NumField, Select,
 } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
+import SmartSelect from '../../../shr/components/SmartSelect';
 
 export interface SellForm {
   buyerId: string;

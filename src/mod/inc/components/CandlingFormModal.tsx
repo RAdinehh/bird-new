@@ -140,7 +140,7 @@ export default function CandlingFormModal(props: CandlingFormModalProps) {
           value={modalDevice}
           placeholder="— همه دستگاه‌ها —"
           modalTitle="انتخاب دستگاه"
-          options={devices.map((d) => ({ value: String(d.id), label: String(d.name) }))}
+          options={devices.map((d) => ({ value: String(d.id), label: String(d.name), icon: 'incubator' }))}
           onChange={(val: string) => {
             setModalDevice(val);
             setSelectedIds(new Set());

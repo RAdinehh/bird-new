@@ -280,7 +280,7 @@ export default function DevicesPage({ active = true }: { active?: boolean } = {}
       )}
       <HelpBanner
         id="inc-devices-intro"
-        icon="hall"
+        icon="incubator"
         title="راهنمای دستگاه‌های جوجه‌کشی"
         description="دستگاه‌های ستر (انکوباسیون) و هچر را با ظرفیت، مشخصات و وضعیت کاری ثبت کنید تا برنامه‌ریزی چیدمان تخم و هچ دقیق انجام شود."
         tone="info"

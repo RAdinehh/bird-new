@@ -9,6 +9,7 @@ import {
   NumField, SectionTitle, Select,
 } from '../../../shr/components/ui';
 import DatePicker from '../../../shr/components/DatePicker';
+import SmartSelect from '../../../shr/components/SmartSelect';
 import type { DeviceMode, DeviceStatus } from '../store';
 import type { F } from '../types-devices';
 import { warrantyInfo } from '../api/warranty';

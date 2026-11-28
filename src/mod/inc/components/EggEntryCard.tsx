@@ -76,7 +76,7 @@ export default function EggEntryCard(props: EggEntryCardProps) {
     <ExpandableCard
       accent={accent}
       index={fmt.count(i + 1)}
-      iconEmoji="🥚"
+      iconEmoji="fertile_egg"
       title={fmt.count(e.count || 0) + ' تخم • ' + (bird?.name || '—') + (breed ? ' (' + breed.name + ')' : '')}
       subtitle={dev?.name || '—'}
       isOpen={isOpen}
@@ -134,7 +134,7 @@ export default function EggEntryCard(props: EggEntryCardProps) {
 
  <div style={{ fontSize: 'var(--fs-base)', color: 'var(--text)', fontWeight: 700, letterSpacing: '.3px'}}>منبع</div>
  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
- <Row l="نوع"v={(DEAL_LABEL as any)[e.dealType]} />
+ <Row l="نوع" v={`${e.dealType === 'own' ? '🏠' : e.dealType === 'partnership' ? '🤝' : e.dealType === 'purchase' ? '💰' : e.dealType === 'rent' ? '📋' : '📦'} ${(DEAL_LABEL as any)[e.dealType]}`} />
  {e.dealType === 'own'&& (e as any).flockId && <Row l="گله"v={(flocks.find((f) =>f.id === (e as any).flockId)?.name) || '—'} />}
  {e.dealType === 'purchase'&& sellerName && <Row l="فروشنده"v={String(sellerName)} />}
  {e.dealType === 'partnership'&& partnerName && <Row l="شریک"v={String(partnerName)} />}

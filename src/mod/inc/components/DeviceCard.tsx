@@ -42,7 +42,7 @@ export default function DeviceCard({
   const w = warrantyInfo(d.purchasedAt, d.warranty);
 
   return (
-    <ExpandableCard key={d.id} id={d.id} ms={ms} accent={accentFor(d.status)} index={fmt.count(index + 1)} iconEmoji="🥚"
+    <ExpandableCard key={d.id} id={d.id} ms={ms} accent={accentFor(d.status)} index={fmt.count(index + 1)} iconEmoji="incubator"
                 title={d.name} subtitle={MODE_FA[d.mode] + ' • ' + STATUS_FA[d.status]}
                 isOpen={isOpen} onToggle={onToggle}
                 badge={activeEntries > 0 ? <Tag tone="green">{fmt.count(activeEntries)} ورودی فعال</Tag> : undefined}
