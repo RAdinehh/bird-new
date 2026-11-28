@@ -1,5 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <g data-normalized="1" transform="translate(5, 5) scale(0.921875)" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M26 26 L102 102 M102 26 L26 102" stroke="#EF4444" stroke-width="18" stroke-linecap="round"/>
+  <g data-normalized="1" transform="translate(8, 8) scale(0.875)" stroke="#1F2937" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M64 14 C34 14 18 33 18 57 C18 72 26 83 38 88 L40 108 C40.5 111.5 43.2 114 46.8 114 L81.2 114 C84.8 114 87.5 111.5 88 108 L90 88 C102 83 110 72 110 57 C110 33 94 14 64 14 Z" fill="#F9FAFB"/>
+    <circle cx="46" cy="58" r="11" fill="#1F2937"/>
+    <circle cx="82" cy="58" r="11" fill="#1F2937"/>
+    <path d="M64 68 L58 80 L70 80 Z" fill="#1F2937"/>
+    <line x1="52" y1="96" x2="52" y2="113"/>
+    <line x1="64" y1="96" x2="64" y2="113"/>
+    <line x1="76" y1="96" x2="76" y2="113"/>
   </g>
 </svg>

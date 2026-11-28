@@ -19,7 +19,7 @@ export const ICON_KEYS = [
 
 export type AppIconKey = typeof ICON_KEYS[number];
 
-export const ICON_ASSET_VERSION = 33;
+export const ICON_ASSET_VERSION = 34;
 
 /** نگاشت کلیدهای قدیمی یا مترادف به کلیدهای استاندارد برای حفظ سازگاری با داده‌های ذخیره‌شده */
 export const ICON_KEY_ALIASES: Record<string, AppIconKey> = {

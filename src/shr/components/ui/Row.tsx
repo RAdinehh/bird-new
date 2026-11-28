@@ -15,7 +15,7 @@ function extractText(node: ReactNode): string {
 function inferRowIcon(l: ReactNode): AppIconKey | null {
   const raw = extractText(l).trim();
   if (!raw) return null;
-  if (/تلفات\s*رود|تلفات/.test(raw)) return 'mortality';
+  if (/تلفات/.test(raw)) return 'mortality';
   if (/تخم\s*شکسته|شکسته/.test(raw)) return 'broken_egg';
   if (/نطفه/.test(raw)) return 'fertile_egg';
   if (/تخم\s*(خوراکی|سالم|کل)/.test(raw)) return 'egg';
@@ -23,7 +23,7 @@ function inferRowIcon(l: ReactNode): AppIconKey | null {
   if (/خرید/.test(raw)) return 'invoice';
   if (/تعمیر/.test(raw)) return 'hand_tools';
   if (/اسقاط/.test(raw)) return 'archive_box';
-  if (/^فعال$/.test(raw)) return 'equipment';
+  if (/فعال/.test(raw)) return 'equipment';
   if (/رطوبت|آب/.test(raw)) return 'water';
   if (/دما/.test(raw)) return 'climate';
   if (/دان|خوراک/.test(raw)) return 'feed';
