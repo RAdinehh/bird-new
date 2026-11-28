@@ -380,9 +380,9 @@ export const TYPE_COLORS: Record<EventType, { dot: string; bg: string; text: str
 
 export const TYPE_LABELS: Record<EventType, string> = {
   hatch: 'جوجه‌کشی',
-  vaccine: 'واکسن',
-  herbal: 'گیاهی',
+  vaccine: 'واکسن / دارو',
+  herbal: 'داروی گیاهی',
   payment: 'مالی',
-  daily: 'روزانه',
-  finance: 'سایر'
+  daily: 'ثبت روزانه',
+  finance: 'یادآوری'
 };

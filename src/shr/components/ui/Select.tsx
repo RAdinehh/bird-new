@@ -174,8 +174,9 @@ export function Select({
           ...style,
         }}
       >
-        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
-          {currentOption ? currentOption.label : "— انتخاب —"}
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
+          {currentOption?.icon ? <span style={{ display: "inline-flex", alignItems: "center", flexShrink: 0 }}>{currentOption.icon}</span> : null}
+          <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{currentOption ? currentOption.label : "— انتخاب —"}</span>
         </span>
         <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24"
           fill="none" stroke="var(--muted)" strokeWidth="2"

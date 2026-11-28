@@ -10,10 +10,10 @@ import { useFab } from '../../shr/hooks/useFab';
 const FILTERS: { id: EventType | 'all'; label: string }[] = [
   { id: 'all', label: 'همه' },
   { id: 'hatch', label: 'جوجه‌کشی' },
-  { id: 'vaccine', label: 'واکسن' },
-  { id: 'herbal', label: 'گیاهی' },
+  { id: 'vaccine', label: 'واکسن / دارو' },
+  { id: 'herbal', label: 'داروی گیاهی' },
   { id: 'payment', label: 'مالی' },
-  { id: 'daily', label: 'روزانه' }
+  { id: 'daily', label: 'ثبت روزانه' }
 ];
 
 export default function Cal() {
