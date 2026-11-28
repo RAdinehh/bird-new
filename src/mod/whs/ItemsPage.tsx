@@ -1,3 +1,5 @@
+import { CATEGORY_ICON } from './store';
+import { getWhsItemIcon } from './helpers';
 import { useFormat } from '../../shr/units/useFormat';
 import { useState, useMemo, useEffect } from 'react';
 import { VET_METHOD_LABEL } from '../../shr/constants/vetMethods';
@@ -47,6 +49,8 @@ interface F {
   id?: string;
   name: string;
   category: ItemCategory;
+  icon?: string;
+  iconManual?: boolean;
   unit: ItemUnit;
   subUnits?: { name: string; factor: number }[];
   minStock: string;
@@ -83,7 +87,7 @@ interface F {
 }
 
 const empty = (): F => ({
-  name: '', category: 'feed', unit: 'kg', subUnits: [],
+  name: '', category: 'feed', icon: '', iconManual: false, unit: 'kg', subUnits: [],
   minStock: '', initialStock: '',
   supplierId: '', expireDate: '',
   withdrawalDays: '', storage: 'room',
@@ -309,6 +313,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
       addItem({
         name: form.name.trim(),
         category: form.category,
+        icon: form.icon || getWhsItemIcon(form.name, form.category, (CATEGORY_ICON as any)[form.category]),
         unit: form.unit,
         subUnits: form.subUnits || [],
         minStock: num(form.minStock),
@@ -346,6 +351,7 @@ export default function ItemsPage({ active = true }: { active?: boolean } = {}) 
       updateItem(form.id, {
         name: form.name.trim(),
         category: form.category,
+        icon: form.icon || getWhsItemIcon(form.name, form.category, (CATEGORY_ICON as any)[form.category]),
         unit: form.unit,
         subUnits: form.subUnits || [],
         minStock: num(form.minStock),

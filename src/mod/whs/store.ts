@@ -16,6 +16,7 @@ export interface Item {
   id: string;
   name: string;
   category: ItemCategory;
+  icon?: string;
   feedType?: string;
   brand?: string;
   protein?: number | null;

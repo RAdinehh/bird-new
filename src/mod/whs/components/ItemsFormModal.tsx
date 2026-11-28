@@ -9,6 +9,7 @@ import DatePicker from '../../../shr/components/DatePicker';
 import SmartSelect from '../../../shr/components/SmartSelect';
 import { toFa } from '../../../shr/utils/fa';
 import { FieldHint } from '../../../shr/intelligence';
+import { getWhsItemIcon } from '../helpers';
 import { CATEGORY_DEFAULTS, UNIT_LABEL, CATEGORY_ICON, CATEGORY_LABEL, type ItemUnit, type ItemCategory } from '../store';
 import { ToggleChip } from '../../../shr/components/itemFormHelpers';
 import { VET_METHOD_OPTIONS } from '../../../shr/constants/vetMethods';
@@ -44,7 +45,7 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
       >
         <Grid2>
           <Field label="نام قلم" required error={showError?.('name')} onTouch={() => markTouched?.('name')}>
-            <Input placeholder="نام" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+            <Input placeholder="نام" value={form.name} onChange={e => { const nextName = e.target.value; setForm((f: any) => ({ ...f, name: nextName, icon: f.iconManual ? f.icon : getWhsItemIcon(nextName, f.category, (CATEGORY_ICON as any)[f.category]) })); }} />
           </Field>
           <Field label="تأمین‌کننده" hint="فقط فروشنده‌ها">
             <SmartSelect
@@ -60,6 +61,43 @@ export default function ItemsFormModal(props: ItemsFormModalProps) {
             />
           </Field>
         </Grid2>
+
+
+        <Field label="آیکون کالا" hint="ثابت می‌ماند و با تغییر نام حذف نمی‌شود">
+          <SmartSelect
+            value={form.icon || getWhsItemIcon(form.name, form.category, (CATEGORY_ICON as any)[form.category])}
+            modalTitle="انتخاب آیکون کالا"
+            onChange={v => setForm((f: any) => ({ ...f, icon: v, iconManual: true }))}
+            options={[
+              { value: 'corn', label: 'ذرت', icon: 'corn', group: 'دان و خوراک' },
+              { value: 'wheat', label: 'گندم', icon: 'wheat', group: 'دان و خوراک' },
+              { value: 'barley', label: 'جو', icon: 'barley', group: 'دان و خوراک' },
+              { value: 'bran', label: 'سبوس گندم', icon: 'bran', group: 'دان و خوراک' },
+              { value: 'soybean_meal', label: 'کنجاله سویا', icon: 'soybean_meal', group: 'دان و خوراک' },
+              { value: 'canola_meal', label: 'کنجاله کلزا / کانولا', icon: 'canola_meal', group: 'دان و خوراک' },
+              { value: 'sunflower_meal', label: 'کنجاله آفتابگردان', icon: 'sunflower_meal', group: 'دان و خوراک' },
+              { value: 'sesame_meal', label: 'کنجاله کنجد', icon: 'sesame_meal', group: 'دان و خوراک' },
+              { value: 'fish_meal', label: 'پودر ماهی', icon: 'fish_meal', group: 'دان و خوراک' },
+              { value: 'alfalfa', label: 'یونجه خشک', icon: 'alfalfa', group: 'دان و خوراک' },
+              { value: 'oil', label: 'روغن', icon: 'oil', group: 'دان و خوراک' },
+              { value: 'feed', label: 'خوراک آماده / کنسانتره', icon: 'feed', group: 'دان و خوراک' },
+              { value: 'premix', label: 'پرمیکس / ویتامین', icon: 'premix', group: 'مکمل و مواد معدنی' },
+              { value: 'amino_acid', label: 'اسید آمینه (لیزین / متیونین)', icon: 'amino_acid', group: 'مکمل و مواد معدنی' },
+              { value: 'calcium_powder', label: 'کلسیم / دی‌کلسیم فسفات', icon: 'calcium_powder', group: 'مکمل و مواد معدنی' },
+              { value: 'oyster_shell', label: 'پودر صدف', icon: 'oyster_shell', group: 'مکمل و مواد معدنی' },
+              { value: 'calcium_bicarbonate', label: 'جوش شیرین / بی‌کربنات', icon: 'calcium_bicarbonate', group: 'مکمل و مواد معدنی' },
+              { value: 'rock_salt', label: 'سنگ نمک', icon: 'rock_salt', group: 'مکمل و مواد معدنی' },
+              { value: 'salt', label: 'نمک طعام', icon: 'salt', group: 'مکمل و مواد معدنی' },
+              { value: 'meds', label: 'دارو', icon: 'meds', group: 'بهداشت و درمان' },
+              { value: 'vet_injection', label: 'واکسن / تزریقی', icon: 'vet_injection', group: 'بهداشت و درمان' },
+              { value: 'herbal', label: 'گیاه دارویی', icon: 'herbal', group: 'بهداشت و درمان' },
+              { value: 'equipment', label: 'تجهیزات', icon: 'equipment', group: 'سایر' },
+              { value: 'inventory', label: 'مصرفی / عمومی', icon: 'inventory', group: 'سایر' },
+              { value: 'egg', label: 'تخم مرغ / نطفه‌دار', icon: 'egg', group: 'سایر' },
+              { value: 'manure', label: 'کود', icon: 'manure', group: 'سایر' },
+            ]}
+          />
+        </Field>
 
         <Grid2>
           <Field label="دسته" required error={showError?.('category')} onTouch={() => markTouched?.('category')}>

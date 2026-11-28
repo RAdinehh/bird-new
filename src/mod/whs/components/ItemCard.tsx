@@ -80,7 +80,7 @@ export default function ItemCard(props: ItemCardProps) {
 
   return (
     <ExpandableCard key={it.id} id={it.id} ms={ms} accent={accent} index={fmt.count(i + 1)}
-      iconEmoji={getWhsItemIcon(it.name, it.category, (CATEGORY_ICON as any)[it.category])} title={it.name}
+      iconEmoji={it.icon || getWhsItemIcon(it.name, it.category, (CATEGORY_ICON as any)[it.category])} title={it.name}
       subtitle={`${(CATEGORY_LABEL as any)[it.category]} • ${formatQty(it.currentStock, it.unit)}`}
       isOpen={isOpen} onToggle={onToggle}
       badge={
