@@ -263,7 +263,7 @@ export default function EggEntryModal(props: EggEntryModalProps) {
               value={currentRow.dealData.partnerId || ''}
               placeholder="— انتخاب شریک —"
               modalTitle="انتخاب شریک"
-              options={allPersons.map((p) => ({ value: String(p.id), label: String(p.name), icon: '🤝' }))}
+              options={allPersons.map((p) => ({ value: String(p.id), label: String(p.name), icon: '👤' }))}
               onChange={(val: string) => setD('partnerId', val)}
             />
           </Field>
