@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../shr/components/OptionIcon';
 import { getGlobalFormat } from '../../shr/units/useFormat';
 import { Btn } from '../../shr/components/ui';
 import { exportTableToCSV, printHTML, printTemplate } from '../../shr/utils/export';
@@ -182,15 +183,15 @@ export default function ExportButtons() {
         display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)'
       }}>
         <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>
-          📊 خروجی Excel (CSV)
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="stats" size={16} /><span>خروجی Excel (CSV)</span></span>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-          <Btn size="sm" onClick={exportSales}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📥</span> فروش</Btn>
-          <Btn size="sm" onClick={exportPurchases}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📤</span> خرید</Btn>
-          <Btn size="sm" onClick={exportEggs}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🥚</span> تخم‌گذاری</Btn>
-          <Btn size="sm" onClick={exportFlocks}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🐔</span> گله‌ها</Btn>
-          <Btn size="sm" onClick={exportContacts}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>👥</span> مخاطبین</Btn>
-          <Btn size="sm" onClick={exportDailyLogs}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📋</span> ثبت روزانه</Btn>
+          <Btn size="sm" onClick={exportSales}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="cash" size={15} /><span>فروش</span></span></Btn>
+          <Btn size="sm" onClick={exportPurchases}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="invoice" size={15} /><span>خرید</span></span></Btn>
+          <Btn size="sm" onClick={exportEggs}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="egg" size={15} /><span>تخم‌گذاری</span></span></Btn>
+          <Btn size="sm" onClick={exportFlocks}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="flock" size={15} /><span>گله‌ها</span></span></Btn>
+          <Btn size="sm" onClick={exportContacts}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="flock" size={15} /><span>مخاطبین</span></span></Btn>
+          <Btn size="sm" onClick={exportDailyLogs}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="📋" size={15} /><span>ثبت روزانه</span></span></Btn>
         </div>
         <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
           فایل‌های CSV در Excel و Google Sheets باز می‌شوند
@@ -205,7 +206,7 @@ export default function ExportButtons() {
         display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)'
       }}>
         <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)' }}>
-          📄 خروجی PDF
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="export_doc" size={16} /><span>خروجی PDF</span></span>
         </div>
         <Btn variant="primary" full onClick={exportSummaryPDF}>
           📄 گزارش کلی PDF

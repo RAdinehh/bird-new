@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../shr/components/OptionIcon';
 import { useFormat, getGlobalFormat } from '../../shr/units/useFormat';
 import { useMemo } from 'react';
 import { useTra } from '../tra/store';
@@ -30,7 +31,7 @@ function ParetoCard({ invoices }: { invoices: any[] }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 'var(--pad-comfy)', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)' }}>
-      <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📊</span> تحلیل Pareto — اقلام پرهزینه</div>
+      <div style={{ fontSize: 'var(--fs-md)', fontWeight: 700 }}><span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="stats" size={16} /><span>تحلیل Pareto — اقلام پرهزینه</span></span></div>
       <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', lineHeight: 1.7 }}>
         {getGlobalFormat().count(top80.length)} قلم اول = حدود ۸۰٪ کل خرید
       </div>
@@ -137,7 +138,7 @@ export default function FinancialPage() {
           {receivables > 0 ? (
             <div style={{ padding: 'var(--pad-comfy)', background: 'var(--accent-soft)',
                border: '1px solid var(--accent-border)', borderRadius: 'var(--r-md)' }}>
-              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📥</span> طلب از مشتریان</div>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent)', fontWeight: 700 }}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="cash" size={15} /><span>طلب از مشتریان</span></span></div>
               <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--accent)', marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
                 {fmt.money(receivables, { withUnit: false })}
               </div>
@@ -146,7 +147,7 @@ export default function FinancialPage() {
           ) : null}
           {payables > 0 ? (
             <div style={{ padding: 'var(--pad-comfy)', background: 'var(--warn-soft)', border: '1px solid var(--warn)', borderRadius: 'var(--r-md)' }}>
-              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>📤</span> بدهی به فروشندگان</div>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn)', fontWeight: 700 }}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="invoice" size={15} /><span>بدهی به فروشندگان</span></span></div>
               <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--warn)', marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
                 {fmt.money(payables, { withUnit: false })}
               </div>
@@ -157,22 +158,22 @@ export default function FinancialPage() {
       ) : null}
 
       {/* نمودار فروش */}
-      <Section title="📊 فروش ۶ ماه اخیر">
+      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="stats" size={16} /><span>فروش ۶ ماه اخیر</span></span>}>
         <BarChart data={salesData} color="var(--accent)" />
       </Section>
 
       {/* نمودار خرید */}
-      <Section title="📊 خرید ۶ ماه اخیر">
+      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="invoice" size={16} /><span>خرید ۶ ماه اخیر</span></span>}>
         <BarChart data={purchaseData} color="var(--warn)" />
       </Section>
 
       {/* جریان نقدی */}
-      <Section title="💵 جریان نقدی">
+      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="cash" size={16} /><span>جریان نقدی</span></span>}>
         <DualBarChart data={cashData} colorA="var(--accent)" colorB="var(--danger)" labelA="دریافت" labelB="پرداخت" />
       </Section>
 
       {/* روند سود */}
-      <Section title="📈 روند سود">
+      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="stats" size={16} /><span>روند سود</span></span>}>
         <LineChart
           data={months.map(m => ({
             label: monthLabel(m),
@@ -184,14 +185,14 @@ export default function FinancialPage() {
 
       {/* سهم دسته‌ها */}
       {catSales.length > 0 ? (
-        <Section title="🎯 سهم دسته‌ها در فروش">
+        <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="target" size={16} /><span>سهم دسته‌ها در فروش</span></span>}>
           <PieChart data={catSales} />
         </Section>
       ) : null}
 
       {/* خروجی‌ها */}
       <div style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', padding: '4px 4px 8px' }}>
-        📤 خروجی گرفتن
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="export_doc" size={16} /><span>خروجی گرفتن</span></span>
       </div>
       <ExportButtons />
     </PageContainer>

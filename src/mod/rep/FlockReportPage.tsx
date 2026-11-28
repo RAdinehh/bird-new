@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../shr/components/OptionIcon';
 import { useFormat } from '../../shr/units/useFormat';
 import { useMemo } from 'react';
 import { useFlk, getAgeDays, getLifecycle } from '../flk/store';
@@ -164,32 +165,32 @@ export default function FlockReportPage() {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-            <StatCard label="🥚 تخم کل" value={fmt.count(d.totalEggs)} color="accent" />
-            <StatCard label="💀 مرگ‌ومیر" value={fmt.code(d.mortality.toFixed(1)) + '٪'} color="danger" />
-            <StatCard label="📊 Hen-Day" value={fmt.code(d.avgHenDay.toFixed(1)) + '٪'} color="info" />
-            <StatCard label="🌾 دان مصرفی" value={fmt.num(d.totalFeed) + ' kg'} color="warn" />
-            {d.avgBroken > 0 ? <StatCard label="💔 شکسته" value={fmt.code(d.avgBroken.toFixed(1)) + '٪'} color="warn" /> : null}
-            <StatCard label="📋 رکوردها" value={fmt.count(d.productionsCount + d.logsCount)} color="accent" />
+            <StatCard icon="egg" label="تخم کل" value={fmt.count(d.totalEggs)} color="accent" />
+            <StatCard icon="mortality" label="مرگ‌ومیر" value={fmt.code(d.mortality.toFixed(1)) + '٪'} color="danger" />
+            <StatCard icon="stats" label="Hen-Day" value={fmt.code(d.avgHenDay.toFixed(1)) + '٪'} color="info" />
+            <StatCard icon="feed" label="دان مصرفی" value={fmt.num(d.totalFeed) + ' kg'} color="warn" />
+            {d.avgBroken > 0 ? <StatCard icon="broken" label="شکسته" value={fmt.code(d.avgBroken.toFixed(1)) + '٪'} color="warn" /> : null}
+            <StatCard icon="📋" label="رکوردها" value={fmt.count(d.productionsCount + d.logsCount)} color="accent" />
           </div>
         </div>
       ))}
 
       {flockData.length > 1 ? (
         <>
-          <Section title="🥚 مقایسه تخم‌گذاری گله‌ها">
+          <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="egg" size={16} /><span>مقایسه تخم‌گذاری گله‌ها</span></span>}>
             <BarChart data={eggsChart} color="var(--accent)" />
           </Section>
 
-          <Section title="💀 مقایسه مرگ‌ومیر">
+          <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="mortality" size={16} /><span>مقایسه مرگ‌ومیر</span></span>}>
             <BarChart data={mortalityChart} color="var(--danger)" />
           </Section>
 
-          <Section title="📊 مقایسه Hen-Day">
+          <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="stats" size={16} /><span>مقایسه Hen-Day</span></span>}>
             <BarChart data={henDayChart} color="var(--accent)" />
           </Section>
         </>
       ) : null}
-          <Section title="📤 خروجی CSV">
+          <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="export_doc" size={16} /><span>خروجی CSV</span></span>}>
         <Btn full variant="primary" onClick={() => {
           const headers = ['گله', 'نوع', 'تعداد', 'تخم کل', 'مرگ‌ومیر٪', 'Hen-Day٪', 'دان (kg)', 'شکسته٪', 'رکوردها'];
           const rows = flockData.map(d => [

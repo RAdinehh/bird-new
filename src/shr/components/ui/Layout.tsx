@@ -45,7 +45,7 @@ export function SectionTitle({ children, first }: { children: React.ReactNode; f
  * استفاده در گزارش‌ها، تنظیمات، AboutTab
  * برای LogCard/StatsCard به LogSection/StatsCard ماژول خودشان مراجعه کن
  */
-export function Section({ title, children }: { title: string; children: React.ReactNode }) {
+export function Section({ title, children }: { title: React.ReactNode; children: React.ReactNode }) {
   return (
     <div style={{
       background: 'var(--card)',

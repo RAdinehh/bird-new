@@ -1,3 +1,4 @@
+import { OptionIcon } from '../../shr/components/OptionIcon';
 import { useFormat } from '../../shr/units/useFormat';
 import { useMemo } from 'react';
 import { useEgg } from '../egg/store';
@@ -100,9 +101,9 @@ export default function ProductionPage() {
       />
       {/* ۳ کارت اصلی */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
-        <StatCard label="🥚 تخم کل" value={totalEggs} unit="عدد" color="accent" />
-        <StatCard label="🌾 دان کل" value={totalFeed} unit="kg" color="warn" />
-        <StatCard label="💀 تلفات" value={totalDeaths} unit="پرنده" color="danger" />
+        <StatCard icon="egg" label="تخم کل" value={totalEggs} unit="عدد" color="accent" />
+        <StatCard icon="feed" label="دان کل" value={totalFeed} unit="kg" color="warn" />
+        <StatCard icon="mortality" label="تلفات" value={totalDeaths} unit="پرنده" color="danger" />
       </div>
 
       {/* میانگین روزانه */}
@@ -124,30 +125,30 @@ export default function ProductionPage() {
       ) : null}
 
       {/* نمودار تخم */}
-      <Section title="🥚 تولید تخم ۶ ماه">
+      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="egg" size={16} /><span>تولید تخم ۶ ماه</span></span>}>
         <BarChart data={eggData} color="var(--accent)" />
       </Section>
 
       {/* نمودار دان */}
-      <Section title="🌾 مصرف دان ۶ ماه">
+      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="feed" size={16} /><span>مصرف دان ۶ ماه</span></span>}>
         <BarChart data={feedData} color="var(--warn)" />
       </Section>
 
       {/* مقایسه تخم و دان */}
-      <Section title="📊 مقایسه تخم و دان">
+      <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="stats" size={16} /><span>مقایسه تخم و دان</span></span>}>
         <DualBarChart data={productionVsFeed} colorA="var(--accent)" colorB="var(--warn)" labelA="تخم" labelB="دان (kg)" />
       </Section>
 
       {/* Hen-Day */}
       {henDayData.some(d => d.value > 0) ? (
-        <Section title="📈 نرخ تخم‌گذاری (Hen-Day)">
+        <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="stats" size={16} /><span>نرخ تخم‌گذاری (Hen-Day)</span></span>}>
           <LineChart data={henDayData} color="var(--accent)" />
         </Section>
       ) : null}
 
       {/* FCR */}
       {fcrData.some(d => d.value > 0) ? (
-        <Section title="⚖ FCR (ضریب تبدیل)">
+        <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="compare" size={16} /><span>FCR (ضریب تبدیل)</span></span>}>
           <LineChart data={fcrData} color="var(--accent)" />
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', textAlign: 'center', marginTop: 4 }}>
             محاسبه: دان مصرفی / وزن تخم‌های تولیدی
@@ -157,11 +158,11 @@ export default function ProductionPage() {
 
       {/* نمودار تلفات */}
       {totalDeaths > 0 ? (
-        <Section title="💀 تلفات ۶ ماه">
+        <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="mortality" size={16} /><span>تلفات ۶ ماه</span></span>}>
           <BarChart data={deathData} color="var(--danger)" />
         </Section>
       ) : null}
-          <Section title="📤 خروجی CSV">
+          <Section title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="export_doc" size={16} /><span>خروجی CSV</span></span>}>
         <Btn full variant="primary" onClick={() => {
           const headers = ['ماه', 'تخم سالم', 'دان (kg)', 'تلفات'];
           const rows = months.map(m => {
