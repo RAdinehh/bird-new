@@ -53,19 +53,29 @@ export default function DeviceFormModal(props: DeviceFormModalProps) {
         </Field>
         <Grid2>
           <Field label="حالت" required>
-            <Select value={form.mode} onChange={e => setForm({...form, mode: e.target.value as DeviceMode})}>
-              <option value="setter">ستر</option>
-              <option value="hatcher">هچر</option>
-              <option value="setter+hatcher">ستر + هچر</option>
-            </Select>
+            <SmartSelect
+              value={form.mode}
+              modalTitle="حالت دستگاه"
+              options={[
+                { value: 'setter', label: 'ستر', subtitle: 'دوره انکوباسیون و چرخش', icon: 'incubator' },
+                { value: 'hatcher', label: 'هچر', subtitle: 'دوره قفل و خروج جوجه', icon: 'hatch' },
+                { value: 'setter+hatcher', label: 'ستر + هچر', subtitle: 'ترکیبی (کل دوره)', icon: 'egg_tray' },
+              ]}
+              onChange={v => setForm({...form, mode: v as DeviceMode})}
+            />
           </Field>
           <Field label="وضعیت" required>
-            <Select value={form.status} onChange={e => setForm({...form, status: e.target.value as DeviceStatus})}>
-              <option value="active">✅ فعال</option>
-              <option value="idle">غیرفعال</option>
-              <option value="maintenance"><span style={{ fontSize: '1.05em', lineHeight: 1, display: 'inline-block', marginLeft: 4 }}>🔧</span> تعمیر</option>
-              <option value="broken">❌ خراب</option>
-            </Select>
+            <SmartSelect
+              value={form.status}
+              modalTitle="وضعیت دستگاه"
+              options={[
+                { value: 'active', label: 'فعال', icon: '✅' },
+                { value: 'idle', label: 'غیرفعال', icon: '⏸️' },
+                { value: 'maintenance', label: 'در حال تعمیر', icon: 'hand_tools' },
+                { value: 'broken', label: 'خراب', icon: '❌' },
+              ]}
+              onChange={v => setForm({...form, status: v as DeviceStatus})}
+            />
           </Field>
         </Grid2>
 
@@ -124,11 +134,16 @@ export default function DeviceFormModal(props: DeviceFormModalProps) {
         </Grid2>
         <Grid2>
           <Field label="وضعیت چرخش">
-            <Select value={form.turningCurrent} onChange={e => setForm({...form, turningCurrent: e.target.value})}>
-              <option value="auto">🤖 خودکار</option>
-              <option value="on">🔄 روشن</option>
-              <option value="off">⏸ قطع</option>
-            </Select>
+            <SmartSelect
+              value={form.turningCurrent}
+              modalTitle="وضعیت چرخش"
+              options={[
+                { value: 'auto', label: 'خودکار', icon: '🤖' },
+                { value: 'on', label: 'روشن', icon: '🔄' },
+                { value: 'off', label: 'قطع', icon: '⏸️' },
+              ]}
+              onChange={v => setForm({...form, turningCurrent: v})}
+            />
           </Field>
           <Field label="رطوبت فعلی">
             <NumField placeholder="۰" value={form.humidity} onChange={e => setForm({...form, humidity: e.target.value})} unit="٪" min={30} max={90} />

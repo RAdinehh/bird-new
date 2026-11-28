@@ -72,11 +72,16 @@ export default function FlockCreateModal(props: FlockCreateModalProps) {
       </Field>
       <Grid2>
         <Field label="نوع" required>
-          <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}>
-            <option value="layer">تخم‌گذار</option>
-            <option value="broiler">گوشتی</option>
-            <option value="breeder">مادر</option>
-          </Select>
+          <SmartSelect
+            value={form.type}
+            modalTitle="انتخاب نوع گله"
+            options={[
+              { value: 'layer', label: 'تخم‌گذار', icon: '🥚' },
+              { value: 'broiler', label: 'گوشتی', icon: '🥩' },
+              { value: 'breeder', label: 'مادر', icon: '🐣' },
+            ]}
+            onChange={v => setForm({ ...form, type: v })}
+          />
         </Field>
         <Field label="تعداد">
           <Input placeholder="۰" value={String(count || 0)} readOnly dir="ltr" unit="پرنده" />
@@ -84,24 +89,23 @@ export default function FlockCreateModal(props: FlockCreateModalProps) {
       </Grid2>
       <Grid2>
         <Field label="سالن">
-          <Select
+          <SmartSelect
             value={form.hallId}
-            onChange={e => setForm({ ...form, hallId: e.target.value, zoneId: '' })}
-          >
-            <option value="">—</option>
-            {halls.map(h => <option key={h.id} value={h.id}>{h.name}</option>)}
-          </Select>
+            placeholder="— انتخاب سالن —"
+            modalTitle="انتخاب سالن"
+            options={halls.map(h => ({ value: h.id, label: h.name, icon: 'hall' }))}
+            onChange={v => setForm({ ...form, hallId: v, zoneId: '' })}
+          />
         </Field>
         <Field label="بخش">
-          <Select
+          <SmartSelect
             value={form.zoneId}
             disabled={!form.hallId}
-            onChange={e => setForm({ ...form, zoneId: e.target.value })}
-          >
-            <option value="">—</option>
-            {zones.filter(z => !form.hallId || z.hallId === form.hallId)
-              .map(z => <option key={z.id} value={z.id}>{z.name}</option>)}
-          </Select>
+            placeholder="— انتخاب بخش —"
+            modalTitle="انتخاب بخش"
+            options={zones.filter(z => !form.hallId || z.hallId === form.hallId).map(z => ({ value: z.id, label: z.name, icon: 'zone' }))}
+            onChange={v => setForm({ ...form, zoneId: v })}
+          />
         </Field>
       </Grid2>
 

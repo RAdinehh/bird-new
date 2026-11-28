@@ -167,20 +167,30 @@ export default function CandlingEntryRow(props: CandlingEntryRowProps) {
 
           <Grid2>
             <Field label="دلیل بی‌نطفه">
-              <Select
+              <SmartSelect
                 value={d.infertileReason}
-                onChange={ev => onUpdate({ infertileReason: ev.target.value })}
-              >
-                {INFERTILE_REASONS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-              </Select>
+                placeholder="— انتخاب —"
+                modalTitle="دلیل بی‌نطفه"
+                options={INFERTILE_REASONS.map(([v, l]) => {
+                  const t = String(v + " " + l);
+                  const icon = !v ? '' : /فصل|season/i.test(t) ? '🗓️' : /خروس|نر|male/i.test(t) ? 'sex_male' : /تغذیه|nutr/i.test(t) ? 'feed' : /ژنتیک|gene/i.test(t) ? '🧬' : /نگهداری|انبار|stor/i.test(t) ? 'egg_tray' : 'candling';
+                  return { value: v, label: l, icon: icon || undefined };
+                })}
+                onChange={v => onUpdate({ infertileReason: v })}
+              />
             </Field>
             <Field label="دلیل مرگ">
-              <Select
+              <SmartSelect
                 value={d.deadReason}
-                onChange={ev => onUpdate({ deadReason: ev.target.value })}
-              >
-                {DEAD_REASONS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-              </Select>
+                placeholder="— انتخاب —"
+                modalTitle="دلیل مرگ جنین"
+                options={DEAD_REASONS.map(([v, l]) => {
+                  const t = String(v + " " + l);
+                  const icon = !v ? '' : /دما|temp/i.test(t) ? 'climate' : /رطوبت|humid/i.test(t) ? 'water' : /تهویه|vent/i.test(t) ? 'ventilation' : /ژنتیک|gene/i.test(t) ? '🧬' : /عفونت|بیماری|infect/i.test(t) ? 'cause_disease' : /چرخش|turn/i.test(t) ? 'incubator' : 'cause_weakness';
+                  return { value: v, label: l, icon: icon || undefined };
+                })}
+                onChange={v => onUpdate({ deadReason: v })}
+              />
             </Field>
           </Grid2>
         </>

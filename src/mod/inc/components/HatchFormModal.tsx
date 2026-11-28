@@ -81,17 +81,21 @@ export default function HatchFormModal(props: HatchFormModalProps) {
 
       {editingId ? (
         <Field label="ورودی تخم" required>
-          <Select value={formEntryId} onChange={e => setFormEntryId(e.target.value)}>
-            {eggEntries.map(e => {
+          <SmartSelect
+            value={formEntryId}
+            modalTitle="انتخاب ورودی تخم"
+            options={eggEntries.map(e => {
               const bird = birdsById[e.birdId];
               const dev = devicesById[e.deviceId];
-              return (
-                <option key={e.id} value={e.id}>
-                  {bird?.name || '—'} • {fmt.date(e.entryDate)} • {fmt.count(e.count || 0)} تخم • {dev?.name || ''}
-                </option>
-              );
+              return {
+                value: e.id,
+                label: (bird?.name || '—') + ' • ' + fmt.count(e.count || 0) + ' تخم',
+                subtitle: fmt.date(e.entryDate) + ' • ' + (dev?.name || ''),
+                icon: 'fertile_egg',
+              };
             })}
-          </Select>
+            onChange={v => setFormEntryId(v)}
+          />
         </Field>
       ) : (
         <>
@@ -99,10 +103,13 @@ export default function HatchFormModal(props: HatchFormModalProps) {
             label="فیلتر دستگاه"
             hint={selectedIds.size > 0 ? fmt.count(selectedIds.size) + ' انتخاب‌شده' : undefined}
           >
-            <Select value={deviceFilter} onChange={e => setDeviceFilter(e.target.value)}>
-              <option value="">— همه دستگاه‌ها —</option>
-              {devices.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-            </Select>
+            <SmartSelect
+              value={deviceFilter}
+              placeholder="— همه دستگاه‌ها —"
+              modalTitle="فیلتر دستگاه"
+              options={[{ value: '', label: 'همه دستگاه‌ها', icon: 'incubator' }, ...devices.map(d => ({ value: d.id, label: d.name, icon: 'incubator' }))]}
+              onChange={v => setDeviceFilter(v)}
+            />
           </Field>
 
           {availableEntries.length === 0 ? (

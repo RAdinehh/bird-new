@@ -57,13 +57,13 @@ export default function SellModal(props: SellModalProps) {
             مخاطبی نیست
           </div>
         ) : (
-          <Select
+          <SmartSelect
             value={form.buyerId}
-            onChange={e => setForm({ ...form, buyerId: e.target.value })}
-          >
-            <option value="">— انتخاب خریدار —</option>
-            {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </Select>
+            placeholder="— انتخاب خریدار —"
+            modalTitle="انتخاب خریدار"
+            options={customers.map(c => ({ value: c.id, label: c.name, icon: '👤' }))}
+            onChange={v => setForm({ ...form, buyerId: v })}
+          />
         )}
       </Field>
       <Grid2>
