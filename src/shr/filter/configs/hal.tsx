@@ -140,7 +140,7 @@ export function getHalEquipmentConfig(ctx: {
         icon: <IconActivity size={18} />,
         options: Object.entries(STATUS_LABELS as Record<string, { icon: string; name: string }>).map(([k, v]) => ({
           value: k,
-          label: `${v.icon} ${v.name}`,
+          label: v.name,
         })),
         getValue: (e: Equipment) => e.status || 'active',
       },
@@ -157,7 +157,7 @@ export function getHalEquipmentConfig(ctx: {
         icon: <IconFolder size={18} />,
         options: Object.entries((CATEGORY_LABELS || {}) as Record<string, { icon: string; name: string }>).map(([k, v]) => ({
           value: k,
-          label: `${v.icon} ${v.name}`,
+          label: v.name,
         })),
         getValue: (e: Equipment) => e.category || '',
         multi: true,

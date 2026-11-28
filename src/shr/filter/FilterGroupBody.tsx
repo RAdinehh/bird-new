@@ -1,4 +1,3 @@
-import { OptionIcon } from '../components/OptionIcon';
 import type { ReactNode, CSSProperties } from 'react';
 import { Input } from '../components/ui';
 import DatePicker from '../components/DatePicker';
@@ -83,12 +82,12 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter, filterS
                     overflow: 'hidden',
                     transition: 'all var(--dur-fast) var(--ease-out)',
                   }}>
-                  {o.icon && (
+                  {o.icon && typeof o.icon !== 'string' && (
                     <span style={{
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                       flexShrink: 0,
                       fontSize: typeof o.icon === 'string' ? 'var(--fs-md)' : undefined,
-                    }}><OptionIcon icon={o.icon} size={16} /></span>
+                    }}>{o.icon}</span>
                   )}
                   <span style={{
                     overflow: 'hidden', textOverflow: 'ellipsis',
@@ -118,7 +117,7 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter, filterS
                   key={o.value}
                   active={active}
                   multi={isMulti}
-                  icon={o.icon}
+                  icon={typeof o.icon === 'string' ? undefined : o.icon}
                   label={o.label}
                   onClick={() => {
                     if (isMulti) {
@@ -155,10 +154,10 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter, filterS
                   }
                 }}
                 style={chipIn(active)}>
-                {o.icon && <span style={{
+                {o.icon && typeof o.icon !== 'string' && <span style={{
                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: typeof o.icon === 'string' ? 'var(--fs-base)' : undefined,
-                }}><OptionIcon icon={o.icon} size={16} /></span>}
+                }}>{o.icon}</span>}
                 <span>{o.label}</span>
               </button>
             );

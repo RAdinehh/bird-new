@@ -1,4 +1,3 @@
-import { OptionIcon } from '../components/OptionIcon';
 /**
  * filter/FilterBar.tsx — نوار فیلتر و مرتب‌سازی مرکزی
  * طراحی: Tabs بین گروه‌ها + ردیف‌های بلند + بدون گرادیانت
@@ -311,10 +310,10 @@ export function FilterBar<T>({
                   fontFamily: 'inherit', cursor: 'pointer',
                   whiteSpace: 'nowrap',
                 }}>
-                {c.icon && <span style={{
+                {c.icon && typeof c.icon !== 'string' && <span style={{
                   display: 'inline-flex', alignItems: 'center',
                   fontSize: typeof c.icon === 'string' ? 12 : undefined,
-                }}><OptionIcon icon={c.icon} size={14} /></span>}
+                }}>{c.icon}</span>}
                 <span>{c.text}</span>
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -340,13 +339,13 @@ export function FilterBar<T>({
                   display: 'flex', alignItems: 'center', gap: 8,
                   padding: '5px 2px',
                 }}>
-                  {def.icon && (
+                  {def.icon && typeof def.icon !== 'string' && (
                     <span style={{
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                       flexShrink: 0,
                       fontSize: typeof def.icon === 'string' ? 16 : undefined,
                       color: cnt > 0 ? 'var(--accent)' : 'var(--muted)',
-                    }}><OptionIcon icon={def.icon} size={16} /></span>
+                    }}>{def.icon}</span>
                   )}
                   <span style={{
                     flex: 1, fontSize: 'var(--fs-base)', fontWeight: 700,
@@ -457,14 +456,14 @@ export function FilterBar<T>({
                     textAlign: 'right',
                     transition: 'all var(--dur-fast) var(--ease-out)',
                   }}>
-                  {def.icon && (
+                  {def.icon && typeof def.icon !== 'string' && (
                     <span style={{
                       width: 30, height: 30, borderRadius: 'var(--r-md)',
                       background: isActive ? 'var(--accent)' : 'var(--input-bg)',
                       color: isActive ? 'var(--avatar-text)' : 'var(--muted)',
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                       flexShrink: 0,
-                    }}><OptionIcon icon={def.icon} size={16} /></span>
+                    }}>{def.icon}</span>
                   )}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{
