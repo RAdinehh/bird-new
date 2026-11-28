@@ -1,5 +1,6 @@
 import { OptionIcon } from '../../../shr/components/OptionIcon';
-import { resolveCategoryIconKey, resolveAlertIconKey } from '../../../shr/components/uiIconRegistry';
+import { resolveCategoryIconKey } from '../../../shr/components/uiIconRegistry';
+import { resolveAlertIcon } from '../resolveAlertIcon';
 /**
  * AlertTabPanel — محتوای یک تب از هشدارها (carousel)
  */
@@ -157,7 +158,7 @@ export default function AlertTabPanel({ tab, active: isActive }: Props) {
                 key={a.id}
                 accent={accent}
                 index={fmt.count(i + 1)}
-                iconEmoji={resolveAlertIconKey(a)}
+                iconEmoji={resolveAlertIcon(a)}
                 title={a.title}
                 subtitle={CATEGORY_LABEL[a.category] + ' • ' + fmt.date(a.date)}
                 isOpen={isOpen}
