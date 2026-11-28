@@ -763,17 +763,13 @@ export default function FlockComparisonPanel({
           </CardSection>
 
           <CardSection
-            title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon="export_report" size={18} /><span>خروجی گزارش</span></span>}
+            title={<span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><OptionIcon icon={resolveCategoryIconKey('export', 'report')} size={18} /><span>خروجی گزارش</span></span>}
             meta={`${fmt.count(orderedCandidates.length)} از ${fmt.count(MAX_FLOCKS)} گله`}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                <Btn size="sm" variant="primary" disabled={!canCompare} onClick={handleExportCSV}>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="export_report" size={15} /><span><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="export_report" size={16} /><span><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon={resolveCategoryIconKey('export', 'csv')} size={16} /><span>خروجی CSV</span></span></span></span></span></span>
-                </Btn>
-                <Btn size="sm" variant="primary" disabled={!canCompare} onClick={handleExportPDF}>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="export_report" size={15} /><span><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon="export_report" size={16} /><span><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon={resolveCategoryIconKey('export', 'pdf')} size={16} /><span>خروجی PDF</span></span></span></span></span></span>
-                </Btn>
+                <Btn size="sm" variant="primary" disabled={!canCompare} onClick={handleExportCSV}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon={resolveCategoryIconKey('export', 'csv')} size={16} /><span>خروجی CSV</span></span></Btn>
+                <Btn size="sm" variant="primary" disabled={!canCompare} onClick={handleExportPDF}><span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><OptionIcon icon={resolveCategoryIconKey('export', 'pdf')} size={16} /><span>خروجی PDF</span></span></Btn>
               </div>
             </div>
           </CardSection>
