@@ -1,3 +1,4 @@
+import { OptionIcon } from '../components/OptionIcon';
 import type { ReactNode, CSSProperties } from 'react';
 import { Input } from '../components/ui';
 import DatePicker from '../components/DatePicker';
@@ -87,7 +88,7 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter, filterS
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                       flexShrink: 0,
                       fontSize: typeof o.icon === 'string' ? 'var(--fs-md)' : undefined,
-                    }}>{o.icon}</span>
+                    }}><OptionIcon icon={o.icon} size={16} /></span>
                   )}
                   <span style={{
                     overflow: 'hidden', textOverflow: 'ellipsis',
@@ -157,7 +158,7 @@ export function FilterGroupBody<T>({ def, value, setFilter, clearFilter, filterS
                 {o.icon && <span style={{
                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: typeof o.icon === 'string' ? 'var(--fs-base)' : undefined,
-                }}>{o.icon}</span>}
+                }}><OptionIcon icon={o.icon} size={16} /></span>}
                 <span>{o.label}</span>
               </button>
             );

@@ -1,3 +1,4 @@
+import { OptionIcon } from './OptionIcon';
 import { useState, useEffect } from 'react';
 import { useSet } from '../../mod/set/store';
 
@@ -127,7 +128,7 @@ export default function HelpBanner({
           color: c.fg,
         }}
       >
-        <span aria-hidden="true">{icon || c.icon}</span>
+        <OptionIcon icon={icon || c.icon} size={18} />
         <span>{title}</span>
       </div>
 

@@ -1,3 +1,4 @@
+import { OptionIcon } from '../components/OptionIcon';
 /**
  * filter/FilterBar.tsx — نوار فیلتر و مرتب‌سازی مرکزی
  * طراحی: Tabs بین گروه‌ها + ردیف‌های بلند + بدون گرادیانت
@@ -313,7 +314,7 @@ export function FilterBar<T>({
                 {c.icon && <span style={{
                   display: 'inline-flex', alignItems: 'center',
                   fontSize: typeof c.icon === 'string' ? 12 : undefined,
-                }}>{c.icon}</span>}
+                }}><OptionIcon icon={c.icon} size={14} /></span>}
                 <span>{c.text}</span>
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -345,7 +346,7 @@ export function FilterBar<T>({
                       flexShrink: 0,
                       fontSize: typeof def.icon === 'string' ? 16 : undefined,
                       color: cnt > 0 ? 'var(--accent)' : 'var(--muted)',
-                    }}>{def.icon}</span>
+                    }}><OptionIcon icon={def.icon} size={16} /></span>
                   )}
                   <span style={{
                     flex: 1, fontSize: 'var(--fs-base)', fontWeight: 700,
@@ -463,7 +464,7 @@ export function FilterBar<T>({
                       color: isActive ? 'var(--avatar-text)' : 'var(--muted)',
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                       flexShrink: 0,
-                    }}>{def.icon}</span>
+                    }}><OptionIcon icon={def.icon} size={16} /></span>
                   )}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{
